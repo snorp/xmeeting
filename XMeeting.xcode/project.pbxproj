@@ -7,6 +7,9 @@
 	objects = {
 		080E96DDFE201D6D7F000001 = {
 			children = (
+				D163336307A01BD5003FD9C0,
+				D163336407A01BD5003FD9C0,
+				D163333C07A01A8B003FD9C0,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -44,6 +47,10 @@
 		1058C7A0FEA54F0111CA2CBB = {
 			children = (
 				1058C7A1FEA54F0111CA2CBB,
+				D16333ED07A020FF003FD9C0,
+				D16333E007A020D9003FD9C0,
+				D16333E107A020D9003FD9C0,
+				D163339707A01EE8003FD9C0,
 			);
 			isa = PBXGroup;
 			name = "Linked Frameworks";
@@ -237,7 +244,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			isa = PBXBuildStyle;
 			name = Development;
@@ -268,14 +275,32 @@
 				8D11072E0486CEB800E47090,
 			);
 			buildRules = (
+				D163335407A01B47003FD9C0,
 			);
 			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = XMeeting_Prefix.pch;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_LABEL = NO;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "$(HOME)/pwlib/include";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "\"$(HOME)/pwlib/lib\" /Users/hannes/pwlib/lib";
 				PRODUCT_NAME = XMeeting;
+				WARNING_CFLAGS = "-Wno-long-double";
 				WRAPPER_EXTENSION = app;
 			};
 			dependencies = (
@@ -292,6 +317,9 @@
 			files = (
 				8D11072A0486CEB800E47090,
 				8D11072B0486CEB800E47090,
+				D163333807A01A83003FD9C0,
+				D163336507A01BD5003FD9C0,
+				D16333A007A01F7F003FD9C0,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +340,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090,
+				D163333907A01A83003FD9C0,
+				D163336607A01BD5003FD9C0,
+				D16333A107A01F7F003FD9C0,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,6 +359,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090,
+				D163339807A01EE8003FD9C0,
+				D16333E207A020D9003FD9C0,
+				D16333E307A020D9003FD9C0,
+				D16333EE07A020FF003FD9C0,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -353,6 +388,182 @@
 			path = XMeeting.app;
 			refType = 3;
 			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+//8D0
+//8D1
+//8D2
+//8D3
+//8D4
+//D10
+//D11
+//D12
+//D13
+//D14
+		D163333607A01A83003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMEndpoint.h;
+			path = Source/Framework/XMEndpoint.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163333707A01A83003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMEndpoint.cpp;
+			path = Source/Framework/XMEndpoint.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163333807A01A83003FD9C0 = {
+			fileRef = D163333607A01A83003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163333907A01A83003FD9C0 = {
+			fileRef = D163333707A01A83003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163333C07A01A8B003FD9C0 = {
+			children = (
+				D163339E07A01F7F003FD9C0,
+				D163339F07A01F7F003FD9C0,
+				D163333607A01A83003FD9C0,
+				D163333707A01A83003FD9C0,
+			);
+			isa = PBXGroup;
+			name = Framework;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163335407A01B47003FD9C0 = {
+			compilerSpec = com.apple.compilers.gcc;
+			fileType = sourcecode.cpp;
+			isEditable = 1;
+			isa = PBXBuildRule;
+			outputFiles = (
+			);
+		};
+		D163336307A01BD5003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMApplicationController.h;
+			path = Source/XMApplicationController.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163336407A01BD5003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMApplicationController.m;
+			path = Source/XMApplicationController.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163336507A01BD5003FD9C0 = {
+			fileRef = D163336307A01BD5003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163336607A01BD5003FD9C0 = {
+			fileRef = D163336407A01BD5003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163339707A01EE8003FD9C0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = archive.ar;
+			name = libpt_Darwin_ppc_r_s.a;
+			path = ../pwlib/lib/libpt_Darwin_ppc_r_s.a;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		D163339807A01EE8003FD9C0 = {
+			fileRef = D163339707A01EE8003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163339E07A01F7F003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMController.h;
+			path = Source/Framework/XMController.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163339F07A01F7F003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMController.mm;
+			path = Source/Framework/XMController.mm;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D16333A007A01F7F003FD9C0 = {
+			fileRef = D163339E07A01F7F003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16333A107A01F7F003FD9C0 = {
+			fileRef = D163339F07A01F7F003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16333E007A020D9003FD9C0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = AudioToolbox.framework;
+			path = /System/Library/Frameworks/AudioToolbox.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D16333E107A020D9003FD9C0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = AudioUnit.framework;
+			path = /System/Library/Frameworks/AudioUnit.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D16333E207A020D9003FD9C0 = {
+			fileRef = D16333E007A020D9003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16333E307A020D9003FD9C0 = {
+			fileRef = D16333E107A020D9003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16333ED07A020FF003FD9C0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = CoreAudio.framework;
+			path = /System/Library/Frameworks/CoreAudio.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D16333EE07A020FF003FD9C0 = {
+			fileRef = D16333ED07A020FF003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 	};
 	rootObject = 29B97313FDCFA39411CA2CEA;
