@@ -46,11 +46,12 @@
 //104
 		1058C7A0FEA54F0111CA2CBB = {
 			children = (
+				D10AFF7D07B387B300BBC8EA,
+				D16337BD07A4DF5A003FD9C0,
 				1058C7A1FEA54F0111CA2CBB,
 				D16333ED07A020FF003FD9C0,
 				D16333E007A020D9003FD9C0,
 				D16333E107A020D9003FD9C0,
-				D163339707A01EE8003FD9C0,
 			);
 			isa = PBXGroup;
 			name = "Linked Frameworks";
@@ -184,6 +185,7 @@
 		};
 		29B97323FDCFA39411CA2CEA = {
 			children = (
+				D16337A707A4DDDF003FD9C0,
 				1058C7A0FEA54F0111CA2CBB,
 				1058C7A2FEA54F0111CA2CBB,
 			);
@@ -295,10 +297,10 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = "$(HOME)/pwlib/include";
+				HEADER_SEARCH_PATHS = "$(HOME)/pwlib/include $(HOME)/opal/include";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = "\"$(HOME)/pwlib/lib\" /Users/hannes/pwlib/lib";
+				LIBRARY_SEARCH_PATHS = "\"$(HOME)/pwlib/lib\" \"$(HOME)/opal/lib\" /Users/hannes/pwlib/lib /Users/hannes/opal/lib";
 				PRODUCT_NAME = XMeeting;
 				WARNING_CFLAGS = "-Wno-long-double";
 				WRAPPER_EXTENSION = app;
@@ -317,9 +319,24 @@
 			files = (
 				8D11072A0486CEB800E47090,
 				8D11072B0486CEB800E47090,
-				D163333807A01A83003FD9C0,
 				D163336507A01BD5003FD9C0,
-				D16333A007A01F7F003FD9C0,
+				D16334CB07A1C036003FD9C0,
+				D163350B07A1C576003FD9C0,
+				D163365007A456C4003FD9C0,
+				D163381D07A4E739003FD9C0,
+				D163382D07A4E7BC003FD9C0,
+				D1D63D3707AA9A8800F1FB74,
+				D1D63D3F07AA9A9F00F1FB74,
+				D1D63D4507AA9B2B00F1FB74,
+				D114919307ACEE1E005BDCCB,
+				D18BF5F207AFA006000CF993,
+				D18BF63E07AFA98F000CF993,
+				D1FE29CF07AFF4FB004337C9,
+				D1342CC207B0C1460012B578,
+				D166CD6607B2312300BC27A6,
+				D10AFE9607B3771F00BBC8EA,
+				D10AFEB407B3781700BBC8EA,
+				D177D7A107B62C9500BD0172,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -340,9 +357,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090,
-				D163333907A01A83003FD9C0,
 				D163336607A01BD5003FD9C0,
-				D16333A107A01F7F003FD9C0,
+				D16334CC07A1C036003FD9C0,
+				D163350C07A1C576003FD9C0,
+				D163365107A456C4003FD9C0,
+				D163381E07A4E739003FD9C0,
+				D1D63D3807AA9A8800F1FB74,
+				D1D63D4007AA9A9F00F1FB74,
+				D1D63D4607AA9B2B00F1FB74,
+				D114919407ACEE1E005BDCCB,
+				D18BF5F307AFA007000CF993,
+				D18BF63F07AFA98F000CF993,
+				D1342CC307B0C1460012B578,
+				D166CD6707B2312300BC27A6,
+				D10AFE9707B3771F00BBC8EA,
+				D10AFEB507B3781700BBC8EA,
+				D177D7A207B62C9500BD0172,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -359,10 +389,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090,
-				D163339807A01EE8003FD9C0,
 				D16333E207A020D9003FD9C0,
 				D16333E307A020D9003FD9C0,
 				D16333EE07A020FF003FD9C0,
+				D16337B607A4DE3A003FD9C0,
+				D16337BE07A4DF5A003FD9C0,
+				D1148E5C07ABFD25005BDCCB,
+				D1148ED307AC489A005BDCCB,
+				D10AFF7E07B387B300BBC8EA,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -399,42 +433,202 @@
 //D12
 //D13
 //D14
-		D163333607A01A83003FD9C0 = {
+		D10AFE9407B3771F00BBC8EA = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
-			name = XMEndpoint.h;
-			path = Source/Framework/XMEndpoint.h;
+			name = XMCallManager.h;
+			path = Source/Framework/XMCallManager.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		D163333707A01A83003FD9C0 = {
+		D10AFE9507B3771F00BBC8EA = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = XMEndpoint.cpp;
-			path = Source/Framework/XMEndpoint.cpp;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMCallManager.mm;
+			path = Source/Framework/XMCallManager.mm;
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		D163333807A01A83003FD9C0 = {
-			fileRef = D163333607A01A83003FD9C0;
+		D10AFE9607B3771F00BBC8EA = {
+			fileRef = D10AFE9407B3771F00BBC8EA;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		D163333907A01A83003FD9C0 = {
-			fileRef = D163333707A01A83003FD9C0;
+		D10AFE9707B3771F00BBC8EA = {
+			fileRef = D10AFE9507B3771F00BBC8EA;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D10AFEB207B3781700BBC8EA = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMUtils.h;
+			path = Source/Framework/XMUtils.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D10AFEB307B3781700BBC8EA = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMUtils.mm;
+			path = Source/Framework/XMUtils.mm;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D10AFEB407B3781700BBC8EA = {
+			fileRef = D10AFEB207B3781700BBC8EA;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D10AFEB507B3781700BBC8EA = {
+			fileRef = D10AFEB307B3781700BBC8EA;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D10AFF7D07B387B300BBC8EA = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = QuickTime.framework;
+			path = /System/Library/Frameworks/QuickTime.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D10AFF7E07B387B300BBC8EA = {
+			fileRef = D10AFF7D07B387B300BBC8EA;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1148E5B07ABFD25005BDCCB = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.dylib";
+			name = libpt_Darwin_ppc_r.dylib;
+			path = /Users/hannes/pwlib/lib/libpt_Darwin_ppc_r.1.8.4.dylib;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D1148E5C07ABFD25005BDCCB = {
+			fileRef = D1148E5B07ABFD25005BDCCB;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1148ED207AC489A005BDCCB = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.dylib";
+			name = "libopal_Darwin_ppc_r.2.1-beta1.dylib";
+			path = "/Users/hannes/opal/lib/libopal_Darwin_ppc_r.2.1-beta1.dylib";
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D1148ED307AC489A005BDCCB = {
+			fileRef = D1148ED207AC489A005BDCCB;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D114919107ACEE1E005BDCCB = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMPCSSEndPoint.h;
+			path = Source/Framework/XMPCSSEndPoint.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D114919207ACEE1E005BDCCB = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMPCSSEndPoint.cpp;
+			path = Source/Framework/XMPCSSEndPoint.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D114919307ACEE1E005BDCCB = {
+			fileRef = D114919107ACEE1E005BDCCB;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D114919407ACEE1E005BDCCB = {
+			fileRef = D114919207ACEE1E005BDCCB;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1342CC007B0C1460012B578 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMVideoDevices.h;
+			path = Source/Framework/XMVideoDevices.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1342CC107B0C1460012B578 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMVideoDevices.cpp;
+			path = Source/Framework/XMVideoDevices.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1342CC207B0C1460012B578 = {
+			fileRef = D1342CC007B0C1460012B578;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1342CC307B0C1460012B578 = {
+			fileRef = D1342CC107B0C1460012B578;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
 		D163333C07A01A8B003FD9C0 = {
 			children = (
-				D163339E07A01F7F003FD9C0,
-				D163339F07A01F7F003FD9C0,
-				D163333607A01A83003FD9C0,
-				D163333707A01A83003FD9C0,
+				D1FE29CE07AFF4FB004337C9,
+				D177D79F07B62C9500BD0172,
+				D177D7A007B62C9500BD0172,
+				D10AFEB207B3781700BBC8EA,
+				D10AFEB307B3781700BBC8EA,
+				D10AFE9407B3771F00BBC8EA,
+				D10AFE9507B3771F00BBC8EA,
+				D1D63D4307AA9B2B00F1FB74,
+				D1D63D4407AA9B2B00F1FB74,
+				D1D63D3D07AA9A9F00F1FB74,
+				D1D63D3E07AA9A9F00F1FB74,
+				D166CD6407B2312300BC27A6,
+				D166CD6507B2312300BC27A6,
+				D1D63D3507AA9A8800F1FB74,
+				D1D63D3607AA9A8800F1FB74,
+				D163381B07A4E739003FD9C0,
+				D163381C07A4E739003FD9C0,
+				D16334C907A1C036003FD9C0,
+				D16334CA07A1C036003FD9C0,
+				D18BF5F007AFA006000CF993,
+				D18BF5F107AFA006000CF993,
+				D163350907A1C576003FD9C0,
+				D163350A07A1C576003FD9C0,
+				D114919107ACEE1E005BDCCB,
+				D114919207ACEE1E005BDCCB,
+				D163364E07A456C4003FD9C0,
+				D163364F07A456C4003FD9C0,
+				D163382C07A4E7BC003FD9C0,
+				D18BF63C07AFA98F000CF993,
+				D18BF63D07AFA98F000CF993,
+				D1342CC007B0C1460012B578,
+				D1342CC107B0C1460012B578,
 			);
 			isa = PBXGroup;
 			name = Framework;
@@ -479,50 +673,6 @@
 			settings = {
 			};
 		};
-		D163339707A01EE8003FD9C0 = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libpt_Darwin_ppc_r_s.a;
-			path = ../pwlib/lib/libpt_Darwin_ppc_r_s.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		D163339807A01EE8003FD9C0 = {
-			fileRef = D163339707A01EE8003FD9C0;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		D163339E07A01F7F003FD9C0 = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = XMController.h;
-			path = Source/Framework/XMController.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D163339F07A01F7F003FD9C0 = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.objcpp;
-			name = XMController.mm;
-			path = Source/Framework/XMController.mm;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D16333A007A01F7F003FD9C0 = {
-			fileRef = D163339E07A01F7F003FD9C0;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		D16333A107A01F7F003FD9C0 = {
-			fileRef = D163339F07A01F7F003FD9C0;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		D16333E007A020D9003FD9C0 = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -561,6 +711,405 @@
 		};
 		D16333EE07A020FF003FD9C0 = {
 			fileRef = D16333ED07A020FF003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16334C907A1C036003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMBridge.h;
+			path = Source/Framework/XMBridge.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D16334CA07A1C036003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMBridge.cpp;
+			path = Source/Framework/XMBridge.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D16334CB07A1C036003FD9C0 = {
+			fileRef = D16334C907A1C036003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16334CC07A1C036003FD9C0 = {
+			fileRef = D16334CA07A1C036003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163350907A1C576003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMOpalManager.h;
+			path = Source/Framework/XMOpalManager.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163350A07A1C576003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMOpalManager.cpp;
+			path = Source/Framework/XMOpalManager.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163350B07A1C576003FD9C0 = {
+			fileRef = D163350907A1C576003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163350C07A1C576003FD9C0 = {
+			fileRef = D163350A07A1C576003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163364E07A456C4003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMProcess.h;
+			path = Source/Framework/XMProcess.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163364F07A456C4003FD9C0 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMProcess.cpp;
+			path = Source/Framework/XMProcess.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163365007A456C4003FD9C0 = {
+			fileRef = D163364E07A456C4003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163365107A456C4003FD9C0 = {
+			fileRef = D163364F07A456C4003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16337A707A4DDDF003FD9C0 = {
+			children = (
+				D1148E5B07ABFD25005BDCCB,
+				D1148ED207AC489A005BDCCB,
+				D16337B507A4DE3A003FD9C0,
+			);
+			isa = PBXGroup;
+			name = SharedLibraries;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D16337B507A4DE3A003FD9C0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.dylib";
+			name = libcrypto.dylib;
+			path = /usr/lib/libcrypto.dylib;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D16337B607A4DE3A003FD9C0 = {
+			fileRef = D16337B507A4DE3A003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D16337BD07A4DF5A003FD9C0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = LDAP.framework;
+			path = /System/Library/Frameworks/LDAP.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		D16337BE07A4DF5A003FD9C0 = {
+			fileRef = D16337BD07A4DF5A003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163381B07A4E739003FD9C0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMPreferences.h;
+			path = Source/Framework/XMPreferences.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163381C07A4E739003FD9C0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMPreferences.m;
+			path = Source/Framework/XMPreferences.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163381D07A4E739003FD9C0 = {
+			fileRef = D163381B07A4E739003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163381E07A4E739003FD9C0 = {
+			fileRef = D163381C07A4E739003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D163382C07A4E7BC003FD9C0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMTypes.h;
+			path = Source/Framework/XMTypes.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D163382D07A4E7BC003FD9C0 = {
+			fileRef = D163382C07A4E7BC003FD9C0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D166CD6407B2312300BC27A6 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMLocalVideoView.h;
+			path = Source/Framework/XMLocalVideoView.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D166CD6507B2312300BC27A6 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMLocalVideoView.m;
+			path = Source/Framework/XMLocalVideoView.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D166CD6607B2312300BC27A6 = {
+			fileRef = D166CD6407B2312300BC27A6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D166CD6707B2312300BC27A6 = {
+			fileRef = D166CD6507B2312300BC27A6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D177D79F07B62C9500BD0172 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMCallInfo.h;
+			path = Source/Framework/XMCallInfo.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D177D7A007B62C9500BD0172 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMCallInfo.m;
+			path = Source/Framework/XMCallInfo.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D177D7A107B62C9500BD0172 = {
+			fileRef = D177D79F07B62C9500BD0172;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D177D7A207B62C9500BD0172 = {
+			fileRef = D177D7A007B62C9500BD0172;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D18BF5F007AFA006000CF993 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMCallbackBridge.h;
+			path = Source/Framework/XMCallbackBridge.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D18BF5F107AFA006000CF993 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMCallbackBridge.mm;
+			path = Source/Framework/XMCallbackBridge.mm;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D18BF5F207AFA006000CF993 = {
+			fileRef = D18BF5F007AFA006000CF993;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D18BF5F307AFA007000CF993 = {
+			fileRef = D18BF5F107AFA006000CF993;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D18BF63C07AFA98F000CF993 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMVolumeControl.h;
+			path = Source/Framework/XMVolumeControl.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D18BF63D07AFA98F000CF993 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = XMVolumeControl.cpp;
+			path = Source/Framework/XMVolumeControl.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D18BF63E07AFA98F000CF993 = {
+			fileRef = D18BF63C07AFA98F000CF993;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D18BF63F07AFA98F000CF993 = {
+			fileRef = D18BF63D07AFA98F000CF993;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1D63D3507AA9A8800F1FB74 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMAudioManager.h;
+			path = Source/Framework/XMAudioManager.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1D63D3607AA9A8800F1FB74 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMAudioManager.mm;
+			path = Source/Framework/XMAudioManager.mm;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1D63D3707AA9A8800F1FB74 = {
+			fileRef = D1D63D3507AA9A8800F1FB74;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1D63D3807AA9A8800F1FB74 = {
+			fileRef = D1D63D3607AA9A8800F1FB74;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1D63D3D07AA9A9F00F1FB74 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMVideoManager.h;
+			path = Source/Framework/XMVideoManager.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1D63D3E07AA9A9F00F1FB74 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMVideoManager.mm;
+			path = Source/Framework/XMVideoManager.mm;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1D63D3F07AA9A9F00F1FB74 = {
+			fileRef = D1D63D3D07AA9A9F00F1FB74;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1D63D4007AA9A9F00F1FB74 = {
+			fileRef = D1D63D3E07AA9A9F00F1FB74;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1D63D4307AA9B2B00F1FB74 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMCodecManager.h;
+			path = Source/Framework/XMCodecManager.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1D63D4407AA9B2B00F1FB74 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = XMCodecManager.mm;
+			path = Source/Framework/XMCodecManager.mm;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1D63D4507AA9B2B00F1FB74 = {
+			fileRef = D1D63D4307AA9B2B00F1FB74;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1D63D4607AA9B2B00F1FB74 = {
+			fileRef = D1D63D4407AA9B2B00F1FB74;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1FE29CE07AFF4FB004337C9 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMPrivate.h;
+			path = Source/Framework/XMPrivate.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1FE29CF07AFF4FB004337C9 = {
+			fileRef = D1FE29CE07AFF4FB004337C9;
 			isa = PBXBuildFile;
 			settings = {
 			};
