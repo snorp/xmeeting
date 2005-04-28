@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,6 +45,8 @@
 	
 	incomingAudioCodec = nil;
 	outgoingAudioCodec = nil;
+	incomingVideoCodec = nil;
+	outgoingVideoCodec = nil;
 	
 	return self;
 }
@@ -58,6 +60,8 @@
 	
 	[incomingAudioCodec release];
 	[outgoingAudioCodec release];
+	[incomingVideoCodec release];
+	[outgoingVideoCodec release];
 	
 	[super dealloc];
 }
@@ -94,6 +98,11 @@
 	return remoteApplication;
 }
 
+- (XMCallStatus)callStatus
+{
+	return callStatus;
+}
+
 - (NSString *)incomingAudioCodec
 {
 	return incomingAudioCodec;
@@ -104,7 +113,45 @@
 	return outgoingAudioCodec;
 }
 
+- (NSString *)incomingVideoCodec
+{
+	return incomingVideoCodec;
+}
+
+- (NSString *)outgoingVideoCodec
+{
+	return outgoingVideoCodec;
+}
+
 #pragma mark Setter Methods
+
+- (void)_setRemoteName:(NSString *)theName
+{
+	NSString *old = remoteName;
+	remoteName = [theName copy];
+	[old release];
+}
+
+- (void)_setRemoteNumber:(NSString *)theNumber
+{
+	NSString *old = remoteNumber;
+	remoteNumber = [theNumber copy];
+	[old release];
+}
+
+- (void)_setRemoteAddress:(NSString *)theAddress
+{
+	NSString *old = remoteAddress;
+	remoteAddress = [theAddress copy];
+	[old release];
+}
+
+- (void)_setRemoteApplication:(NSString *)theApplication
+{
+	NSString *old = remoteApplication;
+	remoteApplication = [theApplication copy];
+	[old release];
+}
 
 - (void)_setCallStatus:(XMCallStatus)status
 {
@@ -114,6 +161,34 @@
 - (void)_setCallEndReason:(XMCallEndReason)endReason
 {
 	callEndReason = endReason;
+}
+
+- (void)_setIncomingAudioCodec:(NSString *)codec
+{
+	NSString *old = incomingAudioCodec;
+	incomingAudioCodec = [codec copy];
+	[old release];
+}
+
+- (void)_setOutgoingAudioCodec:(NSString *)codec
+{
+	NSString *old = outgoingAudioCodec;
+	outgoingAudioCodec = [codec copy];
+	[old release];
+}
+
+- (void)_setIncomingVideoCodec:(NSString *)codec
+{
+	NSString *old = incomingVideoCodec;
+	incomingVideoCodec = [codec copy];
+	[old release];
+}
+
+- (void)_setOutgoingVideoCodec:(NSString *)codec
+{
+	NSString *old = outgoingVideoCodec;
+	outgoingVideoCodec = [codec copy];
+	[old release];
 }
 
 @end

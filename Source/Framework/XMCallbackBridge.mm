@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.mm,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMCallbackBridge.mm,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,4 +55,29 @@ void noteCallEstablished(unsigned callID)
 void noteCallCleared(unsigned callID, XMCallEndReason endReason)
 {
 	[[XMCallManager sharedInstance] _handleCallCleared:callID withCallEndReason:endReason];
+}
+
+void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *mediaFormat)
+{
+	NSString *name = [[NSString alloc] initWithCString:mediaFormat];
+	
+	[[XMCallManager sharedInstance] _handleMediaStreamOpened:callID 
+											   isInputStream:isInputStream
+												 mediaFormat:name];
+}
+
+void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat)
+{
+	// currently not implemented
+}
+
+bool noteVideoFrameUpdate(void *buffer, unsigned width, unsigned height, unsigned bytesPerPixel)
+{
+	return [[XMVideoManager sharedInstance] _handleVideoFrame:buffer width:width
+													   height:height bytesPerPixel:bytesPerPixel];
+}
+
+bool getVideoFrame(void *buffer, unsigned *bytesReturned)
+{
+	return false;
 }

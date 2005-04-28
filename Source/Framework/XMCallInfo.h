@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,8 @@
 	
 	NSString *incomingAudioCodec;
 	NSString *outgoingAudioCodec;
+	NSString *incomingVideoCodec;
+	NSString *outgoingVideoCodec;
 }
 
 /**
@@ -75,7 +77,7 @@
 /**
  * Returns the current state of the call
  **/
-- (XMCallStatus)currentStatus;
+- (XMCallStatus)callStatus;
 
 /**
  * Returns the reason why the call was ended.
@@ -100,5 +102,15 @@
  * Returns the audio codec used for the outgoing audio stream
  **/
 - (NSString *)outgoingAudioCodec;
+
+/**
+ * Returns the video codec used for the incoming video stream
+ **/
+- (NSString *)incomingVideoCodec;
+
+/**
+ * Returns the video codec used for the outgoing video stream
+ **/
+- (NSString *)outgoingVideoCodec;
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,5 +57,28 @@ void noteCallEstablished(unsigned callID);
  * supplying the callID and the CallEndReason.
  **/
 void noteCallCleared(unsigned callID, XMCallEndReason callEndReason);
+
+/**
+ * This function is called every time a new media stream is opened.
+ **/
+void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *mediaFormat);
+
+/**
+ * This function is called every time an existing media stream is closed.
+ * Note that the callID currently is set constantly to 0.
+ **/
+void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat);
+
+/**
+ * This function is called from the video subsystem every time a new
+ * frame is ready to display
+ **/
+bool noteVideoFrameUpdate(void *buffer, unsigned width, unsigned height, unsigned bytesPerPixel);
+
+/**
+ * This function is called from the video subsystem every time a new
+ * frame is required
+ **/
+bool getVideoFrame(void *buffer, unsigned *bytesReturned);
 
 #endif // __XM_CALLBACK_BRIDGE_H__

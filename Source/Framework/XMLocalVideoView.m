@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.m,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMLocalVideoView.m,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 
 - (void)startDisplayingLocalVideo
 {	
+	NSLog(@"starting displaying local video");
 	[[XMVideoManager sharedInstance] _addLocalVideoView:self];
 }
 

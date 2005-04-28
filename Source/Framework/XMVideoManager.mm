@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.mm,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMVideoManager.mm,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,6 +47,10 @@ OSErr XM_SGDataProc(SGChannel c,
 @end
 
 @interface XMVideoManager (PrivateMethods)
+
+- (id)_init;
+
+- (void)_noteVideoFrameRead:(NSBitmapImageRep *)rep;
 
 - (BOOL)_initializeComponentAndChannel;
 - (void)_closeComponentAndChannel;
@@ -97,7 +101,7 @@ OSErr XM_SGDataProc(SGChannel c,
 	
 	if(sharedInstance == nil)
 	{
-		sharedInstance = [[XMVideoManager alloc] init];
+		sharedInstance = [[XMVideoManager alloc] _init];
 	}
 	
 	return sharedInstance;
@@ -106,6 +110,14 @@ OSErr XM_SGDataProc(SGChannel c,
 #pragma mark Init & Deallocation Methods
 
 - (id)init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	
+	return nil;
+}
+
+- (id)_init
 {
 	self = [super init];
 	
@@ -127,10 +139,12 @@ OSErr XM_SGDataProc(SGChannel c,
 	
 	videoSize = XMVideoSize_NoVideo;
 	
-	stillImage = nil;
-	imgRep = nil;
+	//stillImage = nil;
+	//imgRep = nil;
 	
 	fps = 10;
+	
+	remoteVideoFrame = nil;
 	
 	// making sure that the underlying OPAL system is properly initialised
 	initOPAL();
@@ -152,14 +166,19 @@ OSErr XM_SGDataProc(SGChannel c,
 	
 	/* releasing all objects */
 	[view release];
-	[stillImage release];
-	[imgRep release];
+	//[stillImage release];
+	//[imgRep release];
 	
 	/* completing deallocation */
 	[super dealloc];
 }
 
 #pragma mark Public Interface Methods
+
+- (NSBitmapImageRep *)remoteVideoFrame
+{
+	return remoteVideoFrame;
+}
 
 - (void)updateDeviceList
 {
@@ -372,13 +391,15 @@ OSErr XM_SGDataProc(SGChannel c,
 
 - (NSImage *)stillImage
 {
-	return stillImage;
+	//return stillImage;
+	return nil;
 }
 
 - (void)setStillImage:(NSImage *)image
 {
 	@synchronized(self)
 	{
+		/*
 		if(imgRep)
 		{
 			[imgRep release];
@@ -396,6 +417,7 @@ OSErr XM_SGDataProc(SGChannel c,
 			[stillImage setScalesWhenResized:YES];
 		}
 		//[self _sendStillImageIfNeeded];
+		 */
 	}
 }
 
@@ -410,6 +432,16 @@ OSErr XM_SGDataProc(SGChannel c,
 }
 
 #pragma mark Private Methods
+
+/* store the new image and post a notification */
+
+- (void)_noteVideoFrameRead:(NSBitmapImageRep *)rep
+{
+	[remoteVideoFrame release];
+	remoteVideoFrame = [rep retain];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidReadVideoFrame object:self];
+}
 
 - (BOOL)_initializeComponentAndChannel
 {
@@ -918,11 +950,6 @@ OSErr XM_SGDataProc(SGChannel c,
 	}
 }
 
-- (void)_noteVideoFrameRead:(NSBitmapImageRep *)rep
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidReadVideoFrame object:rep];
-}
-
 - (void)_noteError:(NSString *)errorMessage code:(int)code
 {
 	// creates an instance of XMGrabError and sends this instance to the main thread
@@ -1029,11 +1056,13 @@ OSErr XM_SGDataProc(SGChannel c,
 		
 		// if we are in a call, it's time to send a still image
 		// (if there is one set)
+		/*
 		if(imgRep)
 		{
 			[imgRep release];
 			imgRep = nil;
 		}
+		 */
 		//[self _sendStillImageIfNeeded];
 	}
 	
@@ -1148,6 +1177,30 @@ OSErr XM_SGDataProc(SGChannel c,
 			}
 		}
 	}
+}
+
+- (BOOL)_handleVideoFrame:(void *)buffer width:(unsigned)width
+				   height:(unsigned)height bytesPerPixel:(unsigned)bytesPerPixel
+{
+	unsigned char *data = (unsigned char *)buffer;
+	NSBitmapImageRep *rep = [[NSBitmapImageRep alloc]
+		initWithBitmapDataPlanes:&data
+					  pixelsWide:width
+					  pixelsHigh:height
+				   bitsPerSample:8
+				 samplesPerPixel:bytesPerPixel
+						hasAlpha:NO
+						isPlanar:NO
+				  colorSpaceName:NSDeviceRGBColorSpace
+					 bytesPerRow:width * bytesPerPixel
+					bitsPerPixel:8 * bytesPerPixel];
+	
+	/* performing the rest on the main thread */
+	[self performSelectorOnMainThread:@selector(_noteVideoFrameRead:) withObject:rep
+						waitUntilDone:NO];
+	[rep release];
+	
+	return YES;
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,8 @@ using namespace std;
 
 // reference to the default PProcess
 static XMProcess *theProcess = NULL;
+
+// reference to the active OPAL manager.
 static XMOpalManager *theManager = NULL;
 
 // required to implement the volume control
@@ -34,6 +36,7 @@ void initOPAL()
 		
 		/* temporarily initialise PTracing */
 		PTrace::Initialise(5, "/tmp/XMeeting.log", PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
+		
 		theManager = new XMOpalManager;
 		theManager->Initialise();
 		
@@ -45,28 +48,84 @@ void initOPAL()
 
 bool startH323Listeners(unsigned listenerPort)
 {
-	H323EndPoint *h323EP = theManager->CurrentH323EndPoint();
-	
-	return h323EP->StartListeners(psprintf("tcp$*:%u", listenerPort));
+	return theManager->StartH323Listeners(listenerPort);
 }
 
 void stopH323Listeners()
 {
-	// currently not implemented
+	theManager->StopH323Listeners();
 }
 
 bool isH323Listening()
 {
-	//not impemented yet
-	return false;
+	return theManager->IsH323Listening();
 }
 
 #pragma mark Call Management functions
 
-void setAcceptCall(bool acceptFlag)
+unsigned startCall(XMCallProtocol protocol, const char *remoteParty)
 {	
-	theManager->CurrentPCSSEndPoint()->SetAcceptIncomingCall(acceptFlag);
+	PString token;
+	const char *protocolName;
+	
+	switch (protocol)
+	{
+		case XMCallProtocol_H323:
+			protocolName = "h323";
+			break;
+		case XMCallProtocol_SIP:
+			protocolName = "sip";
+			break;
+		default:
+			return 0;
+	}
+	
+	PString remoteName = psprintf("%s:%s", protocolName, remoteParty);
+	
+	BOOL returnValue = theManager->StartCall(remoteName, token);
+	
+	if(returnValue == TRUE)
+	{
+		return token.AsUnsigned();
+	}
+	else
+	{
+		return 0;
+	}
 }
+
+void setAcceptIncomingCall(unsigned callID, bool acceptFlag)
+{	
+	theManager->SetAcceptIncomingCall(acceptFlag);
+}
+
+void clearCall(unsigned callID)
+{
+	PString callToken = PString(callID);
+	theManager->ClearCall(callToken);
+}
+
+void getCallInformation(unsigned callID,
+						const char** remoteName, 
+						const char** remoteNumber,
+						const char** remoteAddress, 
+						const char** remoteApplication)
+{
+	PString nameStr;
+	PString numberStr;
+	PString addressStr;
+	PString appStr;
+	PString token = PString(callID);
+	
+	theManager->GetCallInformation(token, nameStr, numberStr, addressStr, appStr);
+	
+	*remoteName = nameStr;
+	*remoteNumber = numberStr;
+	*remoteAddress = addressStr;
+	*remoteApplication = appStr;
+}
+
+#pragma mark General Setup functions
 
 void setUserName(const char *string)
 {
@@ -88,6 +147,17 @@ void setPortRanges(unsigned int udpPortMin,
 	theManager->SetUDPPorts(udpPortMin, udpPortMax);
 	theManager->SetTCPPorts(tcpPortMin, tcpPortMax);
 	theManager->SetRtpIpPorts(rtpPortMin, rtpPortMax);
+}
+
+void setTranslationAddress(const char *a)
+{
+	PString str = a;
+	theManager->SetTranslationAddress(str);
+}
+
+void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
+{
+	theManager->SetVideoFunctionality(receiveVideo, transmitVideo);
 }
 
 #pragma mark Audio Functions
@@ -224,27 +294,13 @@ bool setAudioOutputVolume(unsigned value)
 
 #pragma mark H.323 Functions
 
-void setEnableFastStart(bool flag)
+void setH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 {
-	theManager->CurrentH323EndPoint()->DisableFastStart(!flag);
+	theManager->SetH323Functionality(enableFastStart, enableH245Tunnel);
 }
 
-void setEnableH245Tunnel(bool flag)
+bool setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber)
 {
-	theManager->CurrentH323EndPoint()->DisableH245Tunneling(!flag);
-}
-
-void setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber)
-{
-	H323EndPoint *h323EP = theManager->CurrentH323EndPoint();
-	
-	if(identifier != NULL || address != NULL)
-	{
-		h323EP->UseGatekeeper(address, identifier);
-	}
-	else
-	{
-		h323EP->RemoveGatekeeper();
-	}
+	theManager->SetGatekeeper(address, identifier, gkUsername, phoneNumber);
 }
 

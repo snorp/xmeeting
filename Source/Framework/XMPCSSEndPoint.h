@@ -1,5 +1,5 @@
 /*
- * $Id: XMPCSSEndPoint.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMPCSSEndPoint.h,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,10 +31,16 @@ public:
 	virtual void OnEstablished(OpalConnection & connection);
 	virtual void OnConnected(OpalConnection & connection);
 	
+	virtual void AcceptIncomingConnection(const PString & connectionToken);
 	virtual void RefuseIncomingConnection(PString & connectionToken);
 	
 	void SetAcceptIncomingCall(BOOL acceptConnection);
 	void SetCallProtocol(XMCallProtocol protocol);
+	
+	void GetCallInformation(PString & remoteName, 
+							PString & remoteNumber,
+							PString & remoteAddress,
+							PString & remoteApplication);
 	
 private:
 	PString incomingConnectionToken;

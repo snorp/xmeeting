@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.mm,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMCodecManager.mm,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,6 +43,12 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 		  quality:(NSString *)quality;
 @end
 
+@interface XMCodecDescriptor (PrivateMethods)
+
+- (id)_init;
+
+@end
+
 @implementation XMCodecManager
 
 #pragma mark Class Methods
@@ -53,7 +59,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	
 	if(sharedInstance == nil)
 	{
-		sharedInstance = [[XMCodecManager alloc] init];
+		sharedInstance = [[XMCodecManager alloc] _init];
 	}
 	
 	return sharedInstance;
@@ -61,11 +67,19 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 
 #pragma mark Init & Deallocation methods
 
+- (id)init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	
+	return nil;
+}
+
 
 // This methods currently misses the check with the OPAL system to verify that
 // codec described in the plist really exists. This has to be done to prevent
 // unpredictable behaviour.
-- (id)init
+- (id)_init
 {
 	self = [super init];
 	

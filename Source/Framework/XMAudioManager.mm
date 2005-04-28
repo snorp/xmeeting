@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.mm,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMAudioManager.mm,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,12 @@
 
 #import "XMBridge.h"
 
+@interface XMAudioManager (PrivateMethods)
+
+- (id)_init;
+
+@end
+
 @implementation XMAudioManager
 
 + (XMAudioManager *)sharedInstance
@@ -19,13 +25,21 @@
 	
 	if(sharedInstance == nil)
 	{
-		sharedInstance = [[XMAudioManager alloc] init];
+		sharedInstance = [[XMAudioManager alloc] _init];
 	}
 	
 	return sharedInstance;
 }
 
 - (id)init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	
+	return nil;
+}
+
+- (id)_init
 {
 	self = [super init];
 	

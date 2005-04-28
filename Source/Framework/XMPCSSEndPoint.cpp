@@ -1,5 +1,5 @@
 /*
- * $Id: XMPCSSEndPoint.cpp,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMPCSSEndPoint.cpp,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,13 +16,13 @@ XMPCSSEndPoint::XMPCSSEndPoint(XMOpalManager & mgr)
 
 PString XMPCSSEndPoint::OnGetDestination(const OpalPCSSConnection & connection)
 {
-	cout << "XMPCSSEndPoint::OnGetDestination" << endl;
+	//cout << "XMPCSSEndPoint::OnGetDestination" << endl;
 	return "destination";
 }
 
 void XMPCSSEndPoint::OnShowIncoming(const OpalPCSSConnection & connection)
 {
-	cout << "XMPCSSEndPoint::Incoming connection " << connection << endl;
+	//cout << "XMPCSSEndPoint::Incoming connection " << connection << endl;
 	
 	incomingConnectionToken = connection.GetToken();
 	
@@ -53,12 +53,27 @@ void XMPCSSEndPoint::OnEstablished(OpalConnection & connection)
 void XMPCSSEndPoint::OnConnected(OpalConnection & connection)
 {
 	//cout << "XMPCSSEndPoint::OnConnected" << endl;
+	
+	/*cout << connection.GetRemotePartyName() << "a" <<
+		connection.GetRemotePartyNumber() << "b" <<
+		connection.GetRemotePartyAddress() << "c" <<
+		connection.GetRemoteApplication() << endl;*/
 	OpalPCSSEndPoint::OnConnected(connection);
+}
+
+void XMPCSSEndPoint::AcceptIncomingConnection(const PString & token)
+{
+	PSafePtr<OpalPCSSConnection> connection = GetPCSSConnectionWithLock(token, PSafeReadOnly);
+	
+	if(connection != NULL)
+	{
+		connection->AcceptIncoming();
+	}
 }
 
 void XMPCSSEndPoint::RefuseIncomingConnection(PString & token)
 {
-	PSafePtr<OpalPCSSConnection> connection = GetPCSSConnectionWithLock(token);
+	PSafePtr<OpalPCSSConnection> connection = GetPCSSConnectionWithLock(token, PSafeReadOnly);
 	
 	if(connection != NULL)
 	{
@@ -81,4 +96,27 @@ void XMPCSSEndPoint::SetAcceptIncomingCall(BOOL acceptConnection)
 void XMPCSSEndPoint::SetCallProtocol(XMCallProtocol theProtocol)
 {
 	protocol = theProtocol;
+}
+
+void XMPCSSEndPoint::GetCallInformation(PString & remoteName, 
+										PString & remoteNumber,
+										PString & remoteAddress,
+										PString & remoteApplication)
+{
+	PSafePtr<OpalPCSSConnection> connection = GetPCSSConnectionWithLock(incomingConnectionToken, PSafeReadOnly);
+	
+	//cout << "trying with " << incomingConnectionToken << endl;
+	if(connection != NULL)
+	{
+		remoteName = connection->GetRemotePartyName();
+		remoteNumber = connection->GetRemotePartyNumber();
+		remoteAddress = connection->GetRemotePartyAddress();
+		remoteApplication = connection->GetRemoteApplication();
+		
+		//cout << "fetching " << remoteName << " " << remoteNumber << " "
+			//<< remoteAddress << " " << remoteApplication << endl;
+	}
+	else{
+		//cout << "failed fetching infos" << endl;
+	}
 }

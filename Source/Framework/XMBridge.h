@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,8 @@
  * responsible for the memory management if there is any memory to manage.
  **/
 
+#include "XMTypes.h"
+
 #pragma mark Init & Startup/Stop functions
 
 /** 
@@ -52,11 +54,37 @@ bool isH323Listening();
 #pragma mark Call Management functions
 
 /**
+ * This function causes the OPAL system to call the specified
+ * remote party, using the specified protocol.
+ * The return value is the callID for this call, or zero if the call
+ * failed. A non-zero return value does not mean that the call was 
+ * successful in itself, only that the attempt to call the remote
+ * party was successful. The result of the call will then be reported
+ * back through the CallbackBridge.
+ **/
+unsigned startCall(XMCallProtocol protocol, const char *remoteParty);
+
+/**
  * Call this function if you want to accept an incoming call.
  * Note that calling this function is only valid if there is
  * a pending incoming call!
  **/
-void setAcceptCall(bool acceptFlag);
+void setAcceptIncomingCall(unsigned callID, bool acceptFlag);
+
+/**
+ * Tells the OPAL system to clear an existing call
+ **/
+void clearCall(unsigned callID);
+
+/**
+ * This function provides additional information about the remote party. 
+ * Note that this information is only valid when the call is established.
+ **/
+void getCallInformation(unsigned callID,
+						const char** remoteName, 
+						const char** remoteNumber,
+						const char** remoteAddress, 
+						const char** remoteApplication);
 
 #pragma mark General Setup Functions
 
@@ -77,6 +105,10 @@ void setPortRanges(unsigned int udpPortMin,
 				   unsigned int tcpPortMax,
 				   unsigned int rtpPortMin,
 				   unsigned int rtpPortMax);
+
+void setTranslationAddress(const char *address);
+
+void setVideoFunctionality(bool receiveVideo, bool transmitVideo);
 
 #pragma mark Audio Functions
 
@@ -108,9 +140,8 @@ bool setAudioOutputVolume(unsigned value);
 
 #pragma mark H.323 Setup Functions
 
-void setEnableH245Tunnel(bool flag);
-void setEnableFastStart(bool flag);
+void setH323Functionality(bool enableFastStart, bool enableH245Tunnel);
 
-void setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber);
+bool setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber);
 
 #pragma mark SIP Setup Functions

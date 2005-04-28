@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,10 +37,12 @@ extern NSString *XMNotification_DidUpdateVideoDeviceList;
 	
 	XMVideoSize videoSize;			// The currently used video size for decompressing into GWorld
 	
-	NSImage *stillImage;			// The still image to use.
-	NSBitmapImageRep *imgRep;		// The bitmap representation from the image (used to get the pixel bytes)
+	//NSImage *stillImage;			// The still image to use.
+	//NSBitmapImageRep *imgRep;		// The bitmap representation from the image (used to get the pixel bytes)
 	
 	int fps;						// indicating the framerate in which to grab video
+	
+	NSBitmapImageRep *remoteVideoFrame;
 	
 	BOOL didCallCallback;			// workaround for FW-Cam freeze bug
 
@@ -52,6 +54,9 @@ extern NSString *XMNotification_DidUpdateVideoDeviceList;
  * will not work.
  */
 + (XMVideoManager *)sharedInstance;
+
+/* storage for the remote video frame */
+- (NSBitmapImageRep *)remoteVideoFrame;
 
 /**
  * Updates the device list. This may take some time, so use with care.

@@ -1,0 +1,78 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = XMGeneralPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {contentView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                createNewLocation = id; 
+                defaultAction = id; 
+                deleteLocation = id; 
+                duplicateLocation = id; 
+                endNewLocationSheet = id; 
+                getExternalAddress = id; 
+                importLocations = id; 
+                renameLocation = id; 
+                toggleAutoGetExternalAddress = id; 
+                toggleEnableH323 = id; 
+                toggleEnableVideoTransmit = id; 
+                toggleUseAddressTranslation = id; 
+                toggleUseGatekeeper = id; 
+            }; 
+            CLASS = XMLocationPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                audioBufferSizeSlider = NSSlider; 
+                audioCodecPreferenceOrderTableView = NSTableView; 
+                autoGetExternalAddressSwitch = NSButton; 
+                bandwidthLimitPopUp = NSPopUpButton; 
+                contentView = NSView; 
+                deleteLocationButton = NSButton; 
+                duplicateLocationButton = NSButton; 
+                enableFastStartSwitch = NSButton; 
+                enableH245TunnelSwitch = NSButton; 
+                enableH323Switch = NSButton; 
+                enableVideoReceiveSwitch = NSButton; 
+                enableVideoTransmitSwitch = NSButton; 
+                externalAddressField = NSTextField; 
+                gatekeeperHostField = NSTextField; 
+                gatekeeperIDField = NSTextField; 
+                gatekeeperPhoneNumberField = NSTextField; 
+                gatekeeperUserAliasField = NSTextField; 
+                getExternalAddressButton = NSButton; 
+                importLocationsButton = NSButton; 
+                localSignalingPortField = NSTextField; 
+                locationsTableView = NSTableView; 
+                maxTCPPortField = NSTextField; 
+                maxUDPPortField = NSTextField; 
+                minTCPPortField = NSTextField; 
+                minUDPPortField = NSTextField; 
+                newLocationButton = NSButton; 
+                newLocationCancelButton = NSButton; 
+                newLocationNameField = NSTextField; 
+                newLocationOKButton = NSButton; 
+                newLocationSheet = NSPanel; 
+                renameLocationButton = NSButton; 
+                sectionsTab = NSTabView; 
+                useGatekeeperSwitch = NSButton; 
+                useIPAddressTranslationSwitch = NSButton; 
+                videoCodecPreferenceOrderTableView = NSTableView; 
+                videoFrameRateField = NSTextField; 
+                videoSizePopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {applyPreferences = id; revertPreferences = id; }; 
+            CLASS = XMPreferencesWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {applyButton = NSButton; buttonToolbarView = NSView; revertButton = NSButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
