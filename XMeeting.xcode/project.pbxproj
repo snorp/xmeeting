@@ -157,6 +157,7 @@
 		};
 		29B97317FDCFA39411CA2CEA = {
 			children = (
+				D189803D082411AC007CD286,
 				8D1107310486CEB800E47090,
 				089C165CFE840E0CC02AAC07,
 				29B97318FDCFA39411CA2CEA,
@@ -361,6 +362,7 @@
 				D1A02ADD081E56DB0018BD11,
 				D1A02AED081E57040018BD11,
 				D1A02B26081E96D30018BD11,
+				D189803E082411AC007CD286,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -990,6 +992,30 @@
 		};
 		D177D7A207B62C9500BD0172 = {
 			fileRef = D177D7A007B62C9500BD0172;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1897F7C0823EEF2007CD286 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.xml;
+			name = English;
+			path = English.lproj/XMCodecDescriptions.plist;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D189803D082411AC007CD286 = {
+			children = (
+				D1897F7C0823EEF2007CD286,
+			);
+			isa = PBXVariantGroup;
+			name = XMCodecDescriptions.plist;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D189803E082411AC007CD286 = {
+			fileRef = D189803D082411AC007CD286;
 			isa = PBXBuildFile;
 			settings = {
 			};

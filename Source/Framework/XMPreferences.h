@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.3 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -155,11 +155,9 @@ extern NSString *XMKey_CodecIsEnabled;
 
 #pragma mark Audio-specific Methods
 
-- (unsigned)audioCodecPreferenceListCount;
-- (XMCodecListRecord *)audioCodecPreferenceListEntryAtIndex:(unsigned)index;
-- (void)audioCodecPreferenceListExchangeEntryAtIndex:(unsigned)index1 withEntryAtIndex:(unsigned)index2;
-- (void)audioCodecPreferenceListAddEntry:(XMCodecListRecord *)entry;
-- (void)audioCodecPreferenceListRemoveEntryAtIndex:(unsigned)index;
+- (unsigned)audioCodecListCount;
+- (XMCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index;
+- (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
 
 - (unsigned)audioBufferSize;
 - (void)setAudioBufferSize:(unsigned)size;
@@ -178,11 +176,9 @@ extern NSString *XMKey_CodecIsEnabled;
 - (XMVideoSize)videoSize;
 - (void)setVideoSize:(XMVideoSize)size;
 
-- (unsigned)videoCodecPreferenceListCount;
-- (XMCodecListRecord *)videoCodecPreferenceListEntryAtIndex:(unsigned)index;
-- (void)videoCodecPreferenceListExchangeEntryAtIndex:(unsigned)index1 withEntryAtIndex:(unsigned)index2;
-- (void)videoCodecPreferenceListAddEntry:(XMCodecListRecord *)entry;
-- (void)videoCodecPreferenceListRemoveEntryAtIndex:(unsigned)index;
+- (unsigned)videoCodecListCount;
+- (XMCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index;
+- (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
 
 #pragma mark H.323-specific Methods
 

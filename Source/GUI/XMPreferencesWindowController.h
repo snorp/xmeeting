@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,7 +33,6 @@ extern NSString *XMKey_ButtonToolbarItemIdentifier;	// identifier for the apply 
 	
 	NSToolbarItem *buttonToolbarItem;
 	IBOutlet NSView *buttonToolbarView;
-	IBOutlet NSButton *revertButton;
 	IBOutlet NSButton *applyButton;
 	
 	NSToolbarItem *currentSelectedItem;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.mm,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMCodecManager.mm,v 1.3 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,11 +8,11 @@
 
 #import "XMCodecManager.h"
 
-#define XM_CODEC_DESCRIPTIONS_FILENAME @"CodecDescriptions"
+#define XM_CODEC_DESCRIPTIONS_FILENAME @"XMCodecDescriptions"
 #define XM_CODEC_DESCRIPTIONS_FILETYPE @"plist"
 
-#define AUDIO_CODECS_KEY @"AudioCodecs"
-#define VIDEO_CODECS_KEY @"VideoCodecs"
+#define AUDIO_CODECS_KEY @"XMeeting_AudioCodecs"
+#define VIDEO_CODECS_KEY @"XMeeting_VideoCodecs"
 
 NSString *XMAudioCodec_G711_ALaw = @"g.711-alaw";
 NSString *XMAudioCodec_G711_uLaw = @"g.711-ulaw";
@@ -23,8 +23,8 @@ NSString *XMAudioCodec_iLBC = @"ilbc";
 NSString *XMAudioCodec_IMA_ADPCM = @"ima_adpcm";
 NSString *XMAudioCodec_LPC = @"lpc";
 
-NSString *XMVideoCodec_H261 = @"H.261";
-NSString *XMVideoCodec_H263 = @"H.263";
+NSString *XMVideoCodec_H261 = @"h.261";
+NSString *XMVideoCodec_H263 = @"h.263";
 
 NSString *XMKey_CodecKey = @"XMeeting_CodecKey";
 NSString *XMKey_CodecName = @"XMeeting_CodecName";
@@ -176,7 +176,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	return nil;
 }
 
-- (unsigned)audioCodecsCount
+- (unsigned)audioCodecCount
 {
 	return [audioCodecDescriptors count];
 }
@@ -186,7 +186,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	return (XMCodecDescriptor *)[audioCodecDescriptors objectAtIndex:index];
 }
 
-- (unsigned)videoCodecsCount
+- (unsigned)videoCodecCount
 {
 	return [videoCodecDescriptors count];
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.3 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,7 @@
  */
 
 #import "XMPreferences.h"
+#import "XMCodecManager.h"
 
 NSString *XMKey_BandwidthLimit = @"XMeeting_BandwidthLimit";
 NSString *XMKey_UseAddressTranslation = @"XMeeting_UseAddressTranslation";
@@ -37,15 +38,17 @@ NSString *XMKey_H323_GatekeeperUsername = @"XMeeting_H323_GatekeeperUsername";
 NSString *XMKey_H323_GatekeeperE164Number = @"XMeeting_H323_GatekeeperE164Number";
 
 // XMKey_CodecKey is defined in XMCodecManager.mm
-NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
+NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 
 @interface XMPreferences(PrivateMethods)
 
-- (NSArray *)_audioCodecPreferenceList;
+- (NSMutableArray *)_audioCodecPreferenceList;
 - (void)_setAudioCodecPreferenceList:(NSArray *)arr;
 
-- (NSArray *)_videoCodecPreferenceList;
+- (NSMutableArray *)_videoCodecPreferenceList;
 - (void)_setVideoCodecPreferenceList:(NSArray *)arr;
+
+- (void)_validateCodecs;
 
 @end
 
@@ -65,14 +68,17 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	udpPortMin = 5000;
 	udpPortMax = 5099;
 	
-	audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:5];
+	// to reduce unnecessary copy overhead, we do not allocate any storage, indicating that
+	// this has yet to be done. In case of a copy operation, the array allocated here is never
+	// used.
+	audioCodecPreferenceList = nil;
 	audioBufferSize = 2;
 	
 	enableVideoReceive = NO;
 	sendVideo = NO;
 	sendFPS = 5;
 	videoSize = XMVideoSize_NoVideo;
-	videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:2];
+	videoCodecPreferenceList = nil;
 	
 	h323_IsEnabled = YES;
 	h323_EnableH245Tunnel = NO;
@@ -139,17 +145,35 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	obj = [dict objectForKey:XMKey_AudioCodecPreferenceList];
 	if(obj)
 	{
+		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		NSArray *arr = (NSArray *)obj;
 		unsigned count = [arr count];
-		int i;
+		unsigned i;
 		
-		[audioCodecPreferenceList removeAllObjects];
+		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
-			XMCodecListRecord *entry = [[XMCodecListRecord alloc] initWithDictionary:dict];
-			[audioCodecPreferenceList addObject:entry];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithDictionary:dict];
+			
+			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			{
+				[audioCodecPreferenceList addObject:record];
+			}
+			[record release];
+		}
+		
+		// any newly added codecs are guaranteed to be found at the end of the array
+		count = [audioCodecPreferenceList count];
+		unsigned codecCount = [codecManager audioCodecCount];
+		
+		for(i = count; i < codecCount; i++)
+		{
+			NSString *key = [[codecManager audioCodecDescriptorAtIndex:i] key];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			[audioCodecPreferenceList addObject:record];
+			[record release];
 		}
 	}
 	
@@ -186,17 +210,35 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	obj = [dict objectForKey:XMKey_VideoCodecPreferenceList];
 	if(obj)
 	{
+		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		NSArray *arr = (NSArray *)obj;
 		unsigned count = [arr count];
 		int i;
 		
-		[videoCodecPreferenceList removeAllObjects];
+		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
-			XMCodecListRecord *entry = [[XMCodecListRecord alloc] initWithDictionary:dict];
-			[videoCodecPreferenceList addObject:entry];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithDictionary:dict];
+			
+			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			{
+				[videoCodecPreferenceList addObject:record];
+			}
+			[record release];
+		}
+		
+		// we have to include additional codec records in case new codecs were added to the system
+		count = [videoCodecPreferenceList count];
+		unsigned codecCount = [codecManager videoCodecCount];
+		
+		for(i = count; i < codecCount; i++)
+		{
+			NSString *key = [[codecManager videoCodecDescriptorAtIndex:i] key];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			[videoCodecPreferenceList addObject:record];
+			[record release];
 		}
 	}
 	
@@ -304,6 +346,10 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	
 	if([coder allowsKeyedCoding]) // use keyed coding
 	{
+		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
+		NSArray *array;
+		unsigned count, codecCount, i;
+		
 		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_BandwidthLimit]];
 		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_UseAddressTranslation]];
 		[self setExternalAddress:[coder decodeObjectForKey:XMKey_ExternalAddress]];
@@ -312,14 +358,54 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 		[self setUDPPortMin:[coder decodeIntForKey:XMKey_UDPPortMin]];
 		[self setUDPPortMax:[coder decodeIntForKey:XMKey_UDPPortMax]];
 		
-		[self _setAudioCodecPreferenceList:[coder decodeObjectForKey:XMKey_AudioCodecPreferenceList]];
+		array = (NSArray *)[coder decodeObjectForKey:XMKey_AudioCodecPreferenceList];
+		count = [array count];
+		codecCount = [codecManager audioCodecCount];
+		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		
+		for(i = 0; i < count; i++)
+		{
+			XMCodecListRecord *record = (XMCodecListRecord *)[array objectAtIndex:i];
+			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			{
+				[audioCodecPreferenceList addObject:record];
+			}
+		}
+		for(i = count; i < codecCount; i++)
+		{
+			NSString *key = [[codecManager audioCodecDescriptorAtIndex:i] key];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			[audioCodecPreferenceList addObject:record];
+			[record release];
+		}
+		
 		[self setAudioBufferSize:[coder decodeIntForKey:XMKey_AudioBufferSize]];
 		
 		[self setEnableVideoReceive:[coder decodeBoolForKey:XMKey_EnableVideoReceive]];
 		[self setSendVideo:[coder decodeBoolForKey:XMKey_SendVideo]];
 		[self setSendFPS:[coder decodeIntForKey:XMKey_SendFPS]];
 		[self setVideoSize:[coder decodeIntForKey:XMKey_VideoSize]];
-		[self _setVideoCodecPreferenceList:[coder decodeObjectForKey:XMKey_VideoCodecPreferenceList]];
+		
+		array = (NSArray *)[coder decodeObjectForKey:XMKey_VideoCodecPreferenceList];
+		count = [array count];
+		codecCount = [codecManager videoCodecCount];
+		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		
+		for(i = 0; i < count; i++)
+		{
+			XMCodecListRecord *record = (XMCodecListRecord *)[array objectAtIndex:i];
+			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			{
+				[videoCodecPreferenceList addObject:record];
+			}
+		}
+		for(i = count; i < codecCount; i++)
+		{
+			NSString *key = [[codecManager videoCodecDescriptorAtIndex:i] key];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			[videoCodecPreferenceList addObject:record];
+			[record release];
+		}
 		
 		[self setH323IsEnabled:[coder decodeBoolForKey:XMKey_H323_IsEnabled]];
 		[self setH323EnableH245Tunnel:[coder decodeBoolForKey:XMKey_H323_EnableH245Tunnel]];
@@ -385,7 +471,6 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	[externalAddress release];
 	
 	[audioCodecPreferenceList release];
-	
 	[videoCodecPreferenceList release];
 	
 	[h323_GatekeeperAddress release];
@@ -398,6 +483,10 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 
 #pragma mark General NSObject Functionality
 
+/**
+ * this compare is correct but may break if someone decides to
+ * override the audio/video codec preferences list handling
+ **/
 - (BOOL)isEqual:(id)object
 {
 	XMPreferences *prefs;
@@ -692,44 +781,19 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 
 #pragma mark Audio-specific Methods
 
-- (NSArray *)_audioCodecPreferenceList
+- (unsigned)audioCodecListCount
 {
-	return audioCodecPreferenceList;
+	return [[self _audioCodecPreferenceList] count];
 }
 
-- (void)_setAudioCodecPreferenceList:(NSArray *)list
+- (XMCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index
 {
-	if(list != audioCodecPreferenceList)
-	{
-		NSArray *old = audioCodecPreferenceList;
-		audioCodecPreferenceList = [list mutableCopy];
-		[old release];
-	}
+	return (XMCodecListRecord *)[[self _audioCodecPreferenceList] objectAtIndex:index];
 }
 
-- (unsigned)audioCodecPreferenceListCount
+- (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
-	return [audioCodecPreferenceList count];
-}
-
-- (XMCodecListRecord *)audioCodecPreferenceListEntryAtIndex:(unsigned)index
-{
-	return (XMCodecListRecord *)[audioCodecPreferenceList objectAtIndex:index];
-}
-
-- (void)audioCodecPreferenceListExchangeEntryAtIndex:(unsigned)index1 withEntryAtIndex:(unsigned)index2
-{
-	[audioCodecPreferenceList exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
-}
-
-- (void)audioCodecPreferenceListAddEntry:(XMCodecListRecord *)entry
-{
-	[audioCodecPreferenceList addObject:entry];
-}
-
-- (void)audioCodecPreferenceListRemoveEntryAtIndex:(unsigned)index
-{
-	[audioCodecPreferenceList removeObjectAtIndex:index];
+	[[self _audioCodecPreferenceList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
 }
 
 - (unsigned)audioBufferSize
@@ -784,44 +848,19 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	videoSize = size;
 }
 
-- (NSArray *)_videoCodecPreferenceList
+- (unsigned)videoCodecListCount
 {
-	return videoCodecPreferenceList;
+	return [[self _videoCodecPreferenceList] count];
 }
 
-- (void)_setVideoCodecPreferenceList:(NSArray *)list
+- (XMCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index
 {
-	if(list != videoCodecPreferenceList)
-	{
-		NSArray *old = videoCodecPreferenceList;
-		videoCodecPreferenceList = [list mutableCopy];
-		[old release];
-	}
+	return (XMCodecListRecord *)[[self _videoCodecPreferenceList] objectAtIndex:index];
 }
 
-- (unsigned)videoCodecPreferenceListCount
+- (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
-	return [videoCodecPreferenceList count];
-}
-
-- (XMCodecListRecord *)videoCodecPreferenceListEntryAtIndex:(unsigned)index
-{
-	return (XMCodecListRecord *)[videoCodecPreferenceList objectAtIndex:index];
-}
-
-- (void)videoCodecPreferenceListExchangeEntryAtIndex:(unsigned)index1 withEntryAtIndex:(unsigned)index2
-{
-	[videoCodecPreferenceList exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
-}
-
-- (void)videoCodecPreferenceListAddEntry:(XMCodecListRecord *)entry
-{
-	[videoCodecPreferenceList addObject:entry];
-}
-
-- (void)videoCodecPreferenceListRemoveEntryAtIndex:(unsigned)index
-{
-	[videoCodecPreferenceList removeObjectAtIndex:index];
+	[[self _videoCodecPreferenceList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
 }
 
 #pragma mark H.323-specific Methods
@@ -1012,6 +1051,69 @@ NSString *XMKey_CodecIsEnabled = @"XMeeeting_CodecIsEnabled";
 	//return [[XMKeyChainAccess sharedInstance] setPassword:password forServiceName:gatekeeper account:user];
 	 */
 	return FALSE;
+}
+
+#pragma mark Private Methods
+
+- (NSMutableArray *)_audioCodecPreferenceList
+{
+	if(!audioCodecPreferenceList)
+	{
+		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
+		unsigned count = [codecManager audioCodecCount];
+		unsigned i;
+		
+		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		
+		for(i = 0; i < count; i++)
+		{
+			NSString *key = [[codecManager audioCodecDescriptorAtIndex:i] key];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			[audioCodecPreferenceList addObject:record];
+			[record release];
+		}
+	}
+	
+	return audioCodecPreferenceList;
+}
+
+- (void)_setAudioCodecPreferenceList:(NSArray *)list
+{
+	NSArray *old = audioCodecPreferenceList;
+	audioCodecPreferenceList = [list mutableCopy];
+	[old release];
+}
+
+- (NSArray *)_videoCodecPreferenceList
+{
+	if(!videoCodecPreferenceList)
+	{
+		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
+		unsigned count = [codecManager videoCodecCount];
+		unsigned i;
+		
+		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		
+		for(i = 0; i < count; i++)
+		{
+			NSString *key = [[codecManager videoCodecDescriptorAtIndex:i] key];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			[videoCodecPreferenceList addObject:record];
+			[record release];
+		}
+	}
+	
+	return videoCodecPreferenceList;
+}
+
+- (void)_setVideoCodecPreferenceList:(NSArray *)list
+{
+	if(list != videoCodecPreferenceList)
+	{
+		NSArray *old = videoCodecPreferenceList;
+		videoCodecPreferenceList = [list mutableCopy];
+		[old release];
+	}
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.1 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,20 +70,6 @@ extern NSString *XMKey_ActiveLocation;
  * are simply ignored.
  **/
 - (void)setLocations:(NSArray *)locations;
-
-/**
- * Adds location to the list of locations.
- * This method synchronizes with UserDefaults and posts the 
- * according notifications
- **/
-- (void)addLocation:(XMLocation *)location;
-
-/**
- * Removes the location at index from the list of locations.
- * Synchronizes the locations with UserDefaults and posts the
- * according notificaitons
- **/
-- (void)removeLocationAtIndex:(unsigned)index;
 
 /**
  * convenience method to access just the names of the locations

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,7 +19,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 @interface XMLocationPreferencesModule : NSObject <XMPreferencesModule> {
 	
 	XMPreferencesWindowController *prefWindowController;
-	NSArray *locations;
+	NSMutableArray *locations;
 	XMLocation *currentLocation;
 	IBOutlet NSView *contentView;
 	float contentViewHeight;
@@ -49,7 +49,6 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	
 	// h323 outlets
 	IBOutlet NSButton *enableH323Switch;
-	IBOutlet NSTextField *localSignalingPortField;
 	IBOutlet NSButton *enableH245TunnelSwitch;
 	IBOutlet NSButton *enableFastStartSwitch;
 	IBOutlet NSButton *useGatekeeperSwitch;
@@ -71,12 +70,16 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *videoFrameRateField;
 	IBOutlet NSPopUpButton *videoSizePopUp;
 	IBOutlet NSTableView *videoCodecPreferenceOrderTableView;
+	IBOutlet NSButton *moveAudioCodecUpButton;
+	IBOutlet NSButton *moveAudioCodecDownButton;
 	
 	// Outlets for the newLocation Sheet
 	IBOutlet NSPanel *newLocationSheet;
 	IBOutlet NSTextField *newLocationNameField;
 	IBOutlet NSButton *newLocationOKButton;
 	IBOutlet NSButton *newLocationCancelButton;
+	IBOutlet NSButton *moveVideoCodecUpButton;
+	IBOutlet NSButton *moveVideoCodecDownButton;
 }
 
 // action methos for dealing with locations
@@ -102,10 +105,11 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 // none at present
 
 // Audio action methods
-// none at present
+- (IBAction)moveAudioCodec:(id)sender;
 
 // Video action methods
 - (IBAction)toggleEnableVideoTransmit:(id)sender;
+- (IBAction)moveVideoCodec:(id)sender;
 
 // Action methods for the newLocation Sheet
 - (IBAction)endNewLocationSheet:(id)sender;

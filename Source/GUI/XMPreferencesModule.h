@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesModule.h,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMPreferencesModule.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,15 +64,6 @@
  * XMPreferencesManager
  **/
 - (void)loadPreferences;
-
-/**
- * This method instructs the receiver to restore its preferences.
- * This method is very similar to loadPreferences, the difference
- * may be what happens with the GUI: In loadPreferences, the
- * GUI should be restored to it's default look (tab-selections etc),
- * while restorePreferences only should restore the actual data
- **/
-- (void)revertPreferences;
 
 /**
  * This method instructs the receiver to save the changes made

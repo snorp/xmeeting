@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,7 +20,6 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 // adding new locations
 - (void)_addLocation:(XMLocation *)location;
-- (void)_removeCurrentLocation;
 
 // loading and saving the current selected location
 - (void)_loadCurrentLocation;
@@ -51,7 +50,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 {
 	prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
 	
-	locations = nil;
+	locations = [[NSMutableArray alloc] initWithCapacity:3];
 	
 	return self;
 }
@@ -109,45 +108,23 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 - (void)loadPreferences
 {	
-	// loading the data
-	[self revertPreferences];
+	// replacing the locations with a fresh set
+	[locations removeAllObjects];
+	[locations addObjectsFromArray:[[XMPreferencesManager sharedInstance] locations]];
+	
+	// making sure that there is no wrong data saved
+	currentLocation = nil;
+	
+	// causing the table view to reload its data and select the first item
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
+	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+	[locationsTableView reloadData];
 	
 	// validating the location buttons
 	[self _validateLocationButtonUserInterface];
 	
 	// displaying the first tab item at the start
 	[sectionsTab selectFirstTabViewItem:self];
-	
-	// causing the table view to reload its data and select the first item
-	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
-	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
-}
-
-- (void)revertPreferences
-{
-	unsigned currentIndex;
-	
-	// determining the index of the old location
-	if(currentLocation)
-	{
-		unsigned currentIndex = [locations indexOfObject:currentLocation];
-	}
-	else
-	{
-		currentIndex = 0;
-	}
-	// replace the locations array with a new one
-	[locations release];
-	locations = [[[XMPreferencesManager sharedInstance] locations] retain];
-	
-	// we are guaranteed that we have at least one loation in preferences
-	currentLocation = (XMLocation *)[locations objectAtIndex:0];
-	
-	// loading the data
-	[self _loadCurrentLocation];
-	
-	// reloading the tableView data
-	[locationsTableView reloadData];
 }
 
 - (void)savePreferences
@@ -169,6 +146,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 - (IBAction)createNewLocation:(id)sender
 {
 	[newLocationNameField setStringValue:NSLocalizedString(@"New Location", @"New Location Name")];
+	[newLocationNameField selectText:self];
 	
 	// we obtain the window through the NSView's -window method
 	[NSApp beginSheet:newLocationSheet modalForWindow:[sectionsTab window] modalDelegate:self
@@ -181,29 +159,42 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 - (IBAction)duplicateLocation:(id)sender
 {
+	unsigned index = [locations count];
+	
 	NSString *currentLocationName = [currentLocation name];
 	XMLocation *duplicate = [currentLocation copy];
 	[duplicate setName:[currentLocationName stringByAppendingString:NSLocalizedString(@" Copy", @"LocationCopySuffix")]];
 	
 	[self _addLocation:duplicate];
 	[duplicate release];
+	
+	[locationsTableView editColumn:0 row:index withEvent:nil select:YES];
 }
 
 - (IBAction)deleteLocation:(id)sender
 {
-	NSString *alertText = [[NSString alloc] initWithFormat:NSLocalizedString(@"deleteLocationAlert \"%@\"", @"Delete location Alert Text"),
-		[currentLocation name]];
+	unsigned index = [locations indexOfObject:currentLocation];
 	
-	NSAlert *alert = [[NSAlert alloc] init];
+	// removing the location from the list and taking the first location as the current one.
+	[locations removeObjectAtIndex:index];
+	currentLocation = nil;
 	
-	[alert setMessageText:alertText];
-	[alert addButtonWithTitle:NSLocalizedString(@"Delete", @"Delete")];
-	[alert addButtonWithTitle:NSLocalizedString(@"Don't Delete", @"Don't Delete")];
+	// validate the GUI
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
+	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+	[locationsTableView reloadData];
+	[self _validateLocationButtonUserInterface];
 	
-	[alert beginSheetModalForWindow:[sectionsTab window]
-					  modalDelegate:self
-					 didEndSelector:@selector(_deleteLocationAlertDidEnd:returnCode:context:)
-						contextInfo:NULL];
+	[sectionsTab selectFirstTabViewItem:self];
+	
+	// triggering the defaultAction
+	[self defaultAction:self];
+	
+	// in case of index == 0, we have to manually set the new active location
+	if(index == 0)
+	{
+		currentLocation = (XMLocation *)[locations objectAtIndex:0];
+	}
 }
 
 - (IBAction)renameLocation:(id)sender
@@ -240,10 +231,18 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[self defaultAction:self];
 }
 
+- (IBAction)moveAudioCodec:(id)sender
+{
+}
+
 - (IBAction)toggleEnableVideoTransmit:(id)sender
 {
 	[self _validateVideoTransmitUserInterface];
 	[self defaultAction:self];
+}
+
+- (IBAction)moveVideoCodec:(id)sender
+{
 }
 
 - (IBAction)endNewLocationSheet:(id)sender
@@ -277,21 +276,18 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	
 	if(tableView == locationsTableView)
 	{
-		unsigned currentIndex = [locations indexOfObject:currentLocation];
+		if(currentLocation)
+		{
+			[self _saveCurrentLocation];
+		}
+		
 		unsigned newIndex = [locationsTableView selectedRow];
 		
-		if(currentIndex != newIndex)
-		{
+		// change the current location
+		currentLocation = [locations objectAtIndex:newIndex];
 		
-			// first, save the currentLocation
-			[self _saveCurrentLocation];
-		
-			// change the current location
-			currentLocation = [locations objectAtIndex:newIndex];
-		
-			// update the GUI to show the new location
-			[self _loadCurrentLocation];
-		}
+		// update the GUI to show the new location
+		[self _loadCurrentLocation];
 	}
 }
 
@@ -303,13 +299,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	unsigned index = [locations count];
 	
 	// adding the location
-	[locations autorelease];
-	locations = [[locations arrayByAddingObject:location] retain];
-	[[XMPreferencesManager sharedInstance] addLocation:location];
-	
-	// choose the new location as the location and display this location
-	currentLocation = location;
-	[self _loadCurrentLocation];
+	[locations addObject:location];
 	
 	// validate the GUI
 	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
@@ -317,30 +307,8 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
 	[sectionsTab selectFirstTabViewItem:self];
 	[self _validateLocationButtonUserInterface];
-}
-
-- (void)_removeCurrentLocation
-{
-	unsigned index = [locations indexOfObject:currentLocation];
 	
-	// replacing the locations array with a new one without the location to remove
-	NSMutableArray *newLocations = [locations mutableCopy];
-	[newLocations removeObjectAtIndex:index];
-	[locations release];
-	locations = newLocations;
-	currentLocation = [locations objectAtIndex:0];
-	
-	// removing the location
-	[[XMPreferencesManager sharedInstance] removeLocationAtIndex:index];
-	
-	[self _loadCurrentLocation];
-	
-	// validate the GUI
-	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
-	[locationsTableView reloadData];
-	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
-	[sectionsTab selectFirstTabViewItem:self];
-	[self _validateLocationButtonUserInterface];
+	[self defaultAction:self];
 }
 
 #pragma mark Load & Save a Location
@@ -379,9 +347,6 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	// load the H.323 section
 	state = ([currentLocation h323IsEnabled] == YES) ? NSOnState : NSOffState;
 	[enableH323Switch setState:state];
-	
-	// this is fixed at present time
-	[localSignalingPortField setIntValue:1720];
 	
 	state = ([currentLocation h323EnableH245Tunnel] == YES) ? NSOnState : NSOffState;
 	[enableH245TunnelSwitch setState:state];
@@ -572,7 +537,6 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 {
 	BOOL flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
 	
-	[localSignalingPortField setEnabled:NO]; // currently not active
 	[enableH245TunnelSwitch setEnabled:flag];
 	[enableFastStartSwitch setEnabled:flag];
 	[useGatekeeperSwitch setEnabled:flag];
@@ -617,18 +581,57 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	{
 		return [locations count];
 	}
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		return [currentLocation audioCodecListCount];
+	}
+	if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		return [currentLocation videoCodecListCount];
+	}
 	
 	return 0;
 }
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)column row:(int)rowIndex
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)column row:(int)rowIndex
 {
-	if(aTableView == locationsTableView)
+	if(tableView == locationsTableView)
 	{
 		return [(XMLocation *)[locations objectAtIndex:rowIndex] name];
 	}
 	
-	return nil;
+	if(tableView != audioCodecPreferenceOrderTableView &&
+	   tableView != videoCodecPreferenceOrderTableView)
+	{
+		return nil;
+	}
+	
+	NSString *identifier = [column identifier];
+	XMCodecListRecord *record;
+	
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		record = [currentLocation audioCodecListRecordAtIndex:rowIndex];
+	}
+	else if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		record = [currentLocation videoCodecListRecordAtIndex:rowIndex];
+	}
+	
+	if([identifier isEqualToString:XMKey_CodecIsEnabled])
+	{
+		if([record isEnabled])
+		{
+			return NSLocalizedString(@"YES", @"YES");
+		}
+		else
+		{
+			return NSLocalizedString(@"NO", @"NO");
+		}
+	}
+	
+	XMCodecDescriptor *codecDescriptor = [[XMCodecManager sharedInstance] codecDescriptorForKey:[record key]];
+	return [codecDescriptor propertyForKey:identifier];
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
@@ -639,6 +642,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		{
 			[(XMLocation *)[locations objectAtIndex:rowIndex] setName:(NSString *)anObject];
 		}
+		[self defaultAction:self];
 	}
 }
 
@@ -653,14 +657,6 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		XMLocation *location = [[XMLocation alloc] initWithName:name];
 		[self _addLocation:location];
 		[location release];
-	}
-}
-
-- (void)_deleteLocationAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode context:(void *)context
-{
-	if(returnCode == NSAlertFirstButtonReturn) // Delete
-	{
-		[self _removeCurrentLocation];
 	}
 }
 

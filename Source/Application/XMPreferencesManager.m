@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.1 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -152,24 +152,6 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 			[locations addObject:[obj copy]];
 		}
 	}
-}
-
-- (void)addLocation:(XMLocation *)location
-{
-	[locations addObject:[location copy]];
-	
-	[self _writeLocationsToUserDefaults];
-	
-	// post a notification here;
-}
-
-- (void)removeLocationAtIndex:(unsigned)index
-{
-	[locations removeObjectAtIndex:index];
-	
-	[self _writeLocationsToUserDefaults];
-	
-	// post a notification here;
 }
 
 - (NSArray *)locationNames

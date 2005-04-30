@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,10 +68,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 }
 
 - (void)loadPreferences
-{
-}
-
-- (void)revertPreferences
 {
 }
 

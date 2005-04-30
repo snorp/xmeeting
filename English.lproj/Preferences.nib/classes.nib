@@ -16,6 +16,8 @@
                 endNewLocationSheet = id; 
                 getExternalAddress = id; 
                 importLocations = id; 
+                moveAudioCodec = id; 
+                moveVideoCodec = id; 
                 renameLocation = id; 
                 toggleAutoGetExternalAddress = id; 
                 toggleEnableH323 = id; 
@@ -45,12 +47,15 @@
                 gatekeeperUserAliasField = NSTextField; 
                 getExternalAddressButton = NSButton; 
                 importLocationsButton = NSButton; 
-                localSignalingPortField = NSTextField; 
                 locationsTableView = NSTableView; 
                 maxTCPPortField = NSTextField; 
                 maxUDPPortField = NSTextField; 
                 minTCPPortField = NSTextField; 
                 minUDPPortField = NSTextField; 
+                moveAudioCodecDownButton = NSButton; 
+                moveAudioCodecUpButton = NSButton; 
+                moveVideoCodecDownButton = NSButton; 
+                moveVideoCodecUpButton = NSButton; 
                 newLocationButton = NSButton; 
                 newLocationCancelButton = NSButton; 
                 newLocationNameField = NSTextField; 

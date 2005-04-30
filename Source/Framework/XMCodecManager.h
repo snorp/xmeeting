@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMCodecManager.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,13 +62,13 @@ extern NSString *XMKey_CodecQuality;
 /*
  * Accessing the available audio codecs
  */
-- (unsigned)audioCodecsCount;
+- (unsigned)audioCodecCount;
 - (XMCodecDescriptor *)audioCodecDescriptorAtIndex:(unsigned)index;
 
 /*
  * Accessing the available video codecs
  */
-- (unsigned)videoCodecsCount;
+- (unsigned)videoCodecCount;
 - (XMCodecDescriptor *)videoCodecDescriptorAtIndex:(unsigned)index;
 
 @end

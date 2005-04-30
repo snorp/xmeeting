@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,6 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 
 // action method for the toolbar items
 - (IBAction)toolbarItemAction:(NSToolbarItem *)sender;
-- (IBAction)revertPreferences:(NSButton *)sender;
 - (IBAction)applyPreferences:(id)sender;
 
 // modal sheets modal delegate methods
@@ -120,8 +119,7 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 	[window setToolbar:toolbar];
 	[toolbar release];
 	
-	/* making the two buttons in the toolbar disabled */
-	[revertButton setEnabled:NO];
+	/* making the apply button in the toolbar disabled */
 	[applyButton setEnabled:NO];
 }
 
@@ -141,7 +139,6 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 			id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
 			[module loadPreferences];
 		}
-		[revertButton setEnabled:NO];
 		[applyButton setEnabled:NO];
 		[[self window] setDocumentEdited:NO];
 		preferencesHaveChanged = NO;
@@ -158,7 +155,6 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 {
 	if(!preferencesHaveChanged)
 	{
-		[revertButton setEnabled:YES];
 		[applyButton setEnabled:YES];
 		[[self window] setDocumentEdited:YES];
 		preferencesHaveChanged = YES;
@@ -269,23 +265,6 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 	}
 }
 
-- (IBAction)revertPreferences:(NSButton *)sender
-{
-	unsigned count = [modules count];
-	unsigned i;
-	
-	for(i = 0; i < count; i++)
-	{
-		id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
-		[module revertPreferences];
-	}
-	
-	[revertButton setEnabled:NO];
-	[applyButton setEnabled:NO];
-	[[self window] setDocumentEdited:NO];
-	preferencesHaveChanged = NO;
-}
-
 - (IBAction)applyPreferences:(id)sender
 {
 	unsigned count = [modules count];
@@ -297,7 +276,6 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 		[module savePreferences];
 	}
 	
-	[revertButton setEnabled:NO];
 	[applyButton setEnabled:NO];
 	[[self window] setDocumentEdited:NO];
 	preferencesHaveChanged = NO;
