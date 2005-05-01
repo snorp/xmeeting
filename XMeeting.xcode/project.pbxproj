@@ -363,6 +363,7 @@
 				D1A02AED081E57040018BD11,
 				D1A02B26081E96D30018BD11,
 				D189803E082411AC007CD286,
+				D189805308241F11007CD286,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -406,6 +407,7 @@
 				D1A02A78081E40580018BD11,
 				D1A02ADE081E56DB0018BD11,
 				D1A02AEE081E57040018BD11,
+				D189805408241F11007CD286,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1020,6 +1022,36 @@
 			settings = {
 			};
 		};
+		D189805108241F11007CD286 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMBooleanCell.h;
+			path = Source/GUI/XMBooleanCell.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D189805208241F11007CD286 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMBooleanCell.m;
+			path = Source/GUI/XMBooleanCell.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D189805308241F11007CD286 = {
+			fileRef = D189805108241F11007CD286;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D189805408241F11007CD286 = {
+			fileRef = D189805208241F11007CD286;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		D18BF5F007AFA006000CF993 = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
@@ -1204,6 +1236,8 @@
 				D1A02ADC081E56DB0018BD11,
 				D1A02AEB081E57040018BD11,
 				D1A02AEC081E57040018BD11,
+				D189805108241F11007CD286,
+				D189805208241F11007CD286,
 			);
 			isa = PBXGroup;
 			name = PreferencesWindow;

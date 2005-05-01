@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.3 2005/05/01 09:34:41 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #import "XMPreferencesWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMLocation.h"
+#import "XMBooleanCell.h"
 
 NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPreferencesModule";
 
@@ -31,7 +32,9 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 - (void)_validateExternalAddressUserInterface;
 - (void)_validateH323UserInterface;
 - (void)_validateGatekeeperUserInterface;
+- (void)_validateAudioOrderUserInterface;
 - (void)_validateVideoTransmitUserInterface;
+- (void)_validateVideoOrderUserInterface;
 
 // table view source methods
 - (int)numberOfRowsInTableView:(NSTableView *)tableView;
@@ -59,6 +62,18 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 {
 	contentViewHeight = [contentView frame].size.height;
 	[prefWindowController addPreferencesModule:self];
+	
+	XMBooleanCell *cell = [[XMBooleanCell alloc] init];
+	
+	NSTableColumn *column = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_CodecIsEnabled];
+	[column setDataCell:cell];
+	[audioCodecPreferenceOrderTableView setRowHeight:16];
+	
+	column = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_CodecIsEnabled];
+	[column setDataCell:cell];
+	[videoCodecPreferenceOrderTableView setRowHeight:16];
+	
+	[cell release];
 }
 
 - (void)dealloc
@@ -136,7 +151,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[[XMPreferencesManager sharedInstance] setLocations:locations];
 }
 
-#pragma mark UserInterface Methods
+#pragma mark User Interface Methods
 
 - (IBAction)defaultAction:(id)sender
 {
@@ -233,6 +248,23 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 - (IBAction)moveAudioCodec:(id)sender
 {
+	int rowIndex = [audioCodecPreferenceOrderTableView selectedRow];
+	int newIndex;
+	if(sender == moveAudioCodecUpButton)
+	{
+		newIndex = rowIndex - 1;
+	}
+	else
+	{
+		newIndex = rowIndex + 1;
+	}
+	[currentLocation audioCodecListExchangeRecordAtIndex:rowIndex withRecordAtIndex:newIndex];
+	[audioCodecPreferenceOrderTableView reloadData];
+	
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:newIndex];
+	[audioCodecPreferenceOrderTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+	
+	[self defaultAction:self];
 }
 
 - (IBAction)toggleEnableVideoTransmit:(id)sender
@@ -243,6 +275,23 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 - (IBAction)moveVideoCodec:(id)sender
 {
+	int rowIndex = [videoCodecPreferenceOrderTableView selectedRow];
+	int newIndex;
+	if(sender == moveVideoCodecUpButton)
+	{
+		newIndex = rowIndex - 1;
+	}
+	else
+	{
+		newIndex = rowIndex + 1;
+	}
+	[currentLocation videoCodecListExchangeRecordAtIndex:rowIndex withRecordAtIndex:newIndex];
+	[videoCodecPreferenceOrderTableView reloadData];
+	
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:newIndex];
+	[audioCodecPreferenceOrderTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+	
+	[self defaultAction:self];
 }
 
 - (IBAction)endNewLocationSheet:(id)sender
@@ -289,7 +338,48 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		// update the GUI to show the new location
 		[self _loadCurrentLocation];
 	}
+	
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		[self _validateAudioOrderUserInterface];
+	}
+	
+	if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		[self _validateVideoOrderUserInterface];
+	}
 }
+
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		NSColor *colorToUse;
+		if([[currentLocation audioCodecListRecordAtIndex:rowIndex] isEnabled])
+		{
+			colorToUse = [NSColor controlTextColor];
+		}
+		else
+		{
+			colorToUse = [NSColor disabledControlTextColor];
+		}
+		[aCell setTextColor:colorToUse];
+	}
+	if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		NSColor *colorToUse;
+		if([[currentLocation videoCodecListRecordAtIndex:rowIndex] isEnabled])
+		{
+			colorToUse = [NSColor controlTextColor];
+		}
+		else
+		{
+			colorToUse = [NSColor disabledControlTextColor];
+		}
+		[aCell setTextColor:colorToUse];
+	}
+}
+
 
 #pragma mark Adding a New Location
 
@@ -417,7 +507,9 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[self _validateAddressTranslationUserInterface];
 	[self _validateExternalAddressUserInterface];
 	[self _validateH323UserInterface];
+	[self _validateAudioOrderUserInterface];
 	[self _validateVideoTransmitUserInterface];
+	[self _validateVideoOrderUserInterface];
 }
 
 - (void)_saveCurrentLocation
@@ -565,12 +657,51 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[gatekeeperPhoneNumberField setEnabled:flag];
 }
 
+- (void)_validateAudioOrderUserInterface
+{
+	unsigned count = [currentLocation audioCodecListCount];
+	int selectedRow = [audioCodecPreferenceOrderTableView selectedRow];
+	BOOL enableUp = YES;
+	BOOL enableDown = YES;
+	
+	if(selectedRow == 0)
+	{
+		enableUp = NO;
+	}
+	if(selectedRow == (count -1))
+	{
+		enableDown = NO;
+	}
+	[moveAudioCodecUpButton setEnabled:enableUp];
+	[moveAudioCodecDownButton setEnabled:enableDown];
+}
+
 - (void)_validateVideoTransmitUserInterface
 {
 	BOOL flag = ([enableVideoTransmitSwitch state] == NSOnState) ? YES : NO;
 	
 	[videoFrameRateField setEnabled:flag];
 	[videoSizePopUp setEnabled:flag];
+}
+
+- (void)_validateVideoOrderUserInterface
+{
+	unsigned count = [currentLocation videoCodecListCount];
+	int selectedRow = [videoCodecPreferenceOrderTableView selectedRow];
+	BOOL enableUp = YES;
+	BOOL enableDown = YES;
+	
+	if(selectedRow == 0)
+	{
+		enableUp = NO;
+	}
+	if(selectedRow == (count -1))
+	{
+		enableDown = NO;
+	}
+	
+	[moveVideoCodecUpButton setEnabled:enableUp];
+	[moveVideoCodecDownButton setEnabled:enableDown];
 }
 
 #pragma mark tableViewSource methods
@@ -620,14 +751,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	
 	if([identifier isEqualToString:XMKey_CodecIsEnabled])
 	{
-		if([record isEnabled])
-		{
-			return NSLocalizedString(@"YES", @"YES");
-		}
-		else
-		{
-			return NSLocalizedString(@"NO", @"NO");
-		}
+		return [NSNumber numberWithBool:[record isEnabled]];
 	}
 	
 	XMCodecDescriptor *codecDescriptor = [[XMCodecManager sharedInstance] codecDescriptorForKey:[record key]];
@@ -642,8 +766,21 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		{
 			[(XMLocation *)[locations objectAtIndex:rowIndex] setName:(NSString *)anObject];
 		}
-		[self defaultAction:self];
 	}
+	
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		[[currentLocation audioCodecListRecordAtIndex:rowIndex] setIsEnabled:[anObject boolValue]];
+		[audioCodecPreferenceOrderTableView reloadData];
+	}
+	
+	if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		[[currentLocation videoCodecListRecordAtIndex:rowIndex] setIsEnabled:[anObject boolValue]];
+		[videoCodecPreferenceOrderTableView reloadData];
+	}
+	
+	[self defaultAction:self];
 }
 
 #pragma mark Sheet Modal Delegate Methods
