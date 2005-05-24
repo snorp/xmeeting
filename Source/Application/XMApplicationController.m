@@ -1,93 +1,42 @@
 /*
- * $Id: XMApplicationController.m,v 1.1 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMeeting.h"
 #import "XMApplicationController.h"
-#import "XMAudioManager.h"
-#import "XMVideoManager.h"
-#import "XMLocalVideoView.h"
-#import "XMCallManager.h"
-#import "XMCallInfo.h"
-
+#import "XMMainWindowController.h"
 #import "XMPreferencesWindowController.h"
+#import "XMNoCallModule.h"
+#import "XMInCallModule.h"
+#import "XMAddressBookModule.h"
+#import "XMZeroConfModule.h"
+#import "XMDialPadModule.h"
+#import "XMTextChatModule.h"
+#import "XMStatisticsModule.h"
+#import "XMCallHistoryModule.h"
 
 @implementation XMApplicationController
 
 - (void)awakeFromNib
 {
-	[[XMCallManager sharedInstance] setDelegate:self];
-	[[XMVideoManager sharedInstance] setDelegate:self];
+	[[XMNoCallModule alloc] init];
+	[[XMInCallModule alloc] init];
+	[[XMAddressBookModule alloc] init];
+	[[XMZeroConfModule alloc] init];
+	[[XMDialPadModule alloc] init];
+	[[XMTextChatModule alloc] init];
+	[[XMStatisticsModule alloc] init];
+	[[XMCallHistoryModule alloc] init];
+	[[XMMainWindowController sharedInstance] showMainWindow];
 }
 
-- (void)callManagerDidReceiveIncomingCall:(NSNotification *)notif
-{
-	XMCallInfo *callInfo = [[XMCallManager sharedInstance] activeCall];
-	int result = NSRunAlertPanel(@"IncomingCall", [callInfo remoteName], @"Accept", @"Deny", nil);
-	
-	[remotePartyField setStringValue:[callInfo remoteName]];
-	[extraField setStringValue:@"Incoming call"];
-	
-	if(result == NSOKButton)
-	{
-		[[XMCallManager sharedInstance] acceptIncomingCall:YES];
-	}
-	else
-	{
-		[[XMCallManager sharedInstance] acceptIncomingCall:NO];
-	}
-}
-
-- (void)callManagerDidEstablishCall:(NSNotification *)notif
-{
-	XMCallInfo *callInfo = [[XMCallManager sharedInstance] activeCall];
-	
-	[extraField setStringValue:@"Call Established"];
-	[callButton setTitle:@"Clear"];
-}
-
-- (void)callManagerDidEndCall:(NSNotification *)notif
-{
-	XMCallInfo *callInfo = [[XMCallManager sharedInstance] activeCall];
-	
-	[extraField setStringValue:@"Call Ended"];
-	[callButton setTitle:@"Call"];
-}
-
-- (IBAction)callButtonPressed:(id)sender
-{
-	if([[callButton title] isEqualToString:@"Call"])
-	{
-		[[XMCallManager sharedInstance] callRemoteParty:[addressField stringValue] 
-										  usingProtocol:XMCallProtocol_H323];
-	}
-	else
-	{
-		[[XMCallManager sharedInstance] clearActiveCall];
-	}
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)notif
+- (IBAction)showPreferences:(id)sender
 {
 	[[XMPreferencesWindowController sharedInstance] showPreferencesWindow];
-	//[videoView startDisplayingLocalVideo];
-	//[[XMVideoManager sharedInstance] startGrabbing];
-}
-
-- (void)videoManagerDidReadVideoFrame:(NSNotification *)notif
-{
-	NSBitmapImageRep *frame = [[XMVideoManager sharedInstance] remoteVideoFrame];
-	
-	NSImage *oldImage = [remoteView image];
-	
-	NSImage *newImage = [[NSImage alloc] init];
-	[newImage addRepresentation:frame];
-	
-	[remoteView setImage:newImage];
-	[newImage release];
 }
 
 @end

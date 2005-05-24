@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,16 +9,11 @@
 #include <ptlib.h>
 
 #include "XMBridge.h"
-#include "XMProcess.h"
 
 #include "XMOpalManager.h"
-#include "XMPCSSEndPoint.h"
 #include "XMVolumeControl.h"
 
 using namespace std;
-
-// reference to the default PProcess
-static XMProcess *theProcess = NULL;
 
 // reference to the active OPAL manager.
 static XMOpalManager *theManager = NULL;
@@ -29,36 +24,17 @@ static XMSoundChannel *recorderChannel = NULL;
 
 void initOPAL()
 {
-	if(theProcess == NULL)
+	if(theManager == NULL)
 	{
-		PProcess::PreInitialise(0, 0, 0);
-		theProcess = new XMProcess;
-		
-		/* temporarily initialise PTracing */
-		PTrace::Initialise(5, "/tmp/XMeeting.log", PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
+		XMOpalManager::InitOpal();
 		
 		theManager = new XMOpalManager;
 		theManager->Initialise();
 		
 		/* workaround for the lack of useable volume control in OPAL's PCSSEndPoint */
-		playerChannel = new XMSoundChannel(theManager->CurrentPCSSEndPoint()->GetSoundChannelPlayDevice(), PSoundChannel::Player, 1, 8000, 16);
-		recorderChannel = new XMSoundChannel(theManager->CurrentPCSSEndPoint()->GetSoundChannelRecordDevice(), PSoundChannel::Recorder, 1, 8000, 16);
+		playerChannel = new XMSoundChannel(theManager->GetSoundChannelPlayDevice(), PSoundChannel::Player, 1, 8000, 16);
+		recorderChannel = new XMSoundChannel(theManager->GetSoundChannelRecordDevice(), PSoundChannel::Recorder, 1, 8000, 16);
 	}
-}
-
-bool startH323Listeners(unsigned listenerPort)
-{
-	return theManager->StartH323Listeners(listenerPort);
-}
-
-void stopH323Listeners()
-{
-	theManager->StopH323Listeners();
-}
-
-bool isH323Listening()
-{
-	return theManager->IsH323Listening();
 }
 
 #pragma mark Call Management functions
@@ -137,6 +113,13 @@ const char *getUserName()
 	return theManager->GetDefaultUserName();
 }
 
+#pragma mark Network Setup functions
+
+void setBandwidthLimit(unsigned limit)
+{
+	theManager->SetBandwidthLimit(limit);
+}
+
 void setPortRanges(unsigned int udpPortMin, 
 				   unsigned int udpPortMax, 
 				   unsigned int tcpPortMin, 
@@ -153,11 +136,6 @@ void setTranslationAddress(const char *a)
 {
 	PString str = a;
 	theManager->SetTranslationAddress(str);
-}
-
-void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
-{
-	theManager->SetVideoFunctionality(receiveVideo, transmitVideo);
 }
 
 #pragma mark Audio Functions
@@ -234,17 +212,16 @@ void getDefaultAudioOutputDevice(char *buffer)
 // The underlying system is call-by-reference
 const char *getSelectedAudioInputDevice()
 {
-	return theManager->CurrentPCSSEndPoint()->GetSoundChannelRecordDevice();
+	return theManager->GetSoundChannelRecordDevice();
 }
 
 bool setSelectedAudioInputDevice(const char *device)
 {
-	XMPCSSEndPoint *pcssEP = theManager->CurrentPCSSEndPoint();
-	bool result = pcssEP->SetSoundChannelRecordDevice(device);
+	bool result = theManager->SetSoundChannelRecordDevice(device);
 	
 	// deleting the old instance of recorderChannel and replacing with a new one.
 	delete recorderChannel;
-	recorderChannel = new XMSoundChannel(pcssEP->GetSoundChannelRecordDevice(), PSoundChannel::Recorder, 1, 8000, 16);
+	recorderChannel = new XMSoundChannel(theManager->GetSoundChannelRecordDevice(), PSoundChannel::Recorder, 1, 8000, 16);
 	
 	return result;
 }
@@ -252,16 +229,15 @@ bool setSelectedAudioInputDevice(const char *device)
 // The underlying system is call-by-reference
 const char *getSelectedAudioOutputDevice()
 {
-	return theManager->CurrentPCSSEndPoint()->GetSoundChannelPlayDevice();
+	return theManager->GetSoundChannelPlayDevice();
 }
 
 bool setSelectedAudioOutputDevice(const char *device)
 {
-	XMPCSSEndPoint *pcssEP = theManager->CurrentPCSSEndPoint();
-	bool result = pcssEP->SetSoundChannelPlayDevice(device);
+	bool result = theManager->SetSoundChannelPlayDevice(device);
 	
 	delete playerChannel;
-	playerChannel = new XMSoundChannel(pcssEP->GetSoundChannelPlayDevice(), PSoundChannel::Player, 1, 8000, 16);
+	playerChannel = new XMSoundChannel(theManager->GetSoundChannelPlayDevice(), PSoundChannel::Player, 1, 8000, 16);
 	
 	return result;
 }
@@ -292,7 +268,52 @@ bool setAudioOutputVolume(unsigned value)
 	return playerChannel->SetVolume(value);
 }
 
+unsigned getAudioBufferSize()
+{
+	return theManager->GetSoundChannelBufferDepth();
+}
+
+void setAudioBufferSize(unsigned size)
+{
+	theManager->SetSoundChannelBufferDepth(size);
+}
+
+#pragma mark Video functions
+
+void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
+{
+	theManager->SetVideoFunctionality(receiveVideo, transmitVideo);
+}
+
+#pragma mark codec functions
+
+void setDisabledCodecs(const char * const * codecs, unsigned codecCount)
+{
+	PStringArray codecsArray = PStringArray(codecCount, codecs);
+	
+	// since video currently is disabled but we are experiencing some troubles with that, we simply disable
+	// the video codecs
+	codecsArray.AppendString("261");
+	theManager->SetMediaFormatMask(codecsArray);
+}
+
+void setCodecOrder(const char * const * codecs, unsigned codecCount)
+{
+	PStringArray codecsArray = PStringArray(codecCount, codecs);
+	theManager->SetMediaFormatOrder(codecsArray);
+}
+
 #pragma mark H.323 Functions
+
+bool enableH323Listeners(bool flag)
+{
+	return theManager->EnableH323Listeners(flag);
+}
+
+bool isH323Listening()
+{
+	return theManager->IsH323Listening();
+}
 
 void setH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 {
@@ -301,6 +322,6 @@ void setH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 
 bool setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber)
 {
-	theManager->SetGatekeeper(address, identifier, gkUsername, phoneNumber);
+	return theManager->SetGatekeeper(address, identifier, gkUsername, phoneNumber);
 }
 

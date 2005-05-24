@@ -1,0 +1,52 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                addNewRecord = id; 
+                call = id; 
+                callTypeSelected = id; 
+                cancelNewRecord = id; 
+                editURL = id; 
+                endEditRecordSheet = id; 
+                gatekeeperTypeChanged = id; 
+                launchAddressBook = id; 
+                newRecord = id; 
+            }; 
+            CLASS = XMAddressBookModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressBookView = ABPeoplePickerView; 
+                callButton = NSButton; 
+                callTypePopUp = NSPopUpButton; 
+                cancelButton = NSButton; 
+                contentView = NSView; 
+                deleteButton = NSButton; 
+                directCallAddressField = NSTextField; 
+                directCallAddressLabel = NSTextField; 
+                editButton = NSButton; 
+                editRecordSheet = NSPanel; 
+                firstNameField = NSTextField; 
+                gatekeeperCallAddressField = NSTextField; 
+                gatekeeperCallAddressLabel = NSTextField; 
+                gatekeeperHostField = NSTextField; 
+                gatekeeperMatrix = NSMatrix; 
+                isOrganizationSwitch = NSButton; 
+                lastNameField = NSTextField; 
+                launchAddressBookButton = NSButton; 
+                newButton = NSButton; 
+                newRecordSheet = NSPanel; 
+                okButton = NSButton; 
+                organizationField = NSTextField; 
+                recordNameField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

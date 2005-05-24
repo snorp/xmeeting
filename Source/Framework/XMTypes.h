@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -89,7 +89,7 @@ typedef enum XMCallEndReason
 
 /**
  * Defines the various types of status the listener system can be in
- */
+ **/
 typedef enum XMListenerStatus
 {
 	XMListenerStatus_Offline = 0,
@@ -98,5 +98,27 @@ typedef enum XMListenerStatus
 	XMListenerStatus_InCall,
 	XMListenerStatusCount
 } XMListenerStatus;
+
+/**
+ * Defines the various types of URL's that the XMeeting framework understands
+ **/
+typedef enum XMURLType
+{
+	XMURLType_Callto = 0,
+	XMURLTypeCount
+} XMURLType;
+
+/**
+ * Defines the types of connection an XMCalltoURL instance can implement
+ **/
+typedef enum XMCalltoURLType
+{
+	XMCalltoURLType_Unknown = 0,
+	XMCalltoURLType_Direct,
+	XMCalltoURLType_Gatekeeper,
+	XMCalltoURLType_Directory,	/* not supported */
+	XMCalltoURLType_Gateway,	/* not supported */
+	XMCalltoURLTypeCount
+} XMCalltoURLType;
 
 #endif // __XM_TYPES_H__

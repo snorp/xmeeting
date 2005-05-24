@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,9 @@
  * responsible for the memory management if there is any memory to manage.
  **/
 
+#ifndef __XM_BRIDGE_H__
+#define __XM_BRIDGE_H__
+
 #include "XMTypes.h"
 
 #pragma mark Init & Startup/Stop functions
@@ -38,18 +41,6 @@
  * It is safe to call initOPAL() multiple times.
  **/
 void initOPAL();
-
-/**
- * makes the h323 system listen and thereby ready for calls
- **/
-bool startH323Listeners(unsigned listenerPort = 1720);
-
-/**
- * stops the h323 system from being active
- **/
-void stopH323Listeners();
-
-bool isH323Listening();
 
 #pragma mark Call Management functions
 
@@ -78,7 +69,7 @@ void clearCall(unsigned callID);
 
 /**
  * This function provides additional information about the remote party. 
- * Note that this information is only valid when the call is established.
+ * Note that calling this function is only safe when the call is established
  **/
 void getCallInformation(unsigned callID,
 						const char** remoteName, 
@@ -93,12 +84,23 @@ void getCallInformation(unsigned callID,
  **/
 void setUserName(const char *string);
 
-/*
+/**
  * Returns the current user name
  * The value is obtained call-by-reference.
- */
+ **/
 const char *getUserName();
 
+#pragma mark Network setup functions
+
+/**
+ * sets the bandwidth limit to the value as specified
+ **/
+void setBandwidthLimit(unsigned limit);
+
+/**
+ * defines which port ranges to use to establish
+ * the media streams
+ **/
 void setPortRanges(unsigned int udpPortMin,
 				   unsigned int udpPortMax,
 				   unsigned int tcpPortMin,
@@ -106,9 +108,11 @@ void setPortRanges(unsigned int udpPortMin,
 				   unsigned int rtpPortMin,
 				   unsigned int rtpPortMax);
 
+/**
+ * Sets the translation address (usually the NAT address)
+ * to enable NAT-Tunneling
+ **/
 void setTranslationAddress(const char *address);
-
-void setVideoFunctionality(bool receiveVideo, bool transmitVideo);
 
 #pragma mark Audio Functions
 
@@ -138,10 +142,46 @@ bool setAudioInputVolume(unsigned value);
 unsigned getAudioOutputVolume();
 bool setAudioOutputVolume(unsigned value);
 
+unsigned getAudioBufferSize();
+void setAudioBufferSize(unsigned value);
+
+#pragma mark Video Setup Functions
+
+/**
+ * Sets whether we are able to send / receive video
+ **/
+void setVideoFunctionality(bool receiveVideo, bool transmitVideo);
+
+#pragma mark Codec Functions
+
+/**
+ * disables the codecs as listed in the array of strings
+ **/
+void setDisabledCodecs(const char * const * codecs, unsigned codecCount);
+
+/**
+ * Maintains the codec preference order as listed in the array of strings
+ **/
+void setCodecOrder(char const * const * codecs, unsigned codecCount);
+
 #pragma mark H.323 Setup Functions
 
+/**
+ * makes the h323 system listen and thereby ready for calls
+ **/
+bool enableH323Listeners(bool flag);
+bool isH323Listening();
+
+/**
+ * enables/disables FastStart and H.245 tunneling through H.323
+ **/
 void setH323Functionality(bool enableFastStart, bool enableH245Tunnel);
 
+/**
+ * sets up the gatekeeper. If all variables are NULL, no gatekeeper is used
+ **/
 bool setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber);
 
 #pragma mark SIP Setup Functions
+
+#endif // __XM_BRIDGE_H__

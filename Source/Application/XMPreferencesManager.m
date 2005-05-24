@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 @end
 
 @implementation XMPreferencesManager
+
+#pragma mark Init & Deallocation Methods
 
 + (XMPreferencesManager *)sharedInstance
 {
@@ -58,6 +60,12 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	[defaultsDict setObject:defaultLocationArray forKey:XMKey_Locations];
 	[defaultLocation release];
 	
+	[defaultsDict setObject:NSFullUserName() forKey:XMKey_UserName];
+	
+	NSNumber *number = [[NSNumber alloc] initWithBool:NO];
+	[defaultsDict setObject:number forKey:XMKey_AutoAnswerCalls];
+	[number release];
+	
 	// code to be written yet
 	[userDefaults registerDefaults:defaultsDict];
 	[defaultsDict release];
@@ -74,6 +82,7 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 		{
 			NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
 			XMLocation *location = [[XMLocation alloc] initWithDictionary:dict];
+			[location _updateTag];
 			[locations addObject:location];
 			[location release];
 		}
@@ -89,6 +98,8 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 		activeLocation = 0;
 	}
 	
+	autoAnswerCalls = [userDefaults boolForKey:XMKey_AutoAnswerCalls];
+	
 	return self;
 }
 
@@ -98,6 +109,8 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	
 	[super dealloc];
 }
+
+#pragma mark Getting & Setting Methods
 
 - (void)synchronizeAndNotify
 {
@@ -137,12 +150,22 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 - (void)setLocations:(NSArray *)newLocations
 {
 	unsigned count = [newLocations count];
+	
+	if(count == 0)
+	{
+		// this isn't allowed and we simply return
+		return;
+	}
+	
 	unsigned i;
+	unsigned currentTag = [(XMLocation *)[locations objectAtIndex:activeLocation] _tag];
 	
 	// this is safe since locations is an internal variable and is never
 	// directly exposed to the outside
 	[locations removeAllObjects];
 	
+	// we have also to determine the index of the actual location since this could have changed
+	activeLocation = 0;
 	for(i = 0; i < count; i++)
 	{
 		NSObject *obj = [newLocations objectAtIndex:i];
@@ -150,6 +173,10 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 		if([obj isKindOfClass:[XMLocation class]])
 		{
 			[locations addObject:[obj copy]];
+			if([(XMLocation *)obj _tag] == currentTag)
+			{
+				activeLocation = i;
+			}
 		}
 	}
 }
@@ -158,7 +185,7 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 {
 	unsigned count = [locations count];
 	unsigned i;
-	NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:count];
+	NSMutableArray *arr = [[[NSMutableArray alloc] initWithCapacity:count] autorelease];
 	
 	for(i = 0; i < count; i++)
 	{
@@ -182,6 +209,11 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	return [locations objectAtIndex:activeLocation];
 }
 
+- (unsigned)indexOfActiveLocation
+{
+	return activeLocation;
+}
+
 - (void)activateLocationAtIndex:(unsigned)index
 {
 	if(index >= 0 && index < [locations count])
@@ -193,6 +225,36 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_ActiveLocationDidChange
 														object:self
 													  userInfo:nil];
+}
+
+- (NSString *)userName
+{
+	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_UserName];
+}
+
+- (void)setUserName:(NSString *)name
+{
+	[[NSUserDefaults standardUserDefaults] setObject:name forKey:XMKey_UserName];
+}
+
+- (BOOL)autoAnswerCalls
+{
+	return autoAnswerCalls;
+}
+
+- (void)setAutoAnswerCalls:(BOOL)flag
+{
+	autoAnswerCalls = flag;
+}
+
+- (BOOL)defaultAutoAnswerCalls
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_AutoAnswerCalls];
+}
+
+- (void)setDefaultAutoAnswerCalls:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_AutoAnswerCalls];
 }
 
 #pragma mark Private Methods

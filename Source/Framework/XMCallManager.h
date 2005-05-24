@@ -1,10 +1,13 @@
 /*
- * $Id: XMCallManager.h,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
+
+#ifndef __XM_CALL_MANAGER_H__
+#define __XM_CALL_MANAGER_H__
 
 #import <Cocoa/Cocoa.h>
 
@@ -31,6 +34,7 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 	
 	id delegate;	// reference to the delegate (if any)
 	
+	BOOL isOnline;
 	XMPreferences *activePreferences;
 	XMCallInfo *activeCall;
 	BOOL autoAnswerCalls;
@@ -49,9 +53,19 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 - (id)delegate;
 - (void)setDelegate:(id)delegate;
 
-//- (BOOL)startH323Listening;
-//- (void)stopH323Listening;
+/**
+ * If the manager is online, this means that the framework is listening on whatever
+ * protocol currently is enabled.
+ **/
+- (BOOL)isOnline;
+- (void)setIsOnline:(BOOL)flag;
+
+/**
+ * Returns whether we are currently listening on the specified protocol. Which
+ * protocols are enabled is by defined in the active XMPreferences instance
+ **/
 - (BOOL)isH323Listening;
+- (BOOL)isSIPListening;
 
 /**
  * Returns the currently active preferences
@@ -101,3 +115,5 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 - (void)callManagerDidEndCall:(NSNotification *)notif;
 
 @end
+
+#endif // __XM_CALL_MANAGER_H__

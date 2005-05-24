@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.h,v 1.1 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.h,v 1.2 2005/05/24 15:21:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,8 +19,13 @@ extern NSString *XMKey_GeneralPreferencesModuleIdentifier;
 @interface XMGeneralPreferencesModule : NSObject <XMPreferencesModule> {
 
 	XMPreferencesWindowController *prefWindowController;
+	float contentViewHeight;
 	IBOutlet NSView *contentView;
+	IBOutlet NSTextField *userNameField;
+	IBOutlet NSButton *autoAnswerCallsSwitch;
 }
+
+- (IBAction)defaultAction:(id)sender;
 
 @end
 

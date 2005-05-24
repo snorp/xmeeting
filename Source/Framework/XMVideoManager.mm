@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.mm,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMVideoManager.mm,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -317,7 +317,7 @@ OSErr XM_SGDataProc(SGChannel c,
 				{
 					// this structure contains the actual human understandable name
 					SGDeviceInputName inputName = inputListRecord->entry[j];
-					NSString *name = [[NSString alloc] initWithCString:inputName.name];
+					NSString *name = [[NSString alloc] initWithCString:(const char*)inputName.name];
 					
 					// adding the name to the object
 					[array addObject:name];
@@ -362,7 +362,7 @@ OSErr XM_SGDataProc(SGChannel c,
 	{
 		SGDeviceInputListRecord *inputListRecord = *(deviceName.inputs);
 		SGDeviceInputName inputName = inputListRecord->entry[inputListRecord->selectedIndex];
-		name = [NSString stringWithCString:inputName.name];
+		name = [NSString stringWithCString:(const char*)inputName.name];
 	}
 	
 	return name;
@@ -630,7 +630,7 @@ OSErr XM_SGDataProc(SGChannel c,
 		for(j = 0; j < inputListRecord->count; j++)
 		{
 			inputName = inputListRecord->entry[j];
-			theName = [[NSString alloc] initWithCString:inputName.name];
+			theName = [[NSString alloc] initWithCString:(const char *)inputName.name];
 			
 			if([theName isEqualToString:nameOfDeviceToSelect]) // now we have a match
 			{
@@ -885,7 +885,7 @@ OSErr XM_SGDataProc(SGChannel c,
 		// to the XMVideoView's gdPort
 		err = DecompressSequenceBegin(&drawSequence,
 									  imageDesc,
-									  [view qdPort],
+									  (OpaqueGrafPtr *)[view qdPort],
 									  NULL,
 									  NULL,
 									  &scaleMatrix,

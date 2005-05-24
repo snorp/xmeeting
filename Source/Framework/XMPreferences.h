@@ -1,32 +1,18 @@
 /*
- * $Id: XMPreferences.h,v 1.3 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.4 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#ifndef __XM_PREFERENCES_H__
+#define __XM_PREFERENCES_H__
+
 #import <Foundation/Foundation.h>
 #import "XMTypes.h"
 
 @class XMCodecListRecord;
-
-/**
- * This class encapsulates all setting options which affect
- * the call behaviour both for H.323/SIP.
- * Instances of this class are passed to XMCallManager
- * to setup the underlying OPAL system.
- *
- * This version of the class is very lightweight, in contrast
- * to the previous one. The preferences are no longer directly
- * stored in the UserDefaults database, this has to be done
- * by the application using this framework.
- * This new design offers more flexibility on how to organize
- * the UserDefaults database since it allows to store multiple
- * sets of preferences and to easily switch between them.
- * To simplify this task, this class can be cast into a
- * NSDictionary-Representation or encoded using NSKeyedCoding.
- **/
 
 #pragma mark XMPreferences - Keys
 /**
@@ -34,7 +20,8 @@
  * The settings are described in the corresponding methods of XMPreferences.
  **/
 
-// Call-Management keys
+// General keys
+extern NSString *XMKey_UserName;
 extern NSString *XMKey_AutoAnswerCalls;
 
 // Network-specific keys
@@ -77,8 +64,29 @@ extern NSString *XMKey_H323_GatekeeperE164Number;
 extern NSString *XMKey_CodecKey;
 extern NSString *XMKey_CodecIsEnabled;
 
+
+/**
+* This class encapsulates all setting options which affect
+ * the call behaviour both for H.323/SIP.
+ * Instances of this class are passed to XMCallManager
+ * to setup the underlying OPAL system.
+ *
+ * This version of the class is very lightweight, in contrast
+ * to the previous one. The preferences are no longer directly
+ * stored in the UserDefaults database, this has to be done
+ * by the application using this framework.
+ * This new design offers more flexibility on how to organize
+ * the UserDefaults database since it allows to store multiple
+ * sets of preferences and to easily switch between them.
+ * To simplify this task, this class can be cast into a
+ * NSDictionary-Representation or encoded using NSKeyedCoding.
+ **/
 @interface XMPreferences : NSObject <NSCopying, NSCoding> 
 {	
+	/* General settings */
+	NSString	*userName;						// The user name to be used
+	BOOL		 autoAnswerCalls;				// automatically accepts incoming calls if set
+	
 	/* Network settings */
 	unsigned	 bandwidthLimit;				// The bandwidth limit in bit/s (0 for no limit)
 	BOOL		 useAddressTranslation;			// Set whether to use address translation or not (NAT)
@@ -101,8 +109,6 @@ extern NSString *XMKey_CodecIsEnabled;
 
 	/* H.323-specific settings */
 	BOOL		 h323_IsEnabled;				// Flag to indicate whether H.323 is active or not
-	unsigned	 h323_LocalListenerPort;		// The local listener port to use, currently not supported
-	unsigned	 h323_RemoteListenerPort;		// The remote listener port to call, currently not supported
 	BOOL		 h323_EnableH245Tunnel;			// Enable H.245 Tunneling
 	BOOL		 h323_EnableFastStart;			// Enable H.323 Fast-Start
 	BOOL		 h323_UseGatekeeper;			// Set whether to use a gatekeeper or not
@@ -131,7 +137,16 @@ extern NSString *XMKey_CodecIsEnabled;
  **/
 - (NSMutableDictionary *)dictionaryRepresentation;
 
+#pragma mark Methods for General Settings
+
+- (NSString *)userName;
+- (void)setUserName:(NSString *)name;
+
+- (BOOL)autoAnswerCalls;
+- (void)setAutoAnswerCalls:(BOOL)flag;
+
 #pragma mark Methods for Network settings
+
 - (unsigned)bandwidthLimit;
 - (void)setBandwidthLimit:(unsigned)limit;
 
@@ -190,14 +205,6 @@ extern NSString *XMKey_CodecIsEnabled;
 
 - (BOOL)h323EnableFastStart;
 - (void)setH323EnableFastStart:(BOOL)flag;
-
-/* currently unsupported */
-- (unsigned)h323LocalListenerPort;
-- (void)setH323LocalListenerPort:(unsigned)port;
-
-/* currently unsupported */
-- (unsigned)h323RemoteListenerPort;
-- (void)setH323RemoteListenerPort:(unsigned)port;
 
 - (BOOL)h323UseGatekeeper;
 - (void)setH323UseGatekeeper:(BOOL)flag;
@@ -259,3 +266,5 @@ extern NSString *XMKey_CodecIsEnabled;
 - (void)setIsEnabled:(BOOL)flag;
 
 @end
+
+#endif // __XM_PREFERENCES_H__

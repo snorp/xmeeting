@@ -1,0 +1,24 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {
+            ACTIONS = {
+                bottomContentButtonAction = id; 
+                showBottomModuleInSeparateWindow = id; 
+                toggleShowBottomContentView = id; 
+            }; 
+            CLASS = XMMainWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                bottomContentBox = NSBox; 
+                bottomContentDisclosure = NSButton; 
+                mainContentBox = NSBox; 
+                separatorContentBox = NSBox; 
+                showModuleInSeparateWindowButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

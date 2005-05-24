@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,7 @@ extern NSString *XMKey_ActiveLocation;
 
 	NSMutableArray *locations;
 	int activeLocation;
+	BOOL autoAnswerCalls;
 }
 
 /**
@@ -87,9 +88,29 @@ extern NSString *XMKey_ActiveLocation;
 - (XMLocation *)activeLocation;
 
 /**
+ * Returns the index of the active loation
+ **/
+- (unsigned)indexOfActiveLocation;
+
+/**
  * Makes the location found at index the active location
  **/
 - (void)activateLocationAtIndex:(unsigned)index;
+
+/**
+ * Manages the user name
+ **/
+- (NSString *)userName;
+- (void)setUserName:(NSString *)name;
+
+/**
+ * Manages the autoanswer behaviour
+ **/
+- (BOOL)autoAnswerCalls;
+- (void)setAutoAnswerCalls:(BOOL)flag;
+
+- (BOOL)defaultAutoAnswerCalls;
+- (void)setDefaultAutoAnswerCalls:(BOOL)flag;
 
 @end
 

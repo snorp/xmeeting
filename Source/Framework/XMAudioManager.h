@@ -1,10 +1,13 @@
 /*
- * $Id: XMAudioManager.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
+
+#ifndef __XM_AUDIO_MANAGER_H__
+#define __XM_AUDIO_MANAGER_H__
 
 #import <Foundation/Foundation.h>
 
@@ -81,3 +84,5 @@ extern NSString *XMNotification_OutputVolumeDidChange;
 - (void)audioManagerOutputVolumeDidChange:(NSNotification *)notif;
 
 @end
+
+#endif // __XM_AUDIO_MANAGER_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.3 2005/05/01 09:34:41 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.4 2005/05/24 15:21:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -144,6 +144,16 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 - (void)savePreferences
 {
+	// in case that the locations table view is editing a location's name,
+	// we have to stor that value as well
+	unsigned index = [locationsTableView editedRow];
+	if(index != -1)
+	{
+		NSCell *cell = [locationsTableView selectedCell];
+		NSText *text = [locationsTableView currentEditor];
+		[cell endEditing:text];
+	}
+	
 	// first, save the current location
 	[self _saveCurrentLocation];
 	
@@ -177,8 +187,8 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	unsigned index = [locations count];
 	
 	NSString *currentLocationName = [currentLocation name];
-	XMLocation *duplicate = [currentLocation copy];
-	[duplicate setName:[currentLocationName stringByAppendingString:NSLocalizedString(@" Copy", @"LocationCopySuffix")]];
+	NSString *newName = [currentLocationName stringByAppendingString:NSLocalizedString(@" Copy", @"LocationCopySuffix")];
+	XMLocation *duplicate = [currentLocation duplicateWithName:newName];
 	
 	[self _addLocation:duplicate];
 	[duplicate release];

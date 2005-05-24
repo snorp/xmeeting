@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,7 +92,6 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 	NSSize size = [buttonToolbarView bounds].size;
 	[buttonToolbarItem setMinSize:size];
 	[buttonToolbarItem setMaxSize:size];
-	//[buttonToolbarItem setLabel:NSLocalizedString(@"Edit Preferences", @"ButtonToolbarItemLabel")];
 	
 	// adding some additional items to the toolbar
 	[identifiers addObject:NSToolbarFlexibleSpaceItemIdentifier];
@@ -138,7 +137,15 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 		{
 			id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
 			[module loadPreferences];
+			
+			if(i == 0)
+			{
+				[[[self window] toolbar] setSelectedItemIdentifier:[module identifier]];
+			}
 		}
+		
+		[self toolbarItemAction:[toolbarItems objectAtIndex:0]];
+		
 		[applyButton setEnabled:NO];
 		[[self window] setDocumentEdited:NO];
 		preferencesHaveChanged = NO;

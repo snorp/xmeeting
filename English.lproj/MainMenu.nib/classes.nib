@@ -2,17 +2,9 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {callButtonPressed = id; }; 
+            ACTIONS = {showPreferences = id; }; 
             CLASS = XMApplicationController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                addressField = NSTextField; 
-                callButton = NSButton; 
-                extraField = NSTextField; 
-                remotePartyField = NSTextField; 
-                remoteView = NSImageView; 
-                videoView = XMLocalVideoView; 
-            }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSQuickDrawView; }

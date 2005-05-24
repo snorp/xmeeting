@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.1 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 {
 	self = [super init];
 	[self setName:theName];
+	[self _setTag:0];
 	
 	return self;
 }
@@ -26,6 +27,7 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 	
 	NSString *theName = (NSString *)[dict objectForKey:XMKey_LocationName];
 	[self setName:theName];
+	[self _setTag:0];
 	
 	return self;
 }
@@ -35,6 +37,8 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 	XMLocation *location = (XMLocation *)[super copyWithZone:zone];
 	
 	[location setName:[self name]];
+	[location _setTag:[self _tag]];
+	
 	
 	return location;
 }
@@ -81,6 +85,53 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 	NSString *old = name;
 	name = [theName copy];
 	[old release];
+}
+
+- (XMLocation *)duplicateWithName:(NSString *)theName
+{
+	XMLocation *duplicate = [self copy];
+	[duplicate setName:theName];
+	[duplicate _updateTag];
+	
+	return duplicate;
+}
+
+- (void)_updateTag
+{
+	static unsigned nextTag = 1;
+	
+	[self _setTag:nextTag];
+	nextTag++;
+}
+
+- (void)_setTag:(unsigned)newTag
+{
+	tag = newTag;
+}
+
+- (unsigned)_tag
+{
+	return tag;
+}
+
+#pragma mark overriding methods from XMPreferences
+
+- (NSString *)userName
+{
+	return @"UserName";
+}
+
+- (void)setUserName:(NSString *)name
+{
+}
+
+- (BOOL)autoAnswerCalls
+{
+	return NO;
+}
+
+- (void)setAutoAnswerCalls:(BOOL)flag
+{
 }
 
 @end

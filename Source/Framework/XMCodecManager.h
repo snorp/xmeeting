@@ -1,10 +1,13 @@
 /*
- * $Id: XMCodecManager.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMCodecManager.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
+
+#ifndef __XM_CODEC_MANAGER_H__
+#define __XM_CODEC_MANAGER_H__
 
 #import <Foundation/Foundation.h>
 
@@ -99,3 +102,5 @@ extern NSString *XMKey_CodecQuality;
 - (NSString *)propertyForKey:(NSString *)key;
 
 @end
+
+#endif // __XM_CODEC_MANAGER_H__

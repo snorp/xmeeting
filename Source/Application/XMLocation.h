@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.1 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@ extern NSString *XMKey_LocationName;
 
 @interface XMLocation : XMPreferences {
 	NSString *name;
+	unsigned tag;
 }
 
 /**
@@ -25,6 +26,25 @@ extern NSString *XMKey_LocationName;
 
 - (NSString *)name;
 - (void)setName:(NSString *)name;
+
+/**
+ * Returns a duplicate of the location with the
+ * new name set. Using this method is preferred instead
+ * of -copy and then -setName: since it makes sure that
+ * several internal optimisations work
+ **/
+- (XMLocation *)duplicateWithName:(NSString *)name;
+
+@end
+
+@interface XMLocation (PrivateMethods)
+
+/**
+ * internal optimisation to ensure correct object identification
+ **/
+- (void)_updateTag;
+- (void)_setTag:(unsigned)tag;
+- (unsigned)_tag;
 
 @end
 

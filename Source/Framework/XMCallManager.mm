@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,7 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 @interface XMCallManager (PrivateMethods)
 
 - (id)_init;
+- (void)_setupSubsystem;
 
 @end
 
@@ -61,8 +62,9 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	self = [super init];
 	
 	delegate = nil;
-	activePreferences = nil;
 	
+	isOnline = NO;
+	activePreferences = nil;
 	activeCall = nil;
 	
 	//initializing the underlying OPAL system
@@ -120,21 +122,36 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	}
 }
 
-/*
-- (BOOL)startH323Listening
+- (BOOL)isOnline
 {
-	return startH323Listeners();
+	return isOnline;
 }
 
-- (void)stopH323Listening
+- (void)setIsOnline:(BOOL)flag
 {
-	stopH323Listeners();
+	if(isOnline != flag)
+	{
+		isOnline = flag;
+		
+		if(flag)
+		{
+			[self _setupSubsystem];
+		}
+		else 
+		{
+			enableH323Listeners(NO);
+		}
+	}
 }
-*/
 
 - (BOOL)isH323Listening
 {
 	return isH323Listening();
+}
+
+- (BOOL)isSIPListening
+{
+	return NO;
 }
 
 - (XMPreferences *)activePreferences
@@ -148,61 +165,7 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	activePreferences = [prefs copy];
 	[old release];
 	
-	//autoAnswerCalls = [activePreferences autoAnswerCalls];
-	autoAnswerCalls = NO;
-	
-	// now setting up the OPAL system according to the preferences
-	if([activePreferences useAddressTranslation])
-	{
-		//add autoget ext addr
-		setTranslationAddress([[activePreferences externalAddress] cString]);
-	}
-	else
-	{
-		setTranslationAddress(NULL);
-	}
-	
-	// adjusting the port ranges
-	setPortRanges([activePreferences udpPortMin],
-				  [activePreferences udpPortMax],
-				  [activePreferences tcpPortMin],
-				  [activePreferences tcpPortMax],
-				  [activePreferences udpPortMin],
-				  [activePreferences udpPortMax]);
-	
-	// setting the audio preferences
-	
-	// setting the video preferences
-	
-	if([activePreferences h323IsEnabled])
-	{
-		if(!isH323Listening() && !startH323Listeners([activePreferences h323LocalListenerPort]))
-		{
-			NSLog(@"ERROR: StartH323Listening failed!");
-		}
-		
-		setH323Functionality([activePreferences h323EnableFastStart], [activePreferences h323EnableH245Tunnel]);
-		
-		if([activePreferences h323UseGatekeeper])
-		{
-			setGatekeeper([[activePreferences h323GatekeeperAddress] cString],
-						  [[activePreferences h323GatekeeperID] cString],
-						  [[activePreferences h323GatekeeperUsername] cString],
-						  [[activePreferences h323GatekeeperE164Number] cString]);
-		}
-		else
-		{
-			setGatekeeper(NULL, NULL, NULL, NULL);
-		}
-	}
-	else
-	{
-		if(isH323Listening())
-		{
-			stopH323Listeners();
-		}
-	}
-				  
+	[self _setupSubsystem];
 }
 
 - (XMCallInfo *)activeCall
@@ -253,6 +216,124 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 }
 
 #pragma mark Private Methods
+
+- (void)_setupSubsystem
+{
+	NSLog(@"SetupSubsystem");
+	if(activePreferences == nil)
+	{
+		NSLog(@"no active preferences");
+		return;
+	}
+		
+	// setting the general settings
+	setUserName([[activePreferences userName] cString]);
+	autoAnswerCalls = [activePreferences autoAnswerCalls];
+	
+	// setting the network preferences
+	
+	setBandwidthLimit([activePreferences bandwidthLimit]);
+	
+	if([activePreferences useAddressTranslation])
+	{
+		//add autoget ext addr here
+		setTranslationAddress([[activePreferences externalAddress] cString]);
+	}
+	else
+	{
+		setTranslationAddress(NULL);
+	}
+	
+	setPortRanges([activePreferences udpPortMin],
+				  [activePreferences udpPortMax],
+				  [activePreferences tcpPortMin],
+				  [activePreferences tcpPortMax],
+				  [activePreferences udpPortMin],
+				  [activePreferences udpPortMax]);
+	
+	// setting the audio preferences
+	setAudioBufferSize([activePreferences audioBufferSize]);
+	unsigned audioCodecCount = [activePreferences audioCodecListCount];
+	unsigned videoCodecCount = [activePreferences videoCodecListCount];
+	unsigned i;
+	unsigned disabledCodecCount = 0;
+	unsigned orderedCodecCount = 0;
+	char const** disabledCodecs = (char const**)malloc((audioCodecCount + videoCodecCount) * sizeof(char *));
+	char const** orderedCodecs = (char const**)malloc((audioCodecCount + videoCodecCount) * sizeof(char *));
+	for(i = 0; i < audioCodecCount; i++)
+	{
+		XMCodecListRecord *record = [activePreferences audioCodecListRecordAtIndex:i];
+		const char *key = [[record key] cString];
+		if([record isEnabled])
+		{
+			orderedCodecs[orderedCodecCount] = key;
+			orderedCodecCount++;
+		}
+		else
+		{
+			disabledCodecs[disabledCodecCount] = key;
+			disabledCodecCount++;
+		}
+	}
+	for(i = 0; i < videoCodecCount; i++)
+	{
+		XMCodecListRecord *record = [activePreferences videoCodecListRecordAtIndex:i];
+		const char *key = [[record key] cString];
+		if([record isEnabled])
+		{
+			orderedCodecs[orderedCodecCount] = key;
+			orderedCodecCount++;
+		}
+		else
+		{
+			disabledCodecs[disabledCodecCount] = key;
+			disabledCodecCount++;
+		}
+	}
+	orderedCodecs[orderedCodecCount] = NULL;
+	disabledCodecs[disabledCodecCount] = NULL;
+	setDisabledCodecs(disabledCodecs, disabledCodecCount);
+	setCodecOrder(orderedCodecs, orderedCodecCount);
+	free(orderedCodecs);
+	free(disabledCodecs);
+	
+	// setting the video preferences
+	setVideoFunctionality(NO, NO);
+	
+	// setting the H.323 preferences
+	if([activePreferences h323IsEnabled])
+	{
+		if(enableH323Listeners(YES))
+		{
+		
+			setH323Functionality([activePreferences h323EnableFastStart], [activePreferences h323EnableH245Tunnel]);
+		
+			if([activePreferences h323UseGatekeeper])
+			{
+				if(!setGatekeeper([[activePreferences h323GatekeeperAddress] cString],
+							  [[activePreferences h323GatekeeperID] cString],
+							  [[activePreferences h323GatekeeperUsername] cString],
+							  [[activePreferences h323GatekeeperE164Number] cString]))
+				{
+					NSLog(@"Setting the gatekeeper failed!");
+				}
+			}
+			else
+			{
+				setGatekeeper(NULL, NULL, NULL, NULL);
+			}
+		}
+		else
+		{
+			NSLog(@"ERROR: Enabling the H.323 listeners failed!");
+		}
+	}
+	else
+	{
+		setGatekeeper(NULL, NULL, NULL, NULL);
+		enableH323Listeners(NO);
+	}	
+}
 
 - (void)_handleIncomingCall:(unsigned)callID 
 				   protocol:(XMCallProtocol)protocol

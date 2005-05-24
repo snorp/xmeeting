@@ -1,10 +1,13 @@
 /*
- * $Id: XMVideoManager.h,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
+
+#ifndef __XM_VIDEO_MANAGER_H__
+#define __XM_VIDEO_MANAGER_H__
 
 #import <Cocoa/Cocoa.h>
 #import <QuickTime/QuickTime.h>
@@ -129,3 +132,5 @@ extern NSString *XMNotification_DidUpdateVideoDeviceList;
 - (void)noteVideoManagerError:(NSString *)errorMessage code:(int)errorCode;
 
 @end
+
+#endif // __XM_VIDEO_MANAGER_H__

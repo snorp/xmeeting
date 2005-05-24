@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,34 +24,12 @@ class XMOpalManager : public OpalManager
 	PCLASSINFO(XMOpalManager, OpalManager);
 	
 public:
+	static void InitOpal();
+	
 	XMOpalManager();
 	~XMOpalManager();
 	
 	void Initialise();
-	
-	XMPCSSEndPoint *CurrentPCSSEndPoint();
-	H323EndPoint *CurrentH323EndPoint();
-	
-	BOOL StartH323Listeners(unsigned listenerPort);
-	void StopH323Listeners();
-	BOOL IsH323Listening();
-	
-	virtual BOOL TranslateIPAddress(PIPSocket::Address & localAddress,
-									const PIPSocket::Address & remoteAddress);
-	BOOL TranslateAddress(PString & address);
-	
-	void SetVideoFunctionality(BOOL receiveVideo, BOOL sendVideo);
-	
-	/* General call  functions */
-	BOOL StartCall(const PString & remoteName, PString & token);
-	void SetAcceptIncomingCall(BOOL acceptFlag);
-	void ClearCall(PString & callToken);
-	
-	void GetCallInformation(PString & callToken,
-							PString & remoteName, 
-							PString & remoteNumber,
-							PString & remoteAddress,
-							PString & remoteApplication);
 	
 	/* overriding some callbacks */
 	BOOL OnIncomingConnection(OpalConnection & connection);
@@ -63,15 +41,44 @@ public:
 	BOOL OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream);
 	void OnClosedMediaStream(OpalMediaStream & stream);
 	
+	/* Call Management functions */
+	BOOL StartCall(const PString & remoteName, PString & token);
+	void SetAcceptIncomingCall(BOOL acceptFlag);
+	void ClearCall(PString & callToken);
+	void GetCallInformation(PString & callToken,
+							PString & remoteName, 
+							PString & remoteNumber,
+							PString & remoteAddress,
+							PString & remoteApplication);
+
+	/* Network setup functions */
+	void SetBandwidthLimit(unsigned limit);
+	
+	/* audio functions */
+	const PString & GetSoundChannelPlayDevice();
+	BOOL SetSoundChannelPlayDevice(const PString & name);
+	const PString & GetSoundChannelRecordDevice();
+	BOOL SetSoundChannelRecordDevice(const PString & name);
+	unsigned GetSoundChannelBufferDepth();
+	void SetSoundChannelBufferDepth(unsigned depth);
+	
+	/* video functions */
+	void SetVideoFunctionality(BOOL receiveVideo, BOOL sendVideo);
+	
 	/* dealing with h.323 functionality */
+	BOOL EnableH323Listeners(BOOL flag);
+	BOOL IsH323Listening();
 	void SetH323Functionality(BOOL enableFastStart, BOOL enableH245Tunnel);
 	BOOL SetGatekeeper(const PString & address, const PString & identifier,
 					   const PString & username, const PString & phoneNumber);
 	
-private:
+	/* dealing with SIP functionality */
+	// currently none
 	
+private:
 	XMPCSSEndPoint *pcssEP;
 	XMH323EndPoint *h323EP;
+	BOOL isH323Listening;
 };
 
 #endif // __XM_OPAL_MANAGER_H__
