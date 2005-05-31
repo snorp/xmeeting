@@ -1,6 +1,11 @@
 {
     IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
             ACTIONS = {
@@ -18,7 +23,8 @@
                 showModuleInSeparateWindowButton = NSButton; 
             }; 
             SUPERCLASS = NSWindowController; 
-        }
+        }, 
+        {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }
     ); 
     IBVersion = 1; 
 }

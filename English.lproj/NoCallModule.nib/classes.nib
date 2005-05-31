@@ -2,9 +2,24 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            CLASS = XMMainModule; 
+            CLASS = XMDatabaseField; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSTextField; 
+        }, 
+        {
+            ACTIONS = {call = id; changeActiveLocation = id; showCallHistory = id; }; 
+            CLASS = XMNoCallModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                callAddressField = XMDatabaseField; 
+                callButton = NSButton; 
+                callHistoryButton = NSButton; 
+                contentView = NSView; 
+                locationsPopUp = NSPopUpButton; 
+                statusFieldOne = NSTextField; 
+                statusFieldTwo = NSTextField; 
+            }; 
             SUPERCLASS = NSObject; 
         }
     ); 

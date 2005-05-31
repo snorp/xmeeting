@@ -384,6 +384,13 @@
 				D163945F083E19E300F7FD83,
 				D16394C3083E23D600F7FD83,
 				D1EB18AD08437A26002CEF53,
+				D1EB18BA0843D6B6002CEF53,
+				D1EB18E00843D90D002CEF53,
+				D1EB18E40843DB92002CEF53,
+				D1EB18EA0843DCC2002CEF53,
+				D1EB18F00843DEC9002CEF53,
+				D1EB19360843E47F002CEF53,
+				D1152F74084C61730057CA9D,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -440,6 +447,8 @@
 				D163947A083E234D00F7FD83,
 				D16395280840C57A00F7FD83,
 				D16395620841B4E100F7FD83,
+				D12211B50844D1820021D4CD,
+				D15B067B084763F000FA58A1,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -516,20 +525,22 @@
 				D1FE29CE07AFF4FB004337C9,
 				D10AFEB207B3781700BBC8EA,
 				D10AFEB307B3781700BBC8EA,
-				D177D79F07B62C9500BD0172,
-				D177D7A007B62C9500BD0172,
 				D10AFE9407B3771F00BBC8EA,
 				D10AFE9507B3771F00BBC8EA,
+				D177D79F07B62C9500BD0172,
+				D177D7A007B62C9500BD0172,
+				D163381B07A4E739003FD9C0,
+				D163381C07A4E739003FD9C0,
 				D1D63D4307AA9B2B00F1FB74,
 				D1D63D4407AA9B2B00F1FB74,
+				D1D63D3507AA9A8800F1FB74,
+				D1D63D3607AA9A8800F1FB74,
 				D1D63D3D07AA9A9F00F1FB74,
 				D1D63D3E07AA9A9F00F1FB74,
 				D166CD6407B2312300BC27A6,
 				D166CD6507B2312300BC27A6,
-				D1D63D3507AA9A8800F1FB74,
-				D1D63D3607AA9A8800F1FB74,
-				D163381B07A4E739003FD9C0,
-				D163381C07A4E739003FD9C0,
+				D12211B30844D1820021D4CD,
+				D12211B40844D1820021D4CD,
 				D16395260840C57A00F7FD83,
 				D16395270840C57A00F7FD83,
 				D16395600841B4E100F7FD83,
@@ -679,6 +690,44 @@
 			settings = {
 			};
 		};
+		D1152F73084C61730057CA9D = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = DefaultURL.tiff;
+			path = Resources/Images/DefaultURL.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1152F74084C61730057CA9D = {
+			fileRef = D1152F73084C61730057CA9D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D12211B30844D1820021D4CD = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMAddressBookManager.h;
+			path = Source/Framework/XMAddressBookManager.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D12211B40844D1820021D4CD = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMAddressBookManager.m;
+			path = Source/Framework/XMAddressBookManager.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D12211B50844D1820021D4CD = {
+			fileRef = D12211B40844D1820021D4CD;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		D1342CC007B0C1460012B578 = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
@@ -705,6 +754,30 @@
 		};
 		D1342CC307B0C1460012B578 = {
 			fileRef = D1342CC107B0C1460012B578;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D15B0679084763F000FA58A1 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMDatabaseField.h;
+			path = Source/GUI/XMDatabaseField.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D15B067A084763F000FA58A1 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMDatabaseField.m;
+			path = Source/GUI/XMDatabaseField.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D15B067B084763F000FA58A1 = {
+			fileRef = D15B067A084763F000FA58A1;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -1676,6 +1749,8 @@
 				D1B4CD9808316DF100A444E1,
 				D189805108241F11007CD286,
 				D189805208241F11007CD286,
+				D15B0679084763F000FA58A1,
+				D15B067A084763F000FA58A1,
 			);
 			isa = PBXGroup;
 			name = "GUI-Widgets";
@@ -2027,7 +2102,14 @@
 		};
 		D1EB1897084379C5002CEF53 = {
 			children = (
+				D1EB19350843E47F002CEF53,
+				D1EB18EF0843DEC9002CEF53,
+				D1EB18E90843DCC2002CEF53,
+				D1EB18E30843DB92002CEF53,
+				D1EB18DF0843D90D002CEF53,
+				D1EB18B90843D6B6002CEF53,
 				D1EB18AC08437A26002CEF53,
+				D1152F73084C61730057CA9D,
 			);
 			isa = PBXGroup;
 			name = Images;
@@ -2055,6 +2137,90 @@
 		};
 		D1EB18AD08437A26002CEF53 = {
 			fileRef = D1EB18AC08437A26002CEF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1EB18B90843D6B6002CEF53 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = ZeroConf.tiff;
+			path = Resources/Images/ZeroConf.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1EB18BA0843D6B6002CEF53 = {
+			fileRef = D1EB18B90843D6B6002CEF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1EB18DF0843D90D002CEF53 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = DialPad.tiff;
+			path = Resources/Images/DialPad.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1EB18E00843D90D002CEF53 = {
+			fileRef = D1EB18DF0843D90D002CEF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1EB18E30843DB92002CEF53 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = TextChat.tiff;
+			path = Resources/Images/TextChat.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1EB18E40843DB92002CEF53 = {
+			fileRef = D1EB18E30843DB92002CEF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1EB18E90843DCC2002CEF53 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = Statistics.tiff;
+			path = Resources/Images/Statistics.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1EB18EA0843DCC2002CEF53 = {
+			fileRef = D1EB18E90843DCC2002CEF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1EB18EF0843DEC9002CEF53 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = CallHistory.tiff;
+			path = Resources/Images/CallHistory.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1EB18F00843DEC9002CEF53 = {
+			fileRef = D1EB18EF0843DEC9002CEF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1EB19350843E47F002CEF53 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.tiff;
+			name = Window.tiff;
+			path = Resources/Images/Window.tiff;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1EB19360843E47F002CEF53 = {
+			fileRef = D1EB19350843E47F002CEF53;
 			isa = PBXBuildFile;
 			settings = {
 			};
