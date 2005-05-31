@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,11 +12,14 @@
 #import "XMMainWindowBottomModule.h"
 #import "XMMouseOverButton.h"
 
+NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
+
 @interface XMMainWindowController (PrivateMethods)
 
 - (id)_init;
 
 - (void)windowWillClose:(NSNotification *)notif;
+- (void)windowDidMove:(NSNotification *)notif;
 
 - (void)_showMainModuleAtIndex:(unsigned)index;
 - (void)_showBottomModuleAtIndex:(unsigned)index;
@@ -54,9 +57,7 @@
 	mainModules = [[NSMutableArray alloc] initWithCapacity:2];
 	bottomModules = [[NSMutableArray alloc] initWithCapacity:3];
 	bottomButtons = [[NSMutableArray alloc] initWithCapacity:3];
-	displayedBottomButtons = [[NSMutableArray alloc] initWithCapacity:3];
 	separateWindows = [[NSMutableArray alloc] initWithCapacity:3];
-	separateWindowModuleIndexes = [[NSMutableArray alloc] initWithCapacity:3];
 	
 	return self;
 }
@@ -66,9 +67,7 @@
 	[mainModules release];
 	[bottomModules release];
 	[bottomButtons release];
-	[displayedBottomButtons release];
 	[separateWindows release];
-	[separateWindowModuleIndexes release];
 	
 	[super dealloc];
 }
@@ -84,7 +83,21 @@
 	[self _showBottomModuleAtIndex:UINT_MAX];
 	
 	/* arranging the bottom content buttons */
-	[self _layoutBottomButtons];
+	unsigned count = [bottomButtons count];
+	unsigned i;
+	unsigned x = 23; // x-value to start
+	for(i = 0; i < count; i++)
+	{
+		NSButton *button = (NSButton *)[bottomButtons objectAtIndex:i];
+		
+		// calculating the location of the button
+		NSRect rect = [button frame];
+		rect.origin.y = 1;
+		rect.origin.x = x;
+		[separatorContentBox addSubview:button];
+		[button setFrame:rect];
+		x += rect.size.width;	// stacking the buttons in a row
+	}	
 }
 
 #pragma mark Action Methods
@@ -113,23 +126,41 @@
 - (IBAction)bottomContentButtonAction:(id)sender
 {
 	int tag = [sender tag];
-	[self _showBottomModuleAtIndex:tag];
+	
+	NSWindow *window = [separateWindows objectAtIndex:tag];
+	
+	if((id)window == (id)[NSNull null])
+	{
+		[self _showBottomModuleAtIndex:tag];
+	}
+	else
+	{
+		NSButton *button = (NSButton *)[bottomButtons objectAtIndex:tag];
+		[button setState:NSOffState];
+		[window makeKeyAndOrderFront:self];
+	}
 }
 
 - (IBAction)showBottomModuleInSeparateWindow:(id)sender
 {
 	[self _showSeparateWindowWithBottomModuleAtIndex:currentSelectedBottomModuleIndex];
 	
-	if([displayedBottomButtons count] == 0)
+	unsigned i;
+	unsigned count = [separateWindows count];
+	
+	for(i = 0; i < count; i++)
 	{
-		[self _showBottomModuleAtIndex:UINT_MAX];
-		[bottomContentDisclosure setEnabled:NO];
+		id object = [separateWindows objectAtIndex:i];
+		
+		if(object == [NSNull null])
+		{
+			[self _showBottomModuleAtIndex:i];
+			return;
+		}
 	}
-	else
-	{
-		unsigned index = [(XMMouseOverButton *)[displayedBottomButtons objectAtIndex:0] tag];
-		[self _showBottomModuleAtIndex:index];
-	}
+	
+	[self _showBottomModuleAtIndex:UINT_MAX];
+	[bottomContentDisclosure setEnabled:NO];
 }
 
 #pragma mark Module Methods
@@ -146,7 +177,6 @@
 	
 	// creating a new button for this module and adding it to the array
 	XMMouseOverButton *button = [[XMMouseOverButton alloc] initWithFrame:NSMakeRect(0,0,0,0)];
-	[button setTitle:[module name]];
 	[button setImage:[module image]];
 	[button setToolTip:[module name]];
 	[button setBezelStyle:NSShadowlessSquareBezelStyle];
@@ -157,8 +187,10 @@
 	[button setAction:@selector(bottomContentButtonAction:)];
 	[button setTag:[bottomButtons count]];
 	[bottomButtons addObject:button];
-	[displayedBottomButtons addObject:button];
 	[button release];
+	
+	// adding NSNull to the windows array to increase the array's count as well
+	[separateWindows addObject:[NSNull null]];
 }
 
 #pragma mark Delegate Methods
@@ -173,26 +205,22 @@
 		return;
 	}
 	
-	unsigned moduleIndex = [[separateWindowModuleIndexes objectAtIndex:index] unsignedIntValue];
+	[separateWindows replaceObjectAtIndex:index withObject:[NSNull null]];
 	
-	[separateWindows removeObjectAtIndex:index];
-	[separateWindowModuleIndexes removeObjectAtIndex:index];
-	
-	XMMouseOverButton *button = (XMMouseOverButton *)[bottomButtons objectAtIndex:moduleIndex];
-	
-	unsigned j = 0;
-	unsigned count = [displayedBottomButtons count];
-	for(j = 0; j < count; j++)
+	if([bottomContentDisclosure isEnabled] == NO)
 	{
-		XMMouseOverButton *otherButton = [displayedBottomButtons objectAtIndex:j];
-		if([otherButton tag] > moduleIndex)
-		{
-			break;
-		}
+		[bottomContentDisclosure setEnabled:YES];
+		
+		currentSelectedBottomModuleIndex = index;
 	}
-	
-	[displayedBottomButtons insertObject:button atIndex:j];
-	[self _layoutBottomButtons];
+}
+
+- (void)windowDidMove:(NSNotification *)notif
+{
+	NSWindow *window = [notif object];
+	NSString *name = [[NSString alloc] initWithFormat:windowSaveNameFormat, [window title]];
+	[window saveFrameUsingName:name];
+	[name release];
 }
 
 #pragma mark Private Methods
@@ -302,7 +330,13 @@
 	}
 	
 	[bottomContentDisclosure setState:bottomContentDisclosureState];
+	
+	[showModuleInSeparateWindowButton setHidden:!enableShowModuleInSeparateWindowButton];
 	[showModuleInSeparateWindowButton setEnabled:enableShowModuleInSeparateWindowButton];
+	if(!enableShowModuleInSeparateWindowButton)
+	{
+		[showModuleInSeparateWindowButton reset];
+	}
 	
 	// calculating the new frame rect
 	float bottomHeight = [bottomContentBox bounds].size.height;
@@ -346,53 +380,24 @@
 														   styleMask:(NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask)
 															 backing:NSBackingStoreBuffered
 															   defer:NO];
-	[separateWindow setHasShadow:YES];
-	[separateWindow setOpaque:NO];
+	
 	[separateWindow setTitle:[module name]];
 	[separateWindow setContentView:contentView];
-	[separateWindow center];
+	
+	NSString *windowSaveName = [[NSString alloc] initWithFormat:windowSaveNameFormat, [module name]];
+	if(![separateWindow setFrameUsingName:windowSaveName force:YES])
+	{
+		[separateWindow center];
+		[separateWindow saveFrameUsingName:windowSaveName];
+	}
 	[separateWindow setDelegate:self];
-	[separateWindows addObject:separateWindow];
-	number = [[NSNumber alloc] initWithUnsignedInt:index];
-	[separateWindowModuleIndexes addObject:number];
-	[number release];
-	//[separateWindow release];
+	[separateWindows replaceObjectAtIndex:index withObject:separateWindow];
 	
 	[separateWindow makeKeyAndOrderFront:self];
 	
-	unsigned count = [displayedBottomButtons count];
-	unsigned i;
-	for(i = 0; i < count; i++)
-	{
-		XMMouseOverButton *button = (XMMouseOverButton *)[displayedBottomButtons objectAtIndex:i];
-		if([button tag] == index)
-		{
-			[displayedBottomButtons removeObjectAtIndex:i];
-			[button removeFromSuperview];
-			break;
-		}
-	}
-	
-	[self _layoutBottomButtons];
-}
-
-- (void)_layoutBottomButtons
-{
-	unsigned count = [displayedBottomButtons count];
-	unsigned i;
-	unsigned x = 23; // x-value to start
-	for(i = 0; i < count; i++)
-	{
-		NSButton *button = (NSButton *)[displayedBottomButtons objectAtIndex:i];
-		
-		// calculating the location of the button
-		NSRect rect = [button frame];
-		rect.origin.y = 1;
-		rect.origin.x = x;
-		[separatorContentBox addSubview:button];
-		[button setFrame:rect];
-		x += rect.size.width;	// stacking the buttons in a row
-	}
+	// workaround since the state of the button does not automatically
+	// return to NSOffState.
+	[showModuleInSeparateWindowButton setState:NSOffState];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMouseOverButton.m,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMMouseOverButton.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,12 @@
 	isMouseOver = NO;
 	
 	return self;
+}
+
+- (void)reset
+{
+	isMouseOver = NO;
+	[self setState:NSOffState];
 }
 
 - (void)sizeToFit

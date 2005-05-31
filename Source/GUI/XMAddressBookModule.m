@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,7 @@
 #import "XMAddressBookModule.h"
 #import "XMMainWindowController.h"
 
-NSString *XMCalltoURLProperty = @"calltoURL";
+NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeoplePickerView";
 
 @interface XMAddressBookModule (PrivateMethods)
 
@@ -46,18 +46,17 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 {
 	contentViewSize = [contentView frame].size;
 	
-	NSNumber *number = [[NSNumber alloc] initWithInt:kABStringProperty];
-	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMCalltoURLProperty, NULL];
-	[ABPerson addPropertiesAndTypes:dict];
-	[dict release];
-	[number release];
-	
-	//[addressBookView setAutosaveName:@"XMAddressBookView"];
+	[addressBookView setAutosaveName:XMAddressBookPeoplePickerViewAutosaveName];
 	[addressBookView setTarget:self];
 	[addressBookView setNameDoubleAction:@selector(editURL:)];
 	
-	[addressBookView addProperty:XMCalltoURLProperty];
-	[addressBookView setColumnTitle:@"Callto URL" forProperty:XMCalltoURLProperty];
+	// since the XMeeting framework stores the full XMURL string which is not very well
+	// human readable, we store a more human readable form under the
+	// XMAddressBookHumanReadableCallAddressProperty key. This way, we maintain
+	// both a more human readable representation to display in the PeoplePickerView and
+	// the complete call URL used for the XMeeting framework
+	[addressBookView addProperty:XMAddressBookHumanReadableCallAddressProperty];
+	[addressBookView setColumnTitle:@"Call Address" forProperty:XMAddressBookHumanReadableCallAddressProperty];
 	
 	// registering some notification
 	[[NSNotificationCenter defaultCenter] addObserver:self 
@@ -155,12 +154,9 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 
 - (IBAction)endEditRecordSheet:(id)sender
 {	
-	ABRecord *editedRecord = [[ABAddressBook sharedAddressBook] recordForUniqueId:editedId];
-	
 	if(sender == deleteButton)
 	{
-		[editedRecord removeValueForProperty:XMCalltoURLProperty];
-		[[ABAddressBook sharedAddressBook] save];
+		[editedRecord setCallURL:nil];
 	}
 	else if(sender == okButton)
 	{
@@ -207,57 +203,41 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 		}
 		[editedCalltoURL setType:type];
 		[editedCalltoURL setGatekeeperHost:gatekeeperHost];
+
+		[editedRecord setCallURL:editedCalltoURL];
 		
-		[editedRecord setValue:[editedCalltoURL stringRepresentation] forProperty:XMCalltoURLProperty];
-		[[ABAddressBook sharedAddressBook] save];
+		// in case this is a new record, we add it. If the record is already contained,
+		// this method does nothing
+		XMAddressBookManager *addressBookManager = [XMAddressBookManager sharedInstance];
+		[addressBookManager addRecord:editedRecord];
 	}
 	
 	[NSApp endSheet:editRecordSheet];
 	[editRecordSheet orderOut:self];
 	
-	[editedId release];
-	[editedCalltoURL release];
-	editedId = nil;
-	editedCalltoURL = nil;
-	
 	//workaround for buggy behaviour of people picker view
 	[addressBookView selectRecord:editedRecord byExtendingSelection:NO];
+	
+	[editedRecord release];
+	[editedCalltoURL release];
+	editedRecord = nil;
+	editedCalltoURL = nil;
+	
+	[self _validateButtons];
 }
 
 - (IBAction)addNewRecord:(id)sender
 {
-	ABPerson *person = [[ABPerson alloc] init];
-	
-	NSString *str = [firstNameField stringValue];
-	if(![str isEqualToString:@""])
-	{
-		[person setValue:str forProperty:kABFirstNameProperty];
-	}
-	str = [lastNameField stringValue];
-	if(![str isEqualToString:@""])
-	{
-		[person setValue:str forProperty:kABLastNameProperty];
-	}
-	str = [organizationField stringValue];
-	if(![str isEqualToString:@""])
-	{
-		[person setValue:str forProperty:kABOrganizationProperty];
-	}
-	
-	if([isOrganizationSwitch state] == NSOnState)
-	{
-		NSNumber *number = [[NSNumber alloc] initWithInt:kABShowAsCompany];
-		[person setValue:number forProperty:kABPersonFlags];
-		[number release];
-	}
-	
-	[[ABAddressBook sharedAddressBook] addRecord:person];
-	[[ABAddressBook sharedAddressBook] save];
+	XMAddressBookManager *addressBookManager = [XMAddressBookManager sharedInstance];
+	ABPerson *record = [addressBookManager createRecordWithFirstName:[firstNameField stringValue]
+														   lastName:[lastNameField stringValue]
+														companyName:[organizationField stringValue]
+														  isCompany:([isOrganizationSwitch state] == NSOnState)
+															callURL:nil];
 	
 	[self cancelNewRecord:self];
 	
-	[self _editRecord:person];
-	[person release];
+	[self _editRecord:record];
 }
 
 - (IBAction)cancelNewRecord:(id)sender
@@ -301,76 +281,8 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 	// are present, the company name is used if possible.
 	// in case of a company, the company name is taken as the first
 	// choice.
-	
-	NSString *recordName = nil;
-	NSString *firstName;
-	NSString *lastName;
-	NSString *organizationName;
-	
-	firstName = [record valueForProperty:kABFirstNameProperty];
-	lastName = [record valueForProperty:kABLastNameProperty];
-	organizationName = [record valueForProperty:kABOrganizationProperty];
-	
-	BOOL isPerson = YES;
-	
-	if(!firstName && !lastName && !organizationName)
-	{
-		recordName = @"<No Name>";
-	}
-	else
-	{
-		NSNumber *number = [record valueForProperty:kABPersonFlags];
-		if(number != nil)
-		{
-			int value = [number intValue];
-			
-			if((value & kABShowAsMask) == kABShowAsCompany)
-			{
-				isPerson = NO;
-			}
-		}
-	
-		if(isPerson)
-		{
-	
-			if(firstName && lastName)
-			{
-				recordName = [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-			}
-			else if(firstName)
-			{
-				recordName = firstName;
-			}
-			else if(lastName)
-			{
-				recordName = lastName;
-			}
-		}
-		
-		if(!recordName)
-		{
-			if(organizationName)
-			{
-				recordName = organizationName;
-			}
-			else if(firstName && lastName)
-			{
-				recordName = [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-			}
-			else if(firstName)
-			{
-				recordName = firstName;
-			}
-			else
-			{
-				recordName = lastName;
-			}
-		}
-	}
-	[recordNameField setStringValue:recordName];
-	
-	// filling the content with the appropriate information
-	NSString *calltoURLString = [record valueForProperty:XMCalltoURLProperty];
+	NSString *recordDisplayName = [record displayName];
+	[recordNameField setStringValue:recordDisplayName];
 	
 	BOOL enableDeleteButton;
 	BOOL enableGatekeeperPart;
@@ -380,12 +292,7 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 	unsigned gatekeeperTypeIndex;
 	NSString *gatekeeperAddress;
 	
-	NSLog(calltoURLString);
-	
-	if(calltoURLString)
-	{
-		editedCalltoURL = [[XMCalltoURL alloc] initWithString:calltoURLString];
-	}
+	editedCalltoURL = (XMCalltoURL *)[[record callURL] retain];
 	
 	if(!editedCalltoURL)
 	{
@@ -445,7 +352,7 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 	
 	[NSApp beginSheet:editRecordSheet modalForWindow:[contentView window] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 	
-	editedId = [[record uniqueId] retain];
+	editedRecord = [record retain];
 }
 
 - (void)_validateButtons
@@ -465,7 +372,7 @@ NSString *XMCalltoURLProperty = @"calltoURL";
 	{
 		record = (ABRecord *)[selectedRecords objectAtIndex:0];
 		
-		if([record valueForProperty:XMCalltoURLProperty] == nil)
+		if([record isValid] == NO)
 		{
 			enableCallButton = NO;
 		}

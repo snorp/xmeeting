@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.4 2005/05/31 14:59:34 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,7 +54,7 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	
 	/* intermediate code to make sure that at least one location is present in UserDefaults */
 	/* later, this will be replaced by some sort of wizard popping up */
-	XMLocation *defaultLocation = [[XMLocation alloc] initWithName:@"<DefaultLocation>"];
+	XMLocation *defaultLocation = [[XMLocation alloc] initWithName:NSLocalizedString(@"<Default Location>", @"")];
 	NSDictionary *dict = [defaultLocation dictionaryRepresentation];
 	NSArray *defaultLocationArray = [NSArray arrayWithObject:dict];
 	[defaultsDict setObject:defaultLocationArray forKey:XMKey_Locations];
@@ -99,6 +99,8 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	}
 	
 	autoAnswerCalls = [userDefaults boolForKey:XMKey_AutoAnswerCalls];
+	
+	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
 	
 	return self;
 }
@@ -168,17 +170,19 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 	activeLocation = 0;
 	for(i = 0; i < count; i++)
 	{
-		NSObject *obj = [newLocations objectAtIndex:i];
+		XMLocation *location = (XMLocation *)[newLocations objectAtIndex:i];
 		
-		if([obj isKindOfClass:[XMLocation class]])
+		if([location isKindOfClass:[XMLocation class]])
 		{
-			[locations addObject:[obj copy]];
-			if([(XMLocation *)obj _tag] == currentTag)
+			[locations addObject:[location copy]];
+			if([location _tag] == currentTag)
 			{
 				activeLocation = i;
 			}
 		}
 	}
+	
+	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
 }
 
 - (NSArray *)locationNames
@@ -216,15 +220,17 @@ NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 
 - (void)activateLocationAtIndex:(unsigned)index
 {
-	if(index >= 0 && index < [locations count])
+	if(activeLocation != index && index < [locations count])
 	{
 		activeLocation = index;
-	}
 	
-	// post the notification
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_ActiveLocationDidChange
-														object:self
-													  userInfo:nil];
+		// post the notification
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_ActiveLocationDidChange
+															object:self
+														  userInfo:nil];
+	
+		[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
+	}
 }
 
 - (NSString *)userName

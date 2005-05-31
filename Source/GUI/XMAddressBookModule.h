@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMAddressBookModule.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,7 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowBottomModule.h"
 
-@class ABPeoplePickerView, ABRecord, XMCalltoURL;
+@class ABPeoplePickerView, ABPerson, XMCalltoURL;
 
 @interface XMAddressBookModule : NSObject <XMMainWindowBottomModule> {
 
@@ -51,7 +51,7 @@
 	IBOutlet NSTextField *organizationField;
 	IBOutlet NSButton *isOrganizationSwitch;
 	
-	NSString *editedId;
+	ABPerson *editedRecord;
 	XMCalltoURL *editedCalltoURL;
 	
 	NSNib *nibLoader;

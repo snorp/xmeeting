@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowBottomModule.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMMainWindowBottomModule.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,7 +26,7 @@
 
 /**
  * Returns a small image for this module. This image is displayed
- * at currently 10x10 pixels, so returning bigger images is not
+ * at currently 16x16 pixels, so returning bigger images is not
  * necessary
  **/
 - (NSImage *)image;

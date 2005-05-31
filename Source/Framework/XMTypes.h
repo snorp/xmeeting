@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.4 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,6 +98,20 @@ typedef enum XMListenerStatus
 	XMListenerStatus_InCall,
 	XMListenerStatusCount
 } XMListenerStatus;
+
+/**
+ * Defines which part of a record matched a search operation in the address book
+ * database
+ **/
+typedef enum XMAddressBookRecordPropertyMatch
+{
+	XMAddressBookRecordPropertyMatch_NoMatch = 0,
+	XMAddressBookRecordPropertyMatch_FirstNameMatch,
+	XMAddressBookRecordPropertyMatch_LastNameMatch,
+	XMAddressBookRecordPropertyMatch_CompanyMatch,
+	XMAddressBookRecordPropertyMatch_CallAddressMatch,
+	XMAddressBookRecordPropertyMatchCount
+} XMAddressBookRecordPropertyMatch;
 
 /**
  * Defines the various types of URL's that the XMeeting framework understands

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMouseOverButton.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMMouseOverButton.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,13 @@
 	NSTrackingRectTag trackingTag;
 	BOOL isMouseOver;
 }
+
+/**
+ * Since the tracking rect does not send a mouseExited: message when
+ * the button disappears from the window, we sometimes need to
+ * reset the internal state of the button
+ **/
+- (void)reset;
 
 @end
 

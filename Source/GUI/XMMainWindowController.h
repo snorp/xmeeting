@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,8 @@
 #define __XM_MAIN_WINDOW_CONTROLLER_H__
 
 #import <Cocoa/Cocoa.h>
+
+@class XMMouseOverButton;
 
 /**
  * XMMainWindowController manages the content of the main
@@ -35,14 +37,13 @@
 	IBOutlet NSBox *bottomContentBox;
 	
 	IBOutlet NSButton *bottomContentDisclosure;
-	IBOutlet NSButton *showModuleInSeparateWindowButton;
+	IBOutlet XMMouseOverButton *showModuleInSeparateWindowButton;
 	
-	NSMutableArray *mainModules;
-	NSMutableArray *bottomModules;
-	NSMutableArray *bottomButtons;
-	NSMutableArray *displayedBottomButtons;
-	NSMutableArray *separateWindows;
-	NSMutableArray *separateWindowModuleIndexes;
+	NSMutableArray *mainModules;		// contains the main modules
+	NSMutableArray *bottomModules;		// contains the bottom modules
+	NSMutableArray *bottomButtons;		// contains the buttons corresponding to the bottom modules
+	NSMutableArray *separateWindows;	// contains the windows or NSNull if the module is not displayed in a separate window
+	NSMutableArray *windowLocations;
 	
 	unsigned currentSelectedMainModuleIndex;
 	unsigned currentSelectedBottomModuleIndex;
