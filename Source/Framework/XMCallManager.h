@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.4 2005/06/01 08:51:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,10 @@ extern NSString *XMNotification_IncomingCall;		// posted when there is an incomi
 extern NSString *XMNotification_CallEstablished;	// posted when a call is established
 extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 
+// Notification concerning the H.323 part
+extern NSString *XMNotification_RegisteredAtGatekeeper;
+extern NSString *XMNotification_UnregisteredAtGatekeeper;
+
 @class XMPreferences, XMCallInfo;
 
 /**
@@ -38,6 +42,9 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 	XMPreferences *activePreferences;
 	XMCallInfo *activeCall;
 	BOOL autoAnswerCalls;
+	
+	// h.323 variables
+	NSString *gatekeeperName;
 }
 
 /**
@@ -94,7 +101,7 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 
 /**
  * This method accepts or rejects the incoming call.
- * If this method is called if there is no incoming call, an expection is raised
+ * If this method is called and there is no incoming call, an expection is raised
  **/
 - (void)acceptIncomingCall:(BOOL)acceptCall;
 
@@ -102,6 +109,14 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
  * Hang-up of the active call
  **/
 - (void)clearActiveCall;
+
+#pragma mark H.323-specific methods
+
+/**
+ * Returns the name of the gatekeeper registered or nil if the framework
+ * is not registered at a gatekeeper
+ **/
+- (NSString *)gatekeeperName;
 
 @end
 

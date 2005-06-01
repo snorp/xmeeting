@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.mm,v 1.2 2005/04/28 20:26:27 hfriederich Exp $
+ * $Id: XMCallbackBridge.mm,v 1.3 2005/06/01 08:51:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,6 +64,8 @@ void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *medi
 	[[XMCallManager sharedInstance] _handleMediaStreamOpened:callID 
 											   isInputStream:isInputStream
 												 mediaFormat:name];
+	
+	[name release];
 }
 
 void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat)
@@ -81,3 +83,18 @@ bool getVideoFrame(void *buffer, unsigned *bytesReturned)
 {
 	return false;
 }
+
+#pragma mark H.323 specific Callbacks
+
+void noteRegisteredAtGatekeeper(const char *gatekeeperName)
+{
+	NSString *name = [[NSString alloc] initWithCString:gatekeeperName];
+	[[XMCallManager sharedInstance] _handleRegisteredAtGatekeeper:name];
+	[name release];
+}
+
+void noteUnregisteredAtGatekeeper()
+{
+	[[XMCallManager sharedInstance] _handleUnregisteredAtGatekeeper];
+}
+

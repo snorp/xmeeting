@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.4 2005/06/01 08:51:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,10 +17,19 @@ NSString *XMNotification_IncomingCall = @"XMeeting_IncomingCallNotification";
 NSString *XMNotification_CallEstablished = @"XMeeting_CallEstablishedNotification";
 NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 
+NSString *XMNotification_RegisteredAtGatekeeper = @"XMeeting_RegisteredAtGatekeeper";
+NSString *XMNotification_UnregisteredAtGatekeeper = @"XMeeting_UnregisteredAtGatekeeper";
+
 @interface XMCallManager (PrivateMethods)
 
 - (id)_init;
 - (void)_setupSubsystem;
+
+- (void)_handleIncomingCall:(XMCallInfo *)callInfo;
+- (void)_handleCallEstablished;
+- (void)_handleCallCleared:(NSNumber *)callEndReason;
+- (void)_handleMediaStreamOpened:(NSArray *)values;
+
 
 @end
 
@@ -67,6 +76,8 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	activePreferences = nil;
 	activeCall = nil;
 	
+	gatekeeperName = nil;
+	
 	//initializing the underlying OPAL system
 	initOPAL();
 	
@@ -79,6 +90,8 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	
 	[activePreferences release];
 	[activeCall release];
+	
+	[gatekeeperName release];
 	
 	[super dealloc];
 }
@@ -213,6 +226,13 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	}
 	
 	clearCall([activeCall _callID]);
+}
+
+#pragma mark H.323-specific Methods
+
+- (NSString *)gatekeeperName
+{
+	return gatekeeperName;
 }
 
 #pragma mark Private Methods
@@ -528,5 +548,35 @@ NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 	}
 }
 	
+#pragma mark H.323 private methods
 
+- (void)_handleRegisteredAtGatekeeper:(NSString *)theGatekeeperName
+{
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleRegisteredAtGatekeeper:)
+						   withObject:theGatekeeperName waitUntilDone:NO];
+}
+
+- (void)_mainThreadHandleRegisteredAtGatekeeper:(NSString *)theGatekeeperName
+{
+	NSLog(@"registered at gatekeeeper:");
+	NSLog(theGatekeeperName);
+	[gatekeeperName release];
+	gatekeeperName = [theGatekeeperName retain];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_RegisteredAtGatekeeper object:self];
+}
+
+- (void)_handleUnregisteredAtGatekeeper
+{
+	[self performSelectorOnMainThread:@selector(_mainThreadhandleUnregisteredAtGatekeeper)
+						   withObject:nil waitUntilDone:NO];
+}
+
+- (void)_mainThreadHandleUnregisteredAtGatekeeper
+{
+	[gatekeeperName release];
+	gatekeeperName = nil;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UnregisteredAtGatekeeper object:self];
+}
 @end

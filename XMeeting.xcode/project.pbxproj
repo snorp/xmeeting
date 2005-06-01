@@ -7,8 +7,7 @@
 	objects = {
 		080E96DDFE201D6D7F000001 = {
 			children = (
-				D163336307A01BD5003FD9C0,
-				D163336407A01BD5003FD9C0,
+				D1AF73E0084D02E400D50883,
 				D1B4CD9408316D5900A444E1,
 				D1B4CC21082F4E0E00A444E1,
 				D1A02A6C081E40360018BD11,
@@ -449,6 +448,8 @@
 				D16395620841B4E100F7FD83,
 				D12211B50844D1820021D4CD,
 				D15B067B084763F000FA58A1,
+				D1AF73DB084D02C200D50883,
+				D1AF744D084DA1BE00D50883,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1642,6 +1643,68 @@
 		};
 		D1A02B26081E96D30018BD11 = {
 			fileRef = D1A02B24081E96D30018BD11;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1AF73D9084D02C200D50883 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMCallAddressManager.h;
+			path = Source/Application/XMCallAddressManager.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF73DA084D02C200D50883 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMCallAddressManager.m;
+			path = Source/Application/XMCallAddressManager.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF73DB084D02C200D50883 = {
+			fileRef = D1AF73DA084D02C200D50883;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		D1AF73E0084D02E400D50883 = {
+			children = (
+				D163336307A01BD5003FD9C0,
+				D163336407A01BD5003FD9C0,
+				D1AF73D9084D02C200D50883,
+				D1AF73DA084D02C200D50883,
+				D1AF744B084DA1BE00D50883,
+				D1AF744C084DA1BE00D50883,
+			);
+			isa = PBXGroup;
+			name = "Application General";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF744B084DA1BE00D50883 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMAddressBookCallAddressProvider.h;
+			path = Source/Application/XMAddressBookCallAddressProvider.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF744C084DA1BE00D50883 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMAddressBookCallAddressProvider.m;
+			path = Source/Application/XMAddressBookCallAddressProvider.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF744D084DA1BE00D50883 = {
+			fileRef = D1AF744C084DA1BE00D50883;
 			isa = PBXBuildFile;
 			settings = {
 			};

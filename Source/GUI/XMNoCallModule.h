@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.3 2005/06/01 08:51:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,8 +12,12 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowModule.h"
 
-@class XMAddressBookManager, XMDatabaseField, XMPreferencesManager;
+@class XMAddressBookManager, XMDatabaseField, XMCallAddressManager, XMPreferencesManager;
 
+/**
+ * XMNoCallModule is the main window module displayed when the
+ * application is not in a call.
+ **/
 @interface XMNoCallModule : NSObject <XMMainWindowModule> {
 	// XMMainWindowModule Outlets and variables
 	IBOutlet NSView *contentView;
@@ -29,12 +33,12 @@
 	
 	// Optimizations for XMDatabaseField completions
 	unsigned uncompletedStringLength;
-	NSMutableArray *matchedValidRecords;
+	NSMutableArray *matchedAddresses;
 	NSMutableArray *completions;
 	
-	XMAddressBookManager *addressBookManager;
 	NSNib *nibLoader;
 	
+	XMCallAddressManager *callAddressManager;
 	XMPreferencesManager *preferencesManager;
 }
 

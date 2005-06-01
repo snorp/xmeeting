@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.4 2005/06/01 08:51:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,12 +32,6 @@
 		  remoteApplication:(NSString *)remoteApplication;
 
 /**
- * This method gets called on the main thread
- * from the related callback method.
- **/
-- (void)_handleIncomingCall:(XMCallInfo *)callInfo;
-
-/**
  * This method gets called from the CallbackBridge
  * every time a call is established. The call happens
  * not on the main thread.
@@ -45,23 +39,11 @@
 - (void)_handleCallEstablished:(unsigned)callID;
 
 /**
- * This method gets called on the main thread 
- * from the related callback method
- **/
-- (void)_handleCallEstablished;
-
-/**
  * This method gets called from the CallbackBridge
  * every time a call is cleared. The call happens
  * not on the main thread.
  **/
 - (void)_handleCallCleared:(unsigned)callID withCallEndReason:(XMCallEndReason)endReason;
-
-/**
- * This method gets called on the main thread
- * from the related callback method
- **/
-- (void)_handleCallCleared:(NSNumber *)callEndReason;
 
 /**
  * This method gets called from the CallbackBridge
@@ -73,12 +55,6 @@
 					 mediaFormat:(NSString *)mediaFormat;
 
 /**
- * This method gets called on the main thread
- * from the related callback method
- **/
-- (void)_handleMediaStreamOpened:(NSArray *)values;
-
-/**
  * This method gets called from the CallbackBridge
  * every time a media stream is closed. The call
  * happens not on the main thread.
@@ -86,6 +62,20 @@
 - (void)_handleMediaStreamClosed:(unsigned)callID
 				   isInputStream:(BOOL)isInputStream
 					 mediaFormat:(NSString *)mediaFormat;
+
+#pragma mark H.323 callbacks
+
+/**
+ * This method gets called every time the framework registers at a gatekeeper
+ * This Method gets not called on the main thread
+ **/
+- (void)_handleRegisteredAtGatekeeper:(NSString *)gatekeeperName;
+
+/**
+ * This method gets called every time the framework unregisters at a gatekeeper
+ * This method gets not called on the main thread
+ **/
+- (void)_handleUnregisteredAtGatekeeper;
 
 @end
 

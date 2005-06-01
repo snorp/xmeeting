@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.1 2005/05/31 15:01:01 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.2 2005/06/01 08:51:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -78,14 +78,6 @@ extern NSString *XMAddressBookHumanReadableCallAddressProperty;
  **/
 - (NSArray *)recordsMatchingString:(NSString *)searchString mustBeValid:(BOOL)mustBeValid
 			  returnExtraInformation:(BOOL)returnExtraInformation;
-
-/**
- * This method searches the recordsToCheck array for records matching searchString. If
- * an instance in recordsToCheck is of type XMAddressBookRecordSearchMatch, the property
- * which was matched is excluded from the
-- (NSArray *)recordsMatchingString:(NSString *)searchString recordsToCheck:(NSArray *)recordsToCheck
-			returnExtraInformation:(BOOL)returnExtraInformation;
-**/
 
 @end
 

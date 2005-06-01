@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.3 2005/06/01 08:51:41 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,8 @@
 
 #import "XMeeting.h"
 #import "XMApplicationController.h"
+#import "XMAddressBookCallAddressProvider.h"
+
 #import "XMMainWindowController.h"
 #import "XMPreferencesWindowController.h"
 #import "XMNoCallModule.h"
@@ -23,6 +25,7 @@
 
 - (void)awakeFromNib
 {
+	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	[[XMNoCallModule alloc] init];
 	[[XMInCallModule alloc] init];
 	[[XMAddressBookModule alloc] init];
