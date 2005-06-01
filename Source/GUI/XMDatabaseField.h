@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.h,v 1.1 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMDatabaseField.h,v 1.2 2005/06/01 11:00:37 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,9 @@
 
 - (NSImage *)defaultImage;
 - (void)setDefaultImage:(NSImage *)image;
+
+- (id)representedObject;
+- (void)setRepresentedObject:(id)representedObject;
 
 @end
 

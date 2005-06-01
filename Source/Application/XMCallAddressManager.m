@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.1 2005/06/01 08:51:41 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.2 2005/06/01 11:00:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMCallAddressManager.h"
+
+NSString *XMNotification_CallAddressManagerDidInitiateCall = @"XMeeting_CallAddressManagerDidInitiateCallNotification";
 
 @interface XMCallAddressManager (PrivateMethods)
 
@@ -41,6 +43,7 @@
 - (id)_init
 {
 	callAddressProviders = [[NSMutableArray alloc] initWithCapacity:3];
+	activeCallAddress = nil;
 	
 	return self;
 }
@@ -87,13 +90,26 @@
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString
 {
 	id<XMCallAddressProvider> provider = [address provider];
+	
+	if(provider == nil)
+	{
+		return nil;
+	}
 	return [provider completionStringForAddress:address uncompletedString:uncompletedString];
+}
+
+- (id<XMCallAddress>)activeCallAddress
+{
+	return activeCallAddress;
 }
 
 - (BOOL)makeCallToAddress:(id<XMCallAddress>)address
 {
-	// not yet implemented
-	return NO;
+	[activeCallAddress release];
+	activeCallAddress = [address retain];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallAddressManagerDidInitiateCall
+														object:self];
+	return YES;
 }
 
 @end

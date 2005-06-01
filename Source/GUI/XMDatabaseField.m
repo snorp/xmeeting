@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.1 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.2 2005/06/01 11:00:37 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,7 +47,7 @@ databaseField:imageForRepresentedObject:";
 - (void)_init;
 
 - (void)_setNeedsDisplay;
-
+- (void)_displayRepresentedObject;
 - (void)_displayCompletionAtIndex:(unsigned)index;
 - (void)_displayCompletionsWindow;
 - (void)_hideCompletionsWindow;
@@ -176,6 +176,19 @@ databaseField:imageForRepresentedObject:";
 	[old release];
 	
 	[[self cell] _setImage:image];
+}
+
+- (id)representedObject
+{
+	return representedObject;
+}
+
+- (void)setRepresentedObject:(id)theObject
+{
+	[representedObject release];
+	representedObject = [theObject retain];
+	
+	[self _displayRepresentedObject];
 }
 
 #pragma mark NSControl delegate methods
@@ -322,16 +335,7 @@ databaseField:imageForRepresentedObject:";
 	if(dataSource != nil)
 	{
 		representedObject = [[dataSource databaseField:self representedObjectForCompletedString:currentString] retain];
-		if(representedObject != nil)
-		{
-			NSImage *imageToDisplay = [dataSource databaseField:self imageForRepresentedObject:representedObject];
-			if(imageToDisplay == nil)
-			{
-				imageToDisplay = defaultImage;
-			}
-			[[self cell] _setImage:imageToDisplay];
-			[currentEditor setString:[dataSource databaseField:self displayStringForRepresentedObject:representedObject]];
-		}
+		[self _displayRepresentedObject];
 	}
 	[self _hideCompletionsWindow];
 	[self _setNeedsDisplay];
@@ -371,6 +375,40 @@ databaseField:imageForRepresentedObject:";
 {
 	[self setKeyboardFocusRingNeedsDisplayInRect:[self bounds]];
 	[super setNeedsDisplay:YES];
+}
+
+- (void)_displayRepresentedObject
+{
+	XMDatabaseFieldCell *cell = (XMDatabaseFieldCell *)[self cell];
+	NSText *currentEditor = [self currentEditor];
+	NSImage *displayImage;
+	NSString *displayString;
+	
+	if(representedObject != nil && dataSource != nil)
+	{
+		displayImage = [dataSource databaseField:self imageForRepresentedObject:representedObject];
+		if(displayImage == nil)
+		{
+			displayImage = defaultImage;
+		}
+		displayString = [dataSource databaseField:self displayStringForRepresentedObject:representedObject];
+	}
+	else
+	{
+		displayImage = defaultImage;
+		displayString = @"";
+	}
+	
+	[cell _setImage:displayImage];
+	
+	if(currentEditor != nil)
+	{
+		[currentEditor setString:displayString];
+	}
+	else
+	{
+		[cell setStringValue:displayString];
+	}
 }
 	
 - (void)_displayCompletionAtIndex:(unsigned)indexOfCompletion

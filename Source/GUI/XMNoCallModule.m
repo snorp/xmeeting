@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.3 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.4 2005/06/01 11:00:37 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 @interface XMNoCallModule (PrivateMethods)
 
 - (void)_preferencesDidChange:(NSNotification *)notif;
+- (void)_didInitiateCall:(NSNotification *)notif;
 
 - (NSArray *)_searchMatchesForString:(NSString *)string;
 
@@ -69,6 +70,9 @@
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_preferencesDidChange:)
 												 name:XMNotification_PreferencesDidChange object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didInitiateCall:)
+												 name:XMNotification_CallAddressManagerDidInitiateCall
+											   object:nil];
 }
 
 #pragma mark XMMainWindowModule methods
@@ -130,6 +134,12 @@
 	[locationsPopUp removeAllItems];
 	[locationsPopUp addItemsWithTitles:[preferencesManager locationNames]];
 	[locationsPopUp selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
+}
+
+- (void)_didInitiateCall:(NSNotification *)notif
+{
+	id<XMCallAddress> activeCallAddress = [callAddressManager activeCallAddress];
+	[callAddressField setRepresentedObject:activeCallAddress];
 }
 
 #pragma mark Call Address XMDatabaseComboBox Data Source Methods
@@ -196,13 +206,14 @@
 
 - (NSString *)databaseField:(XMDatabaseField *)databaseField displayStringForRepresentedObject:(id)representedObject
 {
-	id record = [(XMAddressBookRecordSearchMatch *)representedObject record];
-	return [record displayName];
+	NSString *displayString = [(id<XMCallAddress>)representedObject displayString];
+	return displayString;
 }
 
 - (NSImage *)databaseField:(XMDatabaseField *)databaseField imageForRepresentedObject:(id)representedObject
 {
-	return [NSImage imageNamed:@"AddressBook"];
+	NSImage *image = [(id<XMCallAddress>)representedObject displayImage];
+	return image;
 }
 
 @end

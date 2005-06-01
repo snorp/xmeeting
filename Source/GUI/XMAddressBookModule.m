@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.3 2005/06/01 11:00:37 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,8 +12,18 @@
 #import "XMeeting.h"
 #import "XMAddressBookModule.h"
 #import "XMMainWindowController.h"
+#import "XMCallAddressManager.h"
 
 NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeoplePickerView";
+
+@interface ABPerson (XMCallAddressMethods)
+
+- (id<XMCallAddressProvider>)provider;
+- (XMURL *)url;
+- (NSString *)displayString;
+- (NSString *)displayImage;
+
+@end
 
 @interface XMAddressBookModule (PrivateMethods)
 
@@ -108,7 +118,16 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (IBAction)call:(id)sender
 {
-	NSLog(@"Call, currently not implemented");
+	NSArray *selectedRecords = [addressBookView selectedRecords];
+	
+	if([selectedRecords count] == 0)
+	{
+		return;
+	}
+	
+	ABRecord *record = [selectedRecords objectAtIndex:0];
+	
+	[[XMCallAddressManager sharedInstance] makeCallToAddress:(id<XMCallAddress>)record];
 }
 
 - (IBAction)editURL:(id)sender
@@ -434,6 +453,29 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	
 	[okButton setEnabled:enableOKButton];
 }
-	
+
+@end
+
+@implementation ABPerson (XMCallAddressMethods)
+
+- (id<XMCallAddressProvider>)provider
+{
+	return nil;
+}
+
+- (XMURL *)url
+{
+	return [self callURL];
+}
+
+- (NSString *)displayString
+{
+	return [self displayName];
+}
+
+- (NSString *)displayImage
+{
+	return [NSImage imageNamed:@"AddressBook"];
+}
 
 @end

@@ -1,10 +1,15 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.1 2005/06/01 08:51:41 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.2 2005/06/01 11:00:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
+
+#ifndef __XM_CALL_ADDRESS_MANAGER_H__
+#define __XM_CALL_ADDRESS_MANAGER_H__
+
+extern NSString *XMNotification_CallAddressManagerDidInitiateCall;
 
 #import <Cocoa/Cocoa.h>
 #import "XMeeting.h"
@@ -22,6 +27,7 @@
 @interface XMCallAddressManager : NSObject {
 	
 	NSMutableArray *callAddressProviders;
+	id<XMCallAddress> activeCallAddress;
 }
 
 /**
@@ -41,6 +47,12 @@
  **/
 - (NSArray *)addressesMatchingString:(NSString *)searchString;
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
+
+/**
+ * Returns the call address instance which currently is being called (or in a call).
+ * Returns nil if there is no address the receiver tries to call.
+ **/
+- (id<XMCallAddress>)activeCallAddress;
 
 /**
  * Tries to make a call to the address specified, returning success of this operation
@@ -99,3 +111,5 @@
 - (NSImage *)displayImage;
 
 @end
+
+#endif // __XM_CALL_ADDRESS_MANAGER_H__
