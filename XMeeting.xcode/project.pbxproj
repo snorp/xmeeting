@@ -354,7 +354,6 @@
 				D10AFEB407B3781700BBC8EA,
 				D177D7A107B62C9500BD0172,
 				D1DE52EF07C6474100343A8D,
-				D1DE53B507C6BEB900343A8D,
 				D1A02881081CBCC00018BD11,
 				D1A02895081CBED00018BD11,
 				D1A02923081CD0700018BD11,
@@ -427,7 +426,6 @@
 				D10AFEB507B3781700BBC8EA,
 				D177D7A207B62C9500BD0172,
 				D1DE52F007C6474100343A8D,
-				D1DE53B607C6BEB900343A8D,
 				D1A02882081CBCC00018BD11,
 				D1A02896081CBED00018BD11,
 				D1A02A78081E40580018BD11,
@@ -450,6 +448,7 @@
 				D15B067B084763F000FA58A1,
 				D1AF73DB084D02C200D50883,
 				D1AF744D084DA1BE00D50883,
+				D1AF7600084E57BB00D50883,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -573,8 +572,6 @@
 				D1DE52EE07C6474100343A8D,
 				D114919107ACEE1E005BDCCB,
 				D114919207ACEE1E005BDCCB,
-				D1DE53B307C6BEB900343A8D,
-				D1DE53B407C6BEB900343A8D,
 				D163364E07A456C4003FD9C0,
 				D163364F07A456C4003FD9C0,
 				D18BF63C07AFA98F000CF993,
@@ -1709,10 +1706,36 @@
 			settings = {
 			};
 		};
+		D1AF75FE084E57BB00D50883 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = XMMainWindowStatusBarController.h;
+			path = Source/GUI/XMMainWindowStatusBarController.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF75FF084E57BB00D50883 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = XMMainWindowStatusBarController.m;
+			path = Source/GUI/XMMainWindowStatusBarController.m;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D1AF7600084E57BB00D50883 = {
+			fileRef = D1AF75FF084E57BB00D50883;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		D1B4CC21082F4E0E00A444E1 = {
 			children = (
 				D1B4CC28082F4E6800A444E1,
 				D1B4CC29082F4E6800A444E1,
+				D1AF75FE084E57BB00D50883,
+				D1AF75FF084E57BB00D50883,
 				D1ECCD0308348C4E008EBAE3,
 				D1ECCD330834923D008EBAE3,
 				D1ECCD340834923D008EBAE3,
@@ -2110,36 +2133,6 @@
 		};
 		D1DE52F007C6474100343A8D = {
 			fileRef = D1DE52EE07C6474100343A8D;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		D1DE53B307C6BEB900343A8D = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = XMGatekeeper.h;
-			path = Source/Framework/XMGatekeeper.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D1DE53B407C6BEB900343A8D = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = XMGatekeeper.cpp;
-			path = Source/Framework/XMGatekeeper.cpp;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D1DE53B507C6BEB900343A8D = {
-			fileRef = D1DE53B307C6BEB900343A8D;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		D1DE53B607C6BEB900343A8D = {
-			fileRef = D1DE53B407C6BEB900343A8D;
 			isa = PBXBuildFile;
 			settings = {
 			};

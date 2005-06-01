@@ -24,6 +24,12 @@
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
+        {
+            CLASS = XMMainWindowStatusBarController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {statusBar = NSTextField; }; 
+            SUPERCLASS = NSObject; 
+        }, 
         {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }
     ); 
     IBVersion = 1; 

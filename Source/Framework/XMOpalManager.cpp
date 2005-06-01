@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.4 2005/06/01 21:20:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -307,7 +307,6 @@ BOOL XMOpalManager::SetGatekeeper(const PString & address, const PString & ident
 		}
 		if(h323EP->UseGatekeeper(address, identifier))
 		{
-			//H323Gatekeeper *gk = h323EP->GetGatekeeper();
 			return TRUE;
 		}
 		else
