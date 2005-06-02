@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.3 2005/05/01 09:34:41 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.4 2005/06/02 12:47:33 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,8 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *maxTCPPortField;
 	IBOutlet NSTextField *minUDPPortField;
 	IBOutlet NSTextField *maxUDPPortField;
+	BOOL externalAddressIsValid;
+	BOOL isFetchingExternalAddress;
 	
 	// h323 outlets
 	IBOutlet NSButton *enableH323Switch;

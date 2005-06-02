@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowStatusBarController.m,v 1.2 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMMainWindowStatusBarController.m,v 1.3 2005/06/02 12:47:34 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -66,8 +66,6 @@
 	
 	if([utils didSucceedFetchingExternalAddress])
 	{
-		NSLog(@"abc");
-		NSLog([utils externalAddress]);
 		displayString = [NSLocalizedString(@"Fetching External Address... Done", @"") retain];
 	}
 	else
@@ -110,6 +108,7 @@
 	{
 		[displayClearTimer invalidate];
 		[displayClearTimer release];
+		displayClearTimer = nil;
 	}
 	if(timeInterval != 0.0)
 	{

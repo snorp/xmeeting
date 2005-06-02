@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.3 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.4 2005/06/02 12:47:33 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,7 +30,9 @@ extern NSString *XMNotification_DidEndFetchingExternalAddress;
  **/
 @interface XMUtils : NSObject {
 	
-	NSURL *fetchingURL;
+	NSURLConnection *externalAddressURLConnection;
+	NSMutableData *externalAddressURLData;
+	NSTimer *fetchingExternalAddressTimer;
 	BOOL isFetchingExternalAddress;
 	BOOL didSucceedFetchingExternalAddress;
 	NSString *externalAddress;

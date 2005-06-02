@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.4 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.5 2005/06/02 12:47:34 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,6 +45,9 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 - (void)_newLocationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode context:(void *)context;
 - (void)_deleteLocationAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode context:(void *)context;
 
+// notification responding
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
+
 @end
 
 @implementation XMLocationPreferencesModule
@@ -54,6 +57,9 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
 	
 	locations = [[NSMutableArray alloc] initWithCapacity:3];
+	
+	externalAddressIsValid = YES;
+	isFetchingExternalAddress = NO;
 	
 	return self;
 }
@@ -72,8 +78,21 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	column = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_CodecIsEnabled];
 	[column setDataCell:cell];
 	[videoCodecPreferenceOrderTableView setRowHeight:16];
-	
 	[cell release];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+												 name:XMNotification_DidEndFetchingExternalAddress object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
+												 name:XMNotification_DidStartFetchingExternalAddress object:nil];
+	
+	XMUtils *utils = [XMUtils sharedInstance];
+	if([utils didSucceedFetchingExternalAddress] && [utils externalAddress] == nil)
+	{
+		// in this case, the external address has not yet been fetched, thus
+		// we start fetching the address
+		[utils startFetchingExternalAddress];
+		isFetchingExternalAddress = YES;
+	}
 }
 
 - (void)dealloc
@@ -236,6 +255,14 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 
 - (IBAction)getExternalAddress:(id)sender
 {
+	NSLog(@"Start fetching");
+	XMUtils *utils = [XMUtils sharedInstance];
+	
+	[utils startFetchingExternalAddress];
+	
+	[externalAddressField setStringValue:NSLocalizedString(@"Fetching...", @"")];
+	[externalAddressField setEnabled:NO];
+	externalAddressIsValid = NO;
 }
 
 - (IBAction)toggleAutoGetExternalAddress:(id)sender
@@ -604,6 +631,8 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[currentLocation setVideoSize:size];
 }
 
+#pragma mark validate the user interface
+
 - (void)_validateLocationButtonUserInterface
 {
 	BOOL flag = ([locations count] == 1) ? NO : YES;
@@ -616,8 +645,8 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 {
 	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
 	
-	[externalAddressField setEnabled:flag];
 	[autoGetExternalAddressSwitch setEnabled:flag];
+	[getExternalAddressButton setEnabled:flag];
 	
 	if(flag)
 	{
@@ -633,6 +662,47 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 {
 	BOOL flag = ([autoGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
 	[externalAddressField setEnabled:flag];
+	
+	NSColor *textColor;
+		
+	if(flag == NO)
+	{
+		XMUtils *utils = [XMUtils sharedInstance];
+		NSString *externalAddress = [utils externalAddress];
+		NSString *displayString;
+		
+		if(externalAddress == nil)
+		{
+			if(isFetchingExternalAddress)
+			{
+				displayString = NSLocalizedString(@"Fetching...", @"");
+			}
+			else
+			{
+				displayString = NSLocalizedString(@"<Not available>", @"");
+			}
+			textColor = [NSColor controlTextColor];
+			externalAddressIsValid = NO;
+		}
+		else
+		{
+			displayString = externalAddress;
+			textColor = [NSColor controlTextColor];
+			externalAddressIsValid = YES;
+		}
+		
+		[externalAddressField setStringValue:displayString];
+	}
+	else
+	{
+		if(!externalAddressIsValid)
+		{
+			[externalAddressField setStringValue:@""];
+		}
+		textColor = [NSColor controlTextColor];
+	}
+	
+	[externalAddressField setTextColor:textColor];		
 }
 
 - (void)_validateH323UserInterface
@@ -805,6 +875,19 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		[self _addLocation:location];
 		[location release];
 	}
+}
+
+#pragma mark Notification Responding Methods
+
+- (void)_didStartFetchingExternalAddress:(NSNotification *)notif
+{
+	isFetchingExternalAddress = YES;
+}
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	isFetchingExternalAddress = NO;
+	[self _validateExternalAddressUserInterface];
 }
 
 @end

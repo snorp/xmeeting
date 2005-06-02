@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.mm,v 1.3 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMUtils.mm,v 1.4 2005/06/02 12:47:33 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,13 +61,20 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 {
 	isFetchingExternalAddress = NO;
 	didSucceedFetchingExternalAddress = YES;
+	externalAddressURLConnection = nil;
+	externalAddressURLData = nil;
 	externalAddress = nil;
 	externalAddressFetchFailReason = nil;
 }
 
 - (void)dealloc
 {
-	[fetchingURL release];
+	if(externalAddressURLConnection != nil)
+	{
+		[externalAddressURLConnection cancel];
+		[externalAddressURLConnection release];
+	}
+	[externalAddressURLData release];
 	[externalAddress release];
 	[externalAddressFetchFailReason release];
 	
@@ -80,8 +87,21 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 {
 	if(isFetchingExternalAddress == NO)
 	{
-		fetchingURL = [[NSURL alloc] initWithString:@"http://checkip.dyndns.org"];
-		[fetchingURL loadResourceDataNotifyingClient:self usingCache:NO];
+		NSURL *externalAddressURL = [[NSURL alloc] initWithString:@"http://checkip.dyndns.org"];
+		NSURLRequest *externalAddressURLRequest = [[NSURLRequest alloc] initWithURL:externalAddressURL 
+																		cachePolicy:NSURLRequestReloadIgnoringCacheData
+																	timeoutInterval:5.0];
+		externalAddressURLConnection = [[NSURLConnection alloc] initWithRequest:externalAddressURLRequest delegate:self];
+		
+		// since the timeoutInterval in NSURLRequest for some reason doesn't work, we do our own timeout by
+		// using a timer and seinding a -cancel message to the NSURLConnection when the timer fires
+		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:5.0 target:self
+																	   selector:@selector(_urlLoadingTimeout:) 
+																	   userInfo:nil repeats:NO] retain];
+		
+		[externalAddressURL release];
+		[externalAddressURLRequest release];
+		
 		isFetchingExternalAddress = YES;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartFetchingExternalAddress object:self];
 	}
@@ -102,11 +122,23 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 	return externalAddressFetchFailReason;
 }
 
-#pragma mark NSURLClient Methods
+#pragma mark NSURLConnection delegate Methods
 
-- (void)URLResourceDidFinishLoading:(NSURL *)sender
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-	if(sender != fetchingURL)
+	if(externalAddressURLData == nil)
+	{
+		externalAddressURLData = [data mutableCopy];
+	}
+	else
+	{
+		[externalAddressURLData appendData:data];
+	}
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+	if(connection != externalAddressURLConnection)
 	{
 		return;
 	}
@@ -116,12 +148,11 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 	[externalAddressFetchFailReason release];
 	externalAddressFetchFailReason = nil;
 	
-	NSData *data = [fetchingURL resourceDataUsingCache:YES];
-	if(data != nil)
+	if(externalAddressURLData != nil)
 	{
 		// parsing the data for the address string
 		NSCharacterSet *ipCharacters = [NSCharacterSet characterSetWithCharactersInString:@"0123456789."];
-		NSString *urlDataString = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+		NSString *urlDataString = [[NSString alloc] initWithData:externalAddressURLData encoding:NSASCIIStringEncoding];
 		NSString *addressString;
 		NSScanner *scanner = [[NSScanner alloc] initWithString:urlDataString];
 		if([scanner scanUpToCharactersFromSet:ipCharacters intoString:nil] &&
@@ -145,43 +176,61 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 		didSucceedFetchingExternalAddress = NO;
 	}
 	
-	[fetchingURL release];
-	fetchingURL = nil;
+	[externalAddressURLConnection release];
+	externalAddressURLConnection = nil;
+	[externalAddressURLData release];
+	externalAddressURLData = nil;
+	if(fetchingExternalAddressTimer != nil)
+	{
+		[fetchingExternalAddressTimer invalidate];
+		[fetchingExternalAddressTimer release];
+		fetchingExternalAddressTimer = nil;
+	}
 	isFetchingExternalAddress = NO;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFetchingExternalAddress object:self];
 }
 
-- (void)URLResourceDidCancelLoading:(NSURL *)sender
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-	[fetchingURL release];
-	fetchingURL = nil;
-	isFetchingExternalAddress = NO;
-	didSucceedFetchingExternalAddress = NO;
+	[externalAddressURLConnection release];
+	externalAddressURLConnection = nil;
+	[externalAddressURLData release];
+	externalAddressURLData = nil;
+	if(fetchingExternalAddressTimer != nil)
+	{
+		[fetchingExternalAddressTimer invalidate];
+		[fetchingExternalAddressTimer release];
+		fetchingExternalAddressTimer = nil;
+	}
+	
 	[externalAddress release];
 	externalAddress = nil;
 	[externalAddressFetchFailReason release];
-	NSString *failReason = @"Resource loading cancelled";
-	externalAddressFetchFailReason = [failReason retain];
+	externalAddressFetchFailReason = [error localizedDescription];
+	didSucceedFetchingExternalAddress = NO;
+	isFetchingExternalAddress = NO;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFetchingExternalAddress object:self];
 }
 
-- (void)URL:(NSURL *)sender resourceDataDidBecomeAvailable:(NSData *)newBytes
+- (void)_urlLoadingTimeout:(NSTimer *)timer
 {
-	// just ignoring
-}
-
-- (void)URL:(NSURL *)sender resourceDidFailLoadingWithReason:(NSString *)reason
-{
-	[fetchingURL release];
-	fetchingURL = nil;
-	isFetchingExternalAddress = NO;
-	didSucceedFetchingExternalAddress = NO;
+	[externalAddressURLConnection cancel];
+	[externalAddressURLConnection release];
+	externalAddressURLConnection = nil;
+	[externalAddressURLData release];
+	externalAddressURLData = nil;
+	[fetchingExternalAddressTimer release];
+	fetchingExternalAddressTimer = nil;
+	
 	[externalAddress release];
 	externalAddress = nil;
 	[externalAddressFetchFailReason release];
-	externalAddressFetchFailReason = [reason retain];
+	externalAddressFetchFailReason = [NSLocalizedString(@"connection timeout", @"") retain];
+	didSucceedFetchingExternalAddress = NO;
+	isFetchingExternalAddress = NO;
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFetchingExternalAddress object:self];
 }
 
