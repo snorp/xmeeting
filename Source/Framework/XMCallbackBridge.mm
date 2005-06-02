@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.mm,v 1.3 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMCallbackBridge.mm,v 1.4 2005/06/02 08:23:16 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -93,8 +93,8 @@ void noteRegisteredAtGatekeeper(const char *gatekeeperName)
 	[name release];
 }
 
-void noteUnregisteredAtGatekeeper()
+void noteRemovedGatekeeper()
 {
-	[[XMCallManager sharedInstance] _handleUnregisteredAtGatekeeper];
+	[[XMCallManager sharedInstance] _handleRemovedGatekeeper];
 }
 

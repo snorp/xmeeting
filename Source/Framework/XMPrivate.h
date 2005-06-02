@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.4 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.5 2005/06/02 08:23:16 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -75,7 +75,7 @@
  * This method gets called every time the framework unregisters at a gatekeeper
  * This method gets not called on the main thread
  **/
-- (void)_handleUnregisteredAtGatekeeper;
+- (void)_handleRemovedGatekeeper;
 
 @end
 

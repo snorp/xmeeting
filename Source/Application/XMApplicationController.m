@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.3 2005/06/01 08:51:41 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.4 2005/06/02 08:23:08 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,6 +35,8 @@
 	[[XMStatisticsModule alloc] init];
 	[[XMCallHistoryModule alloc] init];
 	[[XMMainWindowController sharedInstance] showMainWindow];
+	
+	[[XMUtils sharedInstance] startFetchingExternalAddress];
 }
 
 - (IBAction)showPreferences:(id)sender

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.4 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.5 2005/06/02 08:23:16 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,7 +22,7 @@ extern NSString *XMNotification_CallEnd;			// posted when a call did end.
 
 // Notification concerning the H.323 part
 extern NSString *XMNotification_RegisteredAtGatekeeper;
-extern NSString *XMNotification_UnregisteredAtGatekeeper;
+extern NSString *XMNotification_RemovedGatekeeper;
 
 @class XMPreferences, XMCallInfo;
 

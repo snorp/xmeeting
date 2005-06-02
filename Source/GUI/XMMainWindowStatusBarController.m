@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowStatusBarController.m,v 1.1 2005/06/01 21:20:21 hfriederich Exp $
+ * $Id: XMMainWindowStatusBarController.m,v 1.2 2005/06/02 08:23:16 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,8 @@
 
 @interface XMMainWindowStatusBarController (PrivateMethods)
 
-- (void)_setupDisplayClearTimer;
+- (void)_setStatusBarString:(NSString *)statusBarString;
+- (void)_setStatusBarString:(NSString *)statusBarString timeInterval:(NSTimeInterval)timeInterval;
 - (void)_clearStatusBar:(NSTimer *)timer;
 
 @end
@@ -37,33 +38,84 @@
 
 - (void)awakeFromNib
 {
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
+												 name:XMNotification_DidStartFetchingExternalAddress object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+												 name:XMNotification_DidEndFetchingExternalAddress object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_registeredAtGatekeeper:)
 												 name:XMNotification_RegisteredAtGatekeeper object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_removedGatekeeper:)
+												 name:XMNotification_RemovedGatekeeper object:nil];
 }
 
 #pragma mark Notification Handling Methods
+
+- (void)_didStartFetchingExternalAddress:(NSNotification *)notif
+{
+	NSString *displayString = NSLocalizedString(@"Fetching External Address...", @"");
+	// we have no time interval for this message since this notification is followed
+	// by the _didEndFetchingExternalAddress: notification after no mor than the default
+	// ip fetch timeout
+	[self _setStatusBarString:displayString timeInterval:0.0];
+}
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	XMUtils *utils = [XMUtils sharedInstance];
+	NSString *displayString;
+	
+	if([utils didSucceedFetchingExternalAddress])
+	{
+		NSLog(@"abc");
+		NSLog([utils externalAddress]);
+		displayString = [NSLocalizedString(@"Fetching External Address... Done", @"") retain];
+	}
+	else
+	{
+		NSString *displayFormat = NSLocalizedString(@"Fetching External Address... Failed (%@)", @"");
+		displayString = [[NSString alloc] initWithFormat:displayFormat, [utils externalAddressFetchFailReason]];
+	}
+	[self _setStatusBarString:displayString];
+	[displayString release];
+}
 
 - (void)_registeredAtGatekeeper:(NSNotification *)notif
 {
 	NSString *displayFormat = NSLocalizedString(@"H.323: Gatekeeper set: %@", @"");
 	NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, [[XMCallManager sharedInstance] gatekeeperName]];
-	[statusBar setStringValue:displayString];
+	[self _setStatusBarString:displayString];
 	[displayString release];
-	
-	[self _setupDisplayClearTimer];
+}
+
+- (void)_removedGatekeeper:(NSNotification *)notif
+{
+	NSString *displayFormat = NSLocalizedString(@"H.323: Removed Gatekeeper %@", @"");
+	NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, [[XMCallManager sharedInstance] gatekeeperName]];
+	[self _setStatusBarString:displayString];
+	[displayString release];
 }
 
 #pragma mark Private Methods
 
-- (void)_setupDisplayClearTimer
+- (void)_setStatusBarString:(NSString *)statusBarString
 {
+	[self _setStatusBarString:statusBarString timeInterval:4.0];
+}
+
+- (void)_setStatusBarString:(NSString *)statusBarString timeInterval:(NSTimeInterval)timeInterval
+{
+	[statusBar setStringValue:statusBarString];
+	
 	if(displayClearTimer != nil)
 	{
 		[displayClearTimer invalidate];
 		[displayClearTimer release];
 	}
-	displayClearTimer = [[NSTimer scheduledTimerWithTimeInterval:4.0 target:self selector:@selector(_clearStatusBar:)
-														userInfo:nil repeats:NO] retain];
+	if(timeInterval != 0.0)
+	{
+		displayClearTimer = [[NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(_clearStatusBar:)
+															userInfo:nil repeats:NO] retain];
+	}
 }
 
 - (void)_clearStatusBar:(NSTimer *)timer

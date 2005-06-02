@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.4 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.5 2005/06/02 08:23:16 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,7 +18,7 @@ NSString *XMNotification_CallEstablished = @"XMeeting_CallEstablishedNotificatio
 NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
 
 NSString *XMNotification_RegisteredAtGatekeeper = @"XMeeting_RegisteredAtGatekeeper";
-NSString *XMNotification_UnregisteredAtGatekeeper = @"XMeeting_UnregisteredAtGatekeeper";
+NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 @interface XMCallManager (PrivateMethods)
 
@@ -566,17 +566,17 @@ NSString *XMNotification_UnregisteredAtGatekeeper = @"XMeeting_UnregisteredAtGat
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_RegisteredAtGatekeeper object:self];
 }
 
-- (void)_handleUnregisteredAtGatekeeper
+- (void)_handleRemovedGatekeeper
 {
-	[self performSelectorOnMainThread:@selector(_mainThreadhandleUnregisteredAtGatekeeper)
+	[self performSelectorOnMainThread:@selector(_mainThreadhandleRemovedGatekeeper)
 						   withObject:nil waitUntilDone:NO];
 }
 
-- (void)_mainThreadHandleUnregisteredAtGatekeeper
+- (void)_mainThreadHandleRemovedGatekeeper
 {
 	[gatekeeperName release];
 	gatekeeperName = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UnregisteredAtGatekeeper object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_RemovedGatekeeper object:self];
 }
 @end
