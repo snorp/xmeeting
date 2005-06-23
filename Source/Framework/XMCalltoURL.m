@@ -1,10 +1,13 @@
 /*
- * $Id: XMCalltoURL.m,v 1.1 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMCalltoURL.m,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
+
+#import "XMStringConstants.h"
+#import "XMPrivate.h"
 
 #import "XMCalltoURL.h"
 #import "XMUtils.h"
@@ -62,7 +65,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 	
 	type = XMCalltoURLType_Unknown;
 	address = nil;
-	port = UINT_MAX;
+	port = 0;
 	conferenceToJoin = nil;
 	
 	gkHost = nil;
@@ -261,7 +264,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 	}
 	else
 	{
-		[NSException raise:@"XMeetingNonSupportedCoderException" format:@"Only NSCoder subclasses which allow keyed coding are supported."];
+		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 		[self release];
 		return nil;
 	}
@@ -292,7 +295,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 	}
 	else
 	{
-		[NSException raise:@"XMeetingNonSupportedCoderException" format:@"Only NSCoder subclasses which allow keyed coding are supported."];
+		[NSException raise:XMException_UnsupportedCoder format:@"Only NSCoder subclasses which allow keyed coding are supported."];
 	}
 }	
 
@@ -314,7 +317,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 			}
 			[str appendString:addr];
 			
-			if(port != UINT_MAX)
+			if(port != 0)
 			{
 				[str appendFormat:@":%d", port];
 			}
@@ -409,7 +412,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 	{
 		[dictionary setObject:address forKey:XMKey_URLAddress];
 	}
-	if(port!= UINT_MAX)
+	if(port!= 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:port];
 		[dictionary setObject:number forKey:XMKey_URLPort];
@@ -448,6 +451,11 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 		[url release];
 		url = nil;
 	}
+}
+
+- (XMCallProtocol)callProtocol
+{
+	return XMCallProtocol_H323;
 }
 
 - (NSString *)address
@@ -561,7 +569,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 		return nil;
 	}
 	
-	if(conferenceToJoin && port != UINT_MAX)
+	if(conferenceToJoin && port != 0)
 	{
 		return [NSString stringWithFormat:@"%@:%d**%@", address, port, conferenceToJoin];
 	}
@@ -569,7 +577,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 	{
 		return [NSString stringWithFormat:@"%@**%@", address, conferenceToJoin];
 	}
-	else if(port != UINT_MAX)
+	else if(port != 0)
 	{
 		return [NSString stringWithFormat:@"%@:%d", address, port];
 	}
@@ -609,7 +617,7 @@ NSString *XMKey_CalltoURLGatekeeperHost = @"XMeeting_CalltoURLGatekeeperHost";
 	}
 	else
 	{
-		newPort = UINT_MAX;
+		newPort = 0;
 	}
 	
 	if([scanner scanString:@"**" intoString:nil])

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMAddressBookModule.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,11 +10,11 @@
 #define __XM_ADDRESS_BOOK_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowBottomModule.h"
+#import "XMMainWindowAdditionModule.h"
 
 @class ABPeoplePickerView, ABPerson, XMCalltoURL;
 
-@interface XMAddressBookModule : NSObject <XMMainWindowBottomModule> {
+@interface XMAddressBookModule : NSObject <XMMainWindowAdditionModule> {
 
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;

@@ -1,52 +1,29 @@
 /*
- * $Id: XMCodecManager.mm,v 1.3 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMCodecManager.mm,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMStringConstants.h"
+#import "XMPrivate.h"
 #import "XMCodecManager.h"
 
-#define XM_CODEC_DESCRIPTIONS_FILENAME @"XMCodecDescriptions"
-#define XM_CODEC_DESCRIPTIONS_FILETYPE @"plist"
+@interface XMCodecManager (PrivateMethods)
 
-#define AUDIO_CODECS_KEY @"XMeeting_AudioCodecs"
-#define VIDEO_CODECS_KEY @"XMeeting_VideoCodecs"
+- (id)_init;
 
-NSString *XMAudioCodec_G711_ALaw = @"g.711-alaw";
-NSString *XMAudioCodec_G711_uLaw = @"g.711-ulaw";
-NSString *XMAudioCodec_Speex = @"speex";
-NSString *XMAudioCodec_GSM = @"gsm";
-NSString *XMAudioCodec_G726 = @"g.726";
-NSString *XMAudioCodec_iLBC = @"ilbc";
-NSString *XMAudioCodec_IMA_ADPCM = @"ima_adpcm";
-NSString *XMAudioCodec_LPC = @"lpc";
-
-NSString *XMVideoCodec_H261 = @"h.261";
-NSString *XMVideoCodec_H263 = @"h.263";
-
-NSString *XMKey_CodecKey = @"XMeeting_CodecKey";
-NSString *XMKey_CodecName = @"XMeeting_CodecName";
-NSString *XMKey_CodecBandwidth = @"XMeeting_CodecBandwidth";
-NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
-
-/*
- * Private interface to XMCodecDescritpro
- */
-@interface XMCodecDescriptor (InitMethod)
-
-- (id)_initWithDictionary:(NSDictionary *)dict;
-- (id)_initWithKey:(NSString *)key
-			 name:(NSString *)name
-		bandwidth:(NSString *)bandwidth
-		  quality:(NSString *)quality;
 @end
 
 @interface XMCodecDescriptor (PrivateMethods)
 
-- (id)_init;
+- (id)_initWithDictionary:(NSDictionary *)dict;
 
+- (id)_initWithIdentifier:(NSString *)identifier
+					 name:(NSString *)name
+				bandwidth:(NSString *)bandwidth
+				  quality:(NSString *)quality;
 @end
 
 @implementation XMCodecManager
@@ -88,8 +65,8 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	
 	// obtaining the plist-data
 	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-	NSString *descFilePath = [bundle pathForResource:XM_CODEC_DESCRIPTIONS_FILENAME 
-											  ofType:XM_CODEC_DESCRIPTIONS_FILETYPE];
+	NSString *descFilePath = [bundle pathForResource:XMKey_CodecManager_CodecDescriptionsFilename 
+											  ofType:XMKey_CodecManager_CodecDescriptionsFiletype];
 	
 	NSData *descFileData = [NSData dataWithContentsOfFile:descFilePath];
 	
@@ -101,12 +78,12 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	
 	if(dict == nil)
 	{
-		[NSException raise:@"XMeetingCodecInfoParseException" format:@"Parsing the infos for available codecs failed. (%@)", errorString];
+		[NSException raise:XMException_InternalConsistencyFailure format:XMExceptionReason_CodecManagerInternalConsistencyFailure, errorString];
 		return nil;
 	}
 	
 	// Importing the audio codecs from the plist
-	NSArray *arr = [dict objectForKey:AUDIO_CODECS_KEY];
+	NSArray *arr = [dict objectForKey:XMKey_CodecManager_AudioCodecs];
 	int count = [arr count];
 	int i;
 	
@@ -120,7 +97,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	}
 	
 	// Importing the video codecs from the plist
-	arr = [dict objectForKey:VIDEO_CODECS_KEY];
+	arr = [dict objectForKey:XMKey_CodecManager_VideoCodecs];
 	count = [arr count];
 	
 	for(i = 0; i < count; i++)
@@ -145,7 +122,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 
 #pragma mark Methods for Accessing Codec Descriptors
 
-- (XMCodecDescriptor *)codecDescriptorForKey:(NSString *)codecKey
+- (XMCodecDescriptor *)codecDescriptorForIdentifier:(NSString *)identifier
 {
 	// check all audio codecs
 	int count = [audioCodecDescriptors count];
@@ -154,7 +131,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	{
 		XMCodecDescriptor *codecDesc = (XMCodecDescriptor *)[audioCodecDescriptors objectAtIndex:i];
 		
-		if([[codecDesc key] isEqualToString:codecKey])
+		if([[codecDesc identifier] isEqualToString:identifier])
 		{
 			return codecDesc;
 		}
@@ -166,13 +143,13 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	{
 		XMCodecDescriptor *codecDesc = (XMCodecDescriptor *)[videoCodecDescriptors objectAtIndex:i];
 		
-		if([[codecDesc key] isEqualToString:codecKey])
+		if([[codecDesc identifier] isEqualToString:identifier])
 		{
 			return codecDesc;
 		}
 	}
 	
-	// noting found, hence returning nil
+	// noting found, returning nil
 	return nil;
 }
 
@@ -211,22 +188,28 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 
 - (id)_initWithDictionary:(NSDictionary *)dict
 {
-	NSString *aKey = [dict objectForKey:XMKey_CodecKey];
-	NSString *aName = [dict objectForKey:XMKey_CodecName];
-	NSString *aBandwidth = [dict objectForKey:XMKey_CodecBandwidth];
-	NSString *aQuality = [dict objectForKey:XMKey_CodecQuality];
+	NSString *anIdentifier = [dict objectForKey:XMKey_CodecDescriptor_Identifier];
+	NSString *aName = [dict objectForKey:XMKey_CodecDescriptor_Name];
+	NSString *aBandwidth = [dict objectForKey:XMKey_CodecDescriptor_Bandwidth];
+	NSString *aQuality = [dict objectForKey:XMKey_CodecDescriptor_Quality];
 	
-	return [self _initWithKey:aKey name:aName bandwidth:aBandwidth quality:aQuality];
+	if(anIdentifier == nil || aName == nil || aBandwidth == nil || aQuality == nil)
+	{
+		[NSException raise:XMException_InternalConsistencyFailure
+					format:XMExceptionReason_CodecManagerInternalConsistencyFailure];
+	}
+	
+	return [self _initWithIdentifier:anIdentifier name:aName bandwidth:aBandwidth quality:aQuality];
 }
 
-- (id)_initWithKey:(NSString *)aKey 
-			 name:(NSString *)aName 
-		bandwidth:(NSString *)aBandwidth 
-		  quality:(NSString *)aQuality
+- (id)_initWithIdentifier:(NSString *)anIdentifier
+					 name:(NSString *)aName 
+				bandwidth:(NSString *)aBandwidth 
+				  quality:(NSString *)aQuality
 {
 	self = [super init];
 	
-	key = [aKey copy];
+	identifier = [anIdentifier copy];
 	name = [aName copy];
 	bandwidth = [aBandwidth copy];
 	quality = [aQuality copy];
@@ -236,7 +219,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 
 - (void)dealloc
 {
-	[key release];
+	[identifier release];
 	[name release];
 	[bandwidth release];
 	[quality release];
@@ -256,7 +239,7 @@ NSString *XMKey_CodecQuality = @"XMeeting_CodecQuality";
 	if([object isKindOfClass:[self class]])
 	{
 		XMCodecDescriptor *desc = (XMCodecDescriptor *)object;
-		if([key isEqualToString:[desc key]] &&
+		if([identifier isEqualToString:[desc identifier]] &&
 		   [name isEqualToString:[desc name]] &&
 		   [bandwidth isEqualToString:[desc bandwidth]] &&
 		   [quality isEqualToString:[desc quality]])
@@ -271,22 +254,22 @@ return NO;
 
 - (NSString *)propertyForKey:(NSString *)theKey
 {
-	if([theKey isEqualToString:XMKey_CodecKey])
+	if([theKey isEqualToString:XMKey_CodecDescriptor_Identifier])
 	{
-		return key;
+		return identifier;
 	}
 	
-	if([theKey isEqualToString:XMKey_CodecName])
+	if([theKey isEqualToString:XMKey_CodecDescriptor_Name])
 	{
 		return name;
 	}
 	
-	if([theKey isEqualToString:XMKey_CodecBandwidth])
+	if([theKey isEqualToString:XMKey_CodecDescriptor_Bandwidth])
 	{
 		return bandwidth;
 	}
 	
-	if([theKey isEqualToString:XMKey_CodecQuality])
+	if([theKey isEqualToString:XMKey_CodecDescriptor_Quality])
 	{
 		return quality;
 	}
@@ -294,9 +277,9 @@ return NO;
 	return nil;
 }
 
-- (NSString *)key
+- (NSString *)identifier
 {
-	return key;
+	return identifier;
 }
 
 - (NSString *)name

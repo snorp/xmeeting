@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.4 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,11 +28,9 @@
 void initializeCallbacks();
 
 /**
- * These methods gets called every time the volume is changed
- * by an external source.
+ * initiates the subsystem setup
  **/
-void audioInputVolumeDidChange(unsigned volume);
-void audioOutputVolumeDidChange(unsigned volume);
+void doSubsystemSetup(void *preferences);
 
 /**
  * If there is an incoming call and autoanswer is off,
@@ -83,7 +81,8 @@ bool getVideoFrame(void *buffer, unsigned *bytesReturned);
 
 #pragma mark H.323 specific callbacks
 
-void noteRegisteredAtGatekeeper(const char *gatekeeperName);
-void noteRemovedGatekeeper();
+void noteGatekeeperRegistration(const char *gatekeeperName);
+void noteGatekeeperUnregistration();
+void noteGatekeeperRegistrationFailure();
 
 #endif // __XM_CALLBACK_BRIDGE_H__

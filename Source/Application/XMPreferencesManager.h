@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,9 +15,6 @@
 
 extern NSString *XMNotification_PreferencesDidChange;
 extern NSString *XMNotification_ActiveLocationDidChange;
-
-extern NSString *XMKey_Locations;
-extern NSString *XMKey_ActiveLocation;
 
 /**
  * XMPreferencesManager deals with the various task concerning

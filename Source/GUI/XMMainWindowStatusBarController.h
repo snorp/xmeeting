@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowStatusBarController.h,v 1.1 2005/06/01 21:20:21 hfriederich Exp $
+ * $Id: XMMainWindowStatusBarController.h,v 1.2 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,9 @@
 @interface XMMainWindowStatusBarController : NSObject {
 
 	IBOutlet NSTextField *statusBar;
+	IBOutlet NSProgressIndicator *progressIndicator;
+	BOOL doesSubsystemSetup;
+	BOOL progressIndicatorDoesAnimate;
 	NSTimer *displayClearTimer;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,11 +13,6 @@
 #import <QuickTime/QuickTime.h>
 
 #import "XMTypes.h"
-
-extern NSString *XMNotification_DidStartVideoGrabbing;
-extern NSString *XMNotification_DidStopVideoGrabbing;
-extern NSString *XMNotification_DidReadVideoFrame;
-extern NSString *XMNotification_DidUpdateVideoDeviceList;
 
 @class XMLocalVideoView;
 

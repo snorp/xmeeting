@@ -1,45 +1,22 @@
 /*
- * $Id: XMPreferences.m,v 1.4 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMStringConstants.h"
+#import "XMPrivate.h"
 #import "XMPreferences.h"
 #import "XMCodecManager.h"
 
-NSString *XMKey_UserName = @"XMeeting_UserName";
-NSString *XMKey_AutoAnswerCalls = @"XMeeting_AutoAnswerCalls";
+@interface XMCodecListRecord (PrivateMethods)
 
-NSString *XMKey_BandwidthLimit = @"XMeeting_BandwidthLimit";
-NSString *XMKey_UseAddressTranslation = @"XMeeting_UseAddressTranslation";
-NSString *XMKey_ExternalAddress = @"XMeeting_ExternalAddress";
-NSString *XMKey_TCPPortMin = @"XMeeting_TCPPortMin";
-NSString *XMKey_TCPPortMax = @"XMeeting_TCPPortMax";
-NSString *XMKey_UDPPortMin = @"XMeeting_UDPPortMin";
-NSString *XMKey_UDPPortMax = @"XMeeting_UDPPortMax";
+- (id)_initWithIdentifier:(NSString *)identifier enabled:(BOOL)enabled;
+- (id)_initWithDictionary:(NSDictionary *)dict;
 
-NSString *XMKey_AudioCodecPreferenceList = @"XMeeting_AudioCodecPreferenceList";
-NSString *XMKey_AudioBufferSize = @"XMeeting_AudioBufferSize";
-
-NSString *XMKey_EnableVideoReceive = @"XMeeting_EnableVideoReceive";
-NSString *XMKey_SendVideo = @"XMeeting_SendVideo";
-NSString *XMKey_SendFPS = @"XMeeting_SendFPS";
-NSString *XMKey_VideoSize = @"XMeeting_VideoSize";
-NSString *XMKey_VideoCodecPreferenceList = @"XMeeting_VideoCodecPreferenceList";
-
-NSString *XMKey_H323_IsEnabled = @"XMeeting_H323_IsEnabled";
-NSString *XMKey_H323_EnableH245Tunnel = @"XMeeting_H323_EnableH245Tunnel";
-NSString *XMKey_H323_EnableFastStart = @"XMeeting_H323_EnableFastStart";
-NSString *XMKey_H323_UseGatekeeper = @"XMeeting_H323_UseGatekeeper";
-NSString *XMKey_H323_GatekeeperAddress = @"XMeeting_H323_GatekeeperAddress";
-NSString *XMKey_H323_GatekeeperID = @"XMeeting_H323_GatekeeperID";
-NSString *XMKey_H323_GatekeeperUsername = @"XMeeting_H323_GatekeeperUsername";
-NSString *XMKey_H323_GatekeeperE164Number = @"XMeeting_H323_GatekeeperE164Number";
-
-// XMKey_CodecKey is defined in XMCodecManager.mm
-NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
+@end
 
 @interface XMPreferences(PrivateMethods)
 
@@ -67,31 +44,31 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	bandwidthLimit = 0;
 	useAddressTranslation = NO;
 	externalAddress = nil;
-	tcpPortMin = 30000;
+	tcpPortBase = 30000;
 	tcpPortMax = 30010;
-	udpPortMin = 5000;
+	udpPortBase = 5000;
 	udpPortMax = 5099;
 	
 	// to reduce unnecessary copy overhead, we do not allocate any storage, indicating that
 	// this has yet to be done. In case of a copy operation, the array allocated here is never
 	// used.
-	audioCodecPreferenceList = nil;
 	audioBufferSize = 2;
+	audioCodecPreferenceList = nil;
 	
 	enableVideoReceive = NO;
-	sendVideo = NO;
-	sendFPS = 5;
+	enableVideoTransmit = NO;
+	videoFramesPerSecond = 5;
 	videoSize = XMVideoSize_NoVideo;
 	videoCodecPreferenceList = nil;
 	
-	h323_IsEnabled = YES;
-	h323_EnableH245Tunnel = NO;
-	h323_EnableFastStart = NO;
-	h323_UseGatekeeper = NO;
-	h323_GatekeeperAddress = nil;
-	h323_GatekeeperID = nil;
-	h323_GatekeeperUsername = nil;
-	h323_GatekeeperE164Number = nil;
+	enableH323 = NO;
+	enableH245Tunnel = NO;
+	enableFastStart = NO;
+	useGatekeeper = NO;
+	gatekeeperAddress = nil;
+	gatekeeperID = nil;
+	gatekeeperUsername = nil;
+	gatekeeperPhoneNumber = nil;
 
 	return self;
 }
@@ -102,61 +79,61 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	
 	self = [self init];
 	
-	obj = [dict objectForKey:XMKey_UserName];
+	obj = [dict objectForKey:XMKey_Preferences_UserName];
 	if(obj)
 	{
 		[self setUserName:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_AutoAnswerCalls];
+	obj = [dict objectForKey:XMKey_Preferences_AutoAnswerCalls];
 	if(obj)
 	{
 		[self setAutoAnswerCalls:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_BandwidthLimit];
+	obj = [dict objectForKey:XMKey_Preferences_BandwidthLimit];
 	if(obj)
 	{
 		[self setBandwidthLimit:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_UseAddressTranslation];
+	obj = [dict objectForKey:XMKey_Preferences_UseAddressTranslation];
 	if(obj)
 	{
 		[self setUseAddressTranslation:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_ExternalAddress];
+	obj = [dict objectForKey:XMKey_Preferences_ExternalAddress];
 	if(obj)
 	{
 		[self setExternalAddress:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_TCPPortMin];
+	obj = [dict objectForKey:XMKey_Preferences_TCPPortBase];
 	if(obj)
 	{
-		[self setTCPPortMin:[(NSNumber *)obj unsignedIntValue]];
+		[self setTCPPortBase:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_TCPPortMax];
+	obj = [dict objectForKey:XMKey_Preferences_TCPPortMax];
 	if(obj)
 	{
 		[self setTCPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_UDPPortMin];
+	obj = [dict objectForKey:XMKey_Preferences_UDPPortBase];
 	if(obj)
 	{
-		[self setUDPPortMin:[(NSNumber *)obj unsignedIntValue]];
+		[self setUDPPortBase:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_UDPPortMax];
+	obj = [dict objectForKey:XMKey_Preferences_UDPPortMax];
 	if(obj)
 	{
 		[self setUDPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_AudioCodecPreferenceList];
+	obj = [dict objectForKey:XMKey_Preferences_AudioCodecPreferenceList];
 	if(obj)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
@@ -169,9 +146,9 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithDictionary:dict];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithDictionary:dict];
 			
-			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
 			{
 				[audioCodecPreferenceList addObject:record];
 			}
@@ -184,44 +161,44 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *key = [[codecManager audioCodecDescriptorAtIndex:i] key];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			NSString *identifier = [[codecManager audioCodecDescriptorAtIndex:i] identifier];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[audioCodecPreferenceList addObject:record];
 			[record release];
 		}
 	}
 	
-	obj = [dict objectForKey:XMKey_AudioBufferSize];
+	obj = [dict objectForKey:XMKey_Preferences_AudioBufferSize];
 	if(obj)
 	{
 		[self setAudioBufferSize:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_EnableVideoReceive];
+	obj = [dict objectForKey:XMKey_Preferences_EnableVideoReceive];
 	if(obj)
 	{
 		[self setEnableVideoReceive:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_SendVideo];
+	obj = [dict objectForKey:XMKey_Preferences_EnableVideoTransmit];
 	if(obj)
 	{
-		[self setSendVideo:[(NSNumber *)obj boolValue]];
+		[self setEnableVideoTransmit:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_SendFPS];
+	obj = [dict objectForKey:XMKey_Preferences_VideoFramesPerSecond];
 	if(obj)
 	{
-		[self setSendFPS:[(NSNumber *)obj unsignedIntValue]];
+		[self setVideoFramesPerSecond:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_VideoSize];
+	obj = [dict objectForKey:XMKey_Preferences_VideoSize];
 	if(obj)
 	{
 		[self setVideoSize:[(NSNumber *)obj intValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_VideoCodecPreferenceList];
+	obj = [dict objectForKey:XMKey_Preferences_VideoCodecPreferenceList];
 	if(obj)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
@@ -234,9 +211,9 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithDictionary:dict];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithDictionary:dict];
 			
-			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
 			{
 				[videoCodecPreferenceList addObject:record];
 			}
@@ -249,59 +226,59 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *key = [[codecManager videoCodecDescriptorAtIndex:i] key];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			NSString *identifier = [[codecManager videoCodecDescriptorAtIndex:i] identifier];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[videoCodecPreferenceList addObject:record];
 			[record release];
 		}
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_IsEnabled];
+	obj = [dict objectForKey:XMKey_Preferences_EnableH323];
 	if(obj)
 	{
-		[self setH323IsEnabled:[(NSNumber *)obj boolValue]];
+		[self setEnableH323:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_EnableH245Tunnel];
+	obj = [dict objectForKey:XMKey_Preferences_EnableH245Tunnel];
 	if(obj)
 	{
-		[self setH323EnableH245Tunnel:[(NSNumber *)obj boolValue]];
+		[self setEnableH245Tunnel:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_EnableFastStart];
+	obj = [dict objectForKey:XMKey_Preferences_EnableFastStart];
 	if(obj)
 	{
-		[self setH323EnableFastStart:[(NSNumber *)obj boolValue]];
+		[self setEnableFastStart:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_UseGatekeeper];
+	obj = [dict objectForKey:XMKey_Preferences_UseGatekeeper];
 	if(obj)
 	{
-		[self setH323UseGatekeeper:[(NSNumber *)obj boolValue]];
+		[self setUseGatekeeper:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_GatekeeperAddress];
+	obj = [dict objectForKey:XMKey_Preferences_GatekeeperAddress];
 	if(obj)
 	{
-		[self setH323GatekeeperAddress:(NSString *)obj];
+		[self setGatekeeperAddress:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_GatekeeperID];
+	obj = [dict objectForKey:XMKey_Preferences_GatekeeperID];
 	if(obj)
 	{
-		[self setH323GatekeeperID:(NSString *)obj];
+		[self setGatekeeperID:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_GatekeeperUsername];
+	obj = [dict objectForKey:XMKey_Preferences_GatekeeperUsername];
 	if(obj)
 	{
-		[self setH323GatekeeperUsername:(NSString *)obj];
+		[self setGatekeeperUsername:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_H323_GatekeeperE164Number];
+	obj = [dict objectForKey:XMKey_Preferences_GatekeeperPhoneNumber];
 	if(obj)
 	{
-		[self setH323GatekeeperE164Number:(NSString *)obj];
+		[self setGatekeeperPhoneNumber:(NSString *)obj];
 	}
 	
 	return self;
@@ -317,28 +294,28 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	[preferences setBandwidthLimit:[self bandwidthLimit]];
 	[preferences setUseAddressTranslation:[self useAddressTranslation]];
 	[preferences setExternalAddress:[self externalAddress]];
-	[preferences setTCPPortMin:[self tcpPortMin]];
+	[preferences setTCPPortBase:[self tcpPortBase]];
 	[preferences setTCPPortMax:[self tcpPortMax]];
-	[preferences setUDPPortMin:[self udpPortMin]];
+	[preferences setUDPPortBase:[self udpPortBase]];
 	[preferences setUDPPortMax:[self udpPortMax]];
 	
 	[preferences _setAudioCodecPreferenceList:[self _audioCodecPreferenceList]];
 	[preferences setAudioBufferSize:[self audioBufferSize]];
 	
 	[preferences setEnableVideoReceive:[self enableVideoReceive]];
-	[preferences setSendVideo:[self sendVideo]];
-	[preferences setSendFPS:[self sendFPS]];
+	[preferences setEnableVideoTransmit:[self enableVideoTransmit]];
+	[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
 	[preferences setVideoSize:[self videoSize]];
 	[preferences _setVideoCodecPreferenceList:[self _videoCodecPreferenceList]];
 	
-	[preferences setH323IsEnabled:[self h323IsEnabled]];
-	[preferences setH323EnableH245Tunnel:[self h323EnableH245Tunnel]];
-	[preferences setH323EnableFastStart:[self h323EnableFastStart]];
-	[preferences setH323UseGatekeeper:[self h323UseGatekeeper]];
-	[preferences setH323GatekeeperAddress:[self h323GatekeeperAddress]];
-	[preferences setH323GatekeeperID:[self h323GatekeeperID]];
-	[preferences setH323GatekeeperUsername:[self h323GatekeeperUsername]];
-	[preferences setH323GatekeeperE164Number:[self h323GatekeeperE164Number]];
+	[preferences setEnableH323:[self enableH323]];
+	[preferences setEnableH245Tunnel:[self enableH245Tunnel]];
+	[preferences setEnableFastStart:[self enableFastStart]];
+	[preferences setUseGatekeeper:[self useGatekeeper]];
+	[preferences setGatekeeperAddress:[self gatekeeperAddress]];
+	[preferences setGatekeeperID:[self gatekeeperID]];
+	[preferences setGatekeeperUsername:[self gatekeeperUsername]];
+	[preferences setGatekeeperPhoneNumber:[self gatekeeperPhoneNumber]];
 
 	return preferences;
 }
@@ -353,17 +330,17 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		NSArray *array;
 		unsigned count, codecCount, i;
 		
-		[self setUserName:[coder decodeObjectForKey:XMKey_UserName]];
-		[self setAutoAnswerCalls:[coder decodeBoolForKey:XMKey_AutoAnswerCalls]];
-		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_BandwidthLimit]];
-		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_UseAddressTranslation]];
-		[self setExternalAddress:[coder decodeObjectForKey:XMKey_ExternalAddress]];
-		[self setTCPPortMin:[coder decodeIntForKey:XMKey_TCPPortMin]];
-		[self setTCPPortMax:[coder decodeIntForKey:XMKey_TCPPortMax]];
-		[self setUDPPortMin:[coder decodeIntForKey:XMKey_UDPPortMin]];
-		[self setUDPPortMax:[coder decodeIntForKey:XMKey_UDPPortMax]];
+		[self setUserName:[coder decodeObjectForKey:XMKey_Preferences_UserName]];
+		[self setAutoAnswerCalls:[coder decodeBoolForKey:XMKey_Preferences_AutoAnswerCalls]];
+		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_Preferences_BandwidthLimit]];
+		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_Preferences_UseAddressTranslation]];
+		[self setExternalAddress:[coder decodeObjectForKey:XMKey_Preferences_ExternalAddress]];
+		[self setTCPPortBase:[coder decodeIntForKey:XMKey_Preferences_TCPPortBase]];
+		[self setTCPPortMax:[coder decodeIntForKey:XMKey_Preferences_TCPPortMax]];
+		[self setUDPPortBase:[coder decodeIntForKey:XMKey_Preferences_UDPPortBase]];
+		[self setUDPPortMax:[coder decodeIntForKey:XMKey_Preferences_UDPPortMax]];
 		
-		array = (NSArray *)[coder decodeObjectForKey:XMKey_AudioCodecPreferenceList];
+		array = (NSArray *)[coder decodeObjectForKey:XMKey_Preferences_AudioCodecPreferenceList];
 		count = [array count];
 		codecCount = [codecManager audioCodecCount];
 		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
@@ -371,27 +348,27 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		for(i = 0; i < count; i++)
 		{
 			XMCodecListRecord *record = (XMCodecListRecord *)[array objectAtIndex:i];
-			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
 			{
 				[audioCodecPreferenceList addObject:record];
 			}
 		}
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *key = [[codecManager audioCodecDescriptorAtIndex:i] key];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			NSString *identifier = [[codecManager audioCodecDescriptorAtIndex:i] identifier];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[audioCodecPreferenceList addObject:record];
 			[record release];
 		}
 		
-		[self setAudioBufferSize:[coder decodeIntForKey:XMKey_AudioBufferSize]];
+		[self setAudioBufferSize:[coder decodeIntForKey:XMKey_Preferences_AudioBufferSize]];
 		
-		[self setEnableVideoReceive:[coder decodeBoolForKey:XMKey_EnableVideoReceive]];
-		[self setSendVideo:[coder decodeBoolForKey:XMKey_SendVideo]];
-		[self setSendFPS:[coder decodeIntForKey:XMKey_SendFPS]];
-		[self setVideoSize:[coder decodeIntForKey:XMKey_VideoSize]];
+		[self setEnableVideoReceive:[coder decodeBoolForKey:XMKey_Preferences_EnableVideoReceive]];
+		[self setEnableVideoTransmit:[coder decodeBoolForKey:XMKey_Preferences_EnableVideoTransmit]];
+		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_Preferences_VideoFramesPerSecond]];
+		[self setVideoSize:[coder decodeIntForKey:XMKey_Preferences_VideoSize]];
 		
-		array = (NSArray *)[coder decodeObjectForKey:XMKey_VideoCodecPreferenceList];
+		array = (NSArray *)[coder decodeObjectForKey:XMKey_Preferences_VideoCodecPreferenceList];
 		count = [array count];
 		codecCount = [codecManager videoCodecCount];
 		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
@@ -399,31 +376,31 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		for(i = 0; i < count; i++)
 		{
 			XMCodecListRecord *record = (XMCodecListRecord *)[array objectAtIndex:i];
-			if([codecManager codecDescriptorForKey:[record key]] != nil)
+			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
 			{
 				[videoCodecPreferenceList addObject:record];
 			}
 		}
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *key = [[codecManager videoCodecDescriptorAtIndex:i] key];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			NSString *identifier = [[codecManager videoCodecDescriptorAtIndex:i] identifier];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[videoCodecPreferenceList addObject:record];
 			[record release];
 		}
 		
-		[self setH323IsEnabled:[coder decodeBoolForKey:XMKey_H323_IsEnabled]];
-		[self setH323EnableH245Tunnel:[coder decodeBoolForKey:XMKey_H323_EnableH245Tunnel]];
-		[self setH323EnableFastStart:[coder decodeBoolForKey:XMKey_H323_EnableFastStart]];
-		[self setH323UseGatekeeper:[coder decodeBoolForKey:XMKey_H323_UseGatekeeper]];
-		[self setH323GatekeeperAddress:[coder decodeObjectForKey:XMKey_H323_GatekeeperAddress]];
-		[self setH323GatekeeperID:[coder decodeObjectForKey:XMKey_H323_GatekeeperID]];
-		[self setH323GatekeeperUsername:[coder decodeObjectForKey:XMKey_H323_GatekeeperUsername]];
-		[self setH323GatekeeperE164Number:[coder decodeObjectForKey:XMKey_H323_GatekeeperE164Number]];
+		[self setEnableH323:[coder decodeBoolForKey:XMKey_Preferences_EnableH323]];
+		[self setEnableH245Tunnel:[coder decodeBoolForKey:XMKey_Preferences_EnableH245Tunnel]];
+		[self setEnableFastStart:[coder decodeBoolForKey:XMKey_Preferences_EnableFastStart]];
+		[self setUseGatekeeper:[coder decodeBoolForKey:XMKey_Preferences_UseGatekeeper]];
+		[self setGatekeeperAddress:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperAddress]];
+		[self setGatekeeperID:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperID]];
+		[self setGatekeeperUsername:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperUsername]];
+		[self setGatekeeperPhoneNumber:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperPhoneNumber]];
 	}
 	else // raise an exception
 	{
-		[NSException raise:@"XMeetingNonSupportedCoderException" format:@"Only NSCoder subclasses which allow keyed coding are supported."];
+		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 		[self release];
 		return nil;
 	}
@@ -435,54 +412,54 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 {
 	if([coder allowsKeyedCoding])
 	{
-		[coder encodeObject:[self userName] forKey:XMKey_UserName];
-		[coder encodeBool:[self autoAnswerCalls] forKey:XMKey_AutoAnswerCalls];
+		[coder encodeObject:[self userName] forKey:XMKey_Preferences_UserName];
+		[coder encodeBool:[self autoAnswerCalls] forKey:XMKey_Preferences_AutoAnswerCalls];
 		
-		[coder encodeInt:[self bandwidthLimit] forKey:XMKey_BandwidthLimit];
-		[coder encodeBool:[self useAddressTranslation] forKey:XMKey_UseAddressTranslation];
-		[coder encodeObject:[self externalAddress] forKey:XMKey_ExternalAddress];
-		[coder encodeInt:[self tcpPortMin] forKey:XMKey_TCPPortMin];
-		[coder encodeInt:[self tcpPortMax] forKey:XMKey_TCPPortMax];
-		[coder encodeInt:[self udpPortMin] forKey:XMKey_UDPPortMin];
-		[coder encodeInt:[self udpPortMax] forKey:XMKey_UDPPortMax];
+		[coder encodeInt:[self bandwidthLimit] forKey:XMKey_Preferences_BandwidthLimit];
+		[coder encodeBool:[self useAddressTranslation] forKey:XMKey_Preferences_UseAddressTranslation];
+		[coder encodeObject:[self externalAddress] forKey:XMKey_Preferences_ExternalAddress];
+		[coder encodeInt:[self tcpPortBase] forKey:XMKey_Preferences_TCPPortBase];
+		[coder encodeInt:[self tcpPortMax] forKey:XMKey_Preferences_TCPPortMax];
+		[coder encodeInt:[self udpPortBase] forKey:XMKey_Preferences_UDPPortBase];
+		[coder encodeInt:[self udpPortMax] forKey:XMKey_Preferences_UDPPortMax];
 		
-		[coder encodeObject:[self _audioCodecPreferenceList] forKey:XMKey_AudioCodecPreferenceList];
-		[coder encodeInt:[self audioBufferSize] forKey:XMKey_AudioBufferSize];
+		[coder encodeObject:[self _audioCodecPreferenceList] forKey:XMKey_Preferences_AudioCodecPreferenceList];
+		[coder encodeInt:[self audioBufferSize] forKey:XMKey_Preferences_AudioBufferSize];
 		
-		[coder encodeBool:[self enableVideoReceive] forKey:XMKey_EnableVideoReceive];
-		[coder encodeBool:[self sendVideo] forKey:XMKey_SendVideo];
-		[coder encodeInt:[self sendFPS] forKey:XMKey_SendFPS];
-		[coder encodeInt:[self videoSize] forKey:XMKey_VideoSize];
-		[coder encodeObject:[self _videoCodecPreferenceList] forKey:XMKey_VideoCodecPreferenceList];
+		[coder encodeBool:[self enableVideoReceive] forKey:XMKey_Preferences_EnableVideoReceive];
+		[coder encodeBool:[self enableVideoTransmit] forKey:XMKey_Preferences_EnableVideoTransmit];
+		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_Preferences_VideoFramesPerSecond];
+		[coder encodeInt:[self videoSize] forKey:XMKey_Preferences_VideoSize];
+		[coder encodeObject:[self _videoCodecPreferenceList] forKey:XMKey_Preferences_VideoCodecPreferenceList];
 		
-		[coder encodeBool:[self h323IsEnabled] forKey:XMKey_H323_IsEnabled];
-		[coder encodeBool:[self h323EnableH245Tunnel] forKey:XMKey_H323_EnableH245Tunnel];
-		[coder encodeBool:[self h323EnableFastStart] forKey:XMKey_H323_EnableFastStart];
-		[coder encodeBool:[self h323UseGatekeeper] forKey:XMKey_H323_UseGatekeeper];
-		[coder encodeObject:[self h323GatekeeperAddress] forKey:XMKey_H323_GatekeeperAddress];
-		[coder encodeObject:[self h323GatekeeperID] forKey:XMKey_H323_GatekeeperID];
-		[coder encodeObject:[self h323GatekeeperUsername] forKey:XMKey_H323_GatekeeperUsername];
-		[coder encodeObject:[self h323GatekeeperE164Number] forKey:XMKey_H323_GatekeeperE164Number];
+		[coder encodeBool:[self enableH323] forKey:XMKey_Preferences_EnableH323];
+		[coder encodeBool:[self enableH245Tunnel] forKey:XMKey_Preferences_EnableH245Tunnel];
+		[coder encodeBool:[self enableFastStart] forKey:XMKey_Preferences_EnableFastStart];
+		[coder encodeBool:[self useGatekeeper] forKey:XMKey_Preferences_UseGatekeeper];
+		[coder encodeObject:[self gatekeeperAddress] forKey:XMKey_Preferences_GatekeeperAddress];
+		[coder encodeObject:[self gatekeeperID] forKey:XMKey_Preferences_GatekeeperID];
+		[coder encodeObject:[self gatekeeperUsername] forKey:XMKey_Preferences_GatekeeperUsername];
+		[coder encodeObject:[self gatekeeperPhoneNumber] forKey:XMKey_Preferences_GatekeeperPhoneNumber];
 	}
 	else // raise an exception
 	{
-		[NSException raise:@"XMeetingNonSupportedCoderException" format:@"Only NSCoder subclasses which allow keyed coding are supported."];
+		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 	}
 }
 
 - (void)dealloc
 {
-	[externalAddress release];
-	
 	[userName release];
+	
+	[externalAddress release];
 	
 	[audioCodecPreferenceList release];
 	[videoCodecPreferenceList release];
 	
-	[h323_GatekeeperAddress release];
-	[h323_GatekeeperID release];
-	[h323_GatekeeperUsername release];
-	[h323_GatekeeperE164Number release];
+	[gatekeeperAddress release];
+	[gatekeeperID release];
+	[gatekeeperUsername release];
+	[gatekeeperPhoneNumber release];
 	
 	[super dealloc];
 }
@@ -495,7 +472,7 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
  **/
 - (BOOL)isEqual:(id)object
 {
-	XMPreferences *prefs;
+	XMPreferences *otherPreferences;
 	
 	if(object == self)
 	{
@@ -506,35 +483,36 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	{
 		return NO;
 	}
-	prefs = (XMPreferences *)object;
 	
-	if([[prefs userName] isEqualToString:[self userName]] &&
-	   [prefs autoAnswerCalls] == [self autoAnswerCalls] &&
-	   [prefs bandwidthLimit] == [self bandwidthLimit] &&
-	   [prefs useAddressTranslation] == [self useAddressTranslation] &&
-	   [[prefs externalAddress] isEqualToString:[self externalAddress]] &&
-	   [prefs tcpPortMin] == [self tcpPortMin] &&
-	   [prefs tcpPortMax] == [self tcpPortMax] &&
-	   [prefs udpPortMin] == [self udpPortMin] &&
-	   [prefs udpPortMax] == [self udpPortMax] &&
+	otherPreferences = (XMPreferences *)object;
+	
+	if([[otherPreferences userName] isEqualToString:[self userName]] &&
+	   [otherPreferences autoAnswerCalls] == [self autoAnswerCalls] &&
+	   [otherPreferences bandwidthLimit] == [self bandwidthLimit] &&
+	   [otherPreferences useAddressTranslation] == [self useAddressTranslation] &&
+	   [[otherPreferences externalAddress] isEqualToString:[self externalAddress]] &&
+	   [otherPreferences tcpPortBase] == [self tcpPortBase] &&
+	   [otherPreferences tcpPortMax] == [self tcpPortMax] &&
+	   [otherPreferences udpPortBase] == [self udpPortBase] &&
+	   [otherPreferences udpPortMax] == [self udpPortMax] &&
 	   
-	   [[prefs _audioCodecPreferenceList] isEqual:[self _audioCodecPreferenceList]] &&
-	   [prefs audioBufferSize] == [self audioBufferSize] &&
+	   [[otherPreferences _audioCodecPreferenceList] isEqual:[self _audioCodecPreferenceList]] &&
+	   [otherPreferences audioBufferSize] == [self audioBufferSize] &&
 	   
-	   [prefs enableVideoReceive] == [self enableVideoReceive] &&
-	   [prefs sendVideo] == [self sendVideo] &&
-	   [prefs sendFPS] == [self sendFPS] &&
-	   [prefs videoSize] == [self videoSize] &&
-	   [[prefs _videoCodecPreferenceList] isEqual:[self _videoCodecPreferenceList]] &&
+	   [otherPreferences enableVideoReceive] == [self enableVideoReceive] &&
+	   [otherPreferences enableVideoTransmit] == [self enableVideoTransmit] &&
+	   [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
+	   [otherPreferences videoSize] == [self videoSize] &&
+	   [[otherPreferences _videoCodecPreferenceList] isEqual:[self _videoCodecPreferenceList]] &&
 
-	   [prefs h323IsEnabled] == [self h323IsEnabled] &&
-	   [prefs h323EnableH245Tunnel] == [self h323EnableH245Tunnel] &&
-	   [prefs h323EnableFastStart] == [self h323EnableFastStart] &&
-	   [prefs h323UseGatekeeper] == [self h323UseGatekeeper] &&
-	   [[prefs h323GatekeeperAddress] isEqualToString:[self h323GatekeeperAddress]] &&
-	   [[prefs h323GatekeeperID] isEqualToString:[self h323GatekeeperID]] &&
-	   [[prefs h323GatekeeperUsername] isEqualToString:[self h323GatekeeperUsername]] &&
-	   [[prefs h323GatekeeperE164Number] isEqualToString:[self h323GatekeeperE164Number]])
+	   [otherPreferences enableH323] == [self enableH323] &&
+	   [otherPreferences enableH245Tunnel] == [self enableH245Tunnel] &&
+	   [otherPreferences enableFastStart] == [self enableFastStart] &&
+	   [otherPreferences useGatekeeper] == [self useGatekeeper] &&
+	   [[otherPreferences gatekeeperAddress] isEqualToString:[self gatekeeperAddress]] &&
+	   [[otherPreferences gatekeeperID] isEqualToString:[self gatekeeperID]] &&
+	   [[otherPreferences gatekeeperUsername] isEqualToString:[self gatekeeperUsername]] &&
+	   [[otherPreferences gatekeeperPhoneNumber] isEqualToString:[self gatekeeperPhoneNumber]])
 	{
 		return YES;
 	}
@@ -554,57 +532,57 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	obj = [self userName];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_UserName];
+		[dict setObject:obj forKey:XMKey_Preferences_UserName];
 	}
 	
 	number = [[NSNumber alloc] initWithBool:[self autoAnswerCalls]];
-	[dict setObject:number forKey:XMKey_AutoAnswerCalls];
+	[dict setObject:number forKey:XMKey_Preferences_AutoAnswerCalls];
 	[number release];
 	
 	integer = [self bandwidthLimit];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_BandwidthLimit];
+		[dict setObject:number forKey:XMKey_Preferences_BandwidthLimit];
 		[number release];
 	}
 	
 	number = [[NSNumber alloc] initWithBool:[self useAddressTranslation]];
-	[dict setObject:number forKey:XMKey_UseAddressTranslation];
+	[dict setObject:number forKey:XMKey_Preferences_UseAddressTranslation];
 	[number release];
 	
 	obj = [self externalAddress];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_ExternalAddress];
+		[dict setObject:obj forKey:XMKey_Preferences_ExternalAddress];
 	}
 	
-	integer = [self tcpPortMin];
+	integer = [self tcpPortBase];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_TCPPortMin];
+		[dict setObject:number forKey:XMKey_Preferences_TCPPortBase];
 		[number release];
 	}
 	integer = [self tcpPortMax];
 	if(integer != UINT_MAX)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_TCPPortMax];
+		[dict setObject:number forKey:XMKey_Preferences_TCPPortMax];
 		[number release];
 	}
-	integer = [self udpPortMin];
+	integer = [self udpPortBase];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_UDPPortMin];
+		[dict setObject:number forKey:XMKey_Preferences_UDPPortBase];
 		[number release];
 	}
 	integer = [self udpPortMax];
 	if(integer != UINT_MAX)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_UDPPortMax];
+		[dict setObject:number forKey:XMKey_Preferences_UDPPortMax];
 		[number release];
 	}
 	
@@ -615,30 +593,30 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	{
 		[arr addObject:[(XMCodecListRecord *)[audioCodecPreferenceList objectAtIndex:i] dictionaryRepresentation]];
 	}
-	[dict setObject:arr forKey:XMKey_AudioCodecPreferenceList];
+	[dict setObject:arr forKey:XMKey_Preferences_AudioCodecPreferenceList];
 	[arr release];
 	
 	integer = [self audioBufferSize];
 	if(integer != 2)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_AudioBufferSize];
+		[dict setObject:number forKey:XMKey_Preferences_AudioBufferSize];
 		[number release];
 	}
 	
 	number = [[NSNumber alloc] initWithBool:[self enableVideoReceive]];
-	[dict setObject:number forKey:XMKey_EnableVideoReceive];
+	[dict setObject:number forKey:XMKey_Preferences_EnableVideoReceive];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:[self sendVideo]];
-	[dict setObject:number forKey:XMKey_SendVideo];
+	number = [[NSNumber alloc] initWithBool:[self enableVideoTransmit]];
+	[dict setObject:number forKey:XMKey_Preferences_EnableVideoTransmit];
 	[number release];
 	
-	integer = [self sendFPS];
+	integer = [self videoFramesPerSecond];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_SendFPS];
+		[dict setObject:number forKey:XMKey_Preferences_VideoFramesPerSecond];
 		[number release];
 	}
 	
@@ -646,7 +624,7 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	if(integer != XMVideoSize_NoVideo)
 	{
 		number = [[NSNumber alloc] initWithInt:integer];
-		[dict setObject:number forKey:XMKey_VideoSize];
+		[dict setObject:number forKey:XMKey_Preferences_VideoSize];
 		[number release];
 	}
 		
@@ -656,47 +634,47 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	{
 		[arr addObject:[(XMCodecListRecord *)[videoCodecPreferenceList objectAtIndex:i] dictionaryRepresentation]];
 	}
-	[dict setObject:arr forKey:XMKey_VideoCodecPreferenceList];
+	[dict setObject:arr forKey:XMKey_Preferences_VideoCodecPreferenceList];
 	[arr release];
 	
-	number = [[NSNumber alloc] initWithBool:[self h323IsEnabled]];
-	[dict setObject:number forKey:XMKey_H323_IsEnabled];
+	number = [[NSNumber alloc] initWithBool:[self enableH323]];
+	[dict setObject:number forKey:XMKey_Preferences_EnableH323];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:[self h323EnableH245Tunnel]];
-	[dict setObject:number forKey:XMKey_H323_EnableH245Tunnel];
+	number = [[NSNumber alloc] initWithBool:[self enableH245Tunnel]];
+	[dict setObject:number forKey:XMKey_Preferences_EnableH245Tunnel];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:[self h323EnableFastStart]];
-	[dict setObject:number forKey:XMKey_H323_EnableFastStart];
+	number = [[NSNumber alloc] initWithBool:[self enableFastStart]];
+	[dict setObject:number forKey:XMKey_Preferences_EnableFastStart];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:[self h323UseGatekeeper]];
-	[dict setObject:number forKey:XMKey_H323_UseGatekeeper];
+	number = [[NSNumber alloc] initWithBool:[self useGatekeeper]];
+	[dict setObject:number forKey:XMKey_Preferences_UseGatekeeper];
 	[number release];
 	
-	obj = [self h323GatekeeperAddress];
+	obj = [self gatekeeperAddress];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_H323_GatekeeperAddress];
+		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperAddress];
 	}
 	
-	obj = [self h323GatekeeperID];
+	obj = [self gatekeeperID];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_H323_GatekeeperID];
+		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperID];
 	}
 	
-	obj = [self h323GatekeeperUsername];
+	obj = [self gatekeeperUsername];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_H323_GatekeeperUsername];
+		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperUsername];
 	}
 	
-	obj = [self h323GatekeeperE164Number];
+	obj = [self gatekeeperPhoneNumber];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_H323_GatekeeperE164Number];
+		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperPhoneNumber];
 	}
 	
 	return dict;
@@ -763,14 +741,14 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	}
 }
 
-- (unsigned)tcpPortMin
+- (unsigned)tcpPortBase
 {
-	return tcpPortMin;
+	return tcpPortBase;
 }
 
-- (void)setTCPPortMin:(unsigned)port
+- (void)setTCPPortBase:(unsigned)port
 {
-	tcpPortMin = port;
+	tcpPortBase = port;
 }
 
 - (unsigned)tcpPortMax
@@ -783,14 +761,14 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	tcpPortMax = port;
 }
 
-- (unsigned)udpPortMin
+- (unsigned)udpPortBase
 {
-	return udpPortMin;
+	return udpPortBase;
 }
 
-- (void)setUDPPortMin:(unsigned)port
+- (void)setUDPPortBase:(unsigned)port
 {
-	udpPortMin = port;
+	udpPortBase = port;
 }
 
 - (unsigned)udpPortMax
@@ -842,24 +820,24 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	enableVideoReceive = flag;
 }
 
-- (BOOL)sendVideo
+- (BOOL)enableVideoTransmit
 {
-	return sendVideo;
+	return enableVideoTransmit;
 }
 
-- (void)setSendVideo:(BOOL)flag
+- (void)setEnableVideoTransmit:(BOOL)flag
 {
-	sendVideo = flag;
+	enableVideoTransmit = flag;
 }
 
-- (unsigned)sendFPS
+- (unsigned)videoFramesPerSecond
 {
-	return sendFPS;
+	return videoFramesPerSecond;
 }
 
-- (void)setSendFPS:(unsigned)value
+- (void)setVideoFramesPerSecond:(unsigned)value
 {
-	sendFPS = value;
+	videoFramesPerSecond = value;
 }
 
 - (XMVideoSize)videoSize
@@ -889,179 +867,111 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 
 #pragma mark H.323-specific Methods
 
-- (BOOL)h323IsEnabled
+- (BOOL)enableH323
 {
-	return h323_IsEnabled;
+	return enableH323;
 }
 
-- (void)setH323IsEnabled:(BOOL)flag
+- (void)setEnableH323:(BOOL)flag
 {
-	h323_IsEnabled = flag;
+	enableH323 = flag;
 }
 
-- (BOOL)h323EnableH245Tunnel
+- (BOOL)enableH245Tunnel
 {
-	return h323_EnableH245Tunnel;
+	return enableH245Tunnel;
 }
 
-- (void)setH323EnableH245Tunnel:(BOOL)flag
+- (void)setEnableH245Tunnel:(BOOL)flag
 {
-	h323_EnableH245Tunnel = flag;
+	enableH245Tunnel = flag;
 }
 
-- (BOOL)h323EnableFastStart
+- (BOOL)enableFastStart
 {
-	return h323_EnableFastStart;
+	return enableFastStart;
 }
 
-- (void)setH323EnableFastStart:(BOOL)flag
+- (void)setEnableFastStart:(BOOL)flag
 {
-	h323_EnableFastStart = flag;
+	enableFastStart = flag;
 }
 
-- (BOOL)h323UseGatekeeper
+- (BOOL)useGatekeeper
 {
-	return h323_UseGatekeeper;
+	return useGatekeeper;
 }
 
-- (void)setH323UseGatekeeper:(BOOL)flag
+- (void)setUseGatekeeper:(BOOL)flag
 {
-	h323_UseGatekeeper = flag;
+	useGatekeeper = flag;
 }
 
-- (NSString *)h323GatekeeperAddress
+- (NSString *)gatekeeperAddress
 {
-	return h323_GatekeeperAddress;
+	return gatekeeperAddress;
 }
 
-- (void)setH323GatekeeperAddress:(NSString *)address
+- (void)setGatekeeperAddress:(NSString *)address
 {
-	if(address != h323_GatekeeperAddress)
+	if(address != gatekeeperAddress)
 	{
-		NSString *old = h323_GatekeeperAddress;
-		h323_GatekeeperAddress = [address copy];
+		NSString *old = gatekeeperAddress;
+		gatekeeperAddress = [address copy];
 		[old release];
 	}
 }
 
-- (NSString *)h323GatekeeperID
+- (NSString *)gatekeeperID
 {
-	return h323_GatekeeperID;
+	return gatekeeperID;
 }
 
-- (void)setH323GatekeeperID:(NSString *)string
+- (void)setGatekeeperID:(NSString *)string
 {
-	if(string != h323_GatekeeperID)
+	if(string != gatekeeperID)
 	{
-		NSString *old = h323_GatekeeperID;
-		h323_GatekeeperID = [string copy];
+		NSString *old = gatekeeperID;
+		gatekeeperID = [string copy];
 		[old release];
 	}
 }
 
-- (NSString *)h323GatekeeperUsername
+- (NSString *)gatekeeperUsername
 {
-	return h323_GatekeeperUsername;
+	return gatekeeperUsername;
 }
 
-- (void)setH323GatekeeperUsername:(NSString *)string
+- (void)setGatekeeperUsername:(NSString *)string
 {
-	if(string != h323_GatekeeperUsername)
+	if(string != gatekeeperUsername)
 	{
-		NSString *old = h323_GatekeeperUsername;
-		h323_GatekeeperUsername = [string copy];
+		NSString *old = gatekeeperUsername;
+		gatekeeperUsername = [string copy];
 		[old release];
 	}
 }
 
-- (NSString *)h323GatekeeperE164Number
+- (NSString *)gatekeeperPhoneNumber
 {
-	return h323_GatekeeperE164Number;
+	return gatekeeperPhoneNumber;
 }
 
-- (void)setH323GatekeeperE164Number:(NSString *)string
+- (void)setGatekeeperPhoneNumber:(NSString *)string
 {
-	if(string != h323_GatekeeperE164Number)
+	if(string != gatekeeperPhoneNumber)
 	{
-		NSString *old = h323_GatekeeperE164Number;
-		h323_GatekeeperE164Number = [string copy];
+		NSString *old = gatekeeperPhoneNumber;
+		gatekeeperPhoneNumber = [string copy];
 		[old release];
 	}
-}
-
-- (NSString *)h323GatekeeperPassword
-{
-	return nil;
-	/*
-	NSString *gatekeeper;
-	NSString *user;
-	
-	if(h323_GatekeeperHost != nil && [h323_GatekeeperHost length] > 0)
-	{
-		gatekeeper = h323_GatekeeperHost;
-	}
-	else if (h323_GatekeeperID != nil && [h323_GatekeeperID length] > 0)
-	{
-		gatekeeper = h323_GatekeeperID;
-	}
-	else
-	{
-		return nil;
-	}
-	
-	if(h323_GatekeeperUsername != nil && [h323_GatekeeperUsername length] > 0)
-	{
-		user = h323_GatekeeperUsername;
-	}
-	else
-	{
-		return nil;
-	}
-	
-	return nil;
-	//return [[XMKeyChainAccess sharedInstance] passwordForServiceName:gatekeeper account:user];
-	 */
-}
-
-- (BOOL)setH323GatekeeperPassword:(NSString *)password
-{
-	/*
-	NSString *gatekeeper;
-	NSString *user;
-	
-	if(h323_GatekeeperHost != nil && [h323_GatekeeperHost length] > 0)
-	{
-		gatekeeper = h323_GatekeeperHost;
-	}
-	else if (h323_GatekeeperID != nil && [h323_GatekeeperID length] > 0)
-	{
-		gatekeeper = h323_GatekeeperID;
-	}
-	else
-	{
-		return NO;
-	}
-	
-	if(h323_GatekeeperUsername != nil && [h323_GatekeeperUsername length] > 0)
-	{
-		user = h323_GatekeeperUsername;
-	}
-	else
-	{
-		return NO;
-	}
-	
-	return NO;
-	//return [[XMKeyChainAccess sharedInstance] setPassword:password forServiceName:gatekeeper account:user];
-	 */
-	return FALSE;
 }
 
 #pragma mark Private Methods
 
 - (NSMutableArray *)_audioCodecPreferenceList
 {
-	if(!audioCodecPreferenceList)
+	if(audioCodecPreferenceList == nil)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		unsigned count = [codecManager audioCodecCount];
@@ -1071,26 +981,36 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		
 		for(i = 0; i < count; i++)
 		{
-			NSString *key = [[codecManager audioCodecDescriptorAtIndex:i] key];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			NSString *identifier = [[codecManager audioCodecDescriptorAtIndex:i] identifier];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[audioCodecPreferenceList addObject:record];
 			[record release];
 		}
 	}
-	
 	return audioCodecPreferenceList;
 }
 
 - (void)_setAudioCodecPreferenceList:(NSArray *)list
 {
 	NSArray *old = audioCodecPreferenceList;
-	audioCodecPreferenceList = [list mutableCopy];
+	
+	unsigned count = [list count];
+	unsigned i;
+	audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+	for(i = 0; i < count; i++)
+	{
+		XMCodecListRecord *record = (XMCodecListRecord *)[list objectAtIndex:i];
+		XMCodecListRecord *copyOfRecord = [record copy];
+		[audioCodecPreferenceList addObject:copyOfRecord];
+		[copyOfRecord release];
+	}
+	
 	[old release];
 }
 
 - (NSMutableArray *)_videoCodecPreferenceList
 {
-	if(!videoCodecPreferenceList)
+	if(videoCodecPreferenceList == nil)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		unsigned count = [codecManager videoCodecCount];
@@ -1100,8 +1020,8 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 		
 		for(i = 0; i < count; i++)
 		{
-			NSString *key = [[codecManager videoCodecDescriptorAtIndex:i] key];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] initWithKey:key isEnabled:YES];
+			NSString *identifier = [[codecManager videoCodecDescriptorAtIndex:i] identifier];
+			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[videoCodecPreferenceList addObject:record];
 			[record release];
 		}
@@ -1112,12 +1032,20 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 
 - (void)_setVideoCodecPreferenceList:(NSArray *)list
 {
-	if(list != videoCodecPreferenceList)
+	NSArray *old = videoCodecPreferenceList;
+	
+	unsigned count = [list count];
+	unsigned i;
+	videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+	for(i = 0; i < count; i++)
 	{
-		NSArray *old = videoCodecPreferenceList;
-		videoCodecPreferenceList = [list mutableCopy];
-		[old release];
+		XMCodecListRecord *record = (XMCodecListRecord *)[list objectAtIndex:i];
+		XMCodecListRecord *copyOfRecord = [record copy];
+		[videoCodecPreferenceList addObject:copyOfRecord];
+		[copyOfRecord release];
 	}
+	
+	[old release];
 }
 
 @end
@@ -1126,33 +1054,40 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 
 #pragma mark Init & Deallocation Methods
 
-- (id)initWithKey:(NSString *)theKey isEnabled:(BOOL)enabled
+- (id)init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	return nil;
+}
+
+- (id)_initWithIdentifier:(NSString *)theIdentifier enabled:(BOOL)enabled
 {
 	self = [super init];
 	
-	key = [theKey copy];
-	[self setIsEnabled:enabled];
+	identifier = [theIdentifier copy];
+	[self setEnabled:enabled];
 	
 	return self;
 }
 
-- (id)initWithDictionary:(NSDictionary *)dict
+- (id)_initWithDictionary:(NSDictionary *)dict
 {
 	NSObject *obj;
 	
 	self = [super init];
 	
-	obj = [dict objectForKey:XMKey_CodecKey];
+	obj = [dict objectForKey:XMKey_CodecListRecord_Identifier];
 	if(obj)
 	{
-		key = (NSString *)[obj copy];
+		identifier = (NSString *)[obj copy];
 	}
 	else
 	{
-		key = @"<Unknown Codec>";
+		identifier = nil;
 	}
 	
-	obj = [dict objectForKey:XMKey_CodecIsEnabled];
+	obj = [dict objectForKey:XMKey_CodecListRecord_IsEnabled];
 	if(obj)
 	{
 		isEnabled = [(NSNumber *)obj boolValue];
@@ -1167,7 +1102,7 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	return [[XMCodecListRecord allocWithZone:zone] initWithKey:[self key] isEnabled:[self isEnabled]];
+	return [[XMCodecListRecord allocWithZone:zone] _initWithIdentifier:[self identifier] enabled:[self isEnabled]];
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -1176,12 +1111,12 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	
 	if([coder allowsKeyedCoding]) // use keyed coding
 	{
-		key = (NSString *)[[coder decodeObjectForKey:XMKey_CodecKey] copy];
-		[self setIsEnabled:[coder decodeBoolForKey:XMKey_CodecIsEnabled]];
+		identifier = (NSString *)[[coder decodeObjectForKey:XMKey_CodecListRecord_Identifier] retain];
+		[self setEnabled:[coder decodeBoolForKey:XMKey_CodecListRecord_IsEnabled]];
 	}
 	else // raise an exception
 	{
-		[NSException raise:@"XMeetingNonSupportedCoderException" format:@"Only NSCoder subclasses which allow keyed coding are supported."];
+		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 		[self release];
 		return nil;
 	}
@@ -1193,18 +1128,18 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 {
 	if([coder allowsKeyedCoding])
 	{
-		[coder encodeObject:[self key] forKey:XMKey_CodecKey];
-		[coder encodeBool:[self isEnabled] forKey:XMKey_CodecIsEnabled];
+		[coder encodeObject:[self identifier] forKey:XMKey_CodecListRecord_Identifier];
+		[coder encodeBool:[self isEnabled] forKey:XMKey_CodecListRecord_IsEnabled];
 	}
 	else
 	{
-		[NSException raise:@"XMeetingNonSupportedCoderException" format:@"Only NSCoder subclasses which allow keyed coding are supported."];
+		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 	}
 }
 
 - (void)dealloc
 {
-	[key release];
+	[identifier release];
 	
 	[super dealloc];
 }
@@ -1226,7 +1161,7 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	}
 	entry = (XMCodecListRecord *)object;
 	
-	if([[entry key] isEqualToString:[self key]] &&
+	if([[entry identifier] isEqualToString:[self identifier]] &&
 	   [entry isEnabled] == [self isEnabled])
 	{
 		return YES;
@@ -1241,10 +1176,10 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	NSNumber *number;
 		
-	[dict setObject:[self key] forKey:XMKey_CodecKey];
+	[dict setObject:[self identifier] forKey:XMKey_CodecListRecord_Identifier];
 	
 	number = [[NSNumber alloc] initWithBool:[self isEnabled]];
-	[dict setObject:number forKey:XMKey_CodecIsEnabled];
+	[dict setObject:number forKey:XMKey_CodecListRecord_IsEnabled];
 	[number release];
 	
 	return dict;
@@ -1252,9 +1187,9 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 
 #pragma mark Getter & Setter Methods
 
-- (NSString *)key;
+- (NSString *)identifier;
 {
-	return key;
+	return identifier;
 }
 
 - (BOOL)isEnabled
@@ -1262,7 +1197,7 @@ NSString *XMKey_CodecIsEnabled = @"XMeeting_CodecIsEnabled";
 	return isEnabled;
 }
 
-- (void)setIsEnabled:(BOOL)flag
+- (void)setEnabled:(BOOL)flag
 {
 	isEnabled = flag;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.4 2005/06/02 12:47:33 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,26 +9,16 @@
 #ifndef __XM_UTILS_H__
 #define __XM_UTILS_H__
 
-/**
- * Posted every time the receiver starts a search for an external
- * address.
- **/
-extern NSString *XMNotification_DidStartFetchingExternalAddress;
-
-/**
- * Posted every time a search for an external address ends.
- * The success or failure of the operation can be queried
- * from the XMUtil instance.
- **/
-extern NSString *XMNotification_DidEndFetchingExternalAddress;
-
 #import <Cocoa/Cocoa.h>
+#import "XMTypes.h"
 
 /**
  * XMUtils provides useful service functionality which
  * does not belong at another place
  **/
 @interface XMUtils : NSObject {
+	
+	NSString *localAddress;
 	
 	NSURLConnection *externalAddressURLConnection;
 	NSMutableData *externalAddressURLData;
@@ -49,6 +39,11 @@ extern NSString *XMNotification_DidEndFetchingExternalAddress;
  * digits, white space and '(' ')' '+' or '-'
  **/
 + (BOOL)isPhoneNumber:(NSString *)str;
+
+/**
+ * Returns the local address for this computer
+ **/
+- (NSString *)localAddress;
 
 /**
  * Starts a search for the external address on the network interface.
@@ -75,6 +70,16 @@ extern NSString *XMNotification_DidEndFetchingExternalAddress;
  * Returns the fail reason for the external address fetch
  **/
 - (NSString *)externalAddressFetchFailReason;
+
+/**
+ * This method returns the result of a NAT detection query.
+ * Currently, this is done simply by comparing the local
+ * and external address for equality. If the external address
+ * is not yet available, returns XMNATDetectionResult_Error.
+ * If no external address could be fetched, returns
+ * XMNATDetectionResult_NoNAT.
+ **/
+- (XMNATDetectionResult)NATDetectionResult;
 
 @end
 

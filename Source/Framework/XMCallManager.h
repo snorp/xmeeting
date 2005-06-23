@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.5 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.6 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,18 +13,7 @@
 
 #import "XMTypes.h"
 
-/**
- * Declaration of the notifications posted by XMCallManager
- **/
-extern NSString *XMNotification_IncomingCall;		// posted when there is an incoming call, waiting for user acknowledge
-extern NSString *XMNotification_CallEstablished;	// posted when a call is established
-extern NSString *XMNotification_CallEnd;			// posted when a call did end.
-
-// Notification concerning the H.323 part
-extern NSString *XMNotification_RegisteredAtGatekeeper;
-extern NSString *XMNotification_RemovedGatekeeper;
-
-@class XMPreferences, XMCallInfo;
+@class XMPreferences, XMCallInfo, XMURL;
 
 /**
  * XMCallManager is the central class in the XMeeting framework.
@@ -36,15 +25,24 @@ extern NSString *XMNotification_RemovedGatekeeper;
  **/
 @interface XMCallManager : NSObject {
 	
-	id delegate;	// reference to the delegate (if any)
+	id delegate;
 	
 	BOOL isOnline;
+	
 	XMPreferences *activePreferences;
+	BOOL doesSubsystemSetup;
+	BOOL needsSubsystemSetupAfterCallEnd;
+	BOOL needsSubsystemShutdownAfterSubsystemSetup;
+	
 	XMCallInfo *activeCall;
 	BOOL autoAnswerCalls;
 	
 	// h.323 variables
 	NSString *gatekeeperName;
+	NSTimer *gatekeeperRegistrationCheckTimer;
+	
+	// call history
+	NSMutableArray *recentCalls;
 }
 
 /**
@@ -65,7 +63,7 @@ extern NSString *XMNotification_RemovedGatekeeper;
  * protocol currently is enabled.
  **/
 - (BOOL)isOnline;
-- (void)setIsOnline:(BOOL)flag;
+- (void)setOnline:(BOOL)flag;
 
 /**
  * Returns whether we are currently listening on the specified protocol. Which
@@ -87,6 +85,20 @@ extern NSString *XMNotification_RemovedGatekeeper;
 - (void)setActivePreferences:(XMPreferences *)prefs;
 
 /**
+ * Returns YES if a subsystem setup process is currently running or not, NO otherwise.
+ * While the subsystem is setup, certain actions such as -setActivePreferences are
+ * not allowed and do rais an exception
+ **/
+- (BOOL)doesSubsystemSetup;
+
+#pragma mark Call management methods
+
+/**
+ * Returns whether the framework is currently in a call or not
+ **/
+- (BOOL)isInCall;
+
+/**
  * Returns the XMCallInfo instance describing the currently active call.
  * Returns nil if there is no active call
  **/
@@ -97,7 +109,7 @@ extern NSString *XMNotification_RemovedGatekeeper;
  * If the protocol (e.g. H.323) is not active in the current settings, an exception
  * is raise.
  **/
-- (XMCallInfo *)callRemoteParty:(NSString *)remoteParty usingProtocol:(XMCallProtocol)protocol;
+- (XMCallInfo *)callURL:(XMURL *)remotePartyURL;
 
 /**
  * This method accepts or rejects the incoming call.
@@ -106,9 +118,19 @@ extern NSString *XMNotification_RemovedGatekeeper;
 - (void)acceptIncomingCall:(BOOL)acceptCall;
 
 /**
- * Hang-up of the active call
+ * Clears the active call. If there is no active call, an exception
+ * is raised
  **/
 - (void)clearActiveCall;
+
+/**
+ * Returns the last calls made, NOT including any active call.
+ * The most recent call is found at the lowest index.
+ * The framework does not store any calls beyond the application
+ * process's lifetime, and the number of calls recorded is
+ * limited to 100 (a rather theoretical number...)
+ **/
+- (NSArray *)recentCalls;
 
 #pragma mark H.323-specific methods
 

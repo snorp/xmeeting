@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.2 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,9 +11,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMTypes.h"
-
-extern NSString *XMAddressBookCallURLProperty;
-extern NSString *XMAddressBookHumanReadableCallAddressProperty;
 
 @class ABAddressBook, ABSearchElement, XMURL;
 
@@ -106,7 +103,7 @@ extern NSString *XMAddressBookHumanReadableCallAddressProperty;
 
 /**
  * This interface declares which methods the record instances
- * do resopnd to.
+ * do respond to.
  **/
 @interface NSObject (XMAddressBookRecordMethods)
 

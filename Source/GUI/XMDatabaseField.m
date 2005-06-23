@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.2 2005/06/01 11:00:37 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -189,6 +189,23 @@ databaseField:imageForRepresentedObject:";
 	representedObject = [theObject retain];
 	
 	[self _displayRepresentedObject];
+}
+
+- (void)endEditing
+{
+	if(representedObject != nil)
+	{
+		return;
+	}
+	
+	if(dataSource != nil)
+	{
+		NSString *currentString = [self stringValue];
+		representedObject = [[dataSource databaseField:self representedObjectForCompletedString:currentString] retain];
+		[self _displayRepresentedObject];
+	}
+	[self _hideCompletionsWindow];
+	[self _setNeedsDisplay];
 }
 
 #pragma mark NSControl delegate methods

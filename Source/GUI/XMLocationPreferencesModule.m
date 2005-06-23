@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.5 2005/06/02 12:47:34 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.6 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,11 @@
 #import "XMBooleanCell.h"
 
 NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPreferencesModule";
+
+NSString *XMKey_InitialNameIdentifier = @"Name";
+NSString *XMKey_InitialBandwidthIdentifier = @"Bandwidth";
+NSString *XMKey_InitialQualityIdentifier = @"Quality";
+NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 @interface XMLocationPreferencesModule (PrivateMethods)
 
@@ -69,16 +74,38 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	contentViewHeight = [contentView frame].size.height;
 	[prefWindowController addPreferencesModule:self];
 	
-	XMBooleanCell *cell = [[XMBooleanCell alloc] init];
+	// replacing the table column identifiers with better ones
+	NSTableColumn *tableColumn;
 	
-	NSTableColumn *column = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_CodecIsEnabled];
-	[column setDataCell:cell];
+	tableColumn = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialNameIdentifier];
+	[tableColumn setIdentifier:XMKey_CodecDescriptor_Name];
+	
+	tableColumn = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialBandwidthIdentifier];
+	[tableColumn setIdentifier:XMKey_CodecDescriptor_Bandwidth];
+	
+	tableColumn = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialQualityIdentifier];
+	[tableColumn setIdentifier:XMKey_CodecDescriptor_Quality];
+	
+	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialNameIdentifier];
+	[tableColumn setIdentifier:XMKey_CodecDescriptor_Name];
+	
+	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialBandwidthIdentifier];
+	[tableColumn setIdentifier:XMKey_CodecDescriptor_Bandwidth];
+	
+	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialQualityIdentifier];
+	[tableColumn setIdentifier:XMKey_CodecDescriptor_Quality];
+	
+	// making the table view use a XMBoolean cell for the "enabled" column
+	XMBooleanCell *booleanCell = [[XMBooleanCell alloc] init];
+	
+	NSTableColumn *column = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_EnabledIdentifier];
+	[column setDataCell:booleanCell];
 	[audioCodecPreferenceOrderTableView setRowHeight:16];
 	
-	column = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_CodecIsEnabled];
-	[column setDataCell:cell];
+	column = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_EnabledIdentifier];
+	[column setDataCell:booleanCell];
 	[videoCodecPreferenceOrderTableView setRowHeight:16];
-	[cell release];
+	[booleanCell release];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
 												 name:XMNotification_DidEndFetchingExternalAddress object:nil];
@@ -466,46 +493,46 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[externalAddressField setStringValue:string];
 	[autoGetExternalAddressSwitch setState:state];
 	
-	[minTCPPortField setIntValue:[currentLocation tcpPortMin]];
+	[minTCPPortField setIntValue:[currentLocation tcpPortBase]];
 	[maxTCPPortField setIntValue:[currentLocation tcpPortMax]];
-	[minUDPPortField setIntValue:[currentLocation udpPortMin]];
+	[minUDPPortField setIntValue:[currentLocation udpPortBase]];
 	[maxUDPPortField setIntValue:[currentLocation udpPortMax]];
 	
 	// load the H.323 section
-	state = ([currentLocation h323IsEnabled] == YES) ? NSOnState : NSOffState;
+	state = ([currentLocation enableH323] == YES) ? NSOnState : NSOffState;
 	[enableH323Switch setState:state];
 	
-	state = ([currentLocation h323EnableH245Tunnel] == YES) ? NSOnState : NSOffState;
+	state = ([currentLocation enableH245Tunnel] == YES) ? NSOnState : NSOffState;
 	[enableH245TunnelSwitch setState:state];
 	
-	state = ([currentLocation h323EnableFastStart] == YES) ? NSOnState : NSOffState;
+	state = ([currentLocation enableFastStart] == YES) ? NSOnState : NSOffState;
 	[enableFastStartSwitch setState:state];
 	
-	state = ([currentLocation h323UseGatekeeper] == YES) ? NSOnState : NSOffState;
+	state = ([currentLocation useGatekeeper] == YES) ? NSOnState : NSOffState;
 	[useGatekeeperSwitch setState:state];
 	
-	string = [currentLocation h323GatekeeperAddress];
+	string = [currentLocation gatekeeperAddress];
 	if(!string)
 	{
 		string = @"";
 	}
 	[gatekeeperHostField setStringValue:string];
 	
-	string = [currentLocation h323GatekeeperID];
+	string = [currentLocation gatekeeperID];
 	if(!string)
 	{
 		string = @"";
 	}
 	[gatekeeperIDField setStringValue:string];
 	
-	string = [currentLocation h323GatekeeperUsername];
+	string = [currentLocation gatekeeperUsername];
 	if(!string)
 	{
 		string = @"";
 	}
 	[gatekeeperUserAliasField setStringValue:string];
 	
-	string = [currentLocation h323GatekeeperE164Number];
+	string = [currentLocation gatekeeperPhoneNumber];
 	if(!string)
 	{
 		string = @"";
@@ -522,10 +549,10 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	state = ([currentLocation enableVideoReceive] == YES) ? NSOnState : NSOffState;
 	[enableVideoReceiveSwitch setState:state];
 	
-	state = ([currentLocation sendVideo] == YES) ? NSOnState : NSOffState;
+	state = ([currentLocation enableVideoTransmit] == YES) ? NSOnState : NSOffState;
 	[enableVideoTransmitSwitch setState:state];
 	
-	[videoFrameRateField setIntValue:[currentLocation sendFPS]];
+	[videoFrameRateField setIntValue:[currentLocation videoFramesPerSecond]];
 	
 	state = [currentLocation videoSize];
 	if(state == XMVideoSize_QCIF)
@@ -567,51 +594,51 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	}
 	[currentLocation setExternalAddress:string];
 	
-	[currentLocation setTCPPortMin:[minTCPPortField intValue]];
+	[currentLocation setTCPPortBase:[minTCPPortField intValue]];
 	[currentLocation setTCPPortMax:[maxTCPPortField intValue]];
-	[currentLocation setUDPPortMin:[minUDPPortField intValue]];
+	[currentLocation setUDPPortBase:[minUDPPortField intValue]];
 	[currentLocation setUDPPortMax:[maxUDPPortField intValue]];
 	
 	// saving the H.323 section
 	flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
-	[currentLocation setH323IsEnabled:flag];
+	[currentLocation setEnableH323:flag];
 	
 	flag = ([enableH245TunnelSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setH323EnableH245Tunnel:flag];
+	[currentLocation setEnableH245Tunnel:flag];
 	
 	flag = ([enableFastStartSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setH323EnableFastStart:flag];
+	[currentLocation setEnableFastStart:flag];
 	
 	flag = ([useGatekeeperSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setH323UseGatekeeper:flag];
+	[currentLocation setUseGatekeeper:flag];
 	
 	string = [gatekeeperHostField stringValue];
 	if([string isEqualToString:@""])
 	{
 		string = nil;
 	}
-	[currentLocation setH323GatekeeperAddress:string];
+	[currentLocation setGatekeeperAddress:string];
 	
 	string = [gatekeeperIDField stringValue];
 	if([string isEqualToString:@""])
 	{
 		string = nil;
 	}
-	[currentLocation setH323GatekeeperID:string];
+	[currentLocation setGatekeeperID:string];
 	
 	string = [gatekeeperUserAliasField stringValue];
 	if([string isEqualToString:@""])
 	{
 		string = nil;
 	}
-	[currentLocation setH323GatekeeperUsername:string];
+	[currentLocation setGatekeeperUsername:string];
 	
 	string = [gatekeeperPhoneNumberField stringValue];
 	if([string isEqualToString:@""])
 	{
 		string = nil;
 	}
-	[currentLocation setH323GatekeeperE164Number:string];
+	[currentLocation setGatekeeperPhoneNumber:string];
 	
 	// saving the SIP section
 	
@@ -623,9 +650,9 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	[currentLocation setEnableVideoReceive:flag];
 	
 	flag = ([enableVideoTransmitSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setSendVideo:flag];
+	[currentLocation setEnableVideoTransmit:flag];
 	
-	[currentLocation setSendFPS:[videoFrameRateField intValue]];
+	[currentLocation setVideoFramesPerSecond:[videoFrameRateField intValue]];
 	
 	XMVideoSize size = ([videoSizePopUp indexOfSelectedItem] == 0) ? XMVideoSize_CIF : XMVideoSize_QCIF;
 	[currentLocation setVideoSize:size];
@@ -817,7 +844,7 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		return nil;
 	}
 	
-	NSString *identifier = [column identifier];
+	NSString *columnIdentifier = [column identifier];
 	XMCodecListRecord *record;
 	
 	if(tableView == audioCodecPreferenceOrderTableView)
@@ -829,13 +856,13 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 		record = [currentLocation videoCodecListRecordAtIndex:rowIndex];
 	}
 	
-	if([identifier isEqualToString:XMKey_CodecIsEnabled])
+	if([columnIdentifier isEqualToString:XMKey_EnabledIdentifier])
 	{
 		return [NSNumber numberWithBool:[record isEnabled]];
 	}
 	
-	XMCodecDescriptor *codecDescriptor = [[XMCodecManager sharedInstance] codecDescriptorForKey:[record key]];
-	return [codecDescriptor propertyForKey:identifier];
+	XMCodecDescriptor *codecDescriptor = [[XMCodecManager sharedInstance] codecDescriptorForIdentifier:[record identifier]];
+	return [codecDescriptor propertyForKey:columnIdentifier];
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
@@ -850,13 +877,13 @@ NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPrefere
 	
 	if(tableView == audioCodecPreferenceOrderTableView)
 	{
-		[[currentLocation audioCodecListRecordAtIndex:rowIndex] setIsEnabled:[anObject boolValue]];
+		[[currentLocation audioCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
 		[audioCodecPreferenceOrderTableView reloadData];
 	}
 	
 	if(tableView == videoCodecPreferenceOrderTableView)
 	{
-		[[currentLocation videoCodecListRecordAtIndex:rowIndex] setIsEnabled:[anObject boolValue]];
+		[[currentLocation videoCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
 		[videoCodecPreferenceOrderTableView reloadData];
 	}
 	

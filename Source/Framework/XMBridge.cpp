@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,16 +11,21 @@
 #include "XMBridge.h"
 
 #include "XMOpalManager.h"
+#include "XMPCSSEndPoint.h"
+#include "XMH323EndPoint.h"
 #include "XMVolumeControl.h"
+#include "XMSubsystemSetupThread.h"
 
 using namespace std;
 
 // reference to the active OPAL manager.
 static XMOpalManager *theManager = NULL;
 
-// required to implement the volume control
-static XMSoundChannel *playerChannel = NULL;
-static XMSoundChannel *recorderChannel = NULL;
+// reference to the PCSS Endpoint
+static XMPCSSEndPoint *callEndPoint = NULL;
+
+// reference to the H.323 Endpoint
+static XMH323EndPoint *h323EndPoint = NULL;
 
 void initOPAL()
 {
@@ -31,10 +36,15 @@ void initOPAL()
 		theManager = new XMOpalManager;
 		theManager->Initialise();
 		
-		/* workaround for the lack of useable volume control in OPAL's PCSSEndPoint */
-		playerChannel = new XMSoundChannel(theManager->GetSoundChannelPlayDevice(), PSoundChannel::Player, 1, 8000, 16);
-		recorderChannel = new XMSoundChannel(theManager->GetSoundChannelRecordDevice(), PSoundChannel::Recorder, 1, 8000, 16);
+		callEndPoint = theManager->PCSSEndPoint();
+		h323EndPoint = theManager->H323EndPoint();
 	}
+}
+
+void initiateSubsystemSetup(void *preferences)
+{
+	// the thread is automatically deleted after setup completed.
+	XMSubsystemSetupThread *setupThread = new XMSubsystemSetupThread(preferences);
 }
 
 #pragma mark Call Management functions
@@ -58,7 +68,7 @@ unsigned startCall(XMCallProtocol protocol, const char *remoteParty)
 	
 	PString remoteName = psprintf("%s:%s", protocolName, remoteParty);
 	
-	BOOL returnValue = theManager->StartCall(remoteName, token);
+	BOOL returnValue = callEndPoint->StartCall(remoteName, token);
 	
 	if(returnValue == TRUE)
 	{
@@ -72,13 +82,13 @@ unsigned startCall(XMCallProtocol protocol, const char *remoteParty)
 
 void setAcceptIncomingCall(unsigned callID, bool acceptFlag)
 {	
-	theManager->SetAcceptIncomingCall(acceptFlag);
+	callEndPoint->SetAcceptIncomingCall(acceptFlag);
 }
 
 void clearCall(unsigned callID)
 {
 	PString callToken = PString(callID);
-	theManager->ClearCall(callToken);
+	callEndPoint->ClearCall(callToken);
 }
 
 void getCallInformation(unsigned callID,
@@ -93,7 +103,7 @@ void getCallInformation(unsigned callID,
 	PString appStr;
 	PString token = PString(callID);
 	
-	theManager->GetCallInformation(token, nameStr, numberStr, addressStr, appStr);
+	callEndPoint->GetCallInformation(token, nameStr, numberStr, addressStr, appStr);
 	
 	*remoteName = nameStr;
 	*remoteNumber = numberStr;
@@ -168,11 +178,11 @@ void getDefaultAudioInputDevice(char *buffer)
 {
 	// Since the device is obtained as call-by-value, we have to do a copy
 	// so that the buffer isn't destroyed at the end of the method
-	// We explicitly assume that the buffer's length is 64 chars
+	// We explicitly assume that the buffer's length is 128 chars
 	
 	PString str = PSoundChannel::GetDefaultDevice(PSoundChannel::Recorder);
-	strncpy(buffer, str, 64);
-	buffer[63] = '\0';
+	strncpy(buffer, str, 128);
+	buffer[127] = '\0';
 }
 
 const char **getAudioOutputDevices()
@@ -203,10 +213,10 @@ void getDefaultAudioOutputDevice(char *buffer)
 {
 	// Since the device is obtained as call-by-value, we have to do a copy
 	// so that the buffer isn't destroyed at the end of the method
-	// We explicitly assume that the buffer's length is 64 chars
+	// We explicitly assume that the buffer's length is 128 chars
 	PString str = PSoundChannel::GetDefaultDevice(PSoundChannel::Player);
-	strncpy(buffer, str, 64);
-	buffer[63] = '\0';
+	strncpy(buffer, str, 128);
+	buffer[127] = '\0';
 }
 
 // The underlying system is call-by-reference
@@ -218,10 +228,6 @@ const char *getSelectedAudioInputDevice()
 bool setSelectedAudioInputDevice(const char *device)
 {
 	bool result = theManager->SetSoundChannelRecordDevice(device);
-	
-	// deleting the old instance of recorderChannel and replacing with a new one.
-	delete recorderChannel;
-	recorderChannel = new XMSoundChannel(theManager->GetSoundChannelRecordDevice(), PSoundChannel::Recorder, 1, 8000, 16);
 	
 	return result;
 }
@@ -236,36 +242,7 @@ bool setSelectedAudioOutputDevice(const char *device)
 {
 	bool result = theManager->SetSoundChannelPlayDevice(device);
 	
-	delete playerChannel;
-	playerChannel = new XMSoundChannel(theManager->GetSoundChannelPlayDevice(), PSoundChannel::Player, 1, 8000, 16);
-	
 	return result;
-}
-
-unsigned getAudioInputVolume()
-{
-	unsigned vol;
-	recorderChannel->GetVolume(vol);
-	
-	return vol;
-}
-
-bool setAudioInputVolume(unsigned value)
-{
-	return recorderChannel->SetVolume(value);
-}
-
-unsigned getAudioOutputVolume()
-{
-	unsigned vol;
-	playerChannel->GetVolume(vol);
-	
-	return vol;
-}
-
-bool setAudioOutputVolume(unsigned value)
-{
-	return playerChannel->SetVolume(value);
 }
 
 unsigned getAudioBufferSize()
@@ -289,7 +266,7 @@ void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
 
 void setDisabledCodecs(const char * const * codecs, unsigned codecCount)
 {
-	PStringArray codecsArray = PStringArray(codecCount, codecs);
+	PStringArray codecsArray = PStringArray(codecCount, codecs, TRUE);
 	
 	// since video currently is disabled but we are experiencing some troubles with that, we simply disable
 	// the video codecs
@@ -307,21 +284,26 @@ void setCodecOrder(const char * const * codecs, unsigned codecCount)
 
 bool enableH323Listeners(bool flag)
 {
-	return theManager->EnableH323Listeners(flag);
+	return h323EndPoint->EnableListeners(flag);
 }
 
 bool isH323Listening()
 {
-	return theManager->IsH323Listening();
+	return h323EndPoint->IsListening();
 }
 
 void setH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 {
-	theManager->SetH323Functionality(enableFastStart, enableH245Tunnel);
+	h323EndPoint->DisableFastStart(!enableFastStart);
+	h323EndPoint->DisableH245Tunneling(!enableH245Tunnel);
 }
 
 bool setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber)
 {
-	return theManager->SetGatekeeper(address, identifier, gkUsername, phoneNumber);
+	return h323EndPoint->SetGatekeeper(address, identifier, gkUsername, phoneNumber);
 }
 
+void checkGatekeeperRegistration()
+{
+	h323EndPoint->CheckGatekeeperRegistration();
+}

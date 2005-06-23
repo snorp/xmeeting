@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMInCallModule.h,v 1.2 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,8 +17,13 @@
 	IBOutlet NSView *contentView;
 	NSSize contentViewMinSize;
 	
+	IBOutlet NSButton *hangupButton;
+	IBOutlet NSTextField *remotePartyField;
+	
 	NSNib *nibLoader;
 }
+
+- (IBAction)clearCall:(id)sender;
 
 @end
 

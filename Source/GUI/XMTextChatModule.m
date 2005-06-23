@@ -1,5 +1,5 @@
 /*
- * $Id: XMTextChatModule.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMTextChatModule.m,v 1.3 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addBottomModule:self];
+	[[XMMainWindowController sharedInstance] addAdditionModule:self];
 }
 
 - (void)dealloc

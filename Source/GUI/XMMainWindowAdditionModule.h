@@ -1,22 +1,20 @@
 /*
- * $Id: XMMainWindowBottomModule.h,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMMainWindowAdditionModule.h,v 1.1 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#ifndef __XM_MAIN_WINDOW_BOTTOM_MODULE_H__
-#define __XM_MAIN_WINDOW_BOTTOM_MODULE_H__
-
-#import "XMMainWindowController.h"
+#ifndef __XM_MAIN_WINDOW_ADDITION_MODULE_H__
+#define __XM_MAIN_WINDOW_ADDITION_MODULE_H__
 
 /**
  * This protocol declares the methods required for a main window bottom
  * module to ensure proper working. Most methods are similar to the ones
  * found in XMMainWindowModule, but the semantics have changed slightly.
  **/
-@protocol XMMainWindowBottomModule <NSObject>
+@protocol XMMainWindowAdditionModule <NSObject>
 
 /**
  * Returns the name of the module. This name is used to identify the
@@ -52,19 +50,4 @@
 
 @end
 
-/**
- * Declares the methods implemented by XMMainWindowController
- * to ensure proper two-way communication between module and
- * main window controller.
- **/
-@interface XMMainWindowController (BottomModuleMethods)
-
-/**
- * Adds module to the list of main window bottom modules of
- * the receiver.
- **/
-- (void)addBottomModule:(id<XMMainWindowBottomModule>)module;
-
-@end
-
-#endif // __XM_MAIN_WINDOW_BOTTOM_MODULE_H__
+#endif // __XM_MAIN_WINDOW_ADDITION_MODULE_H__

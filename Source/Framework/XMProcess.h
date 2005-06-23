@@ -1,5 +1,5 @@
 /*
- * $Id: XMProcess.h,v 1.1 2005/02/11 12:58:44 hfriederich Exp $
+ * $Id: XMProcess.h,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,8 +9,7 @@
 /*
  * PWLib requires a subclass of PProcess to be present
  * in order to work correctly.
- * This implementation simply does nothing
- * besides a correct initialisation
+ * This implementation does nothing besides correct initialization
  */
 
 #ifndef __XM_PROCESS_H__

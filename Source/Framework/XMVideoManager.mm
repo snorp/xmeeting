@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.mm,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMVideoManager.mm,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,15 +8,11 @@
 
 #include <unistd.h>
 
+#import "XMStringConstants.h"
 #import "XMVideoManager.h"
 #import "XMLocalVideoView.h"
 #import "XMPrivate.h"
 #import "XMBridge.h"
-
-NSString *XMNotification_DidStartVideoGrabbing = @"XMeeting_DidStartVideoGrabbingNotification";
-NSString *XMNotification_DidStopVideoGrabbing = @"XMeeting_DidEndVideoGrabbingNotification";
-NSString *XMNotification_DidReadVideoFrame = @"XMeeting_DidReadVideoFrameNotification";
-NSString *XMNotification_DidUpdateVideoDeviceList = @"XMeeeting_DidUpdateVideoDeviceList";
 
 /* Declaration of the used DataProc (See below) */
 OSErr XM_SGDataProc(SGChannel c, 
@@ -145,9 +141,6 @@ OSErr XM_SGDataProc(SGChannel c,
 	fps = 10;
 	
 	remoteVideoFrame = nil;
-	
-	// making sure that the underlying OPAL system is properly initialised
-	initOPAL();
 	
 	return self;
 }
@@ -1121,7 +1114,7 @@ OSErr XM_SGDataProc(SGChannel c,
 	
 	if(isGrabbing) // this action is not allowed while we are grabbing
 	{
-		[NSException raise:@"XMeetingInvalidActionException" format:@"Not allowed while video grabbing runs"];
+		[NSException raise:XMException_InvalidAction format:@"Not allowed while video grabbing runs"];
 	}
 	
 	if(view == theView)

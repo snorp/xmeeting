@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.2 2005/06/01 11:00:22 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,8 +8,6 @@
 
 #ifndef __XM_CALL_ADDRESS_MANAGER_H__
 #define __XM_CALL_ADDRESS_MANAGER_H__
-
-extern NSString *XMNotification_CallAddressManagerDidInitiateCall;
 
 #import <Cocoa/Cocoa.h>
 #import "XMeeting.h"

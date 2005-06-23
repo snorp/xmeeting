@@ -1,5 +1,5 @@
 /*
- * $Id: XMURL.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMURL.h,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_URL_H__
 
 #import <Foundation/Foundation.h>
+#import "XMTypes.h"
 
 extern NSString *XMKey_URLType;
 extern NSString *XMKey_URLString;
@@ -92,13 +93,19 @@ extern NSString *XMKey_URLPort;
 - (NSDictionary *)dictionaryRepresentation;
 
 /**
+ * Returns the protocol to be used by the framework to make this call
+ **/
+- (XMCallProtocol)callProtocol;
+
+/**
  * Returns the address of the URL in a form that is machine
  * understandable.
  **/
 - (NSString *)address;
 
 /**
- * Returns the port associated with address
+ * Returns the port associated with address. Return 0 if port isn't
+ * specified, uses the default port in this case.
  **/
 - (unsigned)port;
 

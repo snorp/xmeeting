@@ -9,25 +9,51 @@
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
             ACTIONS = {
-                bottomContentButtonAction = id; 
-                showBottomModuleInSeparateWindow = id; 
-                toggleShowBottomContentView = id; 
+                changeAudioInputDevice = id; 
+                changeAudioInputVolume = id; 
+                changeAudioOutputDevice = id; 
+                changeAudioOutputVolume = id; 
+                changeVideoDevice = id; 
+                toggleMuteAudioInput = id; 
+                toggleMuteAudioOutput = id; 
+            }; 
+            CLASS = XMLocalAudioVideoController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                audioInputDevicesPopUp = NSPopUpButton; 
+                audioInputVolumeSlider = NSSlider; 
+                audioOutputDevicesPopUp = NSPopUpButton; 
+                audioOutputVolumeSlider = NSSlider; 
+                muteAudioInputSwitch = NSButton; 
+                muteAudioOutputSwitch = NSButton; 
+                videoDevicesPopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                additionContentButtonAction = id; 
+                showAdditionModuleInSeparateWindow = id; 
+                toggleShowAdditionContentView = id; 
+                toggleShowLocalAudioVideoDrawer = id; 
             }; 
             CLASS = XMMainWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 bottomContentBox = NSBox; 
                 bottomContentDisclosure = NSButton; 
+                localAudioVideoDisclosure = NSButton; 
+                localAudioVideoDrawer = NSDrawer; 
                 mainContentBox = NSBox; 
                 separatorContentBox = NSBox; 
-                showModuleInSeparateWindowButton = NSButton; 
+                showModuleInSeparateWindowButton = XMMouseOverButton; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
         {
             CLASS = XMMainWindowStatusBarController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {statusBar = NSTextField; }; 
+            OUTLETS = {progressIndicator = NSProgressIndicator; statusBar = NSTextField; }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }

@@ -1,15 +1,13 @@
 /*
- * $Id: XMUtils.mm,v 1.4 2005/06/02 12:47:33 hfriederich Exp $
+ * $Id: XMUtils.mm,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMUtils.h"
-
-NSString *XMNotification_DidStartFetchingExternalAddress = @"XMeeting_DidStartFetchingExternalAddressNotification";
-NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchingExternalAddressNotification";
+#import "XMStringConstants.h"
+#import "XMutils.h"
 
 @interface XMUtils (PrivateMethods)
 
@@ -59,6 +57,8 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 
 - (id)_init
 {
+	localAddress = nil;
+	
 	isFetchingExternalAddress = NO;
 	didSucceedFetchingExternalAddress = YES;
 	externalAddressURLConnection = nil;
@@ -69,6 +69,8 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 
 - (void)dealloc
 {
+	[localAddress release];
+	
 	if(externalAddressURLConnection != nil)
 	{
 		[externalAddressURLConnection cancel];
@@ -81,6 +83,48 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 	[super dealloc];
 }
 
+#pragma mark Fetching local address
+
+- (NSString *)localAddress
+{
+	if(localAddress == nil)
+	{
+		NSArray *hostAddresses = [[NSHost currentHost] addresses];
+		unsigned count = [hostAddresses count];
+		unsigned i;
+		
+		for(i = 0; i < count; i++)
+		{
+			NSString *address = [hostAddresses objectAtIndex:i];
+			NSScanner *scanner = [[NSScanner alloc] initWithString:address];
+			int firstByte, secondByte, thirdByte, fourthByte;
+			
+			if([scanner scanInt:&firstByte] &&
+			   [scanner scanString:@"." intoString:nil] &&
+			   [scanner scanInt:&secondByte] &&
+			   [scanner scanString:@"." intoString:nil] &&
+			   [scanner scanInt:&thirdByte] &&
+			   [scanner scanString:@"." intoString:nil] &&
+			   [scanner scanInt:&fourthByte])
+			{
+				// we have an ip address. check that we haven't got the 127.0.0.1 address.
+				
+				if(firstByte != 127 || secondByte != 0 || thirdByte != 0 || fourthByte != 1) // we have a different address
+				{
+					localAddress = [address retain];
+				}
+			}
+			[scanner release];
+			
+			if(localAddress != nil)
+			{
+				break;
+			}
+		}
+	}
+	return localAddress;
+}
+
 #pragma mark Fetching External Address
 
 - (void)startFetchingExternalAddress
@@ -90,12 +134,12 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 		NSURL *externalAddressURL = [[NSURL alloc] initWithString:@"http://checkip.dyndns.org"];
 		NSURLRequest *externalAddressURLRequest = [[NSURLRequest alloc] initWithURL:externalAddressURL 
 																		cachePolicy:NSURLRequestReloadIgnoringCacheData
-																	timeoutInterval:5.0];
+																	timeoutInterval:10.0];
 		externalAddressURLConnection = [[NSURLConnection alloc] initWithRequest:externalAddressURLRequest delegate:self];
 		
 		// since the timeoutInterval in NSURLRequest for some reason doesn't work, we do our own timeout by
 		// using a timer and seinding a -cancel message to the NSURLConnection when the timer fires
-		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:5.0 target:self
+		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0 target:self
 																	   selector:@selector(_urlLoadingTimeout:) 
 																	   userInfo:nil repeats:NO] retain];
 		
@@ -120,6 +164,39 @@ NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchi
 - (NSString *)externalAddressFetchFailReason
 {
 	return externalAddressFetchFailReason;
+}
+
+#pragma mark NAT handling
+
+- (XMNATDetectionResult)NATDetectionResult
+{	
+	NSString *theExternalAddress = [self externalAddress];
+	NSString *theLocalAddress = [self localAddress];
+	XMNATDetectionResult result;
+	
+	if(theLocalAddress == nil)
+	{
+		// we have no network interface!
+		result = XMNATDetectionResult_Error;
+	}
+	else if(theExternalAddress == nil)
+	{
+		if([self didSucceedFetchingExternalAddress] == YES)
+		{
+			// no external address fetched yet
+			result = XMNATDetectionResult_Error;
+		}
+		else
+		{
+			// we have no external address, thus we are not
+			// behind a NAT
+			result = XMNATDetectionResult_NoNAT;
+		}
+	}
+	else if([theExternalAddress isEqualToString:theLocalAddress])
+	{
+		return XMNATDetectionResult_NoNAT;
+	}
 }
 
 #pragma mark NSURLConnection delegate Methods

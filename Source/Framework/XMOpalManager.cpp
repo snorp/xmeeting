@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.4 2005/06/01 21:20:21 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #include "XMVideoDevices.h"
 
 using namespace std;
+
+#pragma mark Init & Deallocation
 
 void XMOpalManager::InitOpal()
 {
@@ -46,7 +48,18 @@ void XMOpalManager::Initialise()
 	h323EP = new XMH323EndPoint(*this);
 	AddRouteEntry("pc:.*   = h323:<da>");
 	AddRouteEntry("h323:.* = pc:<da>");
-	isH323Listening = FALSE;
+}
+
+#pragma mark Access to Endpoints
+
+XMH323EndPoint * XMOpalManager::H323EndPoint()
+{
+	return h323EP;
+}
+
+XMPCSSEndPoint * XMOpalManager::PCSSEndPoint()
+{
+	return pcssEP;
 }
 
 #pragma mark overriding some callbacks
@@ -55,6 +68,8 @@ BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
 {	
 	XMCallProtocol protocol;
 	
+	// determining which protocoll we are using
+	// (currently only H.323)
 	PString prefix = connection.GetEndPoint().GetPrefixName();
 	if(prefix == "h323")
 	{
@@ -65,6 +80,9 @@ BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
 		protocol = XMCallProtocol_Unknown;
 	}
 	
+	// telling the PCSSEndPoint which protocol we use so
+	// that the endpoint can forward this information
+	// when needed
 	pcssEP->SetCallProtocol(protocol);
 	
 	return OpalManager::OnIncomingConnection(connection);
@@ -100,6 +118,11 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
 {
 	cout << "XMOpalManager::OnReleased" << endl;
 	OpalManager::OnReleased(connection);
+	
+	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+	XMCallEndReason endReason = (XMCallEndReason)connection.GetCall().GetCallEndReason();
+	cout << "endReason " << endReason << endl;
+	noteCallCleared(callID, endReason);
 }
 
 BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)
@@ -126,65 +149,20 @@ void XMOpalManager::OnClosedMediaStream(OpalMediaStream & stream)
 	OpalManager::OnClosedMediaStream(stream);
 }
 
-#pragma mark Call Management functions
-
-BOOL XMOpalManager::StartCall(const PString & remoteParty, PString & token)
-{
-	PString partyA = "pc:*";
-	
-	return SetUpCall(partyA, remoteParty, token);
-}
-
-void XMOpalManager::SetAcceptIncomingCall(BOOL acceptFlag)
-{
-	pcssEP->SetAcceptIncomingCall(acceptFlag);
-}
-
-void XMOpalManager::ClearCall(PString & callToken)
-{
-	PSafePtr<OpalCall> call = FindCallWithLock(callToken);
-	if(call != NULL)
-	{
-		call->Clear();
-	}
-	else
-	{
-		cout << "Didn't find call, clearing the call failed!" << endl;
-	}
-}
-
-void XMOpalManager::GetCallInformation(PString & callToken,
-									   PString & remoteName, 
-									   PString & remoteNumber,
-									   PString & remoteAddress,
-									   PString & remoteApplication)
-{
-	//pcssEP->GetCallInformation(remoteName, remoteNumber, remoteAddress, remoteApplication);
-	PSafePtr<OpalCall> call = FindCallWithLock(callToken, PSafeReadOnly);
-	
-	if(call == NULL)
-	{
-		return;
-	}
-	
-	PSafePtr<OpalConnection> connection = call->GetConnection(0);
-	
-	if(connection == NULL)
-	{
-		return;
-	}
-	
-	remoteName = connection->GetRemotePartyName();
-	remoteNumber = connection->GetRemotePartyNumber();
-	remoteAddress = connection->GetRemotePartyAddress();
-	remoteApplication = connection->GetRemoteApplication();
-}
-
 #pragma mark Network setup functions
 
 void XMOpalManager::SetBandwidthLimit(unsigned limit)
 {
-	h323EP->SetInitialBandwidth(limit * 100);
+	if(limit == 0)
+	{
+		limit = UINT_MAX;
+	}
+	else
+	{
+		limit *= 100;
+	}
+	cout << "setting bandwidth limit to " << limit << endl;
+	h323EP->SetInitialBandwidth(limit);
 }
 
 #pragma mark Audio functions
@@ -247,76 +225,3 @@ void XMOpalManager::SetVideoFunctionality(BOOL receiveVideo, BOOL transmitVideo)
 		autoStartTransmitVideo = FALSE;
 	}
 }
-
-#pragma mark H.323 functions
-
-BOOL XMOpalManager::EnableH323Listeners(BOOL flag)
-{
-	if(flag == TRUE)
-	{
-		BOOL result = TRUE;
-	
-		if(isH323Listening == FALSE)
-		{
-			result = h323EP->StartListeners(h323EP->GetDefaultListeners());
-			if(result)
-			{
-				isH323Listening = TRUE;
-			}
-		}
-		return result;
-	}
-	else
-	{
-		if(isH323Listening == TRUE)
-		{
-			h323EP->RemoveListener(NULL);
-			isH323Listening = FALSE;
-		}
-		return TRUE;
-	}
-}
-
-BOOL XMOpalManager::IsH323Listening()
-{
-	return isH323Listening;
-}
-
-void XMOpalManager::SetH323Functionality(BOOL enableFastStart, BOOL enableH245Tunnel)
-{
-	h323EP->DisableFastStart(!enableFastStart);
-	h323EP->DisableH245Tunneling(!enableH245Tunnel);
-}
-
-BOOL XMOpalManager::SetGatekeeper(const PString & address, const PString & identifier,
-								  const PString & username, const PString & phoneNumber)
-{
-	// By setting the user name of the h323 endpoint, we clear all previously
-	// used aliases
-	h323EP->SetLocalUserName(GetDefaultUserName());
-	
-	if(identifier != NULL || address != NULL)
-	{
-		if(username != NULL)
-		{
-			h323EP->AddAliasName(username);
-		}
-		if(phoneNumber != NULL)
-		{
-			h323EP->AddAliasName(phoneNumber);
-		}
-		if(h323EP->UseGatekeeper(address, identifier))
-		{
-			return TRUE;
-		}
-		else
-		{
-			return FALSE;
-		}
-	}
-	else
-	{
-		return h323EP->RemoveGatekeeper();
-	}
-}
-

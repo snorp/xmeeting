@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,13 +7,13 @@
  */
 
 #import "XMCallHistoryModule.h"
-
+#import "XMMainWindowController.h"
 
 @implementation XMCallHistoryModule
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addBottomModule:self];
+	[[XMMainWindowController sharedInstance] addAdditionModule:self];
 }
 
 - (void)dealloc

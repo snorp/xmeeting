@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.2 2005/06/01 11:00:22 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,8 +7,6 @@
  */
 
 #import "XMCallAddressManager.h"
-
-NSString *XMNotification_CallAddressManagerDidInitiateCall = @"XMeeting_CallAddressManagerDidInitiateCallNotification";
 
 @interface XMCallAddressManager (PrivateMethods)
 
@@ -103,13 +101,20 @@ NSString *XMNotification_CallAddressManagerDidInitiateCall = @"XMeeting_CallAddr
 	return activeCallAddress;
 }
 
-- (BOOL)makeCallToAddress:(id<XMCallAddress>)address
+- (BOOL)makeCallToAddress:(id<XMCallAddress>)callAddress
 {
 	[activeCallAddress release];
-	activeCallAddress = [address retain];
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallAddressManagerDidInitiateCall
-														object:self];
-	return YES;
+	activeCallAddress = [callAddress retain];
+	
+	NSLog(@"calling");
+	XMCallInfo *callInfo = [[XMCallManager sharedInstance] callURL:[callAddress url]];
+	if(callInfo != nil)
+	{
+		NSLog(@"succesful");
+		return YES;
+	}
+	NSLog(@"failed");
+	return NO;
 }
 
 @end

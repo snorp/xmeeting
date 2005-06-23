@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class XMLocalVideoView;
+@class XMNoCallModule, XMInCallModule;
+@class XMAddressBookModule, XMZeroConfModule, XMDialPadModule;
+@class XMTextChatModule, XMStatisticsModule, XMCallHistoryModule;
 
 /**
  * XMApplicationController is responsible for the main menu and
@@ -19,6 +21,18 @@
  * manages the application initialization and termination.
  **/
 @interface XMApplicationController : NSObject {
+	
+	XMNoCallModule *noCallModule;
+	XMInCallModule *inCallModule;
+	
+	XMAddressBookModule *addressBookModule;
+	XMZeroConfModule *zeroConfModule;
+	XMDialPadModule *dialPadModule;
+	XMTextChatModule *textChatModule;
+	XMStatisticsModule *statisticsModule;
+	XMCallHistoryModule *callHistoryModule;
+	
+	BOOL appShouldTerminate;
 	
 }
 

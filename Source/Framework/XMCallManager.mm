@@ -1,46 +1,56 @@
 /*
- * $Id: XMCallManager.mm,v 1.5 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.6 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMCallManager.h"
+#import "XMTypes.h"
+#import "XMStringConstants.h"
 #import "XMPrivate.h"
-
+#import "XMCallManager.h"
+#import "XMUtils.h"
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
+#import "XMURL.h"
 #import "XMBridge.h"
-
-NSString *XMNotification_IncomingCall = @"XMeeting_IncomingCallNotification";
-NSString *XMNotification_CallEstablished = @"XMeeting_CallEstablishedNotification";
-NSString *XMNotification_CallEnd = @"XMeeting_CallEndNotification";
-
-NSString *XMNotification_RegisteredAtGatekeeper = @"XMeeting_RegisteredAtGatekeeper";
-NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 @interface XMCallManager (PrivateMethods)
 
 - (id)_init;
-- (void)_setupSubsystem;
 
-- (void)_handleIncomingCall:(XMCallInfo *)callInfo;
-- (void)_handleCallEstablished;
-- (void)_handleCallCleared:(NSNumber *)callEndReason;
-- (void)_handleMediaStreamOpened:(NSArray *)values;
+- (void)_prepareSubsystemSetup;
+- (void)_initiateSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
+- (void)_shutdownSubsystem;
+- (void)_noteSubsystemSetupDidFinish;
 
+// called on a separate thread
+- (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
+
+- (void)_mainThreadHandleIncomingCall:(XMCallInfo *)callInfo;
+- (void)_mainThreadHandleCallEstablished:(NSNumber *)callIDNumber;
+- (void)_mainThreadHandleCallCleared:(NSArray *)infoArray;
+- (void)_mainThreadHandleMediaStreamOpened:(NSArray *)infoArray;
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
+
+- (void)_mainThreadHandleGatekeeperRegistration;
+- (void)_mainThreadHandleGatekeeperUnregistration;
+- (void)_mainThreadHandleGatekeeperRegistrationFailure;
+- (void)_checkGatekeeperRegistration:(NSTimer *)timer;
+
+- (void)_storeCall:(XMCallInfo *)call;
 
 @end
 
 @implementation XMCallManager
 
-/*
+/**
  * This code uses the following policy to ensure
  * data integrity:
  * all changes in the callInfo instance activeCall
  * happens on the main thread.
- */
+ **/
 
 #pragma mark Class Methods
 
@@ -68,18 +78,26 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 - (id)_init
 {
+	//initializing the underlying OPAL system
+	initOPAL();
+	
 	self = [super init];
 	
 	delegate = nil;
 	
 	isOnline = NO;
-	activePreferences = nil;
+	
+	activePreferences = [[XMPreferences alloc] init];
+	doesSubsystemSetup = NO;
+	needsSubsystemSetupAfterCallEnd = NO;
+	needsSubsystemShutdownAfterSubsystemSetup = NO;
+	
 	activeCall = nil;
 	
 	gatekeeperName = nil;
+	gatekeeperRegistrationCheckTimer = nil;
 	
-	//initializing the underlying OPAL system
-	initOPAL();
+	recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
 	
 	return self;
 }
@@ -92,9 +110,19 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 	[activeCall release];
 	
 	[gatekeeperName release];
+	[gatekeeperRegistrationCheckTimer invalidate];
+	[gatekeeperRegistrationCheckTimer release];
+	
+	[recentCalls release];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	[self setOnline:NO];
 	
 	[super dealloc];
 }
+
+#pragma mark General Configuration
 
 - (id)delegate
 {
@@ -105,34 +133,7 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 {
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 	
-	if(delegate != nil) // we need to unregister the old delegate
-	{
-		[nc removeObserver:delegate name:XMNotification_IncomingCall object:nil];
-		[nc removeObserver:delegate name:XMNotification_CallEstablished object:nil];
-		[nc removeObserver:delegate name:XMNotification_CallEnd object:nil];
-	}
-	
 	delegate = theDelegate;
-	
-	if(delegate != nil)
-	{
-		/* registering the delegate for the implemented delegate methods */
-		if([delegate respondsToSelector:@selector(callManagerDidReceiveIncomingCall:)])
-		{
-			[nc addObserver:delegate selector:@selector(callManagerDidReceiveIncomingCall:)
-					   name:XMNotification_IncomingCall object:nil];
-		}
-		if([delegate respondsToSelector:@selector(callManagerDidEstablishCall:)])
-		{
-			[nc addObserver:delegate selector:@selector(callManagerDidEstablishCall:)
-					   name:XMNotification_CallEstablished object:nil];
-		}
-		if([delegate respondsToSelector:@selector(callManagerDidEndCall:)])
-		{
-			[nc addObserver:delegate selector:@selector(callManagerDidEndCall:)
-					   name:XMNotification_CallEnd object:nil];
-		}
-	}
 }
 
 - (BOOL)isOnline
@@ -140,19 +141,35 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 	return isOnline;
 }
 
-- (void)setIsOnline:(BOOL)flag
+- (void)setOnline:(BOOL)flag
 {
 	if(isOnline != flag)
 	{
 		isOnline = flag;
 		
-		if(flag)
+		if(isOnline)
 		{
-			[self _setupSubsystem];
+			[self _prepareSubsystemSetup];
+			[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidGoOnline object:self];
 		}
 		else 
 		{
-			enableH323Listeners(NO);
+			// just for the case...
+			needsSubsystemSetupAfterCallEnd = NO;
+			
+			if(doesSubsystemSetup)
+			{
+				needsSubsystemShutdownAfterSubsystemSetup = YES;
+			}
+			else if([self isInCall])
+			{
+				// the subsystem shutdown is initiated after the call has ended
+				[self clearActiveCall];
+			}
+			else
+			{
+				[self _shutdownSubsystem];
+			}
 		}
 	}
 }
@@ -174,11 +191,48 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 - (void)setActivePreferences:(XMPreferences *)prefs
 {
+	if(doesSubsystemSetup == YES)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup];
+		return;
+	}
+	if(prefs == nil)
+	{
+		[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustNotBeNil];
+		return;
+	}
+	
 	XMPreferences *old = activePreferences;
 	activePreferences = [prefs copy];
 	[old release];
 	
-	[self _setupSubsystem];
+	if([self isInCall])
+	{
+		needsSubsystemSetupAfterCallEnd = YES;
+		return;
+	}
+	
+	// we only modify the subsystem if we really are online
+	if(isOnline == YES)
+	{
+		[self _prepareSubsystemSetup];
+	}
+}
+
+- (BOOL)doesSubsystemSetup
+{
+	return doesSubsystemSetup;
+}
+
+#pragma mark Call management methods
+
+- (BOOL)isInCall
+{
+	if(activeCall == nil)
+	{
+		return NO;
+	}
+	return YES;
 }
 
 - (XMCallInfo *)activeCall
@@ -186,26 +240,46 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 	return activeCall;
 }
 
-- (XMCallInfo *)callRemoteParty:(NSString *)remoteParty usingProtocol:(XMCallProtocol)protocol
+- (XMCallInfo *)callURL:(XMURL *)remotePartyURL;
 {
-	unsigned callID = startCall(protocol, [remoteParty cString]);
+	if(!isOnline)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileOffline];
+		return nil;
+	}
+	else if(doesSubsystemSetup)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup];
+		return nil;
+	}
+	else if([self isInCall])
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileInCall];
+		return nil;
+	}
+	
+	XMCallProtocol callProtocol = [remotePartyURL callProtocol];
+	NSString *address = [remotePartyURL address];
+	unsigned port = [remotePartyURL port];
+	
+	if(port != 0)
+	{
+		address = [NSString stringWithFormat:@"%@:%u", address, port];
+	}
+
+	unsigned callID = startCall(callProtocol, [address cString]);
 	
 	if(callID != 0)
 	{
-		XMCallInfo *info = [[XMCallInfo alloc] _initWithCallID:callID
-													  protocol:protocol
-													remoteName:nil
-												  remoteNumber:nil
-												 remoteAddress:nil
-											 remoteApplication:nil
-													callStatus:XMCallStatus_Calling];
-			
-		if(activeCall)
-		{
-			[activeCall release];
-		}
-			
-		activeCall = info;
+		activeCall = [[XMCallInfo alloc] _initWithCallID:callID
+												protocol:callProtocol
+											  remoteName:nil
+											remoteNumber:nil
+										   remoteAddress:nil
+									   remoteApplication:nil
+											  callStatus:XMCallStatus_Calling];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartCalling object:nil];
 	}
 	
 	return activeCall;
@@ -213,6 +287,12 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 - (void)acceptIncomingCall:(BOOL)acceptFlag
 {
+	if(activeCall == nil)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileNotInCall];
+		return;
+	}
+	
 	unsigned callID = [activeCall _callID];
 		
 	setAcceptIncomingCall(callID, acceptFlag);
@@ -220,12 +300,19 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 - (void)clearActiveCall
 {
-	if(!activeCall)
+	if(activeCall == nil)
 	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileNotInCall];
 		return;
 	}
 	
 	clearCall([activeCall _callID]);
+}
+
+- (NSArray *)recentCalls
+{
+	NSArray *recentCallsCopy = [recentCalls copy];
+	return [recentCallsCopy autorelease];
 }
 
 #pragma mark H.323-specific Methods
@@ -237,76 +324,136 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 #pragma mark Private Methods
 
-- (void)_setupSubsystem
+- (void)_prepareSubsystemSetup
 {
-	NSLog(@"SetupSubsystem");
-	if(activePreferences == nil)
-	{
-		NSLog(@"no active preferences");
-		return;
-	}
-		
-	// setting the general settings
-	setUserName([[activePreferences userName] cString]);
+	// "freeze" any modifications
+	doesSubsystemSetup = YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartSubsystemSetup object:self];
+	
+	// set the autoAnswerCall flag
 	autoAnswerCalls = [activePreferences autoAnswerCalls];
 	
-	// setting the network preferences
-	
-	setBandwidthLimit([activePreferences bandwidthLimit]);
-	
+	// we check whether we have to use the external address
+	// from XMUtils and if this is not yet available, we wait
+	// until this address gets available
 	if([activePreferences useAddressTranslation])
 	{
-		//add autoget ext addr here
-		setTranslationAddress([[activePreferences externalAddress] cString]);
-	}
-	else
-	{
-		setTranslationAddress(NULL);
+		if([activePreferences externalAddress] == nil)
+		{
+			XMUtils *utils = [XMUtils sharedInstance];
+			if([utils externalAddress] == nil)
+			{
+				// address fetch failure or not yet fetched?
+				if([utils didSucceedFetchingExternalAddress])
+				{
+					// not yet fetched
+					[utils startFetchingExternalAddress];
+					[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+																 name:XMNotification_DidEndFetchingExternalAddress object:nil];
+					return;
+				}
+			}
+		}
 	}
 	
-	setPortRanges([activePreferences udpPortMin],
-				  [activePreferences udpPortMax],
-				  [activePreferences tcpPortMin],
-				  [activePreferences tcpPortMax],
-				  [activePreferences udpPortMin],
-				  [activePreferences udpPortMax]);
+	// preparations complete...
+	// We use a copy to avoid possible multithreading problems, even if
+	// the chances for them are really small...
+	[self _initiateSubsystemSetupWithPreferences:[activePreferences copy]];
+}
+
+- (void)_initiateSubsystemSetupWithPreferences:(XMPreferences *)preferences
+{
+	// Calling the OPAL world to create a new thread and call
+	// _doSubsystemSetupWithPreferences on this new thread
+	initiateSubsystemSetup((void *)preferences);
+}
+
+- (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferences
+{
+	// just to be sure...
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	// setting the general settings
+	const char *userName = NULL;
+	NSString *theUserName = [preferences userName];
+	if(theUserName != nil)
+	{
+		userName = [theUserName cString];
+	}
+	
+	// setting the network preferences
+	setBandwidthLimit([preferences bandwidthLimit]);
+	
+	const char *translationAddress = NULL;
+	if([preferences useAddressTranslation])
+	{
+		NSString *externalAddress = [preferences externalAddress];
+		if(externalAddress == nil)
+		{
+			// we have to query XMUtils for the external address
+			XMUtils *utils = [XMUtils sharedInstance];
+			externalAddress = [utils externalAddress];
+			if(externalAddress != nil)
+			{
+				translationAddress = [externalAddress cString];
+			}
+		}
+		else
+		{
+			translationAddress = [externalAddress cString];
+		}
+	}
+	setTranslationAddress(translationAddress);
+	
+	setPortRanges([preferences udpPortBase],
+				  [preferences udpPortMax],
+				  [preferences tcpPortBase],
+				  [preferences tcpPortMax],
+				  [preferences udpPortBase],
+				  [preferences udpPortMax]);
 	
 	// setting the audio preferences
-	setAudioBufferSize([activePreferences audioBufferSize]);
-	unsigned audioCodecCount = [activePreferences audioCodecListCount];
-	unsigned videoCodecCount = [activePreferences videoCodecListCount];
+	setAudioBufferSize([preferences audioBufferSize]);
+	
+	// setting the video preferences (currently disabled)
+	setVideoFunctionality(NO, NO);
+	
+	// for the codec order, we have to create a buffer and fill it with c strings.
+	unsigned audioCodecCount = [preferences audioCodecListCount];
+	unsigned videoCodecCount = [preferences videoCodecListCount];
 	unsigned i;
 	unsigned disabledCodecCount = 0;
 	unsigned orderedCodecCount = 0;
-	char const** disabledCodecs = (char const**)malloc((audioCodecCount + videoCodecCount) * sizeof(char *));
-	char const** orderedCodecs = (char const**)malloc((audioCodecCount + videoCodecCount) * sizeof(char *));
+	char const** disabledCodecs = (char const**)malloc((audioCodecCount + videoCodecCount + 1) * sizeof(char *));
+	char const** orderedCodecs = (char const**)malloc((audioCodecCount + videoCodecCount + 1) * sizeof(char *));
 	for(i = 0; i < audioCodecCount; i++)
 	{
-		XMCodecListRecord *record = [activePreferences audioCodecListRecordAtIndex:i];
-		const char *key = [[record key] cString];
+		XMCodecListRecord *record = [preferences audioCodecListRecordAtIndex:i];
+		const char *identifier = [[record identifier] cString];
 		if([record isEnabled])
 		{
-			orderedCodecs[orderedCodecCount] = key;
+			orderedCodecs[orderedCodecCount] = identifier;
 			orderedCodecCount++;
 		}
 		else
 		{
-			disabledCodecs[disabledCodecCount] = key;
+			disabledCodecs[disabledCodecCount] = identifier;
 			disabledCodecCount++;
 		}
 	}
 	for(i = 0; i < videoCodecCount; i++)
 	{
-		XMCodecListRecord *record = [activePreferences videoCodecListRecordAtIndex:i];
-		const char *key = [[record key] cString];
+		XMCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
+		const char *identifier = [[record identifier] cString];
 		if([record isEnabled])
 		{
-			orderedCodecs[orderedCodecCount] = key;
+			orderedCodecs[orderedCodecCount] = identifier;
 			orderedCodecCount++;
 		}
 		else
 		{
-			disabledCodecs[disabledCodecCount] = key;
+			disabledCodecs[disabledCodecCount] = identifier;
 			disabledCodecCount++;
 		}
 	}
@@ -317,42 +464,96 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 	free(orderedCodecs);
 	free(disabledCodecs);
 	
-	// setting the video preferences
-	setVideoFunctionality(NO, NO);
-	
 	// setting the H.323 preferences
-	if([activePreferences h323IsEnabled])
+	if([preferences enableH323])
 	{
 		if(enableH323Listeners(YES))
 		{
+			setH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
 		
-			setH323Functionality([activePreferences h323EnableFastStart], [activePreferences h323EnableH245Tunnel]);
-		
-			if([activePreferences h323UseGatekeeper])
+			const char *gatekeeperAddress = NULL;
+			const char *gatekeeperID = NULL;
+			const char *gatekeeperUsername = NULL;
+			const char *gatekeeperPhoneNumber = NULL;
+			
+			if([preferences useGatekeeper])
 			{
-				if(!setGatekeeper([[activePreferences h323GatekeeperAddress] cString],
-							  [[activePreferences h323GatekeeperID] cString],
-							  [[activePreferences h323GatekeeperUsername] cString],
-							  [[activePreferences h323GatekeeperE164Number] cString]))
+				NSString *gkAddress = [preferences gatekeeperAddress];
+				NSString *gkID = [preferences gatekeeperID];
+				NSString *gkUsername = [preferences gatekeeperUsername];
+				NSString *gkPhoneNumber = [preferences gatekeeperPhoneNumber];
+				
+				if(gkAddress != nil)
 				{
-					NSLog(@"Setting the gatekeeper failed!");
+					gatekeeperAddress = [gkAddress cString];
+				}
+				if(gkID != nil)
+				{
+					gatekeeperID = [gkID cString];
+				}
+				if(gkUsername != nil)
+				{
+					gatekeeperUsername = [gkUsername cString];
+				}
+				if(gkPhoneNumber != nil)
+				{
+					gatekeeperPhoneNumber = [gkPhoneNumber cString];
 				}
 			}
-			else
-			{
-				setGatekeeper(NULL, NULL, NULL, NULL);
-			}
+			setGatekeeper(gatekeeperAddress, gatekeeperID, gatekeeperUsername, gatekeeperPhoneNumber);
 		}
 		else
 		{
-			NSLog(@"ERROR: Enabling the H.323 listeners failed!");
+			// enabling the H.323 listeners failed we have notify this through notifications
 		}
 	}
 	else
 	{
+		// unregistering the gatekeeper (if any)
 		setGatekeeper(NULL, NULL, NULL, NULL);
+		
+		// stopping the H.323 listening
 		enableH323Listeners(NO);
-	}	
+	}
+	
+	[self performSelectorOnMainThread:@selector(_noteSubsystemSetupDidEnd) withObject:nil waitUntilDone:NO];
+	
+	// cleaning up
+	[preferences release];
+	[autoreleasePool release];
+}
+
+- (void)_shutdownSubsystem
+{
+	[self _doSubsystemSetupWithPreferences:[[XMPreferences alloc] init]];
+	
+	[gatekeeperRegistrationCheckTimer invalidate];
+	[gatekeeperRegistrationCheckTimer release];
+	gatekeeperRegistrationCheckTimer = nil;
+}
+
+- (void)_noteSubsystemSetupDidEnd
+{	
+	if(needsSubsystemShutdownAfterSubsystemSetup == YES)
+	{
+		// we just need to change the subsystem, thus we use new
+		// XMPreferences instance
+		needsSubsystemShutdownAfterSubsystemSetup = NO;
+		[self _doSubsystemSetupWithPreferences:[[XMPreferences alloc] init]];
+	}
+	else
+	{
+		doesSubsystemSetup = NO;
+	
+			// post the notification
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndSubsystemSetup object:self];
+		
+		// in case we just went offline, we post the appropriate notification here
+		if(isOnline == NO)
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidGoOffline object:self];
+		}
+	}
 }
 
 - (void)_handleIncomingCall:(unsigned)callID 
@@ -370,18 +571,27 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 										 remoteApplication:remoteApplication
 												 callStatus:XMCallStatus_Incoming];
 	
-	[self performSelectorOnMainThread:@selector(_handleIncomingCall:)
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleIncomingCall:)
 						   withObject:info
 						waitUntilDone:NO];
 	
 	[info release];
 }
 
-- (void)_handleIncomingCall:(XMCallInfo *)callInfo
+- (void)_mainThreadHandleIncomingCall:(XMCallInfo *)callInfo
 {
 	if(activeCall != nil)
 	{
-		// do something here
+		NSLog(@"incoming call while active call != nil");
+		// This is the very rare situation that we have started a call
+		// roughly the same time as someone called us. I have serious
+		// doubts that this situation is even possible, but nevertheless
+		// it is better to threat this situation appropriate
+		[activeCall _setCallStatus:XMCallStatus_Ended];
+		[activeCall _setCallEndReason:XMCallEndReason_EndedByLocalBusy];
+		[self _storeCall:activeCall];
+		
+		// add call archive here
 		[activeCall release];
 	}
 	
@@ -402,22 +612,28 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 
 -(void)_handleCallEstablished:(unsigned)callID
 {
-	@synchronized(self)
-	{
-		if([activeCall _callID] != callID)
-		{
-			// do something here!
-			NSLog(@"callID mismatch on call established");
-			return;
-		}
-	}
-	
-	[self performSelectorOnMainThread:@selector(_handleCallEstablished) withObject:nil
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleCallEstablished:) withObject:number
 						waitUntilDone:NO];
+	[number release];
 }
 
-- (void)_handleCallEstablished
+- (void)_mainThreadHandleCallEstablished:(NSNumber *)callIDNumber
 {
+	if(activeCall == nil)
+	{
+		[NSException raise:XMException_InternalConsistencyFailure 
+					format:XMExceptionReason_CallManagerCallEstablishedInternalConsistencyFailure];
+		return;
+	}
+	
+	unsigned callID = [callIDNumber unsignedIntValue];
+	if([activeCall _callID] != callID)
+	{
+		NSLog(@"callID mismatch on call established!");
+		return;
+	}
+	
 	XMCallStatus status = [activeCall callStatus];
 	
 	if(status != XMCallStatus_Calling && status != XMCallStatus_Incoming)
@@ -461,57 +677,98 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 														object:self];
 }
 
-- (void)_handleCallCleared:(unsigned)callID withCallEndReason:(XMCallEndReason)endReason
+- (void)_handleCallCleared:(unsigned)callID withCallEndReason:(XMCallEndReason)callEndReason
+{	
+	NSNumber *callIDNumber = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSNumber *callEndReasonNumber = [[NSNumber alloc] initWithUnsignedInt:callEndReason];
+	NSArray *infoArray = [[NSArray alloc] initWithObjects:callIDNumber, callEndReasonNumber, nil];
+	
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleCallCleared:) withObject:infoArray
+						waitUntilDone:NO];
+	[callIDNumber release];
+	[callEndReasonNumber release];
+	[infoArray release];
+}
+
+- (void)_mainThreadHandleCallCleared:(NSArray *)infoArray
 {
-	if([activeCall _callID] != callID)
+	if(activeCall == nil)
 	{
-		NSLog(@"callID mismatch on call cleared");
+		// In some cases, this callback is called multiple times,
+		// therefore we return if the active call is already nil
 		return;
 	}
 	
-	NSNumber *reason = [[NSNumber alloc] initWithUnsignedInt:endReason];
+	NSNumber *callIDNumber = (NSNumber *)[infoArray objectAtIndex:0];
+	NSNumber *callEndReasonNumber = (NSNumber *)[infoArray objectAtIndex:1];
+	unsigned callID = [callIDNumber unsignedIntValue];
+	XMCallEndReason callEndReason = (XMCallEndReason)[callEndReasonNumber unsignedIntValue];
 	
-	[self performSelectorOnMainThread:@selector(_handleCallCleared:) withObject:reason
-						waitUntilDone:NO];
-	[reason release];
-}
-
-- (void)_handleCallCleared:(NSNumber *)endReason
-{
+	if([activeCall _callID] != callID)
+	{
+		NSLog(@"callID mismatch on call cleared!");
+		return;
+	}
+	
 	[activeCall _setCallStatus:XMCallStatus_Ended];
-	[activeCall _setCallEndReason:(XMCallEndReason)[endReason unsignedIntValue]];
+	[activeCall _setCallEndReason:callEndReason];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallEnd
+	[self _storeCall:activeCall];
+	
+	[activeCall release];
+	activeCall = nil;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallCleared
 														object:self];
+	
+	// In some cases, we need to change some settings in the subsystem
+	// since this cannot be done during a call, it's now time to initiate
+	// this task.
+	if(needsSubsystemSetupAfterCallEnd)
+	{
+		needsSubsystemSetupAfterCallEnd = NO;
+		[self _prepareSubsystemSetup];
+	}
+	
+	// if we just went offline and therefore terminated the call, it's
+	// time to finish the subsystem shutdown
+	if(isOnline == NO)
+	{
+		[self _shutdownSubsystem];
+	}
 }
 
 - (void)_handleMediaStreamOpened:(unsigned)callID 
 				   isInputStream:(BOOL)isInputStream 
 					 mediaFormat:(NSString *)mediaFormat
+{	
+	NSNumber *callIDNumber = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSNumber *isInputStreamNumber = [[NSNumber alloc] initWithBool:isInputStream];
+	NSArray *infoArray = [[NSArray alloc] initWithObjects:callIDNumber, isInputStreamNumber, mediaFormat, nil];
+	
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleMediaStreamOpened:) withObject:infoArray
+						waitUntilDone:NO];
+	
+	[callIDNumber release];
+	[isInputStreamNumber release];
+	[infoArray release];
+}
+
+- (void)_mainThreadHandleMediaStreamOpened:(NSArray *)infoArray
 {
+	NSNumber *callIDNumber = (NSNumber *)[infoArray objectAtIndex:0];
+	NSNumber *isInputStreamNumber = (NSNumber *)[infoArray objectAtIndex:1];
+	NSString *codecString = (NSString *)[infoArray objectAtIndex:2];
+	unsigned callID = [callIDNumber unsignedIntValue];
+	BOOL isInputStream = [isInputStreamNumber boolValue];
 	
 	if([activeCall _callID] != callID)
 	{
-		NSLog(@"callID mismatch on media stream opened");
+		NSLog(@"callID mismatch on MediaStreamOpened");
 		return;
 	}
 	
-	NSNumber *number = [[NSNumber alloc] initWithBool:isInputStream];
-	NSArray *arr = [[NSArray alloc] initWithObjects:number, mediaFormat, nil];
-	
-	[self performSelectorOnMainThread:@selector(_handleMediaStreamOpened:) withObject:arr
-						waitUntilDone:NO];
-	
-	[arr release];
-	[number release];
-}
-
-- (void)_handleMediaStreamOpened:(NSArray *)values
-{
-	BOOL isInput = [(NSNumber *)[values objectAtIndex:0] boolValue];
-	NSString *codec = (NSString *)[values objectAtIndex:1];
-	
-	if(isInput)
+	if(isInputStream)
 	{
 		NSLog(@"incoming:");
 	}
@@ -519,64 +776,115 @@ NSString *XMNotification_RemovedGatekeeper = @"XMeeting_RemovedGatekeeper";
 	{
 		NSLog(@"outgoing:");
 	}
-	NSLog(codec);
+	NSLog(codecString);
 	
-	if([codec rangeOfString:@"261"].location != NSNotFound ||
-	   [codec rangeOfString:@"263"].location != NSNotFound)
+	if([codecString rangeOfString:@"261"].location != NSNotFound ||
+	   [codecString rangeOfString:@"263"].location != NSNotFound)
 	{
 		// we have a video codec.
-		if(isInput)
+		if(isInputStream)
 		{
-			[activeCall _setOutgoingVideoCodec:codec];
+			[activeCall _setOutgoingVideoCodec:codecString];
 		}
 		else
 		{
-			[activeCall _setIncomingAudioCodec:codec];
+			[activeCall _setIncomingAudioCodec:codecString];
 		}
 	}
 	else
 	{
 		// we have an audio codec.
-		if(isInput)
+		if(isInputStream)
 		{
-			[activeCall _setOutgoingAudioCodec:codec];
+			[activeCall _setOutgoingAudioCodec:codecString];
 		}
 		else
 		{
-			[activeCall _setIncomingAudioCodec:codec];
+			[activeCall _setIncomingAudioCodec:codecString];
 		}
 	}
+}
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_DidEndFetchingExternalAddress object:nil];
+	[self _initiateSubsystemSetupWithPreferences:[activePreferences copy]];
 }
 	
 #pragma mark H.323 private methods
 
-- (void)_handleRegisteredAtGatekeeper:(NSString *)theGatekeeperName
+- (void)_handleGatekeeperRegistration:(NSString *)theGatekeeperName
 {
-	[self performSelectorOnMainThread:@selector(_mainThreadHandleRegisteredAtGatekeeper:)
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistration:)
 						   withObject:theGatekeeperName waitUntilDone:NO];
 }
 
-- (void)_mainThreadHandleRegisteredAtGatekeeper:(NSString *)theGatekeeperName
+- (void)_mainThreadHandleGatekeeperRegistration:(NSString *)theGatekeeperName
 {
-	NSLog(@"registered at gatekeeeper:");
-	NSLog(theGatekeeperName);
 	[gatekeeperName release];
 	gatekeeperName = [theGatekeeperName retain];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_RegisteredAtGatekeeper object:self];
+	// check every two minutes for gatekeeper registration
+	[gatekeeperRegistrationCheckTimer invalidate];
+	[gatekeeperRegistrationCheckTimer release];
+	gatekeeperRegistrationCheckTimer = [[NSTimer scheduledTimerWithTimeInterval:120.0 target:self 
+																	   selector:@selector(_checkGatekeeperRegistration:)
+																	   userInfo:nil repeats:YES] retain];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_GatekeeperRegistration object:self];
 }
 
-- (void)_handleRemovedGatekeeper
+- (void)_handleGatekeeperUnregistration
 {
-	[self performSelectorOnMainThread:@selector(_mainThreadhandleRemovedGatekeeper)
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeeperUnregistration)
 						   withObject:nil waitUntilDone:NO];
 }
 
-- (void)_mainThreadHandleRemovedGatekeeper
+- (void)_mainThreadHandleGatekeeperUnregistration
 {
 	[gatekeeperName release];
 	gatekeeperName = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_RemovedGatekeeper object:self];
+	[gatekeeperRegistrationCheckTimer invalidate];
+	[gatekeeperRegistrationCheckTimer release];
+	gatekeeperRegistrationCheckTimer = nil;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_GatekeeperUnregistration object:self];
 }
+
+- (void)_handleGatekeeperRegistrationFailure
+{
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistrationFailure) withObject:nil
+						waitUntilDone:NO];
+}
+
+- (void)_mainThreadHandleGatekeeperRegistrationFailure
+{
+	[gatekeeperName release];
+	gatekeeperName = nil;
+	
+	[gatekeeperRegistrationCheckTimer invalidate];
+	[gatekeeperRegistrationCheckTimer release];
+	gatekeeperRegistrationCheckTimer = nil;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_GatekeeperRegistrationFailure object:self];
+}
+
+- (void)_checkGatekeeperRegistration:(NSTimer *)timer
+{
+	if(!doesSubsystemSetup)
+	{
+		checkGatekeeperRegistration();
+	}
+}
+
+- (void)_storeCall:(XMCallInfo *)call
+{
+	if([recentCalls count] == 100)
+	{
+		[recentCalls removeObjectAtIndex:99];
+	}
+	[recentCalls insertObject:call atIndex:0];
+}
+
 @end

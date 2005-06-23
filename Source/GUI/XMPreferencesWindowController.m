@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.4 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,7 @@
 NSString *XMKey_PreferencesNibName = @"Preferences";
 NSString *XMKey_PreferencesToolbar = @"XMeeting_PreferencesToolbar";
 NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdentifier";
+NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTopLeftCorner";
 
 @interface XMPreferencesWindowController (PrivateMethods)
 
@@ -150,7 +151,19 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 		[[self window] setDocumentEdited:NO];
 		preferencesHaveChanged = NO;
 		
-		[window center];
+		NSString *windowTopLeftCornerString = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_PreferencesWindowTopLeftCorner];
+		if(windowTopLeftCornerString != nil)
+		{
+			NSPoint windowTopLeftCorner = NSPointFromString(windowTopLeftCornerString);
+			NSRect windowFrame = [window frame];
+			windowFrame.origin = windowTopLeftCorner;
+			windowFrame.origin.y -= windowFrame.size.height;
+			[window setFrame:windowFrame display:NO];
+		}
+		else
+		{
+			[window center];
+		}
 	}
 	
 	[self showWindow:self];
@@ -315,6 +328,17 @@ NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdenti
 	}
 	
 	return YES;
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+	/* storing the preference window's top left corner */
+	NSRect windowFrame = [[self window] frame];
+	NSPoint topLeftWindowCorner = windowFrame.origin;
+	topLeftWindowCorner.y += windowFrame.size.height;
+	NSString *topLeftWindowCornerString = NSStringFromPoint(topLeftWindowCorner);
+	[[NSUserDefaults standardUserDefaults] setObject:topLeftWindowCornerString
+											  forKey:XMKey_PreferencesWindowTopLeftCorner];
 }
 
 #pragma mark ModalDelegate Methods

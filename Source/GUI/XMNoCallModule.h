@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.3 2005/06/01 08:51:44 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.4 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,7 @@
  * application is not in a call.
  **/
 @interface XMNoCallModule : NSObject <XMMainWindowModule> {
+	
 	// XMMainWindowModule Outlets and variables
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;
@@ -40,6 +41,8 @@
 	
 	XMCallAddressManager *callAddressManager;
 	XMPreferencesManager *preferencesManager;
+	
+	BOOL isCalling;
 }
 
 - (IBAction)call:(id)sender;

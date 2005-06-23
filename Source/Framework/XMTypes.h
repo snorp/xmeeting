@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.4 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,21 +10,21 @@
 #define __XM_TYPES_H__
 
 /**
- * This header provides important enumerations used within the
- * framework
+ * This header provides important enumerations, exceptions, notifications
+ * and NSString keys used within the framework
  **/
 
+#pragma mark Enumerations
+
 /**
- * Defines the various VideoSizes which are supported
- * by the framework
+ * Defines the possible results of a NAT detection operation
  **/
-typedef enum XMVideoSize
+typedef enum XMNATDetectionResult
 {
-	XMVideoSize_NoVideo = 0,
-	XMVideoSize_QCIF,
-	XMVideoSize_CIF,
-	XMVideoSizeCount
-} XMVideoSize;
+	XMNATDetectionResult_Error = 0,
+	XMNATDetectionResult_NoNAT,
+	XMNATDetectionResult_HasNAT
+} XMNATDetectionResult;
 
 /**
  * Defines all available call protocols
@@ -98,6 +98,18 @@ typedef enum XMListenerStatus
 	XMListenerStatus_InCall,
 	XMListenerStatusCount
 } XMListenerStatus;
+
+/**
+ * Defines the various VideoSizes which are supported
+ * by the framework
+ **/
+typedef enum XMVideoSize
+{
+	XMVideoSize_NoVideo = 0,
+	XMVideoSize_QCIF,
+	XMVideoSize_CIF,
+	XMVideoSizeCount
+} XMVideoSize;
 
 /**
  * Defines which part of a record matched a search operation in the address book

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,11 +20,11 @@
  *
  * Therefore, this file provides a couple of c++ functions which can
  * safely be called by the Cocoa-part of the code and which bridge over
- * to PWLib. This approach does work around big hacks and has the
+ * to PWLib/OPAL. This approach does work around big hacks and has the
  * advantage that it generates a clear interface centered in one file
  * without adding too much overhead.
  * However, this apporach requires a good MemoryManagement policy in order not
- * to waste memory through leaks. Above each function is defined who is
+ * to leak memory. Above each function is defined who is
  * responsible for the memory management if there is any memory to manage.
  **/
 
@@ -41,6 +41,12 @@
  * It is safe to call initOPAL() multiple times.
  **/
 void initOPAL();
+
+/**
+ * Used by XMCallManager to allow preferences initialization
+ * in a separate thread
+ **/
+void initiateSubsystemSetup(void *preferences);
 
 #pragma mark Call Management functions
 
@@ -136,12 +142,6 @@ bool setSelectedAudioInputDevice(const char *device);
 const char *getSelectedAudioOutputDevice();
 bool setSelectedAudioOutputDevice(const char *device);
 
-unsigned getAudioInputVolume();
-bool setAudioInputVolume(unsigned value);
-
-unsigned getAudioOutputVolume();
-bool setAudioOutputVolume(unsigned value);
-
 unsigned getAudioBufferSize();
 void setAudioBufferSize(unsigned value);
 
@@ -181,6 +181,11 @@ void setH323Functionality(bool enableFastStart, bool enableH245Tunnel);
  * sets up the gatekeeper. If all variables are NULL, no gatekeeper is used
  **/
 bool setGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber);
+
+/**
+ * Checks whether we still are registered at gatekeeper or not.
+ **/
+void checkGatekeeperRegistration();
 
 #pragma mark SIP Setup Functions
 

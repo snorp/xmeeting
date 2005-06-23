@@ -2,9 +2,14 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {clearCall = id; }; 
             CLASS = XMInCallModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {
+                contentView = NSView; 
+                hangupButton = NSButton; 
+                remotePartyField = NSTextField; 
+            }; 
             SUPERCLASS = NSObject; 
         }
     ); 

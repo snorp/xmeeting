@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.4 2005/05/31 14:59:34 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,8 @@ NSString *XMNotification_ActiveLocationDidChange = @"XMeeting_ActiveLocationDidC
 
 NSString *XMKey_Locations = @"XMeeting_Locations";
 NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
+NSString *XMKey_AutoAnswerCalls = @"XMeeting_AutoAnswerCalls";
+NSString *XMKey_UserName = @"XMeeting_UserName";
 
 @interface XMPreferencesManager (PrivateMethods)
 

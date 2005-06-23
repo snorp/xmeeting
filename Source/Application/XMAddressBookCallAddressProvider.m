@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.1 2005/06/01 08:51:41 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -135,7 +135,7 @@
 		{
 			return nil;
 		}
-		NSString *callAddress = [self humanReadableCallAddress];
+		NSString *callAddress = [record humanReadableCallAddress];
 		return [NSString stringWithFormat:@"%@ <%@>", companyName, callAddress];
 	}
 	else

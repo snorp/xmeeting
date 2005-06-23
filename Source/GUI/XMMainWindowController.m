@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.2 2005/05/31 14:59:52 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.3 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,11 +8,10 @@
 
 
 #import "XMMainWindowController.h"
-#import "XMMainWindowModule.h"
-#import "XMMainWindowBottomModule.h"
 #import "XMMouseOverButton.h"
 
-NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
+NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
+NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 
 @interface XMMainWindowController (PrivateMethods)
 
@@ -22,9 +21,9 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 - (void)windowDidMove:(NSNotification *)notif;
 
 - (void)_showMainModuleAtIndex:(unsigned)index;
-- (void)_showBottomModuleAtIndex:(unsigned)index;
-- (void)_showSeparateWindowWithBottomModuleAtIndex:(unsigned)index;
-- (void)_layoutBottomButtons;
+- (void)_showAdditionModuleAtIndex:(unsigned)index;
+- (void)_showSeparateWindowWithAdditionModuleAtIndex:(unsigned)index;
+- (void)_layoutAdditionButtons;
 
 @end
 
@@ -55,7 +54,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	self = [super initWithWindowNibName:@"MainWindow"];
 	
 	mainModules = [[NSMutableArray alloc] initWithCapacity:2];
-	bottomModules = [[NSMutableArray alloc] initWithCapacity:3];
+	additionModules = [[NSMutableArray alloc] initWithCapacity:3];
 	bottomButtons = [[NSMutableArray alloc] initWithCapacity:3];
 	separateWindows = [[NSMutableArray alloc] initWithCapacity:3];
 	
@@ -65,7 +64,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 - (void)dealloc
 {
 	[mainModules release];
-	[bottomModules release];
+	[additionModules release];
 	[bottomButtons release];
 	[separateWindows release];
 	
@@ -80,7 +79,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	
 	[bottomContentDisclosure setState:NSOffState];
 	currentSelectedBottomModuleIndex = 0;
-	[self _showBottomModuleAtIndex:UINT_MAX];
+	[self _showAdditionModuleAtIndex:UINT_MAX];
 	
 	/* arranging the bottom content buttons */
 	unsigned count = [bottomButtons count];
@@ -97,7 +96,26 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 		[separatorContentBox addSubview:button];
 		[button setFrame:rect];
 		x += rect.size.width;	// stacking the buttons in a row
-	}	
+	}
+	
+	NSWindow *window = [self window];
+	NSString *windowTopLeftCornerString = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_MainWindowTopLeftCorner];
+	if(windowTopLeftCornerString != nil)
+	{
+		NSPoint windowTopLeftCorner = NSPointFromString(windowTopLeftCornerString);
+		NSRect windowFrame = [window frame];
+		windowFrame.origin = windowTopLeftCorner;
+		windowFrame.origin.y -= windowFrame.size.height;
+		[window setFrame:windowFrame display:NO];
+	}
+	
+	/* Setting up the localAudioVideo drawer */
+	NSView *contentView = [localAudioVideoDrawer contentView];
+	NSSize contentSize = [contentView bounds].size;
+	[localAudioVideoDrawer setMaxContentSize:contentSize];
+	[localAudioVideoDrawer setMinContentSize:contentSize];
+	[localAudioVideoDrawer setContentSize:contentSize];
+	[self toggleShowLocalAudioVideoDrawer:self];
 }
 
 #pragma mark Action Methods
@@ -107,7 +125,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	[self showWindow:self];
 }
 
-- (IBAction)toggleShowBottomContentView:(id)sender
+- (IBAction)toggleShowAdditionContentView:(id)sender
 {
 	unsigned index;
 	
@@ -119,11 +137,11 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	{
 		index = currentSelectedBottomModuleIndex;
 	}
-	[self _showBottomModuleAtIndex:index];
+	[self _showAdditionModuleAtIndex:index];
 	
 }
 
-- (IBAction)bottomContentButtonAction:(id)sender
+- (IBAction)additionContentButtonAction:(id)sender
 {
 	int tag = [sender tag];
 	
@@ -131,7 +149,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	
 	if((id)window == (id)[NSNull null])
 	{
-		[self _showBottomModuleAtIndex:tag];
+		[self _showAdditionModuleAtIndex:tag];
 	}
 	else
 	{
@@ -141,9 +159,9 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	}
 }
 
-- (IBAction)showBottomModuleInSeparateWindow:(id)sender
+- (IBAction)showAdditionModuleInSeparateWindow:(id)sender
 {
-	[self _showSeparateWindowWithBottomModuleAtIndex:currentSelectedBottomModuleIndex];
+	[self _showSeparateWindowWithAdditionModuleAtIndex:currentSelectedBottomModuleIndex];
 	
 	unsigned i;
 	unsigned count = [separateWindows count];
@@ -154,13 +172,26 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 		
 		if(object == [NSNull null])
 		{
-			[self _showBottomModuleAtIndex:i];
+			[self _showAdditionModuleAtIndex:i];
 			return;
 		}
 	}
 	
-	[self _showBottomModuleAtIndex:UINT_MAX];
+	[self _showAdditionModuleAtIndex:UINT_MAX];
 	[bottomContentDisclosure setEnabled:NO];
+}
+
+- (void)toggleShowLocalAudioVideoDrawer:(id)sender
+{
+	int state = [localAudioVideoDrawer state];
+	if(state == NSDrawerClosedState)
+	{
+		[localAudioVideoDrawer openOnEdge:NSMaxXEdge];
+	}
+	else if(state == NSDrawerOpenState)
+	{
+		[localAudioVideoDrawer close];
+	}
 }
 
 #pragma mark Module Methods
@@ -170,10 +201,21 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	[mainModules addObject:module];
 }
 
-- (void)addBottomModule:(id<XMMainWindowBottomModule>)module
+- (void)showMainModule:(id<XMMainWindowModule>)module
+{
+	unsigned index = [mainModules indexOfObject:module];
+	
+	if(index == NSNotFound)
+	{
+		return;
+	}
+	[self _showMainModuleAtIndex:index];
+}
+
+- (void)addAdditionModule:(id<XMMainWindowAdditionModule>)module
 {
 	// adding the module
-	[bottomModules addObject:module];
+	[additionModules addObject:module];
 	
 	// creating a new button for this module and adding it to the array
 	XMMouseOverButton *button = [[XMMouseOverButton alloc] initWithFrame:NSMakeRect(0,0,0,0)];
@@ -184,7 +226,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	[[button cell] setFont:[NSFont controlContentFontOfSize:9]];
 	[button sizeToFit];
 	[button setTarget:self];
-	[button setAction:@selector(bottomContentButtonAction:)];
+	[button setAction:@selector(additionContentButtonAction:)];
 	[button setTag:[bottomButtons count]];
 	[bottomButtons addObject:button];
 	[button release];
@@ -193,32 +235,62 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	[separateWindows addObject:[NSNull null]];
 }
 
-#pragma mark Delegate Methods
-
-- (void)windowWillClose:(NSNotification *)notif
+- (void)showAdditionModule:(id<XMMainWindowAdditionModule>)module
 {
-	NSWindow *windowToClose = (NSWindow *)[notif object];
-	unsigned index = [separateWindows indexOfObject:windowToClose];
+	unsigned index = [additionModules indexOfObject:module];
 	
 	if(index == NSNotFound)
 	{
 		return;
 	}
+	[self _showAdditionModuleAtIndex:index];
+}
+
+#pragma mark NSWindow Delegate Methods
+
+- (void)windowWillClose:(NSNotification *)notif
+{
+	NSWindow *windowToClose = (NSWindow *)[notif object];
 	
-	[separateWindows replaceObjectAtIndex:index withObject:[NSNull null]];
-	
-	if([bottomContentDisclosure isEnabled] == NO)
+	if(windowToClose == [self window])
 	{
-		[bottomContentDisclosure setEnabled:YES];
+		/* storing the preference window's top left corner */
+		NSRect windowFrame = [[self window] frame];
+		NSPoint topLeftWindowCorner = windowFrame.origin;
+		topLeftWindowCorner.y += windowFrame.size.height;
+		NSString *topLeftWindowCornerString = NSStringFromPoint(topLeftWindowCorner);
+		[[NSUserDefaults standardUserDefaults] setObject:topLeftWindowCornerString
+												  forKey:XMKey_MainWindowTopLeftCorner];
+	}
+	else
+	{
+		unsigned index = [separateWindows indexOfObject:windowToClose];
+	
+		if(index == NSNotFound)
+		{
+			return;
+		}
+	
+		[separateWindows replaceObjectAtIndex:index withObject:[NSNull null]];
+	
+		if([bottomContentDisclosure isEnabled] == NO)
+		{
+			[bottomContentDisclosure setEnabled:YES];
 		
-		currentSelectedBottomModuleIndex = index;
+			currentSelectedBottomModuleIndex = index;
+		}
 	}
 }
 
 - (void)windowDidMove:(NSNotification *)notif
 {
 	NSWindow *window = [notif object];
-	NSString *name = [[NSString alloc] initWithFormat:windowSaveNameFormat, [window title]];
+	
+	if(window == [self window])
+	{
+		return;
+	}
+	NSString *name = [[NSString alloc] initWithFormat:XMKey_WindowSaveNameFormat, [window title]];
 	[window saveFrameUsingName:name];
 	[name release];
 }
@@ -273,7 +345,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	}
 }
 
-- (void)_showBottomModuleAtIndex:(unsigned)index
+- (void)_showAdditionModuleAtIndex:(unsigned)index
 {
 	NSWindow *window;
 	NSRect windowFrame;
@@ -301,7 +373,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	// we are expanding
 	if(index != UINT_MAX)
 	{
-		id<XMMainWindowBottomModule> module = [bottomModules objectAtIndex:index];
+		id<XMMainWindowAdditionModule> module = [additionModules objectAtIndex:index];
 		[module prepareForDisplay];
 		
 		bottomIsExpanded = YES;
@@ -368,9 +440,9 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	}
 }
 
-- (void)_showSeparateWindowWithBottomModuleAtIndex:(unsigned)index
+- (void)_showSeparateWindowWithAdditionModuleAtIndex:(unsigned)index
 {
-	id<XMMainWindowBottomModule> module = (id<XMMainWindowBottomModule>)[bottomModules objectAtIndex:index];
+	id<XMMainWindowAdditionModule> module = (id<XMMainWindowAdditionModule>)[additionModules objectAtIndex:index];
 	NSView *contentView = [module contentView];
 	NSNumber *number;
 	NSSize contentSize = [module contentViewSize];
@@ -384,7 +456,7 @@ NSString *windowSaveNameFormat = @"XMeetingBottomModule<%@>WindowFrame";
 	[separateWindow setTitle:[module name]];
 	[separateWindow setContentView:contentView];
 	
-	NSString *windowSaveName = [[NSString alloc] initWithFormat:windowSaveNameFormat, [module name]];
+	NSString *windowSaveName = [[NSString alloc] initWithFormat:XMKey_WindowSaveNameFormat, [module name]];
 	if(![separateWindow setFrameUsingName:windowSaveName force:YES])
 	{
 		[separateWindow center];

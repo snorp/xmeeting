@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowModule.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMMainWindowModule.h,v 1.2 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,8 +8,6 @@
 
 #ifndef __XM_MAIN_WINDOW_MODULE_H__
 #define __XM_MAIN_WINDOW_MODULE_H__
-
-#import "XMMainWindowController.h"
 
 /**
  * This protocol declares the necessary methods required for a 
@@ -52,21 +50,6 @@
  * Informs the module that it's content view is going to be displayed on screen
  **/
 - (void)prepareForDisplay;
-
-@end
-
-/**
- * Declares the methods implemented by XMMainWindowController
- * to ensure proper two-way communication between the module
- * and the main window controller.
- **/
-@interface XMMainWindowController (MainModuleMethods)
-
-/**
- * Adds module to the main window module list of the 
- * receiver
- **/
-- (void)addMainModule:(id<XMMainWindowModule>)module;
 
 @end
 

@@ -5,46 +5,46 @@
 	<key>XMeeting_AudioCodecs</key>
 	<array>
 		<dict>
-			<key>XMeeting_CodecBandwidth</key>
+			<key>XMeeting_Bandwidth</key>
 			<string>Another Bandwidth</string>
-			<key>XMeeting_CodecKey</key>
+			<key>XMeeting_Identifier</key>
 			<string>g.711-ulaw</string>
-			<key>XMeeting_CodecName</key>
+			<key>XMeeting_Name</key>
 			<string>G.711- uLaw</string>
-			<key>XMeeting_CodecQuality</key>
+			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>
 		<dict>
-			<key>XMeeting_CodecBandwidth</key>
+			<key>XMeeting_Bandwidth</key>
 			<string>Some Bandwidth</string>
-			<key>XMeeting_CodecKey</key>
+			<key>XMeeting_Identifier</key>
 			<string>g.711-alaw</string>
-			<key>XMeeting_CodecName</key>
+			<key>XMeeting_Name</key>
 			<string>G.711-ALaw</string>
-			<key>XMeeting_CodecQuality</key>
+			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>
 	</array>
 	<key>XMeeting_VideoCodecs</key>
 	<array>
 		<dict>
-			<key>XMeeting_CodecBandwidth</key>
+			<key>XMeeting_Bandwidth</key>
 			<string>Sure!</string>
-			<key>XMeeting_CodecKey</key>
+			<key>XMeeting_Identifier</key>
 			<string>h.263</string>
-			<key>XMeeting_CodecName</key>
+			<key>XMeeting_Name</key>
 			<string>H.263</string>
-			<key>XMeeting_CodecQuality</key>
+			<key>XMeeting_Quality</key>
 			<string>Superior</string>
 		</dict>
 		<dict>
-			<key>XMeeting_CodecBandwidth</key>
+			<key>XMeeting_Bandwidth</key>
 			<string>Not interesting</string>
-			<key>XMeeting_CodecKey</key>
+			<key>XMeeting_Identifier</key>
 			<string>h.261</string>
-			<key>XMeeting_CodecName</key>
+			<key>XMeeting_Name</key>
 			<string>H.261</string>
-			<key>XMeeting_CodecQuality</key>
+			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>
 	</array>

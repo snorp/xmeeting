@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.4 2005/06/01 11:00:37 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.5 2005/06/23 12:35:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,17 +16,21 @@
 @interface XMNoCallModule (PrivateMethods)
 
 - (void)_preferencesDidChange:(NSNotification *)notif;
-- (void)_didInitiateCall:(NSNotification *)notif;
+- (void)_didStartSubsystemSetup:(NSNotification *)notif;
+- (void)_didEndSubsystemSetup:(NSNotification *)notif;
+- (void)_didStartCalling:(NSNotification *)notif;
+- (void)_callCleared:(NSNotification *)notif;
 
-- (NSArray *)_searchMatchesForString:(NSString *)string;
+- (void)_displayListeningStatusFieldInformation;
 
 @end
 
-@interface XMAddressBookRecordSearchMatch (XMCallAddressWrapperMethods)
+@interface XMManualAddressURL : XMURL <XMCallAddress>
+{
+	NSString *address;
+}
 
-- (XMURL *)url;
-- (NSString *)displayString;
-- (NSImage *)displayImage;
+- (id)_initWithAddress:(NSString *)address;
 
 @end
 
@@ -44,6 +48,10 @@
 	
 	callAddressManager = [[XMCallAddressManager sharedInstance] retain];
 	preferencesManager = [[XMPreferencesManager sharedInstance] retain];
+	
+	isCalling = NO;
+	
+	return self;
 }
 
 - (void)dealloc
@@ -69,9 +77,22 @@
 	[self _preferencesDidChange:nil];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_preferencesDidChange:)
-												 name:XMNotification_PreferencesDidChange object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didInitiateCall:)
-												 name:XMNotification_CallAddressManagerDidInitiateCall
+												 name:XMNotification_PreferencesDidChange 
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+												 name:XMNotification_DidEndFetchingExternalAddress
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartSubsystemSetup:)
+												 name:XMNotification_DidStartSubsystemSetup
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndSubsystemSetup:)
+												 name:XMNotification_DidEndSubsystemSetup
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartCalling:)
+												 name:XMNotification_DidStartCalling
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
+												 name:XMNotification_CallCleared
 											   object:nil];
 }
 
@@ -115,10 +136,26 @@
 
 - (IBAction)call:(id)sender
 {
+	if(isCalling == YES)
+	{
+		// we are calling someone but the call has not yet been established
+		// therefore, we simply hang up the call again
+		[[XMCallManager sharedInstance] clearActiveCall];
+	}
+	
+	[callAddressField endEditing];
+	id<XMCallAddress> callAddress = (id<XMCallAddress>)[callAddressField representedObject];
+	if(callAddress == nil)
+	{
+		NSLog(@"ERROR: NO REPRESENTED OBJECT!");
+		return;
+	}
+	[callAddressManager makeCallToAddress:callAddress];
 }
 
 - (IBAction)changeActiveLocation:(id)sender
 {
+	NSLog(@"change");
 	unsigned selectedIndex = [locationsPopUp indexOfSelectedItem];
 	[[XMPreferencesManager sharedInstance] activateLocationAtIndex:selectedIndex];
 }
@@ -136,10 +173,42 @@
 	[locationsPopUp selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
 }
 
-- (void)_didInitiateCall:(NSNotification *)notif
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	[self _displayListeningStatusFieldInformation];
+}
+
+- (void)_didStartSubsystemSetup:(NSNotification *)notif
+{
+	[locationsPopUp setEnabled:NO];
+	[callButton setEnabled:NO];
+}
+
+- (void)_didEndSubsystemSetup:(NSNotification *)notif
+{
+	[locationsPopUp setEnabled:YES];
+	[callButton setEnabled:YES];
+	[self _displayListeningStatusFieldInformation];
+}
+
+- (void)_didStartCalling:(NSNotification *)notif
 {
 	id<XMCallAddress> activeCallAddress = [callAddressManager activeCallAddress];
 	[callAddressField setRepresentedObject:activeCallAddress];
+	[locationsPopUp setEnabled:NO];
+	[callButton setTitle:NSLocalizedString(@"Hangup", @"")];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Calling...", @"")];
+	[statusFieldTwo setStringValue:@""];
+	
+	isCalling = YES;
+}
+
+- (void)_callCleared:(NSNotification *)notif
+{
+	[locationsPopUp setEnabled:YES];
+	[callButton setTitle:NSLocalizedString(@"Call", @"")];
+	[self _displayListeningStatusFieldInformation];
+	isCalling = NO;
 }
 
 #pragma mark Call Address XMDatabaseComboBox Data Source Methods
@@ -199,7 +268,8 @@
 	
 	if(index == NSNotFound)
 	{
-		return nil;
+		XMManualAddressURL *manualAddressURL = [[[XMManualAddressURL alloc] _initWithAddress:completedString] autorelease];
+		return manualAddressURL;
 	}
 	return [matchedAddresses objectAtIndex:index];
 }
@@ -216,27 +286,98 @@
 	return image;
 }
 
+#pragma mark Private Methods
+
+- (void)_displayListeningStatusFieldInformation
+{
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	BOOL isH323Listening = [callManager isH323Listening];
+	
+	if(!isH323Listening)
+	{
+		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
+		[statusFieldTwo setStringValue:@""];
+		return;
+	}
+		
+	XMUtils *utils = [XMUtils sharedInstance];
+	NSString *externalAddress = [utils externalAddress];
+	NSString *localAddress = [utils localAddress];
+		
+	if(localAddress == nil)
+	{
+		[statusFieldOne setStringValue:NSLocalizedString(@"Offline (No Network Address)", @"")];
+		[statusFieldTwo setStringValue:@""];
+		return;
+	}
+		
+	[statusFieldOne setStringValue:NSLocalizedString(@"Waiting for incoming calls", @"")];
+	
+	if(externalAddress == nil || [externalAddress isEqualToString:localAddress])
+	{
+		NSString *displayFormat = NSLocalizedString(@"ip: %@", @"");
+		NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, localAddress];
+		[statusFieldTwo setStringValue:displayString];
+		[displayString release];
+	}
+	else
+	{
+		NSString *displayFormat = NSLocalizedString(@"ip: %@ (%@)", @"");
+		NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, localAddress, externalAddress];
+		[statusFieldTwo setStringValue:displayString];
+		[displayString release];
+	}
+}
+
 @end
 
-/**
- * Implementing the XMCallAddressWrapper category methods for
- * XMAddressBookRecordSearchMatch
- **/
-@implementation XMAddressBookRecordSearchMatch (XMCallAddressWrapperMethods)
+@implementation XMManualAddressURL
+
+- (id)_initWithAddress:(NSString *)theAddress
+{
+	address = [theAddress copy];
+	
+	return self;
+}
+
+- (XMCallProtocol)callProtocol
+{
+	return XMCallProtocol_H323;
+}
+
+- (NSString *)address
+{
+	return address;
+}
+
+- (unsigned)port
+{
+	return 0;
+}
+
+- (NSString *)humanReadableRepresentation
+{
+	return [self address];
+}
+
+- (id<XMCallAddressProvider>)provider
+{
+	return nil;
+}
 
 - (XMURL *)url
 {
-	return [[self record] callURL];
+	return self;
 }
 
 - (NSString *)displayString
 {
-	return [[self record] displayName];
+	return [self address];
 }
 
 - (NSImage *)displayImage
 {
-	return [NSImage imageNamed:@"AddressBook"];
+	return nil;
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.h,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,12 +11,6 @@
 
 #import <Foundation/Foundation.h>
 
-/*
- * Notifications posted by XMAudioManager
- */
-extern NSString *XMNotification_InputVolumeDidChange;
-extern NSString *XMNotification_OutputVolumeDidChange;
-
 /**
  * XMAudioManager provides the interface for accessing all audio-related
  * informations.
@@ -24,51 +18,62 @@ extern NSString *XMNotification_OutputVolumeDidChange;
  * and volume control.
  **/
 @interface XMAudioManager : NSObject {
-	NSArray *audioInputDevices;
-	NSArray *audioOutputDevices;
-	id delegate;
+	NSArray *inputDevices;
+	NSArray *outputDevices;
+	NSString *selectedInputDevice;
+	NSString *selectedOutputDevice;
+	
+	NSString *noDeviceName;
+	NSString *unknownDeviceName;
+	
+	unsigned unmutedInputVolume;
+	unsigned unmutedOutputVolume;
 }
 
-/*
+/**
  * Returns the shared singleton instance of XMAudioManager
- */
+ **/
 + (XMAudioManager *)sharedInstance;
 
-/*
+/**
  * makes XMAudioManager to refresh it's device lists
  * in order to detect newly attached devices or the 
  * removal of devices
- */
+ **/
 - (void)updateDeviceLists;
 
-/*
+/**
  * lists the available devices
- */
+ **/
 - (NSArray *)inputDevices;
 - (NSString *)defaultInputDevice;
 
 - (NSArray *)outputDevices;
 - (NSString *)defaultOutputDevice;
 
-/*
- * Controlling audio input
- */
+/**
+ * Controlling selected devices
+ **/
 - (NSString *)selectedInputDevice;
-- (void)setSelectedInputDevice:(NSString *)str;
-
-// volume is between 0 and 100
-- (unsigned)inputVolume;
-- (void)setInputVolume:(unsigned)vol;
-
-/*
- * Controlling audio output
- */
+- (BOOL)setSelectedInputDevice:(NSString *)str;
 - (NSString *)selectedOutputDevice;
-- (void)setSelectedOutputDevice:(NSString *)str;
+- (BOOL)setSelectedOutputDevice:(NSString *)str;
 
-// volume is between 0 and 100
+/**
+ * Controlling volume
+ * Volume is between 0 and 100
+ **/
+- (BOOL)canAlterInputVolume;
+- (unsigned)inputVolume;
+- (BOOL)setInputVolume:(unsigned)vol;
+- (BOOL)mutesInputVolume;
+- (BOOL)setMutesInputVolume:(BOOL)muteVolume;
+
+- (BOOL)canAlterOutputVolume;
 - (unsigned)outputVolume;
-- (void)setOutputVolume:(unsigned)vol;
+- (BOOL)setOutputVolume:(unsigned)vol;
+- (BOOL)mutesOutputVolume;
+- (BOOL)setMutesOutputVolume:(BOOL)muteVolume;
 
 @end
 

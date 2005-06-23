@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.1 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,9 @@
 #define __XM_CALL_HISTORY_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowBottomModule.h"
+#import "XMMainWindowAdditionModule.h"
 
-@interface XMCallHistoryModule : NSObject <XMMainWindowBottomModule> {
+@interface XMCallHistoryModule : NSObject <XMMainWindowAdditionModule> {
 	
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;

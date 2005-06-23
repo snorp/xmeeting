@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.mm,v 1.4 2005/06/02 08:23:16 hfriederich Exp $
+ * $Id: XMCallbackBridge.mm,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,14 +12,10 @@
 #import "XMPrivate.h"
 #import "XMCallInfo.h"
 
-void audioInputVolumeDidChange(unsigned volume)
+void doSubsystemSetup(void *preferencesPointer)
 {
-	[[XMAudioManager sharedInstance] _inputVolumeDidChange:volume];
-}
-
-void audioOutputVolumeDidChange(unsigned volume)
-{
-	[[XMAudioManager sharedInstance] _outputVolumeDidChange:volume];
+	XMPreferences *preferences = (XMPreferences *)preferencesPointer;
+	[[XMCallManager sharedInstance] _doSubsystemSetupWithPreferences:preferences];
 }
 
 void noteIncomingCall(unsigned callID, 
@@ -86,15 +82,19 @@ bool getVideoFrame(void *buffer, unsigned *bytesReturned)
 
 #pragma mark H.323 specific Callbacks
 
-void noteRegisteredAtGatekeeper(const char *gatekeeperName)
+void noteGatekeeperRegistration(const char *gatekeeperName)
 {
 	NSString *name = [[NSString alloc] initWithCString:gatekeeperName];
-	[[XMCallManager sharedInstance] _handleRegisteredAtGatekeeper:name];
+	[[XMCallManager sharedInstance] _handleGatekeeperRegistration:name];
 	[name release];
 }
 
-void noteRemovedGatekeeper()
+void noteGatekeeperUnregistration()
 {
-	[[XMCallManager sharedInstance] _handleRemovedGatekeeper];
+	[[XMCallManager sharedInstance] _handleGatekeeperUnregistration];
 }
 
+void noteGatekeeperRegistrationFailure()
+{
+	[[XMCallManager sharedInstance] _handleGatekeeperRegistrationFailure];
+}
