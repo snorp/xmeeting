@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,10 +18,16 @@
 #include "XMH323EndPoint.h"
 
 #pragma mark Init & Deallocation
+
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager)
 {
 	isListening = FALSE;
+	
+	remoteName = "";
+	remoteNumber = "";
+	remoteAddress = "";
+	remoteApplication = "";
 }
 
 XMH323EndPoint::~XMH323EndPoint()
@@ -38,7 +44,6 @@ BOOL XMH323EndPoint::EnableListeners(BOOL flag)
 		
 		if(isListening == FALSE)
 		{
-			cout << GetDefaultListeners() << endl;
 			result = StartListeners(GetDefaultListeners());
 			if(result == TRUE)
 			{
@@ -132,6 +137,20 @@ void XMH323EndPoint::CheckGatekeeperRegistration()
 	}
 }
 
+#pragma mark Getting call information
+
+void XMH323EndPoint::GetCallInformation(PString & theRemoteName,
+										PString & theRemoteNumber,
+										PString & theRemoteAddress,
+										PString & theRemoteApplication)
+{
+	theRemoteName = remoteName;
+	theRemoteNumber = remoteNumber;
+	theRemoteAddress = remoteAddress;
+	theRemoteApplication = remoteApplication;
+}
+										
+
 #pragma mark Overriding Callbacks
 
 void XMH323EndPoint::OnRegistrationConfirm()
@@ -142,4 +161,31 @@ void XMH323EndPoint::OnRegistrationConfirm()
 void XMH323EndPoint::OnRegistrationReject()
 {
 	cout << "OnRegistrationReject()" << endl;
+}
+
+void XMH323EndPoint::OnEstablished(OpalConnection & connection)
+{
+	cout << "XMH323EndPoint::OnEstablished()" << endl;
+	remoteName = connection.GetRemotePartyName();
+	remoteNumber = connection.GetRemotePartyNumber();
+	remoteAddress = connection.GetRemotePartyAddress();
+	remoteApplication = connection.GetRemoteApplication();
+	
+	H323EndPoint::OnEstablished(connection);
+}
+
+void XMH323EndPoint::OnReleased(OpalConnection & connection)
+{
+	cout << "XMH323EndPoint::OnReleased()" << endl;
+	
+	remoteName = "";
+	remoteNumber = "";
+	remoteAddress = "";
+	remoteApplication = "";
+	
+	H323EndPoint::OnReleased(connection);
+	
+	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+	XMCallEndReason endReason = (XMCallEndReason)connection.GetCall().GetCallEndReason();
+	noteCallCleared(callID, endReason);
 }

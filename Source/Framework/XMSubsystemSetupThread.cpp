@@ -1,5 +1,5 @@
 /*
- * $Id: XMSubsystemSetupThread.cpp,v 1.1 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMSubsystemSetupThread.cpp,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,7 +18,6 @@ XMSubsystemSetupThread::XMSubsystemSetupThread(void *thePreferences)
 
 XMSubsystemSetupThread::~XMSubsystemSetupThread()
 {
-	cout << "destructor" << endl;
 }
 
 void XMSubsystemSetupThread::Main()

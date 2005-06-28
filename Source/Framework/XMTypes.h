@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -130,7 +130,9 @@ typedef enum XMAddressBookRecordPropertyMatch
  **/
 typedef enum XMURLType
 {
-	XMURLType_Callto = 0,
+	XMURLType_GeneralPurposeURL = 0,
+	XMURLType_H323URL,
+	XMURLType_CalltoURL,
 	XMURLTypeCount
 } XMURLType;
 

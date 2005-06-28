@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,13 +12,10 @@
 #import <Foundation/Foundation.h>
 #import "XMTypes.h"
 
-@class XMCodecListRecord;
-
-#pragma mark XMCodecListRecord - Keys
-
+@class XMPreferencesCodecListRecord;
 
 /**
-* This class encapsulates all setting options which affect
+ * This class encapsulates all setting options which affect
  * the call behaviour both for H.323/SIP.
  * Instances of this class are passed to XMCallManager
  * to setup the underlying OPAL system.
@@ -49,7 +46,7 @@
 	unsigned	 udpPortMax;					// The upper limit of the udp port range
 
 	/* audio settings */
-	NSMutableArray *audioCodecPreferenceList;	// An array containing XMCodecListRecord instances.
+	NSMutableArray *audioCodecList;				// An array containing XMCodecListRecord instances.
 	unsigned	 audioBufferSize;				// The number of audio packets to buffer. 
 
 	/* video settings */
@@ -57,7 +54,7 @@
 	BOOL		 enableVideoTransmit;			// Enables/disables video sending
 	unsigned	 videoFramesPerSecond;			// Framerate for sent video
 	XMVideoSize	 videoSize;						// The preferred video size for sent video
-	NSMutableArray *videoCodecPreferenceList;	// An array containing XMCodecListRecord instances
+	NSMutableArray *videoCodecList;				// An array containing XMCodecListRecord instances
 
 	/* H.323-specific settings */
 	BOOL		 enableH323;				// Flag to indicate whether H.323 is active or not
@@ -71,6 +68,7 @@
 }
 
 #pragma mark Init & Representation Methods
+
 /**
  * designated initializer. All settings are pre-set to the most reasonable values
  **/
@@ -88,6 +86,23 @@
  * fill in additional informations etc.
  **/
 - (NSMutableDictionary *)dictionaryRepresentation;
+
+#pragma mark accessing the properties through keys
+
+/**
+ * Returns an object containing the value defined with
+ * key. For a list of valid keys, have a look at
+ * XMStringConstants.h
+ **/
+- (id)valueForKey:(NSString *)key;
+
+/**
+ * Allows to set the value associated with key.
+ * Please note that the codecLists cannot be
+ * set directly. Attempts to do so will result
+ * in an exception being raised.
+ **/
+- (void)setValue:(id)value forKey:(NSString *)key;
 
 #pragma mark Methods for General Settings
 
@@ -122,12 +137,13 @@
 
 #pragma mark Audio-specific Methods
 
-- (unsigned)audioCodecListCount;
-- (XMCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index;
-- (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
-
 - (unsigned)audioBufferSize;
 - (void)setAudioBufferSize:(unsigned)size;
+
+- (NSArray *)audioCodecList;
+- (unsigned)audioCodecListCount;
+- (XMPreferencesCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index;
+- (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
 
 #pragma mark Video-specific Methods
 
@@ -143,8 +159,9 @@
 - (XMVideoSize)videoSize;
 - (void)setVideoSize:(XMVideoSize)size;
 
+- (NSArray *)videoCodecList;
 - (unsigned)videoCodecListCount;
-- (XMCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index;
+- (XMPreferencesCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index;
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
 
 #pragma mark H.323-specific Methods
@@ -172,36 +189,6 @@
 
 - (NSString *)gatekeeperPhoneNumber;
 - (void)setGatekeeperPhoneNumber:(NSString *)string;
-
-@end
-
-/**
- * An instance of XMCodecListRecord encapsulates all relevant
- * information for a codec such as its key and its status,
- * (enabled / disabled) and is used in the context of the
- * audio/video codec preference lists.
- * To get a list of available codecs and additional informations
- * about a certain codec, please refer to the XMCodecManager API.
- **/
-@interface XMCodecListRecord : NSObject <NSCopying, NSCoding>
-{
-	NSString *identifier;	// the key to identify the codec
-	BOOL	  isEnabled;	// flag whether this codec is enabled or not
-}
-	
-/**
- * Creates a dictionary representation of this object
- **/
-- (NSMutableDictionary *)dictionaryRepresentation;
-
-/**
- * Returns the codec key associated with this instance.
- * This information cannot be changed
- **/
-- (NSString *)identifier;
-
-- (BOOL)isEnabled;
-- (void)setEnabled:(BOOL)flag;
 
 @end
 

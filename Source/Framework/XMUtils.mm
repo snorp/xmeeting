@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.mm,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMUtils.mm,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -147,7 +147,7 @@
 		[externalAddressURLRequest release];
 		
 		isFetchingExternalAddress = YES;
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartFetchingExternalAddress object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidStartFetchingExternalAddress object:self];
 	}
 }
 
@@ -265,7 +265,7 @@
 	}
 	isFetchingExternalAddress = NO;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFetchingExternalAddress object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
@@ -288,7 +288,7 @@
 	didSucceedFetchingExternalAddress = NO;
 	isFetchingExternalAddress = NO;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFetchingExternalAddress object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
 }
 
 - (void)_urlLoadingTimeout:(NSTimer *)timer
@@ -308,7 +308,7 @@
 	didSucceedFetchingExternalAddress = NO;
 	isFetchingExternalAddress = NO;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFetchingExternalAddress object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCodecManager.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,19 +11,19 @@
 
 #import <Foundation/Foundation.h>
 
-@class XMCodecDescriptor;
+@class XMCodec;
 
 /**
  * XMCodecManager provides the interface for accessing information
  * about all available audio/video codecs.
- * The actual data is encapsulated in XMCodecDescriptor classes.
- * The keys for each codec can be used in XMPreferences for the
- * codec preference lists.
+ * The actual data is encapsulated in XMCodec classes.
+ * The keys for each codec are used in XMPreferences objects
+ * to manage their codec preference lists.
  **/
 @interface XMCodecManager : NSObject {
 	
-	NSMutableArray *audioCodecDescriptors;
-	NSMutableArray *videoCodecDescriptors;
+	NSMutableArray *audioCodecs;
+	NSMutableArray *videoCodecs;
 
 }
 
@@ -36,42 +36,19 @@
  * Access to codec descriptors by their identifier.
  * See XMStringConstants for a list of available codec identifiers
  */
-- (XMCodecDescriptor *)codecDescriptorForIdentifier:(NSString *)identifier;
+- (XMCodec *)codecForIdentifier:(NSString *)identifier;
 
 /*
  * Accessing the available audio codecs
  */
 - (unsigned)audioCodecCount;
-- (XMCodecDescriptor *)audioCodecDescriptorAtIndex:(unsigned)index;
+- (XMCodec *)audioCodecAtIndex:(unsigned)index;
 
 /*
  * Accessing the available video codecs
  */
 - (unsigned)videoCodecCount;
-- (XMCodecDescriptor *)videoCodecDescriptorAtIndex:(unsigned)index;
-
-@end
-
-/**
- * Helper class for XMCodecManager to encapsulate
- * the information about a certain codec.
- **/
-@interface XMCodecDescriptor : NSObject {
-	NSString *identifier;
-	NSString *name;
-	NSString *bandwidth;
-	NSString *quality;
-}
-
-- (NSString *)propertyForKey:(NSString *)key;
-
-/*
- * Obtaining the properties
- */
-- (NSString *)identifier;
-- (NSString *)name;
-- (NSString *)bandwidth;
-- (NSString *)quality;
+- (XMCodec *)videoCodecAtIndex:(unsigned)index;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,14 +47,6 @@ public:
 
 	/* Network setup functions */
 	void SetBandwidthLimit(unsigned limit);
-	
-	/* audio functions */
-	const PString & GetSoundChannelPlayDevice();
-	BOOL SetSoundChannelPlayDevice(const PString & name);
-	const PString & GetSoundChannelRecordDevice();
-	BOOL SetSoundChannelRecordDevice(const PString & name);
-	unsigned GetSoundChannelBufferDepth();
-	void SetSoundChannelBufferDepth(unsigned depth);
 	
 	/* video functions */
 	void SetVideoFunctionality(BOOL receiveVideo, BOOL enableVideoTransmit);

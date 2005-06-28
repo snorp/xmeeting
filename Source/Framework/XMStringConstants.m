@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.1 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,111 +11,122 @@
 
 #pragma mark Notifications
 
-NSString *XMNotification_DidStartFetchingExternalAddress = @"XMeeting_DidStartFetchingExternalAddressNotification";
-NSString *XMNotification_DidEndFetchingExternalAddress = @"XMeeting_DidEndFetchingExternalAddressNotification";
+NSString *XMNotification_UtilsDidStartFetchingExternalAddress = @"XMeetingUtilsDidStartFetchingExternalAddressNotification";
+NSString *XMNotification_UtilsDidEndFetchingExternalAddress = @"XMeetingUtilsDidEndFetchingExternalAddressNotification";
 
-NSString *XMNotification_DidGoOnline = @"XMeeting_DidGoOnlineNotification";
-NSString *XMNotification_DidGoOffline = @"XMeeting_DidGoOfflineNotification";
-NSString *XMNotification_DidStartSubsystemSetup = @"XMeeting_DidStartSubsystemSetupNotification";
-NSString *XMNotification_DidEndSubsystemSetup = @"XMeeting_DidEndSubsystemSetupNotification";
+NSString *XMNotification_CallManagerDidGoOnline = @"XMeetingCallManagerDidGoOnlineNotification";
+NSString *XMNotification_CallManagerDidGoOffline = @"XMeetingCallManagerDidGoOfflineNotification";
+NSString *XMNotification_CallManagerDidStartSubsystemSetup = @"XMeetingCallManagerDidStartSubsystemSetupNotification";
+NSString *XMNotification_CallManagerDidEndSubsystemSetup = @"XMeetingCallManagerDidEndSubsystemSetupNotification";
 
-NSString *XMNotification_DidStartCalling = @"XMeeting_DidStartCallingNotification";
-NSString *XMNotification_IncomingCall = @"XMeeting_IncomingCallNotification";
-NSString *XMNotification_CallEstablished = @"XMeeting_CallEstablishedNotification";
-NSString *XMNotification_CallCleared = @"XMeeting_CallClearedNotification";
+NSString *XMNotification_CallManagerDidStartCalling = @"XMeetingCallManagerDidStartCallingNotification";
+NSString *XMNotification_CallManagerIncomingCall = @"XMeetingCallManagerIncomingCallNotification";
+NSString *XMNotification_CallManagerCallEstablished = @"XMeetingCallManagerCallEstablishedNotification";
+NSString *XMNotification_CallManagerCallCleared = @"XMeetingCallManagerCallClearedNotification";
 
-NSString *XMNotification_GatekeeperRegistration = @"XMeeting_GatekeeperRegistrationNotification";
-NSString *XMNotification_GatekeeperUnregistration = @"XMeeting_GatekeeperUnregistrationNotification";
-NSString *XMNotification_GatekeeperRegistrationFailure = @"XMeeting_GatekeeperRegistrationFailureNotification";
+NSString *XMNotification_CallManagerEnablingH323Failed = @"XMeetingCallManagerEnablingH323FailedNotification";
+NSString *XMNotification_CallManagerDidStartGatekeeperRegistration = @"XMeetingCallManagerDidStartGatekeeperRegistrationNotification";
+NSString *XMNotification_CallManagerGatekeeperRegistration = @"XMeetingCallManagerGatekeeperRegistrationNotification";
+NSString *XMNotification_CallManagerGatekeeperUnregistration = @"XMeetingCallManagerGatekeeperUnregistrationNotification";
+NSString *XMNotification_CallManagerGatekeeperRegistrationFailed = @"XMeetingCallManagerGatekeeperRegistrationFailedNotification";
 
-NSString *XMNotification_AudioInputDeviceDidChange = @"XMeeting_AudioInputDeviceDidChangeNotification";
-NSString *XMNotification_AudioOutputDeviceDidChange = @"XMeeting_AudioOutputDeviceDidChangeNotification";
-NSString *XMNotification_AudioInputVolumeDidChange = @"XMeeting_AudioInputVolumeDidChangeNotification";
-NSString *XMNotification_AudioOutputVolumeDidChange = @"XMeeting_AudioOutputVolumeDidChangeNotification";
+NSString *XMNotification_AudioManagerInputDeviceDidChange = @"XMeetingAudioManagerInputDeviceDidChangeNotification";
+NSString *XMNotification_AudioManagerOutputDeviceDidChange = @"XMeetingAudioManagerOutputDeviceDidChangeNotification";
+NSString *XMNotification_AudioManagerInputVolumeDidChange = @"XMeetingAudioManagerInputVolumeDidChangeNotification";
+NSString *XMNotification_AudioManagerOutputVolumeDidChange = @"XMeetingAudioManagerOutputVolumeDidChangeNotification";
 
-NSString *XMNotification_DidStartVideoGrabbing = @"XMeeting_DidStartVideoGrabbingNotification";
-NSString *XMNotification_DidStopVideoGrabbing = @"XMeeting_DidEndVideoGrabbingNotification";
-NSString *XMNotification_DidReadVideoFrame = @"XMeeting_DidReadVideoFrameNotification";
-NSString *XMNotification_DidUpdateVideoDeviceList = @"XMeeting_DidUpdateVideoDeviceListNotification";
+NSString *XMNotification_VideoManagerDidStartGrabbing = @"XMeetingVideoManagerDidStartGrabbingNotification";
+NSString *XMNotification_VideoManagerDidStopGrabbing = @"XMeetingVideoManagerDidEndGrabbingNotification";
+NSString *XMNotification_VideoManagerDidReadFrame = @"XMeetingVideoManagerDidReadFrameNotification";
+NSString *XMNotification_VideoManagerDidUpdateDeviceList = @"XMeetingVideoManagerDidUpdateDeviceListNotification";
+
+NSString *XMNotification_AddressBookManagerDatabaseDidChange = @"XMeetingAddressBookManagerDatabaseDidChangeNotification";
 
 #pragma mark Exceptions
 
-NSString *XMException_InvalidAction = @"XMeeting_InvalidActionException";
-NSString *XMException_InvalidParameter = @"Xmeeting_InvalidParameterException";
-NSString *XMException_UnsupportedCoder = @"XMeeting_UnsupportedCoderException";
-NSString *XMException_InternalConsistencyFailure = @"XMeeting_InternalConsistencFailureException";
+NSString *XMException_InvalidAction = @"XMeetingInvalidActionException";
+NSString *XMException_InvalidParameter = @"XmeetngInvalidParameterException";
+NSString *XMException_UnsupportedCoder = @"XMeetingUnsupportedCoderException";
+NSString *XMException_InternalConsistencyFailure = @"XMeetingInternalConsistencFailureException";
 
 NSString *XMExceptionReason_InvalidParameterMustNotBeNil = @"Parameter must not be nil";
+NSString *XMExceptionReason_InvalidParameterMustBeOfCorrectType = @"Parameter must be of correct type";
+NSString *XMExceptionReason_InvalidParameterMustBeValidKey = @"Key must be valid for this object";
 NSString *XMExceptionReason_UnsupportedCoder = @"Only NSCoder sublasses which allow keyed coding are supported";
 NSString *XMExceptionReason_CallManagerInvalidActionWhileOffline = @"Not allowed while CallManager is offline";
 NSString *XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup = @"Not allowed during subsystem setup";
 NSString *XMExceptionReason_CallManagerInvalidActionWhileInCall = @"Not allowed while in call";
 NSString *XMExceptionReason_CallManagerInvalidActionWhileNotInCall = @"Not allowed unless calling or in a call";
-NSString *XMExceptionReason_CallManagerCallEstablishedInternalConsistencyFailure = @"Call established without active call";
-NSString *XMExceptionReason_CallManagerCallClearedInternalConsistencyFailure = @"Call cleared without active call";
+NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Listening = @"Not allowed if H.323 is succesfully setup";
+NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Disabled = @"Not allowed if H.323 is disabled in preferences";
+NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperRegistered = @"Not allowed if succesfully registered at gatekeeper";
+NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperDisabled = @"Not allowed if gatekeeper usage is disabled in preferences";
+NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallEstablished = @"Call established without active call";
+NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallCleared = @"Call cleared without active call";
 NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure = @"Parsing the infos for available codecs failed (%@)";
 
 #pragma mark Audio Codecs
 
-NSString *XMAudioCodec_G711_ALaw = @"g.711-alaw";
-NSString *XMAudioCodec_G711_uLaw = @"g.711-ulaw";
-NSString *XMAudioCodec_Speex = @"speex";
-NSString *XMAudioCodec_GSM = @"gsm";
-NSString *XMAudioCodec_G726 = @"g.726";
-NSString *XMAudioCodec_iLBC = @"ilbc";
-NSString *XMAudioCodec_IMA_ADPCM = @"ima_adpcm";
-NSString *XMAudioCodec_LPC = @"lpc";
+NSString *XMCodec_Audio_G711_ALaw = @"g.711-alaw";
+NSString *XMCodec_Audio_G711_uLaw = @"g.711-ulaw";
+NSString *XMCodec_Audio_Speex = @"speex";
+NSString *XMCodec_Audio_GSM = @"gsm";
+NSString *XMCodec_Audio_G726 = @"g.726";
+NSString *XMCodec_Audio_iLBC = @"ilbc";
 
 #pragma mark Video Codecs
 
-NSString *XMVideoCodec_H261 = @"h.261";
-NSString *XMVideoCodec_H263 = @"h.263";
-
-#pragma mark Address Book Properties
-
-NSString *XMAddressBook_CallURLProperty = @"XMeeting_CallURL";
-NSString *XMAddressBook_HumanReadableCallAddressProperty = @"XMeeting_HumanReadableCallAddress";
+NSString *XMCodec_Video_H261 = @"h.261";
+NSString *XMCodec_Video_H263 = @"h.263";
 
 #pragma mark Private Keys
 
-NSString *XMKey_Preferences_UserName = @"XMeeting_UserName";
-NSString *XMKey_Preferences_AutoAnswerCalls = @"XMeeting_AutoAnswerCalls";
+NSString *XMKey_PreferencesUserName = @"XMeeting_UserName";
+NSString *XMKey_PreferencesAutoAnswerCalls = @"XMeeting_AutoAnswerCalls";
 
-NSString *XMKey_Preferences_BandwidthLimit = @"XMeeting_BandwidthLimit";
-NSString *XMKey_Preferences_UseAddressTranslation = @"XMeeting_UseAddressTranslation";
-NSString *XMKey_Preferences_ExternalAddress = @"XMeeting_ExternalAddress";
-NSString *XMKey_Preferences_TCPPortBase = @"XMeeting_TCPPortBase";
-NSString *XMKey_Preferences_TCPPortMax = @"XMeeting_TCPPortMax";
-NSString *XMKey_Preferences_UDPPortBase = @"XMeeting_UDPPortBase";
-NSString *XMKey_Preferences_UDPPortMax = @"XMeeting_UDPPortMax";
+NSString *XMKey_PreferencesBandwidthLimit = @"XMeeting_BandwidthLimit";
+NSString *XMKey_PreferencesUseAddressTranslation = @"XMeeting_UseAddressTranslation";
+NSString *XMKey_PreferencesExternalAddress = @"XMeeting_ExternalAddress";
+NSString *XMKey_PreferencesTCPPortBase = @"XMeeting_TCPPortBase";
+NSString *XMKey_PreferencesTCPPortMax = @"XMeeting_TCPPortMax";
+NSString *XMKey_PreferencesUDPPortBase = @"XMeeting_UDPPortBase";
+NSString *XMKey_PreferencesUDPPortMax = @"XMeeting_UDPPortMax";
 
-NSString *XMKey_Preferences_AudioCodecPreferenceList = @"XMeeting_AudioCodecPreferenceList";
-NSString *XMKey_Preferences_AudioBufferSize = @"XMeeting_AudioBufferSize";
+NSString *XMKey_PreferencesAudioCodecList = @"XMeeting_AudioCodecList";
+NSString *XMKey_PreferencesAudioBufferSize = @"XMeeting_AudioBufferSize";
 
-NSString *XMKey_Preferences_EnableVideoReceive = @"XMeeting_EnableVideoReceive";
-NSString *XMKey_Preferences_EnableVideoTransmit = @"XMeeting_EnableVideoTransmit";
-NSString *XMKey_Preferences_VideoFramesPerSecond = @"XMeeting_VideoFramesPerSecond";
-NSString *XMKey_Preferences_VideoSize = @"XMeeting_VideoSize";
-NSString *XMKey_Preferences_VideoCodecPreferenceList = @"XMeeting_VideoCodecPreferenceList";
+NSString *XMKey_PreferencesEnableVideoReceive = @"XMeeting_EnableVideoReceive";
+NSString *XMKey_PreferencesEnableVideoTransmit = @"XMeeting_EnableVideoTransmit";
+NSString *XMKey_PreferencesVideoFramesPerSecond = @"XMeeting_VideoFramesPerSecond";
+NSString *XMKey_PreferencesVideoSize = @"XMeeting_VideoSize";
+NSString *XMKey_PreferencesVideoCodecList = @"XMeeting_VideoCodecList";
 
-NSString *XMKey_Preferences_EnableH323 = @"XMeeting_EnableH323";
-NSString *XMKey_Preferences_EnableH245Tunnel = @"XMeeting_EnableH245Tunnel";
-NSString *XMKey_Preferences_EnableFastStart = @"XMeeting_EnableFastStart";
-NSString *XMKey_Preferences_UseGatekeeper = @"XMeeting_UseGatekeeper";
-NSString *XMKey_Preferences_GatekeeperAddress = @"XMeeting_GatekeeperAddress";
-NSString *XMKey_Preferences_GatekeeperID = @"XMeeting_GatekeeperID";
-NSString *XMKey_Preferences_GatekeeperUsername = @"XMeeting_GatekeeperUsername";
-NSString *XMKey_Preferences_GatekeeperPhoneNumber = @"XMeeting_GatekeeperPhoneNumber";
+NSString *XMKey_PreferencesEnableH323 = @"XMeeting_EnableH323";
+NSString *XMKey_PreferencesEnableH245Tunnel = @"XMeeting_EnableH245Tunnel";
+NSString *XMKey_PreferencesEnableFastStart = @"XMeeting_EnableFastStart";
+NSString *XMKey_PreferencesUseGatekeeper = @"XMeeting_UseGatekeeper";
+NSString *XMKey_PreferencesGatekeeperAddress = @"XMeeting_GatekeeperAddress";
+NSString *XMKey_PreferencesGatekeeperID = @"XMeeting_GatekeeperID";
+NSString *XMKey_PreferencesGatekeeperUsername = @"XMeeting_GatekeeperUsername";
+NSString *XMKey_PreferencesGatekeeperPhoneNumber = @"XMeeting_GatekeeperPhoneNumber";
 
-NSString *XMKey_CodecListRecord_Identifier = @"XMeeting_Identifier";
-NSString *XMKey_CodecListRecord_IsEnabled = @"XMeeting_IsEnabled";
+NSString *XMKey_PreferencesCodecListRecordIdentifier = @"XMeeting_Identifier";
+NSString *XMKey_PreferencesCodecListRecordIsEnabled = @"XMeeting_IsEnabled";
 
-NSString *XMKey_CodecDescriptor_Identifier = @"XMeeting_Identifier";
-NSString *XMKey_CodecDescriptor_Name = @"XMeeting_Name";
-NSString *XMKey_CodecDescriptor_Bandwidth = @"XMeeting_Bandwidth";
-NSString *XMKey_CodecDescriptor_Quality = @"XMeeting_Quality";
+NSString *XMKey_CodecManagerCodecDescriptionsFilename = @"XMCodecDescriptions";
+NSString *XMKey_CodecManagerCodecDescriptionsFiletype = @"plist";
+NSString *XMKey_CodecManagerAudioCodecs = @"XMeeting_AudioCodecs";
+NSString *XMKey_CodecManagerVideoCodecs = @"XMeeting_VideoCodecs";
 
-NSString *XMKey_CodecManager_CodecDescriptionsFilename = @"XMCodecDescriptions";
-NSString *XMKey_CodecManager_CodecDescriptionsFiletype = @"plist";
-NSString *XMKey_CodecManager_AudioCodecs = @"XMeeting_AudioCodecs";
-NSString *XMKey_CodecManager_VideoCodecs = @"XMeeting_VideoCodecs";
+NSString *XMKey_CodecIdentifier = @"XMeeting_Identifier";
+NSString *XMKey_CodecName = @"XMeeting_Name";
+NSString *XMKey_CodecBandwidth = @"XMeeting_Bandwidth";
+NSString *XMKey_CodecQuality = @"XMeeting_Quality";
+
+NSString *XMKey_URLType = @"XMeeting_URLType";
+NSString *XMKey_URLAddress = @"XMeeting_Address";
+
+#pragma mark Address Book Properties
+
+NSString *XMAddressBookProperty_CallURL = @"XMeeting_URL";
+NSString *XMAddressBookProperty_HumanReadableCallURLRepresentation = @"XMeeting_HumanReadableURLRepresentation";

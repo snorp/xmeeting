@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoController.m,v 1.1 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMLocalAudioVideoController.m,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,9 +47,9 @@
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
 	[notificationCenter addObserver:self selector:@selector(_audioInputVolumeDidChange:)
-							   name:XMNotification_AudioInputVolumeDidChange object:nil];
+							   name:XMNotification_AudioManagerInputVolumeDidChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioOutputVolumeDidChange:)
-							   name:XMNotification_AudioOutputVolumeDidChange object:nil];
+							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
 }
 
 #pragma mark Action Methods

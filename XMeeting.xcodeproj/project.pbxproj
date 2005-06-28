@@ -46,7 +46,6 @@
 		D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */; };
 		D16394C3083E23D600F7FD83 /* CallHistoryModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */; };
 		D16395280840C57A00F7FD83 /* XMURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395270840C57A00F7FD83 /* XMURL.m */; };
-		D16395620841B4E100F7FD83 /* XMCalltoURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395610841B4E100F7FD83 /* XMCalltoURL.m */; };
 		D166CD6607B2312300BC27A6 /* XMLocalVideoView.h in Resources */ = {isa = PBXBuildFile; fileRef = D166CD6407B2312300BC27A6 /* XMLocalVideoView.h */; };
 		D166CD6707B2312300BC27A6 /* XMLocalVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D166CD6507B2312300BC27A6 /* XMLocalVideoView.m */; };
 		D177D7A107B62C9500BD0172 /* XMCallInfo.h in Resources */ = {isa = PBXBuildFile; fileRef = D177D79F07B62C9500BD0172 /* XMCallInfo.h */; };
@@ -87,6 +86,9 @@
 		D1B4CFD70833911600A444E1 /* XMZeroConfModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B4CFD50833911600A444E1 /* XMZeroConfModule.m */; };
 		D1B4D0070833937200A444E1 /* ZeroConfModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1B4D0050833937200A444E1 /* ZeroConfModule.nib */; };
 		D1BA750C086ABBB2007E6CEC /* XMeeting.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA750B086ABBB2007E6CEC /* XMeeting.m */; };
+		D1BA7632086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */; };
+		D1BA7666086BEC5E007E6CEC /* XMCallHistoryRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */; };
+		D1BA776C086CB1E3007E6CEC /* XMCodec.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA776B086CB1E3007E6CEC /* XMCodec.m */; };
 		D1CE4B62083CDED900B66B5D /* XMAddressBookModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */; };
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
 		D1CE4B76083CE0FC00B66B5D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
@@ -117,6 +119,10 @@
 		D1ECCD360834923D008EBAE3 /* XMNoCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */; };
 		D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD3908349255008EBAE3 /* XMInCallModule.h */; };
 		D1ECCD3C08349255008EBAE3 /* XMInCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */; };
+		D1F61479086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */; };
+		D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */; };
+		D1F614FD086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F614FC086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.m */; };
+		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressURL.m */; };
 		D1FE29CF07AFF4FB004337C9 /* XMPrivate.h in Resources */ = {isa = PBXBuildFile; fileRef = D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */; };
 /* End PBXBuildFile section */
 
@@ -258,6 +264,12 @@
 		D1B4CFD50833911600A444E1 /* XMZeroConfModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMZeroConfModule.m; path = Source/GUI/XMZeroConfModule.m; sourceTree = "<group>"; };
 		D1B4D0060833937200A444E1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
 		D1BA750B086ABBB2007E6CEC /* XMeeting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMeeting.m; path = Source/Framework/XMeeting.m; sourceTree = "<group>"; };
+		D1BA7630086B4848007E6CEC /* XMCallHistoryCallAddressProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallHistoryCallAddressProvider.h; path = Source/Application/XMCallHistoryCallAddressProvider.h; sourceTree = "<group>"; };
+		D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallHistoryCallAddressProvider.m; path = Source/Application/XMCallHistoryCallAddressProvider.m; sourceTree = "<group>"; };
+		D1BA7664086BEC5E007E6CEC /* XMCallHistoryRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallHistoryRecord.h; path = Source/Application/XMCallHistoryRecord.h; sourceTree = "<group>"; };
+		D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallHistoryRecord.m; path = Source/Application/XMCallHistoryRecord.m; sourceTree = "<group>"; };
+		D1BA776A086CB1E3007E6CEC /* XMCodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCodec.h; path = Source/Framework/XMCodec.h; sourceTree = "<group>"; };
+		D1BA776B086CB1E3007E6CEC /* XMCodec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCodec.m; path = Source/Framework/XMCodec.m; sourceTree = "<group>"; };
 		D1CE4B60083CDED900B66B5D /* XMAddressBookModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookModule.h; path = Source/GUI/XMAddressBookModule.h; sourceTree = "<group>"; };
 		D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookModule.m; path = Source/GUI/XMAddressBookModule.m; sourceTree = "<group>"; };
 		D1CE4B68083CDF3900B66B5D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/AddressBook.nib; sourceTree = "<group>"; };
@@ -291,6 +303,14 @@
 		D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMNoCallModule.m; path = Source/GUI/XMNoCallModule.m; sourceTree = "<group>"; };
 		D1ECCD3908349255008EBAE3 /* XMInCallModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMInCallModule.h; path = Source/GUI/XMInCallModule.h; sourceTree = "<group>"; };
 		D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInCallModule.m; path = Source/GUI/XMInCallModule.m; sourceTree = "<group>"; };
+		D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesCodecListRecord.h; path = Source/Framework/XMPreferencesCodecListRecord.h; sourceTree = "<group>"; };
+		D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesCodecListRecord.m; path = Source/Framework/XMPreferencesCodecListRecord.m; sourceTree = "<group>"; };
+		D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMGeneralPurposeURL.h; path = Source/Framework/XMGeneralPurposeURL.h; sourceTree = "<group>"; };
+		D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMGeneralPurposeURL.m; path = Source/Framework/XMGeneralPurposeURL.m; sourceTree = "<group>"; };
+		D1F614FB086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookRecordSearchMatch.h; path = Source/Framework/XMAddressBookRecordSearchMatch.h; sourceTree = "<group>"; };
+		D1F614FC086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookRecordSearchMatch.m; path = Source/Framework/XMAddressBookRecordSearchMatch.m; sourceTree = "<group>"; };
+		D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleAddressURL.h; path = Source/Application/XMSimpleAddressURL.h; sourceTree = "<group>"; };
+		D1F61AA008706A6900FDD4F0 /* XMSimpleAddressURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleAddressURL.m; path = Source/Application/XMSimpleAddressURL.m; sourceTree = "<group>"; };
 		D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPrivate.h; path = Source/Framework/XMPrivate.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -424,8 +444,12 @@
 				D177D7A007B62C9500BD0172 /* XMCallInfo.m */,
 				D163381B07A4E739003FD9C0 /* XMPreferences.h */,
 				D163381C07A4E739003FD9C0 /* XMPreferences.m */,
+				D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */,
+				D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */,
 				D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */,
 				D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.mm */,
+				D1BA776A086CB1E3007E6CEC /* XMCodec.h */,
+				D1BA776B086CB1E3007E6CEC /* XMCodec.m */,
 				D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */,
 				D1D63D3607AA9A8800F1FB74 /* XMAudioManager.mm */,
 				D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */,
@@ -434,8 +458,12 @@
 				D166CD6507B2312300BC27A6 /* XMLocalVideoView.m */,
 				D12211B30844D1820021D4CD /* XMAddressBookManager.h */,
 				D12211B40844D1820021D4CD /* XMAddressBookManager.m */,
+				D1F614FB086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.h */,
+				D1F614FC086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.m */,
 				D16395260840C57A00F7FD83 /* XMURL.h */,
 				D16395270840C57A00F7FD83 /* XMURL.m */,
+				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeURL.h */,
+				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */,
 				D16395600841B4E100F7FD83 /* XMCalltoURL.h */,
 				D16395610841B4E100F7FD83 /* XMCalltoURL.m */,
 			);
@@ -525,8 +553,14 @@
 				D163336407A01BD5003FD9C0 /* XMApplicationController.m */,
 				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
 				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
+				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressURL.h */,
+				D1F61AA008706A6900FDD4F0 /* XMSimpleAddressURL.m */,
 				D1AF744B084DA1BE00D50883 /* XMAddressBookCallAddressProvider.h */,
 				D1AF744C084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m */,
+				D1BA7630086B4848007E6CEC /* XMCallHistoryCallAddressProvider.h */,
+				D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */,
+				D1BA7664086BEC5E007E6CEC /* XMCallHistoryRecord.h */,
+				D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */,
 			);
 			name = "Application General";
 			sourceTree = "<group>";
@@ -808,7 +842,6 @@
 				D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */,
 				D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */,
 				D16395280840C57A00F7FD83 /* XMURL.m in Sources */,
-				D16395620841B4E100F7FD83 /* XMCalltoURL.m in Sources */,
 				D12211B50844D1820021D4CD /* XMAddressBookManager.m in Sources */,
 				D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */,
 				D1AF73DB084D02C200D50883 /* XMCallAddressManager.m in Sources */,
@@ -818,6 +851,13 @@
 				D1D9A46D08519C9200445833 /* XMStringConstants.m in Sources */,
 				D1B06A78086AA28A00563EDB /* XMLocalAudioVideoController.m in Sources */,
 				D1BA750C086ABBB2007E6CEC /* XMeeting.m in Sources */,
+				D1BA7632086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m in Sources */,
+				D1BA7666086BEC5E007E6CEC /* XMCallHistoryRecord.m in Sources */,
+				D1BA776C086CB1E3007E6CEC /* XMCodec.m in Sources */,
+				D1F61479086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m in Sources */,
+				D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeURL.m in Sources */,
+				D1F614FD086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.m in Sources */,
+				D1F61AA108706A6900FDD4F0 /* XMSimpleAddressURL.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

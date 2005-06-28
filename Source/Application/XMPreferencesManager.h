@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -108,6 +108,11 @@ extern NSString *XMNotification_ActiveLocationDidChange;
 
 - (BOOL)defaultAutoAnswerCalls;
 - (void)setDefaultAutoAnswerCalls:(BOOL)flag;
+
+/**
+ * Manages the recent calls made
+ **/
+
 
 @end
 

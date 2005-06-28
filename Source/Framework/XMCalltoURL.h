@@ -1,5 +1,5 @@
 /*
- * $Id: XMCalltoURL.h,v 1.1 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMCalltoURL.h,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,7 @@
 
 #ifndef __XM_CALLTO_URL_H__
 #define __XM_CALLTO_URL_H__
+#else
 
 #import <Foundation/Foundation.h>
 #import "XMTypes.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #import "XMTypes.h"
 
 @class ABAddressBook, ABSearchElement, XMURL;
+
+@protocol XMAddressBookRecord;
 
 /**
  * XMAddressBookManager encapsulates functionality useful for dealing with
@@ -33,7 +35,6 @@
 @interface XMAddressBookManager : NSObject {
 	
 	ABAddressBook *addressBook;
-	ABSearchElement *validRecordsSearchElement;
 }
 
 + (XMAddressBookManager *)sharedInstance;
@@ -76,36 +77,21 @@
 - (NSArray *)recordsMatchingString:(NSString *)searchString mustBeValid:(BOOL)mustBeValid
 			  returnExtraInformation:(BOOL)returnExtraInformation;
 
-@end
-
 /**
- * Instances of this object encapsulate information about a
- * record matching some searchString. Besides the actual record,
- * also the information which part of the record matched the searchString
- * is stored in this instance and can be queried
+ * Returns the record that matches callAddress, or nil if
+ * no record matches callAddress. If multiple records have
+ * a match on callAddress, it isn't defined which record
+ * is returned.
  **/
-@interface XMAddressBookRecordSearchMatch : NSObject {
-	id record;
-	XMAddressBookRecordPropertyMatch propertyMatch;
-}
-
-/**
- * Returns the address book record
- **/
-- (id)record;
-
-/**
- * Returns which part of the record matched the search string
- **/
-- (XMAddressBookRecordPropertyMatch)propertyMatch;
+- (id<XMAddressBookRecord>)recordWithCallAddress:(NSString *)callAddress;
 
 @end
 
 /**
- * This interface declares which methods the record instances
+ * This protocol declares which methods the address book record instances
  * do respond to.
  **/
-@interface NSObject (XMAddressBookRecordMethods)
+@protocol XMAddressBookRecord <NSObject>
 
 /**
  * Returns whether the record is valid in the context of the
@@ -132,7 +118,7 @@
  * Returns a more human readable representation of the record's
  * call address
  **/
-- (NSString *)humanReadableCallAddress;
+- (NSString *)humanReadableCallURLRepresentation;
 
 /**
  * Returns a string useful for Display. This string takes
@@ -140,11 +126,6 @@
  * and what the name ordering mask is.
  **/
 - (NSString *)displayName;
-
-/**
- * Returns an image representation for this record
- **/
-- (NSImage *)image;
 
 @end
 

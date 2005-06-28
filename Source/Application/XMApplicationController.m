@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #import "XMeeting.h"
 #import "XMApplicationController.h"
 #import "XMAddressBookCallAddressProvider.h"
+#import "XMCallHistoryCallAddressProvider.h"
 
 #import "XMMainWindowController.h"
 #import "XMPreferencesWindowController.h"
@@ -26,6 +27,11 @@
 - (void)_didGoOffline:(NSNotification *)notif;
 - (void)_callEstablished:(NSNotification *)notif;
 - (void)_callCleared:(NSNotification *)notif;
+- (void)_enablingH323Failed:(NSNotification *)notif;
+- (void)_gatekeeperRegistrationFailed:(NSNotification *)notif;
+
+- (void)_displayEnablingH323FailedAlert;
+- (void)_displayGatekeeperRegistrationFailedAlert;
 
 @end
 
@@ -40,6 +46,7 @@
 	
 	// registering the call address providers
 	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
+	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];
@@ -55,16 +62,23 @@
 	[[XMMainWindowController sharedInstance] showMainWindow];
 	
 	// start fetching the external address
-	[[XMUtils sharedInstance] localAddress];
-	[[XMUtils sharedInstance] startFetchingExternalAddress];
+	XMUtils *utils = [XMUtils sharedInstance];
+	[utils localAddress];
+	[utils startFetchingExternalAddress];
 	
 	// registering for notifications
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didGoOffline:)
-												 name:XMNotification_DidGoOffline object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callEstablished:)
-												 name:XMNotification_CallEstablished object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
-												 name:XMNotification_CallCleared object:nil];
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	
+	[notificationCenter addObserver:self selector:@selector(_didGoOffline:)
+							   name:XMNotification_CallManagerDidGoOffline object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
+							   name:XMNotification_CallManagerCallEstablished object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callCleared:)
+							   name:XMNotification_CallManagerCallCleared object:nil];
+	[notificationCenter addObserver:self selector:@selector(_enablingH323Failed:)
+							   name:XMNotification_CallManagerEnablingH323Failed object:nil];
+	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationFailed:)
+							   name:XMNotification_CallManagerGatekeeperRegistrationFailed object:nil];
 	
 	// last but not least, go online
 	[[XMCallManager sharedInstance] setOnline:YES];
@@ -102,7 +116,7 @@
 	return NSTerminateLater;
 }
 
-#pragma mark Private Methods
+#pragma mark Notification Methods
 
 - (void)_didGoOffline:(NSNotification *)notif
 {
@@ -120,6 +134,62 @@
 - (void)_callCleared:(NSNotification *)notif
 {	
 	[[XMMainWindowController sharedInstance] showMainModule:noCallModule];
+}
+
+- (void)_enablingH323Failed:(NSNotification *)notif
+{
+	[self performSelector:@selector(_displayEnableH323FailedAlert) withObject:nil afterDelay:0.0];
+}
+
+- (void)_gatekeeperRegistrationFailed:(NSNotification *)notif
+{
+	[self performSelector:@selector(_displayGatekeeperRegistrationFailedAlert) withObject:nil afterDelay:0.0];
+}
+
+#pragma mark Displaying Alerts
+
+- (void)_displayEnableH323FailedAlert
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	
+	[alert setMessageText:NSLocalizedString(@"Enabling H.323 Failed", @"")];
+	[alert setInformativeText:NSLocalizedString(@"Unable to enable the H.323 subsystem (REASON) \
+	You will not be able to make H.323 calls", @"")];
+	
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
+	
+	int result = [alert runModal];
+	
+	if(result == NSAlertSecondButtonReturn)
+	{
+		[[XMCallManager sharedInstance] retryEnableH323];
+	}
+	
+	[alert release];
+}
+
+- (void)_displayGatekeeperRegistrationFailedAlert
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	
+	[alert setMessageText:NSLocalizedString(@"Gatekeeper Registration Failed", @"")];
+	[alert setInformativeText:NSLocalizedString(@"Unable to register at gatekeeper (GK). You will not be able to \
+	use phone numbers to call. Please check your internet connection", @"")];
+	
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
+	
+	int result = [alert runModal];
+	
+	if(result == NSAlertSecondButtonReturn)
+	{
+		[[XMCallManager sharedInstance] retryGatekeeperRegistration];
+	}
+	
+	[alert release];
 }
 
 @end

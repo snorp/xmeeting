@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.2 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@
 {
 	[[XMMainWindowController sharedInstance] addMainModule:self];
 	
+	[self contentView];
+	
 	return self;
 }
 
@@ -35,12 +37,14 @@
 
 - (void)awakeFromNib
 {
+	NSLog(@"awakeFromNib");
 	contentViewMinSize = [contentView frame].size;
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callEstablished:)
-												 name:XMNotification_CallEstablished object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
-												 name:XMNotification_CallCleared object:nil];
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
+												 name:XMNotification_CallManagerCallEstablished object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callCleared:)
+												 name:XMNotification_CallManagerCallCleared object:nil];
 }
 
 - (NSString *)name
@@ -88,6 +92,7 @@
 
 - (void)_callEstablished:(NSNotification *)notif
 {
+	NSLog(@"callEstablished");
 	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
 	[remotePartyField setStringValue:remoteName];
 }

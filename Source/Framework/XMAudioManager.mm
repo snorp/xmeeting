@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.mm,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMAudioManager.mm,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -231,7 +231,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 		unmutedInputVolume = 101;
 		
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioInputDeviceDidChange
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerInputDeviceDidChange
 															object:self];
 		return YES;
 	}
@@ -286,7 +286,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		
 		unmutedOutputVolume = 101;
 		
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioOutputDeviceDidChange
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputDeviceDidChange
 															object:self];
 		return YES;
 	}
@@ -791,7 +791,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		}
 	}
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioInputVolumeDidChange
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerInputVolumeDidChange
 														object:self];
 }
 
@@ -814,7 +814,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		}
 	}
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioOutputVolumeDidChange
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputVolumeDidChange
 														object:self];
 }
 

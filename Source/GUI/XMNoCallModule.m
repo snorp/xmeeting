@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.5 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,9 @@
 #import "XMNoCallModule.h"
 #import "XMMainWindowController.h"
 #import "XMCallAddressManager.h"
+#import "XMSimpleAddressURL.h"
+#import "XMCallHistoryCallAddressProvider.h"
+#import "XMCallHistoryRecord.h"
 #import "XMPreferencesManager.h"
 #import "XMDatabaseField.h"
 
@@ -20,17 +23,12 @@
 - (void)_didEndSubsystemSetup:(NSNotification *)notif;
 - (void)_didStartCalling:(NSNotification *)notif;
 - (void)_callCleared:(NSNotification *)notif;
+- (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif;
+- (void)_callHistoryDataDidChange:(NSNotification *)notif;
 
 - (void)_displayListeningStatusFieldInformation;
-
-@end
-
-@interface XMManualAddressURL : XMURL <XMCallAddress>
-{
-	NSString *address;
-}
-
-- (id)_initWithAddress:(NSString *)address;
+- (void)_setupRecentCallsPullDownMenu;
+- (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender;
 
 @end
 
@@ -61,10 +59,12 @@
 	
 	[nibLoader release];
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[imageItem release];
 	
 	[callAddressManager release];
 	[preferencesManager release];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[super dealloc];
 }
@@ -73,27 +73,43 @@
 {	
 	contentViewSize = [contentView frame].size;
 	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
+	
+	imageItem = [[NSMenuItem alloc] init];
+	[imageItem setImage:[NSImage imageNamed:@"CallHistory"]];
+	
+	[self _setupRecentCallsPullDownMenu];
 
 	[self _preferencesDidChange:nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_preferencesDidChange:)
-												 name:XMNotification_PreferencesDidChange 
-											   object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-												 name:XMNotification_DidEndFetchingExternalAddress
-											   object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartSubsystemSetup:)
-												 name:XMNotification_DidStartSubsystemSetup
-											   object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndSubsystemSetup:)
-												 name:XMNotification_DidEndSubsystemSetup
-											   object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartCalling:)
-												 name:XMNotification_DidStartCalling
-											   object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
-												 name:XMNotification_CallCleared
-											   object:nil];
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	
+	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
+							   name:XMNotification_PreferencesDidChange 
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+							   name:XMNotification_UtilsDidEndFetchingExternalAddress
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
+							   name:XMNotification_CallManagerDidStartSubsystemSetup
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
+							   name:XMNotification_CallManagerDidEndSubsystemSetup
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartCalling:)
+							   name:XMNotification_CallManagerDidStartCalling
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callCleared:)
+							   name:XMNotification_CallManagerCallCleared
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
+							   name:XMNotification_CallManagerGatekeeperRegistration
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
+							   name:XMNotification_CallManagerGatekeeperUnregistration
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
+							   name:XMNotification_CallHistoryCallAddressProviderDataDidChange
+							 object:nil];
 }
 
 #pragma mark XMMainWindowModule methods
@@ -155,67 +171,15 @@
 
 - (IBAction)changeActiveLocation:(id)sender
 {
-	NSLog(@"change");
-	unsigned selectedIndex = [locationsPopUp indexOfSelectedItem];
+	unsigned selectedIndex = [locationsPopUpButton indexOfSelectedItem];
 	[[XMPreferencesManager sharedInstance] activateLocationAtIndex:selectedIndex];
-}
-
-- (IBAction)showCallHistory:(id)sender
-{
-}
-
-#pragma mark Notification Methods
-
-- (void)_preferencesDidChange:(NSNotification *)notif
-{
-	[locationsPopUp removeAllItems];
-	[locationsPopUp addItemsWithTitles:[preferencesManager locationNames]];
-	[locationsPopUp selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
-}
-
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
-{
-	[self _displayListeningStatusFieldInformation];
-}
-
-- (void)_didStartSubsystemSetup:(NSNotification *)notif
-{
-	[locationsPopUp setEnabled:NO];
-	[callButton setEnabled:NO];
-}
-
-- (void)_didEndSubsystemSetup:(NSNotification *)notif
-{
-	[locationsPopUp setEnabled:YES];
-	[callButton setEnabled:YES];
-	[self _displayListeningStatusFieldInformation];
-}
-
-- (void)_didStartCalling:(NSNotification *)notif
-{
-	id<XMCallAddress> activeCallAddress = [callAddressManager activeCallAddress];
-	[callAddressField setRepresentedObject:activeCallAddress];
-	[locationsPopUp setEnabled:NO];
-	[callButton setTitle:NSLocalizedString(@"Hangup", @"")];
-	[statusFieldOne setStringValue:NSLocalizedString(@"Calling...", @"")];
-	[statusFieldTwo setStringValue:@""];
-	
-	isCalling = YES;
-}
-
-- (void)_callCleared:(NSNotification *)notif
-{
-	[locationsPopUp setEnabled:YES];
-	[callButton setTitle:NSLocalizedString(@"Call", @"")];
-	[self _displayListeningStatusFieldInformation];
-	isCalling = NO;
 }
 
 #pragma mark Call Address XMDatabaseComboBox Data Source Methods
 
 - (NSArray *)databaseField:(XMDatabaseField *)databaseField
-		 completionsForString:(NSString *)uncompletedString
-		  indexOfSelectedItem:(unsigned *)indexOfSelectedItem
+	  completionsForString:(NSString *)uncompletedString
+	   indexOfSelectedItem:(unsigned *)indexOfSelectedItem
 {	
 	NSArray *originalMatchedAddresses;
 	unsigned newUncompletedStringLength = [uncompletedString length];
@@ -268,8 +232,8 @@
 	
 	if(index == NSNotFound)
 	{
-		XMManualAddressURL *manualAddressURL = [[[XMManualAddressURL alloc] _initWithAddress:completedString] autorelease];
-		return manualAddressURL;
+		XMSimpleAddressURL *simpleAddressURL = [[[XMSimpleAddressURL alloc] initWithAddress:completedString] autorelease];
+		return simpleAddressURL;
 	}
 	return [matchedAddresses objectAtIndex:index];
 }
@@ -284,6 +248,75 @@
 {
 	NSImage *image = [(id<XMCallAddress>)representedObject displayImage];
 	return image;
+}
+
+#pragma mark Notification Methods
+
+- (void)_preferencesDidChange:(NSNotification *)notif
+{
+	[locationsPopUpButton removeAllItems];
+	[locationsPopUpButton addItemsWithTitles:[preferencesManager locationNames]];
+	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
+}
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	[self _displayListeningStatusFieldInformation];
+}
+
+- (void)_didStartSubsystemSetup:(NSNotification *)notif
+{
+	[locationsPopUpButton setEnabled:NO];
+	[callButton setEnabled:NO];
+}
+
+- (void)_didEndSubsystemSetup:(NSNotification *)notif
+{
+	[locationsPopUpButton setEnabled:YES];
+	[callButton setEnabled:YES];
+	[self _displayListeningStatusFieldInformation];
+}
+
+- (void)_didStartCalling:(NSNotification *)notif
+{
+	id<XMCallAddress> activeCallAddress = [callAddressManager activeCallAddress];
+	[callAddressField setRepresentedObject:activeCallAddress];
+	[locationsPopUpButton setEnabled:NO];
+	[callButton setTitle:NSLocalizedString(@"Hangup", @"")];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Calling...", @"")];
+	[statusFieldTwo setStringValue:@""];
+	
+	isCalling = YES;
+}
+
+- (void)_callCleared:(NSNotification *)notif
+{
+	[locationsPopUpButton setEnabled:YES];
+	[callButton setTitle:NSLocalizedString(@"Call", @"")];
+	[self _displayListeningStatusFieldInformation];
+	isCalling = NO;
+}
+
+- (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif
+{
+	NSString *gatekeeperName = [[XMCallManager sharedInstance] gatekeeperName];
+	
+	if(gatekeeperName != nil)
+	{
+		NSString *gatekeeperFormat = NSLocalizedString(@"Registered at gatekeeper: %@", @"");
+		NSString *gatekeeperString = [[NSString alloc] initWithFormat:gatekeeperFormat, gatekeeperName];
+		[statusFieldThree setStringValue:gatekeeperString];
+		[gatekeeperString release];
+	}
+	else
+	{
+		[statusFieldThree setStringValue:@""];
+	}
+}
+
+- (void)_callHistoryDataDidChange:(NSNotification *)notif
+{
+	[self _setupRecentCallsPullDownMenu];
 }
 
 #pragma mark Private Methods
@@ -329,55 +362,39 @@
 	}
 }
 
-@end
-
-@implementation XMManualAddressURL
-
-- (id)_initWithAddress:(NSString *)theAddress
+- (void)_setupRecentCallsPullDownMenu
 {
-	address = [theAddress copy];
+	[recentCallsPopUpButton setMenu:nil];
 	
-	return self;
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
+	[menu addItem:imageItem];
+	NSArray *recentCalls = [[XMCallHistoryCallAddressProvider sharedInstance] recentCalls];
+	
+	unsigned i;
+	unsigned count = [recentCalls count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMCallHistoryRecord *record = [recentCalls objectAtIndex:i];
+		NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[record displayString] action:@selector(_recentCallsPopUpButtonAction:) keyEquivalent:@""];
+		[menuItem setTarget:self];
+		[menuItem setTag:i];
+		[menu addItem:menuItem];
+		[menuItem release];
+	}
+	
+	[recentCallsPopUpButton setMenu:menu];
+	[menu release];
 }
 
-- (XMCallProtocol)callProtocol
+- (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender
 {
-	return XMCallProtocol_H323;
-}
-
-- (NSString *)address
-{
-	return address;
-}
-
-- (unsigned)port
-{
-	return 0;
-}
-
-- (NSString *)humanReadableRepresentation
-{
-	return [self address];
-}
-
-- (id<XMCallAddressProvider>)provider
-{
-	return nil;
-}
-
-- (XMURL *)url
-{
-	return self;
-}
-
-- (NSString *)displayString
-{
-	return [self address];
-}
-
-- (NSImage *)displayImage
-{
-	return nil;
+	unsigned index = [sender tag];
+	NSArray *recentCalls = [[XMCallHistoryCallAddressProvider sharedInstance] recentCalls];
+	XMCallHistoryRecord *record = [recentCalls objectAtIndex:index];
+	
+	[callAddressField setRepresentedObject:record];
+	[[contentView window] makeFirstResponder:nil];
 }
 
 @end

@@ -8,16 +8,17 @@
             SUPERCLASS = NSTextField; 
         }, 
         {
-            ACTIONS = {call = id; changeActiveLocation = id; showCallHistory = id; }; 
+            ACTIONS = {call = id; changeActiveLocation = id; }; 
             CLASS = XMNoCallModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 callAddressField = XMDatabaseField; 
                 callButton = NSButton; 
-                callHistoryButton = NSButton; 
                 contentView = NSView; 
-                locationsPopUp = NSPopUpButton; 
+                locationsPopUpButton = NSPopUpButton; 
+                recentCallsPopUpButton = NSPopUpButton; 
                 statusFieldOne = NSTextField; 
+                statusFieldThree = NSTextField; 
                 statusFieldTwo = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 

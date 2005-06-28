@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -121,18 +121,6 @@ void setPortRanges(unsigned int udpPortMin,
 void setTranslationAddress(const char *address);
 
 #pragma mark Audio Functions
-
-// the pointer-array returned must explicitely be deleted by the caller
-const char **getAudioInputDevices();
-
-// copies a NULL-terminated-string into buffer
-void getDefaultAudioInputDevice(char *buffer);
-
-// the pointer-array returned must explicitely be deleted by the caller
-const char **getAudioOutputDevices();
-
-// copies a NULL-terminated-string into buffer
-void getDefaultAudioOutputDevice(char *buffer);
 
 // The underlying system is call-by-reference
 const char *getSelectedAudioInputDevice();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.6 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,15 +9,19 @@
 #ifndef __XM_PRIVATE_H__
 #define __XM_PRIVATE_H__
 
+#import "XMTypes.h"
 #import "XMCallManager.h"
+#import "XMCallInfo.h"
+#import "XMPreferences.h"
+#import "XMPreferencesCodecListRecord.h"
+#import "XMCodec.h"
 #import "XMAudioManager.h"
 #import "XMVideoManager.h"
-#import "XMCallInfo.h"
-#import "XMTypes.h"
+#import "XMAddressBookRecordSearchMatch.h"
 
-@class XMLocalVideoView, XMCallInfo;
+@class XMLocalVideoView, XMCallInfo, ABPerson;
 
-@interface XMCallManager(FrameworkMethods)
+@interface XMCallManager (FrameworkMethods)
 
 /**
  * This method gets called every time a subsystem setup thread
@@ -92,26 +96,15 @@
 
 @end
 
-@interface XMVideoManager(FrameworkMethods)
-
-- (void)_addLocalVideoView:(XMLocalVideoView *)view;
-- (void)_removeLocalVideoView:(XMLocalVideoView *)view;
-- (void)_drawToView:(XMLocalVideoView *)view;
-
-- (BOOL)_handleVideoFrame:(void *)buffer width:(unsigned)width
-				   height:(unsigned)height bytesPerPixel:(unsigned)bytesPerPixel;
-
-@end
-
 @interface XMCallInfo (FrameworkMethods)
 
 - (id)_initWithCallID:(unsigned)callID 
-			   protocol:(XMCallProtocol)protocol
-			 remoteName:(NSString *)remoteName
-		   remoteNumber:(NSString *)remoteNumber
-		  remoteAddress:(NSString *)remoteAddress
-	  remoteApplication:(NSString *)remoteApplication
-			 callStatus:(XMCallStatus)status;
+			 protocol:(XMCallProtocol)protocol
+		   remoteName:(NSString *)remoteName
+		 remoteNumber:(NSString *)remoteNumber
+		remoteAddress:(NSString *)remoteAddress
+	remoteApplication:(NSString *)remoteApplication
+		   callStatus:(XMCallStatus)status;
 
 - (unsigned)_callID;
 
@@ -128,69 +121,81 @@
 
 @end
 
+@interface XMPreferences (FrameworkMethods)
+
+#define XM_VALUE_TEST_RESULT unsigned
+#define XM_VALID_VALUE 0
+#define XM_INVALID_KEY 1
+#define XM_INVALID_VALUE_TYPE 2
++ (XM_VALUE_TEST_RESULT)_checkValue:(id)value forKey:(NSString *)key;
+- (BOOL)_value:(id)value differsFromValueWithKey:(NSString *)key;
+
+@end
+
+@interface XMPreferencesCodecListRecord (FrameworkMethods)
+
+- (id)_initWithIdentifier:(NSString *)identifier enabled:(BOOL)enabled;
+- (id)_initWithDictionary:(NSDictionary *)dict;
+
+@end
+
+@interface XMCodec (FrameworkMethods)
+
+- (id)_initWithDictionary:(NSDictionary *)dict;
+
+- (id)_initWithIdentifier:(NSString *)identifier
+					 name:(NSString *)name
+				bandwidth:(NSString *)bandwidth
+				  quality:(NSString *)quality;
+
+@end
+
+@interface XMVideoManager (FrameworkMethods)
+
+- (void)_addLocalVideoView:(XMLocalVideoView *)view;
+- (void)_removeLocalVideoView:(XMLocalVideoView *)view;
+- (void)_drawToView:(XMLocalVideoView *)view;
+
+- (BOOL)_handleVideoFrame:(void *)buffer width:(unsigned)width
+				   height:(unsigned)height bytesPerPixel:(unsigned)bytesPerPixel;
+
+@end
+
+@interface XMAddressBookRecordSearchMatch (FrameworkMethods)
+
+- (id)_initWithRecord:(ABPerson *)record propertyMatch:(XMAddressBookRecordPropertyMatch)propertyMatch;
+
+@end
+
 #pragma mark private key declarations
-
-/**
- * XMPreferences Keys
- **/
-
-// General keys
-extern NSString *XMKey_Preferences_UserName;
-extern NSString *XMKey_Preferences_AutoAnswerCalls;
-
-// Network-specific keys
-extern NSString *XMKey_Preferences_BandwidthLimit;
-extern NSString *XMKey_Preferences_UseAddressTranslation;
-extern NSString *XMKey_Preferences_ExternalAddress;
-extern NSString *XMKey_Preferences_TCPPortBase;
-extern NSString *XMKey_Preferences_TCPPortMax;
-extern NSString *XMKey_Preferences_UDPPortBase;
-extern NSString *XMKey_Preferences_UDPPortMax;
-
-// audio-specific keys
-extern NSString *XMKey_Preferences_AudioCodecPreferenceList;
-extern NSString *XMKey_Preferences_AudioBufferSize;
-
-// video-specific keys
-extern NSString *XMKey_Preferences_EnableVideoReceive;
-extern NSString *XMKey_Preferences_EnableVideoTransmit;
-extern NSString *XMKey_Preferences_VideoFramesPerSecond;
-extern NSString *XMKey_Preferences_VideoSize;
-extern NSString *XMKey_Preferences_VideoCodecPreferenceList;
-
-// H323-specific keys
-extern NSString *XMKey_Preferences_EnableH323;
-extern NSString *XMKey_Preferences_EnableH245Tunnel;
-extern NSString *XMKey_Preferences_EnableFastStart;
-extern NSString *XMKey_Preferences_UseGatekeeper;
-extern NSString *XMKey_Preferences_GatekeeperAddress;
-extern NSString *XMKey_Preferences_GatekeeperID;
-extern NSString *XMKey_Preferences_GatekeeperUsername;
-extern NSString *XMKey_Preferences_GatekeeperPhoneNumber;
-
-// XMCodecListRecord key
-extern NSString *XMKey_CodecListRecord_Identifier;
-extern NSString *XMKey_CodecListRecord_IsEnabled;
 
 /**
  * XMCodecManager keys
  **/
-extern NSString *XMKey_CodecManager_CodecDescriptionsFilename;
-extern NSString *XMKey_CodecManager_CodecDescriptionsFiletype;
-extern NSString *XMKey_CodecManager_AudioCodecs;
-extern NSString *XMKey_CodecManager_VideoCodecs;
+extern NSString *XMKey_CodecManagerCodecDescriptionsFilename;
+extern NSString *XMKey_CodecManagerCodecDescriptionsFiletype;
+extern NSString *XMKey_CodecManagerAudioCodecs;
+extern NSString *XMKey_CodecManagerVideoCodecs;
 
 /**
  * Exception reasons
  **/
 extern NSString *XMExceptionReason_InvalidParameterMustNotBeNil;
+extern NSString *XMExceptionReason_InvalidParameterMustBeOfCorrectType;
+extern NSString *XMExceptionReason_InvalidParameterMustBeValidKey;
 extern NSString *XMExceptionReason_UnsupportedCoder;
+
 extern NSString *XMExceptionReason_CallManagerInvalidActionWhileOffline;
 extern NSString *XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup;
 extern NSString *XMExceptionReason_CallManagerInvalidActionWhileInCall;
 extern NSString *XMExceptionReason_CallManagerInvalidActionWhileNotInCall;
-extern NSString *XMExceptionReason_CallManagerCallEstablishedInternalConsistencyFailure;
-extern NSString *XMexceptionReason_CallManagerCallClearedInternalConsistencyFailure;
+extern NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Listening;
+extern NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Disabled;
+extern NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperRegistered;
+extern NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperDisabled;
+
+extern NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallEstablished;
+extern NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallCleared;
 extern NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure;
 
 #endif // __XM_PRIVATE_H__

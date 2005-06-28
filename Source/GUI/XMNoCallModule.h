@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.4 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,12 +25,14 @@
 	NSSize contentViewSize;
 	
 	// GUI Outlets
+	IBOutlet NSPopUpButton *recentCallsPopUpButton;
 	IBOutlet XMDatabaseField *callAddressField;
-	IBOutlet NSPopUpButton *locationsPopUp;
-	IBOutlet NSButton *callHistoryButton;
+	IBOutlet NSPopUpButton *locationsPopUpButton;
 	IBOutlet NSButton *callButton;
+	
 	IBOutlet NSTextField *statusFieldOne;
 	IBOutlet NSTextField *statusFieldTwo;
+	IBOutlet NSTextField *statusFieldThree;
 	
 	// Optimizations for XMDatabaseField completions
 	unsigned uncompletedStringLength;
@@ -38,6 +40,8 @@
 	NSMutableArray *completions;
 	
 	NSNib *nibLoader;
+	
+	NSMenuItem *imageItem;
 	
 	XMCallAddressManager *callAddressManager;
 	XMPreferencesManager *preferencesManager;
@@ -47,7 +51,6 @@
 
 - (IBAction)call:(id)sender;
 - (IBAction)changeActiveLocation:(id)sender;
-- (IBAction)showCallHistory:(id)sender;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.6 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -78,22 +78,22 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	NSTableColumn *tableColumn;
 	
 	tableColumn = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialNameIdentifier];
-	[tableColumn setIdentifier:XMKey_CodecDescriptor_Name];
+	[tableColumn setIdentifier:XMKey_CodecName];
 	
 	tableColumn = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialBandwidthIdentifier];
-	[tableColumn setIdentifier:XMKey_CodecDescriptor_Bandwidth];
+	[tableColumn setIdentifier:XMKey_CodecBandwidth];
 	
 	tableColumn = [audioCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialQualityIdentifier];
-	[tableColumn setIdentifier:XMKey_CodecDescriptor_Quality];
+	[tableColumn setIdentifier:XMKey_CodecQuality];
 	
 	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialNameIdentifier];
-	[tableColumn setIdentifier:XMKey_CodecDescriptor_Name];
+	[tableColumn setIdentifier:XMKey_CodecName];
 	
 	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialBandwidthIdentifier];
-	[tableColumn setIdentifier:XMKey_CodecDescriptor_Bandwidth];
+	[tableColumn setIdentifier:XMKey_CodecBandwidth];
 	
 	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialQualityIdentifier];
-	[tableColumn setIdentifier:XMKey_CodecDescriptor_Quality];
+	[tableColumn setIdentifier:XMKey_CodecQuality];
 	
 	// making the table view use a XMBoolean cell for the "enabled" column
 	XMBooleanCell *booleanCell = [[XMBooleanCell alloc] init];
@@ -107,10 +107,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[videoCodecPreferenceOrderTableView setRowHeight:16];
 	[booleanCell release];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-												 name:XMNotification_DidEndFetchingExternalAddress object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
-												 name:XMNotification_DidStartFetchingExternalAddress object:nil];
+												 name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+												 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 	
 	XMUtils *utils = [XMUtils sharedInstance];
 	if([utils didSucceedFetchingExternalAddress] && [utils externalAddress] == nil)
@@ -282,7 +282,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (IBAction)getExternalAddress:(id)sender
 {
-	NSLog(@"Start fetching");
 	XMUtils *utils = [XMUtils sharedInstance];
 	
 	[utils startFetchingExternalAddress];
@@ -845,7 +844,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	}
 	
 	NSString *columnIdentifier = [column identifier];
-	XMCodecListRecord *record;
+	XMPreferencesCodecListRecord *record;
 	
 	if(tableView == audioCodecPreferenceOrderTableView)
 	{
@@ -861,8 +860,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		return [NSNumber numberWithBool:[record isEnabled]];
 	}
 	
-	XMCodecDescriptor *codecDescriptor = [[XMCodecManager sharedInstance] codecDescriptorForIdentifier:[record identifier]];
-	return [codecDescriptor propertyForKey:columnIdentifier];
+	XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[record identifier]];
+	return [codec propertyForKey:columnIdentifier];
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex

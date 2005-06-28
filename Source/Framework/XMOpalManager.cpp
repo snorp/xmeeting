@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -118,11 +118,6 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
 {
 	cout << "XMOpalManager::OnReleased" << endl;
 	OpalManager::OnReleased(connection);
-	
-	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
-	XMCallEndReason endReason = (XMCallEndReason)connection.GetCall().GetCallEndReason();
-	cout << "endReason " << endReason << endl;
-	noteCallCleared(callID, endReason);
 }
 
 BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)
@@ -161,40 +156,7 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 	{
 		limit *= 100;
 	}
-	cout << "setting bandwidth limit to " << limit << endl;
 	h323EP->SetInitialBandwidth(limit);
-}
-
-#pragma mark Audio functions
-
-const PString & XMOpalManager::GetSoundChannelPlayDevice()
-{
-	return pcssEP->GetSoundChannelPlayDevice();
-}
-
-BOOL XMOpalManager::SetSoundChannelPlayDevice(const PString & name)
-{
-	return pcssEP->SetSoundChannelPlayDevice(name);
-}
-
-const PString & XMOpalManager::GetSoundChannelRecordDevice()
-{
-	return pcssEP->GetSoundChannelRecordDevice();
-}
-
-BOOL XMOpalManager::SetSoundChannelRecordDevice(const PString & name)
-{
-	return pcssEP->SetSoundChannelRecordDevice(name);
-}
-
-unsigned XMOpalManager::GetSoundChannelBufferDepth()
-{
-	return pcssEP->GetSoundChannelBufferDepth();
-}
-
-void XMOpalManager::SetSoundChannelBufferDepth(unsigned depth)
-{
-	pcssEP->SetSoundChannelBufferDepth(depth);
 }
 
 #pragma mark Video setup functions

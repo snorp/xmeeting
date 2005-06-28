@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.6 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -139,6 +139,25 @@
  * is not registered at a gatekeeper
  **/
 - (NSString *)gatekeeperName;
+
+/**
+ * Call this method if the enabling of the H.323 subsystem failed somehow
+ * (notified with XMNotification_CallManagerEnablingH323Failed)
+ * and you want to retry the subsystem setup process.
+ * This method raises an exception if the H.323 subsystem is successfully
+ * listening or if the current active preferences do not use H.323 at all!
+ **/
+- (void)retryEnableH323;
+
+/**
+ * Call this method if the gatekeeper registration failed somehow
+ * (notified with XMNotification_CallManagerGatekeeperRegistrationFailed)
+ * and you want to retry the gatekeeper registration process.
+ * This method raises an exception if the gatekeeper registration was
+ * succesful or if the current active preferences do not use a gatekeeper
+ * at all
+ **/
+- (void)retryGatekeeperRegistration;
 
 @end
 

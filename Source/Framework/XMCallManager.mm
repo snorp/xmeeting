@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.6 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,7 @@
 #import "XMUtils.h"
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
+#import "XMPreferencesCodecListRecord.h"
 #import "XMURL.h"
 #import "XMBridge.h"
 
@@ -22,18 +23,19 @@
 
 - (void)_prepareSubsystemSetup;
 - (void)_initiateSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
-- (void)_shutdownSubsystem;
-- (void)_noteSubsystemSetupDidFinish;
-
-// called on a separate thread
+	// called on a separate thread
 - (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
+- (void)_shutdownSubsystem;
+- (void)_mainThreadHandleSubsystemSetupDidFinish;
 
 - (void)_mainThreadHandleIncomingCall:(XMCallInfo *)callInfo;
-- (void)_mainThreadHandleCallEstablished:(NSNumber *)callIDNumber;
+- (void)_mainThreadHandleCallEstablished:(NSArray *)infoArray;
 - (void)_mainThreadHandleCallCleared:(NSArray *)infoArray;
 - (void)_mainThreadHandleMediaStreamOpened:(NSArray *)infoArray;
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
 
+- (void)_mainThreadHandleH323Failure;
+- (void)_mainThreadHandleGatekeeperRegistrationStart;
 - (void)_mainThreadHandleGatekeeperRegistration;
 - (void)_mainThreadHandleGatekeeperUnregistration;
 - (void)_mainThreadHandleGatekeeperRegistrationFailure;
@@ -150,7 +152,9 @@
 		if(isOnline)
 		{
 			[self _prepareSubsystemSetup];
-			[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidGoOnline object:self];
+			
+			NSNotification *notif = [NSNotification notificationWithName:XMNotification_CallManagerDidGoOnline object:self];
+			[[NSNotificationQueue defaultQueue] enqueueNotification:notif postingStyle:NSPostASAP];
 		}
 		else 
 		{
@@ -260,12 +264,6 @@
 	
 	XMCallProtocol callProtocol = [remotePartyURL callProtocol];
 	NSString *address = [remotePartyURL address];
-	unsigned port = [remotePartyURL port];
-	
-	if(port != 0)
-	{
-		address = [NSString stringWithFormat:@"%@:%u", address, port];
-	}
 
 	unsigned callID = startCall(callProtocol, [address cString]);
 	
@@ -279,7 +277,8 @@
 									   remoteApplication:nil
 											  callStatus:XMCallStatus_Calling];
 		
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartCalling object:nil];
+		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidStartCalling object:nil];
+		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 	}
 	
 	return activeCall;
@@ -322,13 +321,67 @@
 	return gatekeeperName;
 }
 
+- (void)retryEnableH323
+{
+	if(doesSubsystemSetup == NO && [self isH323Listening] == NO && [activePreferences enableH323])
+	{
+		[self _prepareSubsystemSetup];
+	}
+	else
+	{
+		NSString *exceptionReason;
+		
+		if(doesSubsystemSetup == YES)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup;
+		}
+		else if([self isH323Listening] == YES)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionWhileH323Listening;
+		}
+		else
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionWhileH323Disabled;
+		}
+		
+		[NSException raise:XMException_InvalidAction format:exceptionReason];
+	}
+}
+
+- (void)retryGatekeeperRegistration
+{
+	if(doesSubsystemSetup == NO && gatekeeperName == nil && [activePreferences useGatekeeper])
+	{
+		[self _prepareSubsystemSetup];
+	}
+	else
+	{
+		NSString *exceptionReason;
+		
+		if(doesSubsystemSetup == YES)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup;
+		}
+		else if(gatekeeperName != nil)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionWhileGatekeeperRegistered;
+		}
+		else
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionWhileGatekeeperDisabled;
+		}
+		
+		[NSException raise:XMException_InvalidAction format:exceptionReason];
+	}
+}
+
 #pragma mark Private Methods
 
 - (void)_prepareSubsystemSetup
 {
 	// "freeze" any modifications
 	doesSubsystemSetup = YES;
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartSubsystemSetup object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup object:self];
 	
 	// set the autoAnswerCall flag
 	autoAnswerCalls = [activePreferences autoAnswerCalls];
@@ -349,7 +402,7 @@
 					// not yet fetched
 					[utils startFetchingExternalAddress];
 					[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-																 name:XMNotification_DidEndFetchingExternalAddress object:nil];
+																 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 					return;
 				}
 			}
@@ -429,7 +482,7 @@
 	char const** orderedCodecs = (char const**)malloc((audioCodecCount + videoCodecCount + 1) * sizeof(char *));
 	for(i = 0; i < audioCodecCount; i++)
 	{
-		XMCodecListRecord *record = [preferences audioCodecListRecordAtIndex:i];
+		XMPreferencesCodecListRecord *record = [preferences audioCodecListRecordAtIndex:i];
 		const char *identifier = [[record identifier] cString];
 		if([record isEnabled])
 		{
@@ -444,7 +497,7 @@
 	}
 	for(i = 0; i < videoCodecCount; i++)
 	{
-		XMCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
+		XMPreferencesCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
 		const char *identifier = [[record identifier] cString];
 		if([record isEnabled])
 		{
@@ -500,11 +553,16 @@
 					gatekeeperPhoneNumber = [gkPhoneNumber cString];
 				}
 			}
+			
+			// inform the rest through notifications since this might be a lengthy task
+			[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistrationStart) withObject:nil waitUntilDone:NO];
+			
 			setGatekeeper(gatekeeperAddress, gatekeeperID, gatekeeperUsername, gatekeeperPhoneNumber);
 		}
 		else
 		{
-			// enabling the H.323 listeners failed we have notify this through notifications
+			// enabling the H.323 listeners failed
+			[self performSelectorOnMainThread:@selector(_mainThreadHandleH323Failure) withObject:nil waitUntilDone:NO];
 		}
 	}
 	else
@@ -516,7 +574,7 @@
 		enableH323Listeners(NO);
 	}
 	
-	[self performSelectorOnMainThread:@selector(_noteSubsystemSetupDidEnd) withObject:nil waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleSubsystemSetupDidEnd) withObject:nil waitUntilDone:NO];
 	
 	// cleaning up
 	[preferences release];
@@ -532,7 +590,7 @@
 	gatekeeperRegistrationCheckTimer = nil;
 }
 
-- (void)_noteSubsystemSetupDidEnd
+- (void)_mainThreadHandleSubsystemSetupDidEnd
 {	
 	if(needsSubsystemShutdownAfterSubsystemSetup == YES)
 	{
@@ -546,12 +604,12 @@
 		doesSubsystemSetup = NO;
 	
 			// post the notification
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndSubsystemSetup object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
 		
 		// in case we just went offline, we post the appropriate notification here
 		if(isOnline == NO)
 		{
-			[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidGoOffline object:self];
+			[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidGoOffline object:self];
 		}
 	}
 }
@@ -605,27 +663,58 @@
 	else
 	{
 		// post the appropriate notification
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_IncomingCall
-														object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerIncomingCall
+															object:self];
 	}
 }
 
 -(void)_handleCallEstablished:(unsigned)callID
-{
+{	
+	
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-	[self performSelectorOnMainThread:@selector(_mainThreadHandleCallEstablished:) withObject:number
-						waitUntilDone:NO];
+	NSString *remoteNameString;
+	NSString *remoteNumberString;
+	NSString *remoteAddressString;
+	NSString *remoteApplicationString;
+	
+	// we need to get additional information.
+	const char *remoteName;
+	const char *remoteNumber;
+	const char *remoteAddress;
+	const char *remoteApplication;
+	
+	getCallInformation([activeCall _callID], &remoteName, &remoteNumber, &remoteAddress, &remoteApplication);
+	
+	remoteNameString = [[NSString alloc] initWithCString:remoteName];
+	remoteNumberString = [[NSString alloc] initWithCString:remoteNumber];
+	remoteAddressString = [[NSString alloc] initWithCString:remoteAddress];
+	remoteApplicationString = [[NSString alloc] initWithCString:remoteApplication];
+	
+	NSArray *informationArray = [[NSArray alloc] initWithObjects:number, remoteNameString, remoteNumberString,
+															remoteAddressString, remoteApplicationString, nil];
+	
 	[number release];
+	[remoteNameString release];
+	[remoteNumberString release];
+	[remoteAddressString release];
+	[remoteApplicationString release];
+	
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleCallEstablished:) withObject:informationArray
+						waitUntilDone:NO];
+	
+	[informationArray release];
 }
 
-- (void)_mainThreadHandleCallEstablished:(NSNumber *)callIDNumber
+- (void)_mainThreadHandleCallEstablished:(NSArray *)infoArray
 {
 	if(activeCall == nil)
 	{
 		[NSException raise:XMException_InternalConsistencyFailure 
-					format:XMExceptionReason_CallManagerCallEstablishedInternalConsistencyFailure];
+					format:XMExceptionReason_CallManagerInternalConsistencyFailureOnCallEstablished];
 		return;
 	}
+	
+	NSNumber *callIDNumber = (NSNumber *)[infoArray objectAtIndex:0];
 	
 	unsigned callID = [callIDNumber unsignedIntValue];
 	if([activeCall _callID] != callID)
@@ -647,33 +736,18 @@
 	
 	if([activeCall remoteName] == nil)
 	{
-		NSLog(@"fetching additional infos");
-		// we need to get additional information.
-		const char *remoteName;
-		const char *remoteNumber;
-		const char *remoteAddress;
-		const char *remoteApplication;
+		NSString *remoteName = (NSString *)[infoArray objectAtIndex:1];
+		NSString *remoteNumber = (NSString *)[infoArray objectAtIndex:2];
+		NSString *remoteAddress = (NSString *)[infoArray objectAtIndex:3];
+		NSString *remoteApplication = (NSString *)[infoArray objectAtIndex:4];
 		
-		getCallInformation([activeCall _callID], &remoteName, &remoteNumber, &remoteAddress, &remoteApplication);
-		
-		NSString *str = [[NSString alloc] initWithCString:remoteName];
-		[activeCall _setRemoteName:str];
-		[str release];
-		
-		str = [[NSString alloc] initWithCString:remoteNumber];
-		[activeCall _setRemoteNumber:str];
-		[str release];
-		
-		str = [[NSString alloc] initWithCString:remoteAddress];
-		[activeCall _setRemoteAddress:str];
-		[str release];
-		
-		str = [[NSString alloc] initWithCString:remoteApplication];
-		[activeCall _setRemoteApplication:str];
-		[str release];
+		[activeCall _setRemoteName:remoteName];
+		[activeCall _setRemoteNumber:remoteNumber];
+		[activeCall _setRemoteAddress:remoteAddress];
+		[activeCall _setRemoteApplication:remoteApplication];
 	}
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallEstablished
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallEstablished
 														object:self];
 }
 
@@ -718,7 +792,7 @@
 	[activeCall release];
 	activeCall = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallCleared
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallCleared
 														object:self];
 	
 	// In some cases, we need to change some settings in the subsystem
@@ -768,16 +842,6 @@
 		return;
 	}
 	
-	if(isInputStream)
-	{
-		NSLog(@"incoming:");
-	}
-	else
-	{
-		NSLog(@"outgoing:");
-	}
-	NSLog(codecString);
-	
 	if([codecString rangeOfString:@"261"].location != NSNotFound ||
 	   [codecString rangeOfString:@"263"].location != NSNotFound)
 	{
@@ -807,11 +871,21 @@
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_DidEndFetchingExternalAddress object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 	[self _initiateSubsystemSetupWithPreferences:[activePreferences copy]];
 }
 	
 #pragma mark H.323 private methods
+
+- (void)_mainThreadHandleH323Failure
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerEnablingH323Failed object:self];
+}
+
+- (void)_mainThreadHandleGatekeeperRegistrationStart
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartGatekeeperRegistration object:self];
+}
 
 - (void)_handleGatekeeperRegistration:(NSString *)theGatekeeperName
 {
@@ -831,7 +905,7 @@
 																	   selector:@selector(_checkGatekeeperRegistration:)
 																	   userInfo:nil repeats:YES] retain];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_GatekeeperRegistration object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperRegistration object:self];
 }
 
 - (void)_handleGatekeeperUnregistration
@@ -849,7 +923,7 @@
 	[gatekeeperRegistrationCheckTimer release];
 	gatekeeperRegistrationCheckTimer = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_GatekeeperUnregistration object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperUnregistration object:self];
 }
 
 - (void)_handleGatekeeperRegistrationFailure
@@ -867,7 +941,7 @@
 	[gatekeeperRegistrationCheckTimer release];
 	gatekeeperRegistrationCheckTimer = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_GatekeeperRegistrationFailure object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperRegistrationFailed object:self];
 }
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer

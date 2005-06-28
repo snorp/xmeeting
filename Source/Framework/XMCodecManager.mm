@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.mm,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCodecManager.mm,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,16 +14,6 @@
 
 - (id)_init;
 
-@end
-
-@interface XMCodecDescriptor (PrivateMethods)
-
-- (id)_initWithDictionary:(NSDictionary *)dict;
-
-- (id)_initWithIdentifier:(NSString *)identifier
-					 name:(NSString *)name
-				bandwidth:(NSString *)bandwidth
-				  quality:(NSString *)quality;
 @end
 
 @implementation XMCodecManager
@@ -60,13 +50,10 @@
 {
 	self = [super init];
 	
-	audioCodecDescriptors = [[NSMutableArray alloc] initWithCapacity:5];
-	videoCodecDescriptors = [[NSMutableArray alloc] initWithCapacity:2];
-	
 	// obtaining the plist-data
 	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-	NSString *descFilePath = [bundle pathForResource:XMKey_CodecManager_CodecDescriptionsFilename 
-											  ofType:XMKey_CodecManager_CodecDescriptionsFiletype];
+	NSString *descFilePath = [bundle pathForResource:XMKey_CodecManagerCodecDescriptionsFilename 
+											  ofType:XMKey_CodecManagerCodecDescriptionsFiletype];
 	
 	NSData *descFileData = [NSData dataWithContentsOfFile:descFilePath];
 	
@@ -83,30 +70,34 @@
 	}
 	
 	// Importing the audio codecs from the plist
-	NSArray *arr = [dict objectForKey:XMKey_CodecManager_AudioCodecs];
+	NSArray *arr = [dict objectForKey:XMKey_CodecManagerAudioCodecs];
 	int count = [arr count];
 	int i;
+	
+	audioCodecs = [[NSMutableArray alloc] initWithCapacity:count];
 	
 	for(i = 0; i < count; i++)
 	{
 		NSDictionary *descDict = (NSDictionary *)[arr objectAtIndex:i];
 		
-		XMCodecDescriptor *desc = [[XMCodecDescriptor alloc] _initWithDictionary:descDict];
-		[audioCodecDescriptors addObject:desc];
-		[desc release];
+		XMCodec *codec = [[XMCodec alloc] _initWithDictionary:descDict];
+		[audioCodecs addObject:codec];
+		[codec release];
 	}
 	
 	// Importing the video codecs from the plist
-	arr = [dict objectForKey:XMKey_CodecManager_VideoCodecs];
+	arr = [dict objectForKey:XMKey_CodecManagerVideoCodecs];
 	count = [arr count];
+	
+	videoCodecs = [[NSMutableArray alloc] initWithCapacity:count];
 	
 	for(i = 0; i < count; i++)
 	{
 		NSDictionary *descDict = (NSDictionary *)[arr objectAtIndex:i];
 
-		XMCodecDescriptor *desc = [[XMCodecDescriptor alloc] _initWithDictionary:descDict];
-		[videoCodecDescriptors addObject:desc];
-		[desc release];
+		XMCodec *codec = [[XMCodec alloc] _initWithDictionary:descDict];
+		[videoCodecs addObject:codec];
+		[codec release];
 	}
 	
 	return self;
@@ -114,38 +105,38 @@
 
 - (void)dealloc
 {
-	[audioCodecDescriptors release];
-	[videoCodecDescriptors release];
+	[audioCodecs release];
+	[videoCodecs release];
 	
 	[super dealloc];
 }
 
 #pragma mark Methods for Accessing Codec Descriptors
 
-- (XMCodecDescriptor *)codecDescriptorForIdentifier:(NSString *)identifier
+- (XMCodec *)codecForIdentifier:(NSString *)identifier
 {
 	// check all audio codecs
-	int count = [audioCodecDescriptors count];
+	int count = [audioCodecs count];
 	int i;
 	for(i = 0; i < count; i++)
 	{
-		XMCodecDescriptor *codecDesc = (XMCodecDescriptor *)[audioCodecDescriptors objectAtIndex:i];
+		XMCodec *codec = (XMCodec *)[audioCodecs objectAtIndex:i];
 		
-		if([[codecDesc identifier] isEqualToString:identifier])
+		if([[codec identifier] isEqualToString:identifier])
 		{
-			return codecDesc;
+			return codec;
 		}
 	}
 	
 	// now check the video codecs
-	count = [videoCodecDescriptors count];
+	count = [videoCodecs count];
 	for(i = 0; i < count; i++)
 	{
-		XMCodecDescriptor *codecDesc = (XMCodecDescriptor *)[videoCodecDescriptors objectAtIndex:i];
+		XMCodec *codec = (XMCodec *)[videoCodecs objectAtIndex:i];
 		
-		if([[codecDesc identifier] isEqualToString:identifier])
+		if([[codec identifier] isEqualToString:identifier])
 		{
-			return codecDesc;
+			return codec;
 		}
 	}
 	
@@ -155,146 +146,22 @@
 
 - (unsigned)audioCodecCount
 {
-	return [audioCodecDescriptors count];
+	return [audioCodecs count];
 }
 
-- (XMCodecDescriptor *)audioCodecDescriptorAtIndex:(unsigned)index
+- (XMCodec *)audioCodecAtIndex:(unsigned)index
 {
-	return (XMCodecDescriptor *)[audioCodecDescriptors objectAtIndex:index];
+	return (XMCodec *)[audioCodecs objectAtIndex:index];
 }
 
 - (unsigned)videoCodecCount
 {
-	return [videoCodecDescriptors count];
+	return [videoCodecs count];
 }
 
-- (XMCodecDescriptor *)videoCodecDescriptorAtIndex:(unsigned)index
+- (XMCodec *)videoCodecAtIndex:(unsigned)index
 {
-	return (XMCodecDescriptor *)[videoCodecDescriptors objectAtIndex:index];
-}
-
-@end
-
-@implementation XMCodecDescriptor
-
-#pragma mark Init & Deallocation Methods
-
-- (id)init
-{
-	[self doesNotRecognizeSelector:_cmd];
-	[self release];
-	return nil;
-}
-
-- (id)_initWithDictionary:(NSDictionary *)dict
-{
-	NSString *anIdentifier = [dict objectForKey:XMKey_CodecDescriptor_Identifier];
-	NSString *aName = [dict objectForKey:XMKey_CodecDescriptor_Name];
-	NSString *aBandwidth = [dict objectForKey:XMKey_CodecDescriptor_Bandwidth];
-	NSString *aQuality = [dict objectForKey:XMKey_CodecDescriptor_Quality];
-	
-	if(anIdentifier == nil || aName == nil || aBandwidth == nil || aQuality == nil)
-	{
-		[NSException raise:XMException_InternalConsistencyFailure
-					format:XMExceptionReason_CodecManagerInternalConsistencyFailure];
-	}
-	
-	return [self _initWithIdentifier:anIdentifier name:aName bandwidth:aBandwidth quality:aQuality];
-}
-
-- (id)_initWithIdentifier:(NSString *)anIdentifier
-					 name:(NSString *)aName 
-				bandwidth:(NSString *)aBandwidth 
-				  quality:(NSString *)aQuality
-{
-	self = [super init];
-	
-	identifier = [anIdentifier copy];
-	name = [aName copy];
-	bandwidth = [aBandwidth copy];
-	quality = [aQuality copy];
-	
-	return self;
-}
-
-- (void)dealloc
-{
-	[identifier release];
-	[name release];
-	[bandwidth release];
-	[quality release];
-	
-	[super dealloc];
-}
-
-#pragma mark General NSObject Functionality
-
-- (BOOL)isEqual:(NSObject *)object
-{
-	if(self == object)
-	{
-		return YES;
-	}
-	
-	if([object isKindOfClass:[self class]])
-	{
-		XMCodecDescriptor *desc = (XMCodecDescriptor *)object;
-		if([identifier isEqualToString:[desc identifier]] &&
-		   [name isEqualToString:[desc name]] &&
-		   [bandwidth isEqualToString:[desc bandwidth]] &&
-		   [quality isEqualToString:[desc quality]])
-		   {
-			   return YES;
-		   }
-	}
-return NO;
-}
-
-#pragma mark Accessors
-
-- (NSString *)propertyForKey:(NSString *)theKey
-{
-	if([theKey isEqualToString:XMKey_CodecDescriptor_Identifier])
-	{
-		return identifier;
-	}
-	
-	if([theKey isEqualToString:XMKey_CodecDescriptor_Name])
-	{
-		return name;
-	}
-	
-	if([theKey isEqualToString:XMKey_CodecDescriptor_Bandwidth])
-	{
-		return bandwidth;
-	}
-	
-	if([theKey isEqualToString:XMKey_CodecDescriptor_Quality])
-	{
-		return quality;
-	}
-	
-	return nil;
-}
-
-- (NSString *)identifier
-{
-	return identifier;
-}
-
-- (NSString *)name
-{
-	return name;
-}
-
-- (NSString *)bandwidth
-{
-	return bandwidth;
-}
-
-- (NSString *)quality
-{
-	return quality;
+	return (XMCodec *)[videoCodecs objectAtIndex:index];
 }
 
 @end

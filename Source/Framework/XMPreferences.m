@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,28 +9,287 @@
 #import "XMStringConstants.h"
 #import "XMPrivate.h"
 #import "XMPreferences.h"
+#import "XMPreferencesCodecListRecord.h"
 #import "XMCodecManager.h"
 
-@interface XMCodecListRecord (PrivateMethods)
+@interface XMPreferences (PrivateMethods)
 
-- (id)_initWithIdentifier:(NSString *)identifier enabled:(BOOL)enabled;
-- (id)_initWithDictionary:(NSDictionary *)dict;
+- (NSMutableArray *)_audioCodecList;
+- (void)_setAudioCodecList:(NSArray *)arr;
 
-@end
-
-@interface XMPreferences(PrivateMethods)
-
-- (NSMutableArray *)_audioCodecPreferenceList;
-- (void)_setAudioCodecPreferenceList:(NSArray *)arr;
-
-- (NSMutableArray *)_videoCodecPreferenceList;
-- (void)_setVideoCodecPreferenceList:(NSArray *)arr;
-
-- (void)_validateCodecs;
+- (NSMutableArray *)_videoCodecList;
+- (void)_setVideoCodecList:(NSArray *)arr;
 
 @end
 
 @implementation XMPreferences
+
+#pragma mark Framework Methods
+
++ (XM_VALUE_TEST_RESULT)_checkValue:(id)value forKey:(NSString *)key
+{
+	XM_VALUE_TEST_RESULT result;
+	
+	if([key isEqualToString:XMKey_PreferencesUserName])
+	{
+		if([value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesAutoAnswerCalls])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesExternalAddress])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesTCPPortBase])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesTCPPortMax])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUDPPortBase])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUDPPortMax])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioBufferSize])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableVideoReceive])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableVideoTransmit])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoSize])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH323])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH245Tunnel])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableFastStart])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseGatekeeper])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperID])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else
+	{
+		result = XM_INVALID_KEY;
+	}
+	
+	return result;
+}
+
+- (BOOL)_value:(id)value differsFromPropertyWithKey:(NSString *)key
+{
+	id storedValue = [self valueForKey:key];
+	
+	if([value isEqual:storedValue])
+	{
+		return NO;
+	}
+	return YES;
+}
 
 #pragma mark Init & Deallocation Methods
 
@@ -53,13 +312,13 @@
 	// this has yet to be done. In case of a copy operation, the array allocated here is never
 	// used.
 	audioBufferSize = 2;
-	audioCodecPreferenceList = nil;
+	audioCodecList = nil;
 	
 	enableVideoReceive = NO;
 	enableVideoTransmit = NO;
 	videoFramesPerSecond = 5;
 	videoSize = XMVideoSize_NoVideo;
-	videoCodecPreferenceList = nil;
+	videoCodecList = nil;
 	
 	enableH323 = NO;
 	enableH245Tunnel = NO;
@@ -79,61 +338,67 @@
 	
 	self = [self init];
 	
-	obj = [dict objectForKey:XMKey_Preferences_UserName];
+	obj = [dict objectForKey:XMKey_PreferencesUserName];
 	if(obj)
 	{
 		[self setUserName:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_AutoAnswerCalls];
+	obj = [dict objectForKey:XMKey_PreferencesAutoAnswerCalls];
 	if(obj)
 	{
 		[self setAutoAnswerCalls:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_BandwidthLimit];
+	obj = [dict objectForKey:XMKey_PreferencesBandwidthLimit];
 	if(obj)
 	{
 		[self setBandwidthLimit:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_UseAddressTranslation];
+	obj = [dict objectForKey:XMKey_PreferencesUseAddressTranslation];
 	if(obj)
 	{
 		[self setUseAddressTranslation:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_ExternalAddress];
+	obj = [dict objectForKey:XMKey_PreferencesExternalAddress];
 	if(obj)
 	{
 		[self setExternalAddress:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_TCPPortBase];
+	obj = [dict objectForKey:XMKey_PreferencesTCPPortBase];
 	if(obj)
 	{
 		[self setTCPPortBase:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_TCPPortMax];
+	obj = [dict objectForKey:XMKey_PreferencesTCPPortMax];
 	if(obj)
 	{
 		[self setTCPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_UDPPortBase];
+	obj = [dict objectForKey:XMKey_PreferencesUDPPortBase];
 	if(obj)
 	{
 		[self setUDPPortBase:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_UDPPortMax];
+	obj = [dict objectForKey:XMKey_PreferencesUDPPortMax];
 	if(obj)
 	{
 		[self setUDPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_AudioCodecPreferenceList];
+	obj = [dict objectForKey:XMKey_PreferencesAudioBufferSize];
+	if(obj)
+	{
+		[self setAudioBufferSize:[(NSNumber *)obj unsignedIntValue]];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesAudioCodecList];
 	if(obj)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
@@ -141,64 +406,58 @@
 		unsigned count = [arr count];
 		unsigned i;
 		
-		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithDictionary:dict];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithDictionary:dict];
 			
-			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
+			if([codecManager codecForIdentifier:[record identifier]] != nil)
 			{
-				[audioCodecPreferenceList addObject:record];
+				[audioCodecList addObject:record];
 			}
 			[record release];
 		}
 		
 		// any newly added codecs are guaranteed to be found at the end of the array
-		count = [audioCodecPreferenceList count];
+		count = [audioCodecList count];
 		unsigned codecCount = [codecManager audioCodecCount];
 		
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager audioCodecDescriptorAtIndex:i] identifier];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[audioCodecPreferenceList addObject:record];
+			NSString *identifier = [[codecManager audioCodecAtIndex:i] identifier];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+			[audioCodecList addObject:record];
 			[record release];
 		}
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_AudioBufferSize];
-	if(obj)
-	{
-		[self setAudioBufferSize:[(NSNumber *)obj unsignedIntValue]];
-	}
-	
-	obj = [dict objectForKey:XMKey_Preferences_EnableVideoReceive];
+	obj = [dict objectForKey:XMKey_PreferencesEnableVideoReceive];
 	if(obj)
 	{
 		[self setEnableVideoReceive:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_EnableVideoTransmit];
+	obj = [dict objectForKey:XMKey_PreferencesEnableVideoTransmit];
 	if(obj)
 	{
 		[self setEnableVideoTransmit:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_VideoFramesPerSecond];
+	obj = [dict objectForKey:XMKey_PreferencesVideoFramesPerSecond];
 	if(obj)
 	{
 		[self setVideoFramesPerSecond:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_VideoSize];
+	obj = [dict objectForKey:XMKey_PreferencesVideoSize];
 	if(obj)
 	{
 		[self setVideoSize:[(NSNumber *)obj intValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_VideoCodecPreferenceList];
+	obj = [dict objectForKey:XMKey_PreferencesVideoCodecList];
 	if(obj)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
@@ -206,76 +465,76 @@
 		unsigned count = [arr count];
 		int i;
 		
-		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithDictionary:dict];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithDictionary:dict];
 			
-			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
+			if([codecManager codecForIdentifier:[record identifier]] != nil)
 			{
-				[videoCodecPreferenceList addObject:record];
+				[videoCodecList addObject:record];
 			}
 			[record release];
 		}
 		
 		// we have to include additional codec records in case new codecs were added to the system
-		count = [videoCodecPreferenceList count];
+		count = [videoCodecList count];
 		unsigned codecCount = [codecManager videoCodecCount];
 		
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager videoCodecDescriptorAtIndex:i] identifier];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[videoCodecPreferenceList addObject:record];
+			NSString *identifier = [[codecManager videoCodecAtIndex:i] identifier];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+			[videoCodecList addObject:record];
 			[record release];
 		}
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_EnableH323];
+	obj = [dict objectForKey:XMKey_PreferencesEnableH323];
 	if(obj)
 	{
 		[self setEnableH323:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_EnableH245Tunnel];
+	obj = [dict objectForKey:XMKey_PreferencesEnableH245Tunnel];
 	if(obj)
 	{
 		[self setEnableH245Tunnel:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_EnableFastStart];
+	obj = [dict objectForKey:XMKey_PreferencesEnableFastStart];
 	if(obj)
 	{
 		[self setEnableFastStart:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_UseGatekeeper];
+	obj = [dict objectForKey:XMKey_PreferencesUseGatekeeper];
 	if(obj)
 	{
 		[self setUseGatekeeper:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_GatekeeperAddress];
+	obj = [dict objectForKey:XMKey_PreferencesGatekeeperAddress];
 	if(obj)
 	{
 		[self setGatekeeperAddress:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_GatekeeperID];
+	obj = [dict objectForKey:XMKey_PreferencesGatekeeperID];
 	if(obj)
 	{
 		[self setGatekeeperID:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_GatekeeperUsername];
+	obj = [dict objectForKey:XMKey_PreferencesGatekeeperUsername];
 	if(obj)
 	{
 		[self setGatekeeperUsername:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_Preferences_GatekeeperPhoneNumber];
+	obj = [dict objectForKey:XMKey_PreferencesGatekeeperPhoneNumber];
 	if(obj)
 	{
 		[self setGatekeeperPhoneNumber:(NSString *)obj];
@@ -299,14 +558,14 @@
 	[preferences setUDPPortBase:[self udpPortBase]];
 	[preferences setUDPPortMax:[self udpPortMax]];
 	
-	[preferences _setAudioCodecPreferenceList:[self _audioCodecPreferenceList]];
 	[preferences setAudioBufferSize:[self audioBufferSize]];
+	[preferences _setAudioCodecList:[self _audioCodecList]];
 	
 	[preferences setEnableVideoReceive:[self enableVideoReceive]];
 	[preferences setEnableVideoTransmit:[self enableVideoTransmit]];
 	[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
 	[preferences setVideoSize:[self videoSize]];
-	[preferences _setVideoCodecPreferenceList:[self _videoCodecPreferenceList]];
+	[preferences _setVideoCodecList:[self _videoCodecList]];
 	
 	[preferences setEnableH323:[self enableH323]];
 	[preferences setEnableH245Tunnel:[self enableH245Tunnel]];
@@ -330,73 +589,73 @@
 		NSArray *array;
 		unsigned count, codecCount, i;
 		
-		[self setUserName:[coder decodeObjectForKey:XMKey_Preferences_UserName]];
-		[self setAutoAnswerCalls:[coder decodeBoolForKey:XMKey_Preferences_AutoAnswerCalls]];
-		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_Preferences_BandwidthLimit]];
-		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_Preferences_UseAddressTranslation]];
-		[self setExternalAddress:[coder decodeObjectForKey:XMKey_Preferences_ExternalAddress]];
-		[self setTCPPortBase:[coder decodeIntForKey:XMKey_Preferences_TCPPortBase]];
-		[self setTCPPortMax:[coder decodeIntForKey:XMKey_Preferences_TCPPortMax]];
-		[self setUDPPortBase:[coder decodeIntForKey:XMKey_Preferences_UDPPortBase]];
-		[self setUDPPortMax:[coder decodeIntForKey:XMKey_Preferences_UDPPortMax]];
+		[self setUserName:[coder decodeObjectForKey:XMKey_PreferencesUserName]];
+		[self setAutoAnswerCalls:[coder decodeBoolForKey:XMKey_PreferencesAutoAnswerCalls]];
+		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_PreferencesBandwidthLimit]];
+		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_PreferencesUseAddressTranslation]];
+		[self setExternalAddress:[coder decodeObjectForKey:XMKey_PreferencesExternalAddress]];
+		[self setTCPPortBase:[coder decodeIntForKey:XMKey_PreferencesTCPPortBase]];
+		[self setTCPPortMax:[coder decodeIntForKey:XMKey_PreferencesTCPPortMax]];
+		[self setUDPPortBase:[coder decodeIntForKey:XMKey_PreferencesUDPPortBase]];
+		[self setUDPPortMax:[coder decodeIntForKey:XMKey_PreferencesUDPPortMax]];
 		
-		array = (NSArray *)[coder decodeObjectForKey:XMKey_Preferences_AudioCodecPreferenceList];
+		[self setAudioBufferSize:[coder decodeIntForKey:XMKey_PreferencesAudioBufferSize]];
+		
+		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesAudioCodecList];
 		count = [array count];
 		codecCount = [codecManager audioCodecCount];
-		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
-			XMCodecListRecord *record = (XMCodecListRecord *)[array objectAtIndex:i];
-			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
+			XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[array objectAtIndex:i];
+			if([codecManager codecForIdentifier:[record identifier]] != nil)
 			{
-				[audioCodecPreferenceList addObject:record];
+				[audioCodecList addObject:record];
 			}
 		}
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager audioCodecDescriptorAtIndex:i] identifier];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[audioCodecPreferenceList addObject:record];
+			NSString *identifier = [[codecManager audioCodecAtIndex:i] identifier];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+			[audioCodecList addObject:record];
 			[record release];
 		}
 		
-		[self setAudioBufferSize:[coder decodeIntForKey:XMKey_Preferences_AudioBufferSize]];
+		[self setEnableVideoReceive:[coder decodeBoolForKey:XMKey_PreferencesEnableVideoReceive]];
+		[self setEnableVideoTransmit:[coder decodeBoolForKey:XMKey_PreferencesEnableVideoTransmit]];
+		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
+		[self setVideoSize:[coder decodeIntForKey:XMKey_PreferencesVideoSize]];
 		
-		[self setEnableVideoReceive:[coder decodeBoolForKey:XMKey_Preferences_EnableVideoReceive]];
-		[self setEnableVideoTransmit:[coder decodeBoolForKey:XMKey_Preferences_EnableVideoTransmit]];
-		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_Preferences_VideoFramesPerSecond]];
-		[self setVideoSize:[coder decodeIntForKey:XMKey_Preferences_VideoSize]];
-		
-		array = (NSArray *)[coder decodeObjectForKey:XMKey_Preferences_VideoCodecPreferenceList];
+		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesVideoCodecList];
 		count = [array count];
 		codecCount = [codecManager videoCodecCount];
-		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
-			XMCodecListRecord *record = (XMCodecListRecord *)[array objectAtIndex:i];
-			if([codecManager codecDescriptorForIdentifier:[record identifier]] != nil)
+			XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[array objectAtIndex:i];
+			if([codecManager codecForIdentifier:[record identifier]] != nil)
 			{
-				[videoCodecPreferenceList addObject:record];
+				[videoCodecList addObject:record];
 			}
 		}
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager videoCodecDescriptorAtIndex:i] identifier];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[videoCodecPreferenceList addObject:record];
+			NSString *identifier = [[codecManager videoCodecAtIndex:i] identifier];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+			[videoCodecList addObject:record];
 			[record release];
 		}
 		
-		[self setEnableH323:[coder decodeBoolForKey:XMKey_Preferences_EnableH323]];
-		[self setEnableH245Tunnel:[coder decodeBoolForKey:XMKey_Preferences_EnableH245Tunnel]];
-		[self setEnableFastStart:[coder decodeBoolForKey:XMKey_Preferences_EnableFastStart]];
-		[self setUseGatekeeper:[coder decodeBoolForKey:XMKey_Preferences_UseGatekeeper]];
-		[self setGatekeeperAddress:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperAddress]];
-		[self setGatekeeperID:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperID]];
-		[self setGatekeeperUsername:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperUsername]];
-		[self setGatekeeperPhoneNumber:[coder decodeObjectForKey:XMKey_Preferences_GatekeeperPhoneNumber]];
+		[self setEnableH323:[coder decodeBoolForKey:XMKey_PreferencesEnableH323]];
+		[self setEnableH245Tunnel:[coder decodeBoolForKey:XMKey_PreferencesEnableH245Tunnel]];
+		[self setEnableFastStart:[coder decodeBoolForKey:XMKey_PreferencesEnableFastStart]];
+		[self setUseGatekeeper:[coder decodeBoolForKey:XMKey_PreferencesUseGatekeeper]];
+		[self setGatekeeperAddress:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperAddress]];
+		[self setGatekeeperID:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperID]];
+		[self setGatekeeperUsername:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperUsername]];
+		[self setGatekeeperPhoneNumber:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber]];
 	}
 	else // raise an exception
 	{
@@ -412,34 +671,34 @@
 {
 	if([coder allowsKeyedCoding])
 	{
-		[coder encodeObject:[self userName] forKey:XMKey_Preferences_UserName];
-		[coder encodeBool:[self autoAnswerCalls] forKey:XMKey_Preferences_AutoAnswerCalls];
+		[coder encodeObject:[self userName] forKey:XMKey_PreferencesUserName];
+		[coder encodeBool:[self autoAnswerCalls] forKey:XMKey_PreferencesAutoAnswerCalls];
 		
-		[coder encodeInt:[self bandwidthLimit] forKey:XMKey_Preferences_BandwidthLimit];
-		[coder encodeBool:[self useAddressTranslation] forKey:XMKey_Preferences_UseAddressTranslation];
-		[coder encodeObject:[self externalAddress] forKey:XMKey_Preferences_ExternalAddress];
-		[coder encodeInt:[self tcpPortBase] forKey:XMKey_Preferences_TCPPortBase];
-		[coder encodeInt:[self tcpPortMax] forKey:XMKey_Preferences_TCPPortMax];
-		[coder encodeInt:[self udpPortBase] forKey:XMKey_Preferences_UDPPortBase];
-		[coder encodeInt:[self udpPortMax] forKey:XMKey_Preferences_UDPPortMax];
+		[coder encodeInt:[self bandwidthLimit] forKey:XMKey_PreferencesBandwidthLimit];
+		[coder encodeBool:[self useAddressTranslation] forKey:XMKey_PreferencesUseAddressTranslation];
+		[coder encodeObject:[self externalAddress] forKey:XMKey_PreferencesExternalAddress];
+		[coder encodeInt:[self tcpPortBase] forKey:XMKey_PreferencesTCPPortBase];
+		[coder encodeInt:[self tcpPortMax] forKey:XMKey_PreferencesTCPPortMax];
+		[coder encodeInt:[self udpPortBase] forKey:XMKey_PreferencesUDPPortBase];
+		[coder encodeInt:[self udpPortMax] forKey:XMKey_PreferencesUDPPortMax];
 		
-		[coder encodeObject:[self _audioCodecPreferenceList] forKey:XMKey_Preferences_AudioCodecPreferenceList];
-		[coder encodeInt:[self audioBufferSize] forKey:XMKey_Preferences_AudioBufferSize];
+		[coder encodeInt:[self audioBufferSize] forKey:XMKey_PreferencesAudioBufferSize];
+		[coder encodeObject:[self _audioCodecList] forKey:XMKey_PreferencesAudioCodecList];
 		
-		[coder encodeBool:[self enableVideoReceive] forKey:XMKey_Preferences_EnableVideoReceive];
-		[coder encodeBool:[self enableVideoTransmit] forKey:XMKey_Preferences_EnableVideoTransmit];
-		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_Preferences_VideoFramesPerSecond];
-		[coder encodeInt:[self videoSize] forKey:XMKey_Preferences_VideoSize];
-		[coder encodeObject:[self _videoCodecPreferenceList] forKey:XMKey_Preferences_VideoCodecPreferenceList];
+		[coder encodeBool:[self enableVideoReceive] forKey:XMKey_PreferencesEnableVideoReceive];
+		[coder encodeBool:[self enableVideoTransmit] forKey:XMKey_PreferencesEnableVideoTransmit];
+		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
+		[coder encodeInt:[self videoSize] forKey:XMKey_PreferencesVideoSize];
+		[coder encodeObject:[self _videoCodecList] forKey:XMKey_PreferencesVideoCodecList];
 		
-		[coder encodeBool:[self enableH323] forKey:XMKey_Preferences_EnableH323];
-		[coder encodeBool:[self enableH245Tunnel] forKey:XMKey_Preferences_EnableH245Tunnel];
-		[coder encodeBool:[self enableFastStart] forKey:XMKey_Preferences_EnableFastStart];
-		[coder encodeBool:[self useGatekeeper] forKey:XMKey_Preferences_UseGatekeeper];
-		[coder encodeObject:[self gatekeeperAddress] forKey:XMKey_Preferences_GatekeeperAddress];
-		[coder encodeObject:[self gatekeeperID] forKey:XMKey_Preferences_GatekeeperID];
-		[coder encodeObject:[self gatekeeperUsername] forKey:XMKey_Preferences_GatekeeperUsername];
-		[coder encodeObject:[self gatekeeperPhoneNumber] forKey:XMKey_Preferences_GatekeeperPhoneNumber];
+		[coder encodeBool:[self enableH323] forKey:XMKey_PreferencesEnableH323];
+		[coder encodeBool:[self enableH245Tunnel] forKey:XMKey_PreferencesEnableH245Tunnel];
+		[coder encodeBool:[self enableFastStart] forKey:XMKey_PreferencesEnableFastStart];
+		[coder encodeBool:[self useGatekeeper] forKey:XMKey_PreferencesUseGatekeeper];
+		[coder encodeObject:[self gatekeeperAddress] forKey:XMKey_PreferencesGatekeeperAddress];
+		[coder encodeObject:[self gatekeeperID] forKey:XMKey_PreferencesGatekeeperID];
+		[coder encodeObject:[self gatekeeperUsername] forKey:XMKey_PreferencesGatekeeperUsername];
+		[coder encodeObject:[self gatekeeperPhoneNumber] forKey:XMKey_PreferencesGatekeeperPhoneNumber];
 	}
 	else // raise an exception
 	{
@@ -453,8 +712,8 @@
 	
 	[externalAddress release];
 	
-	[audioCodecPreferenceList release];
-	[videoCodecPreferenceList release];
+	[audioCodecList release];
+	[videoCodecList release];
 	
 	[gatekeeperAddress release];
 	[gatekeeperID release];
@@ -496,14 +755,14 @@
 	   [otherPreferences udpPortBase] == [self udpPortBase] &&
 	   [otherPreferences udpPortMax] == [self udpPortMax] &&
 	   
-	   [[otherPreferences _audioCodecPreferenceList] isEqual:[self _audioCodecPreferenceList]] &&
 	   [otherPreferences audioBufferSize] == [self audioBufferSize] &&
+	   [[otherPreferences _audioCodecList] isEqual:[self _audioCodecList]] &&
 	   
 	   [otherPreferences enableVideoReceive] == [self enableVideoReceive] &&
 	   [otherPreferences enableVideoTransmit] == [self enableVideoTransmit] &&
 	   [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
 	   [otherPreferences videoSize] == [self videoSize] &&
-	   [[otherPreferences _videoCodecPreferenceList] isEqual:[self _videoCodecPreferenceList]] &&
+	   [[otherPreferences _videoCodecList] isEqual:[self _videoCodecList]] &&
 
 	   [otherPreferences enableH323] == [self enableH323] &&
 	   [otherPreferences enableH245Tunnel] == [self enableH245Tunnel] &&
@@ -532,91 +791,91 @@
 	obj = [self userName];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_Preferences_UserName];
+		[dict setObject:obj forKey:XMKey_PreferencesUserName];
 	}
 	
 	number = [[NSNumber alloc] initWithBool:[self autoAnswerCalls]];
-	[dict setObject:number forKey:XMKey_Preferences_AutoAnswerCalls];
+	[dict setObject:number forKey:XMKey_PreferencesAutoAnswerCalls];
 	[number release];
 	
 	integer = [self bandwidthLimit];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_BandwidthLimit];
+		[dict setObject:number forKey:XMKey_PreferencesBandwidthLimit];
 		[number release];
 	}
 	
 	number = [[NSNumber alloc] initWithBool:[self useAddressTranslation]];
-	[dict setObject:number forKey:XMKey_Preferences_UseAddressTranslation];
+	[dict setObject:number forKey:XMKey_PreferencesUseAddressTranslation];
 	[number release];
 	
 	obj = [self externalAddress];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_Preferences_ExternalAddress];
+		[dict setObject:obj forKey:XMKey_PreferencesExternalAddress];
 	}
 	
 	integer = [self tcpPortBase];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_TCPPortBase];
+		[dict setObject:number forKey:XMKey_PreferencesTCPPortBase];
 		[number release];
 	}
 	integer = [self tcpPortMax];
 	if(integer != UINT_MAX)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_TCPPortMax];
+		[dict setObject:number forKey:XMKey_PreferencesTCPPortMax];
 		[number release];
 	}
 	integer = [self udpPortBase];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_UDPPortBase];
+		[dict setObject:number forKey:XMKey_PreferencesUDPPortBase];
 		[number release];
 	}
 	integer = [self udpPortMax];
 	if(integer != UINT_MAX)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_UDPPortMax];
+		[dict setObject:number forKey:XMKey_PreferencesUDPPortMax];
 		[number release];
 	}
-	
-	integer = [audioCodecPreferenceList count];
-	int i;
-	NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:integer];
-	for(i = 0; i < integer; i++)
-	{
-		[arr addObject:[(XMCodecListRecord *)[audioCodecPreferenceList objectAtIndex:i] dictionaryRepresentation]];
-	}
-	[dict setObject:arr forKey:XMKey_Preferences_AudioCodecPreferenceList];
-	[arr release];
 	
 	integer = [self audioBufferSize];
 	if(integer != 2)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_AudioBufferSize];
+		[dict setObject:number forKey:XMKey_PreferencesAudioBufferSize];
 		[number release];
 	}
 	
+	integer = [audioCodecList count];
+	int i;
+	NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:integer];
+	for(i = 0; i < integer; i++)
+	{
+		[arr addObject:[(XMPreferencesCodecListRecord *)[audioCodecList objectAtIndex:i] dictionaryRepresentation]];
+	}
+	[dict setObject:arr forKey:XMKey_PreferencesAudioCodecList];
+	[arr release];
+	
 	number = [[NSNumber alloc] initWithBool:[self enableVideoReceive]];
-	[dict setObject:number forKey:XMKey_Preferences_EnableVideoReceive];
+	[dict setObject:number forKey:XMKey_PreferencesEnableVideoReceive];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableVideoTransmit]];
-	[dict setObject:number forKey:XMKey_Preferences_EnableVideoTransmit];
+	[dict setObject:number forKey:XMKey_PreferencesEnableVideoTransmit];
 	[number release];
 	
 	integer = [self videoFramesPerSecond];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_VideoFramesPerSecond];
+		[dict setObject:number forKey:XMKey_PreferencesVideoFramesPerSecond];
 		[number release];
 	}
 	
@@ -624,60 +883,421 @@
 	if(integer != XMVideoSize_NoVideo)
 	{
 		number = [[NSNumber alloc] initWithInt:integer];
-		[dict setObject:number forKey:XMKey_Preferences_VideoSize];
+		[dict setObject:number forKey:XMKey_PreferencesVideoSize];
 		[number release];
 	}
 		
-	integer = [videoCodecPreferenceList count];
+	integer = [videoCodecList count];
 	arr = [[NSMutableArray alloc] initWithCapacity:integer];
 	for(i = 0; i < integer; i++)
 	{
-		[arr addObject:[(XMCodecListRecord *)[videoCodecPreferenceList objectAtIndex:i] dictionaryRepresentation]];
+		[arr addObject:[(XMPreferencesCodecListRecord *)[videoCodecList objectAtIndex:i] dictionaryRepresentation]];
 	}
-	[dict setObject:arr forKey:XMKey_Preferences_VideoCodecPreferenceList];
+	[dict setObject:arr forKey:XMKey_PreferencesVideoCodecList];
 	[arr release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableH323]];
-	[dict setObject:number forKey:XMKey_Preferences_EnableH323];
+	[dict setObject:number forKey:XMKey_PreferencesEnableH323];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableH245Tunnel]];
-	[dict setObject:number forKey:XMKey_Preferences_EnableH245Tunnel];
+	[dict setObject:number forKey:XMKey_PreferencesEnableH245Tunnel];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableFastStart]];
-	[dict setObject:number forKey:XMKey_Preferences_EnableFastStart];
+	[dict setObject:number forKey:XMKey_PreferencesEnableFastStart];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self useGatekeeper]];
-	[dict setObject:number forKey:XMKey_Preferences_UseGatekeeper];
+	[dict setObject:number forKey:XMKey_PreferencesUseGatekeeper];
 	[number release];
 	
 	obj = [self gatekeeperAddress];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperAddress];
+		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperAddress];
 	}
 	
 	obj = [self gatekeeperID];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperID];
+		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperID];
 	}
 	
 	obj = [self gatekeeperUsername];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperUsername];
+		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperUsername];
 	}
 	
 	obj = [self gatekeeperPhoneNumber];
 	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_Preferences_GatekeeperPhoneNumber];
+		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperPhoneNumber];
 	}
 	
 	return dict;
+}
+
+#pragma mark Accesssing values through keys
+
+- (id)valueForKey:(NSString *)key
+{
+	if([key isEqualToString:XMKey_PreferencesUserName])
+	{
+		return [self userName];
+	}
+	else if([key isEqualToString:XMKey_PreferencesAutoAnswerCalls])
+	{
+		return [NSNumber numberWithBool:[self autoAnswerCalls]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
+	{
+		return [NSNumber numberWithUnsignedInt:[self bandwidthLimit]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
+	{
+		return [NSNumber numberWithBool:[self useAddressTranslation]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesExternalAddress])
+	{
+		return [self externalAddress];
+	}
+	else if([key isEqualToString:XMKey_PreferencesTCPPortBase])
+	{
+		return [NSNumber numberWithUnsignedInt:[self tcpPortBase]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesTCPPortMax])
+	{
+		return [NSNumber numberWithUnsignedInt:[self tcpPortMax]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesUDPPortBase])
+	{
+		return [NSNumber numberWithUnsignedInt:[self udpPortBase]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesUDPPortMax])
+	{
+		return [NSNumber numberWithUnsignedInt:[self udpPortMax]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioBufferSize])
+	{
+		return [NSNumber numberWithUnsignedInt:[self audioBufferSize]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioCodecList])
+	{
+		return [self audioCodecList];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableVideoReceive])
+	{
+		return [NSNumber numberWithBool:[self enableVideoReceive]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableVideoTransmit])
+	{
+		return [NSNumber numberWithBool:[self enableVideoTransmit]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
+	{
+		return [NSNumber numberWithUnsignedInt:[self videoFramesPerSecond]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoSize])
+	{
+		return [NSNumber numberWithUnsignedInt:[self videoSize]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoCodecList])
+	{
+		return [self videoCodecList];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH323])
+	{
+		return [NSNumber numberWithBool:[self enableH323]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH245Tunnel])
+	{
+		return [NSNumber numberWithBool:[self enableH245Tunnel]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableFastStart])
+	{
+		return [NSNumber numberWithBool:[self enableFastStart]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseGatekeeper])
+	{
+		return [NSNumber numberWithBool:[self useGatekeeper]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
+	{
+		return [self gatekeeperAddress];
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperID])
+	{
+		return [self gatekeeperID];
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername])
+	{
+		return [self gatekeeperUsername];
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber])
+	{
+		return [self gatekeeperPhoneNumber];
+	}
+	
+	return nil;
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key
+{
+	BOOL correctType = YES;
+	
+	if([key isEqualToString:XMKey_PreferencesUserName])
+	{
+		if([value isKindOfClass:[NSString class]])
+		{
+			[self setUserName:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesAutoAnswerCalls])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setAutoAnswerCalls:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setBandwidthLimit:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setUseAddressTranslation:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesExternalAddress])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setExternalAddress:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesTCPPortBase])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setTCPPortBase:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesTCPPortMax])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setTCPPortMax:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUDPPortBase])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setUDPPortBase:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUDPPortMax])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setUDPPortMax:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioBufferSize])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setAudioBufferSize:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableVideoReceive])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableVideoReceive:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableVideoTransmit])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableVideoTransmit:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setVideoFramesPerSecond:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesVideoSize])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setVideoSize:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH323])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableH323:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH245Tunnel])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableH245Tunnel:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableFastStart])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableFastStart:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseGatekeeper])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setUseGatekeeper:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setGatekeeperAddress:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperID])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setGatekeeperID:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setGatekeeperUsername:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setGatekeeperPhoneNumber:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else
+	{
+		[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeValidKey];
+	}
+	
+	if(correctType == NO)
+	{
+		[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeOfCorrectType];
+	}
 }
 
 #pragma mark General Settings Methods
@@ -783,21 +1403,6 @@
 
 #pragma mark Audio-specific Methods
 
-- (unsigned)audioCodecListCount
-{
-	return [[self _audioCodecPreferenceList] count];
-}
-
-- (XMCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index
-{
-	return (XMCodecListRecord *)[[self _audioCodecPreferenceList] objectAtIndex:index];
-}
-
-- (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
-{
-	[[self _audioCodecPreferenceList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
-}
-
 - (unsigned)audioBufferSize
 {
 	return audioBufferSize;
@@ -806,6 +1411,26 @@
 - (void)setAudioBufferSize:(unsigned)size
 {
 	audioBufferSize = size;
+}
+
+- (NSArray *)audioCodecList
+{
+	return [self _audioCodecList];
+}
+
+- (unsigned)audioCodecListCount
+{
+	return [[self _audioCodecList] count];
+}
+
+- (XMPreferencesCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index
+{
+	return (XMPreferencesCodecListRecord *)[[self _audioCodecList] objectAtIndex:index];
+}
+
+- (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
+{
+	[[self _audioCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
 }
 
 #pragma mark Video Accessor & Setter Methods
@@ -850,19 +1475,24 @@
 	videoSize = size;
 }
 
-- (unsigned)videoCodecListCount
+- (NSArray *)videoCodecList
 {
-	return [[self _videoCodecPreferenceList] count];
+	return [self _videoCodecList];
 }
 
-- (XMCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index
+- (unsigned)videoCodecListCount
 {
-	return (XMCodecListRecord *)[[self _videoCodecPreferenceList] objectAtIndex:index];
+	return [[self _videoCodecList] count];
+}
+
+- (XMPreferencesCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index
+{
+	return (XMPreferencesCodecListRecord *)[[self _videoCodecList] objectAtIndex:index];
 }
 
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
-	[[self _videoCodecPreferenceList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
+	[[self _videoCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
 }
 
 #pragma mark H.323-specific Methods
@@ -969,237 +1599,83 @@
 
 #pragma mark Private Methods
 
-- (NSMutableArray *)_audioCodecPreferenceList
+- (NSMutableArray *)_audioCodecList
 {
-	if(audioCodecPreferenceList == nil)
+	if(audioCodecList == nil)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		unsigned count = [codecManager audioCodecCount];
 		unsigned i;
 		
-		audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
-			NSString *identifier = [[codecManager audioCodecDescriptorAtIndex:i] identifier];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[audioCodecPreferenceList addObject:record];
+			NSString *identifier = [[codecManager audioCodecAtIndex:i] identifier];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+			[audioCodecList addObject:record];
 			[record release];
 		}
 	}
-	return audioCodecPreferenceList;
+	return audioCodecList;
 }
 
-- (void)_setAudioCodecPreferenceList:(NSArray *)list
+- (void)_setAudioCodecList:(NSArray *)list
 {
-	NSArray *old = audioCodecPreferenceList;
+	NSArray *old = audioCodecList;
 	
 	unsigned count = [list count];
 	unsigned i;
-	audioCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+	audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 	for(i = 0; i < count; i++)
 	{
-		XMCodecListRecord *record = (XMCodecListRecord *)[list objectAtIndex:i];
-		XMCodecListRecord *copyOfRecord = [record copy];
-		[audioCodecPreferenceList addObject:copyOfRecord];
+		XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[list objectAtIndex:i];
+		XMPreferencesCodecListRecord *copyOfRecord = [record copy];
+		[audioCodecList addObject:copyOfRecord];
 		[copyOfRecord release];
 	}
 	
 	[old release];
 }
 
-- (NSMutableArray *)_videoCodecPreferenceList
+- (NSMutableArray *)_videoCodecList
 {
-	if(videoCodecPreferenceList == nil)
+	if(videoCodecList == nil)
 	{
 		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		unsigned count = [codecManager videoCodecCount];
 		unsigned i;
 		
-		videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+		videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
-			NSString *identifier = [[codecManager videoCodecDescriptorAtIndex:i] identifier];
-			XMCodecListRecord *record = [[XMCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[videoCodecPreferenceList addObject:record];
+			NSString *identifier = [[codecManager videoCodecAtIndex:i] identifier];
+			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+			[videoCodecList addObject:record];
 			[record release];
 		}
 	}
 	
-	return videoCodecPreferenceList;
+	return videoCodecList;
 }
 
-- (void)_setVideoCodecPreferenceList:(NSArray *)list
+- (void)_setVideoCodecList:(NSArray *)list
 {
-	NSArray *old = videoCodecPreferenceList;
+	NSArray *old = videoCodecList;
 	
 	unsigned count = [list count];
 	unsigned i;
-	videoCodecPreferenceList = [[NSMutableArray alloc] initWithCapacity:count];
+	videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 	for(i = 0; i < count; i++)
 	{
-		XMCodecListRecord *record = (XMCodecListRecord *)[list objectAtIndex:i];
-		XMCodecListRecord *copyOfRecord = [record copy];
-		[videoCodecPreferenceList addObject:copyOfRecord];
+		XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[list objectAtIndex:i];
+		XMPreferencesCodecListRecord *copyOfRecord = [record copy];
+		[videoCodecList addObject:copyOfRecord];
 		[copyOfRecord release];
 	}
 	
 	[old release];
-}
-
-@end
-
-@implementation XMCodecListRecord
-
-#pragma mark Init & Deallocation Methods
-
-- (id)init
-{
-	[self doesNotRecognizeSelector:_cmd];
-	[self release];
-	return nil;
-}
-
-- (id)_initWithIdentifier:(NSString *)theIdentifier enabled:(BOOL)enabled
-{
-	self = [super init];
-	
-	identifier = [theIdentifier copy];
-	[self setEnabled:enabled];
-	
-	return self;
-}
-
-- (id)_initWithDictionary:(NSDictionary *)dict
-{
-	NSObject *obj;
-	
-	self = [super init];
-	
-	obj = [dict objectForKey:XMKey_CodecListRecord_Identifier];
-	if(obj)
-	{
-		identifier = (NSString *)[obj copy];
-	}
-	else
-	{
-		identifier = nil;
-	}
-	
-	obj = [dict objectForKey:XMKey_CodecListRecord_IsEnabled];
-	if(obj)
-	{
-		isEnabled = [(NSNumber *)obj boolValue];
-	}
-	else
-	{
-		isEnabled = NO;
-	}
-	
-	return self;
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-	return [[XMCodecListRecord allocWithZone:zone] _initWithIdentifier:[self identifier] enabled:[self isEnabled]];
-}
-
-- (id)initWithCoder:(NSCoder *)coder
-{
-	self = [super init];
-	
-	if([coder allowsKeyedCoding]) // use keyed coding
-	{
-		identifier = (NSString *)[[coder decodeObjectForKey:XMKey_CodecListRecord_Identifier] retain];
-		[self setEnabled:[coder decodeBoolForKey:XMKey_CodecListRecord_IsEnabled]];
-	}
-	else // raise an exception
-	{
-		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
-		[self release];
-		return nil;
-	}
-	
-	return self;
-}
-
-- (void)encodeWithCoder:(NSCoder *)coder
-{
-	if([coder allowsKeyedCoding])
-	{
-		[coder encodeObject:[self identifier] forKey:XMKey_CodecListRecord_Identifier];
-		[coder encodeBool:[self isEnabled] forKey:XMKey_CodecListRecord_IsEnabled];
-	}
-	else
-	{
-		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
-	}
-}
-
-- (void)dealloc
-{
-	[identifier release];
-	
-	[super dealloc];
-}
-
-#pragma mark General NSObject Functionality
-
-- (BOOL)isEqual:(id)object
-{
-	XMCodecListRecord *entry;
-	
-	if(object == self)
-	{
-		return YES;
-	}
-	
-	if(![object isKindOfClass:[self class]])
-	{
-		return NO;
-	}
-	entry = (XMCodecListRecord *)object;
-	
-	if([[entry identifier] isEqualToString:[self identifier]] &&
-	   [entry isEnabled] == [self isEnabled])
-	{
-		return YES;
-	}
-	return NO;
-}
-
-#pragma mark Getting Different Representations
-
-- (NSMutableDictionary *)dictionaryRepresentation
-{
-	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
-	NSNumber *number;
-		
-	[dict setObject:[self identifier] forKey:XMKey_CodecListRecord_Identifier];
-	
-	number = [[NSNumber alloc] initWithBool:[self isEnabled]];
-	[dict setObject:number forKey:XMKey_CodecListRecord_IsEnabled];
-	[number release];
-	
-	return dict;
-}
-
-#pragma mark Getter & Setter Methods
-
-- (NSString *)identifier;
-{
-	return identifier;
-}
-
-- (BOOL)isEnabled
-{
-	return isEnabled;
-}
-
-- (void)setEnabled:(BOOL)flag
-{
-	isEnabled = flag;
 }
 
 @end

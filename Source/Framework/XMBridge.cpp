@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,6 @@
 #include "XMOpalManager.h"
 #include "XMPCSSEndPoint.h"
 #include "XMH323EndPoint.h"
-#include "XMVolumeControl.h"
 #include "XMSubsystemSetupThread.h"
 
 using namespace std;
@@ -101,9 +100,8 @@ void getCallInformation(unsigned callID,
 	PString numberStr;
 	PString addressStr;
 	PString appStr;
-	PString token = PString(callID);
 	
-	callEndPoint->GetCallInformation(token, nameStr, numberStr, addressStr, appStr);
+	h323EndPoint->GetCallInformation(nameStr, numberStr, addressStr, appStr);
 	
 	*remoteName = nameStr;
 	*remoteNumber = numberStr;
@@ -150,84 +148,15 @@ void setTranslationAddress(const char *a)
 
 #pragma mark Audio Functions
 
-const char **getAudioInputDevices()
-{
-	PStringList devices = PSoundChannel::GetDeviceNames(PSoundChannel::Recorder);
-	PINDEX count = devices.GetSize();
-	PINDEX i;
-	
-	//allocating the correct memory
-	const char **basePtr = new const char*[count + 1];
-	
-	for(i = 0; i < count; i++)
-	{
-		PString *str = (PString *)devices.GetAt(i);
-		char *ptr = new char[str->GetLength()];
-		strcpy(ptr, *str);
-		
-		basePtr[i] = ptr;
-	}
-	
-	// terminating the array
-	basePtr[count] = NULL;
-	
-	return basePtr;
-}
-
-void getDefaultAudioInputDevice(char *buffer)
-{
-	// Since the device is obtained as call-by-value, we have to do a copy
-	// so that the buffer isn't destroyed at the end of the method
-	// We explicitly assume that the buffer's length is 128 chars
-	
-	PString str = PSoundChannel::GetDefaultDevice(PSoundChannel::Recorder);
-	strncpy(buffer, str, 128);
-	buffer[127] = '\0';
-}
-
-const char **getAudioOutputDevices()
-{
-	PStringList devices = PSoundChannel::GetDeviceNames(PSoundChannel::Player);
-	PINDEX count = devices.GetSize();
-	PINDEX i;
-	
-	//allocating the correct memory
-	const char **basePtr = new const char*[count + 1];
-	
-	for(i = 0; i < count; i++)
-	{
-		PString *str = (PString *)devices.GetAt(i);
-		char *ptr = new char[str->GetLength()];
-		strcpy(ptr, *str);
-		
-		basePtr[i] = ptr;
-	}
-	
-	// terminating the array
-	basePtr[count] = NULL;
-	
-	return basePtr;
-}
- 
-void getDefaultAudioOutputDevice(char *buffer)
-{
-	// Since the device is obtained as call-by-value, we have to do a copy
-	// so that the buffer isn't destroyed at the end of the method
-	// We explicitly assume that the buffer's length is 128 chars
-	PString str = PSoundChannel::GetDefaultDevice(PSoundChannel::Player);
-	strncpy(buffer, str, 128);
-	buffer[127] = '\0';
-}
-
 // The underlying system is call-by-reference
 const char *getSelectedAudioInputDevice()
 {
-	return theManager->GetSoundChannelRecordDevice();
+	return callEndPoint->GetSoundChannelRecordDevice();
 }
 
 bool setSelectedAudioInputDevice(const char *device)
 {
-	bool result = theManager->SetSoundChannelRecordDevice(device);
+	bool result = callEndPoint->SetSoundChannelRecordDevice(device);
 	
 	return result;
 }
@@ -235,24 +164,33 @@ bool setSelectedAudioInputDevice(const char *device)
 // The underlying system is call-by-reference
 const char *getSelectedAudioOutputDevice()
 {
-	return theManager->GetSoundChannelPlayDevice();
+	return callEndPoint->GetSoundChannelPlayDevice();
 }
 
 bool setSelectedAudioOutputDevice(const char *device)
 {
-	bool result = theManager->SetSoundChannelPlayDevice(device);
+	bool result = callEndPoint->SetSoundChannelPlayDevice(device);
+	
+	if(result)
+	{
+		cout << "succ" << endl;
+	}
+	else
+	{
+		cout << "no succ" << endl;
+	}
 	
 	return result;
 }
 
 unsigned getAudioBufferSize()
 {
-	return theManager->GetSoundChannelBufferDepth();
+	return callEndPoint->GetSoundChannelBufferDepth();
 }
 
 void setAudioBufferSize(unsigned size)
 {
-	theManager->SetSoundChannelBufferDepth(size);
+	callEndPoint->SetSoundChannelBufferDepth(size);
 }
 
 #pragma mark Video functions
@@ -267,10 +205,6 @@ void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
 void setDisabledCodecs(const char * const * codecs, unsigned codecCount)
 {
 	PStringArray codecsArray = PStringArray(codecCount, codecs, TRUE);
-	
-	// since video currently is disabled but we are experiencing some troubles with that, we simply disable
-	// the video codecs
-	codecsArray.AppendString("261");
 	theManager->SetMediaFormatMask(codecsArray);
 }
 

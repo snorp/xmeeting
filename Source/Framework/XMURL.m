@@ -1,5 +1,5 @@
 /*
- * $Id: XMURL.m,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMURL.m,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,51 +7,39 @@
  */
 
 #import "XMURL.h"
+#import "XMGeneralPurposeURL.h"
 #import "XMCalltoURL.h"
-
-NSString *XMKey_URLType = @"XMeeting_URLType";
-NSString *XMKey_URLString = @"XMeeting_URLString";
-NSString *XMKey_URLAddress = @"XMeeting_URLAddress";
-NSString *XMKey_URLPort = @"XMeeting_URLPort";
 
 @implementation XMURL
 
-+ (BOOL)canHandleString:(NSString *)url
++ (BOOL)canHandleStringRepresentation:(NSString *)stringRepresentation
 {
-	if([XMCalltoURL canHandleString:url])
+	return NO;
+}
+
++ (BOOL)canHandleDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
+{
+	if([XMGeneralPurposeURL canHandleDictionaryRepresentation:dictionaryRepresentation])
 	{
 		return YES;
 	}
 	return NO;
 }
 
-+ (BOOL)canHandleDictionary:(NSDictionary *)dict
-{
-	if([XMCalltoURL canHandleDictionary:dict])
-	{
-		return YES;
-	}
-	return NO;
-}
-
-+ (XMURL *)urlWithString:(NSString *)url
++ (XMURL *)urlWithStringRepresentation:(NSString *)stringRepresentation
 {
 	XMURL *instance = nil;
 	
-	if([XMCalltoURL canHandleString:url])
-	{
-		instance = [XMCalltoURL urlWithString:url];
-	}
 	return instance;
 }
 
-+ (XMURL *)urlWithDictionary:(NSDictionary *)dict
++ (XMURL *)urlWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
 	XMURL *instance = nil;
 	
-	if([XMCalltoURL canHandleDictionary:dict])
+	if([XMGeneralPurposeURL canHandleDictionaryRepresentation:dictionaryRepresentation])
 	{
-		instance = [XMCalltoURL urlWithDictionary:dict];
+		instance = [XMGeneralPurposeURL urlWithDictionaryRepresentation:dictionaryRepresentation];
 	}
 	return instance;
 }
@@ -63,27 +51,27 @@ NSString *XMKey_URLPort = @"XMeeting_URLPort";
 	return nil;
 }
 
-- (id)initWithString:(NSString *)url
+- (id)initWithStringRepresentation:(NSString *)stringRepresentation
 {
 	// cleanup
 	[self release];
 	
-	if([XMCalltoURL canHandleString:url])
+	if([XMGeneralPurposeURL canHandleStringRepresentation:stringRepresentation])
 	{
-		return [[XMCalltoURL alloc] initWithString:url];
+		return [[XMGeneralPurposeURL alloc] initWithStringRepresentation:stringRepresentation];
 	}
 
 	return nil;
 }
 
-- (id)initWithDictionary:(NSDictionary *)dict
+- (id)initWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
 	// cleanup
 	[self release];
 	
-	if([XMCalltoURL canHandleDictionary:dict])
+	if([XMGeneralPurposeURL canHandleDictionaryRepresentation:dictionaryRepresentation])
 	{
-		return [[XMCalltoURL alloc] initWithDictionary:dict];
+		return [[XMGeneralPurposeURL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
 	}
 	
 	return nil;
@@ -111,12 +99,6 @@ NSString *XMKey_URLPort = @"XMeeting_URLPort";
 {
 	[self doesNotRecognizeSelector:_cmd];
 	return nil;
-}
-
-- (unsigned)port
-{
-	[self doesNotRecognizeSelector:_cmd];
-	return 0;
 }
 
 - (NSString *)humanReadableRepresentation

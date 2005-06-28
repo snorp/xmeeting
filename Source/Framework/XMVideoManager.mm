@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.mm,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMVideoManager.mm,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -194,10 +194,10 @@ OSErr XM_SGDataProc(SGChannel c,
 	
 	if(delegate)
 	{
-		[nc removeObserver:delegate name:XMNotification_DidStartVideoGrabbing object:self];
-		[nc removeObserver:delegate name:XMNotification_DidStopVideoGrabbing object:self];
-		[nc removeObserver:delegate name:XMNotification_DidReadVideoFrame object:nil];
-		[nc removeObserver:delegate name:XMNotification_DidUpdateVideoDeviceList object:self];
+		[nc removeObserver:delegate name:XMNotification_VideoManagerDidStartGrabbing object:self];
+		[nc removeObserver:delegate name:XMNotification_VideoManagerDidStopGrabbing object:self];
+		[nc removeObserver:delegate name:XMNotification_VideoManagerDidReadFrame object:nil];
+		[nc removeObserver:delegate name:XMNotification_VideoManagerDidUpdateDeviceList object:self];
 	}
 	
 	delegate = theDelegate;
@@ -208,24 +208,24 @@ OSErr XM_SGDataProc(SGChannel c,
 		if([delegate respondsToSelector:@selector(videoManagerDidStartGrabbing:)])
 		{
 			[nc addObserver:delegate selector:@selector(videoManagerDidStartGrabbing:)
-					   name:XMNotification_DidStartVideoGrabbing object:self];
+					   name:XMNotification_VideoManagerDidStartGrabbing object:self];
 		}
 		
 		if([delegate respondsToSelector:@selector(videoManagerDidStopGrabbing:)])
 		{
 			[nc addObserver:delegate selector:@selector(videoManagerDidStopGrabbing:)
-					   name:XMNotification_DidStopVideoGrabbing object:self];
+					   name:XMNotification_VideoManagerDidStopGrabbing object:self];
 		}
 		
 		if([delegate respondsToSelector:@selector(videoManagerDidReadVideoFrame:)])
 		{
 			[nc addObserver:delegate selector:@selector(videoManagerDidReadVideoFrame:)
-					   name:XMNotification_DidReadVideoFrame object:nil];
+					   name:XMNotification_VideoManagerDidReadFrame object:nil];
 		}
 		if([delegate respondsToSelector:@selector(videoManagerDidUpdateVideoDeviceList:)])
 		{
 			[nc addObserver:delegate selector:@selector(videoManagerDidUpdateVideoDeviceList:)
-					   name:XMNotification_DidUpdateVideoDeviceList object:self];
+					   name:XMNotification_VideoManagerDidUpdateDeviceList object:self];
 		}
 	}
 }
@@ -256,7 +256,7 @@ OSErr XM_SGDataProc(SGChannel c,
 	if(result)
 	{
 		// notifying the success
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStartVideoGrabbing object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartGrabbing object:self];
 	}
 	
 	return result;
@@ -323,7 +323,7 @@ OSErr XM_SGDataProc(SGChannel c,
 		[array release];
 		
 		// finally, notifying interested parties
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidUpdateVideoDeviceList object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidUpdateDeviceList object:self];
 	}
 	
 	// returing the stored names
@@ -433,7 +433,7 @@ OSErr XM_SGDataProc(SGChannel c,
 	[remoteVideoFrame release];
 	remoteVideoFrame = [rep retain];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidReadVideoFrame object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidReadFrame object:self];
 }
 
 - (BOOL)_initializeComponentAndChannel
@@ -934,7 +934,7 @@ OSErr XM_SGDataProc(SGChannel c,
 - (void)_noteGrabEnd
 {	
 	// notifying interested parties. The may now call -startGrabbing again
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidStopVideoGrabbing object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStopGrabbing object:self];
 	
 	// telling the view to update it's display
 	if(view)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 @interface XMCallAddressManager (PrivateMethods)
 
 - (id)_init;
+
+- (void)_callCleared:(NSNotification *)notif;
 
 @end
 
@@ -42,6 +44,9 @@
 {
 	callAddressProviders = [[NSMutableArray alloc] initWithCapacity:3];
 	activeCallAddress = nil;
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
+												 name:XMNotification_CallManagerCallCleared object:nil];
 	
 	return self;
 }
@@ -103,18 +108,29 @@
 
 - (BOOL)makeCallToAddress:(id<XMCallAddress>)callAddress
 {
-	[activeCallAddress release];
-	activeCallAddress = [callAddress retain];
-	
-	NSLog(@"calling");
+	if(activeCallAddress != nil)
+	{
+		return NO;
+	}
+
+	activeCallAddress = callAddress;
 	XMCallInfo *callInfo = [[XMCallManager sharedInstance] callURL:[callAddress url]];
+	
 	if(callInfo != nil)
 	{
-		NSLog(@"succesful");
+		[activeCallAddress retain];
 		return YES;
 	}
-	NSLog(@"failed");
+	activeCallAddress = nil;
 	return NO;
+}
+
+#pragma mark Private Methods
+
+- (void)_callCleared:(NSNotification *)notif
+{
+	[activeCallAddress release];
+	activeCallAddress = nil;
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,12 +29,27 @@ public:
 					   const PString & username, const PString & phoneNumber);
 	void CheckGatekeeperRegistration();
 	
+	// obtaining information about the remote party
+	void GetCallInformation(PString & remoteName, 
+							PString & remoteNumber,
+							PString & remoteAddress,
+							PString & remoteApplication);	
+	
 	// overriding some callbacks
 	virtual void OnRegistrationConfirm();
 	virtual void OnRegistrationReject();
+	
+	virtual void OnEstablished(OpalConnection & connection);
+	virtual void OnReleased(OpalConnection & connection);
 private:
 	BOOL isListening;
 	BOOL didRegisterAtGatekeeper;
+	unsigned gatekeeperRegistrationFailReason;
+	
+	PString remoteName;
+	PString remoteNumber;
+	PString remoteAddress;
+	PString remoteApplication;
 };
 
 #endif // __XM_H323_END_POINT_H__

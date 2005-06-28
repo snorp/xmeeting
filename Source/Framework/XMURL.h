@@ -1,5 +1,5 @@
 /*
- * $Id: XMURL.h,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMURL.h,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,11 +11,6 @@
 
 #import <Foundation/Foundation.h>
 #import "XMTypes.h"
-
-extern NSString *XMKey_URLType;
-extern NSString *XMKey_URLString;
-extern NSString *XMKey_URLAddress;
-extern NSString *XMKey_URLPort;
 
 /**
  * XMURL encapsulates the basic features of an URL in conjunction with
@@ -31,35 +26,33 @@ extern NSString *XMKey_URLPort;
 
 /**
  * Returns whether the XMURL umbrella can handle an URL represented
- * by url or not. This is done by querying the subclasses whether
- * they can handle url or not.
+ * by stringRepresentation or not.
  **/
-+ (BOOL)canHandleString:(NSString *)url;
++ (BOOL)canHandleStringRepresentation:(NSString *)stringRepresentation;
 
 /**
  * Returns whether the XMURL umbrella can handle an URL represented
- * in the dictionary or not. This is done by querying the subclasses
- * whether they can handle dictionary or not.
+ * by dictionaryRepresentation or not.
  **/
-+ (BOOL)canHandleDictionary:(NSDictionary *)dictionary;
++ (BOOL)canHandleDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation;
 
 /**
  * Returns an instance of an XMURL subclass initialized
- * with the contents of url. The class of the returned instance
+ * with stringRepresentation. The class of the returned instance
  * depends on the type of the URL. If url does not represent an URL
  * which can be handled by the XMURL umbrella, nil is returned but
  * no exception is thrown.
  **/
-+ (XMURL *)urlWithString:(NSString *)url;
++ (XMURL *)urlWithStringRepresentation:(NSString *)stringRepresentation;
 
 /**
  * Returns an instance of an XMURL subclass initialized with
- * the contents of dictionary.  The class of the returned instance
+ * dictionaryRepresentation.  The class of the returned instance
  * depends on the type of the URL. If url does not represent an URL
  * which can be handled by the XMURL umbrella, nil is returned but
  * no exception is thrown.
  **/
-+ (XMURL *)urlWithDictionary:(NSDictionary *)dict;
++ (XMURL *)urlWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation;
 
 /**
  * initializes the instance to the default values.
@@ -69,18 +62,18 @@ extern NSString *XMKey_URLPort;
 - (id)init;
 
 /**
- * initializes the instance to the values specified in
- * urlString. Invoking this method on XMURL instances causes
+ * initializes the instance to stringRepresentation.
+ * Invoking this method on XMURL instances causes
  * an exception to be thrown.
  **/
-- (id)initWithString:(NSString *)urlString;
+- (id)initWithStringRepresentation:(NSString *)stringRepresentation;
 
 /**
- * initializes the instance to the content of dictionary.
+ * initializes the instance to the content of dictionaryRepresentation.
  * Invoking this method on XMURL instances causes an exception
  * to be thrown.
  **/
-- (id)initWithDictionary:(NSDictionary *)dictionary;
+- (id)initWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation;
 
 /**
  * Returns the content of the URL in a string representation
@@ -104,14 +97,8 @@ extern NSString *XMKey_URLPort;
 - (NSString *)address;
 
 /**
- * Returns the port associated with address. Return 0 if port isn't
- * specified, uses the default port in this case.
- **/
-- (unsigned)port;
-
-/**
- * Returns a textual representation of the URL which is probably
- * better human readable than just using -address and -port.
+ * Returns a textual representation of the URL which is eventually
+ * better human readable than just using -address
  **/
 - (NSString *)humanReadableRepresentation;
 
