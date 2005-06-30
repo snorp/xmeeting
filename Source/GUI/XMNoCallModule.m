@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.7 2005/06/30 09:33:13 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.8 2005/06/30 11:17:32 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -97,9 +97,6 @@
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartCalling:)
 							   name:XMNotification_CallManagerDidStartCalling
-							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callStartFailed:)
-							   name:XMNotification_CallManagerCallStartFailed
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_callCleared:)
 							   name:XMNotification_CallManagerCallCleared
@@ -290,33 +287,6 @@
 	[statusFieldTwo setStringValue:@""];
 	
 	isCalling = YES;
-}
-
-- (void)_callStartFailed:(NSNotification *)notif
-{
-	NSString *displayFormat = NSLocalizedString(@"Calling the address failed (%@)", @"");
-	NSString *failReasonText;
-	
-	XMCallStartFailReason failReason = [[XMCallManager sharedInstance] callStartFailReason];
-	
-	switch(failReason)
-	{
-		case XMCallStartFailReason_ProtocolNotEnabled:
-			failReasonText = NSLocalizedString(@"Protocol not enabled", @"");
-			break;
-		case XMCallStartFailReason_GatekeeperUsedButNotSpecified:
-			failReasonText = NSLocalizedString(@"Address uses a gatekeeper but no gatekeeper is specified in the active location", @"");
-			break;
-		default:
-			failReasonText = NSLocalizedString(@"Unknown reason", @"");
-			break;
-	}
-	
-	NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, failReasonText];
-	
-	[statusFieldOne setStringValue:displayString];
-	
-	[displayString release];
 }
 
 - (void)_callCleared:(NSNotification *)notif

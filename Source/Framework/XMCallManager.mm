@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.8 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.9 2005/06/30 11:17:32 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -342,6 +342,7 @@
 			postSubsystemSetupFailureNotifications = NO;
 			
 			[self _prepareSubsystemSetup];
+			return YES;
 		}
 	}
 	
@@ -718,7 +719,6 @@
 
 - (void)_mainThreadHandleSubsystemSetupDidEnd
 {	
-	
 	if(needsSubsystemShutdownAfterSubsystemSetup == YES)
 	{
 		// we just need to change the subsystem, thus we use new
@@ -763,32 +763,35 @@
 
 - (BOOL)_startIndirectCalling
 {
-	unsigned callID = startCall(protocolToUse, [addressToCall cString]);
-	
-	[addressToCall release];
-	addressToCall = nil;
-	protocolToUse = XMCallProtocol_UnknownProtocol;
-	
-	if(callID != 0)
+	/* checking some call fail conditions */
+	if((protocolToUse != XMCallProtocol_H323 || [self isH323Listening] == YES) &&
+	   ([activePreferences useGatekeeper] == NO || gatekeeperName != nil))
 	{
-		[activeCall _setCallID:callID];
-		return YES;
+	
+		unsigned callID = startCall(protocolToUse, [addressToCall cString]);
+	
+		[addressToCall release];
+		addressToCall = nil;
+		protocolToUse = XMCallProtocol_UnknownProtocol;
+	
+		if(callID != 0)
+		{
+			[activeCall _setCallID:callID];
+			return YES;
+		}
 	}
-	else
-	{
-		[activeCall _setCallStatus:XMCallStatus_Ended];
-		[activeCall _setCallEndReason:XMCallEndReason_EndedByConnectFail];
+	
+	[activeCall _setCallStatus:XMCallStatus_Ended];
+	[activeCall _setCallEndReason:XMCallEndReason_EndedByConnectFail];
 			
-		[self _storeCall:activeCall];
+	[self _storeCall:activeCall];
 			
-		[activeCall release];
-		activeCall = nil;
+	[activeCall release];
+	activeCall = nil;
 			
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallCleared
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallCleared
 															object:self];
-		
-		return NO;
-	}
+	return NO;
 }
 
 - (void)_handleIncomingCall:(unsigned)callID 
@@ -1080,6 +1083,8 @@
 {
 	[gatekeeperName release];
 	gatekeeperName = [theGatekeeperName retain];
+	
+	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	
 	// check every two minutes for gatekeeper registration
 	[gatekeeperRegistrationCheckTimer invalidate];
