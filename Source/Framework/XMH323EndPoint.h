@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.4 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,7 @@ public:
 private:
 	BOOL isListening;
 	BOOL didRegisterAtGatekeeper;
-	unsigned gatekeeperRegistrationFailReason;
+	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
 	PString remoteName;
 	PString remoteNumber;

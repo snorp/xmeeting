@@ -1,5 +1,5 @@
 /*
- * $Id: XMPCSSEndPoint.cpp,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMPCSSEndPoint.cpp,v 1.5 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -88,8 +88,6 @@ BOOL XMPCSSEndPoint::OnShowOutgoing(const OpalPCSSConnection & connection)
 void XMPCSSEndPoint::OnEstablished(OpalConnection & connection)
 {
 	cout << "XMPCSSEndPoint::OnEstablished" << endl;
-	
-	cout << connection.GetRemotePartyName() << "*r*" << connection.GetRemoteApplication() << endl;
 	OpalPCSSEndPoint::OnEstablished(connection);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMURL.m,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMURL.m,v 1.4 2005/06/30 09:33:13 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,7 +92,7 @@
 - (XMCallProtocol)callProtocol
 {
 	[self doesNotRecognizeSelector:_cmd];
-	return XMCallProtocol_Unknown;
+	return XMCallProtocol_UnknownProtocol;
 }
 
 - (NSString *)address

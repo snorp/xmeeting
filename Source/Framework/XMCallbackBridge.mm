@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.mm,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallbackBridge.mm,v 1.6 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,7 +94,7 @@ void noteGatekeeperUnregistration()
 	[[XMCallManager sharedInstance] _handleGatekeeperUnregistration];
 }
 
-void noteGatekeeperRegistrationFailure()
+void noteGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason)
 {
-	[[XMCallManager sharedInstance] _handleGatekeeperRegistrationFailure];
+	[[XMCallManager sharedInstance] _handleGatekeeperRegistrationFailure:reason];
 }

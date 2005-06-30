@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.5 2005/06/30 09:33:09 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,14 +113,14 @@
 		return NO;
 	}
 
-	activeCallAddress = callAddress;
-	XMCallInfo *callInfo = [[XMCallManager sharedInstance] callURL:[callAddress url]];
+	BOOL result = [[XMCallManager sharedInstance] callURL:[callAddress url]];
 	
-	if(callInfo != nil)
+	if(result == YES)
 	{
-		[activeCallAddress retain];
+		activeCallAddress = [callAddress retain];
 		return YES;
 	}
+	
 	activeCallAddress = nil;
 	return NO;
 }

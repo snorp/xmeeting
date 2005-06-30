@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.7 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,11 +31,23 @@ typedef enum XMNATDetectionResult
  **/
 typedef enum XMCallProtocol
 {
-	XMCallProtocol_Unknown = 0,
+	XMCallProtocol_UnknownProtocol = 0,
 	XMCallProtocol_H323,
 	XMCallProtocol_SIP,	/* Not yet supported */
 	XMCallProtocolCount
 } XMCallProtocol;
+
+/**
+ * Defines some reasons why starting a call did fail
+ **/
+typedef enum XMCallStartFailReason
+{
+	XMCallStartFailReason_NoFailure = 0,
+	XMCallStartFailReason_UnknownFailure,
+	XMCallStartFailReason_ProtocolNotEnabled,
+	XMCallStartFailReason_GatekeeperUsedButNotSpecified,
+	XMCallStartFailReasonCount
+} XMCallStartFailReason;
 
 /**
  * Defines the various states in which a call can be
@@ -88,16 +100,16 @@ typedef enum XMCallEndReason
 } XMCallEndReason;
 
 /**
- * Defines the various types of status the listener system can be in
+ * Defines the various gatekeeper registration fail reasons
  **/
-typedef enum XMListenerStatus
+typedef enum XMGatekeeperRegistrationFailReason
 {
-	XMListenerStatus_Offline = 0,
-	XMListenerStatus_Listening,
-	XMListenerStatus_Error,
-	XMListenerStatus_InCall,
-	XMListenerStatusCount
-} XMListenerStatus;
+	XMGatekeeperRegistrationFailReason_NoFailure = 0,
+	XMGatekeeperRegistrationFailReason_UnknownFailure,
+	XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified,
+	XMGatekeeperRegistrationFailReason_GatekeeperNotFound,
+	XMGatekeeperRegistrationFailReason_RegistrationReject
+} XMGatekeeperRegistrationFailReason;
 
 /**
  * Defines the various VideoSizes which are supported

@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.4 2005/06/30 09:33:13 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,11 @@
 {
 	[[XMMainWindowController sharedInstance] addMainModule:self];
 	
-	[self contentView];
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
+							   name:XMNotification_CallManagerCallEstablished object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callCleared:)
+							   name:XMNotification_CallManagerCallCleared object:nil];
 	
 	return self;
 }
@@ -37,14 +41,7 @@
 
 - (void)awakeFromNib
 {
-	NSLog(@"awakeFromNib");
 	contentViewMinSize = [contentView frame].size;
-	
-	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
-												 name:XMNotification_CallManagerCallEstablished object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callCleared:)
-												 name:XMNotification_CallManagerCallCleared object:nil];
 }
 
 - (NSString *)name
@@ -92,8 +89,11 @@
 
 - (void)_callEstablished:(NSNotification *)notif
 {
-	NSLog(@"callEstablished");
 	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
+	
+	//loading the nib file if not already done
+	[self contentView];
+	
 	[remotePartyField setStringValue:remoteName];
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.6 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -83,6 +83,6 @@ bool getVideoFrame(void *buffer, unsigned *bytesReturned);
 
 void noteGatekeeperRegistration(const char *gatekeeperName);
 void noteGatekeeperUnregistration();
-void noteGatekeeperRegistrationFailure();
+void noteGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason);
 
 #endif // __XM_CALLBACK_BRIDGE_H__

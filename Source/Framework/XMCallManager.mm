@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.8 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,8 +26,9 @@
 	// called on a separate thread
 - (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
 - (void)_shutdownSubsystem;
-- (void)_mainThreadHandleSubsystemSetupDidFinish;
+- (void)_mainThreadHandleSubsystemSetupDidEnd;
 
+- (BOOL)_startIndirectCalling;
 - (void)_mainThreadHandleIncomingCall:(XMCallInfo *)callInfo;
 - (void)_mainThreadHandleCallEstablished:(NSArray *)infoArray;
 - (void)_mainThreadHandleCallCleared:(NSArray *)infoArray;
@@ -38,7 +39,7 @@
 - (void)_mainThreadHandleGatekeeperRegistrationStart;
 - (void)_mainThreadHandleGatekeeperRegistration;
 - (void)_mainThreadHandleGatekeeperUnregistration;
-- (void)_mainThreadHandleGatekeeperRegistrationFailure;
+- (void)_mainThreadHandleGatekeeperRegistrationFailure:(NSNumber *)reason;
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer;
 
 - (void)_storeCall:(XMCallInfo *)call;
@@ -49,9 +50,9 @@
 
 /**
  * This code uses the following policy to ensure
- * data integrity:
+ * data consistency:
  * all changes in the callInfo instance activeCall
- * happens on the main thread.
+ * happen on the main thread.
  **/
 
 #pragma mark Class Methods
@@ -88,15 +89,19 @@
 	delegate = nil;
 	
 	isOnline = NO;
-	
-	activePreferences = [[XMPreferences alloc] init];
 	doesSubsystemSetup = NO;
 	needsSubsystemSetupAfterCallEnd = NO;
 	needsSubsystemShutdownAfterSubsystemSetup = NO;
+	postSubsystemSetupFailureNotifications = YES;
+	
+	activePreferences = [[XMPreferences alloc] init];
+	autoAnswerCalls = NO;
 	
 	activeCall = nil;
+	callStartFailReason = XMCallStartFailReason_NoFailure;
 	
 	gatekeeperName = nil;
+	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	gatekeeperRegistrationCheckTimer = nil;
 	
 	recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
@@ -190,7 +195,7 @@
 
 - (XMPreferences *)activePreferences
 {
-	return activePreferences;
+	return [[activePreferences copy] autorelease];
 }
 
 - (void)setActivePreferences:(XMPreferences *)prefs
@@ -209,6 +214,7 @@
 	XMPreferences *old = activePreferences;
 	activePreferences = [prefs copy];
 	[old release];
+	activeSetupPreferences = [activePreferences retain];
 	
 	if([self isInCall])
 	{
@@ -244,27 +250,116 @@
 	return activeCall;
 }
 
-- (XMCallInfo *)callURL:(XMURL *)remotePartyURL;
+- (BOOL)callURL:(XMURL *)remotePartyURL;
 {
+	// invalid action checks
+	
 	if(!isOnline)
 	{
 		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileOffline];
-		return nil;
+		return NO;
 	}
 	else if(doesSubsystemSetup)
 	{
 		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup];
-		return nil;
+		return NO;
 	}
 	else if([self isInCall])
 	{
 		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionWhileInCall];
-		return nil;
+		return NO;
 	}
 	
 	XMCallProtocol callProtocol = [remotePartyURL callProtocol];
 	NSString *address = [remotePartyURL address];
-
+	
+	if([remotePartyURL isKindOfClass:[XMGeneralPurposeURL class]])
+	{
+		XMGeneralPurposeURL *url = (XMGeneralPurposeURL *)remotePartyURL;
+		
+		if([url _doesModifyPreferences:activePreferences])
+		{
+			/*
+			 * In this case, we have to modify the subsystem before continuing
+			 * to make the call. This is "indirect calling" since startCall()
+			 * is called some run loop cycles later.
+			 */
+			XMPreferences *modifiedPreferences = [activePreferences copy];
+			[url _modifyPreferences:modifiedPreferences];
+			
+			/* Detection of call start failure conditions */
+			if(callProtocol == XMCallProtocol_H323 && [modifiedPreferences enableH323] == NO)
+			{
+				callStartFailReason = XMCallStartFailReason_ProtocolNotEnabled;
+				
+				NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerCallStartFailed
+																			 object:self];
+				[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+				
+				[modifiedPreferences release];
+				
+				return NO;
+			}
+			if(callProtocol == XMCallProtocol_H323 && 
+			   [activePreferences useGatekeeper] == NO && 
+			   [modifiedPreferences useGatekeeper] == YES &&
+			   [url valueForKey:XMKey_PreferencesGatekeeperAddress] == nil &&
+			   [url valueForKey:XMKey_PreferencesGatekeeperID] == nil)
+			{
+				callStartFailReason = XMCallStartFailReason_GatekeeperUsedButNotSpecified;
+				
+				NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerCallStartFailed
+																			 object:self];
+				[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+				
+				[modifiedPreferences release];
+				
+				return NO;
+			}
+			
+			/*
+			 * Detection of direct call start failure conditions completed.
+			 * Now, let's start calling
+			 */
+			NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidStartCalling 
+																		 object:self];
+			[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+			
+			[activeSetupPreferences release];
+			activeSetupPreferences = modifiedPreferences;
+			
+			activeCall = [[XMCallInfo alloc] _initWithCallID:0
+													protocol:callProtocol
+												  remoteName:nil
+												remoteNumber:nil
+											   remoteAddress:nil
+										   remoteApplication:nil
+												  callStatus:XMCallStatus_Calling];
+			
+			addressToCall = [address retain];
+			protocolToUse = callProtocol;
+			
+			postSubsystemSetupFailureNotifications = NO;
+			
+			[self _prepareSubsystemSetup];
+		}
+	}
+	
+	/* Direct calling. Detection of call start failure conditions */
+	
+	// checking if the protocol is enabled. It may also be that the enabling failed for some reason!
+	if(callProtocol == XMCallProtocol_H323 && [self isH323Listening] == NO)
+	{
+		callStartFailReason = XMCallStartFailReason_ProtocolNotEnabled;
+		
+		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerCallStartFailed
+																	 object:self];
+		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+		return NO;
+	}
+	
+	/* Checks completed, start calling */
+	
 	unsigned callID = startCall(callProtocol, [address cString]);
 	
 	if(callID != 0)
@@ -276,12 +371,25 @@
 										   remoteAddress:nil
 									   remoteApplication:nil
 											  callStatus:XMCallStatus_Calling];
-		
-		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidStartCalling object:nil];
+			
+		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidStartCalling 
+																		 object:self];
 		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+		
+		return YES;
 	}
-	
-	return activeCall;
+	else
+	{
+		// do some more fine-grain detection of the call start fail reason
+		// (e.g. no address entered)
+		callStartFailReason = XMCallStartFailReason_UnknownFailure;
+		return NO;
+	}
+}
+
+- (XMCallStartFailReason)callStartFailReason
+{
+	return callStartFailReason;
 }
 
 - (void)acceptIncomingCall:(BOOL)acceptFlag
@@ -319,6 +427,11 @@
 - (NSString *)gatekeeperName
 {
 	return gatekeeperName;
+}
+
+- (XMGatekeeperRegistrationFailReason)gatekeeperRegistrationFailReason
+{
+	return gatekeeperRegistrationFailReason;
 }
 
 - (void)retryEnableH323
@@ -381,7 +494,10 @@
 {
 	// "freeze" any modifications
 	doesSubsystemSetup = YES;
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup object:self];
+	
+	NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidStartSubsystemSetup object:self];
+	
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 	
 	// set the autoAnswerCall flag
 	autoAnswerCalls = [activePreferences autoAnswerCalls];
@@ -412,7 +528,7 @@
 	// preparations complete...
 	// We use a copy to avoid possible multithreading problems, even if
 	// the chances for them are really small...
-	[self _initiateSubsystemSetupWithPreferences:[activePreferences copy]];
+	[self _initiateSubsystemSetupWithPreferences:[activeSetupPreferences copy]];
 }
 
 - (void)_initiateSubsystemSetupWithPreferences:(XMPreferences *)preferences
@@ -529,6 +645,7 @@
 			const char *gatekeeperUsername = NULL;
 			const char *gatekeeperPhoneNumber = NULL;
 			
+			
 			if([preferences useGatekeeper])
 			{
 				NSString *gkAddress = [preferences gatekeeperAddress];
@@ -536,26 +653,35 @@
 				NSString *gkUsername = [preferences gatekeeperUsername];
 				NSString *gkPhoneNumber = [preferences gatekeeperPhoneNumber];
 				
-				if(gkAddress != nil)
+				if(gkAddress != nil || gkID != nil)
 				{
-					gatekeeperAddress = [gkAddress cString];
+					if(gkAddress != nil)
+					{
+						gatekeeperAddress = [gkAddress cString];
+					}
+					if(gkID != nil)
+					{
+						gatekeeperID = [gkID cString];
+					}
+					if(gkUsername != nil)
+					{
+						gatekeeperUsername = [gkUsername cString];
+					}
+					if(gkPhoneNumber != nil)
+					{
+						gatekeeperPhoneNumber = [gkPhoneNumber cString];
+					}
+					
+					// inform the rest through notifications since this might be a lengthy task
+					[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistrationStart) 
+										   withObject:nil waitUntilDone:NO];
 				}
-				if(gkID != nil)
+				else
 				{
-					gatekeeperID = [gkID cString];
-				}
-				if(gkUsername != nil)
-				{
-					gatekeeperUsername = [gkUsername cString];
-				}
-				if(gkPhoneNumber != nil)
-				{
-					gatekeeperPhoneNumber = [gkPhoneNumber cString];
+					// the flag indicates gatekeeper usage but we have no valid gatekeeper address or ID
+					[self _handleGatekeeperRegistrationFailure:XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified];
 				}
 			}
-			
-			// inform the rest through notifications since this might be a lengthy task
-			[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistrationStart) withObject:nil waitUntilDone:NO];
 			
 			setGatekeeper(gatekeeperAddress, gatekeeperID, gatekeeperUsername, gatekeeperPhoneNumber);
 		}
@@ -592,6 +718,7 @@
 
 - (void)_mainThreadHandleSubsystemSetupDidEnd
 {	
+	
 	if(needsSubsystemShutdownAfterSubsystemSetup == YES)
 	{
 		// we just need to change the subsystem, thus we use new
@@ -601,16 +728,66 @@
 	}
 	else
 	{
+		if([self isInCall])
+		{
+			BOOL result = [self _startIndirectCalling];
+			
+			if(result == YES)
+			{
+				needsSubsystemSetupAfterCallEnd = YES;
+			}
+			else
+			{
+				[activeSetupPreferences release];
+				activeSetupPreferences = [activePreferences retain];
+				[self _initiateSubsystemSetupWithPreferences:[activePreferences copy]];
+				return;
+			}
+		}
+		
+		postSubsystemSetupFailureNotifications = YES;
 		doesSubsystemSetup = NO;
 	
 			// post the notification
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
+		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
+		
+		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 		
 		// in case we just went offline, we post the appropriate notification here
 		if(isOnline == NO)
 		{
 			[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidGoOffline object:self];
 		}
+	}
+}
+
+- (BOOL)_startIndirectCalling
+{
+	unsigned callID = startCall(protocolToUse, [addressToCall cString]);
+	
+	[addressToCall release];
+	addressToCall = nil;
+	protocolToUse = XMCallProtocol_UnknownProtocol;
+	
+	if(callID != 0)
+	{
+		[activeCall _setCallID:callID];
+		return YES;
+	}
+	else
+	{
+		[activeCall _setCallStatus:XMCallStatus_Ended];
+		[activeCall _setCallEndReason:XMCallEndReason_EndedByConnectFail];
+			
+		[self _storeCall:activeCall];
+			
+		[activeCall release];
+		activeCall = nil;
+			
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallCleared
+															object:self];
+		
+		return NO;
 	}
 }
 
@@ -640,7 +817,6 @@
 {
 	if(activeCall != nil)
 	{
-		NSLog(@"incoming call while active call != nil");
 		// This is the very rare situation that we have started a call
 		// roughly the same time as someone called us. I have serious
 		// doubts that this situation is even possible, but nevertheless
@@ -719,7 +895,6 @@
 	unsigned callID = [callIDNumber unsignedIntValue];
 	if([activeCall _callID] != callID)
 	{
-		NSLog(@"callID mismatch on call established!");
 		return;
 	}
 	
@@ -728,7 +903,6 @@
 	if(status != XMCallStatus_Calling && status != XMCallStatus_Incoming)
 	{
 		// this should actually not happen
-		NSLog(@"illegal call status on call established");
 		return;
 	}
 
@@ -792,8 +966,9 @@
 	[activeCall release];
 	activeCall = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallCleared
-														object:self];
+	NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerCallCleared object:self];
+	
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 	
 	// In some cases, we need to change some settings in the subsystem
 	// since this cannot be done during a call, it's now time to initiate
@@ -801,6 +976,9 @@
 	if(needsSubsystemSetupAfterCallEnd)
 	{
 		needsSubsystemSetupAfterCallEnd = NO;
+		
+		[activeSetupPreferences release];
+		activeSetupPreferences = [activePreferences retain];
 		[self _prepareSubsystemSetup];
 	}
 	
@@ -879,7 +1057,12 @@
 
 - (void)_mainThreadHandleH323Failure
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerEnablingH323Failed object:self];
+	if(postSubsystemSetupFailureNotifications == YES)
+	{
+		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerEnablingH323Failed object:self];
+		
+		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+	}
 }
 
 - (void)_mainThreadHandleGatekeeperRegistrationStart
@@ -905,12 +1088,14 @@
 																	   selector:@selector(_checkGatekeeperRegistration:)
 																	   userInfo:nil repeats:YES] retain];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperRegistration object:self];
+	NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerGatekeeperRegistration object:self];
+	
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 }
 
 - (void)_handleGatekeeperUnregistration
 {
-	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeeperUnregistration)
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperUnregistration)
 						   withObject:nil waitUntilDone:NO];
 }
 
@@ -926,22 +1111,29 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperUnregistration object:self];
 }
 
-- (void)_handleGatekeeperRegistrationFailure
+- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason
 {
-	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistrationFailure) withObject:nil
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:reason];
+	[self performSelectorOnMainThread:@selector(_mainThreadHandleGatekeeperRegistrationFailure:) withObject:number
 						waitUntilDone:NO];
+	[number release];
 }
 
-- (void)_mainThreadHandleGatekeeperRegistrationFailure
+- (void)_mainThreadHandleGatekeeperRegistrationFailure:(NSNumber *)reason
 {
 	[gatekeeperName release];
 	gatekeeperName = nil;
+	
+	gatekeeperRegistrationFailReason = (XMGatekeeperRegistrationFailReason)[reason unsignedIntValue];
 	
 	[gatekeeperRegistrationCheckTimer invalidate];
 	[gatekeeperRegistrationCheckTimer release];
 	gatekeeperRegistrationCheckTimer = nil;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperRegistrationFailed object:self];
+	if(postSubsystemSetupFailureNotifications == YES)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperRegistrationFailed object:self];
+	}
 }
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer

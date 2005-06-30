@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.8 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,7 @@
 #import "XMAudioManager.h"
 #import "XMVideoManager.h"
 #import "XMAddressBookRecordSearchMatch.h"
+#import "XMGeneralPurposeURL.h"
 
 @class XMLocalVideoView, XMCallInfo, ABPerson;
 
@@ -92,7 +93,7 @@
  * This method gets called when an attempt to register at a gatekeeper failed.
  * This method is not called on the main thread
  **/
-- (void)_handleGatekeeperRegistrationFailure;
+- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason;
 
 @end
 
@@ -107,6 +108,7 @@
 		   callStatus:(XMCallStatus)status;
 
 - (unsigned)_callID;
+- (void)_setCallID:(unsigned)theCallID;
 
 - (void)_setCallStatus:(XMCallStatus)status;
 - (void)_setCallEndReason:(XMCallEndReason)endReason;
@@ -164,6 +166,13 @@
 @interface XMAddressBookRecordSearchMatch (FrameworkMethods)
 
 - (id)_initWithRecord:(ABPerson *)record propertyMatch:(XMAddressBookRecordPropertyMatch)propertyMatch;
+
+@end
+
+@interface XMGeneralPurposeURL (FrameworkMethods)
+
+- (BOOL)_doesModifyPreferences:(XMPreferences *)preferences;
+- (void)_modifyPreferences:(XMPreferences *)preferences;
 
 @end
 

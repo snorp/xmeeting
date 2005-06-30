@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.2 2005/06/30 09:33:09 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -86,6 +86,10 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (XMURL *)url
 {
+	if(type == XMCallHistoryRecordType_AddressBookRecord)
+	{
+		return [addressBookRecord callURL];
+	}
 	return self;
 }
 

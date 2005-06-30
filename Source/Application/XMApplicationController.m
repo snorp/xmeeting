@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.7 2005/06/30 09:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -174,9 +174,39 @@
 {
 	NSAlert *alert = [[NSAlert alloc] init];
 	
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	XMGatekeeperRegistrationFailReason failReason = [callManager gatekeeperRegistrationFailReason];
+	NSString *reasonText;
+	NSString *suggestionText;
+	
+	switch(failReason)
+	{
+		case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
+			reasonText = NSLocalizedString(@"no gatekeeper specified", @"");
+			suggestionText = NSLocalizedString(@"Please specify a gatekeeper in preferences.", @"");
+			break;
+		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
+			reasonText = NSLocalizedString(@"gatekeeper not found", @"");
+			suggestionText = NSLocalizedString(@"Please check your internet connection.", @"");
+			break;
+		case XMGatekeeperRegistrationFailReason_RegistrationReject:
+			reasonText = NSLocalizedString(@"gatekeeper rejected registration", @"");
+			suggestionText = NSLocalizedString(@"Please check your gatekeeper settings.", @"");
+			break;
+		default:
+			reasonText = NSLocalizedString(@"unknown failure", @"");
+			suggestionText = @"";
+			break;
+	}
+	
 	[alert setMessageText:NSLocalizedString(@"Gatekeeper Registration Failed", @"")];
-	[alert setInformativeText:NSLocalizedString(@"Unable to register at gatekeeper (GK). You will not be able to \
-	use phone numbers to call. Please check your internet connection", @"")];
+	NSString *informativeTextFormat = NSLocalizedString(@"Unable to register at gatekeeper. (%@) You will not be able \
+	to use phone numbers when making a call. %@", @"");
+	
+
+	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, reasonText, suggestionText];
+	[alert setInformativeText:informativeText];
+	[informativeText release];
 	
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];

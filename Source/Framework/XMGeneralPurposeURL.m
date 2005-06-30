@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPurposeURL.m,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMGeneralPurposeURL.m,v 1.2 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -157,6 +157,60 @@
 	if(correctType == NO)
 	{
 		[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeOfCorrectType];
+	}
+}
+
+#pragma mark Framework Methods
+
+- (BOOL)_doesModifyPreferences:(XMPreferences *)preferences
+{
+	NSArray *keys = [dictionary allKeys];
+	
+	unsigned i;
+	unsigned count = [keys count];
+	
+	for(i = 0; i < count; i++)
+	{
+		NSString *key = [keys objectAtIndex:i];
+		
+		if([key isEqualToString:XMKey_URLType] ||
+		   [key isEqualToString:XMKey_URLAddress])
+		{
+			continue;
+		}
+		
+		NSObject *value = [dictionary objectForKey:key];
+		if(![[preferences valueForKey:key] isEqual:value])
+		{
+			// at least one property changed, this is sufficiant
+			// to return YES
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+- (void)_modifyPreferences:(XMPreferences *)preferences
+{
+	NSArray *keys = [dictionary allKeys];
+	
+	unsigned i;
+	unsigned count = [keys count];
+	
+	for(i = 0; i < count; i++)
+	{
+		NSString *key = [keys objectAtIndex:i];
+		
+		if([key isEqualToString:XMKey_URLType] ||
+		   [key isEqualToString:XMKey_URLAddress])
+		{
+			continue;
+		}
+		
+		NSObject *value = [dictionary objectForKey:key];
+		
+		[preferences setValue:value forKey:key];
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPurposeURL.h,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMGeneralPurposeURL.h,v 1.2 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,8 @@
  * If the value does not have the correct type or if the key 
  * is not a valid key, an exception is raised. If value is
  * nil, any value set for key is removed.
+ * Keys not valid are XMKey_PreferencesEnableH323,
+ * XMKey_PreferencesAudioCodecList, XMKey_PreferencesVideoCodecList
  **/
 - (void)setValue:(id)property forKey:(NSString *)key;
 

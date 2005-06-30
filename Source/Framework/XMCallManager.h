@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.8 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,16 +29,23 @@
 	
 	BOOL isOnline;
 	
-	XMPreferences *activePreferences;
 	BOOL doesSubsystemSetup;
 	BOOL needsSubsystemSetupAfterCallEnd;
 	BOOL needsSubsystemShutdownAfterSubsystemSetup;
+	BOOL postSubsystemSetupFailureNotifications;
+	
+	XMPreferences *activePreferences;
+	XMPreferences *activeSetupPreferences;
+	BOOL autoAnswerCalls;
 	
 	XMCallInfo *activeCall;
-	BOOL autoAnswerCalls;
+	XMCallStartFailReason callStartFailReason;
+	NSString *addressToCall;
+	XMCallProtocol protocolToUse;
 	
 	// h.323 variables
 	NSString *gatekeeperName;
+	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	NSTimer *gatekeeperRegistrationCheckTimer;
 	
 	// call history
@@ -91,7 +98,7 @@
  **/
 - (BOOL)doesSubsystemSetup;
 
-#pragma mark Call management methods
+#pragma mark Call Management Methods
 
 /**
  * Returns whether the framework is currently in a call or not
@@ -106,10 +113,19 @@
 
 /**
  * Calls the remoteParty using the specified call protocol
- * If the protocol (e.g. H.323) is not active in the current settings, an exception
- * is raise.
+ * If the call cannot be made for some reason, (e.g. calling
+ * an H.323 client while H.323 is disabled) NO is returned
+ * and a notification (XMNotification_CallManagerCallStartFailed) is
+ * posted. Otherwise, this method returns YES and the final result of
+ * the call attempt will be posted through notifications
+ * The call fail reason can be obtained through -callStartFailReason
  **/
-- (XMCallInfo *)callURL:(XMURL *)remotePartyURL;
+- (BOOL)callURL:(XMURL *)remotePartyURL;
+
+/**
+ * Returns the reason why the last call start failed.
+ **/
+- (XMCallStartFailReason)callStartFailReason;
 
 /**
  * This method accepts or rejects the incoming call.
@@ -139,6 +155,12 @@
  * is not registered at a gatekeeper
  **/
 - (NSString *)gatekeeperName;
+
+/**
+ * Returns the reason indicating what caused the gatekeeper registration
+ * to fail
+ **/
+- (XMGatekeeperRegistrationFailReason)gatekeeperRegistrationFailReason;
 
 /**
  * Call this method if the enabling of the H.323 subsystem failed somehow

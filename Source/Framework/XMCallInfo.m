@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.2 2005/04/28 20:26:26 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.3 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,6 +71,11 @@
 - (unsigned)_callID
 {
 	return callID;
+}
+
+- (void)_setCallID:(unsigned)theCallID
+{
+	callID = theCallID;
 }
 
 - (XMCallProtocol)protocol

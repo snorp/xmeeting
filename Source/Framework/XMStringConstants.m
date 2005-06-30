@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.3 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,7 @@ NSString *XMNotification_CallManagerDidStartSubsystemSetup = @"XMeetingCallManag
 NSString *XMNotification_CallManagerDidEndSubsystemSetup = @"XMeetingCallManagerDidEndSubsystemSetupNotification";
 
 NSString *XMNotification_CallManagerDidStartCalling = @"XMeetingCallManagerDidStartCallingNotification";
+NSString *XMNotification_CallManagerCallStartFailed = @"XMeetingCallManagerCallStartFailedNotification";
 NSString *XMNotification_CallManagerIncomingCall = @"XMeetingCallManagerIncomingCallNotification";
 NSString *XMNotification_CallManagerCallEstablished = @"XMeetingCallManagerCallEstablishedNotification";
 NSString *XMNotification_CallManagerCallCleared = @"XMeetingCallManagerCallClearedNotification";

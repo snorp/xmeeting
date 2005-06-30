@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.7 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -77,7 +77,7 @@ BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
 	}
 	else
 	{
-		protocol = XMCallProtocol_Unknown;
+		protocol = XMCallProtocol_UnknownProtocol;
 	}
 	
 	// telling the PCSSEndPoint which protocol we use so

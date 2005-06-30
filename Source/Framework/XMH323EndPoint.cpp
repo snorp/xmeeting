@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.4 2005/06/30 09:33:12 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -99,6 +99,7 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 		// call to UseGatekeeper, we have a new registration
 		// and notify the XMeeting framework
 		didRegisterAtGatekeeper = FALSE;
+		gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 		BOOL result = UseGatekeeper(address, identifier);
 		if(result == TRUE && didRegisterAtGatekeeper == TRUE)
 		{
@@ -107,7 +108,11 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 		}
 		else if (result == FALSE)
 		{
-			noteGatekeeperRegistrationFailure();
+			if(gatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_NoFailure)
+			{
+				gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_GatekeeperNotFound;
+			}
+			noteGatekeeperRegistrationFailure(gatekeeperRegistrationFailReason);
 		}
 		return result;
 	}
@@ -119,13 +124,14 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 		{
 			doesUnregister = TRUE;
 		}
-		return RemoveGatekeeper();
+		BOOL result = RemoveGatekeeper();
 		
 		// if we unregistered, we have to inform the obj-C world
-		if(doesUnregister)
+		if(doesUnregister == TRUE)
 		{
 			noteGatekeeperUnregistration();
 		}
+		return result;
 	}
 }
 
@@ -161,6 +167,8 @@ void XMH323EndPoint::OnRegistrationConfirm()
 void XMH323EndPoint::OnRegistrationReject()
 {
 	cout << "OnRegistrationReject()" << endl;
+	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_RegistrationReject;
+	H323EndPoint::OnRegistrationReject();
 }
 
 void XMH323EndPoint::OnEstablished(OpalConnection & connection)
