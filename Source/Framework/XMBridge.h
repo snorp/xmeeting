@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.6 2005/08/21 08:40:18 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -123,12 +123,16 @@ void setTranslationAddress(const char *address);
 #pragma mark Audio Functions
 
 // The underlying system is call-by-reference
-const char *getSelectedAudioInputDevice();
-bool setSelectedAudioInputDevice(const char *device);
+//const char *getSelectedAudioInputDevice();
+//bool setSelectedAudioInputDevice(const char *device);
+void setSelectedAudioInputDevice(unsigned int device);
+void setMuteAudioInputDevice(bool muteFlag);
 
 // The underlying system is call-by-reference
-const char *getSelectedAudioOutputDevice();
-bool setSelectedAudioOutputDevice(const char *device);
+//const char *getSelectedAudioOutputDevice();
+//bool setSelectedAudioOutputDevice(const char *device);
+void setSelectedAudioOutputDevice(unsigned int device);
+void setMuteAudioOutputDevice(bool muteFlag);
 
 unsigned getAudioBufferSize();
 void setAudioBufferSize(unsigned value);
@@ -176,5 +180,12 @@ bool setGatekeeper(const char *address, const char *identifier, const char *gkUs
 void checkGatekeeperRegistration();
 
 #pragma mark SIP Setup Functions
+
+#pragma mark Constants
+
+/**
+ * Device Names used within OPAL
+ **/
+#define XMSoundChannelDevice "XMSoundChannelDevice"
 
 #endif // __XM_BRIDGE_H__

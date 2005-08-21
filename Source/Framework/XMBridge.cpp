@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.6 2005/08/21 08:40:18 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,12 +7,14 @@
  */
 
 #include <ptlib.h>
+#include "XMTypes.h"
 
 #include "XMBridge.h"
 
 #include "XMOpalManager.h"
 #include "XMPCSSEndPoint.h"
 #include "XMH323EndPoint.h"
+#include "XMSoundChannel.h"
 #include "XMSubsystemSetupThread.h"
 
 using namespace std;
@@ -37,6 +39,9 @@ void initOPAL()
 		
 		callEndPoint = theManager->PCSSEndPoint();
 		h323EndPoint = theManager->H323EndPoint();
+		
+		callEndPoint->SetSoundChannelPlayDevice(XMSoundChannelDevice);
+		callEndPoint->SetSoundChannelRecordDevice(XMSoundChannelDevice);
 	}
 }
 
@@ -149,38 +154,34 @@ void setTranslationAddress(const char *a)
 #pragma mark Audio Functions
 
 // The underlying system is call-by-reference
-const char *getSelectedAudioInputDevice()
+//const char *getSelectedAudioInputDevice()
+//{
+//	return callEndPoint->GetSoundChannelRecordDevice();
+//}
+
+void setSelectedAudioInputDevice(unsigned int deviceID)
 {
-	return callEndPoint->GetSoundChannelRecordDevice();
+	XMSoundChannel::SetRecordDevice(deviceID);
 }
 
-bool setSelectedAudioInputDevice(const char *device)
+void setMuteAudioInputDevice(bool muteFlag)
 {
-	bool result = callEndPoint->SetSoundChannelRecordDevice(device);
-	
-	return result;
 }
 
 // The underlying system is call-by-reference
-const char *getSelectedAudioOutputDevice()
+//const char *getSelectedAudioOutputDevice()
+//{
+//	return callEndPoint->GetSoundChannelPlayDevice();
+//}
+
+void setSelectedAudioOutputDevice(unsigned int deviceID)
 {
-	return callEndPoint->GetSoundChannelPlayDevice();
+	XMSoundChannel::SetPlayDevice(deviceID);
 }
 
-bool setSelectedAudioOutputDevice(const char *device)
+void setMuteAudioOutputDevice(bool muteFlag)
 {
-	bool result = callEndPoint->SetSoundChannelPlayDevice(device);
-	
-	if(result)
-	{
-		cout << "succ" << endl;
-	}
-	else
-	{
-		cout << "no succ" << endl;
-	}
-	
-	return result;
+	XMSoundChannel::SetPlayDeviceMuted(muteFlag);
 }
 
 unsigned getAudioBufferSize()

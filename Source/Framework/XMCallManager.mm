@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.9 2005/06/30 11:17:32 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.10 2005/08/21 08:40:18 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1016,6 +1016,8 @@
 	NSString *codecString = (NSString *)[infoArray objectAtIndex:2];
 	unsigned callID = [callIDNumber unsignedIntValue];
 	BOOL isInputStream = [isInputStreamNumber boolValue];
+	
+	NSLog(@"media stream opened: %@ (%d)", codecString, (int)isInputStream);
 	
 	if([activeCall _callID] != callID)
 	{

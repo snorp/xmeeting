@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.4 2005/08/21 08:40:18 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_AUDIO_MANAGER_H__
 
 #import <Foundation/Foundation.h>
+#import <CoreAudio/CoreAudio.h>
 
 /**
  * XMAudioManager provides the interface for accessing all audio-related
@@ -19,15 +20,17 @@
  **/
 @interface XMAudioManager : NSObject {
 	NSArray *inputDevices;
-	NSArray *outputDevices;
 	NSString *selectedInputDevice;
+	AudioDeviceID selectedInputDeviceID;
+	BOOL selectedInputDeviceIsMuted;
+	
+	NSArray *outputDevices;
 	NSString *selectedOutputDevice;
+	AudioDeviceID selectedOutputDeviceID;
+	BOOL selectedOutputDeviceIsMuted;
 	
 	NSString *noDeviceName;
 	NSString *unknownDeviceName;
-	
-	unsigned unmutedInputVolume;
-	unsigned unmutedOutputVolume;
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.7 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.8 2005/08/21 08:40:18 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
 #include "XMVideoDevices.h"
+#include "XMSoundChannel.h"
 
 using namespace std;
 
@@ -97,6 +98,8 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {
+	cout << "OnClearedCall" << endl;
+	XMSoundChannel::StopChannels();
 	unsigned callID = call.GetToken().AsUnsigned();
 	noteCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
@@ -116,7 +119,8 @@ void XMOpalManager::OnConnected(OpalConnection & connection)
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
-	cout << "XMOpalManager::OnReleased" << endl;
+	cout << "XMOpalManager::OnReleased" << connection << endl;
+	
 	OpalManager::OnReleased(connection);
 }
 
