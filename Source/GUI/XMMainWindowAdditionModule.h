@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowAdditionModule.h,v 1.1 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMMainWindowAdditionModule.h,v 1.2 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,7 @@
 #define __XM_MAIN_WINDOW_ADDITION_MODULE_H__
 
 /**
- * This protocol declares the methods required for a main window bottom
+ * This protocol declares the methods required for a main window addition
  * module to ensure proper working. Most methods are similar to the ones
  * found in XMMainWindowModule, but the semantics have changed slightly.
  **/
@@ -44,9 +44,16 @@
 - (NSSize)contentViewSize;
 
 /**
- * Informs the module that it's content view is going to be displayed
+ * Informs the receiver that it's content view is going to be displayed
+ * on screen, so that the module can do any necessary preparations
  **/
-- (void)prepareForDisplay;
+- (void)becomeActiveModule;
+
+/**
+ * Informs the receiver that it's content view is removed from the screen,
+ * so that the module can clean up if necessary.
+ **/
+- (void)becomeInactiveModule;
 
 @end
 

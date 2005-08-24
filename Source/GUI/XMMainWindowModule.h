@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowModule.h,v 1.2 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMMainWindowModule.h,v 1.3 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,7 @@
  * This protocol declares the necessary methods required for a 
  * main window module. These methods include informations
  * about name, content view and content view size, as well as
- * notification methods such as -prepareForDisplay, which informs
+ * notification methods such as -becomeActiveModule, which informs
  * the receiver that it's content view is about to be displayed on screen.
  **/
 @protocol XMMainWindowModule <NSObject>
@@ -36,20 +36,32 @@
 - (NSSize)contentViewSize;
 
 /**
- * If the receiver allows resizing, this tells the minimum size for the content view.
- * This value may change through the lifetime of the object.
+ * If the receiver allows resizing, this method should return the minimum size for 
+ * the content view. This value may change through the lifetime of the object.
+ * If the receiver does not allow resizing, return the same size as 
+ * -contentViewSize here.
  **/
 - (NSSize)contentViewMinSize;
 
 /**
- * Returns whether this module's view is resizable or not
+ * If the receiver allows resizing, this method should return the maximum allowed size
+ * for the content view. This value may change through the lifetime of the object.
+ * If the receiver does not allow resizing, return the same size as
+ * -contentViewSize here.
  **/
-- (BOOL)allowsContentViewResizing;
+- (NSSize)contentViewMaxSize;
 
 /**
- * Informs the module that it's content view is going to be displayed on screen
+ * Informs the module that it's content view is going to be displayed on screen,
+ * so that the module can update it's views
  **/
-- (void)prepareForDisplay;
+- (void)becomeActiveModule;
+
+/**
+ * Informs the receiver that the content view is removed from the screen and
+ * the module can be considered inactive.
+ **/
+- (void)becomeInactiveModule;
 
 @end
 

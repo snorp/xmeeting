@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.8 2005/06/30 11:17:27 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.9 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #import "XMPreferencesWindowController.h"
 #import "XMNoCallModule.h"
 #import "XMInCallModule.h"
+#import "XMLocalAudioVideoModule.h"
 #import "XMAddressBookModule.h"
 #import "XMZeroConfModule.h"
 #import "XMDialPadModule.h"
@@ -52,6 +53,8 @@
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];
+	
+	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
 	
 	addressBookModule = [[XMAddressBookModule alloc] init];
 	zeroConfModule = [[XMZeroConfModule alloc] init];
@@ -92,6 +95,7 @@
 {
 	[noCallModule release];
 	[inCallModule release];
+	[localAudioVideoModule release];
 	[addressBookModule release];
 	[zeroConfModule release];
 	[dialPadModule release];

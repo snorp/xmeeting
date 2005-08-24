@@ -31,22 +31,20 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {
-                additionContentButtonAction = id; 
-                showAdditionModuleInSeparateWindow = id; 
-                toggleShowAdditionContentView = id; 
-                toggleShowLocalAudioVideoDrawer = id; 
-            }; 
+            ACTIONS = {showAdditionModuleInSeparateWindow = id; toggleShowAdditionContent = id; }; 
             CLASS = XMMainWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                additionContentDisclosure = NSButton; 
                 bottomContentBox = NSBox; 
-                bottomContentDisclosure = NSButton; 
-                localAudioVideoDisclosure = NSButton; 
-                localAudioVideoDrawer = NSDrawer; 
+                horizontalSeparator = NSBox; 
                 mainContentBox = NSBox; 
+                rightContentBox = NSBox; 
+                separateWindowButton = XMMouseOverButton; 
                 separatorContentBox = NSBox; 
-                showModuleInSeparateWindowButton = XMMouseOverButton; 
+                separatorContentView = NSView; 
+                statusBarContentBox = NSBox; 
+                statusBarContentView = NSView; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

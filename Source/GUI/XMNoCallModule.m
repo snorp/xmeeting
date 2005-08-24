@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.8 2005/06/30 11:17:32 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.9 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -131,20 +131,33 @@
 
 - (NSSize)contentViewSize
 {
+	// if not already done, this triggers the loading of the nib file
+	[self contentView];
+	
 	return contentViewSize;
 }
 
 - (NSSize)contentViewMinSize
 {
+	// if not already done, this triggers the loading of the nib file
+	[self contentView];
+	
 	return contentViewSize;
 }
 
-- (BOOL)allowsContentViewResizing
+- (NSSize)contentViewMaxSize
 {
-	return NO;
+	// if not already done, this triggers the loading of the nib file
+	[self contentView];
+	
+	return contentViewSize;
 }
 
-- (void)prepareForDisplay
+- (void)becomeActiveModule
+{
+}
+
+- (void)becomeInactiveModule
 {
 }
 

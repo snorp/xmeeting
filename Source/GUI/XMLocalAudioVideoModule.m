@@ -1,15 +1,18 @@
 /*
- * $Id: XMLocalAudioVideoController.m,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.1 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMLocalAudioVideoController.h"
 #import "XMeeting.h"
+#import "XMLocalAudioVideoModule.h"
+#import "XMMainWindowController.h"
 
-@interface XMLocalAudioVideoController (PrivateMethods)
+#define COLLAPSED_CONTENT_WIDTH 20.0
+
+@interface XMLocalAudioVideoModule (PrivateMethods)
 
 - (void)_validateControls;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
@@ -17,12 +20,33 @@
 
 @end
 
-@implementation XMLocalAudioVideoController
+@implementation XMLocalAudioVideoModule
 
 #pragma mark Init & Deallocation Methods
 
+- (id)init
+{
+	[[XMMainWindowController sharedInstance] addSupportModule:self];
+	
+	nibLoader = nil;
+	
+	return self;
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	[super dealloc];
+}
+
 - (void)awakeFromNib
 {
+	expandedContentViewSize = [contentView frame].size;
+	collapsedContentViewSize = NSMakeSize(COLLAPSED_CONTENT_WIDTH, expandedContentViewSize.height);
+	isExpanded = YES;
+	[contentDisclosure setState:NSOnState];
+	
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
 	[audioInputDevicesPopUp removeAllItems];
@@ -52,7 +76,55 @@
 							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
 }
 
+#pragma mark Protocol Methods
+
+- (NSString *)name
+{
+	return @"Local Audio/Video control";
+}
+
+- (NSView *)contentView
+{
+	if(nibLoader == nil)
+	{
+		nibLoader = [[NSNib alloc] initWithNibNamed:@"LocalAudioVideoModule" bundle:nil];
+		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+	}
+	
+	return contentView;
+}
+
+- (NSSize)contentViewSize
+{
+	// if not already done, this triggers the loading of the nib file
+	[self contentView];
+	
+	if(isExpanded)
+	{
+		return expandedContentViewSize;
+	}
+	else
+	{
+		return collapsedContentViewSize;
+	}
+}
+
+- (void)becomeActiveModule
+{
+}
+
+- (void)becomeInactiveModule
+{
+}
+
 #pragma mark Action Methods
+
+- (IBAction)toggleShowContent:(id)sender
+{
+	isExpanded = !isExpanded;
+	
+	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfSupportModule:self];
+}
 
 - (IBAction)changeVideoDevice:(id)sender
 {
@@ -155,7 +227,6 @@
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
 	BOOL enableControls = [audioManager canAlterInputVolume];
-	
 	[audioInputVolumeSlider setEnabled:enableControls];
 	[muteAudioInputSwitch setEnabled:enableControls];
 	

@@ -8,19 +8,9 @@
 			<key>XMeeting_Bandwidth</key>
 			<string>Another Bandwidth</string>
 			<key>XMeeting_Identifier</key>
-			<string>g.711-ulaw</string>
+			<string>*g.711*</string>
 			<key>XMeeting_Name</key>
-			<string>G.711- uLaw</string>
-			<key>XMeeting_Quality</key>
-			<string>Good</string>
-		</dict>
-		<dict>
-			<key>XMeeting_Bandwidth</key>
-			<string>Some Bandwidth</string>
-			<key>XMeeting_Identifier</key>
-			<string>g.711-alaw</string>
-			<key>XMeeting_Name</key>
-			<string>G.711-ALaw</string>
+			<string>G.711</string>
 			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>

@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.4 2005/06/30 09:33:13 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.5 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,20 +61,29 @@
 
 - (NSSize)contentViewSize
 {
-	return [contentView bounds].size;
+	return [[self contentView] bounds].size;
 }
 
 - (NSSize)contentViewMinSize
 {
+	// if not already done, this triggers the loading of the nib file
+	[self contentView];
+	
 	return contentViewMinSize;
 }
 
-- (BOOL)allowsContentViewResizing
+- (NSSize)contentViewMaxSize
 {
-	return YES;
+	// we do not return FLT_MAX since this might cause overflow
+	// and wrong results
+	return NSMakeSize(20000.0, 20000.0);
 }
 
-- (void)prepareForDisplay
+- (void)becomeActiveModule
+{
+}
+
+- (void)becomeInactiveModule
 {
 }
 

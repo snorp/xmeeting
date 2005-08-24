@@ -1,0 +1,32 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                changeAudioInputDevice = id; 
+                changeAudioInputVolume = id; 
+                changeAudioOutputDevice = id; 
+                changeAudioOutputVolume = id; 
+                changeVideoDevice = id; 
+                toggleMuteAudioInput = id; 
+                toggleMuteAudioOutput = id; 
+                toggleShowContent = id; 
+            }; 
+            CLASS = XMLocalAudioVideoModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                audioInputDevicesPopUp = NSPopUpButton; 
+                audioInputVolumeSlider = NSSlider; 
+                audioOutputDevicesPopUp = NSPopUpButton; 
+                audioOutputVolumeSlider = NSSlider; 
+                contentDisclosure = NSButton; 
+                contentView = NSView; 
+                muteAudioInputSwitch = NSButton; 
+                muteAudioOutputSwitch = NSButton; 
+                videoDevicesPopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

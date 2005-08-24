@@ -1,5 +1,5 @@
 /*
- * $Id: XMZeroConfModule.m,v 1.3 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMZeroConfModule.m,v 1.4 2005/08/24 22:29:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,10 +52,17 @@
 
 - (NSSize)contentViewSize
 {
+	// if not already done, causing the nib file to load
+	[self contentView];
+	
 	return contentViewSize;
 }
 
-- (void)prepareForDisplay
+- (void)becomeActiveModule
+{
+}
+
+- (void)becomeInactiveModule
 {
 }
 
