@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.10 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.11 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,6 +41,8 @@
 - (void)_mainThreadHandleGatekeeperUnregistration;
 - (void)_mainThreadHandleGatekeeperRegistrationFailure:(NSNumber *)reason;
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer;
+
+- (void)_updateCallStatistics:(NSTimer *)timer;
 
 - (void)_storeCall:(XMCallInfo *)call;
 
@@ -103,6 +105,8 @@
 	gatekeeperName = nil;
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	gatekeeperRegistrationCheckTimer = nil;
+	
+	statisticsUpdateInterval = 1.0;
 	
 	recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
 	
@@ -330,6 +334,7 @@
 			
 			activeCall = [[XMCallInfo alloc] _initWithCallID:0
 													protocol:callProtocol
+										   isOutgoingCall:YES
 												  remoteName:nil
 												remoteNumber:nil
 											   remoteAddress:nil
@@ -367,6 +372,7 @@
 	{
 		activeCall = [[XMCallInfo alloc] _initWithCallID:callID
 												protocol:callProtocol
+									   isOutgoingCall:YES
 											  remoteName:nil
 											remoteNumber:nil
 										   remoteAddress:nil
@@ -487,6 +493,18 @@
 		
 		[NSException raise:XMException_InvalidAction format:exceptionReason];
 	}
+}
+
+#pragma mark InCall Methods
+
+- (NSTimeInterval)statisticsUpdateInterval
+{
+	return statisticsUpdateInterval;
+}
+
+- (void)setStatisticsUpdateInterval:(NSTimeInterval)interval
+{
+	statisticsUpdateInterval = interval;
 }
 
 #pragma mark Private Methods
@@ -803,6 +821,7 @@
 {
 	XMCallInfo *info = [[XMCallInfo alloc] _initWithCallID:callID
 												  protocol:protocol
+										 isOutgoingCall:NO
 												remoteName:remoteName
 											  remoteNumber:remoteNumber
 											 remoteAddress:remoteAddress
@@ -922,6 +941,16 @@
 		[activeCall _setRemoteNumber:remoteNumber];
 		[activeCall _setRemoteAddress:remoteAddress];
 		[activeCall _setRemoteApplication:remoteApplication];
+	}
+	
+	// starting the statistics timer
+	if(statisticsUpdateInterval != 0.0)
+	{
+		[NSTimer scheduledTimerWithTimeInterval:statisticsUpdateInterval
+										 target:self
+									   selector:@selector(_updateCallStatistics:)
+									   userInfo:nil
+										repeats:YES];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallEstablished
@@ -1057,6 +1086,32 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 	[self _initiateSubsystemSetupWithPreferences:[activePreferences copy]];
 }
+
+- (void)_updateCallStatistics:(NSTimer *)timer
+{
+	if(activeCall == nil || [activeCall callStatus] != XMCallStatus_Active)
+	{
+		[timer invalidate];
+	}
+	else
+	{
+		XMCallStatistics *callStatistics = [activeCall _callStatistics];
+		unsigned callID = [activeCall _callID];
+		
+		getCallStatistics(callID, callStatistics);
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerCallStatisticsUpdated object:self];
+	}
+}
+
+- (void)_storeCall:(XMCallInfo *)call
+{
+	if([recentCalls count] == 100)
+	{
+		[recentCalls removeObjectAtIndex:99];
+	}
+	[recentCalls insertObject:call atIndex:0];
+}
 	
 #pragma mark H.323 private methods
 
@@ -1149,15 +1204,6 @@
 	{
 		checkGatekeeperRegistration();
 	}
-}
-
-- (void)_storeCall:(XMCallInfo *)call
-{
-	if([recentCalls count] == 100)
-	{
-		[recentCalls removeObjectAtIndex:99];
-	}
-	[recentCalls insertObject:call atIndex:0];
 }
 
 @end

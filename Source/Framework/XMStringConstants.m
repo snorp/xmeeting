@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.3 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,8 @@ NSString *XMNotification_CallManagerDidStartGatekeeperRegistration = @"XMeetingC
 NSString *XMNotification_CallManagerGatekeeperRegistration = @"XMeetingCallManagerGatekeeperRegistrationNotification";
 NSString *XMNotification_CallManagerGatekeeperUnregistration = @"XMeetingCallManagerGatekeeperUnregistrationNotification";
 NSString *XMNotification_CallManagerGatekeeperRegistrationFailed = @"XMeetingCallManagerGatekeeperRegistrationFailedNotification";
+
+NSString *XMNotification_CallManagerCallStatisticsUpdated = @"XMeetingCallManagerCallStatisticsUpdatedNotification";
 
 NSString *XMNotification_AudioManagerInputDeviceDidChange = @"XMeetingAudioManagerInputDeviceDidChangeNotification";
 NSString *XMNotification_AudioManagerOutputDeviceDidChange = @"XMeetingAudioManagerOutputDeviceDidChangeNotification";

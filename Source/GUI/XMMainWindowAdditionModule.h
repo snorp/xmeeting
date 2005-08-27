@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowAdditionModule.h,v 1.2 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMMainWindowAdditionModule.h,v 1.3 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,8 +38,8 @@
 
 /**
  * Returns the size of the module's content view. Note that
- * the height is fixed and does not change. The width may
- * vary, return the preferred width here.
+ * the height is guaranteed and does not change (unless requested
+ * by the module). The width may vary, return the preferred width here.
  **/
 - (NSSize)contentViewSize;
 

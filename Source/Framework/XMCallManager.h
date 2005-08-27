@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.8 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.9 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,6 +47,9 @@
 	NSString *gatekeeperName;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	NSTimer *gatekeeperRegistrationCheckTimer;
+	
+	// InCall variables
+	NSTimeInterval statisticsUpdateInterval;
 	
 	// call history
 	NSMutableArray *recentCalls;
@@ -180,6 +183,23 @@
  * at all
  **/
 - (void)retryGatekeeperRegistration;
+
+#pragma mark InCall functionality
+
+/**
+ * Returns the interval at which the call statistics are updated.
+ * The default value is 1.0 seconds. If no statistics should be
+ * fetched, returns 0.
+ **/
+- (NSTimeInterval)statisticsUpdateInterval;
+
+/**
+ * Sets the interval at which the call statistics should be updated.
+ * If you don't want any statistics at all, set interval to 0.0 seconds.
+ * Changing this value does not affect the interval of a call already
+ * in progress.
+ **/
+- (void)setStatisticsUpdateInterval:(NSTimeInterval)interval;
 
 @end
 

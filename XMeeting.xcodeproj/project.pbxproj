@@ -24,6 +24,7 @@
 		D1342CC207B0C1460012B578 /* XMVideoDevices.h in Resources */ = {isa = PBXBuildFile; fileRef = D1342CC007B0C1460012B578 /* XMVideoDevices.h */; };
 		D1342CC307B0C1460012B578 /* XMVideoDevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1342CC107B0C1460012B578 /* XMVideoDevices.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
+		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D163336507A01BD5003FD9C0 /* XMApplicationController.h in Resources */ = {isa = PBXBuildFile; fileRef = D163336307A01BD5003FD9C0 /* XMApplicationController.h */; };
 		D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D163336407A01BD5003FD9C0 /* XMApplicationController.m */; };
 		D16333E207A020D9003FD9C0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333E007A020D9003FD9C0 /* AudioToolbox.framework */; };
@@ -196,6 +197,8 @@
 		D1342CC107B0C1460012B578 /* XMVideoDevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMVideoDevices.cpp; path = Source/Framework/XMVideoDevices.cpp; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMDatabaseField.h; path = Source/GUI/XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMDatabaseField.m; path = Source/GUI/XMDatabaseField.m; sourceTree = "<group>"; };
+		D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationFunctions.h; path = Source/Application/XMApplicationFunctions.h; sourceTree = "<group>"; };
+		D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationFunctions.m; path = Source/Application/XMApplicationFunctions.m; sourceTree = "<group>"; };
 		D163336307A01BD5003FD9C0 /* XMApplicationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationController.h; path = Source/Application/XMApplicationController.h; sourceTree = "<group>"; };
 		D163336407A01BD5003FD9C0 /* XMApplicationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationController.m; path = Source/Application/XMApplicationController.m; sourceTree = "<group>"; };
 		D16333E007A020D9003FD9C0 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
@@ -348,10 +351,11 @@
 			isa = PBXGroup;
 			children = (
 				D1AF73E0084D02E400D50883 /* Application General */,
-				D1B4CD9408316D5900A444E1 /* GUI-Widgets */,
+				D1A02899081CBED70018BD11 /* PreferencesManagement */,
 				D1B4CC21082F4E0E00A444E1 /* MainWindow */,
 				D1A02A6C081E40360018BD11 /* PreferencesWindow */,
-				D1A02899081CBED70018BD11 /* PreferencesManagement */,
+				D1B4CD9408316D5900A444E1 /* GUI-Widgets */,
+				D15D5A2208C0BC7600C7D89C /* App Utilities */,
 				D163333C07A01A8B003FD9C0 /* Framework */,
 			);
 			name = Classes;
@@ -511,6 +515,15 @@
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
 			);
 			name = OPAL;
+			sourceTree = "<group>";
+		};
+		D15D5A2208C0BC7600C7D89C /* App Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */,
+				D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */,
+			);
+			name = "App Utilities";
 			sourceTree = "<group>";
 		};
 		D163333C07A01A8B003FD9C0 /* Framework */ = {
@@ -876,6 +889,7 @@
 				D1F614FD086DAC1F00FDD4F0 /* XMAddressBookRecordSearchMatch.m in Sources */,
 				D1F61AA108706A6900FDD4F0 /* XMSimpleAddressURL.m in Sources */,
 				D1B409DA0879B42100C9EF33 /* XMSoundChannel.cpp in Sources */,
+				D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

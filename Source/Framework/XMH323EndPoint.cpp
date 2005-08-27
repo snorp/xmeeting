@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.4 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,6 @@
 #include <ptclib/pils.h>
 
 #include "XMCallbackBridge.h"
-
 #include "XMH323EndPoint.h"
 
 #pragma mark Init & Deallocation
@@ -24,6 +23,7 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 {
 	isListening = FALSE;
 	
+	connectionToken = "";
 	remoteName = "";
 	remoteNumber = "";
 	remoteAddress = "";
@@ -156,6 +156,60 @@ void XMH323EndPoint::GetCallInformation(PString & theRemoteName,
 	theRemoteApplication = remoteApplication;
 }
 										
+void XMH323EndPoint::GetCallStatistics(XMCallStatistics *callStatistics)
+{
+	PSafePtr<H323Connection> connection = FindConnectionWithLock(connectionToken, PSafeReadOnly);
+	
+	if(connection != NULL)
+	{
+		unsigned roundTripDelay = connection->GetRoundTripDelay().GetMilliSeconds();
+		callStatistics->roundTripDelay = roundTripDelay;
+		
+		//fetching the audio statistics
+		RTP_Session *session = connection->GetSession(OpalMediaFormat::DefaultAudioSessionID);
+		
+		if(session != NULL)
+		{
+			callStatistics->audioPacketsSent = session->GetPacketsSent();
+			callStatistics->audioBytesSent = session->GetOctetsSent();
+			callStatistics->audioMinimumSendTime = session->GetMinimumSendTime();
+			callStatistics->audioAverageSendTime = session->GetAverageSendTime();
+			callStatistics->audioMaximumSendTime = session->GetMaximumSendTime();
+			
+			callStatistics->audioPacketsReceived = session->GetPacketsReceived();
+			callStatistics->audioBytesReceived = session->GetOctetsReceived();
+			callStatistics->audioMinimumReceiveTime = session->GetMinimumReceiveTime();
+			callStatistics->audioAverageReceiveTime = session->GetAverageReceiveTime();
+			callStatistics->audioMaximumReceiveTime = session->GetMaximumReceiveTime();
+			
+			callStatistics->audioPacketsLost = session->GetPacketsLost();
+			callStatistics->audioPacketsOutOfOrder = session->GetPacketsOutOfOrder();
+			callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
+		}
+		
+		//fetching the audio statistics
+		session = connection->GetSession(OpalMediaFormat::DefaultVideoSessionID);
+		
+		if(session != NULL)
+		{
+			callStatistics->videoPacketsSent = session->GetPacketsSent();
+			callStatistics->videoBytesSent = session->GetOctetsSent();
+			callStatistics->videoMinimumSendTime = session->GetMinimumSendTime();
+			callStatistics->videoAverageSendTime = session->GetAverageSendTime();
+			callStatistics->videoMaximumSendTime = session->GetMaximumSendTime();
+			
+			callStatistics->videoPacketsReceived = session->GetPacketsReceived();
+			callStatistics->videoBytesReceived = session->GetOctetsReceived();
+			callStatistics->videoMinimumReceiveTime = session->GetMinimumReceiveTime();
+			callStatistics->videoAverageReceiveTime = session->GetAverageReceiveTime();
+			callStatistics->videoMaximumReceiveTime = session->GetMaximumReceiveTime();
+			
+			callStatistics->videoPacketsLost = session->GetPacketsLost();
+			callStatistics->videoPacketsOutOfOrder = session->GetPacketsOutOfOrder();
+			callStatistics->videoPacketsTooLate = session->GetPacketsTooLate();
+		}
+	}
+}
 
 #pragma mark Overriding Callbacks
 
@@ -174,6 +228,7 @@ void XMH323EndPoint::OnRegistrationReject()
 void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 {
 	cout << "XMH323EndPoint::OnEstablished()" << endl;
+	connectionToken = connection.GetToken();
 	remoteName = connection.GetRemotePartyName();
 	remoteNumber = connection.GetRemotePartyNumber();
 	remoteAddress = connection.GetRemotePartyAddress();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.4 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,7 +27,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 
 - (void)_showMainModuleAtIndex:(unsigned)index;
 - (void)_showSupportModuleAtIndex:(unsigned)index;
-- (void)_showAdditionModuleAtIndex:(unsigned)index;
+- (void)_showAdditionModuleAtIndex:(unsigned)index deactivatePreviousModule:(BOOL)deactivateFlag;
 - (void)_showSeparateWindowWithAdditionModuleAtIndex:(unsigned)index;
 
 @end
@@ -106,7 +106,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	}
 	
 	//[bottomContentDisclosure setState:NSOffState];
-	[self _showAdditionModuleAtIndex:UINT_MAX];
+	[self _showAdditionModuleAtIndex:UINT_MAX deactivatePreviousModule:NO];
 	
 	/* arranging the bottom content buttons */
 	unsigned count = [additionButtons count];
@@ -349,7 +349,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	{
 		return;
 	}
-	[self _showAdditionModuleAtIndex:index];
+	[self _showAdditionModuleAtIndex:index deactivatePreviousModule:YES];
 }
 
 - (id<XMMainWindowAdditionModule>)activeAdditionModule
@@ -359,6 +359,85 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 		return (id<XMMainWindowAdditionModule>)[additionModules objectAtIndex:activeAdditionModuleIndex];
 	}
 	return nil;
+}
+
+- (void)noteSizeValuesDidChangeOfAdditionModule:(id<XMMainWindowAdditionModule>)module
+{
+	BOOL isActiveModule = NO;
+	NSWindow *windowToResize = nil;
+	float oldHeight;
+	
+	if(bottomIsExpanded && activeAdditionModuleIndex != UINT_MAX)
+	{
+		id<XMMainWindowAdditionModule> activeModule = [additionModules objectAtIndex:activeAdditionModuleIndex];
+		
+		if(activeModule == module)
+		{
+			isActiveModule = YES;
+			windowToResize = [self window];
+			oldHeight = [bottomContentBox bounds].size.height;
+		}
+	}
+	
+	if(isActiveModule == NO)
+	{
+		unsigned moduleIndex = [additionModules indexOfObject:module];
+		
+		if(moduleIndex == UINT_MAX)
+		{
+			return;
+		}
+		
+		id window = [additionWindows objectAtIndex:moduleIndex];
+		
+		if(window == [NSNull null])
+		{
+			// module not active
+			return;
+		}
+		
+		windowToResize = (NSWindow *)window;
+		oldHeight = [[windowToResize contentView] frame].size.height;
+	}
+	
+	float newHeight = [module contentViewSize].height;
+	NSRect windowFrame = [windowToResize frame];
+	
+	float heightDifference = newHeight - oldHeight;
+	windowFrame.origin.y -= heightDifference;
+	windowFrame.size.height += heightDifference;
+	
+	if(isActiveModule == YES)
+	{
+		// changing the autoresize mask for this resize operation
+		[mainContentBox setAutoresizingMask:NSViewMinYMargin];
+		[rightContentBox setAutoresizingMask:NSViewMinYMargin];
+		[horizontalSeparator setAutoresizingMask:NSViewMinYMargin];
+		[separatorContentBox setAutoresizingMask:NSViewMinYMargin];
+		[bottomContentBox setAutoresizingMask:NSViewHeightSizable];
+	}
+	
+	[windowToResize setFrame:windowFrame display:YES animate:YES];
+	
+	if(isActiveModule == YES)
+	{
+		// restoring the autoresize mask to its previous value
+		[mainContentBox setAutoresizingMask:(NSViewHeightSizable | NSViewWidthSizable)];
+		[rightContentBox setAutoresizingMask:(NSViewMinXMargin | NSViewHeightSizable)];
+		[horizontalSeparator setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
+		[separatorContentBox setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
+		[bottomContentBox setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
+		
+		// adjusting the min size of the window
+		NSSize minSize = [windowToResize minSize];
+		minSize.height += heightDifference;
+		[windowToResize setMinSize:minSize];
+		
+		// adjusting the max size of the window
+		NSSize maxSize = [windowToResize maxSize];
+		maxSize.height += heightDifference;
+		[windowToResize setMaxSize:maxSize];
+	}
 }
 
 #pragma mark Action Methods
@@ -375,7 +454,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	{
 		index = activeAdditionModuleIndex;
 	}
-	[self _showAdditionModuleAtIndex:index];
+	[self _showAdditionModuleAtIndex:index deactivatePreviousModule:YES];
 }
 
 - (IBAction)showAdditionModuleInSeparateWindow:(id)sender
@@ -391,12 +470,12 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 		
 		if(object == [NSNull null])
 		{
-			[self _showAdditionModuleAtIndex:i];
+			[self _showAdditionModuleAtIndex:i deactivatePreviousModule:NO];
 			return;
 		}
 	}
 	
-	[self _showAdditionModuleAtIndex:UINT_MAX];
+	[self _showAdditionModuleAtIndex:UINT_MAX deactivatePreviousModule:NO];
 	[additionContentDisclosure setEnabled:NO];
 }
 
@@ -425,6 +504,9 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 			return;
 		}
 	
+		id<XMMainWindowAdditionModule> moduleToClose = [additionModules objectAtIndex:index];
+		[moduleToClose becomeInactiveModule];
+		
 		[additionWindows replaceObjectAtIndex:index withObject:[NSNull null]];
 	
 		if([additionContentDisclosure isEnabled] == NO)
@@ -455,7 +537,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 {
 	unsigned index = (unsigned)[sender tag];
 	
-	[self _showAdditionModuleAtIndex:index];
+	[self _showAdditionModuleAtIndex:index deactivatePreviousModule:YES];
 }
 
 - (void)_showMainModuleAtIndex:(unsigned)index
@@ -597,7 +679,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	[window setMaxSize:maxSize];
 }
 
-- (void)_showAdditionModuleAtIndex:(unsigned)index
+- (void)_showAdditionModuleAtIndex:(unsigned)index deactivatePreviousModule:(BOOL)deactivateFlag
 {
 	if(bottomIsExpanded && index == activeAdditionModuleIndex)
 	{
@@ -627,8 +709,11 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 		XMMouseOverButton *button = (XMMouseOverButton *)[additionButtons objectAtIndex:activeAdditionModuleIndex];
 		[button reset];
 		
-		id<XMMainWindowAdditionModule> oldModule = [additionModules objectAtIndex:activeAdditionModuleIndex];
-		[oldModule becomeInactiveModule];
+		if(deactivateFlag == YES)
+		{
+			id<XMMainWindowAdditionModule> oldModule = [additionModules objectAtIndex:activeAdditionModuleIndex];
+			[oldModule becomeInactiveModule];
+		}
 	}
 	
 	// fetching the relevant data
@@ -724,6 +809,11 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	{
 		[separateWindow center];
 		[separateWindow saveFrameUsingName:windowSaveName];
+	}
+	else
+	{
+		// in case the window size did change since the last save, update width and height again
+		[separateWindow setContentSize:contentSize];
 	}
 	[separateWindow setDelegate:self];
 	[additionWindows replaceObjectAtIndex:index withObject:separateWindow];

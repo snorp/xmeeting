@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.4 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 
 #include <ptlib.h>
 #include <h323/h323ep.h>
+
+#include "XMTypes.h"
 
 class XMGatekeeper;
 
@@ -29,11 +31,13 @@ public:
 					   const PString & username, const PString & phoneNumber);
 	void CheckGatekeeperRegistration();
 	
-	// obtaining information about the remote party
+	// obtaining information about the connection
 	void GetCallInformation(PString & remoteName, 
 							PString & remoteNumber,
 							PString & remoteAddress,
-							PString & remoteApplication);	
+							PString & remoteApplication);
+	
+	void GetCallStatistics(XMCallStatistics *callStatistics);
 	
 	// overriding some callbacks
 	virtual void OnRegistrationConfirm();
@@ -46,6 +50,7 @@ private:
 	BOOL didRegisterAtGatekeeper;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
+	PString connectionToken;
 	PString remoteName;
 	PString remoteNumber;
 	PString remoteAddress;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.3 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,7 +8,6 @@
 
 #import "XMCallInfo.h"
 #import "XMPrivate.h"
-
 
 @implementation XMCallInfo
 
@@ -23,6 +22,7 @@
 
 - (id)_initWithCallID:(unsigned)theID 
 			 protocol:(XMCallProtocol)theProtocol
+	   isOutgoingCall:(BOOL)isOutgoing
 		   remoteName:(NSString *)theRemoteName 
 		 remoteNumber:(NSString *)theRemoteNumber
 		remoteAddress:(NSString *)theRemoteAddress
@@ -33,6 +33,7 @@
 	
 	callID = theID;
 	protocol = theProtocol;
+	isOutgoingCall = isOutgoing;
 	
 	remoteName = [theRemoteName copy];
 	remoteNumber = [theRemoteNumber copy];
@@ -43,10 +44,44 @@
 	// setting the end reason to an impossible value
 	callEndReason = XMCallEndReasonCount;
 	
+	callInitiationDate = [[NSDate alloc] init];
+	callStartDate = nil;
+	callEndDate = nil;
+	
 	incomingAudioCodec = nil;
 	outgoingAudioCodec = nil;
 	incomingVideoCodec = nil;
 	outgoingVideoCodec = nil;
+	
+	callStatistics.roundTripDelay = 0;
+	
+	callStatistics.audioPacketsSent = 0;
+	callStatistics.audioBytesSent = 0;
+	callStatistics.audioMinimumSendTime = 0;
+	callStatistics.audioAverageSendTime = 0;
+	callStatistics.audioMaximumSendTime = 0;
+	callStatistics.audioPacketsReceived = 0;
+	callStatistics.audioBytesReceived = 0;
+	callStatistics.audioMinimumReceiveTime = 0;
+	callStatistics.audioAverageReceiveTime = 0;
+	callStatistics.audioMaximumReceiveTime = 0;
+	callStatistics.audioPacketsLost = 0;
+	callStatistics.audioPacketsOutOfOrder = 0;
+	callStatistics.audioPacketsTooLate = 0;
+	
+	callStatistics.videoPacketsSent = 0;
+	callStatistics.videoBytesSent = 0;
+	callStatistics.videoMinimumSendTime = 0;
+	callStatistics.videoAverageSendTime = 0;
+	callStatistics.videoMaximumSendTime = 0;
+	callStatistics.videoPacketsReceived = 0;
+	callStatistics.videoBytesReceived = 0;
+	callStatistics.videoMinimumReceiveTime = 0;
+	callStatistics.videoAverageReceiveTime = 0;
+	callStatistics.videoMaximumReceiveTime = 0;
+	callStatistics.videoPacketsLost = 0;
+	callStatistics.videoPacketsOutOfOrder = 0;
+	callStatistics.videoPacketsTooLate = 0;
 	
 	return self;
 }
@@ -58,6 +93,10 @@
 	[remoteAddress release];
 	[remoteApplication release];
 	
+	[callInitiationDate release];
+	[callStartDate release];
+	[callEndDate release];
+	
 	[incomingAudioCodec release];
 	[outgoingAudioCodec release];
 	[incomingVideoCodec release];
@@ -66,21 +105,16 @@
 	[super dealloc];
 }
 
-#pragma mark Accessor Methods
-
-- (unsigned)_callID
-{
-	return callID;
-}
-
-- (void)_setCallID:(unsigned)theCallID
-{
-	callID = theCallID;
-}
+#pragma mark Public Methods
 
 - (XMCallProtocol)protocol
 {
 	return protocol;
+}
+
+- (BOOL)isOutgoingCall
+{
+	return isOutgoingCall;
 }
 
 - (NSString *)remoteName
@@ -108,6 +142,48 @@
 	return callStatus;
 }
 
+- (XMCallEndReason)callEndReason
+{
+	return callEndReason;
+}
+
+- (NSDate *)callInitiationDate
+{
+	return callInitiationDate;
+}
+
+- (NSDate *)callStartDate
+{
+	return callStartDate;
+}
+
+- (NSDate *)callEndDate
+{
+	return callEndDate;
+}
+
+- (NSTimeInterval)callDuration
+{
+	if(callStartDate != nil)
+	{
+		if(callEndDate == nil)
+		{
+			NSDate *now = [[NSDate alloc] init];
+			NSTimeInterval callDuration = [now timeIntervalSinceDate:callStartDate];
+			[now release];
+			return callDuration;
+		}
+		else
+		{
+			return [callEndDate timeIntervalSinceDate:callStartDate];
+		}
+	}
+	else
+	{
+		return (NSTimeInterval)0.0;
+	}
+}
+
 - (NSString *)incomingAudioCodec
 {
 	return incomingAudioCodec;
@@ -128,7 +204,152 @@
 	return outgoingVideoCodec;
 }
 
-#pragma mark Setter Methods
+- (unsigned)roundTripDelay
+{
+	return callStatistics.roundTripDelay;
+}
+
+- (unsigned)audioPacketsSent
+{
+	return callStatistics.audioPacketsSent;
+}
+
+- (unsigned)audioBytesSent
+{
+	return callStatistics.audioBytesSent;
+}
+
+- (unsigned)audioMinimumSendTime
+{
+	return callStatistics.audioMinimumSendTime;
+}
+
+- (unsigned)audioAverageSendTime
+{
+	return callStatistics.audioAverageSendTime;
+}
+
+- (unsigned)audioMaximumSendTime
+{
+	return callStatistics.audioMaximumSendTime;
+}
+	
+- (unsigned)audioPacketsReceived
+{
+	return callStatistics.audioPacketsReceived;
+}
+
+- (unsigned)audioBytesReceived
+{
+	return callStatistics.audioBytesReceived;
+}
+
+- (unsigned)audioMinimumReceiveTime
+{
+	return callStatistics.audioMinimumReceiveTime;
+}
+
+- (unsigned)audioAverageReceiveTime
+{
+	return callStatistics.audioAverageReceiveTime;
+}
+
+- (unsigned)audioMaximumReceiveTime
+{
+	return callStatistics.audioMaximumReceiveTime;
+}
+	
+- (unsigned)audioPacketsLost
+{
+	return callStatistics.audioPacketsLost;
+}
+
+- (unsigned)audioPacketsOutOfOrder
+{
+	return callStatistics.audioPacketsOutOfOrder;
+}
+
+- (unsigned)audioPacketsTooLate
+{
+	return callStatistics.audioPacketsTooLate;
+}
+	
+- (unsigned)videoPacketsSent
+{
+	return callStatistics.videoPacketsSent;
+}
+
+- (unsigned)videoBytesSent
+{
+	return callStatistics.videoBytesSent;
+}
+
+- (unsigned)videoMinimumSendTime
+{
+	return callStatistics.videoMinimumSendTime;
+}
+
+- (unsigned)videoAverageSendTime
+{
+	return callStatistics.videoAverageSendTime;
+}
+
+- (unsigned)videoMaximumSendTime
+{
+	return callStatistics.videoMaximumSendTime;
+}
+	
+- (unsigned)videoPacketsReceived
+{
+	return callStatistics.videoPacketsReceived;
+}
+
+- (unsigned)videoBytesReceived
+{
+	return callStatistics.videoBytesReceived;
+}
+
+- (unsigned)videoMinimumReceiveTime
+{
+	return callStatistics.videoMinimumReceiveTime;
+}
+
+- (unsigned)videoAverageReceiveTime
+{
+	return callStatistics.videoAverageReceiveTime;
+}
+
+- (unsigned)videoMaximumReceiveTime
+{
+	return callStatistics.videoMaximumReceiveTime;
+}
+	
+- (unsigned)videoPacketsLost
+{
+	return callStatistics.videoPacketsLost;
+}
+
+- (unsigned)videoPacketsOutOfOrder
+{
+	return callStatistics.videoPacketsOutOfOrder;
+}
+
+- (unsigned)videoPacketsTooLate
+{
+	return callStatistics.videoPacketsTooLate;
+}
+
+#pragma mark Private Methods
+
+- (unsigned)_callID
+{
+	return callID;
+}
+
+- (void)_setCallID:(unsigned)theCallID
+{
+	callID = theCallID;
+}
 
 - (void)_setRemoteName:(NSString *)theName
 {
@@ -161,6 +382,16 @@
 - (void)_setCallStatus:(XMCallStatus)status
 {
 	callStatus = status;
+	
+	if(status == XMCallStatus_Active)
+	{
+		// fetching the start time
+		callStartDate = [[NSDate alloc] init];
+	}
+	else if(status == XMCallStatus_Ended)
+	{
+		callEndDate = [[NSDate alloc] init];
+	}
 }
 
 - (void)_setCallEndReason:(XMCallEndReason)endReason
@@ -194,6 +425,11 @@
 	NSString *old = outgoingVideoCodec;
 	outgoingVideoCodec = [codec copy];
 	[old release];
+}
+
+- (XMCallStatistics *)_callStatistics
+{
+	return &callStatistics;
 }
 
 @end

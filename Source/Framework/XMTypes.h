@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.7 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.8 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -160,5 +160,38 @@ typedef enum XMCalltoURLType
 	XMCalltoURLType_Gateway,	/* not supported */
 	XMCalltoURLTypeCount
 } XMCalltoURLType;
+
+#pragma mark Structs
+
+typedef struct XMCallStatistics
+{
+	unsigned roundTripDelay;
+	unsigned audioPacketsSent;
+	unsigned audioBytesSent;
+	unsigned audioMinimumSendTime;
+	unsigned audioAverageSendTime;
+	unsigned audioMaximumSendTime;
+	unsigned audioPacketsReceived;
+	unsigned audioBytesReceived;
+	unsigned audioMinimumReceiveTime;
+	unsigned audioAverageReceiveTime;
+	unsigned audioMaximumReceiveTime;
+	unsigned audioPacketsLost;
+	unsigned audioPacketsOutOfOrder;
+	unsigned audioPacketsTooLate;
+	unsigned videoPacketsSent;
+	unsigned videoBytesSent;
+	unsigned videoMinimumSendTime;
+	unsigned videoAverageSendTime;
+	unsigned videoMaximumSendTime;
+	unsigned videoPacketsReceived;
+	unsigned videoBytesReceived;
+	unsigned videoMinimumReceiveTime;
+	unsigned videoAverageReceiveTime;
+	unsigned videoMaximumReceiveTime;
+	unsigned videoPacketsLost;
+	unsigned videoPacketsOutOfOrder;
+	unsigned videoPacketsTooLate;
+} XMCallStatistics;
 
 #endif // __XM_TYPES_H__

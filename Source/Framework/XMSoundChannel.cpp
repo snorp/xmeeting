@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.1 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.2 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,23 @@ static AudioDeviceID activeRecordDeviceID = kAudioDeviceUnknown;
 static BOOL activeRecordDeviceIsMuted = FALSE;
 
 #pragma mark Static Methods
+
+void XMSoundChannel::Init()
+{
+	OSStatus err = noErr;
+	
+	UInt32 deviceIDSize = sizeof(AudioDeviceID);
+	
+	err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
+								   &deviceIDSize,
+								   &activePlayDeviceID);
+	checkStatus(err, 50);
+	
+	err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
+								   &deviceIDSize,
+								   &activeRecordDeviceID);
+	checkStatus(err, 51);
+}
 
 void XMSoundChannel::SetPlayDevice(unsigned int device)
 {
@@ -121,7 +138,6 @@ void XMSoundChannel::StopChannels()
 
 XMSoundChannel::XMSoundChannel()
 {
-	cout << "XMSoundChannel constructor " << (int)this << endl;
 	CommonConstruct();
 }
 
@@ -137,7 +153,6 @@ XMSoundChannel::XMSoundChannel(const PString & device,
 
 XMSoundChannel::~XMSoundChannel()
 {
-	cout << "~XMSoundChannel " << (int)this << endl;
 	
 	deviceEditMutex.Wait();
 	if(direction == Player)
@@ -497,13 +512,11 @@ BOOL XMSoundChannel::Write(const void *buffer,
 {
 	if(state < buffer_set_)
 	{
-		cout << "Illegal write condition" << endl;
 		return FALSE;
 	}
 	
 	if(isMuted == TRUE || mDeviceID == kAudioDeviceUnknown)
 	{
-		cout << "muted" << endl;
 		lastWriteCount =  length; 
 		
 		// safe to assume non-interleaved or mono
@@ -547,7 +560,6 @@ BOOL XMSoundChannel::StartRecording()
 
 BOOL XMSoundChannel::IsRecordBufferFull()
 {
-	cout << "IsRecordBufferFull" << endl;
 	PAssert(direction == Recorder, PInvalidParameter);
 	
 	if(state != buffer_set_)
@@ -565,7 +577,6 @@ BOOL XMSoundChannel::IsRecordBufferFull()
 
 BOOL XMSoundChannel::AreAllRecordBuffersFull()
 {
-	cout << "AreAllRecordBuffersFull" << endl;
 	PAssert(direction == Recorder, PInvalidParameter);
 	
 	if(state != buffer_set_|| 

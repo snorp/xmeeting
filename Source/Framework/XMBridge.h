@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.6 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.7 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,6 +82,12 @@ void getCallInformation(unsigned callID,
 						const char** remoteNumber,
 						const char** remoteAddress, 
 						const char** remoteApplication);
+
+/**
+ * This function provides the relevant statistics data
+ **/
+void getCallStatistics(unsigned callID,
+					   XMCallStatistics *callStatistics);
 
 #pragma mark General Setup Functions
 

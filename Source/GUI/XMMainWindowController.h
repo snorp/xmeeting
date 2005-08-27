@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.4 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -154,6 +154,12 @@
  * window) or nil, if no addition module is displayed within the main window.
  **/
 - (id<XMMainWindowAdditionModule>)activeAdditionModule;
+
+/**
+ * Informs the receiver that the size of the module's content view did change,
+ * causing the main window to be resized
+ **/
+- (void)noteSizeValuesDidChangeOfAdditionModule:(id<XMMainWindowAdditionModule>)module;
 
 /**
  * User Interface action methods

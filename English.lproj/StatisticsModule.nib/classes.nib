@@ -2,9 +2,20 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {toggleShowExtraInformation = id; }; 
             CLASS = XMStatisticsModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {
+                codecTableView = NSTableView; 
+                contentView = NSView; 
+                extraInformationDisclosure = NSButton; 
+                packetReceiveTimeField = NSTextField; 
+                packetSendTimeField = NSTextField; 
+                packetsLateField = NSTextField; 
+                packetsLostField = NSTextField; 
+                packetsOutOfOrderField = NSTextField; 
+                roundTripDelayField = NSTextField; 
+            }; 
             SUPERCLASS = NSObject; 
         }
     ); 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.3 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,6 +47,9 @@ extern NSString *XMNotification_CallManagerDidStartGatekeeperRegistration;
 extern NSString *XMNotification_CallManagerGatekeeperRegistration;
 extern NSString *XMNotification_CallManagerGatekeeperUnregistration;
 extern NSString *XMNotification_CallManagerGatekeeperRegistrationFailed;
+
+// In-Call functionality
+extern NSString *XMNotification_CallManagerCallStatisticsUpdated;
 
 /**
  * Notifications posted by XMAudioManager

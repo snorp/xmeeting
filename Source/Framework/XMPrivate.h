@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.8 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.9 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -99,8 +99,9 @@
 
 @interface XMCallInfo (FrameworkMethods)
 
-- (id)_initWithCallID:(unsigned)callID 
+- (id)_initWithCallID:(unsigned)callID
 			 protocol:(XMCallProtocol)protocol
+	   isOutgoingCall:(BOOL)isOutgoingCall
 		   remoteName:(NSString *)remoteName
 		 remoteNumber:(NSString *)remoteNumber
 		remoteAddress:(NSString *)remoteAddress
@@ -120,6 +121,8 @@
 - (void)_setOutgoingAudioCodec:(NSString *)codec;
 - (void)_setIncomingVideoCodec:(NSString *)codec;
 - (void)_setOutgoingVideoCodec:(NSString *)codec;
+
+- (XMCallStatistics *)_callStatistics;
 
 @end
 

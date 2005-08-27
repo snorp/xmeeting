@@ -1,5 +1,5 @@
 /*
- * $Id: XMCircularBuffer.cpp,v 1.1 2005/08/21 08:41:42 hfriederich Exp $
+ * $Id: XMCircularBuffer.cpp,v 1.2 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,6 @@ XMCircularBuffer::XMCircularBuffer(PINDEX len)
 head(0), 
 tail(0)
 {
-	cout << "XMCircularBuffer constructor " << (int)this << endl;
 	buffer = (char *)malloc(capacity*sizeof(char));
 	if(!buffer) 
 	{
@@ -42,9 +41,7 @@ tail(0)
 }
 
 XMCircularBuffer::~XMCircularBuffer()
-{	
-	cout << "XMCircularBuffer destructor " << (int)this << endl;
-	
+{
 	// just to make sure
 	Stop();
 	

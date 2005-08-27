@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.h,v 1.1 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.2 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,12 @@ class XMSoundChannel : public PSoundChannel
 public:
 
 #pragma mark Static Methods
+	
+	/**
+	 * Does necessary initialization
+	 **/
+	static void Init();
+	
 	/**
 	 * Static Methods for changing devices / mute
 	 **/

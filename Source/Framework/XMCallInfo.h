@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.3 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,6 +27,7 @@
 	unsigned callID;	//identifier for the call token in OPAL
 	
 	XMCallProtocol protocol;
+	BOOL isOutgoingCall;
 	NSString *remoteName;
 	NSString *remoteNumber;
 	NSString *remoteAddress;
@@ -35,18 +36,27 @@
 	XMCallStatus callStatus;
 	XMCallEndReason callEndReason;
 	
-	NSTimeInterval startTime;
+	NSDate *callInitiationDate;
+	NSDate *callStartDate;
+	NSDate *callEndDate;
 	
 	NSString *incomingAudioCodec;
 	NSString *outgoingAudioCodec;
 	NSString *incomingVideoCodec;
 	NSString *outgoingVideoCodec;
+	
+	XMCallStatistics callStatistics;
 }
 
 /**
-* Obtain the call protocol in use
+ * Obtain the call protocol in use
  **/
 - (XMCallProtocol)protocol;
+
+/**
+ * Returns the call direction
+ **/
+- (BOOL)isOutgoingCall;
 
 /**
  * Obtain the remote party's name.
@@ -89,8 +99,27 @@
 - (XMCallEndReason)callEndReason;
 
 /**
- * Obtain the duration of the call. If the call is not active, the duration will be 0.
- * Else the current duration or the total time the call was active is returned
+ * Returns the time when the call was initiated (the time when this object was created)
+ **/
+- (NSDate *)callInitiationDate;
+
+/**
+ * Returns the time when the call started. This marks the time when the
+ * callStatus changed to XMCallStatus_Active. If the call never started,
+ * returns nil
+ **/
+- (NSDate *)callStartDate;
+
+/**
+ * Returns the time when the call ended. If the call is still active
+ * or never started, returns nil. The call is considered to have ended
+ * when the callStatus changed to XMCallStatus_Ended.
+ **/
+- (NSDate *)callEndDate;
+
+/**
+ * Obtain the duration of the call. This information is always up-to-date.
+ * If the call has ended, returns the total duration of the call.
  **/
 - (NSTimeInterval)callDuration;
 
@@ -113,6 +142,46 @@
  * Returns the video codec used for the outgoing video stream
  **/
 - (NSString *)outgoingVideoCodec;
+
+/**
+ * Returns the roundTripDelay in milliseconds
+ **/
+- (unsigned)roundTripDelay;
+
+/**
+ * Return the respective statistics data
+ **/
+- (unsigned)audioPacketsSent;
+- (unsigned)audioBytesSent;
+- (unsigned)audioMinimumSendTime; // milliseconds
+- (unsigned)audioAverageSendTime; // milliseconds
+- (unsigned)audioMaximumSendTime; // milliseconds
+	
+- (unsigned)audioPacketsReceived;
+- (unsigned)audioBytesReceived;
+- (unsigned)audioMinimumReceiveTime; // milliseconds
+- (unsigned)audioAverageReceiveTime; // milliseconds
+- (unsigned)audioMaximumReceiveTime; // milliseconds
+	
+- (unsigned)audioPacketsLost;
+- (unsigned)audioPacketsOutOfOrder;
+- (unsigned)audioPacketsTooLate;
+	
+- (unsigned)videoPacketsSent;
+- (unsigned)videoBytesSent;
+- (unsigned)videoMinimumSendTime; // milliseconds
+- (unsigned)videoAverageSendTime; // milliseconds
+- (unsigned)videoMaximumSendTime; // milliseconds
+	
+- (unsigned)videoPacketsReceived;
+- (unsigned)videoBytesReceived;
+- (unsigned)videoMinimumReceiveTime; // milliseconds
+- (unsigned)videoAverageReceiveTime; // milliseconds
+- (unsigned)videoMaximumReceiveTime; // milliseconds
+	
+- (unsigned)videoPacketsLost;
+- (unsigned)videoPacketsOutOfOrder;
+- (unsigned)videoPacketsTooLate;
 
 @end
 

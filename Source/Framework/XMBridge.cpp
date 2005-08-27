@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.6 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.7 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,8 @@ void initOPAL()
 		
 		callEndPoint->SetSoundChannelPlayDevice(XMSoundChannelDevice);
 		callEndPoint->SetSoundChannelRecordDevice(XMSoundChannelDevice);
+		
+		XMSoundChannel::Init();
 	}
 }
 
@@ -114,6 +116,12 @@ void getCallInformation(unsigned callID,
 	*remoteApplication = appStr;
 }
 
+void getCallStatistics(unsigned callID,
+					   XMCallStatistics *callStatistics)
+{
+	h323EndPoint->GetCallStatistics(callStatistics);
+}
+
 #pragma mark General Setup functions
 
 void setUserName(const char *string)
@@ -153,12 +161,6 @@ void setTranslationAddress(const char *a)
 
 #pragma mark Audio Functions
 
-// The underlying system is call-by-reference
-//const char *getSelectedAudioInputDevice()
-//{
-//	return callEndPoint->GetSoundChannelRecordDevice();
-//}
-
 void setSelectedAudioInputDevice(unsigned int deviceID)
 {
 	XMSoundChannel::SetRecordDevice(deviceID);
@@ -166,13 +168,8 @@ void setSelectedAudioInputDevice(unsigned int deviceID)
 
 void setMuteAudioInputDevice(bool muteFlag)
 {
+	XMSoundChannel::SetRecordDeviceMuted(muteFlag);
 }
-
-// The underlying system is call-by-reference
-//const char *getSelectedAudioOutputDevice()
-//{
-//	return callEndPoint->GetSoundChannelPlayDevice();
-//}
 
 void setSelectedAudioOutputDevice(unsigned int deviceID)
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.mm,v 1.5 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMAudioManager.mm,v 1.6 2005/08/27 22:08:22 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -206,8 +206,10 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 
 - (BOOL)setSelectedOutputDevice:(NSString *)deviceName
 {
+	NSLog(@"setSelectedOutputDevice");
 	if([deviceName isEqualToString:selectedOutputDevice])
 	{
+		NSLog(@"1");
 		return YES;
 	}
 	
@@ -215,6 +217,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 	if(![devices containsObject:deviceName])
 	{
+		NSLog(@"2");
 		return NO;
 	}
 	
