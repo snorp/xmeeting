@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,11 +27,11 @@
 	unsigned callID;	//identifier for the call token in OPAL
 	
 	XMCallProtocol protocol;
-	BOOL isOutgoingCall;
 	NSString *remoteName;
 	NSString *remoteNumber;
 	NSString *remoteAddress;
 	NSString *remoteApplication;
+	NSString *callAddress;
 	
 	XMCallStatus callStatus;
 	XMCallEndReason callEndReason;
@@ -84,6 +84,12 @@
  * cannot be determined (remote party not found)
  **/
 - (NSString *)remoteApplication;
+
+/**
+ * Returns the address used to call the remote party.
+ * If this is an incoming call, returns nil
+ **/
+- (NSString *)callAddress;
 
 /**
  * Returns the current state of the call

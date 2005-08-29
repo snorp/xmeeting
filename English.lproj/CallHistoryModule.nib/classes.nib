@@ -4,7 +4,7 @@
         {
             CLASS = XMCallHistoryModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {contentView = NSView; logTextView = NSTextView; }; 
             SUPERCLASS = NSObject; 
         }
     ); 

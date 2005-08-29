@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,7 +37,7 @@ extern NSString *XMNotification_CallManagerDidEndSubsystemSetup;
 // call management
 extern NSString *XMNotification_CallManagerDidStartCalling;
 extern NSString *XMNotification_CallManagerCallStartFailed;
-extern NSString *XMNotification_CallManagerIncomingCall;		// posted when there is an incoming call, waiting for user acknowledge
+extern NSString *XMNotification_CallManagerIncomingCall;	// posted when there is an incoming call, waiting for user acknowledge
 extern NSString *XMNotification_CallManagerCallEstablished;	// posted when a call is established
 extern NSString *XMNotification_CallManagerCallCleared;		// posted when a call did end.
 

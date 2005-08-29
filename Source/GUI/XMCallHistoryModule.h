@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.2 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.3 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,13 @@
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;
 	
+	IBOutlet NSTextView *logTextView;
+	
 	NSNib *nibLoader;
+	
+	NSString *dateFormatString;
+	
+	BOOL didLogIncomingCall;
 }
 
 @end

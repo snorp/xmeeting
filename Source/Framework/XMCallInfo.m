@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,23 +22,23 @@
 
 - (id)_initWithCallID:(unsigned)theID 
 			 protocol:(XMCallProtocol)theProtocol
-	   isOutgoingCall:(BOOL)isOutgoing
 		   remoteName:(NSString *)theRemoteName 
 		 remoteNumber:(NSString *)theRemoteNumber
 		remoteAddress:(NSString *)theRemoteAddress
 	remoteApplication:(NSString *)theRemoteApplication
+		  callAddress:(NSString *)theCallAddress
 		   callStatus:(XMCallStatus)theStatus;
 {
 	self = [super init];
 	
 	callID = theID;
 	protocol = theProtocol;
-	isOutgoingCall = isOutgoing;
-	
+
 	remoteName = [theRemoteName copy];
 	remoteNumber = [theRemoteNumber copy];
 	remoteAddress = [theRemoteAddress copy];
 	remoteApplication = [theRemoteApplication copy];
+	callAddress = [theCallAddress copy];
 	callStatus = theStatus;
 	
 	// setting the end reason to an impossible value
@@ -92,6 +92,7 @@
 	[remoteNumber release];
 	[remoteAddress release];
 	[remoteApplication release];
+	[callAddress release];
 	
 	[callInitiationDate release];
 	[callStartDate release];
@@ -114,7 +115,7 @@
 
 - (BOOL)isOutgoingCall
 {
-	return isOutgoingCall;
+	return callAddress != nil;
 }
 
 - (NSString *)remoteName
@@ -135,6 +136,11 @@
 - (NSString *)remoteApplication
 {
 	return remoteApplication;
+}
+
+- (NSString *)callAddress
+{
+	return callAddress;
 }
 
 - (XMCallStatus)callStatus

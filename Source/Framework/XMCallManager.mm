@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.11 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.12 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -334,11 +334,11 @@
 			
 			activeCall = [[XMCallInfo alloc] _initWithCallID:0
 													protocol:callProtocol
-										   isOutgoingCall:YES
 												  remoteName:nil
 												remoteNumber:nil
 											   remoteAddress:nil
 										   remoteApplication:nil
+												 callAddress:address
 												  callStatus:XMCallStatus_Calling];
 			
 			addressToCall = [address retain];
@@ -372,11 +372,11 @@
 	{
 		activeCall = [[XMCallInfo alloc] _initWithCallID:callID
 												protocol:callProtocol
-									   isOutgoingCall:YES
 											  remoteName:nil
 											remoteNumber:nil
 										   remoteAddress:nil
 									   remoteApplication:nil
+											 callAddress:address
 											  callStatus:XMCallStatus_Calling];
 			
 		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidStartCalling 
@@ -430,6 +430,11 @@
 }
 
 #pragma mark H.323-specific Methods
+
+- (BOOL)isGatekeeperRegistered
+{
+	return gatekeeperName != nil;
+}
 
 - (NSString *)gatekeeperName
 {
@@ -821,11 +826,11 @@
 {
 	XMCallInfo *info = [[XMCallInfo alloc] _initWithCallID:callID
 												  protocol:protocol
-										 isOutgoingCall:NO
 												remoteName:remoteName
 											  remoteNumber:remoteNumber
 											 remoteAddress:remoteAddress
 										 remoteApplication:remoteApplication
+											   callAddress:nil
 												 callStatus:XMCallStatus_Incoming];
 	
 	[self performSelectorOnMainThread:@selector(_mainThreadHandleIncomingCall:)
@@ -1162,15 +1167,15 @@
 }
 
 - (void)_mainThreadHandleGatekeeperUnregistration
-{
-	[gatekeeperName release];
-	gatekeeperName = nil;
-	
+{	
 	[gatekeeperRegistrationCheckTimer invalidate];
 	[gatekeeperRegistrationCheckTimer release];
 	gatekeeperRegistrationCheckTimer = nil;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperUnregistration object:self];
+	
+	[gatekeeperName release];
+	gatekeeperName = nil;
 }
 
 - (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason

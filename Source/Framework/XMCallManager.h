@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.9 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.10 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -154,7 +154,12 @@
 #pragma mark H.323-specific methods
 
 /**
- * Returns the name of the gatekeeper registered or nil if the framework
+ * Returns whether the client is registered at a gatekeeper or not
+ **/
+- (BOOL)isGatekeeperRegistered;
+
+/**
+ * Returns the name of the gatekeeper registered or nil if the client
  * is not registered at a gatekeeper
  **/
 - (NSString *)gatekeeperName;

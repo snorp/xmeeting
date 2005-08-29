@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.9 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.10 2005/08/29 15:19:51 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -101,11 +101,11 @@
 
 - (id)_initWithCallID:(unsigned)callID
 			 protocol:(XMCallProtocol)protocol
-	   isOutgoingCall:(BOOL)isOutgoingCall
 		   remoteName:(NSString *)remoteName
 		 remoteNumber:(NSString *)remoteNumber
 		remoteAddress:(NSString *)remoteAddress
 	remoteApplication:(NSString *)remoteApplication
+		  callAddress:(NSString *)callAddress
 		   callStatus:(XMCallStatus)status;
 
 - (unsigned)_callID;
