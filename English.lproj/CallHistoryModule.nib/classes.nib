@@ -4,8 +4,19 @@
         {
             CLASS = XMCallHistoryModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; logTextView = NSTextView; }; 
+            OUTLETS = {
+                contentView = NSView; 
+                logTextView = NSTextView; 
+                recentCallsScrollView = NSScrollView; 
+                recentCallsView = XMRecentCallsView; 
+            }; 
             SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = XMRecentCallsView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {scrollView = NSScrollView; }; 
+            SUPERCLASS = NSView; 
         }
     ); 
     IBVersion = 1; 

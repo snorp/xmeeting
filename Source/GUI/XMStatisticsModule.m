@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -212,6 +212,37 @@
 			return [NSString stringWithFormat:@"%6.1f kbit/s", bitrate];
 		}
 	}
+	else if([identifier isEqualToString:@"AvgBitrate"])
+	{
+		float bitrate;
+		
+		switch(rowIndex)
+		{
+			case 0:
+				bitrate = avgAudioReceiveBitrate;
+				break;
+			case 1:
+				bitrate = avgAudioSendBitrate;
+				break;
+			case 2:
+				bitrate = avgVideoReceiveBitrate;
+				break;
+			case 3:
+				bitrate = avgVideoSendBitrate;
+				break;
+			default:
+				bitrate = 0;
+		}
+		
+		if(bitrate < 0)
+		{
+			return @"";
+		}
+		else
+		{
+			return [NSString stringWithFormat:@"%6.1f kbit/s", bitrate];
+		}
+	}
 	else if([identifier isEqualToString:@"TotalPackets"])
 	{
 		
@@ -241,34 +272,6 @@
 				return @"";
 		}
 		
-	}
-	else
-	{
-		switch (rowIndex)
-		{
-			case 0:
-				if([activeCall outgoingAudioCodec] != nil)
-				{
-					return byteString([activeCall audioBytesReceived]);
-				}
-			case 1:
-				if([activeCall incomingAudioCodec] != nil)
-				{
-					return byteString([activeCall audioBytesSent]);
-				}
-			case 2:
-				if([activeCall outgoingVideoCodec] != nil)
-				{
-					return byteString([activeCall videoBytesReceived]);
-				}
-			case 3:
-				if([activeCall incomingVideoCodec] != nil)
-				{
-					return byteString([activeCall videoBytesSent]);
-				}
-			default:
-				return @"";
-		}
 	}
 	
 	return @"ERROR";
@@ -302,66 +305,122 @@
 	if(callStatus == XMCallStatus_Active)
 	{
 		NSDate *newDate = [[NSDate alloc] init];
-		float denominator = (float)([newDate timeIntervalSinceDate:oldDate] * 125.0);
 		
-		[oldDate release];
-		oldDate = newDate;
+		float newAudioBytesSent = (float)[activeCall audioBytesSent];
+		float newAudioBytesReceived = (float)[activeCall audioBytesReceived];
+		float newVideoBytesSent = (float)[activeCall videoBytesSent];
+		float newVideoBytesReceived = (float)[activeCall videoBytesReceived];
 		
-		unsigned newAudioBytesSent = [activeCall audioBytesSent];
-		unsigned newAudioBytesReceived = [activeCall audioBytesReceived];
-		unsigned newVideoBytesSent = [activeCall videoBytesSent];
-		unsigned newVideoBytesReceived = [activeCall videoBytesReceived];
+		NSString *outgoingAudioCodec = [activeCall outgoingAudioCodec];
+		NSString *incomingAudioCodec = [activeCall incomingAudioCodec];
+		NSString *outgoingVideoCodec = [activeCall outgoingVideoCodec];
+		NSString *incomingVideoCodec = [activeCall incomingVideoCodec];
 
 		// newBytes - oldBytes = diffBytes
 		// diffBits = 8 * diffBytes
 		// diffKBits = diffBits / 1000 == diffBytes / 125
-		if(denominator != 0.0 && [activeCall outgoingAudioCodec] != nil)
+		float denominator = (float)([newDate timeIntervalSinceDate:oldDate] * 125.0);
+		
+		if(denominator != 0.0 && outgoingAudioCodec != nil)
 		{
-			audioSendBitrate = (float)(newAudioBytesSent - oldAudioBytesSent) / denominator;
+			audioSendBitrate = (newAudioBytesSent - oldAudioBytesSent) / denominator;
 		}
 		else
 		{
 			audioSendBitrate = -1.0f;
 		}
 	
-		if(denominator != 0.0 && [activeCall incomingAudioCodec] != nil)
+		if(denominator != 0.0 && incomingAudioCodec != nil)
 		{
-			audioReceiveBitrate = (float)(newAudioBytesReceived - oldAudioBytesReceived) / denominator;
+			audioReceiveBitrate = (newAudioBytesReceived - oldAudioBytesReceived) / denominator;
 		}
 		else
 		{
 			audioReceiveBitrate = -1.0f;
 		}
 	
-		if(denominator != 0.0 && [activeCall outgoingVideoCodec])
+		if(denominator != 0.0 && outgoingAudioCodec)
 		{
-			videoSendBitrate = (float)(newVideoBytesSent - oldVideoBytesSent) / denominator;
+			videoSendBitrate = (newVideoBytesSent - oldVideoBytesSent) / denominator;
 		}
 		else
 		{
 			videoSendBitrate = -1.0f;
 		}
 	
-		if(denominator != 0.0 && [activeCall incomingVideoCodec] != nil)
+		if(denominator != 0.0 && incomingVideoCodec != nil)
 		{
-			videoReceiveBitrate = (float)(newVideoBytesReceived - oldVideoBytesReceived) / denominator;
+			videoReceiveBitrate = (newVideoBytesReceived - oldVideoBytesReceived) / denominator;
 		}
 		else
 		{
 			videoReceiveBitrate = -1.0f;
+		}
+		
+		// same formula as above
+		denominator = (float)([newDate timeIntervalSinceDate:[activeCall callStartDate]] * 125.0);
+		
+		if(denominator != 0.0 && outgoingAudioCodec != nil)
+		{
+			avgAudioSendBitrate = newAudioBytesSent / denominator;
+		}
+		else
+		{
+			avgAudioSendBitrate = -1.0f;
+		}
+		
+		if(denominator != 0.0 && incomingAudioCodec != nil)
+		{
+			avgAudioReceiveBitrate = newAudioBytesReceived / denominator;
+		}
+		else
+		{
+			avgAudioReceiveBitrate = -1.0f;
+		}
+		
+		if(denominator != 0.0 && outgoingVideoCodec != nil)
+		{
+			avgVideoSendBitrate = newVideoBytesSent / denominator;
+		}
+		else
+		{
+			avgVideoSendBitrate = -1.0f;
+		}
+		
+		if(denominator != 0.0 && incomingVideoCodec != nil)
+		{
+			avgVideoReceiveBitrate = newVideoBytesReceived / denominator;
+		}
+		else
+		{
+			avgVideoReceiveBitrate = -1.0f;
 		}
 	
 		oldAudioBytesSent = newAudioBytesSent;
 		oldAudioBytesReceived = newAudioBytesReceived;
 		oldVideoBytesSent = newVideoBytesSent;
 		oldVideoBytesReceived = newVideoBytesReceived;
+		
+		[oldDate release];
+		oldDate = newDate;
+		
+		[callInformationBox setHidden:YES];
 	}
 	else
 	{
-		audioSendBitrate = -1.0;
-		audioReceiveBitrate = -1.0;
-		videoSendBitrate = -1.0;
-		videoReceiveBitrate = -1.0;
+		audioSendBitrate = -1.0f;
+		audioReceiveBitrate = -1.0f;
+		videoSendBitrate = -1.0f;
+		videoReceiveBitrate = -1.0f;
+		
+		avgAudioSendBitrate = -1.0f;
+		avgAudioReceiveBitrate = -1.0f;
+		avgVideoSendBitrate = -1.0f;
+		avgVideoReceiveBitrate = -1.0f;
+		
+		[callInformationBox setHidden:NO];
+		[remotePartyNameField setStringValue:[activeCall remoteName]];
+		[callDurationField setStringValue:timeString((unsigned)[activeCall callDuration])];
 	}
 	
 	[roundTripDelayField setIntValue:[activeCall roundTripDelay]];

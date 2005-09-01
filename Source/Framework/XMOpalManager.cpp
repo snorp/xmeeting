@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.8 2005/08/21 08:40:18 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.9 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -91,6 +91,7 @@ BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {	
+	cout << "OnEstablishedCall" << endl;
 	unsigned callID = call.GetToken().AsUnsigned();
 	noteCallEstablished(callID);
 	OpalManager::OnEstablishedCall(call);

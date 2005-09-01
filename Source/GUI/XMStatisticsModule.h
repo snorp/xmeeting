@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.h,v 1.3 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMStatisticsModule.h,v 1.4 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,10 @@
 	IBOutlet NSTextField *packetSendTimeField;
 	IBOutlet NSTextField *packetReceiveTimeField;
 	
+	IBOutlet NSBox *callInformationBox;
+	IBOutlet NSTextField *remotePartyNameField;
+	IBOutlet NSTextField *callDurationField;
+	
 	NSNib *nibLoader;
 	
 	XMCallInfo *activeCall;
@@ -37,15 +41,20 @@
 	BOOL isExpanded;
 	
 	NSDate *oldDate;
-	unsigned oldAudioBytesSent;
-	unsigned oldAudioBytesReceived;
-	unsigned oldVideoBytesSent;
-	unsigned oldVideoBytesReceived;
+	float oldAudioBytesSent;
+	float oldAudioBytesReceived;
+	float oldVideoBytesSent;
+	float oldVideoBytesReceived;
 	
 	float audioSendBitrate;
 	float audioReceiveBitrate;
 	float videoSendBitrate;
 	float videoReceiveBitrate;
+	
+	float avgAudioSendBitrate;
+	float avgAudioReceiveBitrate;
+	float avgVideoSendBitrate;
+	float avgVideoReceiveBitrate;
 }
 
 - (IBAction)toggleShowExtraInformation:(id)sender;

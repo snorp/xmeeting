@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #import "XMMainWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMLocation.h"
+#import "XMRecentCallsView.h"
+#import "XMApplicationFunctions.h"
 
 @interface XMCallHistoryModule (PrivateMethods)
 
@@ -25,7 +27,7 @@
 - (void)_gatekeeperRegistration:(NSNotification *)notif;
 - (void)_gatekeeperUnregistration:(NSNotification *)notif;
 - (void)_gatekeeperRegistrationFailed:(NSNotification *)notif;
-- (void)_logText:(NSString *)text;
+- (void)_logText:(NSString *)text date:(NSDate *)date;
 
 @end
 
@@ -56,8 +58,6 @@
 	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationFailed:)
 							   name:XMNotification_CallManagerGatekeeperRegistrationFailed object:nil];
 	
-	dateFormatString = @"%Y-%m-%d %H:%M:%S";
-	
 	didLogIncomingCall = NO;
 	
 	return self;
@@ -69,12 +69,23 @@
 	
 	[nibLoader release];
 	
+	[gatekeeperName release];
+	
 	[super dealloc];
 }
 
 - (void)awakeFromNib
 {
 	contentViewSize = [contentView frame].size;
+
+	[recentCallsScrollView setBorderType:NSBezelBorder];
+	[recentCallsScrollView setHasHorizontalScroller:NO];
+	[recentCallsScrollView setHasVerticalScroller:YES];
+	[[recentCallsScrollView verticalScroller] setControlSize:NSSmallControlSize];
+	[recentCallsScrollView setAutohidesScrollers:NO];
+	NSSize contentSize = [recentCallsScrollView contentSize];
+	[recentCallsView setFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
+	[recentCallsScrollView setDocumentView:recentCallsView];
 }
 
 - (NSString *)name
@@ -121,7 +132,7 @@
 	XMLocation *activeLocation = [[XMPreferencesManager sharedInstance] activeLocation];
 	NSString *logText = [[NSString alloc] initWithFormat:@"Switched active location to <%@>", [activeLocation name]];
 	
-	[self _logText:logText];
+	[self _logText:logText date:nil];
 	
 	[logText release];
 }
@@ -131,7 +142,7 @@
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
 	NSString *logText = [[NSString alloc] initWithFormat:@"Calling host \"%@\"", [activeCall callAddress]];
 	
-	[self _logText:logText];
+	[self _logText:logText date:[activeCall callInitiationDate]];
 	
 	[logText release];
 }
@@ -141,7 +152,7 @@
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
 	NSString *logText = [[NSString alloc] initWithFormat:@"Incoming call from \"%@\"", [activeCall remoteName]];
 	
-	[self _logText:logText];
+	[self _logText:logText date:[activeCall callInitiationDate]];
 	
 	[logText release];
 	
@@ -159,7 +170,7 @@
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Call with \"%@\" established", [activeCall remoteName]];
 	
-	[self _logText:logText];
+	[self _logText:logText date:[activeCall callStartDate]];
 	
 	[logText release];
 	
@@ -184,7 +195,7 @@
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Call with \"%@\" cleared", remoteName];
 	
-	[self _logText:logText];
+	[self _logText:logText date:[activeCall callEndDate]];
 	
 	[logText release];
 	
@@ -193,27 +204,31 @@
 
 - (void)_enablingH323Failed:(NSNotification *)notif
 {
-	[self _logText:@"Enabling the H.323 subsystem failed!"];
+	[self _logText:@"Enabling the H.323 subsystem failed!" date:nil];
 }
 
 - (void)_gatekeeperRegistration:(NSNotification *)notif
 {
-	NSString *gatekeeperName = [[XMCallManager sharedInstance] gatekeeperName];
+	if(gatekeeperName != nil)
+	{
+		[gatekeeperName release];
+		gatekeeperName = nil;
+	}
+	
+	gatekeeperName = [[[XMCallManager sharedInstance] gatekeeperName] retain];
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Registered at gatekeeper \"%@\"", gatekeeperName];
 	
-	[self _logText:logText];
+	[self _logText:logText date:nil];
 	
 	[logText release];
 }
 
 - (void)_gatekeeperUnregistration:(NSNotification *)notif
-{
-	NSString *gatekeeperName = [[XMCallManager sharedInstance] gatekeeperName];
-	
+{	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Unregistered from gatekeeper \"%@\"", gatekeeperName];
 	
-	[self _logText:logText];
+	[self _logText:logText date:nil];
 	
 	[logText release];
 }
@@ -234,46 +249,38 @@
 	}
 	
 	XMGatekeeperRegistrationFailReason failReason = [[XMCallManager sharedInstance] gatekeeperRegistrationFailReason];
-	NSString *failReasonString;
-	
-	switch(failReason)
-	{
-		case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
-			failReasonString = @"No gatekeeper specified";
-			break;
-		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
-			failReasonString = @"Gatekeeper not found";
-			break;
-		case XMGatekeeperRegistrationFailReason_RegistrationReject:
-			failReasonString = @"Gatekeeper rejected registration";
-			break;
-		default:
-			failReasonString = @"Unknown reason";
-			break;
-	}
+	NSString *failReasonString = gatekeeperRegistrationFailReasonString(failReason);
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Failed to register at gatekeeper \"%@\" (%@)",
 		gatekeeperAddress, failReasonString];
 	
-	[self _logText:logText];
+	[self _logText:logText date:nil];
 	
 	[logText release];
 }
 
-- (void)_logText:(NSString *)logText
+- (void)_logText:(NSString *)logText date:(NSDate *)date
 {
+	BOOL createdDate = NO;
+	
 	// making sure that the nib file has loaded
 	[self contentView];
 	
 	// fetching the current date
-	NSDate *currentDate = [[NSDate alloc] init];
-	NSString *dateString = [currentDate descriptionWithCalendarFormat:dateFormatString timeZone:nil locale:nil];
-	[currentDate release];
+	if(date == nil)
+	{
+		date = [[NSDate alloc] init];
+		createdDate = YES;
+	}
+	NSString *dateString = [date descriptionWithCalendarFormat:dateFormatString() timeZone:nil locale:nil];
+	
+	if(createdDate == YES)
+	{
+		[date release];
+	}
 	
 	// determining the correct (bold) font
-	NSFontManager *fontManager = [NSFontManager sharedFontManager];
-	NSFont *originalFont = [NSFont systemFontOfSize:[NSFont smallSystemFontSize]];
-	NSFont *boldFont = [fontManager convertFont:originalFont toHaveTrait:NSBoldFontMask];
+	NSFont *boldFont = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
 	
 	// setting the correct attributes of the date string
 	NSMutableAttributedString *dateLogString = [[NSMutableAttributedString alloc] initWithString:dateString];
@@ -281,6 +288,9 @@
 	[dateLogString beginEditing];
 	[dateLogString addAttribute:NSFontAttributeName value:boldFont range:dateLogRange];
 	[dateLogString endEditing];
+	
+	//determining the correct normal font
+	NSFont *originalFont = [NSFont systemFontOfSize:[NSFont smallSystemFontSize]];
 	
 	// setting the correct attributes of the log string
 	NSMutableAttributedString *textLogString = [[NSMutableAttributedString alloc] initWithString:logText];

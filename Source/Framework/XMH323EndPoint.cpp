@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,16 +98,31 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 		// if didRegisterAtGatekeeper is yes after the
 		// call to UseGatekeeper, we have a new registration
 		// and notify the XMeeting framework
+		BOOL wasRegisteredAtGatekeeper = IsRegisteredWithGatekeeper();
 		didRegisterAtGatekeeper = FALSE;
 		gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 		BOOL result = UseGatekeeper(address, identifier);
+		
 		if(result == TRUE && didRegisterAtGatekeeper == TRUE)
 		{
+			if(wasRegisteredAtGatekeeper == TRUE)
+			{
+				// if we have been registered before and now have a new registration,
+				// then we have unregistered the previous gatekeeper
+				noteGatekeeperUnregistration();
+			}
+			
 			PString gatekeeperName = GetGatekeeper()->GetName();
 			noteGatekeeperRegistration(gatekeeperName);
 		}
 		else if (result == FALSE)
 		{
+			if(wasRegisteredAtGatekeeper == TRUE)
+			{
+				// same as above
+				noteGatekeeperUnregistration();
+			}
+			
 			if(gatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_NoFailure)
 			{
 				gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_GatekeeperNotFound;
@@ -124,6 +139,7 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 		{
 			doesUnregister = TRUE;
 		}
+		
 		BOOL result = RemoveGatekeeper();
 		
 		// if we unregistered, we have to inform the obj-C world

@@ -6,6 +6,8 @@
             CLASS = XMStatisticsModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                callDurationField = NSTextField; 
+                callInformationBox = NSBox; 
                 codecTableView = NSTableView; 
                 contentView = NSView; 
                 extraInformationDisclosure = NSButton; 
@@ -14,6 +16,7 @@
                 packetsLateField = NSTextField; 
                 packetsLostField = NSTextField; 
                 packetsOutOfOrderField = NSTextField; 
+                remotePartyNameField = NSTextField; 
                 roundTripDelayField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 

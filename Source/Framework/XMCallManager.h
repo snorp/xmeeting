@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.10 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.11 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,7 +46,6 @@
 	// h.323 variables
 	NSString *gatekeeperName;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
-	NSTimer *gatekeeperRegistrationCheckTimer;
 	
 	// InCall variables
 	NSTimeInterval statisticsUpdateInterval;

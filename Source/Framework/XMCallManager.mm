@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.12 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMCallManager.mm,v 1.13 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,7 +104,6 @@
 	
 	gatekeeperName = nil;
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
-	gatekeeperRegistrationCheckTimer = nil;
 	
 	statisticsUpdateInterval = 1.0;
 	
@@ -121,8 +120,6 @@
 	[activeCall release];
 	
 	[gatekeeperName release];
-	[gatekeeperRegistrationCheckTimer invalidate];
-	[gatekeeperRegistrationCheckTimer release];
 	
 	[recentCalls release];
 	
@@ -734,10 +731,6 @@
 - (void)_shutdownSubsystem
 {
 	[self _doSubsystemSetupWithPreferences:[[XMPreferences alloc] init]];
-	
-	[gatekeeperRegistrationCheckTimer invalidate];
-	[gatekeeperRegistrationCheckTimer release];
-	gatekeeperRegistrationCheckTimer = nil;
 }
 
 - (void)_mainThreadHandleSubsystemSetupDidEnd
@@ -1148,12 +1141,10 @@
 	
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	
-	// check every two minutes for gatekeeper registration
-	[gatekeeperRegistrationCheckTimer invalidate];
-	[gatekeeperRegistrationCheckTimer release];
-	gatekeeperRegistrationCheckTimer = [[NSTimer scheduledTimerWithTimeInterval:120.0 target:self 
-																	   selector:@selector(_checkGatekeeperRegistration:)
-																	   userInfo:nil repeats:YES] retain];
+
+	[NSTimer scheduledTimerWithTimeInterval:120.0 target:self 
+								   selector:@selector(_checkGatekeeperRegistration:)
+								   userInfo:nil repeats:YES];
 	
 	NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerGatekeeperRegistration object:self];
 	
@@ -1168,14 +1159,15 @@
 
 - (void)_mainThreadHandleGatekeeperUnregistration
 {	
-	[gatekeeperRegistrationCheckTimer invalidate];
-	[gatekeeperRegistrationCheckTimer release];
-	gatekeeperRegistrationCheckTimer = nil;
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperUnregistration object:self];
+	BOOL doesPostNotification = (gatekeeperName != nil);
 	
 	[gatekeeperName release];
 	gatekeeperName = nil;
+	
+	if(doesPostNotification)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperUnregistration object:self];
+	}
 }
 
 - (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason
@@ -1193,10 +1185,6 @@
 	
 	gatekeeperRegistrationFailReason = (XMGatekeeperRegistrationFailReason)[reason unsignedIntValue];
 	
-	[gatekeeperRegistrationCheckTimer invalidate];
-	[gatekeeperRegistrationCheckTimer release];
-	gatekeeperRegistrationCheckTimer = nil;
-	
 	if(postSubsystemSetupFailureNotifications == YES)
 	{
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerGatekeeperRegistrationFailed object:self];
@@ -1205,6 +1193,11 @@
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer
 {
+	if(gatekeeperName == nil)
+	{
+		[timer invalidate];
+		return;
+	}
 	if(!doesSubsystemSetup)
 	{
 		checkGatekeeperRegistration();

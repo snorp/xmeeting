@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -105,7 +105,7 @@
 - (XMCallEndReason)callEndReason;
 
 /**
- * Returns the time when the call was initiated (the time when this object was created)
+ * Returns the time when the call was initiated (the time this object was created)
  **/
 - (NSDate *)callInitiationDate;
 
