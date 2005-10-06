@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.4 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.5 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,17 +31,26 @@ NSString *XMNotification_CallManagerGatekeeperRegistration = @"XMeetingCallManag
 NSString *XMNotification_CallManagerGatekeeperUnregistration = @"XMeetingCallManagerGatekeeperUnregistrationNotification";
 NSString *XMNotification_CallManagerGatekeeperRegistrationFailed = @"XMeetingCallManagerGatekeeperRegistrationFailedNotification";
 
+NSString *XMNotification_CallManagerOutgoingAudioStreamOpened = @"XMeetingCallManagerOutgoingAudioStreamOpenedNotification";
+NSString *XMNotification_CallManagerIncomingAudioStreamOpened = @"XMeetingCallManagerIncomingAudioStreamOpenedNotification";
+NSString *XMNotification_CallManagerOutgoingVideoStreamOpened = @"XMeetingCallManagerOutgoingVideoStreamOpenedNotification";
+NSString *XMNotification_CallManagerIncomingVideoStreamOpened = @"XMeetingCallManagerIncomingVideoStreamOpenedNotification";
+
+NSString *XMNotification_CallManagerOutgoingAudioStreamClosed = @"XMeetingCallManagerOutgoingAudioStreamClosedNotification";
+NSString *XMNotification_CallManagerIncomingAudioStreamClosed = @"XMeetingCallManagerIncomingAudioStreamClosedNotification";
+NSString *XMNotification_CallManagerOutgoingVideoStreamClosed = @"XMeetingCallManagerOutgoingVideoStreamClosedNotification";
+NSString *XMNotification_CallManagerIncomingVideoStreamClosed = @"XMeetingCallManagerIncomingVideoStreamClosedNotification";
+
 NSString *XMNotification_CallManagerCallStatisticsUpdated = @"XMeetingCallManagerCallStatisticsUpdatedNotification";
 
 NSString *XMNotification_AudioManagerInputDeviceDidChange = @"XMeetingAudioManagerInputDeviceDidChangeNotification";
 NSString *XMNotification_AudioManagerOutputDeviceDidChange = @"XMeetingAudioManagerOutputDeviceDidChangeNotification";
 NSString *XMNotification_AudioManagerInputVolumeDidChange = @"XMeetingAudioManagerInputVolumeDidChangeNotification";
 NSString *XMNotification_AudioManagerOutputVolumeDidChange = @"XMeetingAudioManagerOutputVolumeDidChangeNotification";
+NSString *XMNotification_AudioManagerDidUpdateDeviceList = @"XMeetingAudioManagerDidUpdateDeviceListNotification";
 
-NSString *XMNotification_VideoManagerDidStartGrabbing = @"XMeetingVideoManagerDidStartGrabbingNotification";
-NSString *XMNotification_VideoManagerDidStopGrabbing = @"XMeetingVideoManagerDidEndGrabbingNotification";
-NSString *XMNotification_VideoManagerDidReadFrame = @"XMeetingVideoManagerDidReadFrameNotification";
-NSString *XMNotification_VideoManagerDidUpdateDeviceList = @"XMeetingVideoManagerDidUpdateDeviceListNotification";
+NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate = @"XMeetingVideoManagerDidStartVideoInputDeviceListUpdateNotification";
+NSString *XMNotification_VideoManagerDidUpdateInputDeviceList = @"XMeetingVideoManagerDidUpdateInputDeviceListNotification";
 
 NSString *XMNotification_AddressBookManagerDatabaseDidChange = @"XMeetingAddressBookManagerDatabaseDidChangeNotification";
 

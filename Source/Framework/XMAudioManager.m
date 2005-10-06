@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.mm,v 1.6 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.

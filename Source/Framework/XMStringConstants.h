@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.6 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,17 @@ extern NSString *XMNotification_CallManagerGatekeeperRegistration;
 extern NSString *XMNotification_CallManagerGatekeeperUnregistration;
 extern NSString *XMNotification_CallManagerGatekeeperRegistrationFailed;
 
+// Media Streams
+extern NSString *XMNotification_CallManagerOutgoingAudioStreamOpened;
+extern NSString *XMNotification_CallManagerIncomingAudioStreamOpened;
+extern NSString *XMNotification_CallManagerOutgoingVideoStreamOpened;
+extern NSString *XMNotification_CallManagerIncomingVideoStreamOpened;
+
+extern NSString *XMNotification_CallManagerOutgoingAudioStreamClosed;
+extern NSString *XMNotification_CallManagerIncomingAudioStreamClosed;
+extern NSString *XMNotification_CallManagerOutgoingVideoStreamClosed;
+extern NSString *XMNotification_CallManagerIncomingVideoStreamClosed;
+
 // In-Call functionality
 extern NSString *XMNotification_CallManagerCallStatisticsUpdated;
 
@@ -58,14 +69,13 @@ extern NSString *XMNotification_AudioManagerInputDeviceDidChange;
 extern NSString *XMNotification_AudioManagerOutputDeviceDidChange;
 extern NSString *XMNotification_AudioManagerInputVolumeDidChange;
 extern NSString *XMNotification_AudioManagerOutputVolumeDidChange;
+extern NSString *XMNotification_AudioManagerDidUpdateDeviceList;
 
 /**
  * Notifications posted by XMVideoManager
  **/
-extern NSString *XMNotification_VideoManagerDidStartGrabbing;
-extern NSString *XMNotification_VideoManagerDidStopGrabbing;
-extern NSString *XMNotification_VideoManagerDidReadFrame;
-extern NSString *XMNotification_VideoManagerDidUpdateDeviceList;
+extern NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate;
+extern NSString *XMNotification_VideoManagerDidUpdateInputDeviceList;
 
 /**
  * Notifications posted by XMAddressBookManager

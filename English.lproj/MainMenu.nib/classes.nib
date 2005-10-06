@@ -2,7 +2,7 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {showPreferences = id; }; 
+            ACTIONS = {showPreferences = id; updateDeviceLists = id; }; 
             CLASS = XMApplicationController; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 

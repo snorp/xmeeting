@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.10 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.11 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,10 +17,11 @@
 #import "XMCodec.h"
 #import "XMAudioManager.h"
 #import "XMVideoManager.h"
+#import "XMVideoView.h"
 #import "XMAddressBookRecordSearchMatch.h"
 #import "XMGeneralPurposeURL.h"
 
-@class XMLocalVideoView, XMCallInfo, ABPerson;
+@class XMVideoView, XMCallInfo, ABPerson;
 
 @interface XMCallManager (FrameworkMethods)
 
@@ -157,12 +158,23 @@
 
 @interface XMVideoManager (FrameworkMethods)
 
-- (void)_addLocalVideoView:(XMLocalVideoView *)view;
-- (void)_removeLocalVideoView:(XMLocalVideoView *)view;
-- (void)_drawToView:(XMLocalVideoView *)view;
+- (void)_startup;
+- (void)_addLocalVideoView:(XMVideoView *)videoView;
+- (void)_removeLocalVideoView:(XMVideoView *)videoView;
+- (void)_addRemoteVideoView:(XMVideoView *)videoView;
+- (void)_removeRemoteVideoView:(XMVideoView *)videoView;
+- (void)_drawLocalVideoInRect:(NSRect)rect;
+- (void)_drawRemoteVideoInRect:(NSRect)rect;
+- (void)_handleDeviceList:(NSArray *)deviceList;
+- (void)_handleInputDeviceChangeComplete;
+- (void)_handlePreviewImage:(CIImage *)previewImage;
 
-- (BOOL)_handleVideoFrame:(void *)buffer width:(unsigned)width
-				   height:(unsigned)height bytesPerPixel:(unsigned)bytesPerPixel;
+@end
+
+@interface XMVideoView (FrameworkMethods)
+
+- (void)_startBusyIndicator;
+- (void)_stopBusyIndicator;
 
 @end
 

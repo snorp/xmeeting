@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.4 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.5 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,8 @@
  * Causes the Preferences window to be shown on screen
  **/
 - (IBAction)showPreferences:(id)sender;
+
+- (IBAction)updateDeviceLists:(id)sender;
 
 @end
 

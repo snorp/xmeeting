@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.7 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -232,6 +232,7 @@ void XMH323EndPoint::GetCallStatistics(XMCallStatistics *callStatistics)
 void XMH323EndPoint::OnRegistrationConfirm()
 {
 	didRegisterAtGatekeeper = TRUE;
+	H323EndPoint::OnRegistrationConfirm();
 }
 
 void XMH323EndPoint::OnRegistrationReject()

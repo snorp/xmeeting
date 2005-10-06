@@ -21,7 +21,7 @@
 			<key>XMeeting_Bandwidth</key>
 			<string>Sure!</string>
 			<key>XMeeting_Identifier</key>
-			<string>h.263</string>
+			<string>*h.263*</string>
 			<key>XMeeting_Name</key>
 			<string>H.263</string>
 			<key>XMeeting_Quality</key>
@@ -31,7 +31,7 @@
 			<key>XMeeting_Bandwidth</key>
 			<string>Not interesting</string>
 			<key>XMeeting_Identifier</key>
-			<string>h.261</string>
+			<string>*h.261*</string>
 			<key>XMeeting_Name</key>
 			<string>H.261</string>
 			<key>XMeeting_Quality</key>

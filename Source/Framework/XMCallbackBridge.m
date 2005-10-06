@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.mm,v 1.6 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,8 +71,8 @@ void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *medi
 
 bool noteVideoFrameUpdate(void *buffer, unsigned width, unsigned height, unsigned bytesPerPixel)
 {
-	return [[XMVideoManager sharedInstance] _handleVideoFrame:buffer width:width
-													   height:height bytesPerPixel:bytesPerPixel];
+	//return [[XMVideoManager sharedInstance] _handleVideoFrame:buffer width:width
+	//												   height:height bytesPerPixel:bytesPerPixel];
 }
 
 bool getVideoFrame(void *buffer, unsigned *bytesReturned)

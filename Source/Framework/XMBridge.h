@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.7 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.8 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,10 @@
 #define __XM_BRIDGE_H__
 
 #include "XMTypes.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #pragma mark Init & Startup/Stop functions
 
@@ -193,5 +197,9 @@ void checkGatekeeperRegistration();
  * Device Names used within OPAL
  **/
 #define XMSoundChannelDevice "XMSoundChannelDevice"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __XM_BRIDGE_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.9 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.10 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,7 +42,7 @@
 
 #pragma mark Init & Deallocation Methods
 
-- (void)awakeFromNib
+- (void)applicationDidFinishLaunching:(NSNotification *)notif
 {
 	// First step to do!
 	InitXMeetingFramework();
@@ -89,6 +89,7 @@
 	
 	// last but not least, go online
 	[[XMCallManager sharedInstance] setOnline:YES];
+	[[XMVideoManager sharedInstance] startGrabbing];
 }
 
 - (void)dealloc
@@ -111,6 +112,11 @@
 - (IBAction)showPreferences:(id)sender
 {
 	[[XMPreferencesWindowController sharedInstance] showPreferencesWindow];
+}
+
+- (IBAction)updateDeviceLists:(id)sender
+{
+	[[XMVideoManager sharedInstance] updateInputDeviceList];
 }
 
 #pragma mark NSApplication delegate methods

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.11 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.12 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -204,17 +204,6 @@
  * in progress.
  **/
 - (void)setStatisticsUpdateInterval:(NSTimeInterval)interval;
-
-@end
-
-/**
- * Informal protocol for any delegates of XMCallManager
- **/
-@interface NSObject (XMCallManagerDelegate)
-
-- (void)callManagerDidReceiveIncomingCall:(NSNotification *)notif;
-- (void)callManagerDidEstablishCall:(NSNotification *)notif;
-- (void)callManagerDidEndCall:(NSNotification *)notif;
 
 @end
 

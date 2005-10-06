@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.mm,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.

@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.h,v 1.2 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMeeting.h,v 1.3 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,7 +30,7 @@ void InitXMeetingFramework();
 #import "XMAudioManager.h"
 
 #import "XMVideoManager.h"
-#import "XMLocalVideoView.h"
+#import "XMVideoView.h"
 
 #import "XMAddressBookManager.h"
 #import "XMAddressBookRecordSearchMatch.h"

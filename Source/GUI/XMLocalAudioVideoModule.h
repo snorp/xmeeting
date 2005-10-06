@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.1 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.2 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,8 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowSupportModule.h"
 
+@class XMVideoView;
+
 @interface XMLocalAudioVideoModule : NSObject <XMMainWindowSupportModule> {
 	
 	IBOutlet NSView *contentView;
@@ -19,6 +21,7 @@
 	NSSize collapsedContentViewSize;
 	
 	IBOutlet NSButton *contentDisclosure;
+	IBOutlet XMVideoView *localVideoView;
 	IBOutlet NSPopUpButton *videoDevicesPopUp;
 	IBOutlet NSPopUpButton *audioInputDevicesPopUp;
 	IBOutlet NSPopUpButton *audioOutputDevicesPopUp;

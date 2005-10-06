@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.4 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.5 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,6 @@
 #define __XM_VIDEO_MANAGER_H__
 
 #import <Cocoa/Cocoa.h>
-#import <QuickTime/QuickTime.h>
 
 #import "XMTypes.h"
 
@@ -18,114 +17,88 @@
 
 @interface XMVideoManager : NSObject {
 	
-	id delegate;
+	NSMutableArray *localVideoViews;
+	NSMutableArray *remoteVideoViews;
 	
-	XMLocalVideoView *view;			// The associated XMLocalVideoView (if set)
-	ImageSequence drawSequence;		// Unique identifier for the draw sequence from the gWorld to the image on screen
-	long imageSize;					// holder for the lengt of the image onscreen (displayed by view)
+	NSArray *inputDevices;
+	NSString *selectedInputDevice;
 	
-	SeqGrabComponent component;		// the component for SequenceGrabbing
-	SGChannel channel;				// the channel for viceo data
-	ImageSequence decomSequence;	// Unique identifier for the decompression sequence
-	GWorldPtr gWorld;				// Pointer to the offscreen GWorld
-	BOOL isGrabbing;				// indicates whether we currently are grabbing or not
+	CIImage *localVideoImage;
+	NSCIImageRep *localVideoImageRep;
+	BOOL doesMirrorLocalVideo;
+	CGAffineTransform mirrorTransformationMatrix;
 	
-	SGDeviceList deviceList;		// The cached deviceList
-	NSArray *deviceNames;			// Storing just the device names
+	unsigned transmitFrameRate;
 	
-	XMVideoSize videoSize;			// The currently used video size for decompressing into GWorld
-	
-	//NSImage *stillImage;			// The still image to use.
-	//NSBitmapImageRep *imgRep;		// The bitmap representation from the image (used to get the pixel bytes)
-	
-	int fps;						// indicating the framerate in which to grab video
-	
-	NSBitmapImageRep *remoteVideoFrame;
-	
-	BOOL didCallCallback;			// workaround for FW-Cam freeze bug
+	BOOL needsToStopLocalBusyIndicators;
 
 }
 
-/*
- * Returns the shared instance to be used by the application.
- * XMVideoManager is a singleton object, using [[XMVideoManager alloc] init]
- * will not work.
- */
+/**
+ * Returns the shared singleton instance of this class
+ **/
 + (XMVideoManager *)sharedInstance;
 
-/* storage for the remote video frame */
-- (NSBitmapImageRep *)remoteVideoFrame;
+/**
+ * Returns an array of strings containing the input devices.
+ * Note that this method does not return valid devices before
+ * the appropriate Notification.
+ **/
+- (NSArray *)inputDevices;
 
 /**
- * Updates the device list. This may take some time, so use with care.
- */
-- (void)updateDeviceList;
+ * Discards the current device list and refreshes the list
+ * Note that the new device list isn't available until the
+ * appropriate notification is posted. Sometimes, creating
+ * a new device list might take some time (1s or even more)
+ **/
+- (void)updateInputDeviceList;
 
-/* Returns the current delegate of the receiver (if any) */
-- (id)delegate;
+/**
+ * Returns the currently selected device
+ **/
+- (NSString *)selectedInputDevice;
 
-/* 
- * Sets the current delegate of the receiver. 
- * The delegate isn't retained (as this is common practice) 
- */
-- (void)setDelegate:(id)delegate;
+/**
+ * Sets the device to use
+ **/
+- (void)setSelectedInputDevice:(NSString *)inputDevice;
 
-/* starts the grabbing sequence. Returns the success of this operation */
-- (BOOL)startGrabbing;
+/**
+ * Returns whether the local video is displayed
+ * with the x-axis flipped or not.
+ **/
+- (BOOL)doesMirrorLocalVideo;
 
-/* stops the grabbing sequence */
+/**
+ * Sets whether the local video is displayed
+ * with the x-axis flipped or not
+ **/
+- (void)setDoesMirrorLocalVideo:(BOOL)flag;
+
+/**
+ * Returns the actual frame grab rate
+ **/
+- (unsigned)transmitFrameRate;
+
+/**
+ * Sets the frame grab rate
+ **/
+- (void)setTransmitFrameRate:(unsigned)transmitFrameRate;
+
+/**
+ * Starts the grabbing process
+ **/
+- (void)startGrabbing;
+
+/**
+ * Stops the grabbing process. Calling this method
+ * will raise an exception if called while a transmission
+ * is ongoing
+ **/
 - (void)stopGrabbing;
 
-/* returns whether we are grabbing images or not */
-- (BOOL)isGrabbing;
-
-/* Returns a list of available video input devices, using a cached value if possible */
-- (NSArray *)availableDevices;
-
-/* 
- * Returns the selected device's name in a human understandable form.
- * This method returns values such as "iSight" and not the 
- * actual device name such as "IIDC FireWire Video"
- * Returns nil if there are no input devices
- */
-- (NSString *)selectedDevice;
-
-/*
- * Tries to select a device with deviceName as its name, returning
- * the success of this operation. Device names are the actual
- * devices's names such as "iSight" and not "IIDC FireWire Video"
- * for example
- */
-- (BOOL)setSelectedDevice:(NSString *)deviceName;
-
-/* Returns the still image from the "picture"-device */
-- (NSImage *)stillImage;
-
-/* Sets still image to use with the "picture"-device */
-- (void)setStillImage:(NSImage *)image;
-
-/* Returns the currently used frame rate */
-- (int)fps;
-
-/* Sets the frame rate to use */
-- (void)setFps:(int)fps;
-
 @end
 
-/* 
-* Methods a delecate may implement.
- * It is guaranteed that all methods will be called
- * in the main thread
- */
-@interface NSObject (XMVideoManagerDelegate)
-
-- (void)videoManagerDidStartGrabbing:(NSNotification *)notif;
-- (void)videoManagerDidStopGrabbing:(NSNotification *)notif;
-- (void)videoManagerDidReadVideoFrame:(NSNotification *)notif;
-- (void)videoManagerDidUpdateVideoDeviceList:(NSNotification *)notif;
-
-- (void)noteVideoManagerError:(NSString *)errorMessage code:(int)errorCode;
-
-@end
 
 #endif // __XM_VIDEO_MANAGER_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowStatusBarController.m,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMMainWindowStatusBarController.m,v 1.6 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@
 - (void)_incomingCall:(NSNotification *)notif;
 - (void)_callEstablished:(NSNotification *)notif;
 - (void)_callCleared:(NSNotification *)notif;
+- (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif;
+- (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
 
 - (void)_setStatusBarString:(NSString *)statusBarString;
 
@@ -82,6 +84,10 @@
 							   name:XMNotification_CallManagerCallEstablished object:nil];
 	[notificationCenter addObserver:self selector:@selector(_callCleared:)
 							   name:XMNotification_CallManagerCallCleared object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartVideoInputDeviceListUpdate:)
+							   name:XMNotification_VideoManagerDidStartInputDeviceListUpdate object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUpdateVideoInputDeviceList:)
+							   name:XMNotification_VideoManagerDidUpdateInputDeviceList object:nil];
 }
 
 #pragma mark Notification Handling Methods
@@ -101,7 +107,6 @@
 	{
 		XMUtils *utils = [XMUtils sharedInstance];
 		NSString *displayString;
-		int animationType;
 	
 		if([utils didSucceedFetchingExternalAddress])
 		{
@@ -127,7 +132,7 @@
 - (void)_didEndSubsystemSetup:(NSNotification *)notif
 {
 	doesSubsystemSetup = NO;
-	NSString *displayString = NSLocalizedString(@"Setting up the subsystem done", @"");
+	NSString *displayString = NSLocalizedString(@"Setting up the subsystem... Done.", @"");
 	[self _setStatusBarString:displayString animation:XM_NO_ANIMATION];
 }
 
@@ -175,6 +180,18 @@
 {
 	NSString *displayString = NSLocalizedString(@"Call Ended", @"");
 	[self _setStatusBarString:displayString];
+}
+
+- (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif
+{
+	NSString *displayString = NSLocalizedString(@"Updating Video Input Device List...", @"");
+	[self _setStatusBarString:displayString animation:XM_DO_ANIMATION];
+}
+
+- (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif
+{
+	NSString *displayString = NSLocalizedString(@"Updating Video Input Device List... Done", @"");
+	[self _setStatusBarString:displayString animation:XM_NO_ANIMATION];
 }
 
 #pragma mark Private Methods

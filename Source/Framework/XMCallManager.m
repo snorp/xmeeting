@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.mm,v 1.13 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1052,6 +1052,8 @@
 		return;
 	}
 	
+	NSString *notificationToPost;
+	
 	if([codecString rangeOfString:@"261"].location != NSNotFound ||
 	   [codecString rangeOfString:@"263"].location != NSNotFound)
 	{
@@ -1059,10 +1061,12 @@
 		if(isInputStream)
 		{
 			[activeCall _setOutgoingVideoCodec:codecString];
+			notificationToPost = XMNotification_CallManagerOutgoingVideoStreamOpened;
 		}
 		else
 		{
 			[activeCall _setIncomingAudioCodec:codecString];
+			notificationToPost = XMNotification_CallManagerIncomingVideoStreamOpened;
 		}
 	}
 	else
@@ -1071,11 +1075,19 @@
 		if(isInputStream)
 		{
 			[activeCall _setOutgoingAudioCodec:codecString];
+			notificationToPost = XMNotification_CallManagerOutgoingAudioStreamOpened;
 		}
 		else
 		{
 			[activeCall _setIncomingAudioCodec:codecString];
+			notificationToPost = XMNotification_CallManagerIncomingAudioStreamOpened;
 		}
+	}
+	
+	if(notificationToPost != nil)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:notificationToPost
+															object:self];
 	}
 }
 

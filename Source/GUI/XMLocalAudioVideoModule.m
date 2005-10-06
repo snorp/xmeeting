@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.1 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.2 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,8 @@
 @interface XMLocalAudioVideoModule (PrivateMethods)
 
 - (void)_validateControls;
+- (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif;
+- (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
 
@@ -47,6 +49,9 @@
 	isExpanded = YES;
 	[contentDisclosure setState:NSOnState];
 	
+	[videoDevicesPopUp setEnabled:NO];
+	[localVideoView startDisplayingLocalVideo];
+	
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
 	[audioInputDevicesPopUp removeAllItems];
@@ -70,6 +75,10 @@
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
+	[notificationCenter addObserver:self selector:@selector(_didStartVideoInputDeviceListUpdate:)
+							   name:XMNotification_VideoManagerDidStartInputDeviceListUpdate object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUpdateVideoInputDeviceList:)
+							   name:XMNotification_VideoManagerDidUpdateInputDeviceList object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioInputVolumeDidChange:)
 							   name:XMNotification_AudioManagerInputVolumeDidChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioOutputVolumeDidChange:)
@@ -128,6 +137,11 @@
 
 - (IBAction)changeVideoDevice:(id)sender
 {
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	NSString *device = [videoDevicesPopUp titleOfSelectedItem];
+	
+	[videoManager setSelectedInputDevice:device];
 }
 
 - (IBAction)changeAudioInputDevice:(id)sender
@@ -233,6 +247,21 @@
 	enableControls = [audioManager canAlterOutputVolume];
 	[audioOutputVolumeSlider setEnabled:enableControls];
 	[muteAudioOutputSwitch setEnabled:enableControls];
+}
+
+- (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif
+{
+	[videoDevicesPopUp setEnabled:NO];
+}
+
+- (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	[videoDevicesPopUp setEnabled:YES];
+	[videoDevicesPopUp removeAllItems];
+	[videoDevicesPopUp addItemsWithTitles:[videoManager inputDevices]];
+	[videoDevicesPopUp selectItemWithTitle:[videoManager selectedInputDevice]];
 }
 
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif

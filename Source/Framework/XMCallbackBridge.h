@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.6 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.7 2005/10/06 15:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,10 @@
 #define __XM_CALLBACK_BRIDGE_H__
 
 #include "XMTypes.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * This file provides the callbacks that may be called by the
@@ -84,5 +88,9 @@ bool getVideoFrame(void *buffer, unsigned *bytesReturned);
 void noteGatekeeperRegistration(const char *gatekeeperName);
 void noteGatekeeperUnregistration();
 void noteGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __XM_CALLBACK_BRIDGE_H__

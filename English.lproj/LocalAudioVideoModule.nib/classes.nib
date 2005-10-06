@@ -21,12 +21,14 @@
                 audioOutputVolumeSlider = NSSlider; 
                 contentDisclosure = NSButton; 
                 contentView = NSView; 
+                localVideoView = XMVideoView; 
                 muteAudioInputSwitch = NSButton; 
                 muteAudioOutputSwitch = NSButton; 
                 videoDevicesPopUp = NSPopUpButton; 
             }; 
             SUPERCLASS = NSObject; 
-        }
+        }, 
+        {CLASS = XMVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }
