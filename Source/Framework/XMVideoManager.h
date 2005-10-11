@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.5 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.6 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@
 
 @interface XMVideoManager : NSObject {
 	
+	NSMutableArray *videoInputModules;
 	NSMutableArray *localVideoViews;
 	NSMutableArray *remoteVideoViews;
 	
@@ -27,6 +28,9 @@
 	NSCIImageRep *localVideoImageRep;
 	BOOL doesMirrorLocalVideo;
 	CGAffineTransform mirrorTransformationMatrix;
+	
+	CIImage *remoteVideoImage;
+	NSCIImageRep *remoteVideoImageRep;
 	
 	unsigned transmitFrameRate;
 	

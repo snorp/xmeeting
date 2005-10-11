@@ -9,9 +9,11 @@
                 contentView = NSView; 
                 hangupButton = NSButton; 
                 remotePartyField = NSTextField; 
+                videoView = XMVideoView; 
             }; 
             SUPERCLASS = NSObject; 
-        }
+        }, 
+        {CLASS = XMVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }

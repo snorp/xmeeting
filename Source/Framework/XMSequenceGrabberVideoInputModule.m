@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,28 +11,33 @@
 #define XM_GRAB_WIDTH 352
 #define XM_GRAB_HEIGHT 288
 
+#define XM_CALLBACK_NEVER_CALLED 0
+#define XM_CALLBACK_NOT_CALLED 1
+#define XM_CALLBACK_CALLED 2
+#define XM_CALLBACK_ERROR_REPORTED 4
+
 // Data Proc that is called whenever the SequenceGrabber
 // did grab a frame
-static pascal OSErr processGrabDataProc(SGChannel channel,
-										Ptr data,
-										long length,
-										long *offset,
-										long channelRefCon,
-										TimeValue time,
-										short writeType,
-										long refCon);
+static pascal OSErr XMSGProcessGrabDataProc(SGChannel channel,
+											Ptr data,
+											long length,
+											long *offset,
+											long channelRefCon,
+											TimeValue time,
+											short writeType,
+											long refCon);
 
 // Proc that is called when the grabbed frame is succcesfully
 // decompressed into a CVPixelBufferRef structure
-static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
-										 OSStatus result,
-										 ICMDecompressionTrackingFlags decompressionTrackingFlags,
-										 CVPixelBufferRef pixelBuffer, 
-										 TimeValue64 displayTime,
-										 TimeValue64 displayDuration, 
-										 ICMValidTimeFlags validTimeFlags,
-										 void* reserved, 
-										 void* sourceFrameRefCon);
+static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
+											 OSStatus result,
+											 ICMDecompressionTrackingFlags decompressionTrackingFlags,
+											 CVPixelBufferRef pixelBuffer, 
+											 TimeValue64 displayTime,
+											 TimeValue64 displayDuration, 
+											 ICMValidTimeFlags validTimeFlags,
+											 void* reserved, 
+											 void* sourceFrameRefCon);
 
 @interface XMSGDeviceNameIndex : NSObject {
 	
@@ -50,10 +55,11 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 @interface XMSequenceGrabberVideoInputModule (PrivateMethods)
 
-- (BOOL)_startRecording;
-- (BOOL)_stopRecording;
-- (void)_disposeDecompressionSession;
-- (void)_createDecompressionSession;
+- (void)_openAndConfigureSeqGrabComponent;
+- (void)_disposeSeqGrabComponent;
+- (BOOL)_openAndConfigureChannel;
+- (BOOL)_createDecompressionSession;
+- (BOOL)_disposeDecompressionSession;
 - (OSErr)_processGrabData:(Ptr)grabData length:(long)length time:(TimeValue)time;
 - (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer time:(TimeValue64)time;
 
@@ -72,6 +78,7 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	deviceList = NULL;
 	deviceNames = nil;
 	deviceNameIndexes = nil;
+	selectedDevice = nil;
 	
 	sequenceGrabber = NULL;
 	videoChannel = NULL;
@@ -84,6 +91,8 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	framesPerSecond = 0;
 	
 	isGrabbing = NO;
+	callbackMissCounter = 0;
+	callbackStatus = XM_CALLBACK_NEVER_CALLED;
 	
 	return self;
 }
@@ -91,6 +100,9 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 - (void)dealloc
 {
 	[inputManager release];
+	[deviceNames release];
+	[deviceNameIndexes release];
+	[selectedDevice release];
 	
 	[super dealloc];
 }
@@ -104,78 +116,14 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (void)setupWithInputManager:(id<XMVideoInputManager>)theInputManager
 {
-	ComponentResult err = noErr;
-	
 	inputManager = [theInputManager retain];
 	
-	sequenceGrabber = OpenDefaultComponent(SeqGrabComponentType, 0);
-	if(sequenceGrabber == NULL)
-	{
-		NSLog(@"Error opening SequenceGrabber");
-	}
-	
-	err = SGInitialize(sequenceGrabber);
-	if(err != noErr)
-	{
-		NSLog(@"SGInitializeFailed: %d", (int)err);
-	}
-	
-	// we need to explicitely call this function or the code will break
-	// although we aren't using any GWorld
-	err = SGSetGWorld(sequenceGrabber, NULL, GetMainDevice());
-	if(err != noErr)
-	{
-		NSLog(@"SGSetGWorld failed: %d", (int)err);
-	}
-
-	err = SGSetDataRef(sequenceGrabber, 0, 0, seqGrabDontMakeMovie);
-	if(err != noErr)
-	{
-		NSLog(@"SGSetDataRef failed: %d", (int)err);
-	}
-	
-	err = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
-	if(err != noErr)
-	{
-		NSLog(@"SGNewChannel failed: %d", (int)err);
-	}
-	
-	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
-	if(err != noErr)
-	{
-		NSLog(@"SGSetChannelUsage() failed: %d", err);
-	}
-
-	dataGrabUPP = NewSGDataUPP(processGrabDataProc);
-	err = SGSetDataProc(sequenceGrabber,
-						dataGrabUPP,
-						(long)self);
-	if(err != noErr)
-	{
-		NSLog(@"SGSetDataProc failed: %d", (int)err);
-	}
+	[self _openAndConfigureSeqGrabComponent];
 }
 
 - (void)closeModule
 {
-	ComponentResult err = noErr;
-	
-	err = SGDisposeChannel(sequenceGrabber, videoChannel);
-	if(err != noErr)
-	{
-		NSLog(@"SGDisposeChannel() failed: %d", (int)err);
-	}
-	videoChannel = NULL;
-	
-	err = CloseComponent(sequenceGrabber);
-	if(err != noErr)
-	{
-		NSLog(@"CloseComponent() failed: %d", (int)err);
-	}
-	sequenceGrabber = NULL;
-	
-	DisposeSGDataUPP(dataGrabUPP);
-	dataGrabUPP = NULL;
+	[self _disposeSeqGrabComponent];
 	
 	[inputManager release];
 	inputManager = nil;
@@ -186,51 +134,66 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(deviceNames == nil)
 	{
 		ComponentResult err = noErr;
+		unsigned hintCode = 0;
 		
-		err = SGGetChannelDeviceList(videoChannel, sgDeviceListIncludeInputs, &deviceList);
-		if(err != noErr)
+		if(videoChannel == NULL)
 		{
-			NSLog(@"SGGetChannelDeviceList failed: %d", (int)err);
-			return nil;
+			// it wasn't possible to create the SGChannel, indicating
+			// that no video device is plugged in.
+			deviceNames = [[NSArray alloc] init];
 		}
-		
-		SGDeviceListRecord *deviceListRecord = (*deviceList);
-		NSMutableArray *namesArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
-		NSMutableArray *indexArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
-		unsigned i;
-		
-		for(i = 0; i < deviceListRecord->count; i++)
+		else
 		{
-			SGDeviceName deviceName = deviceListRecord->entry[i];
-			
-			if(deviceName.inputs != NULL)
+			err = SGGetChannelDeviceList(videoChannel, sgDeviceListIncludeInputs, &deviceList);
+			if(err != noErr)
 			{
-				unsigned j;
-				SGDeviceInputListRecord *inputListRecord = *deviceName.inputs;
+				hintCode = 0x002001;
+				[inputManager handleErrorWithCode:err hintCode:hintCode];
 				
-				for(j = 0; j < inputListRecord->count; j++)
+				deviceNames = [[NSArray alloc] init];
+			}
+			else
+			{
+				SGDeviceListRecord *deviceListRecord = (*deviceList);
+				NSMutableArray *namesArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
+				NSMutableArray *indexArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
+				unsigned i;
+		
+				for(i = 0; i < deviceListRecord->count; i++)
 				{
-					// this structure contains the actual human understandable name
-					SGDeviceInputName deviceInputName = inputListRecord->entry[j];
-					NSString *name = [[NSString alloc] initWithCString:(const char *)deviceInputName.name encoding:NSASCIIStringEncoding];
+					SGDeviceName deviceName = deviceListRecord->entry[i];
+			
+					if(deviceName.inputs != NULL)
+					{
+						unsigned j;
+						SGDeviceInputListRecord *inputListRecord = *deviceName.inputs;
+				
+						for(j = 0; j < inputListRecord->count; j++)
+						{
+							// this structure contains the actual human understandable name
+							SGDeviceInputName deviceInputName = inputListRecord->entry[j];
+							NSString *name = [[NSString alloc] initWithCString:(const char *)deviceInputName.name 
+																	  encoding:NSASCIIStringEncoding];
 					
-					// adding the name to the object
-					[namesArray addObject:name];
-					[name release];
+							// adding the name to the object
+							[namesArray addObject:name];
+							[name release];
 					
-					// caching the index of this device
-					XMSGDeviceNameIndex *deviceNameIndex = [[XMSGDeviceNameIndex alloc] _initWithDeviceIndex:i
-																							  inputNameIndex:j];
-					[indexArray addObject:deviceNameIndex];
+							// caching the index of this device
+							XMSGDeviceNameIndex *deviceNameIndex = [[XMSGDeviceNameIndex alloc] _initWithDeviceIndex:i
+																									  inputNameIndex:j];
+							[indexArray addObject:deviceNameIndex];
+						}
+					}
 				}
+		
+				deviceNames = [namesArray copy];
+				deviceNameIndexes = [indexArray copy];
+		
+				[namesArray release];
+				[indexArray release];
 			}
 		}
-		
-		deviceNames = [namesArray copy];
-		deviceNameIndexes = [indexArray copy];
-		
-		[namesArray release];
-		[indexArray release];
 	}
 	
 	return deviceNames;
@@ -246,33 +209,45 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(deviceList != NULL)
 	{
 		ComponentResult err = noErr;
+		unsigned hintCode;
 		
 		err = SGDisposeDeviceList(sequenceGrabber, deviceList);
 		deviceList = NULL;
 		
 		if(err != noErr)
 		{
-			NSLog(@"SGDisposeDeviceList failed: %d", (int)err);
+			hintCode = 0x003001;
+			[inputManager handleErrorWithCode:err hintCode:hintCode];
+		}
+	}
+	
+	// In case we've failed to create a SGChannel previously, due
+	// to the lack of an attached video device, we'll try again here
+	if(videoChannel == NULL)
+	{
+		if([self _openAndConfigureChannel] == NO)
+		{
+			videoChannel = NULL;
 		}
 	}
 }
 
 - (BOOL)openInputDevice:(NSString *)device
-{
-	if([self inputDevices] == nil)
-	{
-		// error occured, already reported
-		return NO;
-	}
+{	
+	ComponentResult err = noErr;
+	unsigned hintCode = 0;
 	
 	unsigned index = [deviceNames indexOfObject:device];
 	
 	if(index == NSNotFound)
 	{
 		// reporting the error here
-		NSLog(@"Device %@ not found!", device);
-		return NO;
+		err = -1;
+		hintCode = 0x004001;
+		goto bail;
 	}
+	
+	selectedDevice = [device retain];
 	
 	XMSGDeviceNameIndex *deviceNameIndex = [deviceNameIndexes objectAtIndex:index];
 	unsigned deviceIndex = [deviceNameIndex _deviceIndex];
@@ -281,54 +256,121 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	SGDeviceListRecord *deviceListRecord = *deviceList;
 	SGDeviceName deviceName = deviceListRecord->entry[deviceIndex];
 	
-	ComponentResult err = noErr;
-	
 	// we have to use the name of the device, not the input device name itself
 	err = SGSetChannelDevice(videoChannel, deviceName.name);
 	if(err != noErr)
 	{
-		NSLog(@"SGSetChannelDevice failed: %d", (int)err);
-		return NO;
+		hintCode = 0x004002;
+		goto bail;
 	}
 	
 	// now we can set the actual input device by its index
 	err = SGSetChannelDeviceInput(videoChannel, inputNameIndex);
 	if(err != noErr)
 	{
-		NSLog(@"SGSetChannelDeviceInput failed: %d", (int)err);
+		hintCode = 0x004003;
+		goto bail;
+	}
+	
+	Rect rect;
+	rect.top = 0;
+	rect.left = 0;
+	rect.bottom = XM_GRAB_HEIGHT;
+	rect.right = XM_GRAB_WIDTH;
+	err = SGSetChannelBounds(videoChannel, &rect);
+	if(err != noErr)
+	{
+		hintCode = 0x004004;
+		goto bail;
+	}
+	
+	err = SGPrepare(sequenceGrabber, false, true);
+	if(err != noErr)
+	{
+		hintCode = 0x004005;
+		goto bail;
+	}
+	
+	err = SGStartRecord(sequenceGrabber);
+	if(err != noErr)
+	{
+		hintCode = 0x004006;
+		goto bail;
+	}
+	
+	err = SGGetChannelTimeScale(videoChannel, &timeScale);
+	if(err != noErr)
+	{
+		NSLog(@"SGGetChannelTimeScale failed(1): %d", (int)err);
+	}
+	
+	lastTime = 0;
+	timeScale = 0;
+	
+	if([self _createDecompressionSession] == NO)
+	{
+		// the error has already been reported
 		return NO;
 	}
 	
-	[self _startRecording];
-	
 	isGrabbing = YES;
+	callbackMissCounter = 0;
+	callbackStatus = XM_CALLBACK_NEVER_CALLED;
 	
 	return YES;
+	
+bail:
+	// stopping any sequence if needed
+	SGStop(sequenceGrabber);
+	
+	[selectedDevice release];
+	selectedDevice = nil;
+	
+	[inputManager handleErrorWithCode:err hintCode:hintCode];
+	return NO;
 }
 
 - (BOOL)closeInputDevice
 {
-	[self _stopRecording];
+	BOOL result = YES;
 	
 	isGrabbing = NO;
 	
-	return YES;
+	if(SGStop(sequenceGrabber) != noErr)
+	{
+		result = NO;
+	}
+	
+	if([self _disposeDecompressionSession] == NO)
+	{
+		result = NO;
+	}
+	
+	[selectedDevice release];
+	selectedDevice = nil;
+	
+	return result;
 }
 
 - (BOOL)setInputFrameSize:(NSSize)theFrameSize
 {
+	BOOL result = YES;
+	
 	frameSize = theFrameSize;
 	
 	if(isGrabbing == YES)
 	{
-		NSLog(@"changin");
-		//[self _stopRecording];
-		//[self _startRecording];
-		[self _disposeDecompressionSession];
-		[self _createDecompressionSession];
 		
+		if([self _disposeDecompressionSession] == NO)
+		{
+			result = NO;
+		}
+		if([self _createDecompressionSession] == NO)
+		{
+			result = NO;
+		}
 	}
-	return YES;
+	return result;
 }
 
 - (void)setFrameGrabRate:(unsigned)theFramesPerSecond
@@ -338,16 +380,55 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	desiredFrameDuration = timeScale / framesPerSecond;
 }
 
-- (void)grabFrame
+- (BOOL)grabFrame
 {
 	ComponentResult err = noErr;
+	unsigned hintCode = 0;
 	
+	// Workaround for the FW-Cam Freeze Bug:
+	// After some time running, a FW-Cam may freeze
+	// so that the SGDataUPP doesn't get called anymore
+	// We detect this by counting the subsequent
+	// callback misses and restart the sequence grabbing
+	// process after some time running
+	if(callbackStatus != XM_CALLBACK_NEVER_CALLED)
+	{
+		callbackStatus = XM_CALLBACK_NOT_CALLED;
+	}
 	err = SGIdle(sequenceGrabber);
+	if(callbackStatus == XM_CALLBACK_NOT_CALLED)
+	{
+		// incrementing the counter and check for 10 subsequent misses
+		callbackMissCounter++;
+		if(callbackMissCounter == 10)
+		{
+			NSLog(@"Callback not called 10 times, restarting the grabbing process");
+			NSString *device = [selectedDevice retain];
+			[self closeInputDevice];
+			[self _disposeSeqGrabComponent];
+			[self _openAndConfigureSeqGrabComponent];
+			[self openInputDevice:device];
+			[device release];
+		}
+	}
+	else if(callbackStatus == XM_CALLBACK_CALLED)
+	{
+		// resetting the counter
+		callbackMissCounter = 0;
+	}
 	
 	if(err != noErr)
 	{
-		NSLog(@"SGIdle() failed: %d", (int)err);
+		// only reporting an error if not already done so.
+		if(callbackStatus != XM_CALLBACK_ERROR_REPORTED)
+		{
+			hintCode = 0x005001;
+			[inputManager handleErrorWithCode:err hintCode:hintCode];
+		}
+		return NO;
 	}
+	
+	return YES;
 }
 
 - (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device
@@ -357,82 +438,142 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 #pragma mark Private Methods
 
-- (BOOL)_startRecording
+- (void)_openAndConfigureSeqGrabComponent
 {
 	ComponentResult err = noErr;
+	unsigned hintCode = 0;
 	
-	Rect rect;
-	rect.top = 0;
-	rect.left = 0;
-	rect.bottom = XM_GRAB_HEIGHT;
-	rect.right = XM_GRAB_WIDTH;
-	
-	err = SGSetChannelBounds(videoChannel, &rect);
-	if(err != noErr)
+	sequenceGrabber = OpenDefaultComponent(SeqGrabComponentType, 0);
+	if(sequenceGrabber == NULL)
 	{
-		NSLog(@"SGSetChannelBounds failed: %d", (int)err);
-		return NO;
+		hintCode = 0x001001;
+		goto bail;
 	}
 	
-	err = SGPrepare(sequenceGrabber, false, true);
+	err = SGInitialize(sequenceGrabber);
 	if(err != noErr)
 	{
-		NSLog(@"SGPrepare() failed: %d", (int)err);
-		return NO;
+		hintCode = 0x001002;
+		goto bail;
 	}
 	
-	err = SGStartRecord(sequenceGrabber);
+	// we need to explicitely call this function or the code will break
+	// although we aren't using any GWorld
+	err = SGSetGWorld(sequenceGrabber, NULL, GetMainDevice());
 	if(err != noErr)
 	{
-		NSLog(@"SGStartRecord() failed: %d", (int)err);
-		return NO;
+		hintCode = 0x001003;
+		goto bail;
 	}
+	
+	err = SGSetDataRef(sequenceGrabber, 0, 0, seqGrabDontMakeMovie);
+	if(err != noErr)
+	{
+		hintCode = 0x001004;
+		goto bail;
+	}
+	
+	if([self _openAndConfigureChannel] == NO)
+	{
+		// Opening the channel failed, probably no video input
+		// device attached to the computer
+		videoChannel = NULL;
+	}
+	
+	return;
+	
+bail:
+		
+	[inputManager handleErrorWithCode:err hintCode:hintCode];
+	
+	if(sequenceGrabber != NULL)
+	{
+		CloseComponent(sequenceGrabber);
+		sequenceGrabber = NULL;
+	}
+}
 
-	lastTime = 0;
-	timeScale = 0;
+- (void)_disposeSeqGrabComponent
+{
+	// we don't report any errors occuring in this method
+	if(videoChannel != NULL)
+	{
+		SGDisposeChannel(sequenceGrabber, videoChannel);
+		videoChannel = NULL;
+	}
 	
-	[self _createDecompressionSession];
+	if(sequenceGrabber != NULL)
+	{
+		CloseComponent(sequenceGrabber);
+		sequenceGrabber = NULL;
+	}
+	
+	if(dataGrabUPP != NULL)
+	{
+		DisposeSGDataUPP(dataGrabUPP);
+		dataGrabUPP = NULL;
+	}
+}
 
+- (BOOL)_openAndConfigureChannel
+{
+	ComponentResult err = noErr;
+	unsigned hintCode = 0;
+	
+	err = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
+	if(err != noErr)
+	{
+		// this indicates that probably no video input device is attached
+		return NO;
+	}
+	
+	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
+	if(err != noErr)
+	{
+		hintCode = 0x006001;
+		goto bail;
+	}
+	
+	dataGrabUPP = NewSGDataUPP(XMSGProcessGrabDataProc);
+	err = SGSetDataProc(sequenceGrabber,
+						dataGrabUPP,
+						(long)self);
+	if(err != noErr)
+	{
+		hintCode = 0x006002;
+		goto bail;
+	}
+	
 	return YES;
-}
-
-- (BOOL)_stopRecording
-{
-	ComponentResult err = noErr;
 	
-	err = SGStop(sequenceGrabber);
-	if(err != noErr)
+bail:
+	if(dataGrabUPP != NULL)
 	{
-		NSLog(@"SGStop() failed: %d", (int)err);
-		return NO;
+		DisposeSGDataUPP(dataGrabUPP);
+		dataGrabUPP = NULL;
 	}
 	
-	[self _disposeDecompressionSession];
-	
-	return YES;
+	[inputManager handleErrorWithCode:err hintCode:hintCode];
+	return NO;
 }
 
-- (void)_disposeDecompressionSession
-{
-	ICMDecompressionSessionRelease(grabDecompressionSession);
-	grabDecompressionSession = NULL;
-}
-
-- (void)_createDecompressionSession
+- (BOOL)_createDecompressionSession
 {
 	ComponentResult err = noErr;
+	unsigned hintCode;
 	
 	ImageDescriptionHandle imageDesc = (ImageDescriptionHandle)NewHandle(0);
 	err = SGGetChannelSampleDescription(videoChannel, (Handle)imageDesc);
 	if(err != noErr)
 	{
-		NSLog(@"SGGetChannelSampleDescription err: %d", (int)err);
+		hintCode = 0x007001;
+		goto bail;
 	}
 	
 	NSNumber *number = nil;
 	NSMutableDictionary *pixelBufferAttributes = nil;
 	
-	pixelBufferAttributes = [[NSMutableDictionary alloc] initWithCapacity:5];
+	pixelBufferAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
 	
 	// Setting the Width / Height for the buffer
 	number = [[NSNumber alloc] initWithInt:frameSize.width];
@@ -448,7 +589,7 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	[number release];
 	
 	ICMDecompressionTrackingCallbackRecord trackingCallbackRecord;
-	trackingCallbackRecord.decompressionTrackingCallback = processDecompressedFrameProc;
+	trackingCallbackRecord.decompressionTrackingCallback = XMSGProcessDecompressedFrameProc;
 	trackingCallbackRecord.decompressionTrackingRefCon = (void *)self;
 	
 	err = ICMDecompressionSessionCreate(NULL, imageDesc, NULL,
@@ -457,26 +598,45 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 										&grabDecompressionSession);
 	if(err != noErr)
 	{
-		NSLog(@"ICMDecompSessionCreate failed: %d", (int)err);
+		hintCode = 0x007002;
 	}
+	
+bail:
 	
 	[pixelBufferAttributes release];
 	DisposeHandle((Handle)imageDesc);
+	
+	if(err != noErr)
+	{
+		[inputManager handleErrorWithCode:err hintCode:hintCode];
+		return NO;
+	}
+	
+	return YES;
+}
+
+- (BOOL)_disposeDecompressionSession
+{
+	ICMDecompressionSessionRelease(grabDecompressionSession);
+	grabDecompressionSession = NULL;
+	return YES;
 }
 
 - (OSErr)_processGrabData:(Ptr)data length:(long)length
 					 time:(TimeValue)time
 {
 	ComponentResult err = noErr;
+	unsigned hintCode = 0;
 	
-	didCallCallback = YES;
+	callbackStatus = XM_CALLBACK_CALLED;
 	
 	if(timeScale == 0)
 	{
 		err = SGGetChannelTimeScale(videoChannel, &timeScale);
 		if(err != noErr)
 		{
-			NSLog(@"SGGetChannelTimeScale failed: %d", (int)err);
+			hintCode = 0x008001;
+			goto bail;
 		}
 		
 		// we use this value to determine whether to drop a frame or not.
@@ -492,13 +652,6 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(((time - lastTime) < (desiredFrameDuration * 0.5)) && (lastTime > 0))
 	{
 		// Dropping the frame
-		NSLog(@"Dropping");
-		return noErr;
-	}
-	
-	if(grabDecompressionSession == NULL)
-	{
-		NSLog(@"noDecompressionSession");
 		return noErr;
 	}
 	
@@ -508,10 +661,19 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 											 (void *)self);
 	if(err != noErr)
 	{
-		NSLog(@"ICMDecompressionDecodeFrame failed: %d", (int)err);
+		hintCode = 0x008002;
+		goto bail;
 	}
 	
 	lastTime = time;
+	
+bail:
+	
+	if(err != noErr)
+	{
+		[inputManager handleErrorWithCode:err hintCode:hintCode];
+		callbackStatus = XM_CALLBACK_ERROR_REPORTED;
+	}
 	
 	return err;
 }
@@ -554,14 +716,14 @@ static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 @end
 
-static pascal OSErr processGrabDataProc(SGChannel channel,
-										Ptr data,
-										long length,
-										long *offset,
-										long channelRefCon,
-										TimeValue time,
-										short writeType,
-										long refCon)
+static pascal OSErr XMSGProcessGrabDataProc(SGChannel channel,
+											Ptr data,
+											long length,
+											long *offset,
+											long channelRefCon,
+											TimeValue time,
+											short writeType,
+											long refCon)
 {
 #pragma unused(channel, offset, channelRefCon, writeType)
 	
@@ -569,23 +731,19 @@ static pascal OSErr processGrabDataProc(SGChannel channel,
 	
 	XMSequenceGrabberVideoInputModule *module = (XMSequenceGrabberVideoInputModule *)refCon;
 	err = [module _processGrabData:data length:length time:time];
-	if(err != noErr)
-	{
-		NSLog(@"_processGrabData failed: %d", (int)err);
-	}
 	
 	return err;
 }
 
-static void processDecompressedFrameProc(void *decompressionTrackingRefCon,
-										 OSStatus result,
-										 ICMDecompressionTrackingFlags decompressionTrackingFlags,
-										 CVPixelBufferRef pixelBuffer, 
-										 TimeValue64 displayTime,
-										 TimeValue64 displayDuration, 
-										 ICMValidTimeFlags validTimeFlags,
-										 void* reserved, 
-										 void* sourceFrameRefCon)
+static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
+											 OSStatus result,
+											 ICMDecompressionTrackingFlags decompressionTrackingFlags,
+											 CVPixelBufferRef pixelBuffer, 
+											 TimeValue64 displayTime,
+											 TimeValue64 displayDuration, 
+											 ICMValidTimeFlags validTimeFlags,
+											 void* reserved, 
+											 void* sourceFrameRefCon)
 {
 	if((kICMDecompressionTracking_EmittingFrame & decompressionTrackingFlags) && pixelBuffer)
 	{

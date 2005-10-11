@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,10 @@
 #import "XMStringConstants.h"
 #import "XMPrivate.h"
 #import "XMVideoManager.h"
-#import "XMTransmitManager.h"
+#import "XMMediaTransmitter.h"
 #import "XMVideoView.h"
 #import "XMSequenceGrabberVideoInputModule.h"
+#import "XMDummyVideoInputModule.h"
 
 @interface XMVideoManager (PrivateMethods)
 
@@ -50,6 +51,7 @@
 {
 	self = [super init];
 	
+	videoInputModules = nil;
 	localVideoViews = [[NSMutableArray alloc] initWithCapacity:3];
 	remoteVideoViews = [[NSMutableArray alloc] initWithCapacity:3];
 	
@@ -66,6 +68,9 @@
 	mirrorTransformationMatrix.tx = 0;
 	mirrorTransformationMatrix.ty = 0;
 	
+	remoteVideoImage = nil;
+	remoteVideoImageRep = nil;
+	
 	transmitFrameRate = 20;
 	
 	needsToStopLocalBusyIndicators = YES;
@@ -75,6 +80,7 @@
 
 - (void)dealloc
 {
+	[videoInputModules release];
 	[localVideoViews release];
 	[remoteVideoViews release];
 	
@@ -83,6 +89,9 @@
 	
 	[localVideoImage release];
 	[localVideoImageRep release];
+	
+	[remoteVideoImage release];
+	[remoteVideoImageRep release];
 	
 	[super dealloc];
 }
@@ -98,7 +107,7 @@
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartInputDeviceListUpdate
 														object:self];
-	[XMTransmitManager _getDeviceList];
+	[XMMediaTransmitter _getDeviceList];
 }
 
 - (NSString *)selectedInputDevice
@@ -113,7 +122,7 @@
 		[selectedInputDevice release];
 		selectedInputDevice = [inputDevice retain];
 		[self _startLocalBusyIndicators];
-		[XMTransmitManager _setDevice:selectedInputDevice];
+		[XMMediaTransmitter _setDevice:selectedInputDevice];
 	}
 }
 
@@ -135,38 +144,34 @@
 - (void)setTransmitFrameRate:(unsigned)theRate
 {
 	transmitFrameRate = theRate;
-	[XMTransmitManager _setFrameGrabRate:transmitFrameRate];
+	[XMMediaTransmitter _setFrameGrabRate:transmitFrameRate];
 }
 
 - (void)startGrabbing
 {
-	[XMTransmitManager _startGrabbing];
-	
-	[NSTimer scheduledTimerWithTimeInterval:7.0 target:self selector:@selector(_test:) userInfo:nil repeats:NO];
-}
-
-- (void)_test:(NSTimer *)timer
-{
-	[XMTransmitManager _shutdown];
+	[XMMediaTransmitter _startGrabbing];
 }
 
 - (void)stopGrabbing
 {
-	[XMTransmitManager _stopGrabbing];
+	[XMMediaTransmitter _stopGrabbing];
 }
 
 #pragma mark Framework Methods
 
 - (void)_startup
 {
-	NSMutableArray *videoInputModules = [[NSMutableArray alloc] initWithCapacity:3];
+	videoInputModules = [[NSMutableArray alloc] initWithCapacity:3];
 	
-	XMSequenceGrabberVideoInputModule *module = [[XMSequenceGrabberVideoInputModule alloc] init];
-	[videoInputModules addObject:module];
+	XMSequenceGrabberVideoInputModule *seqGrabModule = [[XMSequenceGrabberVideoInputModule alloc] init];
+	[videoInputModules addObject:seqGrabModule];
+	[seqGrabModule release];
 	
-	[XMTransmitManager _startupWithVideoInputModules:videoInputModules];
+	XMDummyVideoInputModule *dummyModule = [[XMDummyVideoInputModule alloc] init];
+	[videoInputModules addObject:dummyModule];
+	[dummyModule release];
 	
-	[videoInputModules release];
+	[XMMediaTransmitter _startupWithVideoInputModules:videoInputModules];
 }
 
 - (void)_addLocalVideoView:(XMVideoView *)videoView
@@ -223,6 +228,24 @@
 
 - (void)_drawRemoteVideoInRect:(NSRect)rect
 {
+	if(remoteVideoImage != nil)
+	{
+		if(remoteVideoImageRep == nil)
+		{
+			remoteVideoImageRep = [[NSCIImageRep alloc] initWithCIImage:remoteVideoImage];
+		}
+		
+		BOOL result = [remoteVideoImageRep drawInRect:rect];
+		
+		if(result == NO)
+		{
+			NSLog(@"Drawing remote failed");
+		}
+		
+		return;
+	}
+	
+	NSRectFill(rect);
 }
 
 - (void)_handleDeviceList:(NSArray *)deviceList
@@ -241,8 +264,13 @@
 														object:nil];
 }
 
-- (void)_handleInputDeviceChangeComplete
+- (void)_handleInputDeviceChangeComplete:(NSString *)device
 {
+	if([device isEqualToString:selectedInputDevice] == NO)
+	{
+		[selectedInputDevice release];
+		selectedInputDevice = [device retain];
+	}
 	needsToStopLocalBusyIndicators = YES;
 }
 
@@ -257,10 +285,8 @@
 		localVideoImageRep = nil;
 	}
 
+	// we inherit the retain count from the MediaTransmitter
 	localVideoImage = previewImage;
-	
-	CGRect imageExtent = [localVideoImage extent];
-	NSLog(@"image: %d %d", (int)imageExtent.size.width, (int)imageExtent.size.height);
 	
 	if(doesMirrorLocalVideo)
 	{
@@ -286,6 +312,31 @@
 		[videoView setNeedsDisplay:YES];
 	}
 	needsToStopLocalBusyIndicators = NO;
+}
+
+- (void)_handleRemoteImage:(CIImage *)remoteImage
+{
+	if(remoteVideoImage != nil)
+	{
+		[remoteVideoImage release];
+		remoteVideoImage = nil;
+		
+		[remoteVideoImageRep release];
+		remoteVideoImageRep = nil;
+	}
+	
+	// we inherit the retain count from the MediaTransmitter
+	remoteVideoImage = remoteImage;
+	
+	unsigned count = [remoteVideoViews count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMVideoView *videoView = (XMVideoView *)[remoteVideoViews objectAtIndex:i];
+		
+		[videoView setNeedsDisplay:YES];
+	}
 }
 
 #pragma mark Private Methods

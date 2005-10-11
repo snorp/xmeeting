@@ -1,19 +1,19 @@
 /*
- * $Id: XMTransmitManager.h,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#ifndef __XM_VIDEO_TRANSMIT_MANAGER_H__
-#define __XM_VIDEO_TRANSMIT_MANAGER_H__
+#ifndef __XM_MEDIA_TRANSMITTER_H__
+#define __XM_MEDIA_TRANSMITTER_H__
 
 #import <Cocoa/Cocoa.h>
 #import <QuickTime/QuickTime.h>
 #import "XMVideoInputModule.h"
 
-@interface XMTransmitManager : NSObject <XMVideoInputManager> {
+@interface XMMediaTransmitter : NSObject <XMVideoInputManager> {
 
 	NSPort *receivePort;
 	
@@ -45,4 +45,4 @@
 
 @end
 
-#endif // __XM_VIDEO_TRANSMIT_MANAGER_H__
+#endif // __XM_MEDIA_TRANSMITTER_H__

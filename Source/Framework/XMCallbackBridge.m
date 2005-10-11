@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,15 +69,9 @@ void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *medi
 	// currently not implemented
 }
 
-bool noteVideoFrameUpdate(void *buffer, unsigned width, unsigned height, unsigned bytesPerPixel)
+bool XMProcessPacket(void *packetData, unsigned length, unsigned sessionID)
 {
-	//return [[XMVideoManager sharedInstance] _handleVideoFrame:buffer width:width
-	//												   height:height bytesPerPixel:bytesPerPixel];
-}
-
-bool getVideoFrame(void *buffer, unsigned *bytesReturned)
-{
-	return false;
+	return [[XMMediaReceiver sharedInstance] _processPacket:packetData length:length session:sessionID];
 }
 
 #pragma mark H.323 specific Callbacks

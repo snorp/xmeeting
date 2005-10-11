@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.7 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.8 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,16 +72,9 @@ void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *medi
 void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat);
 
 /**
- * This function is called from the video subsystem every time a new
- * frame is ready to display
+ * Forwads the received packet to the MediaReceiver
  **/
-bool noteVideoFrameUpdate(void *buffer, unsigned width, unsigned height, unsigned bytesPerPixel);
-
-/**
- * This function is called from the video subsystem every time a new
- * frame is required
- **/
-bool getVideoFrame(void *buffer, unsigned *bytesReturned);
+bool XMProcessPacket(void *packet, unsigned length, unsigned sessionID);
 
 #pragma mark H.323 specific callbacks
 

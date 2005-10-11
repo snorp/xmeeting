@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.5 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.6 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,10 +81,12 @@
 
 - (void)becomeActiveModule
 {
+	[videoView startDisplayingRemoteVideo];
 }
 
 - (void)becomeInactiveModule
 {
+	[videoView stopDisplayingRemoteVideo];
 }
 
 #pragma mark User Interface Methods

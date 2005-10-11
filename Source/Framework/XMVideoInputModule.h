@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,21 +19,22 @@
 @protocol XMVideoInputManager <NSObject>
 
 /**
- * In order to allow for efficient processing of the
- * grabbed frames, the frame have to reside within
- * a CVPixelBuffer. This output is automatically
- * created as part of an ICMDecompressionSession
- * from the SequenceGrabber data.
+ * In order to allow for efficient processing of the grabbed frames, the frame
+ * have to reside within a CVPixelBuffer structure, encoded using the
+ * k32ARGBPixelFormat. This output is automatically created as part of an 
+ * ICMDecompressionSession from the SequenceGrabber data for example
  **/
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue64)time;
 
 /**
  * Allows the modules to report errors which occured during the
- * frame grabbing process.
+ * frame grabbing process. the errorCode should report which
+ * error occured while the hint code may be used to indicate the place
+ * where the error occured.
  * In case of an error, the module should be capable of continuing
  * anyway, do not rely on the grabbing process being aborted.
  **/
-- (void)handleErrorWithCode:(unsigned)errorCode;
+- (void)handleErrorWithCode:(ComponentResult)errorCode hintCode:(unsigned)hintCode;
 
 @end
 
@@ -89,19 +90,12 @@
 
 /**
  * Open the device specified with inputDevice and prepare it
- * for capturing. Return the success of this operation. In case
- * a device of this module is already open and the active device
- * does change, this method is directly called without a prior
- * call to -closeInputDevice. This allows the module to switch
- * the device without first closing any resources identical to
- * both devices.
+ * for capturing. Return the success of this operation.
  **/
 - (BOOL)openInputDevice:(NSString *)inputDevice;
 
 /**
- * Closes the device specified with inputDevice and cleanup
- * any used resources for this device. Return the success of this
- * operation
+ * Closes the device just used and cleanup any used resources
  **/
 - (BOOL)closeInputDevice;
 
@@ -132,7 +126,7 @@
  * directly return a frame. Rather, the modules can send the data
  * using the methods of XMVideoInputManager
  **/
-- (void)grabFrame;
+- (BOOL)grabFrame;
 
 /**
  * Return a error description (localized if possible) which

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.11 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.12 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@
 #import "XMCodec.h"
 #import "XMAudioManager.h"
 #import "XMVideoManager.h"
+#import "XMMediaReceiver.h"
 #import "XMVideoView.h"
 #import "XMAddressBookRecordSearchMatch.h"
 #import "XMGeneralPurposeURL.h"
@@ -166,8 +167,9 @@
 - (void)_drawLocalVideoInRect:(NSRect)rect;
 - (void)_drawRemoteVideoInRect:(NSRect)rect;
 - (void)_handleDeviceList:(NSArray *)deviceList;
-- (void)_handleInputDeviceChangeComplete;
+- (void)_handleInputDeviceChangeComplete:(NSString *)selectedDevice;
 - (void)_handlePreviewImage:(CIImage *)previewImage;
+- (void)_handleRemoteImage:(CIImage *)remoteImage;
 
 @end
 

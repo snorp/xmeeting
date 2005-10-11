@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.7 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.8 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,7 @@
 #include "XMBridge.h"
 
 #include "XMOpalManager.h"
-#include "XMPCSSEndPoint.h"
+#include "XMEndPoint.h"
 #include "XMH323EndPoint.h"
 #include "XMSoundChannel.h"
 #include "XMSubsystemSetupThread.h"
@@ -22,8 +22,8 @@ using namespace std;
 // reference to the active OPAL manager.
 static XMOpalManager *theManager = NULL;
 
-// reference to the PCSS Endpoint
-static XMPCSSEndPoint *callEndPoint = NULL;
+// reference to the XMEndpoint
+static XMEndPoint *callEndPoint = NULL;
 
 // reference to the H.323 Endpoint
 static XMH323EndPoint *h323EndPoint = NULL;
@@ -37,11 +37,11 @@ void initOPAL()
 		theManager = new XMOpalManager;
 		theManager->Initialise();
 		
-		callEndPoint = theManager->PCSSEndPoint();
+		callEndPoint = theManager->CallEndPoint();
 		h323EndPoint = theManager->H323EndPoint();
 		
-		callEndPoint->SetSoundChannelPlayDevice(XMSoundChannelDevice);
-		callEndPoint->SetSoundChannelRecordDevice(XMSoundChannelDevice);
+		//callEndPoint->SetSoundChannelPlayDevice(XMSoundChannelDevice);
+		//callEndPoint->SetSoundChannelRecordDevice(XMSoundChannelDevice);
 		
 		XMSoundChannel::Init();
 	}
@@ -58,23 +58,8 @@ void initiateSubsystemSetup(void *preferences)
 unsigned startCall(XMCallProtocol protocol, const char *remoteParty)
 {	
 	PString token;
-	const char *protocolName;
 	
-	switch (protocol)
-	{
-		case XMCallProtocol_H323:
-			protocolName = "h323";
-			break;
-		case XMCallProtocol_SIP:
-			protocolName = "sip";
-			break;
-		default:
-			return 0;
-	}
-	
-	PString remoteName = psprintf("%s:%s", protocolName, remoteParty);
-	
-	BOOL returnValue = callEndPoint->StartCall(remoteName, token);
+	BOOL returnValue = callEndPoint->StartCall(protocol, remoteParty, token);
 	
 	if(returnValue == TRUE)
 	{
@@ -183,12 +168,13 @@ void setMuteAudioOutputDevice(bool muteFlag)
 
 unsigned getAudioBufferSize()
 {
-	return callEndPoint->GetSoundChannelBufferDepth();
+	//return callEndPoint->GetSoundChannelBufferDepth();
+	return 2;
 }
 
 void setAudioBufferSize(unsigned size)
 {
-	callEndPoint->SetSoundChannelBufferDepth(size);
+	//callEndPoint->SetSoundChannelBufferDepth(size);
 }
 
 #pragma mark Video functions
@@ -203,6 +189,14 @@ void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
 void setDisabledCodecs(const char * const * codecs, unsigned codecCount)
 {
 	PStringArray codecsArray = PStringArray(codecCount, codecs, TRUE);
+	codecsArray.AppendString("*g.711*");
+	codecsArray.AppendString("*g.726*");
+	codecsArray.AppendString("*gsm*");
+	codecsArray.AppendString("*ilbc*");
+	codecsArray.AppendString("*speex*");
+	codecsArray.AppendString("*lpc*");
+	codecsArray.AppendString("*ms*");
+	//codecsArray.AppendString("*h.261*");
 	theManager->SetMediaFormatMask(codecsArray);
 }
 

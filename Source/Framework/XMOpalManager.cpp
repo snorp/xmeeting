@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.9 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.10 2005/10/11 09:03:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,9 @@
 #include "XMCallbackBridge.h"
 #include "XMVideoDevices.h"
 #include "XMSoundChannel.h"
+#include "XMReceiverPatch.h"
+
+#include <codec/h261codec.h>
 
 using namespace std;
 
@@ -33,34 +36,34 @@ void XMOpalManager::InitOpal()
 
 XMOpalManager::XMOpalManager()
 {
-	pcssEP = NULL;
-	h323EP = NULL;
+	callEndPoint = NULL;
+	h323EndPoint = NULL;
 }
 
 XMOpalManager::~XMOpalManager()
 {
-	delete pcssEP;
-	delete h323EP;
+	delete callEndPoint;
+	delete h323EndPoint;
 }
 
 void XMOpalManager::Initialise()
 {
-	pcssEP = new XMPCSSEndPoint(*this);
-	h323EP = new XMH323EndPoint(*this);
-	AddRouteEntry("pc:.*   = h323:<da>");
-	AddRouteEntry("h323:.* = pc:<da>");
+	callEndPoint = new XMEndPoint(*this);
+	h323EndPoint = new XMH323EndPoint(*this);
+	AddRouteEntry("xm:.*   = h323:<da>");
+	AddRouteEntry("h323:.* = xm:<da>");
 }
 
 #pragma mark Access to Endpoints
 
-XMH323EndPoint * XMOpalManager::H323EndPoint()
+XMEndPoint * XMOpalManager::CallEndPoint()
 {
-	return h323EP;
+	return callEndPoint;
 }
 
-XMPCSSEndPoint * XMOpalManager::PCSSEndPoint()
+XMH323EndPoint * XMOpalManager::H323EndPoint()
 {
-	return pcssEP;
+	return h323EndPoint;
 }
 
 #pragma mark overriding some callbacks
@@ -84,7 +87,7 @@ BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
 	// telling the PCSSEndPoint which protocol we use so
 	// that the endpoint can forward this information
 	// when needed
-	pcssEP->SetCallProtocol(protocol);
+	callEndPoint->SetCallProtocol(protocol);
 	
 	return OpalManager::OnIncomingConnection(connection);
 }
@@ -149,6 +152,19 @@ void XMOpalManager::OnClosedMediaStream(OpalMediaStream & stream)
 	OpalManager::OnClosedMediaStream(stream);
 }
 
+OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source)
+{
+	if(IsOutgoingMedia(source))
+	{
+		return OpalManager::CreateMediaPatch(source);
+	}
+	else
+	{
+		cout << "Creating XMReceiverPatch" << endl;
+		return new XMReceiverPatch(source);
+	}
+}
+
 #pragma mark Network setup functions
 
 void XMOpalManager::SetBandwidthLimit(unsigned limit)
@@ -161,7 +177,7 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 	{
 		limit *= 100;
 	}
-	h323EP->SetInitialBandwidth(limit);
+	h323EndPoint->SetInitialBandwidth(limit);
 }
 
 #pragma mark Video setup functions
@@ -192,3 +208,19 @@ void XMOpalManager::SetVideoFunctionality(BOOL receiveVideo, BOOL transmitVideo)
 		autoStartTransmitVideo = FALSE;
 	}
 }
+
+#pragma mark Private Methods
+
+BOOL XMOpalManager::IsOutgoingMedia(OpalMediaStream & stream)
+{
+	OpalMediaFormat mediaFormat = stream.GetMediaFormat();
+	OpalMediaFormatList outgoingMediaFormats = callEndPoint->GetMediaFormats();
+	
+	if(outgoingMediaFormats.FindFormat(mediaFormat) != P_MAX_INDEX)
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+	
