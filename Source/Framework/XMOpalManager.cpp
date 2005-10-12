@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.10 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.11 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,9 @@
 #include "XMTypes.h"
 #include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
-#include "XMVideoDevices.h"
 #include "XMSoundChannel.h"
-#include "XMReceiverPatch.h"
+#include "XMTransmitterMediaPatch.h"
+#include "XMReceiverMediaPatch.h"
 
 #include <codec/h261codec.h>
 
@@ -156,12 +156,11 @@ OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source)
 {
 	if(IsOutgoingMedia(source))
 	{
-		return OpalManager::CreateMediaPatch(source);
+		return new XMTransmitterMediaPatch(source);
 	}
 	else
 	{
-		cout << "Creating XMReceiverPatch" << endl;
-		return new XMReceiverPatch(source);
+		return new XMReceiverMediaPatch(source);
 	}
 }
 
@@ -184,6 +183,7 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 
 void XMOpalManager::SetVideoFunctionality(BOOL receiveVideo, BOOL transmitVideo)
 {	
+	/*
 	if(receiveVideo)
 	{
 		autoStartReceiveVideo = TRUE;
@@ -206,7 +206,9 @@ void XMOpalManager::SetVideoFunctionality(BOOL receiveVideo, BOOL transmitVideo)
 	else
 	{
 		autoStartTransmitVideo = FALSE;
-	}
+	}*/
+	autoStartReceiveVideo = TRUE;
+	autoStartTransmitVideo = TRUE;
 }
 
 #pragma mark Private Methods

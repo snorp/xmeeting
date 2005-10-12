@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 
 #import "XMAudioManager.h"
+#import "XMMediaTransmitter.h"
+#import "XMMediaReceiver.h"
 #import "XMPrivate.h"
 #import "XMCallInfo.h"
 
@@ -69,7 +71,38 @@ void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *medi
 	// currently not implemented
 }
 
-bool XMProcessPacket(void *packetData, unsigned length, unsigned sessionID)
+#pragma mark MediaReceiver callbacks
+
+void _XMStartMediaTransmit(unsigned codec, XMVideoSize videoSize, unsigned sessionID)
+{
+	// this is called from a thread without run loop and without autorelease pool
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMMediaTransmitter _startTransmittingWithCodec:codec videoSize:videoSize session:sessionID];
+	
+	[autoreleasePool release];
+}
+
+void _XMStopMediaTransmit(unsigned sessionID)
+{
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMMediaTransmitter _stopTransmittingForSession:sessionID];
+	
+	[autoreleasePool release];
+}
+
+void _XMStartMediaReceiving(unsigned codecType, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID)
+{
+	[[XMMediaReceiver  sharedInstance] _startMediaReceivingWithCodec:codecType payloadType:payloadType videoSize:videoSize session:sessionID];
+}
+
+void _XMStopMediaReceiving(unsigned sessionID)
+{
+	[[XMMediaReceiver sharedInstance] _stopMediaReceivingForSession:sessionID];
+}
+
+bool _XMProcessPacket(void *packetData, unsigned length, unsigned sessionID)
 {
 	return [[XMMediaReceiver sharedInstance] _processPacket:packetData length:length session:sessionID];
 }

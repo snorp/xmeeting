@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,12 +19,10 @@ XMEndPoint::XMEndPoint(OpalManager & manager,
 					   const char *prefix)
 : OpalEndPoint(manager, prefix, CanTerminateCall)
 {
-	cout << "XMEndPoint created" << endl;
 }
 
 XMEndPoint::~XMEndPoint()
 {
-	cout << "~XMEndPoint called" << endl;
 }
 
 #pragma mark Overriding OpalEndPoint Methods
@@ -61,9 +59,7 @@ OpalMediaFormatList XMEndPoint::GetMediaFormats() const
 	OpalMediaFormatList mediaFormats;
 	
 	mediaFormats += OpalPCM16;
-	mediaFormats += XM_VIDEO_FORMAT_H261;
-	
-	//AddVideoMediaFormats(mediaFormats);
+	mediaFormats += XM_MEDIA_FORMAT_VIDEO;
 	
 	return mediaFormats;
 }

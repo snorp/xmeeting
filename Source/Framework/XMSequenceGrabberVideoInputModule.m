@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,7 +61,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 - (BOOL)_createDecompressionSession;
 - (BOOL)_disposeDecompressionSession;
 - (OSErr)_processGrabData:(Ptr)grabData length:(long)length time:(TimeValue)time;
-- (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer time:(TimeValue64)time;
+- (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer;
 
 @end
 
@@ -639,6 +639,9 @@ bail:
 			goto bail;
 		}
 		
+		[inputManager setTimeScale:timeScale];
+		[inputManager noteTimeStampReset];
+		
 		// we use this value to determine whether to drop a frame or not.
 		// this is necessary since SGIdle() does produce frames quite
 		// unregularly, sometimes even twice per call
@@ -678,9 +681,9 @@ bail:
 	return err;
 }
 
-- (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer time:(TimeValue64)time
+- (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer
 {
-	[inputManager handleGrabbedFrame:pixelBuffer time:time];
+	[inputManager handleGrabbedFrame:pixelBuffer time:lastTime];
 }
 
 @end
@@ -748,7 +751,6 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if((kICMDecompressionTracking_EmittingFrame & decompressionTrackingFlags) && pixelBuffer)
 	{
 		XMSequenceGrabberVideoInputModule *module = (XMSequenceGrabberVideoInputModule *)sourceFrameRefCon;
-		[module _processDecompressedFrame:pixelBuffer 
-									 time:displayTime];
+		[module _processDecompressedFrame:pixelBuffer];
 	}
 }

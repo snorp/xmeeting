@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.6 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -79,8 +79,10 @@
  * If no external address could be fetched, returns
  * XMNATDetectionResult_NoNAT.
  **/
-- (XMNATDetectionResult)NATDetectionResult;
+- (XMNATDetectionResult)natDetectionResult;
 
 @end
+
+NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize);
 
 #endif // __XM_UTILS_H__

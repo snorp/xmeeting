@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,6 +65,8 @@
 	externalAddressURLData = nil;
 	externalAddress = nil;
 	externalAddressFetchFailReason = nil;
+	
+	return self;
 }
 
 - (void)dealloc
@@ -168,7 +170,7 @@
 
 #pragma mark NAT handling
 
-- (XMNATDetectionResult)NATDetectionResult
+- (XMNATDetectionResult)natDetectionResult
 {	
 	NSString *theExternalAddress = [self externalAddress];
 	NSString *theLocalAddress = [self localAddress];
@@ -197,6 +199,8 @@
 	{
 		return XMNATDetectionResult_NoNAT;
 	}
+	
+	return XMNATDetectionResult_HasNAT;
 }
 
 #pragma mark NSURLConnection delegate Methods
@@ -312,3 +316,16 @@
 }
 
 @end
+
+NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
+{
+	switch (videoSize)
+	{
+		case XMVideoSize_QCIF:
+			return NSMakeSize(176, 144);
+		case XMVideoSize_CIF:
+			return NSMakeSize(352, 288);
+		default:
+			return NSMakeSize(0, 0);
+	}
+}

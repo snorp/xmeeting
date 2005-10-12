@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.8 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.9 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #include "XMH323EndPoint.h"
 #include "XMSoundChannel.h"
 #include "XMSubsystemSetupThread.h"
+#include "XMTransmitterMediaPatch.h"
 
 using namespace std;
 
@@ -189,7 +190,7 @@ void setVideoFunctionality(bool receiveVideo, bool transmitVideo)
 void setDisabledCodecs(const char * const * codecs, unsigned codecCount)
 {
 	PStringArray codecsArray = PStringArray(codecCount, codecs, TRUE);
-	codecsArray.AppendString("*g.711*");
+	//codecsArray.AppendString("*g.711*");
 	codecsArray.AppendString("*g.726*");
 	codecsArray.AppendString("*gsm*");
 	codecsArray.AppendString("*ilbc*");
@@ -232,4 +233,26 @@ bool setGatekeeper(const char *address, const char *identifier, const char *gkUs
 void checkGatekeeperRegistration()
 {
 	h323EndPoint->CheckGatekeeperRegistration();
+}
+
+#pragma mark MediaTransmitter Functions
+
+void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp)
+{
+	XMTransmitterMediaPatch::SetTimeStamp(sessionID, timeStamp);
+}
+
+void _XMAppendData(unsigned sessionID, void *data, unsigned length)
+{
+	XMTransmitterMediaPatch::AppendData(sessionID, data, length);
+}
+
+void _XMSendPacket(unsigned sessionID, bool setMarkerBit)
+{
+	XMTransmitterMediaPatch::SendPacket(sessionID, setMarkerBit);
+}
+
+void _XMDidStopTransmitting(unsigned sessionID)
+{
+	XMTransmitterMediaPatch::HandleDidStopTransmitting(sessionID);
 }

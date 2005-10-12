@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.8 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.9 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,10 +71,39 @@ void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *medi
  **/
 void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat);
 
+#pragma mark MediaTransmitter & MediaReceiver callbacks
+
+enum
+{
+	_XMVideoCodec_H261 = 1
+};
+
+/**
+ * Instructs the MediaTransmitter to start sending video data
+ **/
+void _XMStartMediaTransmit(unsigned codec, XMVideoSize videoSize, unsigned sessionID);
+
+/**
+ * Instructs the MediaTransmitter to stop sending video data
+ **/
+void _XMStopMediaTransmit(unsigned sessionID);
+
+/**
+ * Tells the MediaReceiver to prepare for incoming data with codec,
+ * RTP payload type and the sessionID
+ **/
+void _XMStartMediaReceiving(unsigned codec, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID);
+
+/**
+ * Tells the MediaReceiver that the media stream for the session has
+ * ended
+ **/
+void _XMStopMediaReceiving(unsigned sessionID);
+
 /**
  * Forwads the received packet to the MediaReceiver
  **/
-bool XMProcessPacket(void *packet, unsigned length, unsigned sessionID);
+bool _XMProcessPacket(void *packet, unsigned length, unsigned sessionID);
 
 #pragma mark H.323 specific callbacks
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,12 +19,10 @@ XMConnection::XMConnection(OpalCall & call,
 : OpalConnection(call, theEndPoint, token),
   endPoint(theEndPoint)
 {	
-	cout << "XMConnection created" << endl;
 }
 
 XMConnection::~XMConnection()
 {
-	cout << "~XMConnection called" << endl;
 }
 
 BOOL XMConnection::SetUpConnection()
@@ -94,13 +92,13 @@ BOOL XMConnection::IsMediaBypassPossible(unsigned sessionID) const
 BOOL XMConnection::OpenSourceMediaStream(const OpalMediaFormatList & mediaFormats,
 										 unsigned sessionID)
 {
-	cout << "OpenSourceMediaStream " << mediaFormats << " and " << sessionID << endl;
+	//cout << "OpenSourceMediaStream " << mediaFormats << " and " << sessionID << endl;
 	return OpalConnection::OpenSourceMediaStream(mediaFormats, sessionID);
 }
 
 OpalMediaStream * XMConnection::OpenSinkMediaStream(OpalMediaStream & source)
 {
-	cout << "OpenSinkMediaStream " << source << endl;
+	//cout << "OpenSinkMediaStream " << source << endl;
 	return OpalConnection::OpenSinkMediaStream(source);
 }
 
@@ -127,7 +125,7 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 											BOOL isSource)
 {
 	// check for "XMeeting" formats
-	if(mediaFormat == XM_VIDEO_FORMAT_H261)
+	if(mediaFormat == XM_MEDIA_FORMAT_VIDEO)
 	{
 		return new XMMediaStream(mediaFormat, sessionID, isSource);
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.2 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -214,7 +214,7 @@
 		}
 		
 		BOOL result = [localVideoImageRep drawInRect:rect];
-		
+
 		if(result == NO)
 		{
 			NSLog(@"drawing preview failed");

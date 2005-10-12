@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,8 @@
 #import "XMMediaReceiver.h"
 #import "XMVideoManager.h"
 #import "XMPacketReassembler.h"
+#import "XMCallbackBridge.h"
+#import "XMUtils.h"
 
 @interface XMMediaReceiver (PrivateMethods)
 
@@ -55,10 +57,26 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 }
 
 - (id)_init
+{	
+	self = [super init];
+	
+	XMRegisterPacketReassembler();
+	
+	videoPacketReassembler = NULL;
+	videoDecompressionSession = NULL;
+	videoCodecType = 0;
+	videoPayloadType = 0;
+	videoMediaSize = XMVideoSize_NoVideo;
+	
+	return self;
+}
+
+#pragma mark Data Handling Methods
+
+- (void)_startMediaReceivingWithCodec:(unsigned)codecType payloadType:(unsigned)payloadType
+								 videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID
 {
 	ComponentResult err = noErr;
-	
-	self = [super init];
 	
 	err = EnterMoviesOnThread(kQTEnterMoviesFlagDontSetComponentsThreadMode);
 	if(err != noErr)
@@ -66,12 +84,30 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		NSLog(@"EnterMoviesOnThread failed");
 	}
 	
-	XMRegisterPacketReassembler();
+	videoCodecType = codecType;
+	videoPayloadType = payloadType;
+	videoMediaSize = videoSize;
 	
-	return self;
+	NSLog(@"Start receiving for Session: %d %d", codecType, sessionID);
 }
 
-#pragma mark Data Handling Methods
+- (void)_stopMediaReceivingForSession:(unsigned)sessionID
+{
+	NSLog(@"End MediaReceiving for Session %d", sessionID);
+	
+	if(videoDecompressionSession != NULL)
+	{
+		ICMDecompressionSessionRelease(videoDecompressionSession);
+		videoDecompressionSession = NULL;
+	}
+	if(videoPacketReassembler != NULL)
+	{
+		CloseComponent(videoPacketReassembler);
+		videoPacketReassembler = NULL;
+	}
+	
+	ExitMoviesOnThread();
+}
 
 - (BOOL)_processPacket:(UInt8*)data length:(unsigned)length session:(unsigned)sessionID
 {
@@ -101,8 +137,15 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			return NO;
 		}
 		
+		// we pass the required information to the XMPacketReassembler through
+		// the default RTPRssmInitParams call.
+		// However, the meaning of timeBase and timeScale are redefined as
+		// follows:
+		// timeBase contains the codecType and
+		// timeScale contains the sessionID to be used
 		RTPRssmInitParams initParams;
-		initParams.payloadType = kRTPPayload_H261;
+		initParams.payloadType = videoPayloadType;
+		initParams.ssrc = videoCodecType;
 		initParams.timeScale = sessionID;
 		err = RTPRssmInitialize(videoPacketReassembler, &initParams);
 		if(err != noErr)
@@ -144,16 +187,31 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	{
 		ImageDescriptionHandle imageDesc;
 		
+		NSSize videoDimensions;
+		
+		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
+		CodecType codecType;
+		
+		switch(videoCodecType)
+		{
+			case _XMVideoCodec_H261:
+				codecType = kH261CodecType;
+				break;
+			default:
+				NSLog(@"illegal codecType");
+				return;
+		}
+		
 		imageDesc = (ImageDescriptionHandle)NewHandleClear(sizeof ( **imageDesc ));
 		(**imageDesc).idSize = sizeof( **imageDesc);
-		(**imageDesc).cType = kH261CodecType;
+		(**imageDesc).cType = codecType;
 		(**imageDesc).version = 1;
 		(**imageDesc).revisionLevel = 1;
 		(**imageDesc).vendor = FOUR_CHAR_CODE('XMet');
 		(**imageDesc).temporalQuality = codecNormalQuality;
 		(**imageDesc).spatialQuality = codecNormalQuality;
-		(**imageDesc).width = 352;
-		(**imageDesc).height = 288;
+		(**imageDesc).width = (short)videoDimensions.width;
+		(**imageDesc).height = (short)videoDimensions.height;
 		(**imageDesc).dataSize = 0;
 		(**imageDesc).frameCount = 1;
 		(**imageDesc).clutID = -1;
@@ -167,11 +225,11 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		NSMutableDictionary *pixelBufferAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
 		NSNumber *number;
 		
-		number = [[NSNumber alloc] initWithInt:352];
+		number = [[NSNumber alloc] initWithInt:(int)videoDimensions.width];
 		[pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferWidthKey];
 		[number release];
 		
-		number = [[NSNumber alloc] initWithInt:288];
+		number = [[NSNumber alloc] initWithInt:(int)videoDimensions.height];
 		[pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferHeightKey];
 		[number release];
 		

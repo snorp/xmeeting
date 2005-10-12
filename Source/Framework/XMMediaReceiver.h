@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.h,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMMediaReceiver.h,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,15 +11,22 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuickTime/QuickTime.h>
+#import "XMTypes.h"
 
 @interface XMMediaReceiver : NSObject {
 
 	RTPReassembler videoPacketReassembler;
 	ICMDecompressionSessionRef videoDecompressionSession;
+	unsigned videoCodecType;
+	unsigned videoPayloadType;
+	XMVideoSize videoMediaSize;
 }
 
 + (XMMediaReceiver *)sharedInstance;
 
+- (void)_startMediaReceivingWithCodec:(unsigned)codecType payloadType:(unsigned)payloadType 
+								 videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID;
+- (void)_stopMediaReceivingForSession:(unsigned)sessionID;
 - (BOOL)_processPacket:(UInt8 *)packet length:(unsigned)length session:(unsigned)sessionID;
 
 @end

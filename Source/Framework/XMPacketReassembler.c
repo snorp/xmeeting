@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassembler.c,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMPacketReassembler.c,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,16 +8,20 @@
 
 #include <QuickTime/QuickTime.h>
 #include "XMPacketReassembler.h"
+#include "XMCallbackBridge.h"
 
 #define kXMPacketReassemblerVersion (0x00010001)
 #define kXMPacketReassemblerComponentSubType FOUR_CHAR_CODE('XMet')
 #define kXMPacketReassemblerComponentManufacturer FOUR_CHAR_CODE('XMet')
+
+#define kXMMaxBufferSize 352*288*4
 
 typedef struct
 {
 	ComponentInstance self;
 	ComponentInstance target;
 	RTPReassembler reassembler;
+	CodecType codecType;
 	unsigned payloadType;
 	unsigned sessionID;
 	UInt8 *chunkBuffer;
@@ -55,6 +59,7 @@ ComponentResult XMPacketReassembler_Open(XMPacketReassemblerGlobals globals,
 	globals->self = self;
 	globals->target = self;
 	globals->reassembler = NULL;
+	globals->codecType = 0;
 	globals->payloadType = 0;
 	globals->sessionID = 0;
 	globals->chunkBuffer = NULL;
@@ -66,6 +71,7 @@ bail:
 ComponentResult XMPacketReassembler_Close(XMPacketReassemblerGlobals globals,
 										  ComponentInstance self)
 {
+	printf("Closing XMPacketReassembler\n");
 	if(globals)
 	{
 		if(globals->reassembler != NULL)
@@ -99,8 +105,20 @@ ComponentResult XMPacketReassembler_Target(XMPacketReassemblerGlobals globals,
 ComponentResult XMPacketReassembler_Initialize(XMPacketReassemblerGlobals globals,
 											   RTPRssmInitParams *inInitParams)
 {	
+	unsigned codecType = inInitParams->ssrc;
+	
+	switch(codecType)
+	{
+		case _XMVideoCodec_H261:
+			globals->codecType = kH261CodecType;
+			break;
+		default:
+			return paramErr;
+	}
+	
 	globals->payloadType = inInitParams->payloadType;
 	globals->sessionID = inInitParams->timeScale;
+	
 	return noErr;
 }
 
@@ -114,7 +132,7 @@ ComponentResult XMPacketReassembler_HandleNewPacket(XMPacketReassemblerGlobals g
 	{
 		ComponentDescription componentDescription;
 		componentDescription.componentType = kRTPReassemblerType;
-		componentDescription.componentSubType = kH261CodecType;
+		componentDescription.componentSubType = globals->codecType;
 		componentDescription.componentManufacturer = 0;
 		componentDescription.componentFlags = 0;
 		componentDescription.componentFlagsMask = 0;
@@ -206,7 +224,7 @@ ComponentResult XMPacketReassembler_SendPacketList(XMPacketReassemblerGlobals gl
 	// with enough size to handle this
 	if(globals->chunkBuffer == NULL)
 	{
-		UInt8 *buffer = malloc(352*288*4); // size of an uncompressed CIF frame
+		UInt8 *buffer = malloc(kXMMaxBufferSize);
 		if(buffer == NULL)
 		{
 			err = memFullErr;
@@ -222,7 +240,7 @@ ComponentResult XMPacketReassembler_SendPacketList(XMPacketReassemblerGlobals gl
 	
 	err = RTPRssmCopyDataToChunk(globals->reassembler,
 								 inPacketListHead,
-								 352*288*4,
+								 kXMMaxBufferSize,
 								 &chunkRecord,
 								 0);
 	if(err != noErr)

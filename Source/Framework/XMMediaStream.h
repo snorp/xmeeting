@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,8 @@ public:
 	virtual BOOL ReadPacket(RTP_DataFrame & packet);
 	virtual BOOL WritePacket(RTP_DataFrame & packet);
 	virtual BOOL IsSynchronous() const;
+	virtual BOOL Close();
+	virtual BOOL ExecuteCommand(const OpalMediaCommand & command);
 };
 
 #endif // __XM_MEDIA_STREAM_H__

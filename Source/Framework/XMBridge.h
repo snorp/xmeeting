@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.8 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.9 2005/10/12 21:07:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -190,6 +190,13 @@ bool setGatekeeper(const char *address, const char *identifier, const char *gkUs
 void checkGatekeeperRegistration();
 
 #pragma mark SIP Setup Functions
+
+#pragma mark MediaTransmitter Functions
+
+void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp);
+void _XMAppendData(unsigned sessionID, void *data, unsigned length);
+void _XMSendPacket(unsigned sessionID, bool setMarkerBit);
+void _XMDidStopTransmitting(unsigned sessionID);
 
 #pragma mark Constants
 
