@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.4 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -119,19 +119,6 @@ void XMConnection::AcceptIncoming()
 BOOL XMConnection::IsMediaBypassPossible(unsigned sessionID) const
 {
 	return OpalConnection::IsMediaBypassPossible(sessionID);
-}
-
-BOOL XMConnection::OpenSourceMediaStream(const OpalMediaFormatList & mediaFormats,
-										 unsigned sessionID)
-{
-	//cout << "OpenSourceMediaStream " << mediaFormats << " and " << sessionID << endl;
-	return OpalConnection::OpenSourceMediaStream(mediaFormats, sessionID);
-}
-
-OpalMediaStream * XMConnection::OpenSinkMediaStream(OpalMediaStream & source)
-{
-	//cout << "OpenSinkMediaStream " << source << endl;
-	return OpalConnection::OpenSinkMediaStream(source);
 }
 
 OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,

@@ -6,7 +6,7 @@
             CLASS = XMGeneralPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                autoAnswerCallsSwitch = NSButton; 
+                automaticallyAcceptIncomingCallsSwitch = NSButton; 
                 contentView = NSView; 
                 userNameField = NSTextField; 
             }; 
@@ -26,7 +26,7 @@
                 renameLocation = id; 
                 toggleAutoGetExternalAddress = id; 
                 toggleEnableH323 = id; 
-                toggleEnableVideoTransmit = id; 
+                toggleEnableVideo = id; 
                 toggleUseAddressTranslation = id; 
                 toggleUseGatekeeper = id; 
             }; 
@@ -43,8 +43,7 @@
                 enableFastStartSwitch = NSButton; 
                 enableH245TunnelSwitch = NSButton; 
                 enableH323Switch = NSButton; 
-                enableVideoReceiveSwitch = NSButton; 
-                enableVideoTransmitSwitch = NSButton; 
+                enableVideoSwitch = NSButton; 
                 externalAddressField = NSTextField; 
                 gatekeeperHostField = NSTextField; 
                 gatekeeperIDField = NSTextField; 

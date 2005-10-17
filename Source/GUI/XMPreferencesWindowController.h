@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.3 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,7 +37,6 @@ extern NSString *XMKey_ButtonToolbarItemIdentifier;	// identifier for the apply 
 	
 	NSToolbarItem *currentSelectedItem;
 	float currentSelectedItemHeight;
-	
 }
 
 /**

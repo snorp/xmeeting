@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.6 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -792,7 +792,6 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 {
 	id<XMMainWindowAdditionModule> module = (id<XMMainWindowAdditionModule>)[additionModules objectAtIndex:index];
 	NSView *contentView = [module contentView];
-	NSNumber *number;
 	NSSize contentSize = [module contentViewSize];
 	NSRect contentRect = NSMakeRect(0, 0, contentSize.width, contentSize.height);
 	

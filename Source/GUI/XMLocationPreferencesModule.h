@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.4 2005/06/02 12:47:33 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.5 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,8 +69,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSButton *moveAudioCodecDownButton;
 	
 	// Video outlets
-	IBOutlet NSButton *enableVideoReceiveSwitch;
-	IBOutlet NSButton *enableVideoTransmitSwitch;
+	IBOutlet NSButton *enableVideoSwitch;
 	IBOutlet NSTextField *videoFrameRateField;
 	IBOutlet NSPopUpButton *videoSizePopUp;
 	IBOutlet NSTableView *videoCodecPreferenceOrderTableView;
@@ -110,7 +109,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 - (IBAction)moveAudioCodec:(id)sender;
 
 // Video action methods
-- (IBAction)toggleEnableVideoTransmit:(id)sender;
+- (IBAction)toggleEnableVideo:(id)sender;
 - (IBAction)moveVideoCodec:(id)sender;
 
 // Action methods for the newLocation Sheet

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.7 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,7 @@
 {	
 	/* General settings */
 	NSString	*userName;						// The user name to be used
-	BOOL		 autoAnswerCalls;
+	BOOL		 automaticallyAcceptIncomingCalls;
 	
 	/* Network settings */
 	unsigned	 bandwidthLimit;				// The bandwidth limit in bit/s (0 for no limit)
@@ -50,8 +50,7 @@
 	unsigned	 audioBufferSize;				// The number of audio packets to buffer. 
 
 	/* video settings */
-	BOOL		 enableVideoReceive;			// Enables/disables video receive
-	BOOL		 enableVideoTransmit;			// Enables/disables video sending
+	BOOL		 enableVideo;					// Enables/disables video
 	unsigned	 videoFramesPerSecond;			// Framerate for sent video
 	XMVideoSize	 videoSize;						// The preferred video size for sent video
 	NSMutableArray *videoCodecList;				// An array containing XMCodecListRecord instances
@@ -109,13 +108,15 @@
 - (NSString *)userName;
 - (void)setUserName:(NSString *)name;
 
-- (BOOL)autoAnswerCalls;
-- (void)setAutoAnswerCalls:(BOOL)flag;
+- (BOOL)automaticallyAcceptIncomingCalls;
+- (void)setAutomaticallyAcceptIncomingCalls:(BOOL)flag;
 
 #pragma mark Methods for Network settings
 
+/*
 - (unsigned)bandwidthLimit;
 - (void)setBandwidthLimit:(unsigned)limit;
+*/
 
 - (BOOL)useAddressTranslation;
 - (void)setUseAddressTranslation:(BOOL)flag;
@@ -147,17 +148,16 @@
 
 #pragma mark Video-specific Methods
 
-- (BOOL)enableVideoReceive;
-- (void)setEnableVideoReceive:(BOOL)flag;
+- (BOOL)enableVideo;
+- (void)setEnableVideo:(BOOL)flag;
 
-- (BOOL)enableVideoTransmit;
-- (void)setEnableVideoTransmit:(BOOL)flag;
-
+/*
 - (unsigned)videoFramesPerSecond;
 - (void)setVideoFramesPerSecond:(unsigned)value;
 
 - (XMVideoSize)videoSize;
 - (void)setVideoSize:(XMVideoSize)size;
+*/
 
 - (NSArray *)videoCodecList;
 - (unsigned)videoCodecListCount;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.12 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.13 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,6 +54,9 @@ void XMOpalManager::Initialise()
 	h323EndPoint = new XMH323EndPoint(*this);
 	AddRouteEntry("xm:.*   = h323:<da>");
 	AddRouteEntry("h323:.* = xm:<da>");
+	
+	SetAutoStartTransmitVideo(TRUE);
+	SetAutoStartReceiveVideo(TRUE);
 }
 
 #pragma mark Access to Endpoints
@@ -92,19 +95,24 @@ void XMOpalManager::OnClearedCall(OpalCall & call)
 }
 
 BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)
-{
-	// first, we want to find out whether we are interested in this media stream or not
-	// We are only interested in the external codecs and not the internal PCM-16 format
-	// and XM_MEDIA_FORMAT_VIDEO
-	PString format = stream.GetMediaFormat();
-	if(!(format == OpalPCM16 ||
-		 format == XM_MEDIA_FORMAT_VIDEO))
+{	
+	BOOL result = OpalManager::OnOpenMediaStream(connection, stream);
+	
+	if(result == TRUE)
 	{
-		callID = connection.GetCall().GetToken().AsUnsigned();
-		_XMHandleMediaStreamOpened(callID, stream.IsSource(), format);
+		// first, we want to find out whether we are interested in this media stream or not
+		// We are only interested in the external codecs and not the internal PCM-16 format
+		// and XM_MEDIA_FORMAT_VIDEO
+		PString format = stream.GetMediaFormat();
+		if(!(format == OpalPCM16 ||
+			 format == XM_MEDIA_FORMAT_VIDEO))
+		{
+			callID = connection.GetCall().GetToken().AsUnsigned();
+			_XMHandleMediaStreamOpened(callID, stream.IsSource(), format);
+		}
 	}
 	
-	return OpalManager::OnOpenMediaStream(connection, stream);
+	return result;
 }
 
 void XMOpalManager::OnClosedMediaStream(const OpalMediaStream & stream)
@@ -134,7 +142,7 @@ OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source)
 	}
 }
 
-#pragma mark Network setup functions
+#pragma mark Network Setup Methods
 
 void XMOpalManager::SetBandwidthLimit(unsigned limit)
 {
@@ -149,36 +157,12 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 	h323EndPoint->SetInitialBandwidth(limit);
 }
 
-#pragma mark Video setup functions
+#pragma mark Video Setup Methods
 
-void XMOpalManager::SetVideoFunctionality(BOOL receiveVideo, BOOL transmitVideo)
-{	
-	/*
-	if(receiveVideo)
-	{
-		autoStartReceiveVideo = TRUE;
-		PVideoDevice::OpenArgs video = GetVideoOutputDevice();
-		video.deviceName = "XMVideo";
-		SetVideoOutputDevice(video);
-	}
-	else
-	{
-		autoStartReceiveVideo = FALSE;
-	}
-	
-	if(transmitVideo)
-	{
-		autoStartTransmitVideo = TRUE;
-		PVideoDevice::OpenArgs video = GetVideoInputDevice();
-		video.deviceName = "XMVideo";
-		SetVideoInputDevice(video);
-	}
-	else
-	{
-		autoStartTransmitVideo = FALSE;
-	}*/
-	autoStartReceiveVideo = TRUE;
-	autoStartTransmitVideo = TRUE;
+void XMOpalManager::SetVideoFunctionality(BOOL newEnableVideoTransmit, BOOL newEnableVideoReceive)
+{
+	enableVideoTransmit = newEnableVideoTransmit;
+	enableVideoReceive = newEnableVideoReceive;
 }
 
 #pragma mark Private Methods

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.8 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.9 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -254,10 +254,4 @@ void XMH323EndPoint::OnReleased(OpalConnection & connection)
 	remoteApplication = "";
 	
 	H323EndPoint::OnReleased(connection);
-	
-	/*
-	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
-	XMCallEndReason endReason = (XMCallEndReason)connection.GetCall().GetCallEndReason();
-	//_XMHandleCallCleared(callID, endReason);
-	 */
 }

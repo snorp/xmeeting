@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.6 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.7 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,7 +41,7 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesAutoAnswerCalls])
+	else if([key isEqualToString:XMKey_PreferencesAutomaticallyAcceptIncomingCalls])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -52,7 +52,7 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
+	/*else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -62,7 +62,7 @@
 		{
 			result = XM_INVALID_VALUE_TYPE;
 		}
-	}
+	}*/
 	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -140,7 +140,7 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesEnableVideoReceive])
+	else if([key isEqualToString:XMKey_PreferencesEnableVideo])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -151,18 +151,7 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesEnableVideoTransmit])
-	{
-		if([value isKindOfClass:[NSNumber class]])
-		{
-			result = XM_VALID_VALUE;
-		}
-		else
-		{
-			result = XM_INVALID_VALUE_TYPE;
-		}
-	}
-	else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
+	/*else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -183,7 +172,7 @@
 		{
 			result = XM_INVALID_VALUE_TYPE;
 		}
-	}
+	}*/
 	else if([key isEqualToString:XMKey_PreferencesEnableH323])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -298,7 +287,7 @@
 	self = [super init];
 	
 	userName = nil;
-	autoAnswerCalls = NO;
+	automaticallyAcceptIncomingCalls = NO;
 	
 	bandwidthLimit = 0;
 	useAddressTranslation = NO;
@@ -314,9 +303,8 @@
 	audioBufferSize = 2;
 	audioCodecList = nil;
 	
-	enableVideoReceive = NO;
-	enableVideoTransmit = NO;
-	videoFramesPerSecond = 5;
+	enableVideo = NO;
+	videoFramesPerSecond = 20;
 	videoSize = XMVideoSize_NoVideo;
 	videoCodecList = nil;
 	
@@ -344,17 +332,17 @@
 		[self setUserName:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesAutoAnswerCalls];
+	obj = [dict objectForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
 	if(obj)
 	{
-		[self setAutoAnswerCalls:[(NSNumber *)obj boolValue]];
+		[self setAutomaticallyAcceptIncomingCalls:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesBandwidthLimit];
+	/*obj = [dict objectForKey:XMKey_PreferencesBandwidthLimit];
 	if(obj)
 	{
 		[self setBandwidthLimit:[(NSNumber *)obj unsignedIntValue]];
-	}
+	}*/
 	
 	obj = [dict objectForKey:XMKey_PreferencesUseAddressTranslation];
 	if(obj)
@@ -433,19 +421,13 @@
 		}
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesEnableVideoReceive];
+	obj = [dict objectForKey:XMKey_PreferencesEnableVideo];
 	if(obj)
 	{
-		[self setEnableVideoReceive:[(NSNumber *)obj boolValue]];
+		[self setEnableVideo:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesEnableVideoTransmit];
-	if(obj)
-	{
-		[self setEnableVideoTransmit:[(NSNumber *)obj boolValue]];
-	}
-	
-	obj = [dict objectForKey:XMKey_PreferencesVideoFramesPerSecond];
+	/*obj = [dict objectForKey:XMKey_PreferencesVideoFramesPerSecond];
 	if(obj)
 	{
 		[self setVideoFramesPerSecond:[(NSNumber *)obj unsignedIntValue]];
@@ -455,7 +437,7 @@
 	if(obj)
 	{
 		[self setVideoSize:[(NSNumber *)obj intValue]];
-	}
+	}*/
 	
 	obj = [dict objectForKey:XMKey_PreferencesVideoCodecList];
 	if(obj)
@@ -548,9 +530,9 @@
 	XMPreferences *preferences = [[[self class] allocWithZone:zone] init];
 	
 	[preferences setUserName:[self userName]];
-	[preferences setAutoAnswerCalls:[self autoAnswerCalls]];
+	[preferences setAutomaticallyAcceptIncomingCalls:[self automaticallyAcceptIncomingCalls]];
 	
-	[preferences setBandwidthLimit:[self bandwidthLimit]];
+	//[preferences setBandwidthLimit:[self bandwidthLimit]];
 	[preferences setUseAddressTranslation:[self useAddressTranslation]];
 	[preferences setExternalAddress:[self externalAddress]];
 	[preferences setTCPPortBase:[self tcpPortBase]];
@@ -561,10 +543,9 @@
 	[preferences setAudioBufferSize:[self audioBufferSize]];
 	[preferences _setAudioCodecList:[self _audioCodecList]];
 	
-	[preferences setEnableVideoReceive:[self enableVideoReceive]];
-	[preferences setEnableVideoTransmit:[self enableVideoTransmit]];
-	[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
-	[preferences setVideoSize:[self videoSize]];
+	[preferences setEnableVideo:[self enableVideo]];
+	//[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
+	//[preferences setVideoSize:[self videoSize]];
 	[preferences _setVideoCodecList:[self _videoCodecList]];
 	
 	[preferences setEnableH323:[self enableH323]];
@@ -590,8 +571,8 @@
 		unsigned count, codecCount, i;
 		
 		[self setUserName:[coder decodeObjectForKey:XMKey_PreferencesUserName]];
-		[self setAutoAnswerCalls:[coder decodeBoolForKey:XMKey_PreferencesAutoAnswerCalls]];
-		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_PreferencesBandwidthLimit]];
+		[self setAutomaticallyAcceptIncomingCalls:[coder decodeBoolForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls]];
+		//[self setBandwidthLimit:[coder decodeIntForKey:XMKey_PreferencesBandwidthLimit]];
 		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_PreferencesUseAddressTranslation]];
 		[self setExternalAddress:[coder decodeObjectForKey:XMKey_PreferencesExternalAddress]];
 		[self setTCPPortBase:[coder decodeIntForKey:XMKey_PreferencesTCPPortBase]];
@@ -622,10 +603,9 @@
 			[record release];
 		}
 		
-		[self setEnableVideoReceive:[coder decodeBoolForKey:XMKey_PreferencesEnableVideoReceive]];
-		[self setEnableVideoTransmit:[coder decodeBoolForKey:XMKey_PreferencesEnableVideoTransmit]];
-		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
-		[self setVideoSize:[coder decodeIntForKey:XMKey_PreferencesVideoSize]];
+		[self setEnableVideo:[coder decodeBoolForKey:XMKey_PreferencesEnableVideo]];
+		//[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
+		//[self setVideoSize:[coder decodeIntForKey:XMKey_PreferencesVideoSize]];
 		
 		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesVideoCodecList];
 		count = [array count];
@@ -672,9 +652,9 @@
 	if([coder allowsKeyedCoding])
 	{
 		[coder encodeObject:[self userName] forKey:XMKey_PreferencesUserName];
-		[coder encodeBool:[self autoAnswerCalls] forKey:XMKey_PreferencesAutoAnswerCalls];
+		[coder encodeBool:[self automaticallyAcceptIncomingCalls] forKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
 		
-		[coder encodeInt:[self bandwidthLimit] forKey:XMKey_PreferencesBandwidthLimit];
+		//[coder encodeInt:[self bandwidthLimit] forKey:XMKey_PreferencesBandwidthLimit];
 		[coder encodeBool:[self useAddressTranslation] forKey:XMKey_PreferencesUseAddressTranslation];
 		[coder encodeObject:[self externalAddress] forKey:XMKey_PreferencesExternalAddress];
 		[coder encodeInt:[self tcpPortBase] forKey:XMKey_PreferencesTCPPortBase];
@@ -685,10 +665,9 @@
 		[coder encodeInt:[self audioBufferSize] forKey:XMKey_PreferencesAudioBufferSize];
 		[coder encodeObject:[self _audioCodecList] forKey:XMKey_PreferencesAudioCodecList];
 		
-		[coder encodeBool:[self enableVideoReceive] forKey:XMKey_PreferencesEnableVideoReceive];
-		[coder encodeBool:[self enableVideoTransmit] forKey:XMKey_PreferencesEnableVideoTransmit];
-		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
-		[coder encodeInt:[self videoSize] forKey:XMKey_PreferencesVideoSize];
+		[coder encodeBool:[self enableVideo] forKey:XMKey_PreferencesEnableVideo];
+		//[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
+		//[coder encodeInt:[self videoSize] forKey:XMKey_PreferencesVideoSize];
 		[coder encodeObject:[self _videoCodecList] forKey:XMKey_PreferencesVideoCodecList];
 		
 		[coder encodeBool:[self enableH323] forKey:XMKey_PreferencesEnableH323];
@@ -746,8 +725,8 @@
 	otherPreferences = (XMPreferences *)object;
 	
 	if([[otherPreferences userName] isEqualToString:[self userName]] &&
-	   [otherPreferences autoAnswerCalls] == [self autoAnswerCalls] &&
-	   [otherPreferences bandwidthLimit] == [self bandwidthLimit] &&
+	   [otherPreferences automaticallyAcceptIncomingCalls] == [self automaticallyAcceptIncomingCalls] &&
+	   //[otherPreferences bandwidthLimit] == [self bandwidthLimit] &&
 	   [otherPreferences useAddressTranslation] == [self useAddressTranslation] &&
 	   [[otherPreferences externalAddress] isEqualToString:[self externalAddress]] &&
 	   [otherPreferences tcpPortBase] == [self tcpPortBase] &&
@@ -758,10 +737,9 @@
 	   [otherPreferences audioBufferSize] == [self audioBufferSize] &&
 	   [[otherPreferences _audioCodecList] isEqual:[self _audioCodecList]] &&
 	   
-	   [otherPreferences enableVideoReceive] == [self enableVideoReceive] &&
-	   [otherPreferences enableVideoTransmit] == [self enableVideoTransmit] &&
-	   [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
-	   [otherPreferences videoSize] == [self videoSize] &&
+	   [otherPreferences enableVideo] == [self enableVideo] &&
+	   //[otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
+	   //[otherPreferences videoSize] == [self videoSize] &&
 	   [[otherPreferences _videoCodecList] isEqual:[self _videoCodecList]] &&
 
 	   [otherPreferences enableH323] == [self enableH323] &&
@@ -794,17 +772,17 @@
 		[dict setObject:obj forKey:XMKey_PreferencesUserName];
 	}
 	
-	number = [[NSNumber alloc] initWithBool:[self autoAnswerCalls]];
-	[dict setObject:number forKey:XMKey_PreferencesAutoAnswerCalls];
+	number = [[NSNumber alloc] initWithBool:[self automaticallyAcceptIncomingCalls]];
+	[dict setObject:number forKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
 	[number release];
 	
-	integer = [self bandwidthLimit];
+	/*integer = [self bandwidthLimit];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
 		[dict setObject:number forKey:XMKey_PreferencesBandwidthLimit];
 		[number release];
-	}
+	}*/
 	
 	number = [[NSNumber alloc] initWithBool:[self useAddressTranslation]];
 	[dict setObject:number forKey:XMKey_PreferencesUseAddressTranslation];
@@ -863,15 +841,11 @@
 	[dict setObject:arr forKey:XMKey_PreferencesAudioCodecList];
 	[arr release];
 	
-	number = [[NSNumber alloc] initWithBool:[self enableVideoReceive]];
-	[dict setObject:number forKey:XMKey_PreferencesEnableVideoReceive];
+	number = [[NSNumber alloc] initWithBool:[self enableVideo]];
+	[dict setObject:number forKey:XMKey_PreferencesEnableVideo];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:[self enableVideoTransmit]];
-	[dict setObject:number forKey:XMKey_PreferencesEnableVideoTransmit];
-	[number release];
-	
-	integer = [self videoFramesPerSecond];
+	/*integer = [self videoFramesPerSecond];
 	if(integer != 0)
 	{
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
@@ -885,7 +859,7 @@
 		number = [[NSNumber alloc] initWithInt:integer];
 		[dict setObject:number forKey:XMKey_PreferencesVideoSize];
 		[number release];
-	}
+	}*/
 		
 	integer = [videoCodecList count];
 	arr = [[NSMutableArray alloc] initWithCapacity:integer];
@@ -947,14 +921,14 @@
 	{
 		return [self userName];
 	}
-	else if([key isEqualToString:XMKey_PreferencesAutoAnswerCalls])
+	else if([key isEqualToString:XMKey_PreferencesAutomaticallyAcceptIncomingCalls])
 	{
-		return [NSNumber numberWithBool:[self autoAnswerCalls]];
+		return [NSNumber numberWithBool:[self automaticallyAcceptIncomingCalls]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
+	/*else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
 	{
 		return [NSNumber numberWithUnsignedInt:[self bandwidthLimit]];
-	}
+	}*/
 	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
 	{
 		return [NSNumber numberWithBool:[self useAddressTranslation]];
@@ -987,22 +961,18 @@
 	{
 		return [self audioCodecList];
 	}
-	else if([key isEqualToString:XMKey_PreferencesEnableVideoReceive])
+	else if([key isEqualToString:XMKey_PreferencesEnableVideo])
 	{
-		return [NSNumber numberWithBool:[self enableVideoReceive]];
+		return [NSNumber numberWithBool:[self enableVideo]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesEnableVideoTransmit])
-	{
-		return [NSNumber numberWithBool:[self enableVideoTransmit]];
-	}
-	else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
+	/*else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
 	{
 		return [NSNumber numberWithUnsignedInt:[self videoFramesPerSecond]];
 	}
 	else if([key isEqualToString:XMKey_PreferencesVideoSize])
 	{
 		return [NSNumber numberWithUnsignedInt:[self videoSize]];
-	}
+	}*/
 	else if([key isEqualToString:XMKey_PreferencesVideoCodecList])
 	{
 		return [self videoCodecList];
@@ -1058,18 +1028,18 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesAutoAnswerCalls])
+	else if([key isEqualToString:XMKey_PreferencesAutomaticallyAcceptIncomingCalls])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
-			[self setAutoAnswerCalls:[(NSNumber *)value boolValue]];
+			[self setAutomaticallyAcceptIncomingCalls:[(NSNumber *)value boolValue]];
 		}
 		else
 		{
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
+	/*else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -1079,7 +1049,7 @@
 		{
 			correctType = NO;
 		}
-	}
+	}*/
 	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -1157,29 +1127,18 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesEnableVideoReceive])
+	else if([key isEqualToString:XMKey_PreferencesEnableVideo])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
-			[self setEnableVideoReceive:[(NSNumber *)value boolValue]];
+			[self setEnableVideo:[(NSNumber *)value boolValue]];
 		}
 		else
 		{
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesEnableVideoTransmit])
-	{
-		if([value isKindOfClass:[NSNumber class]])
-		{
-			[self setEnableVideoTransmit:[(NSNumber *)value boolValue]];
-		}
-		else
-		{
-			correctType = NO;
-		}
-	}
-	else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
+	/*else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -1200,7 +1159,7 @@
 		{
 			correctType = NO;
 		}
-	}
+	}*/
 	else if([key isEqualToString:XMKey_PreferencesEnableH323])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -1314,19 +1273,19 @@
 	[old release];
 }
 
-- (BOOL)autoAnswerCalls;
+- (BOOL)automaticallyAcceptIncomingCalls;
 {
-	return autoAnswerCalls;
+	return automaticallyAcceptIncomingCalls;
 }
 
-- (void)setAutoAnswerCalls:(BOOL)flag
+- (void)setAutomaticallyAcceptIncomingCalls:(BOOL)flag
 {
-	autoAnswerCalls = flag;
+	automaticallyAcceptIncomingCalls = flag;
 }
 
 #pragma mark Network-Settings Methods
 
-- (unsigned)bandwidthLimit
+/*- (unsigned)bandwidthLimit
 {
 	return bandwidthLimit;
 }
@@ -1334,7 +1293,7 @@
 - (void)setBandwidthLimit:(unsigned)limit
 {
 	bandwidthLimit = limit;
-}
+}*/
 
 - (BOOL)useAddressTranslation
 {
@@ -1435,27 +1394,17 @@
 
 #pragma mark Video Accessor & Setter Methods
 
-- (BOOL)enableVideoReceive
+- (BOOL)enableVideo
 {
-	return enableVideoReceive;
+	return enableVideo;
 }
 
-- (void)setEnableVideoReceive:(BOOL)flag
+- (void)setEnableVideo:(BOOL)flag
 {
-	enableVideoReceive = flag;
+	enableVideo = flag;
 }
 
-- (BOOL)enableVideoTransmit
-{
-	return enableVideoTransmit;
-}
-
-- (void)setEnableVideoTransmit:(BOOL)flag
-{
-	enableVideoTransmit = flag;
-}
-
-- (unsigned)videoFramesPerSecond
+/*- (unsigned)videoFramesPerSecond
 {
 	return videoFramesPerSecond;
 }
@@ -1473,7 +1422,7 @@
 - (void)setVideoSize:(XMVideoSize)size
 {
 	videoSize = size;
-}
+}*/
 
 - (NSArray *)videoCodecList
 {

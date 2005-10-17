@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.3 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -107,7 +107,7 @@
 	h323ListeningStatus = XM_H323_NOT_LISTENING;
 	
 	activePreferences = [[XMPreferences alloc] init];
-	autoAnswerCalls = NO;
+	automaticallyAcceptIncomingCalls = NO;
 	
 	activeCall = nil;
 	needsSubsystemSetupAfterCallEnd = NO;
@@ -424,7 +424,7 @@
 															object:self];
 	}
 	
-	autoAnswerCalls = [preferences autoAnswerCalls];
+	automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
 	
 	NSString *externalAddress = nil;
 	if([preferences useAddressTranslation])
@@ -548,7 +548,7 @@
 	
 	callManagerStatus = XM_CALL_MANAGER_IN_CALL;
 	
-	if(autoAnswerCalls == YES)
+	if(automaticallyAcceptIncomingCalls == YES)
 	{
 		[XMOpalDispatcher _acceptIncomingCall:[activeCall _callID]];
 	}

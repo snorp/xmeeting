@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.8 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,16 +42,19 @@ public:
 	virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source);
 
-	/* Network setup functions */
+	/* Network setup methods */
 	void SetBandwidthLimit(unsigned limit);
 	
-	/* video functions */
-	void SetVideoFunctionality(BOOL receiveVideo, BOOL enableVideoTransmit);
+	/* Video setup methods */
+	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);
 	
 private:
 	BOOL IsOutgoingMedia(OpalMediaStream & stream);
 	
 	unsigned callID;
+	
+	BOOL enableVideoTransmit;
+	BOOL enableVideoReceive;
 	
 	XMEndPoint *callEndPoint;
 	XMH323EndPoint *h323EndPoint;

@@ -3,18 +3,18 @@
 <plist version="1.0">
 <dict>
 	<key>IBDocumentLocation</key>
-	<string>325 95 356 240 0 0 1280 832 </string>
+	<string>17 104 356 240 0 0 1280 832 </string>
 	<key>IBEditorPositions</key>
 	<dict>
 		<key>20</key>
 		<string>595 516 90 79 0 0 1280 832 </string>
 		<key>7</key>
-		<string>280 485 720 142 0 0 1280 832 </string>
+		<string>280 435 720 242 0 0 1280 832 </string>
 		<key>9</key>
 		<string>280 343 720 425 0 0 1280 832 </string>
 	</dict>
 	<key>IBFramework Version</key>
-	<string>437.0</string>
+	<string>439.0</string>
 	<key>IBGroupedObjects</key>
 	<dict>
 		<key>1</key>
@@ -27,15 +27,6 @@
 			<string>51</string>
 			<string>53</string>
 		</array>
-		<key>20</key>
-		<array>
-			<string>234</string>
-			<string>233</string>
-			<string>137</string>
-			<string>138</string>
-			<string>124</string>
-			<string>122</string>
-		</array>
 		<key>21</key>
 		<array>
 			<string>76</string>
@@ -47,11 +38,38 @@
 			<string>105</string>
 			<string>106</string>
 		</array>
-		<key>23</key>
+		<key>24</key>
 		<array>
-			<string>101</string>
 			<string>102</string>
 			<string>259</string>
+			<string>101</string>
+		</array>
+		<key>25</key>
+		<array>
+			<string>129</string>
+			<string>132</string>
+			<string>127</string>
+			<string>137</string>
+			<string>138</string>
+			<string>233</string>
+			<string>124</string>
+			<string>131</string>
+			<string>234</string>
+		</array>
+		<key>29</key>
+		<array>
+			<string>107</string>
+			<string>108</string>
+			<string>109</string>
+			<string>115</string>
+			<string>117</string>
+			<string>110</string>
+			<string>111</string>
+			<string>112</string>
+			<string>231</string>
+			<string>232</string>
+			<string>113</string>
+			<string>114</string>
 		</array>
 		<key>3</key>
 		<array>
@@ -62,14 +80,26 @@
 			<string>73</string>
 			<string>75</string>
 		</array>
+		<key>30</key>
+		<array>
+			<string>84</string>
+			<string>83</string>
+		</array>
 	</dict>
 	<key>IBLastGroupID</key>
-	<string>24</string>
+	<string>31</string>
 	<key>IBLockedObjects</key>
 	<array>
 		<integer>9</integer>
 	</array>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>9</integer>
+		<integer>7</integer>
+		<integer>20</integer>
+		<integer>17</integer>
+	</array>
 	<key>IBSystem Version</key>
-	<string>8B15</string>
+	<string>8C46</string>
 </dict>
 </plist>

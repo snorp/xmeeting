@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.4 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,7 +63,11 @@ OpalMediaFormatList XMEndPoint::GetMediaFormats() const
 	OpalMediaFormatList mediaFormats;
 	
 	mediaFormats += OpalPCM16;
-	mediaFormats += XM_MEDIA_FORMAT_VIDEO;
+	
+	if(enableVideo == TRUE)
+	{
+		mediaFormats += XM_MEDIA_FORMAT_VIDEO;
+	}
 	
 	return mediaFormats;
 }
@@ -188,4 +192,9 @@ void XMEndPoint::ClearCall(const PString & token)
 	{
 		cout << "Clearing the Call failed (Call not found)" << endl;
 	}
+}
+
+void XMEndPoint::SetEnableVideo(BOOL flag)
+{
+	enableVideo = flag;
 }

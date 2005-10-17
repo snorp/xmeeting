@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.3 2005/05/24 15:21:02 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.4 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -75,8 +75,8 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	
 	[userNameField setStringValue:[prefManager userName]];
 	
-	int state = ([prefManager defaultAutoAnswerCalls] == YES) ? NSOnState : NSOffState;
-	[autoAnswerCallsSwitch setState:state];
+	int state = ([prefManager defaultAutomaticallyAcceptIncomingCalls] == YES) ? NSOnState : NSOffState;
+	[automaticallyAcceptIncomingCallsSwitch setState:state];
 }
 
 - (void)savePreferences
@@ -85,8 +85,8 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	
 	[prefManager setUserName:[userNameField stringValue]];
 	
-	BOOL flag = ([autoAnswerCallsSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setDefaultAutoAnswerCalls:flag];
+	BOOL flag = ([automaticallyAcceptIncomingCallsSwitch state] == NSOnState) ? YES : NO;
+	[prefManager setDefaultAutomaticallyAcceptIncomingCalls:flag];
 }
 
 #pragma mark Action & Delegate Methods

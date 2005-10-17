@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.13 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.14 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,7 +30,7 @@
 	unsigned h323ListeningStatus;
 	
 	XMPreferences *activePreferences;
-	BOOL autoAnswerCalls;
+	BOOL automaticallyAcceptIncomingCalls;
 	
 	XMCallInfo *activeCall;
 	BOOL needsSubsystemSetupAfterCallEnd;

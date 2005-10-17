@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.3 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMLocation.h"
+
+#import "XMPreferencesManager.h"
 
 NSString *XMKey_LocationName = @"XMeeting_LocationName";
 
@@ -118,16 +120,16 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 
 - (NSString *)userName
 {
-	return @"UserName";
+	return [[XMPreferencesManager sharedInstance] userName];
 }
 
 - (void)setUserName:(NSString *)name
 {
 }
 
-- (BOOL)autoAnswerCalls
+- (BOOL)automaticallyAcceptIncomingCalls
 {
-	return NO;
+	return [[XMPreferencesManager sharedInstance] automaticallyAcceptIncomingCalls];
 }
 
 - (void)setAutoAnswerCalls:(BOOL)flag

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.7 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.8 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 - (void)_validateH323UserInterface;
 - (void)_validateGatekeeperUserInterface;
 - (void)_validateAudioOrderUserInterface;
-- (void)_validateVideoTransmitUserInterface;
+- (void)_validateVideoUserInterface;
 - (void)_validateVideoOrderUserInterface;
 
 // table view source methods
@@ -330,9 +330,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[self defaultAction:self];
 }
 
-- (IBAction)toggleEnableVideoTransmit:(id)sender
+- (IBAction)toggleEnableVideo:(id)sender
 {
-	[self _validateVideoTransmitUserInterface];
+	[self _validateVideoUserInterface];
 	[self defaultAction:self];
 }
 
@@ -472,9 +472,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	NSString *string;
 	
 	// load the Network section
-	unsigned bandwidth = [currentLocation bandwidthLimit];
-	unsigned index = [bandwidthLimitPopUp indexOfItemWithTag:bandwidth];
-	[bandwidthLimitPopUp selectItemAtIndex:index];
+	//unsigned bandwidth = [currentLocation bandwidthLimit];
+	//unsigned index = [bandwidthLimitPopUp indexOfItemWithTag:bandwidth];
+	//[bandwidthLimitPopUp selectItemAtIndex:index];
 	
 	state = ([currentLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
 	[useIPAddressTranslationSwitch setState:state];
@@ -545,15 +545,12 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[audioCodecPreferenceOrderTableView reloadData];
 	
 	// loading the Video section
-	state = ([currentLocation enableVideoReceive] == YES) ? NSOnState : NSOffState;
-	[enableVideoReceiveSwitch setState:state];
+	state = ([currentLocation enableVideo] == YES) ? NSOnState : NSOffState;
+	[enableVideoSwitch setState:state];
 	
-	state = ([currentLocation enableVideoTransmit] == YES) ? NSOnState : NSOffState;
-	[enableVideoTransmitSwitch setState:state];
+	//[videoFrameRateField setIntValue:[currentLocation videoFramesPerSecond]];
 	
-	[videoFrameRateField setIntValue:[currentLocation videoFramesPerSecond]];
-	
-	state = [currentLocation videoSize];
+	/*state = [currentLocation videoSize];
 	if(state == XMVideoSize_QCIF)
 	{
 		state = 1;
@@ -562,7 +559,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	{
 		state = 0;
 	}
-	[videoSizePopUp selectItemAtIndex:state];
+	[videoSizePopUp selectItemAtIndex:state];*/
 	
 	[videoCodecPreferenceOrderTableView reloadData];
 	
@@ -571,7 +568,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[self _validateExternalAddressUserInterface];
 	[self _validateH323UserInterface];
 	[self _validateAudioOrderUserInterface];
-	[self _validateVideoTransmitUserInterface];
+	[self _validateVideoUserInterface];
 	[self _validateVideoOrderUserInterface];
 }
 
@@ -581,7 +578,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	NSString *string;
 	
 	// saving the network section
-	[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
+	//[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
 	
 	flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
 	[currentLocation setUseAddressTranslation:flag];
@@ -645,16 +642,13 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[currentLocation setAudioBufferSize:[audioBufferSizeSlider intValue]];
 	
 	// saving the video section
-	flag = ([enableVideoReceiveSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableVideoReceive:flag];
+	flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableVideo:flag];
 	
-	flag = ([enableVideoTransmitSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableVideoTransmit:flag];
+	//[currentLocation setVideoFramesPerSecond:[videoFrameRateField intValue]];
 	
-	[currentLocation setVideoFramesPerSecond:[videoFrameRateField intValue]];
-	
-	XMVideoSize size = ([videoSizePopUp indexOfSelectedItem] == 0) ? XMVideoSize_CIF : XMVideoSize_QCIF;
-	[currentLocation setVideoSize:size];
+	//XMVideoSize size = ([videoSizePopUp indexOfSelectedItem] == 0) ? XMVideoSize_CIF : XMVideoSize_QCIF;
+	//[currentLocation setVideoSize:size];
 }
 
 #pragma mark validate the user interface
@@ -782,9 +776,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[moveAudioCodecDownButton setEnabled:enableDown];
 }
 
-- (void)_validateVideoTransmitUserInterface
+- (void)_validateVideoUserInterface
 {
-	BOOL flag = ([enableVideoTransmitSwitch state] == NSOnState) ? YES : NO;
+	//BOOL flag = ([enableVideoTransmitSwitch state] == NSOnState) ? YES : NO;
+	BOOL flag = NO;
 	
 	[videoFrameRateField setEnabled:flag];
 	[videoSizePopUp setEnabled:flag];

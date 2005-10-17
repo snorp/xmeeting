@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.11 2005/10/17 13:20:30 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.12 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -111,9 +111,9 @@ void _XMSetAudioBufferSize(unsigned size)
 
 #pragma mark Video functions
 
-void _XMSetVideoFunctionality(bool receiveVideo, bool transmitVideo)
+void _XMSetEnableVideo(bool enableVideo)
 {
-	theManager->SetVideoFunctionality(receiveVideo, transmitVideo);
+	callEndPoint->SetEnableVideo(enableVideo);
 }
 
 #pragma mark codec functions
@@ -121,18 +121,24 @@ void _XMSetVideoFunctionality(bool receiveVideo, bool transmitVideo)
 void _XMSetDisabledCodecs(const char * const * codecs, unsigned codecCount)
 {
 	PStringArray codecsArray = PStringArray(codecCount, codecs, TRUE);
+	
+	// these codecs are currently disabled by default
 	codecsArray.AppendString("*g.726*");
 	codecsArray.AppendString("*gsm*");
 	codecsArray.AppendString("*ilbc*");
 	codecsArray.AppendString("*speex*");
 	codecsArray.AppendString("*lpc*");
 	codecsArray.AppendString("*ms*");
+	//codecsArray.AppendString("*H.261(CIF)*");
+	//codecsArray.AppendString("*H.261(QCIF)*");
+	
 	theManager->SetMediaFormatMask(codecsArray);
 }
 
 void _XMSetCodecOrder(const char * const * codecs, unsigned codecCount)
 {
 	PStringArray codecsArray = PStringArray(codecCount, codecs, TRUE);
+	
 	theManager->SetMediaFormatOrder(codecsArray);
 }
 

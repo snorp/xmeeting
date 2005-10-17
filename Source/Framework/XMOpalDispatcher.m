@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.1 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.2 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1019,7 +1019,7 @@ typedef enum _XMOpalDispatcherMessage
 		_XMSetUserName(userName);
 	}
 	
-	_XMSetBandwidthLimit([preferences bandwidthLimit]);
+	//_XMSetBandwidthLimit([preferences bandwidthLimit]);
 	
 	const char *translationAddress = NULL;
 	if([preferences useAddressTranslation] == YES)
@@ -1047,7 +1047,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	// ***** Adjusting the Video Preferences ***** //
 	
-	_XMSetVideoFunctionality(false, false);
+	_XMSetEnableVideo([preferences enableVideo]);
 	
 	// ***** Adjusting the Codec Order/Mask ***** //
 	
@@ -1088,7 +1088,7 @@ typedef enum _XMOpalDispatcherMessage
 		else
 		{
 			disabledCodecs[disabledCodecsCount] = identifier;
-			disabledCodecs++;
+			disabledCodecsCount++;
 		}
 	}
 	

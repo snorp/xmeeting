@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.5 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.6 2005/10/17 17:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,12 +14,13 @@ NSString *XMNotification_ActiveLocationDidChange = @"XMeeting_ActiveLocationDidC
 
 NSString *XMKey_Locations = @"XMeeting_Locations";
 NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
-NSString *XMKey_AutoAnswerCalls = @"XMeeting_AutoAnswerCalls";
+NSString *XMKey_AutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 NSString *XMKey_UserName = @"XMeeting_UserName";
 
 @interface XMPreferencesManager (PrivateMethods)
 
 - (id)_init;
+- (void)_setup;
 - (void)_writeLocationsToUserDefaults;
 
 @end
@@ -35,6 +36,7 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	if(!sharedInstance)
 	{
 		sharedInstance = [[XMPreferencesManager alloc] _init];
+		[sharedInstance _setup];
 	}
 
 	return sharedInstance;
@@ -48,6 +50,13 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 }
 
 - (id)_init
+{
+	self = [super init];
+	
+	return self;
+}
+
+- (void)_setup
 {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	
@@ -65,7 +74,7 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	[defaultsDict setObject:NSFullUserName() forKey:XMKey_UserName];
 	
 	NSNumber *number = [[NSNumber alloc] initWithBool:NO];
-	[defaultsDict setObject:number forKey:XMKey_AutoAnswerCalls];
+	[defaultsDict setObject:number forKey:XMKey_AutomaticallyAcceptIncomingCalls];
 	[number release];
 	
 	// code to be written yet
@@ -100,11 +109,9 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 		activeLocation = 0;
 	}
 	
-	autoAnswerCalls = [userDefaults boolForKey:XMKey_AutoAnswerCalls];
+	automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
 	
 	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
-	
-	return self;
 }
 
 - (void)dealloc
@@ -245,24 +252,25 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	[[NSUserDefaults standardUserDefaults] setObject:name forKey:XMKey_UserName];
 }
 
-- (BOOL)autoAnswerCalls
+- (BOOL)automaticallyAcceptIncomingCalls
 {
-	return autoAnswerCalls;
+	return automaticallyAcceptIncomingCalls;
 }
 
-- (void)setAutoAnswerCalls:(BOOL)flag
+- (void)setAutomaticallyAcceptIncomingCalls:(BOOL)flag
 {
-	autoAnswerCalls = flag;
+	automaticallyAcceptIncomingCalls = flag;
 }
 
-- (BOOL)defaultAutoAnswerCalls
+- (BOOL)defaultAutomaticallyAcceptIncomingCalls
 {
-	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_AutoAnswerCalls];
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
 }
 
-- (void)setDefaultAutoAnswerCalls:(BOOL)flag
+- (void)setDefaultAutomaticallyAcceptIncomingCalls:(BOOL)flag
 {
-	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_AutoAnswerCalls];
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_AutomaticallyAcceptIncomingCalls];
+	automaticallyAcceptIncomingCalls = flag;
 }
 
 #pragma mark Private Methods
