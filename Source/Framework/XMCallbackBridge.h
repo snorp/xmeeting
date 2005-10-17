@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.9 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.10 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,51 +25,46 @@ extern "C" {
  * within the Cocoa/Objective-C layer, where the framework supports
  * such synchronization in an easy fashion
  **/
-
+	
 /**
- * initializes the callbacks in order to work properly
+ * Indicates that the outgoing call is ringing at the remote party
  **/
-void initializeCallbacks();
-
-/**
- * initiates the subsystem setup
- **/
-void doSubsystemSetup(void *preferences);
+void _XMHandleCallIsAlerting(unsigned callID);
 
 /**
  * If there is an incoming call and autoanswer is off,
  * this callback is called which forwards the request
  * to the Cocoa/Objective-C world
  **/
-void noteIncomingCall(unsigned callID, 
-					  XMCallProtocol protocol,
-					  const char *remoteName, 
-					  const char *remoteNumber, 
-					  const char *remoteAddress,
-					  const char *remoteApplication);
+void _XMHandleIncomingCall(unsigned callID, 
+						   XMCallProtocol protocol,
+						   const char *remoteName, 
+						   const char *remoteNumber, 
+						   const char *remoteAddress,
+						   const char *remoteApplication);
 
 /**
  * This function is called every time a call is established,
  * supplying the callID
  **/
-void noteCallEstablished(unsigned callID);
+void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall);
 
 /**
  * This function is called every time a call was ended,
  * supplying the callID and the CallEndReason.
  **/
-void noteCallCleared(unsigned callID, XMCallEndReason callEndReason);
+void _XMHandleCallCleared(unsigned callID, XMCallEndReason callEndReason);
 
 /**
  * This function is called every time a new media stream is opened.
  **/
-void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *mediaFormat);
+void _XMHandleMediaStreamOpened(unsigned callID, bool isIncomingStream, const char *mediaFormat);
 
 /**
  * This function is called every time an existing media stream is closed.
  * Note that the callID currently is set constantly to 0.
  **/
-void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat);
+void _XMHandleMediaStreamClosed(unsigned callID, bool isIncomingStream, const char *mediaFormat);
 
 #pragma mark MediaTransmitter & MediaReceiver callbacks
 
@@ -107,9 +102,8 @@ bool _XMProcessPacket(void *packet, unsigned length, unsigned sessionID);
 
 #pragma mark H.323 specific callbacks
 
-void noteGatekeeperRegistration(const char *gatekeeperName);
-void noteGatekeeperUnregistration();
-void noteGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason);
+void _XMHandleGatekeeperRegistration(const char *gatekeeperName);
+void _XMHandleGatekeeperUnregistration();
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.7 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,14 +19,26 @@
 @interface XMCallHistoryModule (PrivateMethods)
 
 - (void)_activeLocationDidChange:(NSNotification *)notif;
+- (void)_didStartCallInitiation:(NSNotification *)notif;
 - (void)_didStartCalling:(NSNotification *)notif;
-- (void)_incomingCall:(NSNotification *)notif;
-- (void)_callEstablished:(NSNotification *)notif;
-- (void)_callCleared:(NSNotification *)notif;
-- (void)_enablingH323Failed:(NSNotification *)notif;
-- (void)_gatekeeperRegistration:(NSNotification *)notif;
-- (void)_gatekeeperUnregistration:(NSNotification *)notif;
-- (void)_gatekeeperRegistrationFailed:(NSNotification *)notif;
+- (void)_didNotStartCalling:(NSNotification *)notif;
+- (void)_didReceiveIncomingCall:(NSNotification *)notif;
+- (void)_didEstablishCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
+- (void)_didNotEnableH323:(NSNotification *)notif;
+- (void)_didRegisterAtGatekeeper:(NSNotification *)notif;
+- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif;
+- (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
+
+- (void)_didOpenOutgoingAudioStream:(NSNotification *)notif;
+- (void)_didOpenIncomingAudioStream:(NSNotification *)notif;
+- (void)_didOpenOutgoingVideoStream:(NSNotification *)notif;
+- (void)_didOpenIncomingVideoStream:(NSNotification *)notif;
+- (void)_didCloseOutgoingAudioStream:(NSNotification *)notif;
+- (void)_didCloseIncomingAudioStream:(NSNotification *)notif;
+- (void)_didCloseOutgoingVideoStream:(NSNotification *)notif;
+- (void)_didCloseIncomingVideoStream:(NSNotification *)notif;
+
 - (void)_logText:(NSString *)text date:(NSDate *)date;
 
 @end
@@ -41,24 +53,51 @@
 	
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
 							   name:XMNotification_ActiveLocationDidChange object:nil];
+	
+	[notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
+							   name:XMNotification_CallManagerDidStartCallInitiation object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartCalling:)
 							   name:XMNotification_CallManagerDidStartCalling object:nil];
-	[notificationCenter addObserver:self selector:@selector(_incomingCall:)
-							   name:XMNotification_CallManagerIncomingCall object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
-							   name:XMNotification_CallManagerCallEstablished object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callCleared:)
-							   name:XMNotification_CallManagerCallCleared object:nil];
-	[notificationCenter addObserver:self selector:@selector(_enablingH323Failed:)
-							   name:XMNotification_CallManagerEnablingH323Failed object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistration:)
-							   name:XMNotification_CallManagerGatekeeperRegistration object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperUnregistration:)
-							   name:XMNotification_CallManagerGatekeeperUnregistration object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationFailed:)
-							   name:XMNotification_CallManagerGatekeeperRegistrationFailed object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
+							   name:XMNotification_CallManagerDidNotStartCalling object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
+							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+							   name:XMNotification_CallManagerDidEstablishCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotEnableH323:)
+							   name:XMNotification_CallManagerDidNotEnableH323 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didRegisterAtGatekeeper:)
+							   name:XMNotification_CallManagerDidRegisterAtGatekeeper object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:)
+							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:)
+							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
+	
+	[notificationCenter addObserver:self selector:@selector(_didOpenOutgoingAudioStream:)
+							   name:XMNotification_CallManagerDidOpenOutgoingAudioStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didOpenIncomingAudioStream:)
+							   name:XMNotification_CallManagerDidOpenIncomingAudioStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didOpenOutgoingVideoStream:)
+							   name:XMNotification_CallManagerDidOpenOutgoingVideoStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didOpenIncomingVideoStream:)
+							   name:XMNotification_CallManagerDidOpenIncomingVideoStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didCloseOutgoingAudioStream:)
+							   name:XMNotification_CallManagerDidCloseOutgoingAudioStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didCloseIncomingAudioStream:)
+							   name:XMNotification_CallManagerDidCloseIncomingAudioStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didCloseOutgoingVideoStream:)
+							   name:XMNotification_CallManagerDidCloseOutgoingVideoStream object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didCloseIncomingVideoStream:)
+							   name:XMNotification_CallManagerDidCloseIncomingVideoStream object:nil];
+	
+	nibLoader = nil;
 	
 	didLogIncomingCall = NO;
+	
+	gatekeeperName = nil;
+	callAddress = nil;
 	
 	return self;
 }
@@ -67,9 +106,20 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	[nibLoader release];
+	if(nibLoader != nil)
+	{
+		[nibLoader release];
+	}
 	
-	[gatekeeperName release];
+	if(gatekeeperName != nil)
+	{
+		[gatekeeperName release];
+	}
+	
+	if(callAddress != nil)
+	{
+		[callAddress release];
+	}
 	
 	[super dealloc];
 }
@@ -137,6 +187,17 @@
 	[logText release];
 }
 
+- (void)_didStartCallInitiation:(NSNotification *)notif
+{
+	if(callAddress != nil)
+	{
+		[callAddress release];
+		callAddress = nil;
+	}
+	
+	callAddress = [[XMCallAddressManager sharedInstance] activeCallAddress];
+}
+
 - (void)_didStartCalling:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
@@ -145,9 +206,24 @@
 	[self _logText:logText date:[activeCall callInitiationDate]];
 	
 	[logText release];
+	
+	[callAddress release];
+	callAddress = nil;
 }
 
-- (void)_incomingCall:(NSNotification *)notif
+- (void)_didNotStartCalling:(NSNotification *)notif
+{
+	NSString *logText = [[NSString alloc] initWithFormat:@"Calling host \"%@\" failed", [[callAddress url] address]];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+	
+	[callAddress release];
+	callAddress = nil;
+}
+
+- (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
 	NSString *logText = [[NSString alloc] initWithFormat:@"Incoming call from \"%@\"", [activeCall remoteName]];
@@ -159,13 +235,13 @@
 	didLogIncomingCall = YES;
 }
 	
-- (void)_callEstablished:(NSNotification *)notif
+- (void)_didEstablishCall:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
 	
 	if([activeCall isOutgoingCall] == NO && didLogIncomingCall == NO)
 	{
-		[self _incomingCall:notif];
+		[self _didReceiveIncomingCall:notif];
 	}
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Call with \"%@\" established", [activeCall remoteName]];
@@ -177,7 +253,7 @@
 	didLogIncomingCall = NO;
 }
 
-- (void)_callCleared:(NSNotification *)notif
+- (void)_didClearCall:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = (XMCallInfo *)[[[XMCallManager sharedInstance] recentCalls] objectAtIndex:0];
 	
@@ -202,12 +278,12 @@
 	didLogIncomingCall = NO;
 }
 
-- (void)_enablingH323Failed:(NSNotification *)notif
+- (void)_didNotEnableH323:(NSNotification *)notif
 {
-	[self _logText:@"Enabling the H.323 subsystem failed!" date:nil];
+	[self _logText:@"Enabling the H.323 subsystem failed." date:nil];
 }
 
-- (void)_gatekeeperRegistration:(NSNotification *)notif
+- (void)_didRegisterAtGatekeeper:(NSNotification *)notif
 {
 	if(gatekeeperName != nil)
 	{
@@ -224,7 +300,7 @@
 	[logText release];
 }
 
-- (void)_gatekeeperUnregistration:(NSNotification *)notif
+- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif
 {	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Unregistered from gatekeeper \"%@\"", gatekeeperName];
 	
@@ -233,7 +309,7 @@
 	[logText release];
 }
 
-- (void)_gatekeeperRegistrationFailed:(NSNotification *)notif
+- (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif
 {
 	XMLocation *activeLocation = [[XMPreferencesManager sharedInstance] activeLocation];
 	
@@ -253,6 +329,86 @@
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Failed to register at gatekeeper \"%@\" (%@)",
 		gatekeeperAddress, failReasonString];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didOpenOutgoingAudioStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingAudioCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: sending \"%@\"", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didOpenIncomingAudioStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingAudioCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: receiving \"%@\"", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didOpenOutgoingVideoStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingVideoCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: sending \"%@\"", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didOpenIncomingVideoStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingVideoCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: receiving \"%@\"", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didCloseOutgoingAudioStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingAudioCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Outgoing)", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didCloseIncomingAudioStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingAudioCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Incoming)", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didCloseOutgoingVideoStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingVideoCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Outgoing)", codec];
+	
+	[self _logText:logText date:nil];
+	
+	[logText release];
+}
+
+- (void)_didCloseIncomingVideoStream:(NSNotification *)notif
+{
+	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingVideoCodec];
+	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Incoming)", codec];
 	
 	[self _logText:logText date:nil];
 	

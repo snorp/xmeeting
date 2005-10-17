@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.5 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.6 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,37 +11,41 @@
 
 #pragma mark Notifications
 
+NSString *XMNotification_FrameworkDidInitialize = @"XMeetingFrameworkDidInitializeNotificaiton";
+NSString *XMNotification_FrameworkDidClose = @"XMeetingFrameworkDidCloseNotification";
+
 NSString *XMNotification_UtilsDidStartFetchingExternalAddress = @"XMeetingUtilsDidStartFetchingExternalAddressNotification";
 NSString *XMNotification_UtilsDidEndFetchingExternalAddress = @"XMeetingUtilsDidEndFetchingExternalAddressNotification";
 
-NSString *XMNotification_CallManagerDidGoOnline = @"XMeetingCallManagerDidGoOnlineNotification";
-NSString *XMNotification_CallManagerDidGoOffline = @"XMeetingCallManagerDidGoOfflineNotification";
 NSString *XMNotification_CallManagerDidStartSubsystemSetup = @"XMeetingCallManagerDidStartSubsystemSetupNotification";
 NSString *XMNotification_CallManagerDidEndSubsystemSetup = @"XMeetingCallManagerDidEndSubsystemSetupNotification";
 
+NSString *XMNotification_CallManagerDidStartCallInitiation = @"XMeetingCallManagerDidStartCallInitiationNotification";
 NSString *XMNotification_CallManagerDidStartCalling = @"XMeetingCallManagerDidStartCallingNotification";
-NSString *XMNotification_CallManagerCallStartFailed = @"XMeetingCallManagerCallStartFailedNotification";
-NSString *XMNotification_CallManagerIncomingCall = @"XMeetingCallManagerIncomingCallNotification";
-NSString *XMNotification_CallManagerCallEstablished = @"XMeetingCallManagerCallEstablishedNotification";
-NSString *XMNotification_CallManagerCallCleared = @"XMeetingCallManagerCallClearedNotification";
+NSString *XMNotification_CallManagerDidNotStartCalling = @"XMeetingCallManagerCallDidNotStartCallingNotification";
+NSString *XMNotification_CallManagerDidStartRingingAtRemoteParty = @"XMeetingCallManagerDidStartRingingAtRemotePartyNotification";
+NSString *XMNotification_CallManagerDidReceiveIncomingCall = @"XMeetingCallManagerDidReceiveIncomingCallNotification";
+NSString *XMNotification_CallManagerDidEstablishCall = @"XMeetingCallManagerDidEstablishCallNotification";
+NSString *XMNotification_CallManagerDidClearCall = @"XMeetingCallManagerDidClearCallNotification";
 
-NSString *XMNotification_CallManagerEnablingH323Failed = @"XMeetingCallManagerEnablingH323FailedNotification";
-NSString *XMNotification_CallManagerDidStartGatekeeperRegistration = @"XMeetingCallManagerDidStartGatekeeperRegistrationNotification";
-NSString *XMNotification_CallManagerGatekeeperRegistration = @"XMeetingCallManagerGatekeeperRegistrationNotification";
-NSString *XMNotification_CallManagerGatekeeperUnregistration = @"XMeetingCallManagerGatekeeperUnregistrationNotification";
-NSString *XMNotification_CallManagerGatekeeperRegistrationFailed = @"XMeetingCallManagerGatekeeperRegistrationFailedNotification";
+NSString *XMNotification_CallManagerDidNotEnableH323 = @"XMeetingCallManagerDidNotEnableH323Notification";
+NSString *XMNotification_CallManagerDidStartGatekeeperRegistrationProcess = @"XMeetingCallManagerDidStartGatekeeperRegistrationProcessNotification";
+NSString *XMNotification_CallManagerDidEndGatekeeperRegistrationProcess = @"XMeetingCallManagerDidEndGatekeeperRegistrationProcessNotification";
+NSString *XMNotification_CallManagerDidRegisterAtGatekeeper = @"XMeetingCallManagerDidRegisterAtGatekeeperNotification";
+NSString *XMNotification_CallManagerDidUnregisterFromGatekeeper = @"XMeetingCallManagerDidUnregisterFromGatekeeperNotification";
+NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper = @"XMeetingCallManagerDidNotRegisterAtGatekeeperNotification";
 
-NSString *XMNotification_CallManagerOutgoingAudioStreamOpened = @"XMeetingCallManagerOutgoingAudioStreamOpenedNotification";
-NSString *XMNotification_CallManagerIncomingAudioStreamOpened = @"XMeetingCallManagerIncomingAudioStreamOpenedNotification";
-NSString *XMNotification_CallManagerOutgoingVideoStreamOpened = @"XMeetingCallManagerOutgoingVideoStreamOpenedNotification";
-NSString *XMNotification_CallManagerIncomingVideoStreamOpened = @"XMeetingCallManagerIncomingVideoStreamOpenedNotification";
+NSString *XMNotification_CallManagerDidOpenOutgoingAudioStream = @"XMeetingCallManagerDidOpenOutgoingAudioStreamNotification";
+NSString *XMNotification_CallManagerDidOpenIncomingAudioStream = @"XMeetingCallManagerDidOpenIncomingAudioStreamNotification";
+NSString *XMNotification_CallManagerDidOpenOutgoingVideoStream = @"XMeetingCallManagerDidOpenOutgoingVideoStreamNotification";
+NSString *XMNotification_CallManagerDidOpenIncomingVideoStream = @"XMeetingCallManagerDidOpenIncomingVideoStreamNotification";
 
-NSString *XMNotification_CallManagerOutgoingAudioStreamClosed = @"XMeetingCallManagerOutgoingAudioStreamClosedNotification";
-NSString *XMNotification_CallManagerIncomingAudioStreamClosed = @"XMeetingCallManagerIncomingAudioStreamClosedNotification";
-NSString *XMNotification_CallManagerOutgoingVideoStreamClosed = @"XMeetingCallManagerOutgoingVideoStreamClosedNotification";
-NSString *XMNotification_CallManagerIncomingVideoStreamClosed = @"XMeetingCallManagerIncomingVideoStreamClosedNotification";
+NSString *XMNotification_CallManagerDidCloseOutgoingAudioStream = @"XMeetingCallManagerDidCloseOutgoingAudioStreamNotification";
+NSString *XMNotification_CallManagerDidCloseIncomingAudioStream = @"XMeetingCallManagerDidCloseIncomingAudioStreamNotification";
+NSString *XMNotification_CallManagerDidCloseOutgoingVideoStream = @"XMeetingCallManagerDidCloseOutgoingVideoStreamNotification";
+NSString *XMNotification_CallManagerDidCloseIncomingVideoStream = @"XMeetingCallManagerDidCloseIncomingVideoStreamNotification";
 
-NSString *XMNotification_CallManagerCallStatisticsUpdated = @"XMeetingCallManagerCallStatisticsUpdatedNotification";
+NSString *XMNotification_CallManagerDidUpdateCallStatistics = @"XMeetingCallManagerDidUpdateCallStatisticsNotification";
 
 NSString *XMNotification_AudioManagerInputDeviceDidChange = @"XMeetingAudioManagerInputDeviceDidChangeNotification";
 NSString *XMNotification_AudioManagerOutputDeviceDidChange = @"XMeetingAudioManagerOutputDeviceDidChangeNotification";
@@ -52,7 +56,7 @@ NSString *XMNotification_AudioManagerDidUpdateDeviceList = @"XMeetingAudioManage
 NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate = @"XMeetingVideoManagerDidStartVideoInputDeviceListUpdateNotification";
 NSString *XMNotification_VideoManagerDidUpdateInputDeviceList = @"XMeetingVideoManagerDidUpdateInputDeviceListNotification";
 
-NSString *XMNotification_AddressBookManagerDatabaseDidChange = @"XMeetingAddressBookManagerDatabaseDidChangeNotification";
+NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddressBookManagerDidChangeDatabaseNotification";
 
 #pragma mark Exceptions
 
@@ -65,16 +69,13 @@ NSString *XMExceptionReason_InvalidParameterMustNotBeNil = @"Parameter must not 
 NSString *XMExceptionReason_InvalidParameterMustBeOfCorrectType = @"Parameter must be of correct type";
 NSString *XMExceptionReason_InvalidParameterMustBeValidKey = @"Key must be valid for this object";
 NSString *XMExceptionReason_UnsupportedCoder = @"Only NSCoder sublasses which allow keyed coding are supported";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileOffline = @"Not allowed while CallManager is offline";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup = @"Not allowed during subsystem setup";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileInCall = @"Not allowed while in call";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileNotInCall = @"Not allowed unless calling or in a call";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Listening = @"Not allowed if H.323 is succesfully setup";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Disabled = @"Not allowed if H.323 is disabled in preferences";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperRegistered = @"Not allowed if succesfully registered at gatekeeper";
-NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperDisabled = @"Not allowed if gatekeeper usage is disabled in preferences";
-NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallEstablished = @"Call established without active call";
-NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallCleared = @"Call cleared without active call";
+NSString *XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall = @"Not allowed during subsystem setup or while in a call";
+NSString *XMExceptionReason_CallManagerInvalidActionIfNotInCall = @"Not allowed unless in a call";
+NSString *XMExceptionReason_CallManagerInvalidActionIfCallStatusNotIncoming = @"Not allowed if not an incoming call";
+NSString *XMExceptionReason_CallManagerInvalidActionIfH323Listening = @"Not allowed if H.323 is already succesfully setup";
+NSString *XMExceptionReason_CallManagerInvalidActionIfH323Disabled = @"Not allowed if H.323 is disabled in preferences";
+NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered = @"Not allowed if succesfully registered at gatekeeper";
+NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled = @"Not allowed if gatekeeper usage is disabled in preferences";
 NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure = @"Parsing the infos for available codecs failed (%@)";
 
 #pragma mark Audio Codecs

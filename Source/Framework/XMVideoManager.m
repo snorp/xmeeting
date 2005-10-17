@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,15 +27,13 @@
 #pragma mark Class Methods
 
 + (XMVideoManager *)sharedInstance
-{
-	static XMVideoManager *sharedInstance = nil;
-	
-	if(sharedInstance == nil)
+{	
+	if(_XMVideoManagerSharedInstance == nil)
 	{
-		sharedInstance = [[XMVideoManager alloc] _init];
+		NSLog(@"Attempt to access VideoManager prior to initialization");
 	}
 	
-	return sharedInstance;
+	return _XMVideoManagerSharedInstance;
 }
 
 #pragma mark Init & Deallocation Methods
@@ -78,20 +76,58 @@
 	return self;
 }
 
-- (void)dealloc
+- (void)_close
 {
-	[videoInputModules release];
-	[localVideoViews release];
-	[remoteVideoViews release];
-	
-	[inputDevices release];
-	[selectedInputDevice release];
-	
-	[localVideoImage release];
-	[localVideoImageRep release];
-	
-	[remoteVideoImage release];
-	[remoteVideoImageRep release];
+	if(videoInputModules != nil)
+	{
+		[videoInputModules release];
+		videoInputModules = nil;
+	}
+	if(localVideoViews != nil)
+	{
+		[localVideoViews release];
+		localVideoViews = nil;
+	}
+	if(remoteVideoViews != nil)
+	{
+		[remoteVideoViews release];
+		remoteVideoViews = nil;
+	}
+	if(inputDevices != nil)
+	{
+		[inputDevices release];
+		inputDevices = nil;
+	}
+	if(selectedInputDevice != nil)
+	{
+		[selectedInputDevice release];
+		selectedInputDevice = nil;
+	}
+	if(localVideoImage != nil)
+	{
+		[localVideoImage release];
+		localVideoImage = nil;
+	}
+	if(localVideoImageRep != nil)
+	{
+		[localVideoImageRep release];
+		localVideoImageRep = nil;
+	}
+	if(remoteVideoImage != nil)
+	{
+		[remoteVideoImage release];
+		remoteVideoImage = nil;
+	}
+	if(remoteVideoImageRep != nil)
+	{
+		[remoteVideoImageRep release];
+		remoteVideoImageRep = nil;
+	}
+}
+
+- (void)dealloc
+{	
+	[self _close];
 	
 	[super dealloc];
 }
@@ -158,21 +194,6 @@
 }
 
 #pragma mark Framework Methods
-
-- (void)_startup
-{
-	videoInputModules = [[NSMutableArray alloc] initWithCapacity:3];
-	
-	XMSequenceGrabberVideoInputModule *seqGrabModule = [[XMSequenceGrabberVideoInputModule alloc] init];
-	[videoInputModules addObject:seqGrabModule];
-	[seqGrabModule release];
-	
-	XMDummyVideoInputModule *dummyModule = [[XMDummyVideoInputModule alloc] init];
-	[videoInputModules addObject:dummyModule];
-	[dummyModule release];
-	
-	[XMMediaTransmitter _startupWithVideoInputModules:videoInputModules];
-}
 
 - (void)_addLocalVideoView:(XMVideoView *)videoView
 {

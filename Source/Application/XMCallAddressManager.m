@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.5 2005/06/30 09:33:09 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.6 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,7 @@
 
 - (id)_init;
 
-- (void)_callCleared:(NSNotification *)notif;
+- (void)_callEnded:(NSNotification *)notif;
 
 @end
 
@@ -45,15 +45,24 @@
 	callAddressProviders = [[NSMutableArray alloc] initWithCapacity:3];
 	activeCallAddress = nil;
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
-												 name:XMNotification_CallManagerCallCleared object:nil];
-	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callEnded:)
+												 name:XMNotification_CallManagerDidNotStartCalling
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callEnded:)
+												 name:XMNotification_CallManagerDidClearCall
+											   object:nil];	
 	return self;
 }
 
 - (void)dealloc
 {
 	[callAddressProviders release];
+	
+	if(activeCallAddress != nil)
+	{
+		[activeCallAddress release];
+		activeCallAddress = nil;
+	}
 	
 	[super dealloc];
 }
@@ -106,31 +115,28 @@
 	return activeCallAddress;
 }
 
-- (BOOL)makeCallToAddress:(id<XMCallAddress>)callAddress
+- (void)makeCallToAddress:(id<XMCallAddress>)callAddress
 {
 	if(activeCallAddress != nil)
 	{
-		return NO;
+		NSLog(@"Illegal, active callAddress not nil");
+		return;
 	}
+	
+	activeCallAddress = [callAddress retain];
 
-	BOOL result = [[XMCallManager sharedInstance] callURL:[callAddress url]];
-	
-	if(result == YES)
-	{
-		activeCallAddress = [callAddress retain];
-		return YES;
-	}
-	
-	activeCallAddress = nil;
-	return NO;
+	[[XMCallManager sharedInstance] callURL:[callAddress url]];
 }
 
 #pragma mark Private Methods
 
-- (void)_callCleared:(NSNotification *)notif
+- (void)_callEnded:(NSNotification *)notif
 {
-	[activeCallAddress release];
-	activeCallAddress = nil;
+	if(activeCallAddress != nil)
+	{
+		[activeCallAddress release];
+		activeCallAddress = nil;
+	}
 }
 
 @end

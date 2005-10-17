@@ -1,5 +1,5 @@
 /*
- * $Id: XMRecentCallsView.m,v 1.1 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMRecentCallsView.m,v 1.2 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,7 @@
 	self = [super initWithFrame:frameRect];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callCleared:)
-												 name:XMNotification_CallManagerCallCleared
+												 name:XMNotification_CallManagerDidClearCall
 											   object:nil];
 
 	layoutDone = NO;

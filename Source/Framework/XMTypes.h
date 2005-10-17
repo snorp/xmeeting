@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.8 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.9 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,6 +44,7 @@ typedef enum XMCallStartFailReason
 {
 	XMCallStartFailReason_NoFailure = 0,
 	XMCallStartFailReason_UnknownFailure,
+	XMCallStartFailReason_AlreadyInCall,
 	XMCallStartFailReason_ProtocolNotEnabled,
 	XMCallStartFailReason_GatekeeperUsedButNotSpecified,
 	XMCallStartFailReasonCount
@@ -55,7 +56,8 @@ typedef enum XMCallStartFailReason
 typedef enum XMCallStatus
 {
 	XMCallStatus_Unknown = 0,
-	XMCallStatus_Calling,		// indicates that this is an active call
+	XMCallStatus_Calling,
+	XMCallStatus_Ringing,
 	XMCallStatus_Incoming,
 	XMCallStatus_Active,
 	XMCallStatus_Terminating,
@@ -163,7 +165,7 @@ typedef enum XMCalltoURLType
 
 #pragma mark Structs
 
-typedef struct XMCallStatistics
+typedef struct XMCallStatisticsRecord
 {
 	unsigned roundTripDelay;
 	unsigned audioPacketsSent;
@@ -192,6 +194,6 @@ typedef struct XMCallStatistics
 	unsigned videoPacketsLost;
 	unsigned videoPacketsOutOfOrder;
 	unsigned videoPacketsTooLate;
-} XMCallStatistics;
+} XMCallStatisticsRecord;
 
 #endif // __XM_TYPES_H__

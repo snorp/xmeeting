@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.12 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.13 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,30 +25,23 @@
  **/
 @interface XMCallManager : NSObject {
 	
-	id delegate;
+	unsigned callManagerStatus;
 	
-	BOOL isOnline;
-	
-	BOOL doesSubsystemSetup;
-	BOOL needsSubsystemSetupAfterCallEnd;
-	BOOL needsSubsystemShutdownAfterSubsystemSetup;
-	BOOL postSubsystemSetupFailureNotifications;
+	unsigned h323ListeningStatus;
 	
 	XMPreferences *activePreferences;
-	XMPreferences *activeSetupPreferences;
 	BOOL autoAnswerCalls;
 	
 	XMCallInfo *activeCall;
+	BOOL needsSubsystemSetupAfterCallEnd;
 	XMCallStartFailReason callStartFailReason;
-	NSString *addressToCall;
-	XMCallProtocol protocolToUse;
 	
 	// h.323 variables
 	NSString *gatekeeperName;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
 	// InCall variables
-	NSTimeInterval statisticsUpdateInterval;
+	NSTimeInterval callStatisticsUpdateInterval;
 	
 	// call history
 	NSMutableArray *recentCalls;
@@ -60,19 +53,11 @@
 + (XMCallManager *)sharedInstance;
 
 /**
- * Manages the delegate.
- * If the delegate implements one of the methods described in XMCallManagerDelegate,
- * the delegate is automatically registered to receive these notifications
+ * Returns YES if changes to the setup are allowed or not.
+ * If this method returns NO, attempts to change the
+ * setup will raise an exception
  **/
-- (id)delegate;
-- (void)setDelegate:(id)delegate;
-
-/**
- * If the manager is online, this means that the framework is listening on whatever
- * protocol currently is enabled.
- **/
-- (BOOL)isOnline;
-- (void)setOnline:(BOOL)flag;
+- (BOOL)doesAllowModifications;
 
 /**
  * Returns whether we are currently listening on the specified protocol. Which
@@ -93,36 +78,33 @@
  **/
 - (void)setActivePreferences:(XMPreferences *)prefs;
 
-/**
- * Returns YES if a subsystem setup process is currently running or not, NO otherwise.
- * While the subsystem is setup, certain actions such as -setActivePreferences are
- * not allowed and do rais an exception
- **/
-- (BOOL)doesSubsystemSetup;
-
 #pragma mark Call Management Methods
 
 /**
- * Returns whether the framework is currently in a call or not
+ * Returns whether the framework is currently in a call or not.
+ * In call means that an either a call is established, there is
+ * a pending incoming call or the framework is calling someone.
  **/
 - (BOOL)isInCall;
 
 /**
  * Returns the XMCallInfo instance describing the currently active call.
- * Returns nil if there is no active call
+ * Returns nil if there is no active call or if -callURL: was called
+ * but the call attempt has not yet started.
+ * After that XMNotification_CallManagerDidStartCalling has been posted,
+ * this method will return the active call instance.
  **/
 - (XMCallInfo *)activeCall;
 
 /**
  * Calls the remoteParty using the specified call protocol
  * If the call cannot be made for some reason, (e.g. calling
- * an H.323 client while H.323 is disabled) NO is returned
- * and a notification (XMNotification_CallManagerCallStartFailed) is
- * posted. Otherwise, this method returns YES and the final result of
- * the call attempt will be posted through notifications
- * The call fail reason can be obtained through -callStartFailReason
+ * an H.323 client while H.323 is disabled) a notification 
+ * (XMNotification_CallManagerCallStartFailed) is
+ * posted. Otherwise, the final result of the call attempt will 
+ * be posted through notifications
  **/
-- (BOOL)callURL:(XMURL *)remotePartyURL;
+- (void)callURL:(XMURL *)remotePartyURL;
 
 /**
  * Returns the reason why the last call start failed.
@@ -130,10 +112,16 @@
 - (XMCallStartFailReason)callStartFailReason;
 
 /**
- * This method accepts or rejects the incoming call.
+ * This method accepts the incoming call.
  * If this method is called and there is no incoming call, an expection is raised
  **/
-- (void)acceptIncomingCall:(BOOL)acceptCall;
+- (void)acceptIncomingCall;
+
+/**
+ * This method rejects the incoming call.
+ * if this method is called and there is no incoming call, an exception is raised
+ **/
+- (void)rejectIncomingCall;
 
 /**
  * Clears the active call. If there is no active call, an exception
@@ -146,7 +134,7 @@
  * The most recent call is found at the lowest index.
  * The framework does not store any calls beyond the application
  * process's lifetime, and the number of calls recorded is
- * limited to 100 (a rather theoretical number...)
+ * limited to 100
  **/
 - (NSArray *)recentCalls;
 
@@ -195,7 +183,7 @@
  * The default value is 1.0 seconds. If no statistics should be
  * fetched, returns 0.
  **/
-- (NSTimeInterval)statisticsUpdateInterval;
+- (NSTimeInterval)callStatisticsUpdateInterval;
 
 /**
  * Sets the interval at which the call statistics should be updated.
@@ -203,7 +191,7 @@
  * Changing this value does not affect the interval of a call already
  * in progress.
  **/
-- (void)setStatisticsUpdateInterval:(NSTimeInterval)interval;
+- (void)setCallStatisticsUpdateInterval:(NSTimeInterval)interval;
 
 @end
 

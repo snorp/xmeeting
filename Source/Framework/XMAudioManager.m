@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,9 +7,9 @@
  */
 
 #import "XMAudioManager.h"
+
 #import "XMPrivate.h"
 #import "XMStringConstants.h"
-
 #import "XMBridge.h"
 
 #define XM_DIRECTION BOOL
@@ -23,8 +23,6 @@
  * and controlling the volume
  **/
 @interface XMAudioManager (PrivateMethods)
-
-- (id)_init;
 
 - (NSArray *)_devicesForDirection:(XM_DIRECTION)direction;
 - (AudioDeviceID)_defaultDeviceForDirection:(XM_DIRECTION)direction;
@@ -55,15 +53,13 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 #pragma mark Class Methods
 
 + (XMAudioManager *)sharedInstance
-{
-	static XMAudioManager *sharedInstance = nil;
-	
-	if(sharedInstance == nil)
+{	
+	if(_XMAudioManagerSharedInstance == nil)
 	{
-		sharedInstance = [[XMAudioManager alloc] _init];
+		NSLog(@"Attempt to access XMAudioManager prior to initialization");
 	}
 	
-	return sharedInstance;
+	return _XMAudioManagerSharedInstance;
 }
 
 #pragma mark Init & Deallocation Methods
@@ -105,15 +101,36 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	return self;
 }
 
-- (void)dealloc
+- (void)_close
 {
-	[inputDevices release];
-	[outputDevices release];
-	[selectedInputDevice release];
-	[selectedOutputDevice release];
+	if(inputDevices != nil)
+	{
+		[inputDevices release];
+		inputDevices = nil;
+	}
+	if(outputDevices != nil)
+	{
+		[outputDevices release];
+		outputDevices = nil;
+	}
+	if(selectedInputDevice != nil)
+	{
+		[selectedInputDevice release];
+		selectedInputDevice = nil;
+	}
+	if(selectedOutputDevice != nil)
+	{
+		[selectedOutputDevice release];
+		selectedOutputDevice = nil;
+	}
 	
 	[self _removeVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	[self _removeVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
+}
+
+- (void)dealloc
+{
+	[self _close];
 	
 	[super dealloc];
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.h,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaReceiver.h,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,7 +22,8 @@
 	XMVideoSize videoMediaSize;
 }
 
-+ (XMMediaReceiver *)sharedInstance;
+- (id)_init;
+- (void)_close;
 
 - (void)_startMediaReceivingWithCodec:(unsigned)codecType payloadType:(unsigned)payloadType 
 								 videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID;

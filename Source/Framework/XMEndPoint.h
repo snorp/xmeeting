@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,17 +36,17 @@ public:
 	virtual PSoundChannel * CreateSoundChannel(const XMConnection & connection, BOOL isSource);
 	PSafePtr<XMConnection> GetXMConnectionWithLock(const PString & token,
 												   PSafetyMode mode = PSafeReadWrite);
-	void OnShowIncoming(const XMConnection & connection);
-	BOOL OnShowOutgoing(const XMConnection & connection);
-	void AcceptIncomingConnection(const PString & connectionToken);
-	BOOL OnShowUserInput(const XMConnection & connection, const PString & indication);
 	
 	// Call Management & Information
 	BOOL StartCall(XMCallProtocol protocol, const PString & remoteParty, PString & token);
-	void SetAcceptIncomingCall(BOOL acceptCall);
+	void OnShowOutgoing(const XMConnection & connection);
+	void OnShowIncoming(XMConnection & connection);
+	void AcceptIncomingCall();
+	void RejectIncomingCall();
 	void ClearCall(const PString & callToken);
-	void SetCallProtocol(XMCallProtocol protocol);
-											
+
+private:
+	PString incomingConnectionToken;
 };
 
 #endif // __XM_END_POINT_H__

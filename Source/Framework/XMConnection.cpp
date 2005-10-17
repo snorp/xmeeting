@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,7 @@ XMConnection::XMConnection(OpalCall & call,
 						   XMEndPoint & theEndPoint,
 						   const PString & token)
 : OpalConnection(call, theEndPoint, token),
-  endPoint(theEndPoint)
+  endpoint(theEndPoint)
 {	
 }
 
@@ -32,7 +32,7 @@ BOOL XMConnection::SetUpConnection()
 	remoteApplication = ownerCall.GetOtherPartyConnection(*this)->GetRemoteApplication();
 	
 	phase = AlertingPhase;
-	//endpoint.OnShowIncoming(*this);
+	endpoint.OnShowIncoming(*this);
 	OnAlerting();
 	
 	return TRUE;
@@ -41,10 +41,9 @@ BOOL XMConnection::SetUpConnection()
 BOOL XMConnection::SetAlerting(const PString & calleeName,
 							   BOOL withMedia)
 {
-	cout << "SetAlerting called" << endl;
 	phase = AlertingPhase;
 	remotePartyName = calleeName;
-	// return endpoint.OnShowOutgoing(*this);
+	endpoint.OnShowOutgoing(*this);
 	return TRUE;
 }
 
@@ -65,7 +64,7 @@ BOOL XMConnection::SetConnected()
 
 OpalMediaFormatList XMConnection::GetMediaFormats() const
 {
-	return endPoint.GetMediaFormats();
+	return endpoint.GetMediaFormats();
 }
 
 void XMConnection::InitiateCall()
@@ -84,6 +83,39 @@ void XMConnection::InitiateCall()
 	}
 }
 
+void XMConnection::AcceptIncoming()
+{
+	if (!LockReadOnly())
+		return;
+	
+	if (phase != AlertingPhase) {
+		UnlockReadOnly();
+		return;
+	}
+	
+	LockReadWrite();
+	phase = ConnectedPhase;
+	UnlockReadWrite();
+	UnlockReadOnly();
+	
+	OnConnected();
+	
+	if (!LockReadOnly())
+		return;
+	
+	if (mediaStreams.IsEmpty()) {
+		UnlockReadOnly();
+		return;
+	}
+	
+	LockReadWrite();
+	phase = EstablishedPhase;
+	UnlockReadWrite();
+	UnlockReadOnly();
+	
+	OnEstablished();
+}
+
 BOOL XMConnection::IsMediaBypassPossible(unsigned sessionID) const
 {
 	return OpalConnection::IsMediaBypassPossible(sessionID);
@@ -100,24 +132,6 @@ OpalMediaStream * XMConnection::OpenSinkMediaStream(OpalMediaStream & source)
 {
 	//cout << "OpenSinkMediaStream " << source << endl;
 	return OpalConnection::OpenSinkMediaStream(source);
-}
-
-void XMConnection::StartMediaStreams()
-{
-	cout << "StartMediaStreams()" << endl;
-	OpalConnection::StartMediaStreams();
-}
-
-void XMConnection::CloseMediaStreams()
-{
-	cout << "CloseMediaStreams()" << endl;
-	OpalConnection::CloseMediaStreams();
-}
-
-void XMConnection::RemoveMediaStreams()
-{
-	cout << "RemoveMediaStreams()" << endl;
-	OpalConnection::RemoveMediaStreams();
 }
 
 OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
@@ -167,11 +181,5 @@ BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 
 PSoundChannel * XMConnection::CreateSoundChannel(BOOL isSource)
 {
-	return endPoint.CreateSoundChannel(*this, isSource);
-}
-
-void XMConnection::OnClosedMediaStream(OpalMediaStream & stream)
-{
-	cout << "OnClosedpenMediaStream " << stream << endl;
-	OpalConnection::OnClosedMediaStream(stream);
+	return endpoint.CreateSoundChannel(*this, isSource);
 }

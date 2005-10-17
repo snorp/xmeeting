@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,9 +53,9 @@
 - (id<XMCallAddress>)activeCallAddress;
 
 /**
- * Tries to make a call to the address specified, returning success of this operation
+ * Tries to make a call to the address specified.
  **/
-- (BOOL)makeCallToAddress:(id<XMCallAddress>)address;
+- (void)makeCallToAddress:(id<XMCallAddress>)address;
 
 @end
 

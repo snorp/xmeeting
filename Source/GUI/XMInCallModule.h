@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.h,v 1.3 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMInCallModule.h,v 1.4 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,8 @@
 	IBOutlet NSTextField *remotePartyField;
 	
 	NSNib *nibLoader;
+	
+	BOOL didClearCall;
 }
 
 - (IBAction)clearCall:(id)sender;

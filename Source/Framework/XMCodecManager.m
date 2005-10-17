@@ -1,20 +1,15 @@
 /*
- * $Id: XMCodecManager.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMCodecManager.m,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMStringConstants.h"
-#import "XMPrivate.h"
 #import "XMCodecManager.h"
 
-@interface XMCodecManager (PrivateMethods)
-
-- (id)_init;
-
-@end
+#import "XMStringConstants.h"
+#import "XMPrivate.h"
 
 @implementation XMCodecManager
 
@@ -22,14 +17,12 @@
 
 + (XMCodecManager *)sharedInstance
 {
-	static XMCodecManager *sharedInstance = nil;
-	
-	if(sharedInstance == nil)
+	if(_XMCodecManagerSharedInstance == nil)
 	{
-		sharedInstance = [[XMCodecManager alloc] _init];
+		NSLog(@"Attempt to access CodecManager prior to initialization");
 	}
 	
-	return sharedInstance;
+	return _XMCodecManagerSharedInstance;
 }
 
 #pragma mark Init & Deallocation methods
@@ -42,10 +35,6 @@
 	return nil;
 }
 
-
-// This methods currently misses the check with the OPAL system to verify that
-// codec described in the plist really exists. This has to be done to prevent
-// unpredictable behaviour.
 - (id)_init
 {
 	self = [super init];
@@ -103,10 +92,23 @@
 	return self;
 }
 
+- (void)_close
+{
+	if(audioCodecs != nil)
+	{
+		[audioCodecs release];
+		audioCodecs = nil;
+	}
+	if(videoCodecs != nil)
+	{
+		[videoCodecs release];
+		videoCodecs = nil;
+	}
+}
+
 - (void)dealloc
 {
-	[audioCodecs release];
-	[videoCodecs release];
+	[self _close];
 	
 	[super dealloc];
 }

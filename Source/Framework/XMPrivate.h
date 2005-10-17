@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.12 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.13 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,92 +10,116 @@
 #define __XM_PRIVATE_H__
 
 #import "XMTypes.h"
+#import "XMUtils.h"
 #import "XMCallManager.h"
+#import "XMOpalDispatcher.h"
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
+#import "XMCodecManager.h"
 #import "XMCodec.h"
 #import "XMAudioManager.h"
 #import "XMVideoManager.h"
+#import "XMMediaTransmitter.h"
 #import "XMMediaReceiver.h"
 #import "XMVideoView.h"
 #import "XMAddressBookRecordSearchMatch.h"
 #import "XMGeneralPurposeURL.h"
 
-@class XMVideoView, XMCallInfo, ABPerson;
+#define XM_FRAMEWORK_NOT_INITIALIZED 0
+#define XM_FRAMEWORK_INITIALIZED 1
+#define XM_FRAMEWORK_CLOSE_CALLED 2
+#define XM_FRAMEWORK_SEPARATE_THREADS 2
+
+#define XM_FRAMEWORK_ALL_THREADS_CLOSED XM_FRAMEWORK_CLOSE_CALLED + XM_FRAMEWORK_SEPARATE_THREADS
+
+extern unsigned _XMInitializedStatus;
+extern XMUtils *_XMUtilsSharedInstance;
+extern XMCallManager *_XMCallManagerSharedInstance;
+extern XMOpalDispatcher *_XMOpalDispatcherSharedInstance;
+extern XMCodecManager *_XMCodecManagerSharedInstance;
+extern XMAudioManager *_XMAudioManagerSharedInstance;
+extern XMVideoManager *_XMVideoManagerSharedInstance;
+extern XMMediaTransmitter *_XMMediaTransmitterSharedInstance;
+extern XMMediaReceiver *_XMMediaReceiverSharedInstance;
+
+void _XMThreadExit();
+void _XMCheckCloseStatus();
+
+@class ABPerson, XMCallStatistics;
+
+@interface XMUtils (FrameworkMethods)
+
+- (id)_init;
+- (void)_close;
+
+@end
 
 @interface XMCallManager (FrameworkMethods)
 
-/**
- * This method gets called every time a subsystem setup thread
- * is invoked in order to allow XMCallManager to do the correct
- * setup in a separate thread.
- **/
-- (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferences;
+- (id)_init;
+- (void)_close;
 
-/**
- * This method gets called from the CallbackBridge.
- * The call happens NOT on the main thread.
- * Calls _handleIncomingCall: on the main thread
- **/
-- (void)_handleIncomingCall:(unsigned)callID
-				   protocol:(XMCallProtocol)protocol
-				 remoteName:(NSString *)remoteName 
-			   remoteNumber:(NSString *)remoteNumber
-			  remoteAddress:(NSString *)remoteAddress
-		  remoteApplication:(NSString *)remoteApplication;
+// Called when the OpalDispatcher did complete the
+// subsystem setup end
+- (void)_handleSubsystemSetupEnd;
 
-/**
- * This method gets called from the CallbackBridge
- * every time a call is established. The call happens
- * not on the main thread.
- **/
-- (void)_handleCallEstablished:(unsigned)callID;
+// Called every time a call was succesfully initiated
+// The CallManager takes ownership of this object
+// without retaining it
+- (void)_handleCallInitiated:(XMCallInfo *)call;
 
-/**
- * This method gets called from the CallbackBridge
- * every time a call is cleared. The call happens
- * not on the main thread.
- **/
-- (void)_handleCallCleared:(unsigned)callID withCallEndReason:(XMCallEndReason)endReason;
+// Called every time initiating a call failed
+- (void)_handleCallInitiationFailed:(NSNumber *)failReason;
 
-/**
- * This method gets called from the CallbackBridge
- * every time a media stream is opened. The call
- * happens not on the main thread.
- **/
-- (void)_handleMediaStreamOpened:(unsigned)callID 
-				   isInputStream:(BOOL)isInputStream 
-					 mediaFormat:(NSString *)mediaFormat;
+// Called when the phone is ringing at the remote party
+- (void)_handleCallIsAlerting;
 
-/**
- * This method gets called from the CallbackBridge
- * every time a media stream is closed. The call
- * happens not on the main thread.
- **/
-- (void)_handleMediaStreamClosed:(unsigned)callID
-				   isInputStream:(BOOL)isInputStream
-					 mediaFormat:(NSString *)mediaFormat;
+// Called when there is an incoming call
+- (void)_handleIncomingCall:(XMCallInfo *)call;
+
+// Called when the call is established
+- (void)_handleCallEstablished:(NSArray *)remotePartyInformations;
+
+// Called when the call is cleared
+- (void)_handleCallCleared:(NSNumber *)endReason;
+
+// Called when the call statistics are updated
+- (void)_handleCallStatisticsUpdate:(XMCallStatistics *)callStatistics;
+
+#pragma mark Media callbacks
+
+- (void)_handleOutgoingAudioStreamOpened:(NSString *)codec;
+- (void)_handleIncomingAudioStreamOpened:(NSString *)codec;
+- (void)_handleOutgoingVideoStreamOpened:(NSString *)codec;
+- (void)_handleIncomingVideoStreamOpened:(NSString *)codec;
+
+- (void)_handleOutgoingAudioStreamClosed;
+- (void)_handleIncomingAudioStreamClosed;
+- (void)_handleOutgoingVideoStreamClosed;
+- (void)_handleIncomingVideoStreamClosed;
 
 #pragma mark H.323 callbacks
 
-/**
- * This method gets called every time the framework registers at a gatekeeper
- * This Method gets not called on the main thread
- **/
+// called every time enabling the H.323 stack failed
+- (void)_handleH323EnablingFailure;
+
+// Called when the Frameworks starts the gatekeeper registration
+// process. This might be a lengthy task
+- (void)_handleGatekeeperRegistrationProcessStart;
+
+// Called when the framework ends the gatekeeper registration
+// process.
+- (void)_handleGatekeeperRegistrationProcessEnd;
+
+// Called every time the Framework registers at a gatekeeper
 - (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName;
 
-/**
- * This method gets called every time the framework unregisters at a gatekeeper
- * This method gets not called on the main thread
- **/
+// Called every time the Framework unregisters from a gatekeeper
 - (void)_handleGatekeeperUnregistration;
 
-/**
- * This method gets called when an attempt to register at a gatekeeper failed.
- * This method is not called on the main thread
- **/
-- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason;
+// Called every time an attempt to register at a gatekeeper failed
+- (void)_handleGatekeeperRegistrationFailure:(NSNumber *)gatekeeperRegistrationFailReason;
 
 @end
 
@@ -124,7 +148,7 @@
 - (void)_setIncomingVideoCodec:(NSString *)codec;
 - (void)_setOutgoingVideoCodec:(NSString *)codec;
 
-- (XMCallStatistics *)_callStatistics;
+- (void)_updateCallStatistics:(XMCallStatistics *)callStatistics;
 
 @end
 
@@ -146,6 +170,13 @@
 
 @end
 
+@interface XMCodecManager (FrameworkMethods)
+
+- (id)_init;
+- (void)_close;
+
+@end
+
 @interface XMCodec (FrameworkMethods)
 
 - (id)_initWithDictionary:(NSDictionary *)dict;
@@ -157,7 +188,17 @@
 
 @end
 
+@interface XMAudioManager (FrameworkMethods)
+
+- (id)_init;
+- (void)_close;
+
+@end
+
 @interface XMVideoManager (FrameworkMethods)
+
+- (id)_init;
+- (void)_close;
 
 - (void)_startup;
 - (void)_addLocalVideoView:(XMVideoView *)videoView;
@@ -211,14 +252,13 @@ extern NSString *XMExceptionReason_InvalidParameterMustBeOfCorrectType;
 extern NSString *XMExceptionReason_InvalidParameterMustBeValidKey;
 extern NSString *XMExceptionReason_UnsupportedCoder;
 
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileOffline;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileSubsystemSetup;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileInCall;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileNotInCall;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Listening;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileH323Disabled;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperRegistered;
-extern NSString *XMExceptionReason_CallManagerInvalidActionWhileGatekeeperDisabled;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfNotInCall;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfCallStatusNotIncoming;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfH323Listening;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfH323Disabled;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled;
 
 extern NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallEstablished;
 extern NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallCleared;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,61 +14,86 @@
 #import "XMPrivate.h"
 #import "XMCallInfo.h"
 
-void doSubsystemSetup(void *preferencesPointer)
+void _XMHandleCallIsAlerting(unsigned callID)
 {
-	XMPreferences *preferences = (XMPreferences *)preferencesPointer;
-	[[XMCallManager sharedInstance] _doSubsystemSetupWithPreferences:preferences];
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMOpalDispatcher _callIsAlerting:callID];
+	
+	[autoreleasePool release];
 }
 
-void noteIncomingCall(unsigned callID, 
-					  XMCallProtocol protocol,
-					  const char *remoteName,
-					  const char *remoteNumber,
-					  const char *remoteAddress,
-					  const char *remoteApplication)
+void _XMHandleIncomingCall(unsigned callID, 
+						   XMCallProtocol protocol,
+						   const char *remoteName,
+						   const char *remoteNumber,
+						   const char *remoteAddress,
+						   const char *remoteApplication)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *name = [[NSString alloc] initWithCString:remoteName];
 	NSString *number = [[NSString alloc] initWithCString:remoteNumber];
 	NSString *address = [[NSString alloc] initWithCString:remoteAddress];
 	NSString *application = [[NSString alloc] initWithCString:remoteApplication];
 	
-	[[XMCallManager sharedInstance] _handleIncomingCall:callID
-											   protocol:protocol
-											 remoteName:name
-										   remoteNumber:number
-										  remoteAddress:address
-									  remoteApplication:application];
-	
+	[XMOpalDispatcher _incomingCall:callID
+						   protocol:protocol
+						 remoteName:name
+					   remoteNumber:number
+					  remoteAddress:address
+				  remoteApplication:application];
+
 	[name release];
 	[number release];
 	[address release];
 	[application release];
+	
+	[autoreleasePool release];
 }
 
-void noteCallEstablished(unsigned callID)
+void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall)
 {
-	[[XMCallManager sharedInstance] _handleCallEstablished:callID];
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMOpalDispatcher _callEstablished:callID incoming:isIncomingCall];
+	
+	[autoreleasePool release];
 }
 
-void noteCallCleared(unsigned callID, XMCallEndReason endReason)
+void _XMHandleCallCleared(unsigned callID, XMCallEndReason endReason)
 {
-	[[XMCallManager sharedInstance] _handleCallCleared:callID withCallEndReason:endReason];
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMOpalDispatcher _callCleared:callID reason:endReason];
+	
+	[autoreleasePool release];
 }
 
-void noteMediaStreamOpened(unsigned callID, bool isInputStream, const char *mediaFormat)
+void _XMHandleMediaStreamOpened(unsigned callID, bool isIncomingStream, const char *mediaFormat)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *name = [[NSString alloc] initWithCString:mediaFormat];
 	
-	[[XMCallManager sharedInstance] _handleMediaStreamOpened:callID 
-											   isInputStream:isInputStream
-												 mediaFormat:name];
+	[XMOpalDispatcher _mediaStreamOpened:callID codec:name incoming:isIncomingStream];
 	
 	[name release];
+	
+	[autoreleasePool release];
 }
 
-void noteMediaStreamClosed(unsigned callID, bool isInputStream, const char *mediaFormat)
+void _XMHandleMediaStreamClosed(unsigned callID, bool isIncomingStream, const char *mediaFormat)
 {
-	// currently not implemented
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	NSString *name = [[NSString alloc] initWithCString:mediaFormat];
+	
+	[XMOpalDispatcher _mediaStreamClosed:callID codec:name incoming:isIncomingStream];
+	
+	[name release];
+	
+	[autoreleasePool release];
 }
 
 #pragma mark MediaReceiver callbacks
@@ -94,34 +119,32 @@ void _XMStopMediaTransmit(unsigned sessionID)
 
 void _XMStartMediaReceiving(unsigned codecType, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID)
 {
-	[[XMMediaReceiver  sharedInstance] _startMediaReceivingWithCodec:codecType payloadType:payloadType videoSize:videoSize session:sessionID];
+	[_XMMediaReceiverSharedInstance _startMediaReceivingWithCodec:codecType 
+													  payloadType:payloadType 
+														videoSize:videoSize 
+														  session:sessionID];
 }
 
 void _XMStopMediaReceiving(unsigned sessionID)
 {
-	[[XMMediaReceiver sharedInstance] _stopMediaReceivingForSession:sessionID];
+	[_XMMediaReceiverSharedInstance _stopMediaReceivingForSession:sessionID];
 }
 
 bool _XMProcessPacket(void *packetData, unsigned length, unsigned sessionID)
 {
-	return [[XMMediaReceiver sharedInstance] _processPacket:packetData length:length session:sessionID];
+	return [_XMMediaReceiverSharedInstance _processPacket:packetData length:length session:sessionID];
 }
 
 #pragma mark H.323 specific Callbacks
 
-void noteGatekeeperRegistration(const char *gatekeeperName)
+void _XMHandleGatekeeperRegistration(const char *gatekeeperName)
 {
 	NSString *name = [[NSString alloc] initWithCString:gatekeeperName];
-	[[XMCallManager sharedInstance] _handleGatekeeperRegistration:name];
+	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistration:name];
 	[name release];
 }
 
-void noteGatekeeperUnregistration()
+void _XMHandleGatekeeperUnregistration()
 {
-	[[XMCallManager sharedInstance] _handleGatekeeperUnregistration];
-}
-
-void noteGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason)
-{
-	[[XMCallManager sharedInstance] _handleGatekeeperRegistrationFailure:reason];
+	[_XMOpalDispatcherSharedInstance _handleGatekeeperUnregistration];
 }

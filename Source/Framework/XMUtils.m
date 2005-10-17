@@ -1,49 +1,26 @@
 /*
- * $Id: XMUtils.m,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMUtils.h"
+#import "XMPrivate.h"
 #import "XMStringConstants.h"
-#import "XMutils.h"
-
-@interface XMUtils (PrivateMethods)
-
-- (id)_init;
-
-@end
 
 @implementation XMUtils
 
 #pragma mark Class Methods
 
 + (XMUtils *)sharedInstance
-{
-	static XMUtils *sharedInstance = nil;
-	
-	if(sharedInstance == nil)
+{	
+	if(_XMUtilsSharedInstance == nil)
 	{
-		sharedInstance = [[XMUtils alloc] _init];
+		NSLog(@"Attempt to access XMUtils prior to initialization");
 	}
-	return sharedInstance;
-}
-
-+ (BOOL)isPhoneNumber:(NSString *)str
-{
-	NSCharacterSet *charSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789 ()+-"];
-	NSScanner *scanner = [[NSScanner alloc] initWithString:str];
-	BOOL result = NO;
-	
-	if([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
-	{
-		result = YES;
-	}
-	
-	[scanner release];
-	
-	return result;
+	return _XMUtilsSharedInstance;
 }
 
 #pragma mark Init & Deallocation Methods
@@ -69,18 +46,52 @@
 	return self;
 }
 
-- (void)dealloc
+- (void)_close
 {
-	[localAddress release];
+	if(localAddress != nil)
+	{
+		[localAddress release];
+		localAddress = nil;
+	}
 	
 	if(externalAddressURLConnection != nil)
 	{
 		[externalAddressURLConnection cancel];
 		[externalAddressURLConnection release];
+		externalAddressURLConnection = nil;
 	}
-	[externalAddressURLData release];
-	[externalAddress release];
-	[externalAddressFetchFailReason release];
+	
+	if(externalAddressURLData != nil)
+	{
+		[externalAddressURLData release];
+		externalAddressURLData = nil;
+	}
+	
+	if(externalAddress != nil)
+	{
+		[externalAddress release];
+		externalAddress = nil;
+	}
+	
+	if(externalAddressFetchFailReason != nil)
+	{
+		[externalAddressFetchFailReason release];
+		externalAddressFetchFailReason = nil;
+	}
+	
+	if(fetchingExternalAddressTimer != nil)
+	{
+		[fetchingExternalAddressTimer invalidate];
+		[fetchingExternalAddressTimer release];
+		fetchingExternalAddressTimer = nil;
+	}
+}
+	
+- (void)dealloc
+{
+	// Although _close should have been called,
+	// we call it once again just to be sure
+	[self _close];
 	
 	[super dealloc];
 }
@@ -124,6 +135,7 @@
 			}
 		}
 	}
+	
 	return localAddress;
 }
 
@@ -140,7 +152,7 @@
 		externalAddressURLConnection = [[NSURLConnection alloc] initWithRequest:externalAddressURLRequest delegate:self];
 		
 		// since the timeoutInterval in NSURLRequest for some reason doesn't work, we do our own timeout by
-		// using a timer and seinding a -cancel message to the NSURLConnection when the timer fires
+		// using a timer and sending a -cancel message to the NSURLConnection when the timer fires
 		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0 target:self
 																	   selector:@selector(_urlLoadingTimeout:) 
 																	   userInfo:nil repeats:NO] retain];
@@ -224,10 +236,17 @@
 		return;
 	}
 	
-	[externalAddress release];
-	externalAddress = nil;
-	[externalAddressFetchFailReason release];
-	externalAddressFetchFailReason = nil;
+	if(externalAddress != nil)
+	{
+		[externalAddress release];
+		externalAddress = nil;
+	}
+	
+	if(externalAddressFetchFailReason != nil)
+	{
+		[externalAddressFetchFailReason release];
+		externalAddressFetchFailReason = nil;
+	}
 	
 	if(externalAddressURLData != nil)
 	{
@@ -236,6 +255,7 @@
 		NSString *urlDataString = [[NSString alloc] initWithData:externalAddressURLData encoding:NSASCIIStringEncoding];
 		NSString *addressString;
 		NSScanner *scanner = [[NSScanner alloc] initWithString:urlDataString];
+		
 		if([scanner scanUpToCharactersFromSet:ipCharacters intoString:nil] &&
 		   [scanner scanCharactersFromSet:ipCharacters intoString:&addressString])
 		{
@@ -257,16 +277,25 @@
 		didSucceedFetchingExternalAddress = NO;
 	}
 	
-	[externalAddressURLConnection release];
-	externalAddressURLConnection = nil;
-	[externalAddressURLData release];
-	externalAddressURLData = nil;
+	if(externalAddressURLConnection != nil)
+	{
+		[externalAddressURLConnection release];
+		externalAddressURLConnection = nil;
+	}
+	
+	if(externalAddressURLData != nil)
+	{
+		[externalAddressURLData release];
+		externalAddressURLData = nil;
+	}
+	
 	if(fetchingExternalAddressTimer != nil)
 	{
 		[fetchingExternalAddressTimer invalidate];
 		[fetchingExternalAddressTimer release];
 		fetchingExternalAddressTimer = nil;
 	}
+	
 	isFetchingExternalAddress = NO;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
@@ -274,10 +303,16 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-	[externalAddressURLConnection release];
-	externalAddressURLConnection = nil;
-	[externalAddressURLData release];
-	externalAddressURLData = nil;
+	if(externalAddressURLConnection != nil)
+	{
+		[externalAddressURLConnection release];
+		externalAddressURLConnection = nil;
+	}
+	if(externalAddressURLData != nil)
+	{
+		[externalAddressURLData release];
+		externalAddressURLData = nil;
+	}
 	if(fetchingExternalAddressTimer != nil)
 	{
 		[fetchingExternalAddressTimer invalidate];
@@ -285,10 +320,18 @@
 		fetchingExternalAddressTimer = nil;
 	}
 	
-	[externalAddress release];
-	externalAddress = nil;
-	[externalAddressFetchFailReason release];
-	externalAddressFetchFailReason = [error localizedDescription];
+	if(externalAddress != nil)
+	{
+		[externalAddress release];
+		externalAddress = nil;
+	}
+	
+	if(externalAddressFetchFailReason != nil)
+	{
+		[externalAddressFetchFailReason release];
+	}
+	externalAddressFetchFailReason = [[error localizedDescription] retain];
+	
 	didSucceedFetchingExternalAddress = NO;
 	isFetchingExternalAddress = NO;
 	
@@ -300,15 +343,25 @@
 	[externalAddressURLConnection cancel];
 	[externalAddressURLConnection release];
 	externalAddressURLConnection = nil;
+	
 	[externalAddressURLData release];
 	externalAddressURLData = nil;
+	
 	[fetchingExternalAddressTimer release];
 	fetchingExternalAddressTimer = nil;
 	
-	[externalAddress release];
-	externalAddress = nil;
-	[externalAddressFetchFailReason release];
+	if(externalAddress != nil)
+	{
+		[externalAddress release];
+		externalAddress = nil;
+	}
+	
+	if(externalAddressFetchFailReason != nil)
+	{
+		[externalAddressFetchFailReason release];
+	}
 	externalAddressFetchFailReason = [NSLocalizedString(@"connection timeout", @"") retain];
+	
 	didSucceedFetchingExternalAddress = NO;
 	isFetchingExternalAddress = NO;
 	
@@ -316,6 +369,22 @@
 }
 
 @end
+
+BOOL XMIsPhoneNumber(NSString *string)
+{
+	NSCharacterSet *charSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789 ()+-"];
+	NSScanner *scanner = [[NSScanner alloc] initWithString:string];
+	BOOL result = NO;
+	
+	if([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
+	{
+		result = YES;
+	}
+	
+	[scanner release];
+	
+	return result;
+}
 
 NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.1 2005/10/12 21:09:14 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,13 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 @implementation XMDummyVideoInputModule
 
 - (id)init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	return nil;
+}
+
+- (id)_init
 {
 	self = [super init];
 	
@@ -47,7 +54,7 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	inputManager = [theManager retain];
 }
 
-- (void)closeModule
+- (void)close
 {
 	[inputManager release];
 	inputManager = nil;

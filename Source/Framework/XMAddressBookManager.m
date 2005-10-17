@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.3 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -265,7 +265,7 @@
 
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AddressBookManagerDatabaseDidChange object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AddressBookManagerDidChangeDatabase object:self];
 }
 
 @end

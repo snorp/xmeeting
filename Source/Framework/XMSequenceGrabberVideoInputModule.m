@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,6 +71,13 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (id)init
 {
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	return nil;
+}
+
+- (id)_init
+{
 	self = [super init];
 	
 	inputManager = nil;
@@ -121,7 +128,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	[self _openAndConfigureSeqGrabComponent];
 }
 
-- (void)closeModule
+- (void)close
 {
 	[self _disposeSeqGrabComponent];
 	

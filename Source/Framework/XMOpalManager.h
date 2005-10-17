@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.6 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,15 +35,11 @@ public:
 	XMH323EndPoint * H323EndPoint();
 	XMEndPoint * CallEndPoint();
 	
-	/* overriding some methods */
-	virtual BOOL OnIncomingConnection(OpalConnection & connection);
+	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
 	virtual void OnClearedCall(OpalCall & call);
-	virtual void OnEstablished(OpalConnection & connection);
-	virtual void OnConnected(OpalConnection & connection);
-	virtual void OnReleased(OpalConnection & connection);
 	virtual BOOL OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream);
-	virtual void OnClosedMediaStream(OpalMediaStream & stream);
+	virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source);
 
 	/* Network setup functions */
@@ -54,6 +50,8 @@ public:
 	
 private:
 	BOOL IsOutgoingMedia(OpalMediaStream & stream);
+	
+	unsigned callID;
 	
 	XMEndPoint *callEndPoint;
 	XMH323EndPoint *h323EndPoint;

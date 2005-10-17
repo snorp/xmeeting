@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.5 2005/08/29 15:19:51 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.6 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,7 +7,9 @@
  */
 
 #import "XMCallInfo.h"
+
 #import "XMPrivate.h"
+#import "XMCallStatistics.h"
 
 @implementation XMCallInfo
 
@@ -433,9 +435,11 @@
 	[old release];
 }
 
-- (XMCallStatistics *)_callStatistics
+- (void)_updateCallStatistics:(XMCallStatistics *)callStats
 {
-	return &callStatistics;
+	XMCallStatisticsRecord *newStats = [callStats _callStatisticsRecord];
+	
+	memcpy(&callStatistics, newStats, sizeof(XMCallStatisticsRecord));
 }
 
 @end

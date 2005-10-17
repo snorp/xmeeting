@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMMediaReceiver.h"
+
+#import "XMPrivate.h"
 #import "XMVideoManager.h"
 #import "XMPacketReassembler.h"
 #import "XMCallbackBridge.h"
@@ -33,20 +35,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 @implementation XMMediaReceiver
 
-#pragma mark Class Methods
-
-+ (XMMediaReceiver *)sharedInstance
-{
-	static XMMediaReceiver *sharedInstance = nil;
-	
-	if(sharedInstance == nil)
-	{
-		sharedInstance = [[XMMediaReceiver alloc] _init];
-	}
-	
-	return sharedInstance;
-}
-
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -71,6 +59,17 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	return self;
 }
 
+- (void)_close
+{
+}
+
+- (void)dealloc
+{
+	[self _close];
+	
+	[super dealloc];
+}
+
 #pragma mark Data Handling Methods
 
 - (void)_startMediaReceivingWithCodec:(unsigned)codecType payloadType:(unsigned)payloadType
@@ -87,14 +86,10 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	videoCodecType = codecType;
 	videoPayloadType = payloadType;
 	videoMediaSize = videoSize;
-	
-	NSLog(@"Start receiving for Session: %d %d", codecType, sessionID);
 }
 
 - (void)_stopMediaReceivingForSession:(unsigned)sessionID
-{
-	NSLog(@"End MediaReceiving for Session %d", sessionID);
-	
+{	
 	if(videoDecompressionSession != NULL)
 	{
 		ICMDecompressionSessionRelease(videoDecompressionSession);
@@ -265,7 +260,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 void XMProcessFrame(const UInt8* data, unsigned length, unsigned sessionID)
 {
-	[[XMMediaReceiver sharedInstance] _processFrame:data length:length session:sessionID];
+	[_XMMediaReceiverSharedInstance _processFrame:data length:length session:sessionID];
 }
 
 static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
@@ -281,6 +276,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if((kICMDecompressionTracking_EmittingFrame & decompressionTrackingFlags) && pixelBuffer != NULL)
 	{
 		CIImage *remoteImage = [[CIImage alloc] initWithCVImageBuffer:(CVImageBufferRef)pixelBuffer];
-		[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handleRemoteImage:) withObject:remoteImage waitUntilDone:NO];
+		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleRemoteImage:) withObject:remoteImage waitUntilDone:NO];
 	}
 }

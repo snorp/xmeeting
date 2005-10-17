@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.6 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,25 +20,20 @@
 	
 	NSString *localAddress;
 	
-	NSURLConnection *externalAddressURLConnection;
-	NSMutableData *externalAddressURLData;
-	NSTimer *fetchingExternalAddressTimer;
 	BOOL isFetchingExternalAddress;
 	BOOL didSucceedFetchingExternalAddress;
+	NSURLConnection *externalAddressURLConnection;
+	NSMutableData *externalAddressURLData;
 	NSString *externalAddress;
 	NSString *externalAddressFetchFailReason;
+	
+	NSTimer *fetchingExternalAddressTimer;
 }
 
 /**
  * Returns the shared singleton instance of XMUtils
  **/
 + (XMUtils *)sharedInstance;
-
-/**
- * parses whether str is a phone number and consists of only
- * digits, white space and '(' ')' '+' or '-'
- **/
-+ (BOOL)isPhoneNumber:(NSString *)str;
 
 /**
  * Returns the local address for this computer
@@ -83,6 +78,16 @@
 
 @end
 
+/**
+ * checks whether str is a phone number and consists of only
+ * digits, white space and '(' ')' '+' or '-'
+ **/
+BOOL XMIsPhoneNumber(NSString *phoneNumber);
+
+/**
+ * Returns an NSSize containing the width and height
+ * of the specified video size
+ **/
 NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize);
 
 #endif // __XM_UTILS_H__

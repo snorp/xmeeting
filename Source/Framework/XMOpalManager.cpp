@@ -1,18 +1,20 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.11 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.12 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#include "XMProcess.h"
-#include "XMTypes.h"
 #include "XMOpalManager.h"
+
+#include "XMTypes.h"
 #include "XMCallbackBridge.h"
+#include "XMMediaFormats.h"
 #include "XMSoundChannel.h"
 #include "XMTransmitterMediaPatch.h"
 #include "XMReceiverMediaPatch.h"
+#include "XMProcess.h"
 
 #include <codec/h261codec.h>
 
@@ -68,87 +70,55 @@ XMH323EndPoint * XMOpalManager::H323EndPoint()
 
 #pragma mark overriding some callbacks
 
-BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
-{	
-	XMCallProtocol protocol;
-	
-	// determining which protocoll we are using
-	// (currently only H.323)
-	PString prefix = connection.GetEndPoint().GetPrefixName();
-	if(prefix == "h323")
-	{
-		protocol = XMCallProtocol_H323;
-	}
-	else
-	{
-		protocol = XMCallProtocol_UnknownProtocol;
-	}
-	
-	// telling the PCSSEndPoint which protocol we use so
-	// that the endpoint can forward this information
-	// when needed
-	callEndPoint->SetCallProtocol(protocol);
-	
-	return OpalManager::OnIncomingConnection(connection);
-}
-
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {	
-	cout << "OnEstablishedCall" << endl;
+	BOOL isIncomingCall = TRUE;
+	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
+	if(PIsDescendant(&endPoint, XMEndPoint))
+	{
+		isIncomingCall = FALSE;
+	}
 	unsigned callID = call.GetToken().AsUnsigned();
-	noteCallEstablished(callID);
+	_XMHandleCallEstablished(callID, isIncomingCall);
 	OpalManager::OnEstablishedCall(call);
 }
 
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {
-	cout << "OnClearedCall" << endl;
 	XMSoundChannel::StopChannels();
 	unsigned callID = call.GetToken().AsUnsigned();
-	noteCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
+	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
-}
-
-void XMOpalManager::OnEstablished(OpalConnection & connection)
-{
-	cout << "XMOpalManager::OnEstablished" << endl;
-	OpalManager::OnEstablished(connection);
-}
-
-void XMOpalManager::OnConnected(OpalConnection & connection)
-{
-	cout << "XMOpalManager::OnConnected" << endl;
-	OpalManager::OnConnected(connection);
-}
-
-void XMOpalManager::OnReleased(OpalConnection & connection)
-{
-	cout << "XMOpalManager::OnReleased" << connection << endl;
-	
-	OpalManager::OnReleased(connection);
 }
 
 BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)
 {
 	// first, we want to find out whether we are interested in this media stream or not
-	// We are only interested in the external codecs and not the internal PCM-16
-	// and RGB24/YUV420P formats
+	// We are only interested in the external codecs and not the internal PCM-16 format
+	// and XM_MEDIA_FORMAT_VIDEO
 	PString format = stream.GetMediaFormat();
-	if(!(format == OpalPCM16 
-		 || format == "RGB24" 
-		 || format == "YUV420P"))
+	if(!(format == OpalPCM16 ||
+		 format == XM_MEDIA_FORMAT_VIDEO))
 	{
-		unsigned callID = connection.GetCall().GetToken().AsUnsigned();
-		noteMediaStreamOpened(callID, stream.IsSource(), format);
+		callID = connection.GetCall().GetToken().AsUnsigned();
+		_XMHandleMediaStreamOpened(callID, stream.IsSource(), format);
 	}
 	
 	return OpalManager::OnOpenMediaStream(connection, stream);
 }
 
-void XMOpalManager::OnClosedMediaStream(OpalMediaStream & stream)
+void XMOpalManager::OnClosedMediaStream(const OpalMediaStream & stream)
 {
-	//noteMediaStreamClosed(0, stream.IsSource(), stream.GetMediaFormat());
-	cout << "media stream closed: " << stream.GetMediaFormat() << endl;
+	// first, we want to find out whether we are interested in this media stream or not
+	// We are only interested in the external codecs and not the internal PCM-16 format
+	// and XM_MEDIA_FORMAT_VIDEO
+	PString format = stream.GetMediaFormat();
+	if(!(format == OpalPCM16 ||
+		 format == XM_MEDIA_FORMAT_VIDEO))
+	{
+		_XMHandleMediaStreamClosed(callID, stream.IsSource(), format);
+	}
+	
 	OpalManager::OnClosedMediaStream(stream);
 }
 

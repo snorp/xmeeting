@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.5 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.6 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,8 +34,7 @@
 	XMStatisticsModule *statisticsModule;
 	XMCallHistoryModule *callHistoryModule;
 	
-	BOOL appShouldTerminate;
-	
+	NSAlert *incomingCallAlert;
 }
 
 /**

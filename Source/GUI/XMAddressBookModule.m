@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.6 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,7 +41,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (id)init
 {
+	self = [super init];
+	
 	[[XMMainWindowController sharedInstance] addAdditionModule:self];
+	
+	return self;
 }
 
 - (void)dealloc

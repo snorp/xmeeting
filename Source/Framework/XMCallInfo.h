@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,7 +45,7 @@
 	NSString *incomingVideoCodec;
 	NSString *outgoingVideoCodec;
 	
-	XMCallStatistics callStatistics;
+	XMCallStatisticsRecord callStatistics;
 }
 
 /**

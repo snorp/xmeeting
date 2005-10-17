@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.7 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.8 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,26 +38,17 @@ XMH323EndPoint::~XMH323EndPoint()
 
 BOOL XMH323EndPoint::EnableListeners(BOOL flag)
 {
+	BOOL result = TRUE;
+	
 	if(flag == TRUE)
 	{
-		BOOL result = TRUE;
-		
 		if(isListening == FALSE)
 		{
 			result = StartListeners(GetDefaultListeners());
 			if(result == TRUE)
 			{
 				isListening = TRUE;
-				return TRUE;
 			}
-			else
-			{
-				return FALSE;
-			}
-		}
-		else
-		{
-			return TRUE;
 		}
 	}
 	else
@@ -67,8 +58,9 @@ BOOL XMH323EndPoint::EnableListeners(BOOL flag)
 			RemoveListener(NULL);
 			isListening = FALSE;
 		}
-		return TRUE;
 	}
+	
+	return result;
 }
 
 BOOL XMH323EndPoint::IsListening()
@@ -76,10 +68,10 @@ BOOL XMH323EndPoint::IsListening()
 	return isListening;
 }
 
-BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
-								   const PString & identifier,
-								   const PString & username,
-								   const PString & phoneNumber)
+XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString & address,
+																 const PString & identifier,
+																 const PString & username,
+																 const PString & phoneNumber)
 {	
 	// By setting the user name , we clear all previously used aliases
 	SetLocalUserName(GetManager().GetDefaultUserName());
@@ -101,35 +93,34 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 		BOOL wasRegisteredAtGatekeeper = IsRegisteredWithGatekeeper();
 		didRegisterAtGatekeeper = FALSE;
 		gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+		
 		BOOL result = UseGatekeeper(address, identifier);
 		
 		if(result == TRUE && didRegisterAtGatekeeper == TRUE)
 		{
 			if(wasRegisteredAtGatekeeper == TRUE)
 			{
-				// if we have been registered before and now have a new registration,
-				// then we have unregistered the previous gatekeeper
-				noteGatekeeperUnregistration();
+				// There was a registration previously, thus we have unregistered
+				// from this previous gatekeeper
+				_XMHandleGatekeeperUnregistration();
 			}
 			
 			PString gatekeeperName = GetGatekeeper()->GetName();
-			noteGatekeeperRegistration(gatekeeperName);
+			_XMHandleGatekeeperRegistration(gatekeeperName);
 		}
 		else if (result == FALSE)
 		{
 			if(wasRegisteredAtGatekeeper == TRUE)
 			{
 				// same as above
-				noteGatekeeperUnregistration();
+				_XMHandleGatekeeperUnregistration();
 			}
 			
 			if(gatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_NoFailure)
 			{
 				gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_GatekeeperNotFound;
 			}
-			noteGatekeeperRegistrationFailure(gatekeeperRegistrationFailReason);
 		}
-		return result;
 	}
 	else
 	{
@@ -140,22 +131,25 @@ BOOL XMH323EndPoint::SetGatekeeper(const PString & address,
 			doesUnregister = TRUE;
 		}
 		
-		BOOL result = RemoveGatekeeper();
+		RemoveGatekeeper();
 		
 		// if we unregistered, we have to inform the obj-C world
 		if(doesUnregister == TRUE)
 		{
-			noteGatekeeperUnregistration();
+			_XMHandleGatekeeperUnregistration();
 		}
-		return result;
+		
+		gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	}
+	
+	return gatekeeperRegistrationFailReason;
 }
 
 void XMH323EndPoint::CheckGatekeeperRegistration()
 {
 	if(IsRegisteredWithGatekeeper() == FALSE)
 	{
-		noteGatekeeperUnregistration();
+		_XMHandleGatekeeperUnregistration();
 	}
 }
 
@@ -172,7 +166,7 @@ void XMH323EndPoint::GetCallInformation(PString & theRemoteName,
 	theRemoteApplication = remoteApplication;
 }
 										
-void XMH323EndPoint::GetCallStatistics(XMCallStatistics *callStatistics)
+void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 {
 	PSafePtr<H323Connection> connection = FindConnectionWithLock(connectionToken, PSafeReadOnly);
 	
@@ -237,14 +231,12 @@ void XMH323EndPoint::OnRegistrationConfirm()
 
 void XMH323EndPoint::OnRegistrationReject()
 {
-	cout << "OnRegistrationReject()" << endl;
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_RegistrationReject;
 	H323EndPoint::OnRegistrationReject();
 }
 
 void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 {
-	cout << "XMH323EndPoint::OnEstablished()" << endl;
 	connectionToken = connection.GetToken();
 	remoteName = connection.GetRemotePartyName();
 	remoteNumber = connection.GetRemotePartyNumber();
@@ -255,9 +247,7 @@ void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 }
 
 void XMH323EndPoint::OnReleased(OpalConnection & connection)
-{
-	cout << "XMH323EndPoint::OnReleased()" << endl;
-	
+{	
 	remoteName = "";
 	remoteNumber = "";
 	remoteAddress = "";
@@ -265,7 +255,9 @@ void XMH323EndPoint::OnReleased(OpalConnection & connection)
 	
 	H323EndPoint::OnReleased(connection);
 	
+	/*
 	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 	XMCallEndReason endReason = (XMCallEndReason)connection.GetCall().GetCallEndReason();
-	noteCallCleared(callID, endReason);
+	//_XMHandleCallCleared(callID, endReason);
+	 */
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.4 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.5 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,8 @@
 #define __XM_CALL_HISTORY_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
+
+#import "XMCallAddressManager.h"
 #import "XMMainWindowAdditionModule.h"
 
 @class XMRecentCallsView;
@@ -28,6 +30,8 @@
 	BOOL didLogIncomingCall;
 	
 	NSString *gatekeeperName;
+	id<XMCallAddress> callAddress;
+	
 }
 
 @end

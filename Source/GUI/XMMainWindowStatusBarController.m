@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowStatusBarController.m,v 1.6 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMMainWindowStatusBarController.m,v 1.7 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,16 +13,20 @@
 
 - (void)_didStartFetchingExternalAddress:(NSNotification *)notif;
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
+
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
 - (void)_didEndSubsystemSetup:(NSNotification *)notif;
-- (void)_didStartGatekeeperRegistration:(NSNotification *)notif;
-- (void)_gatekeeperRegistration:(NSNotification *)notif;
-- (void)_gatekeeperUnregistration:(NSNotification *)notif;
-- (void)_gatekeeperRegistrationFailure:(NSNotification *)notif;
+- (void)_didStartGatekeeperRegistrationProcess:(NSNotification *)notif;
+- (void)_didEndGatekeeperRegistrationProcess:(NSNotification *)notif;
+- (void)_didRegisterAtGatekeeper:(NSNotification *)notif;
+- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif;
+- (void)_didStartCallInitiation:(NSNotification *)notif;
 - (void)_didStartCalling:(NSNotification *)notif;
-- (void)_incomingCall:(NSNotification *)notif;
-- (void)_callEstablished:(NSNotification *)notif;
-- (void)_callCleared:(NSNotification *)notif;
+- (void)_didNotStartCalling:(NSNotification *)notif;
+- (void)_didReceiveIncomingCall:(NSNotification *)notif;
+- (void)_didEstablishCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
+
 - (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif;
 - (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
 
@@ -62,28 +66,39 @@
 {
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
+	// utils notifications
 	[notificationCenter addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+	
+	// call manager notifications
 	[notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
 							   name:XMNotification_CallManagerDidStartSubsystemSetup object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
 							   name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didStartGatekeeperRegistration:)
-							   name:XMNotification_CallManagerDidStartGatekeeperRegistration object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistration:)
-							   name:XMNotification_CallManagerGatekeeperRegistration object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperUnregistration:)
-							   name:XMNotification_CallManagerGatekeeperUnregistration object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartGatekeeperRegistrationProcess:)
+							   name:XMNotification_CallManagerDidStartGatekeeperRegistrationProcess object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEndGatekeeperRegistrationProcess:)
+							   name:XMNotification_CallManagerDidEndGatekeeperRegistrationProcess object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didRegisterAtGatekeeper:)
+							   name:XMNotification_CallManagerDidRegisterAtGatekeeper object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:)
+							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
+							   name:XMNotification_CallManagerDidStartCallInitiation object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartCalling:)
 							   name:XMNotification_CallManagerDidStartCalling object:nil];
-	[notificationCenter addObserver:self selector:@selector(_incomingCall:)
-							   name:XMNotification_CallManagerIncomingCall object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
-							   name:XMNotification_CallManagerCallEstablished object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callCleared:)
-							   name:XMNotification_CallManagerCallCleared object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
+							   name:XMNotification_CallManagerDidNotStartCalling object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
+							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+							   name:XMNotification_CallManagerDidEstablishCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall object:nil];
+	
+	// video manager notification
 	[notificationCenter addObserver:self selector:@selector(_didStartVideoInputDeviceListUpdate:)
 							   name:XMNotification_VideoManagerDidStartInputDeviceListUpdate object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateVideoInputDeviceList:)
@@ -125,24 +140,41 @@
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
 	doesSubsystemSetup = YES;
-	NSString *displayString = NSLocalizedString(@"Setting up the subsystem...", @"");
+	NSString *displayString = NSLocalizedString(@"Configuring the subsystem...", @"");
 	[self _setStatusBarString:displayString animation:XM_DO_ANIMATION];
 }
 
 - (void)_didEndSubsystemSetup:(NSNotification *)notif
 {
 	doesSubsystemSetup = NO;
-	NSString *displayString = NSLocalizedString(@"Setting up the subsystem... Done.", @"");
+	NSString *displayString = NSLocalizedString(@"Configuring the subsystem... Done.", @"");
 	[self _setStatusBarString:displayString animation:XM_NO_ANIMATION];
 }
 
-- (void)_didStartGatekeeperRegistration:(NSNotification *)notif
+- (void)_didStartGatekeeperRegistrationProcess:(NSNotification *)notif
 {
-	NSString *displayString = NSLocalizedString(@"H.323: Registering at Gatekeeper", @"");
+	NSString *displayString = NSLocalizedString(@"H.323: Registering at Gatekeeper...", @"");
 	[self _setStatusBarString:displayString];
 }
 
-- (void)_gatekeeperRegistration:(NSNotification *)notif
+- (void)_didEndGatekeeperRegistrationProcess:(NSNotification *)notif
+{
+	NSString *displayString;
+	
+	if([[XMCallManager sharedInstance] isGatekeeperRegistered])
+	{
+		displayString = NSLocalizedString(@"H.323: Registering at Gatekeeper... Done", @"");
+	}
+	else
+	{
+		
+		displayString = NSLocalizedString(@"H.323: Registering at Gatekeeper... Failed", @"");
+	}
+	
+	[self _setStatusBarString:displayString];
+}
+
+- (void)_didRegisterAtGatekeeper:(NSNotification *)notif
 {
 	NSString *displayFormat = NSLocalizedString(@"H.323: Gatekeeper set: %@", @"");
 	NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, [[XMCallManager sharedInstance] gatekeeperName]];
@@ -150,33 +182,45 @@
 	[displayString release];
 }
 
-- (void)_gatekeeperUnregistration:(NSNotification *)notif
+- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif
 {
-	NSString *displayFormat = NSLocalizedString(@"H.323: Removed Gatekeeper %@", @"");
+	NSString *displayFormat = NSLocalizedString(@"H.323: Unregistered from Gatekeeper", @"");
 	NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, [[XMCallManager sharedInstance] gatekeeperName]];
 	[self _setStatusBarString:displayString];
 	[displayString release];
 }
 
+- (void)_didStartCallInitiation:(NSNotification *)notif
+{
+	NSString *displayString = NSLocalizedString(@"Preparing to call...", @"");
+	[self _setStatusBarString:displayString animation:XM_DO_ANIMATION];
+}
+
 - (void)_didStartCalling:(NSNotification *)notif
 {
 	NSString *displayString = NSLocalizedString(@"Calling...", @"");
-	[self _setStatusBarString:displayString];
+	[self _setStatusBarString:displayString animation:XM_NO_ANIMATION];
 }
 
-- (void)_incomingCall:(NSNotification *)notif
+- (void)_didNotStartCalling:(NSNotification *)notif
+{
+	NSString *displayString = NSLocalizedString(@"Unable to start calling", @"");
+	[self _setStatusBarString:displayString animation:XM_NO_ANIMATION];
+}
+
+- (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	NSString *displayString = NSLocalizedString(@"Incoming Call", @"");
 	[self _setStatusBarString:displayString];
 }
 
-- (void)_callEstablished:(NSNotification *)notif
+- (void)_didEstablishCall:(NSNotification *)notif
 {
 	NSString *displayString = NSLocalizedString(@"Call Established", @"");
 	[self _setStatusBarString:displayString];
 }
 
-- (void)_callCleared:(NSNotification *)notif
+- (void)_didClearCall:(NSNotification *)notif
 {
 	NSString *displayString = NSLocalizedString(@"Call Ended", @"");
 	[self _setStatusBarString:displayString];
@@ -249,8 +293,13 @@
 - (void)_clearStatusBar:(NSTimer *)timer
 {
 	[statusBar setStringValue:@""];
-	[displayClearTimer release];
-	displayClearTimer = nil;
+	
+	if(displayClearTimer != nil)
+	{
+		[displayClearTimer invalidate];
+		[displayClearTimer release];
+		displayClearTimer = nil;
+	}
 }
 
 @end

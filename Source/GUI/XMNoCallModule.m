@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.9 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.10 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,8 +21,12 @@
 - (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
 - (void)_didEndSubsystemSetup:(NSNotification *)notif;
+- (void)_didStartCallInitiation:(NSNotification *)notif;
 - (void)_didStartCalling:(NSNotification *)notif;
-- (void)_callCleared:(NSNotification *)notif;
+- (void)_didNotStartCalling:(NSNotification *)notif;
+- (void)_isRingingAtRemoteParty:(NSNotification *)notif;
+- (void)_didReceiveIncomingCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
 - (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif;
 - (void)_callHistoryDataDidChange:(NSNotification *)notif;
 
@@ -95,17 +99,29 @@
 	[notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
 							   name:XMNotification_CallManagerDidEndSubsystemSetup
 							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
+							   name:XMNotification_CallManagerDidStartCallInitiation
+							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartCalling:)
 							   name:XMNotification_CallManagerDidStartCalling
 							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callCleared:)
-							   name:XMNotification_CallManagerCallCleared
+	[notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
+							   name:XMNotification_CallManagerDidNotStartCalling
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_isRingingAtRemoteParty:)
+							   name:XMNotification_CallManagerDidStartRingingAtRemoteParty
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
+							   name:XMNotification_CallManagerDidReceiveIncomingCall
+							  object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
-							   name:XMNotification_CallManagerGatekeeperRegistration
+							   name:XMNotification_CallManagerDidRegisterAtGatekeeper
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
-							   name:XMNotification_CallManagerGatekeeperUnregistration
+							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
 							   name:XMNotification_CallHistoryCallAddressProviderDataDidChange
@@ -170,6 +186,7 @@
 		// we are calling someone but the call has not yet been established
 		// therefore, we simply hang up the call again
 		[[XMCallManager sharedInstance] clearActiveCall];
+		return;
 	}
 	
 	[callAddressField endEditing];
@@ -179,6 +196,7 @@
 		NSLog(@"ERROR: NO REPRESENTED OBJECT!");
 		return;
 	}
+	
 	[callAddressManager makeCallToAddress:callAddress];
 }
 
@@ -290,11 +308,24 @@
 	[self _displayListeningStatusFieldInformation];
 }
 
-- (void)_didStartCalling:(NSNotification *)notif
+- (void)_didStartCallInitiation:(NSNotification *)notif
 {
+	// until XMNotification_CallManagerDidStartCalling is posted, we have to disable
+	// the user GUI. Normally, only very little time passes befor this notification is
+	// posted. However, in some cases, it may take some time (3-4) secs, in which the
+	// user cannot clear the call
+	
 	id<XMCallAddress> activeCallAddress = [callAddressManager activeCallAddress];
 	[callAddressField setRepresentedObject:activeCallAddress];
 	[locationsPopUpButton setEnabled:NO];
+	[callButton setEnabled:NO];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Preparing to call...", @"")];
+	[statusFieldTwo setStringValue:@""];
+}
+
+- (void)_didStartCalling:(NSNotification *)notif
+{
+	[callButton setEnabled:YES];
 	[callButton setTitle:NSLocalizedString(@"Hangup", @"")];
 	[statusFieldOne setStringValue:NSLocalizedString(@"Calling...", @"")];
 	[statusFieldTwo setStringValue:@""];
@@ -302,9 +333,29 @@
 	isCalling = YES;
 }
 
-- (void)_callCleared:(NSNotification *)notif
+- (void)_didNotStartCalling:(NSNotification *)notif
 {
 	[locationsPopUpButton setEnabled:YES];
+	[callButton setEnabled:YES];
+	[self _displayListeningStatusFieldInformation];
+}
+
+- (void)_isRingingAtRemoteParty:(NSNotification *)notif
+{
+	[statusFieldOne setStringValue:NSLocalizedString(@"Ringing Phone at Remote Party...", @"")];
+}
+
+- (void)_didReceiveIncomingCall:(NSNotification *)notif
+{
+	[locationsPopUpButton setEnabled:NO];
+	[callButton setEnabled:NO];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Incoming Call", @"")];
+}
+
+- (void)_didClearCall:(NSNotification *)notif
+{
+	[locationsPopUpButton setEnabled:YES];
+	[callButton setEnabled:YES];
 	[callButton setTitle:NSLocalizedString(@"Call", @"")];
 	[self _displayListeningStatusFieldInformation];
 	isCalling = NO;

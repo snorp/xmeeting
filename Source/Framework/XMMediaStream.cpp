@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,9 +48,7 @@ BOOL XMMediaStream::IsSynchronous() const
 }
 
 BOOL XMMediaStream::Close()
-{
-	cout << "*************" << endl << "XMMediaStream::Close()" << endl;
-	
+{	
 	if(IsSink())
 	{
 		return OpalMediaStream::Close();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.6 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.7 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,7 @@
 
 @interface XMStatisticsModule (PrivateMethods)
 
-- (void)_callStatisticsUpdated:(NSNotification *)notif;
+- (void)_didUpdateCallStatistics:(NSNotification *)notif;
 
 @end
 
@@ -36,6 +36,8 @@
 	audioReceiveBitrate = -1.0f;
 	videoSendBitrate = -1.0f;
 	videoReceiveBitrate = -1.0f;
+	
+	return self;
 }
 
 - (void)dealloc
@@ -99,12 +101,12 @@
 - (void)becomeActiveModule
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(_callStatisticsUpdated:)
-												 name:XMNotification_CallManagerCallStatisticsUpdated
+											 selector:@selector(_didUpdateCallStatistics:)
+												 name:XMNotification_CallManagerDidUpdateCallStatistics
 											   object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(_callStatisticsUpdated:)
-												 name:XMNotification_CallManagerCallCleared
+											 selector:@selector(_didUpdateCallStatistics:)
+												 name:XMNotification_CallManagerDidClearCall
 											   object:nil];
 }
 
@@ -279,7 +281,7 @@
 
 #pragma mark Private Methods
 
-- (void)_callStatisticsUpdated:(NSNotification *)notif
+- (void)_didUpdateCallStatistics:(NSNotification *)notif
 {
 	XMCallInfo *newActiveCall = [[XMCallManager sharedInstance] activeCall];
 	

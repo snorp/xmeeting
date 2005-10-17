@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@
 	id<XMVideoInputModule> activeModule;
 	NSString *selectedDevice;
 	
+	NSTimer *frameGrabTimer;
+	
 	BOOL isGrabbing;
 	BOOL isTransmitting;
 	
@@ -38,8 +40,6 @@
 	RTPMPSampleDataParams sampleData;
 }
 
-+ (void)_startupWithVideoInputModules:(NSArray *)videoInputModules;
-
 + (void)_getDeviceList;
 + (void)_setDevice:(NSString *)device;
 
@@ -51,7 +51,8 @@
 + (void)_startTransmittingWithCodec:(unsigned)codecType videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID;
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 
-+ (void)_shutdown;
+- (id)_init;
+- (void)_close;
 
 @end
 

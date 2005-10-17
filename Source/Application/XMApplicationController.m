@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.10 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.11 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,13 +25,19 @@
 
 @interface XMApplicationController (PrivateMethods)
 
-- (void)_didGoOffline:(NSNotification *)notif;
-- (void)_callStartFailed:(NSNotification *)notif;
-- (void)_callEstablished:(NSNotification *)notif;
-- (void)_callCleared:(NSNotification *)notif;
-- (void)_enablingH323Failed:(NSNotification *)notif;
-- (void)_gatekeeperRegistrationFailed:(NSNotification *)notif;
+- (void)_didReceiveIncomingCall:(NSNotification *)notif;
+- (void)_didEstablishCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
 
+// handle errors
+- (void)_didNotStartCalling:(NSNotification *)notif;
+- (void)_didNotEnableH323:(NSNotification *)notif;
+- (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
+
+// terminating the application
+- (void)_frameworkClosed:(NSNotification *)notif;
+
+- (void)_displayIncomingCall;
 - (void)_displayCallStartFailed;
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
@@ -42,10 +48,17 @@
 
 #pragma mark Init & Deallocation Methods
 
+- (id)init
+{
+	self = [super init];
+	
+	return self;
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)notif
 {
 	// First step to do!
-	InitXMeetingFramework();
+	XMInitFramework();
 	
 	// registering the call address providers
 	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
@@ -57,9 +70,9 @@
 	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
 	
 	addressBookModule = [[XMAddressBookModule alloc] init];
-	zeroConfModule = [[XMZeroConfModule alloc] init];
-	dialPadModule = [[XMDialPadModule alloc] init];
-	textChatModule = [[XMTextChatModule alloc] init];
+	//zeroConfModule = [[XMZeroConfModule alloc] init];
+	//dialPadModule = [[XMDialPadModule alloc] init];
+	//textChatModule = [[XMTextChatModule alloc] init];
 	statisticsModule = [[XMStatisticsModule alloc] init];
 	callHistoryModule = [[XMCallHistoryModule alloc] init];
 	
@@ -74,22 +87,25 @@
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
-	[notificationCenter addObserver:self selector:@selector(_didGoOffline:)
-							   name:XMNotification_CallManagerDidGoOffline object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callStartFailed:)
-							   name:XMNotification_CallManagerCallStartFailed object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
-							   name:XMNotification_CallManagerCallEstablished object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callCleared:)
-							   name:XMNotification_CallManagerCallCleared object:nil];
-	[notificationCenter addObserver:self selector:@selector(_enablingH323Failed:)
-							   name:XMNotification_CallManagerEnablingH323Failed object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationFailed:)
-							   name:XMNotification_CallManagerGatekeeperRegistrationFailed object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
+							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+							   name:XMNotification_CallManagerDidEstablishCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
+							   name:XMNotification_CallManagerDidNotStartCalling object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotEnableH323:)
+							   name:XMNotification_CallManagerDidNotEnableH323 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:)
+							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
+	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
+							   name:XMNotification_FrameworkDidClose object:nil];
 	
-	// last but not least, go online
-	[[XMCallManager sharedInstance] setOnline:YES];
+	// start grabbing from the video sources
 	[[XMVideoManager sharedInstance] startGrabbing];
+	
+	incomingCallAlert = nil;
 }
 
 - (void)dealloc
@@ -98,9 +114,9 @@
 	[inCallModule release];
 	[localAudioVideoModule release];
 	[addressBookModule release];
-	[zeroConfModule release];
-	[dialPadModule release];
-	[textChatModule release];
+	//[zeroConfModule release];
+	//[dialPadModule release];
+	//[textChatModule release];
 	[statisticsModule release];
 	[callHistoryModule release];
 	
@@ -123,49 +139,90 @@
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-	[[XMCallManager sharedInstance] setOnline:NO];
-	appShouldTerminate = YES;
+	XMCloseFramework();
 	
-	// wait for the DidGoOffline notification before terminating.
+	// wait for the FrameworkDidClose notification before terminating.
 	return NSTerminateLater;
 }
 
 #pragma mark Notification Methods
 
-- (void)_didGoOffline:(NSNotification *)notif
+- (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
-	if(appShouldTerminate == YES)
-	{
-		[NSApp replyToApplicationShouldTerminate:YES];
-	}
+	[self performSelector:@selector(_displayIncomingCall) withObject:nil afterDelay:0.0];
 }
 
-- (void)_callStartFailed:(NSNotification *)notif
-{
-	[self performSelector:@selector(_displayCallStartFailed) withObject:nil afterDelay:0.0];
-}
-
-- (void)_callEstablished:(NSNotification *)notif
+- (void)_didEstablishCall:(NSNotification *)notif
 {
 	[[XMMainWindowController sharedInstance] showMainModule:inCallModule];
 }
 
-- (void)_callCleared:(NSNotification *)notif
+- (void)_didClearCall:(NSNotification *)notif
 {	
+	if(incomingCallAlert != nil)
+	{
+		[NSApp abortModal];
+	}
 	[[XMMainWindowController sharedInstance] showMainModule:noCallModule];
 }
 
-- (void)_enablingH323Failed:(NSNotification *)notif
+- (void)_didNotStartCalling:(NSNotification *)notif
+{
+	// by delaying the display of the callStartFailed message on screen, we allow
+	// that all observers of this notification have received the notification
+	[self performSelector:@selector(_displayCallStartFailed) withObject:nil afterDelay:0.0];
+}
+
+- (void)_didNotEnableH323:(NSNotification *)notif
 {
 	[self performSelector:@selector(_displayEnableH323FailedAlert) withObject:nil afterDelay:0.0];
 }
 
-- (void)_gatekeeperRegistrationFailed:(NSNotification *)notif
+- (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif
 {
 	[self performSelector:@selector(_displayGatekeeperRegistrationFailedAlert) withObject:nil afterDelay:0.0];
 }
 
+- (void)_frameworkDidClose:(NSNotification *)notif
+{
+	// Now it's time to terminate the application
+	[NSApp replyToApplicationShouldTerminate:YES];
+}
+
 #pragma mark Displaying Alerts
+
+- (void)_displayIncomingCall
+{
+	incomingCallAlert = [[NSAlert alloc] init];
+	
+	[incomingCallAlert setMessageText:NSLocalizedString(@"Incoming Call", @"")];
+	
+	NSString *informativeTextFormat = NSLocalizedString(@"Incoming call from \"%@\"\nTake call or not?", @"");
+	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
+	NSString *remoteName = [activeCall remoteName];
+	
+	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, remoteName];
+	[incomingCallAlert setInformativeText:informativeText];
+	[informativeText release];
+	
+	[incomingCallAlert setAlertStyle:NSInformationalAlertStyle];
+	[incomingCallAlert addButtonWithTitle:NSLocalizedString(@"Yes", @"")];
+	[incomingCallAlert addButtonWithTitle:NSLocalizedString(@"No", @"")];
+	
+	int result = [incomingCallAlert runModal];
+	
+	if(result == NSAlertFirstButtonReturn)
+	{
+		[[XMCallManager sharedInstance] acceptIncomingCall];
+	}
+	else if(result == NSAlertSecondButtonReturn)
+	{
+		[[XMCallManager sharedInstance] rejectIncomingCall];
+	}
+	
+	[incomingCallAlert release];
+	incomingCallAlert = nil;
+}
 
 - (void)_displayCallStartFailed
 {
@@ -199,6 +256,8 @@
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
 	
 	[alert runModal];
+	
+	[alert release];
 }
 
 - (void)_displayEnableH323FailedAlert

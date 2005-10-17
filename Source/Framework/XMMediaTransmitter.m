@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,21 +13,24 @@
 #import "XMUtils.h"
 #import "XMCallbackBridge.h"
 
+#import "XMSequenceGrabberVideoInputModule.h"
+#import "XMDummyVideoInputModule.h"
+
 typedef enum XMMediaTransmitterMessage
 {
 	// general messages
-	XMMediaTransmitterMessage_Shutdown= 0x0000,
+	_XMMediaTransmitterMessage_Shutdown= 0x0000,
 	
 	// configuration messages
-	XMMediaTransmitterMessage_GetDeviceList = 0x0100,
-	XMMediaTransmitterMessage_SetDevice = 0x0101,
-	XMMediaTransmitterMessage_SetFrameGrabRate = 0x0102,
+	_XMMediaTransmitterMessage_GetDeviceList = 0x0100,
+	_XMMediaTransmitterMessage_SetDevice = 0x0101,
+	_XMMediaTransmitterMessage_SetFrameGrabRate = 0x0102,
 	
 	// "action" messages
-	XMMediaTransmitterMessage_StartGrabbing = 0x0200,
-	XMMediaTransmitterMessage_StopGrabbing = 0x0201,
-	XMMediaTransmitterMessage_StartTransmitting = 0x0202,
-	XMMediaTransmitterMessage_StopTransmitting = 0x0203
+	_XMMediaTransmitterMessage_StartGrabbing = 0x0200,
+	_XMMediaTransmitterMessage_StopGrabbing = 0x0201,
+	_XMMediaTransmitterMessage_StartTransmitting = 0x0202,
+	_XMMediaTransmitterMessage_StopTransmitting = 0x0203
 	
 } XMMediaTransmitterMessage;
 
@@ -35,11 +38,10 @@ typedef enum XMMediaTransmitterMessage
 
 + (void)_sendMessage:(XMMediaTransmitterMessage)message withComponents:(NSArray *)components;
 
-- (id)_initWithVideoInputModules:(NSArray *)videoInputModules;
-
 - (NSPort *)_receivePort;
+- (void)_handleMediaTransmitterThreadDidExit;
 
-- (void)_runVideoTransmitThread;
+- (void)_runMediaTransmitThread;
 - (void)handlePortMessage:(NSPortMessage *)portMessage;
 
 - (void)_handleShutdownMessage;
@@ -70,22 +72,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 @implementation XMMediaTransmitter
 
-static XMMediaTransmitter *transmitManager = nil;
-
 #pragma mark Class Methods
-
-+ (void)_startupWithVideoInputModules:(NSArray *)inputModules
-{
-	if(transmitManager == nil)
-	{
-		transmitManager = [[XMMediaTransmitter alloc] _initWithVideoInputModules:inputModules];
-		[NSThread detachNewThreadSelector:@selector(_runVideoTransmitThread) toTarget:transmitManager withObject:nil];
-	}
-}
 
 + (void)_getDeviceList
 {
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_GetDeviceList withComponents:nil];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_GetDeviceList withComponents:nil];
 }
 
 + (void)_setDevice:(NSString *)device
@@ -93,7 +84,7 @@ static XMMediaTransmitter *transmitManager = nil;
 	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:device];
 	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
 	
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_SetDevice withComponents:components];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SetDevice withComponents:components];
 	
 	[components release];
 }
@@ -105,19 +96,19 @@ static XMMediaTransmitter *transmitManager = nil;
 	[number release];
 	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
 	
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_SetFrameGrabRate withComponents:components];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SetFrameGrabRate withComponents:components];
 	
 	[components release];
 }
 
 + (void)_startGrabbing
 {
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_StartGrabbing withComponents:nil];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartGrabbing withComponents:nil];
 }
 
 + (void)_stopGrabbing
 {
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_StopGrabbing withComponents:nil];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopGrabbing withComponents:nil];
 }
 
 + (void)_startTransmittingWithCodec:(unsigned)codecType videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID
@@ -136,7 +127,7 @@ static XMMediaTransmitter *transmitManager = nil;
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:codecData, sizeData, sessionData, nil];
 	
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_StartTransmitting withComponents:components];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartTransmitting withComponents:components];
 	
 	[components release];
 }
@@ -149,24 +140,19 @@ static XMMediaTransmitter *transmitManager = nil;
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
 	
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_StopTransmitting withComponents:components];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopTransmitting withComponents:components];
 	
 	[components release];
 }
 
-+ (void)_shutdown
-{
-	[XMMediaTransmitter _sendMessage:XMMediaTransmitterMessage_Shutdown withComponents:nil];
-}
-
 + (void)_sendMessage:(XMMediaTransmitterMessage)message withComponents:(NSArray *)components
 {
-	if(transmitManager == nil)
+	if(_XMMediaTransmitterSharedInstance == nil)
 	{
-		NSLog(@"Would raise an exception here!");
+		NSLog(@"Attempt to access XMMediaTransmitter prior to initialization");
 		return;
 	}
-	NSPort *thePort = [transmitManager _receivePort];
+	NSPort *thePort = [_XMMediaTransmitterSharedInstance _receivePort];
 	NSPortMessage *portMessage = [[NSPortMessage alloc] initWithSendPort:thePort receivePort:nil components:components];
 	[portMessage setMsgid:(unsigned)message];
 	if([portMessage sendBeforeDate:[NSDate date]] == NO)
@@ -185,11 +171,18 @@ static XMMediaTransmitter *transmitManager = nil;
 	return nil;
 }
 
-- (id)_initWithVideoInputModules:(NSArray *)inputModules
+- (id)_init
 {
 	self = [super init];
 	
-	videoInputModules = [inputModules copy];
+	XMSequenceGrabberVideoInputModule *seqGrabModule = [[XMSequenceGrabberVideoInputModule alloc] _init];
+	XMDummyVideoInputModule *dummyModule = [[XMDummyVideoInputModule alloc] _init];
+	
+	videoInputModules = [[NSArray alloc] initWithObjects:seqGrabModule, dummyModule, nil];
+	
+	[seqGrabModule release];
+	[dummyModule release];
+	
 	receivePort = [[NSPort port] retain];
 	
 	isGrabbing = NO;
@@ -202,28 +195,40 @@ static XMMediaTransmitter *transmitManager = nil;
 	
 	compressionSession = NULL;
 	mediaPacketizer = 0L;
-
+	
 	return self;
+}
+
+- (void)_close
+{
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_Shutdown withComponents:nil];
 }
 
 - (void)dealloc
 {
-	// have yet to complete
+	[videoInputModules release];
+	
+	[receivePort release];
 	
 	[super dealloc];
 }
 
-#pragma mark Thread methods
+#pragma mark MainThread methods
 
 - (NSPort *)_receivePort
 {
 	return receivePort;
 }
 
-- (void)_runVideoTransmitThread
+- (void)_handleMediaTransmitterThreadDidExit
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	
+	_XMThreadExit();
+}
+
+#pragma mark MediTransmitterThread methods
+
+- (void)_runMediaTransmitterThread
+{	
 	EnterMovies();
 	XMRegisterPacketBuilder();
 	
@@ -258,17 +263,15 @@ static XMMediaTransmitter *transmitManager = nil;
 		
 	}
 	
-	[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												   waitUntilDone:NO];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
+												 waitUntilDone:NO];
 	[devices release];
 	
 	// running the run loop
 	[[NSRunLoop currentRunLoop] run];
 	
-	ExitMovies();
-	
-	[autoreleasePool release];
-	autoreleasePool = nil;
+	// Due to the problem that this run loop will never exit at the moment,
+	// we kill the associated thread after having cleaned up
 }
 
 - (void)handlePortMessage:(NSPortMessage *)portMessage
@@ -277,28 +280,28 @@ static XMMediaTransmitter *transmitManager = nil;
 	
 	switch(message)
 	{
-		case XMMediaTransmitterMessage_Shutdown:
+		case _XMMediaTransmitterMessage_Shutdown:
 			[self _handleShutdownMessage];
 			break;
-		case XMMediaTransmitterMessage_GetDeviceList:
+		case _XMMediaTransmitterMessage_GetDeviceList:
 			[self _handleGetDeviceListMessage];
 			break;
-		case XMMediaTransmitterMessage_SetDevice:
+		case _XMMediaTransmitterMessage_SetDevice:
 			[self _handleSetDeviceMessage:[portMessage components]];
 			break;
-		case XMMediaTransmitterMessage_SetFrameGrabRate:
+		case _XMMediaTransmitterMessage_SetFrameGrabRate:
 			[self _handleSetFrameGrabRateMessage:[portMessage components]];
 			break;
-		case XMMediaTransmitterMessage_StartGrabbing:
+		case _XMMediaTransmitterMessage_StartGrabbing:
 			[self _handleStartGrabbingMessage];
 			break;
-		case XMMediaTransmitterMessage_StopGrabbing:
+		case _XMMediaTransmitterMessage_StopGrabbing:
 			[self _handleStopGrabbingMessage];
 			break;
-		case XMMediaTransmitterMessage_StartTransmitting:
+		case _XMMediaTransmitterMessage_StartTransmitting:
 			[self _handleStartTransmittingMessage:[portMessage components]];
 			break;
-		case XMMediaTransmitterMessage_StopTransmitting:
+		case _XMMediaTransmitterMessage_StopTransmitting:
 			[self _handleStopTransmittingMessage:[portMessage components]];
 			break;
 		default:
@@ -311,7 +314,28 @@ static XMMediaTransmitter *transmitManager = nil;
 
 - (void)_handleShutdownMessage
 {
-	NSLog(@"Should shutdown here");
+	[self _handleStopTransmittingMessage:nil];
+	[self _handleStopGrabbingMessage];
+	
+	unsigned i;
+	unsigned count = [videoInputModules count];
+	
+	for(i = 0; i < count; i++)
+	{
+		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
+		[module close];
+	}
+	
+	// exiting from the run loop
+	[[NSRunLoop currentRunLoop] removePort:receivePort forMode:NSDefaultRunLoopMode];
+	
+	// Since the run loop wil not exit as long as QuickTime is enabled, we have
+	// to kill the thread "by hand"
+	ExitMovies();
+	
+	[self performSelectorOnMainThread:@selector(_handleMediaTransmitterThreadDidExit) withObject:nil waitUntilDone:NO];
+	
+	[NSThread exit];
 }
 
 - (void)_handleGetDeviceListMessage
@@ -329,8 +353,8 @@ static XMMediaTransmitter *transmitManager = nil;
 		[devices addObjectsFromArray:[module inputDevices]];
 	}
 	
-	[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												   waitUntilDone:NO];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
+												 waitUntilDone:NO];
 	[devices release];
 }
 
@@ -379,8 +403,8 @@ static XMMediaTransmitter *transmitManager = nil;
 					activeModule = module;
 					selectedDevice = [deviceToSelect retain];
 					
-					[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
-																  withObject:selectedDevice waitUntilDone:NO];
+					[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
+																	withObject:selectedDevice waitUntilDone:NO];
 					return;
 				}
 				else
@@ -426,6 +450,11 @@ static XMMediaTransmitter *transmitManager = nil;
 	isGrabbing = YES;
 	
 	// starting the timer and grabbing the first frame
+	
+	NSTimeInterval desiredTimeInterval = 1.0/frameGrabRate;
+	frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
+													 selector:@selector(_grabFrame:) userInfo:nil
+													  repeats:YES] retain];
 	[self _grabFrame:nil];
 }
 
@@ -444,6 +473,10 @@ static XMMediaTransmitter *transmitManager = nil;
 	{
 		NSLog(@"Closing the device failed");
 	}
+	
+	[frameGrabTimer invalidate];
+	[frameGrabTimer release];
+	frameGrabTimer = nil;
 }
 
 - (void)_handleStartTransmittingMessage:(NSArray *)components
@@ -595,22 +628,19 @@ static XMMediaTransmitter *transmitManager = nil;
 }
 
 - (void)_grabFrame:(NSTimer *)timer
-{
-	if(isGrabbing == NO)
-	{
-		[timer invalidate];
-		return;
-	}
-	
+{	
 	NSTimeInterval desiredTimeInterval = 1.0/frameGrabRate;
 	
 	// readjusting the timer interval if needed
-	if(timer == nil || [timer timeInterval] != desiredTimeInterval)
+	if([frameGrabTimer timeInterval] != desiredTimeInterval)
 	{
-		[timer invalidate];
+		[frameGrabTimer invalidate];
+		[frameGrabTimer release];
 		
-		[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
-									   selector:@selector(_grabFrame:) userInfo:nil repeats:YES];
+		
+		frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
+														 selector:@selector(_grabFrame:) userInfo:nil
+														  repeats:YES] retain];
 	}
 	
 	// calling the active module to grab a frame
@@ -643,10 +673,10 @@ static XMMediaTransmitter *transmitManager = nil;
 	activeModule = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:(moduleCount-1)];
 	selectedDevice = (NSString *)[[[activeModule inputDevices] objectAtIndex:0] retain];
 	
-	[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
-													  withObject:selectedDevice waitUntilDone:NO];
-	[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												   waitUntilDone:NO];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
+													withObject:selectedDevice waitUntilDone:NO];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
+												 waitUntilDone:NO];
 	[devices release];
 	
 	[activeModule openInputDevice:selectedDevice];
@@ -779,7 +809,7 @@ static XMMediaTransmitter *transmitManager = nil;
 	// sending the preview image to the video manager
 	CIImage *previewImage = [[CIImage alloc] initWithCVImageBuffer:(CVImageBufferRef)frame];
 	
-	[[XMVideoManager sharedInstance] performSelectorOnMainThread:@selector(_handlePreviewImage:) withObject:previewImage waitUntilDone:NO];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handlePreviewImage:) withObject:previewImage waitUntilDone:NO];
 	
 	TimeValue convertedTime = (90000 / timeScale) * time;
 	TimeValue timeStamp = convertedTime - timeOffset;

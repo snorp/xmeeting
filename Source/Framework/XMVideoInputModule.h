@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.3 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,7 +85,7 @@
  * This method is called whenever the module is no longer used and use it
  * to release any resources claimed by initModule.
  **/
-- (void)closeModule;
+- (void)close;
 
 /**
  * Returns all devices this module is able to support. Since getting the

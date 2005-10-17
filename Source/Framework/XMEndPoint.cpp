@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,10 @@
  */
 
 #include "XMEndPoint.h"
+
+#include <h323/h323ep.h>
+
+#include "XMCallbackBridge.h"
 #include "XMConnection.h"
 #include "XMMediaFormats.h"
 #include "XMSoundChannel.h"
@@ -95,7 +99,6 @@ PSoundChannel * XMEndPoint::CreateSoundChannel(const XMConnection & connection,
 
 #pragma mark CallManagement Methods
 
-
 BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty, PString & token)
 {
 	PString partyB;
@@ -120,15 +123,57 @@ BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty,
 	return GetManager().SetUpCall(partyA, partyB, token);
 }
 
-void XMEndPoint::SetAcceptIncomingCall(BOOL acceptCall)
+void XMEndPoint::OnShowOutgoing(const XMConnection & connection)
 {
-	if(acceptCall)
+	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+	
+	_XMHandleCallIsAlerting(callID);
+}
+
+void XMEndPoint::OnShowIncoming(XMConnection & connection)
+{
+	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+	XMCallProtocol callProtocol = XMCallProtocol_UnknownProtocol;
+		
+	OpalEndPoint & endPoint = connection.GetCall().GetOtherPartyConnection(connection)->GetEndPoint();
+	
+	if(PIsDescendant(&endPoint, H323EndPoint))
 	{
-		cout << "Accepting the call" << endl;
+		callProtocol = XMCallProtocol_H323;
 	}
-	else
+	
+	if(callProtocol == XMCallProtocol_UnknownProtocol)
 	{
-		cout << "Refusing incoming call" << endl;
+		cout << "No Valid call protocol" << endl;
+		RejectIncomingCall();
+		return;
+	}
+	
+	incomingConnectionToken = connection.GetToken();
+	
+	_XMHandleIncomingCall(callID,
+						  callProtocol,
+						  connection.GetRemotePartyName(),
+						  connection.GetRemotePartyNumber(),
+						  connection.GetRemotePartyAddress(),
+						  connection.GetRemoteApplication());
+}
+
+void XMEndPoint::AcceptIncomingCall()
+{
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(incomingConnectionToken, PSafeReadOnly);
+	if(connection != NULL)
+	{
+		connection->AcceptIncoming();
+	}
+}
+
+void XMEndPoint::RejectIncomingCall()
+{
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(incomingConnectionToken, PSafeReadOnly);
+	if(connection != NULL)
+	{
+		connection->ClearCall(OpalConnection::EndedByRefusal);
 	}
 }
 
@@ -143,9 +188,4 @@ void XMEndPoint::ClearCall(const PString & token)
 	{
 		cout << "Clearing the Call failed (Call not found)" << endl;
 	}
-}
-
-void XMEndPoint::SetCallProtocol(XMCallProtocol protocol)
-{
-	cout << "SetCallProtocol: " << protocol << endl;
 }

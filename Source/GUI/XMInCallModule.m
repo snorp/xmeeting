@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.6 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.7 2005/10/17 12:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,8 +12,8 @@
 
 @interface XMInCallModule (PrivateMethods)
 
-- (void)_callEstablished:(NSNotification *)notif;
-- (void)_callCleared:(NSNotification *)notif;
+- (void)_didEstablishCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
 
 @end
 
@@ -24,10 +24,10 @@
 	[[XMMainWindowController sharedInstance] addMainModule:self];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter addObserver:self selector:@selector(_callEstablished:)
-							   name:XMNotification_CallManagerCallEstablished object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callCleared:)
-							   name:XMNotification_CallManagerCallCleared object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+							   name:XMNotification_CallManagerDidEstablishCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall object:nil];
 	
 	return self;
 }
@@ -82,6 +82,8 @@
 - (void)becomeActiveModule
 {
 	[videoView startDisplayingRemoteVideo];
+	
+	didClearCall = NO;
 }
 
 - (void)becomeInactiveModule
@@ -93,22 +95,27 @@
 
 - (void)clearCall:(id)sender
 {
+	if(didClearCall == YES)
+	{
+		return;
+	}
+	didClearCall = YES;
 	[[XMCallManager sharedInstance] clearActiveCall];
 }
 
 #pragma mark Private Methods
 
-- (void)_callEstablished:(NSNotification *)notif
+- (void)_didEstablishCall:(NSNotification *)notif
 {
-	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
-	
 	//loading the nib file if not already done
 	[self contentView];
+	
+	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
 	
 	[remotePartyField setStringValue:remoteName];
 }
 
-- (void)_callCleared:(NSNotification *)notif
+- (void)_didClearCall:(NSNotification *)notif
 {
 	[remotePartyField setStringValue:@""];
 }
