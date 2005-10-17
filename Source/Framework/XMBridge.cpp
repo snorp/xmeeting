@@ -1,21 +1,19 @@
 /*
- * $Id: XMBridge.cpp,v 1.10 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.11 2005/10/17 13:20:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#include <ptlib.h>
-#include "XMTypes.h"
-
 #include "XMBridge.h"
 
+#include <ptlib.h>
+#include "XMTypes.h"
 #include "XMOpalManager.h"
 #include "XMEndPoint.h"
 #include "XMH323EndPoint.h"
 #include "XMSoundChannel.h"
-#include "XMSubsystemSetupThread.h"
 #include "XMTransmitterMediaPatch.h"
 
 using namespace std;
