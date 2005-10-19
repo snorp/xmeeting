@@ -20,13 +20,23 @@
                 audioOutputDevicesPopUp = NSPopUpButton; 
                 audioOutputVolumeSlider = NSSlider; 
                 contentDisclosure = NSButton; 
-                contentView = NSView; 
+                contentView = XMLocalAudioVideoView; 
                 localVideoView = XMVideoView; 
                 muteAudioInputSwitch = NSButton; 
                 muteAudioOutputSwitch = NSButton; 
                 videoDevicesPopUp = NSPopUpButton; 
             }; 
             SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = XMLocalAudioVideoView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                audioContentView = NSView; 
+                disclosureContentView = NSView; 
+                videoContentView = NSView; 
+            }; 
+            SUPERCLASS = NSView; 
         }, 
         {CLASS = XMVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 

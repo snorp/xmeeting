@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.6 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.7 2005/10/19 22:09:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,28 +185,28 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	NSSize newSize = [module contentViewSize];
 	NSSize newMinSize = [module contentViewMinSize];
 	NSSize newMaxSize = [module contentViewMaxSize];
-	float supportContentHeight;
+	int supportContentHeight;
 	if(activeSupportModuleIndex != UINT_MAX)
 	{
 		id<XMMainWindowSupportModule> supportModule = [supportModules objectAtIndex:activeSupportModuleIndex];
-		supportContentHeight = [supportModule contentViewSize].height;
+		supportContentHeight = (int)[supportModule contentViewSize].height;
 	}
 	else
 	{
-		supportContentHeight = 0.0;
+		supportContentHeight = 0;
 	}
 	
 	NSWindow *window = [self window];
 	NSRect windowFrame = [window frame];
 	
 	// calculating the new height
-	float newHeight = ((newSize.height > supportContentHeight) ? newSize.height : supportContentHeight);
-	float heightDifference = newHeight - currentSize.height;
+	int newHeight = (((int)newSize.height > supportContentHeight) ? (int)newSize.height : supportContentHeight);
+	int heightDifference = newHeight - (int)currentSize.height;
 	windowFrame.origin.y -= heightDifference;
 	windowFrame.size.height += heightDifference;
 	
 	// calculating the new width
-	float widthDifference = newSize.width - currentSize.width;
+	int widthDifference = (int)newSize.width - (int)currentSize.width;
 	windowFrame.size.width += widthDifference;
 	
 	// resizing the window
@@ -216,14 +216,14 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	NSSize minSize = windowFrame.size;
 	float newMinHeight = ((newMinSize.height > supportContentHeight) ? newMinSize.height : supportContentHeight);
 	heightDifference = newHeight - newMinHeight;
-	widthDifference = newSize.width - newMinSize.width;
+	widthDifference = newSize.width - (int)newMinSize.width;
 	minSize.height -= heightDifference;
 	minSize.width -= widthDifference;
 	[window setMinSize:minSize];
 	
 	NSSize maxSize = windowFrame.size;
-	heightDifference = newMaxSize.height - newHeight;
-	widthDifference = newMaxSize.width - newSize.width;
+	heightDifference = (int)newMaxSize.height - newHeight;
+	widthDifference = (int)newMaxSize.width - (int)newSize.width;
 	maxSize.height += heightDifference;
 	maxSize.width += widthDifference;
 	[window setMaxSize:maxSize];
@@ -266,37 +266,37 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	// fetching the relevant data
 	NSSize oldSize = [rightContentBox frame].size;
 	NSSize newSize = [module contentViewSize];
-	float mainContentHeight;
-	float mainContentMinHeight;
+	int mainContentHeight;
+	int mainContentMinHeight;
 	
 	if(activeMainModuleIndex != UINT_MAX)
 	{
 		id<XMMainWindowModule> mainModule = [mainModules objectAtIndex:activeMainModuleIndex];
-		mainContentHeight = [mainModule contentViewSize].height;
-		mainContentMinHeight = [mainModule contentViewMinSize].height;
+		mainContentHeight = (int)[mainModule contentViewSize].height;
+		mainContentMinHeight = (int)[mainModule contentViewMinSize].height;
 	}
 	else
 	{
-		mainContentHeight = 0.0;
-		mainContentMinHeight = 0.0;
+		mainContentHeight = 0;
+		mainContentMinHeight = 0;
 	}
 	
 	NSWindow *window = [self window];
 	NSRect windowFrame = [window frame];
 	
 	// calculating the new height
-	float newHeight = ((mainContentHeight > newSize.height) ? mainContentHeight : newSize.height);
-	float heightDifference = newHeight - oldSize.height;
+	int newHeight = ((mainContentHeight > (int)newSize.height) ? mainContentHeight : (int)newSize.height);
+	int heightDifference = newHeight - (int)oldSize.height;
 	windowFrame.origin.y -= heightDifference;
 	windowFrame.size.height += heightDifference;
 	
 	// calculating the new width
-	float widthDifference = newSize.width - oldSize.width;
+	int widthDifference = (int)newSize.width - (int)oldSize.width;
 	windowFrame.size.width += widthDifference;
 	
 	// changing the autoresizing mask before this resize operation
-	[mainContentBox setAutoresizingMask:NSViewMaxXMargin];
-	[rightContentBox setAutoresizingMask:NSViewWidthSizable];
+	[mainContentBox setAutoresizingMask:(NSViewMaxXMargin | NSViewHeightSizable)];
+	[rightContentBox setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	
 	// resizing the window
 	[window setFrame:windowFrame display:YES animate:YES];
@@ -365,7 +365,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 {
 	BOOL isActiveModule = NO;
 	NSWindow *windowToResize = nil;
-	float oldHeight;
+	int oldHeight;
 	
 	if(bottomIsExpanded && activeAdditionModuleIndex != UINT_MAX)
 	{
@@ -381,7 +381,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	
 	if(isActiveModule == NO)
 	{
-		unsigned moduleIndex = [additionModules indexOfObject:module];
+		int moduleIndex = [additionModules indexOfObject:module];
 		
 		if(moduleIndex == UINT_MAX)
 		{
@@ -400,10 +400,10 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 		oldHeight = [[windowToResize contentView] frame].size.height;
 	}
 	
-	float newHeight = [module contentViewSize].height;
+	int newHeight = [module contentViewSize].height;
 	NSRect windowFrame = [windowToResize frame];
 	
-	float heightDifference = newHeight - oldHeight;
+	int heightDifference = newHeight - oldHeight;
 	windowFrame.origin.y -= heightDifference;
 	windowFrame.size.height += heightDifference;
 	
@@ -531,6 +531,29 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	[name release];
 }
 
+- (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)newSize
+{
+	if(window == [self window])
+	{
+		NSSize currentSize = [window frame].size;
+		
+		NSSize resizeDifference = NSMakeSize(newSize.width - currentSize.width, newSize.height - currentSize.height);
+		
+		id<XMMainWindowModule> module = [mainModules objectAtIndex:activeMainModuleIndex];
+		id<XMMainWindowSupportModule> supportModule = [supportModules objectAtIndex:activeSupportModuleIndex];
+
+		int minimumHeight = (int)[supportModule contentViewSize].height;
+		resizeDifference = [module adjustResizeDifference:resizeDifference minimumHeight:minimumHeight];
+		
+		currentSize.width += resizeDifference.width;
+		currentSize.height += resizeDifference.height;
+		
+		newSize = currentSize;
+	}
+	
+	return newSize;
+}	
+
 #pragma mark Private Methods
 
 - (void)_additionButtonAction:(id)sender
@@ -562,7 +585,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	NSSize newMainContentSize = [module contentViewSize];
 	NSSize newMainContentMinSize = [module contentViewMinSize];
 	NSSize newMainContentMaxSize = [module contentViewMaxSize];
-	float supportContentHeight;
+	int supportContentHeight;
 	if(activeSupportModuleIndex != UINT_MAX)
 	{
 		id<XMMainWindowSupportModule> supportModule = [supportModules objectAtIndex:activeSupportModuleIndex];
@@ -570,19 +593,20 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	}
 	else
 	{
-		supportContentHeight = 0.0;
+		supportContentHeight = 0;
 	}
 	NSWindow *window = [self window];
 	NSRect windowFrame = [window frame];
 	
 	// setting the new height of the window
-	float newHeight = ((newMainContentSize.height > supportContentHeight) ? newMainContentSize.height : supportContentHeight);
-	float heightDifference = newHeight - currentMainContentSize.height;
+	int newHeight = (((int)newMainContentSize.height > supportContentHeight) ? newMainContentSize.height : supportContentHeight);
+	int heightDifference = newHeight - (int)currentMainContentSize.height;
+	
 	windowFrame.origin.y -= heightDifference;
 	windowFrame.size.height += heightDifference;
 	
 	// setting the new width of the window
-	float widthDifference = newMainContentSize.width - currentMainContentSize.width;
+	int widthDifference = (int)newMainContentSize.width - (int)currentMainContentSize.width;
 	windowFrame.size.width += widthDifference;
 	
 	// resizing the window
@@ -593,20 +617,25 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	
 	// setting the correct minSize values
 	NSSize minSize = windowFrame.size;
-	float newMinHeight = ((newMainContentMinSize.height > supportContentHeight) ? newMainContentMinSize.height : supportContentHeight);
+	int newMinHeight = (((int)newMainContentMinSize.height > supportContentHeight) ? newMainContentMinSize.height : supportContentHeight);
 	heightDifference = newHeight - newMinHeight;
-	widthDifference = newMainContentSize.width - newMainContentMinSize.width;
+	widthDifference = (int)newMainContentSize.width - (int)newMainContentMinSize.width;
 	minSize.height -= heightDifference;
 	minSize.width -= widthDifference;
 	[window setMinSize:minSize];
 	
 	// setting the correct maxSize values
 	NSSize maxSize = windowFrame.size;
-	heightDifference = newMainContentMaxSize.height - newHeight;
-	widthDifference = newMainContentMaxSize.width - newMainContentSize.width;
+	int newMaxHeight = (((int)newMainContentMaxSize.height > supportContentHeight) ? newMainContentMaxSize.height : supportContentHeight);
+	heightDifference = newMaxHeight - newHeight;
+	widthDifference = (int)newMainContentMaxSize.width - (int)newMainContentSize.width;
 	maxSize.height += heightDifference;
 	maxSize.width += widthDifference;
 	[window setMaxSize:maxSize];
+	
+	// displaying the resize indicator if needed
+	BOOL windowIsResizable = ((minSize.width != maxSize.width) || (minSize.height != maxSize.height));
+	[window setShowsResizeIndicator:windowIsResizable];
 }
 
 - (void)_showSupportModuleAtIndex:(unsigned)index
@@ -629,7 +658,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	id<XMMainWindowSupportModule> module = [supportModules objectAtIndex:activeSupportModuleIndex];
 	NSSize currentSupportContentSize = [rightContentBox bounds].size;
 	NSSize newSupportContentSize = [module contentViewSize];
-	float mainContentHeight;
+	int mainContentHeight;
 	if(activeMainModuleIndex != UINT_MAX)
 	{
 		id<XMMainWindowModule> mainModule = [mainModules objectAtIndex:activeMainModuleIndex];
@@ -637,25 +666,25 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	}
 	else
 	{
-		mainContentHeight = 0.0;
+		mainContentHeight = 0;
 	}
 	NSWindow *window = [self window];
 	NSRect windowFrame = [window frame];
 	
 	// setting the new height of the window frame
-	float newHeight = ((mainContentHeight > newSupportContentSize.height) ? mainContentHeight : newSupportContentSize.height);
-	float heightDifference = newHeight - currentSupportContentSize.height;
+	int newHeight = ((mainContentHeight > (int)newSupportContentSize.height) ? mainContentHeight : newSupportContentSize.height);
+	int heightDifference = newHeight - (int)currentSupportContentSize.height;
 	windowFrame.origin.y -= heightDifference;
 	windowFrame.size.height += heightDifference;
 	
 	// setting the new width of the window frame
-	float widthDifference = newSupportContentSize.width - currentSupportContentSize.width;
+	int widthDifference = (int)newSupportContentSize.width - (int)currentSupportContentSize.width;
 	windowFrame.size.width += widthDifference;
 	
 	// changing the autoresizing mask before this resize operation
-	[mainContentBox setAutoresizingMask:NSViewMaxXMargin];
-	[rightContentBox setAutoresizingMask:NSViewWidthSizable];
-	
+	[mainContentBox setAutoresizingMask:(NSViewMaxXMargin | NSViewHeightSizable)];
+	[rightContentBox setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+
 	// resizing the window
 	[rightContentBox setContentView:nil];
 	[window setFrame:windowFrame display:YES animate:YES];
@@ -718,8 +747,8 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	
 	// fetching the relevant data
 	id<XMMainWindowAdditionModule> module;
-	float currentAdditionContentHeight = [bottomContentBox bounds].size.height;
-	float newAdditionContentHeight;
+	int currentAdditionContentHeight = [bottomContentBox bounds].size.height;
+	int newAdditionContentHeight;
 	NSView *contentView;
 	
 	if(index != UINT_MAX)
@@ -737,7 +766,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	else
 	{
 		module = nil;
-		newAdditionContentHeight = 0.0;
+		newAdditionContentHeight = 0;
 		contentView = nil;
 		bottomIsExpanded = NO;
 	}
@@ -754,7 +783,7 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	NSRect windowFrame = [window frame];
 	
 	// setting the new height of the window frame
-	float heightDifference = newAdditionContentHeight - currentAdditionContentHeight;
+	int heightDifference = newAdditionContentHeight - currentAdditionContentHeight;
 	windowFrame.origin.y -= heightDifference;
 	windowFrame.size.height += heightDifference;
 	

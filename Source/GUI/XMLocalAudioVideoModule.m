@@ -1,16 +1,17 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.2 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.3 2005/10/19 22:09:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMeeting.h"
 #import "XMLocalAudioVideoModule.h"
-#import "XMMainWindowController.h"
 
-#define COLLAPSED_CONTENT_WIDTH 20.0
+#import "XMeeting.h"
+#import "XMMainWindowController.h"
+#import "XMPreferencesManager.h"
+#import "XMLocalAudioVideoView.h"
 
 @interface XMLocalAudioVideoModule (PrivateMethods)
 
@@ -19,6 +20,7 @@
 - (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
+- (void)_activeLocationDidChange:(NSNotification *)notif;
 
 @end
 
@@ -43,21 +45,25 @@
 }
 
 - (void)awakeFromNib
-{
-	expandedContentViewSize = [contentView frame].size;
-	collapsedContentViewSize = NSMakeSize(COLLAPSED_CONTENT_WIDTH, expandedContentViewSize.height);
-	isExpanded = YES;
+{	
+	// we start in expanded state
+	[contentView setShowAudioVideoContent:YES];
 	[contentDisclosure setState:NSOnState];
 	
+	// determining wether to initially show the video content or not
+	BOOL showVideoContent = [[[XMPreferencesManager sharedInstance] activeLocation] enableVideo];
+	[contentView setShowVideoContent:showVideoContent];
+	
+	// configuring the video content
 	[videoDevicesPopUp setEnabled:NO];
 	[localVideoView startDisplayingLocalVideo];
 	
+	// configuring the audio content
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
-	
 	[audioInputDevicesPopUp removeAllItems];
 	[audioInputDevicesPopUp addItemsWithTitles:[audioManager inputDevices]];
-	[audioInputDevicesPopUp selectItemWithTitle:[audioManager selectedInputDevice]];
 	
+	[audioInputDevicesPopUp selectItemWithTitle:[audioManager selectedInputDevice]];
 	[audioOutputDevicesPopUp removeAllItems];
 	[audioOutputDevicesPopUp addItemsWithTitles:[audioManager outputDevices]];
 	[audioOutputDevicesPopUp selectItemWithTitle:[audioManager selectedOutputDevice]];
@@ -73,6 +79,7 @@
 	
 	[self _validateControls];
 	
+	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
 	[notificationCenter addObserver:self selector:@selector(_didStartVideoInputDeviceListUpdate:)
@@ -83,6 +90,9 @@
 							   name:XMNotification_AudioManagerInputVolumeDidChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioOutputVolumeDidChange:)
 							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
+	
+	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
+							   name:XMNotification_ActiveLocationDidChange object:nil];
 }
 
 #pragma mark Protocol Methods
@@ -108,14 +118,7 @@
 	// if not already done, this triggers the loading of the nib file
 	[self contentView];
 	
-	if(isExpanded)
-	{
-		return expandedContentViewSize;
-	}
-	else
-	{
-		return collapsedContentViewSize;
-	}
+	return [contentView requiredSize];
 }
 
 - (void)becomeActiveModule
@@ -130,9 +133,14 @@
 
 - (IBAction)toggleShowContent:(id)sender
 {
-	isExpanded = !isExpanded;
+	int state = [contentDisclosure state];
 	
+	BOOL showAudioVideoContent = (state == NSOnState) ? YES : NO;
+	[contentView setShowAudioVideoContent:showAudioVideoContent];
+
+	[contentView setContentVisible:NO];
 	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfSupportModule:self];
+	[contentView setContentVisible:YES];
 }
 
 - (IBAction)changeVideoDevice:(id)sender
@@ -282,6 +290,18 @@
 	
 	int state = ([audioManager mutesOutputVolume] == YES) ? NSOnState : NSOffState;
 	[muteAudioOutputSwitch setState:state];
+}
+
+- (void)_activeLocationDidChange:(NSNotification *)notif
+{
+	XMLocation *location = [[XMPreferencesManager sharedInstance] activeLocation];
+	
+	BOOL showVideoContent = [location enableVideo];
+	[contentView setShowVideoContent:showVideoContent];
+	
+	[contentView setContentVisible:NO];
+	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfSupportModule:self];
+	[contentView setContentVisible:YES];
 }
 
 @end

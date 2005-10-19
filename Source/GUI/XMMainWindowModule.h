@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowModule.h,v 1.3 2005/08/24 22:29:39 hfriederich Exp $
+ * $Id: XMMainWindowModule.h,v 1.4 2005/10/19 22:09:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,7 +30,7 @@
 - (NSView *)contentView;
 
 /**
- * Returns the  preferred size for this module view. This value may change
+ * Returns the preferred size for this module view. This value may change
  * through the lifetime of the object
  **/
 - (NSSize)contentViewSize;
@@ -50,6 +50,12 @@
  * -contentViewSize here.
  **/
 - (NSSize)contentViewMaxSize;
+
+/**
+ * Allows the receiver to adjust the size differences in a user resize operation.
+ * The minimumHeight value indicates which height the view must have at least.
+ **/
+- (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight;
 
 /**
  * Informs the module that it's content view is going to be displayed on screen,

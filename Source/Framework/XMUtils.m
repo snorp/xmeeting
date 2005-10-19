@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.4 2005/10/19 22:08:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -397,4 +397,14 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 		default:
 			return NSMakeSize(0, 0);
 	}
+}
+
+float XMGetVideoHeightForWidth(float width)
+{
+	return width * (9.0/11.0);
+}
+
+float XMGetVideoWidthForHeight(float height)
+{
+	return height * (11.0/9.0);
 }

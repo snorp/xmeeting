@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoView.m,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMVideoView.m,v 1.2 2005/10/19 22:08:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,6 +53,7 @@
 	[busyIndicator setAnimationDelay:(5.0/60.0)];
 	[busyIndicator setAutoresizingMask:(NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin)];
 	[busyIndicator sizeToFit];
+	[busyIndicator setHidden:YES];
 	
 	[self addSubview:busyIndicator positioned:NSWindowAbove relativeTo:nil];
 	
@@ -134,11 +135,13 @@
 
 - (void)_startBusyIndicator
 {
+	[busyIndicator setHidden:NO];
 	[busyIndicator startAnimation:self];
 }
 
 - (void)_stopBusyIndicator
 {
+	[busyIndicator setHidden:YES];
 	[busyIndicator stopAnimation:self];
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.8 2005/10/19 22:08:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -89,5 +89,11 @@ BOOL XMIsPhoneNumber(NSString *phoneNumber);
  * of the specified video size
  **/
 NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize);
+
+/**
+ * calculates the other dimension from the given dimension
+ **/
+float XMGetVideoHeightForWidth(float width);
+float XMGetVideoWidthForHeight(float height);
 
 #endif // __XM_UTILS_H__

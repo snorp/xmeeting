@@ -6,12 +6,22 @@
             CLASS = XMInCallModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                contentView = NSView; 
+                contentView = XMInCallView; 
                 hangupButton = NSButton; 
                 remotePartyField = NSTextField; 
                 videoView = XMVideoView; 
             }; 
             SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = XMInCallView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                buttonContentView = NSView; 
+                statusContentView = NSView; 
+                videoContentView = NSView; 
+            }; 
+            SUPERCLASS = NSView; 
         }, 
         {CLASS = XMVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 

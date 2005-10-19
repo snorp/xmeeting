@@ -1,13 +1,15 @@
 /*
- * $Id: XMApplicationController.m,v 1.11 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.12 2005/10/19 22:08:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMeeting.h"
 #import "XMApplicationController.h"
+
+#import "XMeeting.h"
+#import "XMPreferencesManager.h"
 #import "XMAddressBookCallAddressProvider.h"
 #import "XMCallHistoryCallAddressProvider.h"
 
@@ -59,6 +61,9 @@
 {
 	// First step to do!
 	XMInitFramework();
+	
+	// making sure that the preferences are set up
+	[XMPreferencesManager sharedInstance];
 	
 	// registering the call address providers
 	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];

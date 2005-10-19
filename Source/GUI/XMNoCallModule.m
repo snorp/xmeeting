@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.10 2005/10/17 12:57:54 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.11 2005/10/19 22:09:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -167,6 +167,11 @@
 	[self contentView];
 	
 	return contentViewSize;
+}
+
+- (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight
+{
+	return resizeDifference;
 }
 
 - (void)becomeActiveModule

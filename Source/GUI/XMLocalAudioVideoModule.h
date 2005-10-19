@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.2 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.3 2005/10/19 22:09:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,13 +12,11 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowSupportModule.h"
 
-@class XMVideoView;
+@class XMVideoView, XMLocalAudioVideoView;
 
 @interface XMLocalAudioVideoModule : NSObject <XMMainWindowSupportModule> {
 	
-	IBOutlet NSView *contentView;
-	NSSize expandedContentViewSize;
-	NSSize collapsedContentViewSize;
+	IBOutlet XMLocalAudioVideoView *contentView;
 	
 	IBOutlet NSButton *contentDisclosure;
 	IBOutlet XMVideoView *localVideoView;
@@ -31,8 +29,6 @@
 	IBOutlet NSButton *muteAudioOutputSwitch;
 
 	NSNib *nibLoader;
-	
-	BOOL isExpanded;
 }
 
 - (IBAction)toggleShowContent:(id)sender;
