@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallView.m,v 1.1 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMInCallView.m,v 1.2 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,7 @@
 	buttonContentHeight = buttonContentFrame.size.height;
 	minContentWidth = statusContentFrame.size.width;
 	
-	videoSize = XMVideoSize_QCIF;
+	videoSize = XMVideoSize_CIF;
 	
 	showVideoContent = NO;
 	
@@ -65,25 +65,9 @@
 	[self _validateContentViews];
 }
 
-- (BOOL)setVideoSize:(XMVideoSize)theVideoSize
+- (void)setVideoSize:(XMVideoSize)theVideoSize
 {
 	videoSize = theVideoSize;
-	
-	BOOL needsResize = NO;
-	
-	if(showVideoContent == YES)
-	{
-		NSSize minimumSize = [self minimumSize];
-		NSSize currentSize = [self frame].size;
-		
-		if(minimumSize.width > currentSize.width ||
-		   minimumSize.height > currentSize.height)
-		{
-			needsResize = YES;
-		}
-	}
-	
-	return needsResize;
 }
 
 - (NSSize)minimumSize
@@ -118,8 +102,14 @@
 	}
 	
 	NSSize currentSize = [self frame].size;
+	NSSize requiredSize = XMGetVideoFrameDimensions(videoSize);
 	
 	unsigned width = currentSize.width;
+	
+	if(width < (unsigned)requiredSize.width)
+	{
+		return [self minimumSize];
+	}
 	unsigned contentWidth = width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
 	
 	unsigned videoHeight = XMGetVideoHeightForWidth(contentWidth);
@@ -151,24 +141,20 @@
 	
 	NSSize ownSize = [self frame].size;
 	
-	ownSize.width += resizeDifference.width;
-	ownSize.height += resizeDifference.height;
-	
 	unsigned usedHeight = (TOP_CONTENT_MARGIN + statusContentHeight + 2*CONTENT_SPACING + buttonContentHeight + BOTTOM_CONTENT_MARGIN);
 	
 	int minimumVideoHeight = minimumHeight - usedHeight;
 	
-	int availableWidth = (int)ownSize.width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
-	int availableHeight = (int)ownSize.height - usedHeight;
+	int availableWidth = (int)ownSize.width + (int)resizeDifference.width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
+	int availableHeight = (int)ownSize.height + (int)resizeDifference.height - usedHeight;
 	
 	int calculatedWidth = (int)XMGetVideoWidthForHeight(availableHeight);
 	int calculatedHeight = (int)XMGetVideoHeightForWidth(availableWidth);
 	
 	if(calculatedHeight <= minimumVideoHeight)
 	{
-		// the height doesn't change, but the width is
-		// always adjusted as requested in this case
-		resizeDifference.height = 0;
+		// the height set to the minimum height
+		resizeDifference.height = minimumHeight - ownSize.height;
 	}
 	else
 	{

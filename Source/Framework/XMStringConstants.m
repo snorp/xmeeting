@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.7 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.8 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,6 +55,8 @@ NSString *XMNotification_AudioManagerDidUpdateDeviceList = @"XMeetingAudioManage
 
 NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate = @"XMeetingVideoManagerDidStartVideoInputDeviceListUpdateNotification";
 NSString *XMNotification_VideoManagerDidUpdateInputDeviceList = @"XMeetingVideoManagerDidUpdateInputDeviceListNotification";
+NSString *XMNotification_VideoManagerDidStartReceivingVideo = @"XMeetingVideoManagerDidStartReceivingVideoNotification";
+NSString *XMNotification_VideoManagerDidEndReceivingVideo = @"XMeetingVideoManagerDidEndReceivingVideoNotification";
 
 NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddressBookManagerDidChangeDatabaseNotification";
 

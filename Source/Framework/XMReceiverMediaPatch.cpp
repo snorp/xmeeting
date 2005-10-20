@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.2 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.3 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -74,7 +74,7 @@ void XMReceiverMediaPatch::Main()
 						// this is normally the first packet received
 						// and should not be treated as a lost packet
 						lastSequenceNumber = sequenceNumber;
-						break;
+						//break;
 					}
 					
 					needsPictureUpdate = TRUE;

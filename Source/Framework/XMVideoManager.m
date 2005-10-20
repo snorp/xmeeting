@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.5 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,6 +72,8 @@
 	transmitFrameRate = 20;
 	
 	needsToStopLocalBusyIndicators = YES;
+	
+	remoteVideoSize = XMVideoSize_NoVideo;
 	
 	return self;
 }
@@ -193,6 +195,11 @@
 	[XMMediaTransmitter _stopGrabbing];
 }
 
+- (XMVideoSize)remoteVideoSize
+{
+	return remoteVideoSize;
+}
+
 #pragma mark Framework Methods
 
 - (void)_addLocalVideoView:(XMVideoView *)videoView
@@ -266,7 +273,8 @@
 		return;
 	}
 	
-	NSRectFill(rect);
+	NSEraseRect(rect);
+	NSFrameRect(rect);
 }
 
 - (void)_handleDeviceList:(NSArray *)deviceList
@@ -333,6 +341,20 @@
 		[videoView setNeedsDisplay:YES];
 	}
 	needsToStopLocalBusyIndicators = NO;
+}
+
+- (void)_handleVideoReceivingStart:(NSNumber *)videoSize
+{
+	remoteVideoSize = (XMVideoSize)[videoSize unsignedIntValue];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartReceivingVideo object:self];
+}
+
+- (void)_handleVideoReceivingEnd
+{
+	remoteVideoSize = XMVideoSize_NoVideo;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidEndReceivingVideo object:self];
 }
 
 - (void)_handleRemoteImage:(CIImage *)remoteImage

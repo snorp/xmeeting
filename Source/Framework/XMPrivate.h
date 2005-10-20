@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.13 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.14 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -200,7 +200,6 @@ void _XMCheckCloseStatus();
 - (id)_init;
 - (void)_close;
 
-- (void)_startup;
 - (void)_addLocalVideoView:(XMVideoView *)videoView;
 - (void)_removeLocalVideoView:(XMVideoView *)videoView;
 - (void)_addRemoteVideoView:(XMVideoView *)videoView;
@@ -210,6 +209,8 @@ void _XMCheckCloseStatus();
 - (void)_handleDeviceList:(NSArray *)deviceList;
 - (void)_handleInputDeviceChangeComplete:(NSString *)selectedDevice;
 - (void)_handlePreviewImage:(CIImage *)previewImage;
+- (void)_handleVideoReceivingStart:(NSNumber *)videoSize;
+- (void)_handleVideoReceivingEnd;
 - (void)_handleRemoteImage:(CIImage *)remoteImage;
 
 @end

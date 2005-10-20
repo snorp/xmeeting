@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.11 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.12 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -223,8 +223,11 @@
 	{
 		// there may be more valid records than up to now, therefore
 		// throwing the cache away.
-		[matchedAddresses release];
-		matchedAddresses = nil;
+		if(matchedAddresses != nil)
+		{
+			[matchedAddresses release];
+			matchedAddresses = nil;
+		}
 	}
 	
 	if(matchedAddresses == nil)

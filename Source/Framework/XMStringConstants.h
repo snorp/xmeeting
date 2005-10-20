@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.8 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.9 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -172,6 +172,20 @@ extern NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate;
  * has finished
  **/
 extern NSString *XMNotification_VideoManagerDidUpdateInputDeviceList;
+
+/**
+ * Posted when the VideoManager did start receiving video from the remote
+ * party.
+ * When this notification is posted, the size of the remote video is also
+ * known.
+ **/
+extern NSString *XMNotification_VideoManagerDidStartReceivingVideo;
+
+/**
+ * Posted when the VideoManager no longer receives video from the
+ * remote party
+ **/
+extern NSString *XMNotification_VideoManagerDidEndReceivingVideo;
 
 #pragma mark XMAddressBookManager Notifications
 

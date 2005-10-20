@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.8 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.9 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@
 
 - (void)_didEstablishCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
+- (void)_didStartReceivingVideo:(NSNotification *)notif;
+
 - (void)_activeLocationDidChange:(NSNotification *)notif;
 
 @end
@@ -33,6 +35,8 @@
 							   name:XMNotification_CallManagerDidEstablishCall object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
 							   name:XMNotification_CallManagerDidClearCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartReceivingVideo:)
+							   name:XMNotification_VideoManagerDidStartReceivingVideo object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
 							   name:XMNotification_ActiveLocationDidChange object:nil];
@@ -127,6 +131,17 @@
 - (void)_didClearCall:(NSNotification *)notif
 {
 	[remotePartyField setStringValue:@""];
+	
+	[contentView setVideoSize:XMVideoSize_QCIF];
+}
+
+- (void)_didStartReceivingVideo:(NSNotification *)notif
+{
+	XMVideoSize videoSize = [[XMVideoManager sharedInstance] remoteVideoSize];
+	
+	[contentView setVideoSize:videoSize];
+	
+	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfMainModule:self];
 }
 
 - (void)_activeLocationDidChange:(NSNotification *)notif

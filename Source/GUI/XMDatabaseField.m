@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.5 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -133,6 +133,11 @@ databaseField:imageForRepresentedObject:";
 	[completionsTableView release];
 	[currentCompletions release];
 	
+	if(representedObject != nil)
+	{
+		[representedObject release];
+	}
+	
 	[super dealloc];
 }
 
@@ -185,7 +190,11 @@ databaseField:imageForRepresentedObject:";
 
 - (void)setRepresentedObject:(id)theObject
 {
-	[representedObject release];
+	if(representedObject != nil)
+	{
+		[representedObject release];
+		representedObject = nil;
+	}
 	representedObject = [theObject retain];
 	
 	[self _displayRepresentedObject];
@@ -201,7 +210,15 @@ databaseField:imageForRepresentedObject:";
 	if(dataSource != nil)
 	{
 		NSString *currentString = [self stringValue];
+		
+		if(representedObject == nil)
+		{
+			[representedObject release];
+			representedObject = nil;
+		}
+		
 		representedObject = [[dataSource databaseField:self representedObjectForCompletedString:currentString] retain];
+		
 		[self _displayRepresentedObject];
 	}
 	[self _hideCompletionsWindow];
@@ -351,6 +368,11 @@ databaseField:imageForRepresentedObject:";
 	
 	if(dataSource != nil)
 	{
+		if(representedObject != nil)
+		{
+			[representedObject release];
+			representedObject = nil;
+		}
 		representedObject = [[dataSource databaseField:self representedObjectForCompletedString:currentString] retain];
 		[self _displayRepresentedObject];
 	}

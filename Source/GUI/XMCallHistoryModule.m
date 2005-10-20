@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.7 2005/10/17 12:57:54 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.8 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -195,7 +195,7 @@
 		callAddress = nil;
 	}
 	
-	callAddress = [[XMCallAddressManager sharedInstance] activeCallAddress];
+	callAddress = [[[XMCallAddressManager sharedInstance] activeCallAddress] retain];
 }
 
 - (void)_didStartCalling:(NSNotification *)notif

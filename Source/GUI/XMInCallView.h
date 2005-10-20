@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallView.h,v 1.1 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMInCallView.h,v 1.2 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,7 @@
  * Returns whether window size change needed
  * or not
  **/
-- (BOOL)setVideoSize:(XMVideoSize)videoSize;
+- (void)setVideoSize:(XMVideoSize)videoSize;
 
 - (NSSize)minimumSize;
 - (NSSize)preferredSize;

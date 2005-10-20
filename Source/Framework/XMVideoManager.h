@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.6 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.7 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,6 +35,8 @@
 	unsigned transmitFrameRate;
 	
 	BOOL needsToStopLocalBusyIndicators;
+	
+	XMVideoSize remoteVideoSize;
 
 }
 
@@ -101,6 +103,11 @@
  * is ongoing
  **/
 - (void)stopGrabbing;
+
+/**
+ * Returns the size of the remote video currently received
+ **/
+- (XMVideoSize)remoteVideoSize;
 
 @end
 

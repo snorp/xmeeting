@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.5 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -88,6 +88,11 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	videoCodecType = codecType;
 	videoPayloadType = payloadType;
 	videoMediaSize = videoSize;
+	
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoSize];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingStart:)
+													withObject:number waitUntilDone:NO];
+	[number release];
 }
 
 - (void)_stopMediaReceivingForSession:(unsigned)sessionID
@@ -102,6 +107,9 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		CloseComponent(videoPacketReassembler);
 		videoPacketReassembler = NULL;
 	}
+	
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingEnd)
+													withObject:nil waitUntilDone:NO];
 	
 	ExitMoviesOnThread();
 }

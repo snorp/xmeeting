@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.2 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.3 2005/10/20 19:21:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -515,7 +515,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	[self _doPreferencesSetup:preferences withAddress:externalAddress verbose:YES];
 	
-	[[XMCallManager sharedInstance] performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
 
 - (void)_handleRetryEnableH323Message:(NSArray *)components
@@ -525,7 +525,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	[self _doH323Setup:preferences verbose:YES];
 	
-	[[XMCallManager sharedInstance] performSelectorOnMainThread:@selector(_handleSusbsystemSetupEnd) withObject:nil waitUntilDone:NO];
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
 
 - (void)_handleRetryGatekeeperRegistrationMessage:(NSArray *)components

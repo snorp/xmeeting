@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.4 2005/10/20 19:21:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -66,8 +66,14 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (void)dealloc
 {
-	[displayString release];
-	[addressBookRecord release];
+	if(displayString != nil)
+	{
+		[displayString release];
+	}
+	if(addressBookRecord != nil)
+	{
+		[addressBookRecord release];
+	}
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
@@ -88,7 +94,11 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 {
 	if(type == XMCallHistoryRecordType_AddressBookRecord)
 	{
-		return [addressBookRecord callURL];
+		if(addressBookRecord != nil)
+		{
+			return [addressBookRecord callURL];
+		}
+		return nil;
 	}
 	return self;
 }
@@ -97,7 +107,11 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 {
 	if(type == XMCallHistoryRecordType_AddressBookRecord)
 	{
-		return [addressBookRecord displayName];
+		if(addressBookRecord != nil)
+		{
+			return [addressBookRecord displayName];
+		}
+		return nil;
 	}
 	else
 	{
@@ -133,16 +147,20 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (BOOL)_checkType
 {
-	[addressBookRecord release];
+	if(addressBookRecord != nil)
+	{
+		[addressBookRecord release];
+		addressBookRecord = nil;
+	}
 	
 	BOOL didChange = NO;
 	
 	// check for matches in the AddressBook database
-	addressBookRecord = [[[XMAddressBookManager sharedInstance] recordWithCallAddress:[self address]] retain];
-	
+	addressBookRecord = [[XMAddressBookManager sharedInstance] recordWithCallAddress:[self address]];
 	
 	if(addressBookRecord != nil)
 	{
+		[addressBookRecord retain];
 		if(type != XMCallHistoryRecordType_AddressBookRecord)
 		{
 			type = XMCallHistoryRecordType_AddressBookRecord;
