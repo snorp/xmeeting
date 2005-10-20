@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.h,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.h,v 1.3 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,9 @@ public:
 	virtual BOOL IsTerminated() const;
 	virtual void Resume();
 	void Close();
+	
+	virtual BOOL ExecuteCommand(const OpalMediaCommand & command,
+								BOOL fromSink);
 	
 	static void SetTimeStamp(unsigned sessionID,
 							 unsigned timeStamp);

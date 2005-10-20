@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,6 +27,7 @@
 	
 	BOOL isGrabbing;
 	BOOL isTransmitting;
+	BOOL needsPictureUpdate;
 	
 	unsigned frameGrabRate;
 	XMVideoSize videoSize;
@@ -36,6 +37,7 @@
 	TimeValue lastTime;
 	
 	ICMCompressionSessionRef compressionSession;
+	ICMCompressionFrameOptionsRef compressionFrameOptions;
 	RTPMediaPacketizer mediaPacketizer;
 	RTPMPSampleDataParams sampleData;
 }
@@ -50,6 +52,8 @@
 
 + (void)_startTransmittingWithCodec:(unsigned)codecType videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID;
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
+
++ (void)_updatePicture;
 
 - (id)_init;
 - (void)_close;

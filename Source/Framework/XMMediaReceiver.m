@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,6 +55,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	videoCodecType = 0;
 	videoPayloadType = 0;
 	videoMediaSize = XMVideoSize_NoVideo;
+	
+	didSucceedDecodingFrame = YES;
 	
 	return self;
 }
@@ -162,6 +164,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	memcpy(dest, data, length);
 	streamBuffer->wptr += length;
 	
+	didSucceedDecodingFrame = YES;
+	
 	err = RTPRssmHandleNewPacket(videoPacketReassembler,
 								 streamBuffer,
 								 0);
@@ -171,7 +175,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		return NO;
 	}
 		
-	return YES;		
+	return didSucceedDecodingFrame;		
 }
 
 - (void)_processFrame:(const UInt8 *)data length:(unsigned)length session:(unsigned)sessionID
@@ -253,6 +257,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(err != noErr)
 	{
 		NSLog(@"Decompression of the frame failed %d", (int)err);
+		didSucceedDecodingFrame = NO;
 	}
 }
 

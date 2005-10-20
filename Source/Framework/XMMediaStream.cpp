@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,8 @@
 
 #include "XMMediaStream.h"
 #include "XMTransmitterMediaPatch.h"
+
+#include <codec/vidcodec.h>
 
 XMMediaStream::XMMediaStream(const OpalMediaFormat & mediaFormat,
 										   unsigned sessionID,
@@ -84,11 +86,5 @@ BOOL XMMediaStream::Close()
 	patchMutex.Signal();
 	
 	isOpen = FALSE;
-	return TRUE;
-}
-
-BOOL XMMediaStream::ExecuteCommand(const OpalMediaCommand & command)
-{
-	cout << "OpalMediaStream executeCommand: " << command << endl;
 	return TRUE;
 }

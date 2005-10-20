@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,14 +23,15 @@ typedef enum XMMediaTransmitterMessage
 	
 	// configuration messages
 	_XMMediaTransmitterMessage_GetDeviceList = 0x0100,
-	_XMMediaTransmitterMessage_SetDevice = 0x0101,
-	_XMMediaTransmitterMessage_SetFrameGrabRate = 0x0102,
+	_XMMediaTransmitterMessage_SetDevice,
+	_XMMediaTransmitterMessage_SetFrameGrabRate,
 	
 	// "action" messages
 	_XMMediaTransmitterMessage_StartGrabbing = 0x0200,
-	_XMMediaTransmitterMessage_StopGrabbing = 0x0201,
-	_XMMediaTransmitterMessage_StartTransmitting = 0x0202,
-	_XMMediaTransmitterMessage_StopTransmitting = 0x0203
+	_XMMediaTransmitterMessage_StopGrabbing,
+	_XMMediaTransmitterMessage_StartTransmitting,
+	_XMMediaTransmitterMessage_StopTransmitting,
+	_XMMediaTransmitterMessage_UpdatePicture
 	
 } XMMediaTransmitterMessage;
 
@@ -52,6 +53,7 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleStopGrabbingMessage;
 - (void)_handleStartTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleStopTransmittingMessage:(NSArray *)messageComponents;
+- (void)_handleUpdatePictureMessage;
 
 - (void)_grabFrame:(NSTimer *)timer;
 
@@ -145,6 +147,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[components release];
 }
 
++ (void)_updatePicture
+{
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_UpdatePicture withComponents:nil];
+}
+
 + (void)_sendMessage:(XMMediaTransmitterMessage)message withComponents:(NSArray *)components
 {
 	if(_XMMediaTransmitterSharedInstance == nil)
@@ -187,6 +194,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	isGrabbing = NO;
 	isTransmitting = NO;
+	needsPictureUpdate = NO;
 	
 	frameGrabRate = 20;
 	videoSize = XMVideoSize_QCIF;
@@ -194,6 +202,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	timeScale = 600;
 	
 	compressionSession = NULL;
+	compressionFrameOptions = NULL;
 	mediaPacketizer = 0L;
 	
 	return self;
@@ -303,6 +312,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			break;
 		case _XMMediaTransmitterMessage_StopTransmitting:
 			[self _handleStopTransmittingMessage:[portMessage components]];
+			break;
+		case _XMMediaTransmitterMessage_UpdatePicture:
+			[self _handleUpdatePictureMessage];
 			break;
 		default:
 			// ignore it
@@ -589,6 +601,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	ICMCompressionSessionOptionsRelease(sessionOptions);
 	
+	err = ICMCompressionFrameOptionsCreate(NULL,
+										   compressionSession,
+										   &compressionFrameOptions);
+	if(err != noErr)
+	{
+		NSLog(@"ICMCompressionFrameOptionsCreate failed %d", (int)err);
+	}
+	
 	timeOffset = lastTime;
 	
 	isTransmitting = YES;
@@ -599,6 +619,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	if(isTransmitting == NO)
 	{
 		return;
+	}
+	
+	if(compressionFrameOptions != NULL)
+	{
+		ICMCompressionFrameOptionsRelease(compressionFrameOptions);
+		compressionFrameOptions = NULL;
 	}
 	
 	if(compressionSession != NULL)
@@ -625,6 +651,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	timeOffset = 0;
 	
 	isTransmitting = NO;
+}
+
+- (void)_handleUpdatePictureMessage
+{
+	needsPictureUpdate = YES;
 }
 
 - (void)_grabFrame:(NSTimer *)timer
@@ -819,12 +850,21 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	{
 		OSErr err = noErr;
 		
+		err = ICMCompressionFrameOptionsSetForceKeyFrame(compressionFrameOptions,
+														 needsPictureUpdate);
+		if(err != noErr)
+		{
+			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
+		}
+		
+		needsPictureUpdate = NO;
+		
 		err = ICMCompressionSessionEncodeFrame(compressionSession, 
 											   frame,
 											   timeStamp, 
 											   0, 
 											   kICMValidTime_DisplayTimeStampIsValid,
-											   NULL, 
+											   compressionFrameOptions, 
 											   NULL, 
 											   NULL);
 		if(err != noErr)

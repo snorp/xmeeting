@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.1 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.2 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include "XMReceiverMediaPatch.h"
 
 #include <opal/mediastrm.h>
+#include <opal/mediacmd.h>
 
 #include "XMMediaFormats.h"
 #include "XMMediaStream.h"
@@ -19,6 +20,7 @@ XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 {
 	//cout << "Patch created" << endl;
 	didStartMediaReceiver = FALSE;
+	notifierSet = FALSE;
 }
 
 XMReceiverMediaPatch::~XMReceiverMediaPatch()
@@ -44,6 +46,10 @@ void XMReceiverMediaPatch::Main()
 	}
 	inUse.Signal();
 	
+	WORD lastSequenceNumber = 0;
+	DWORD lastTimestamp;
+	BOOL needsPictureUpdate = FALSE;
+	
 	RTP_DataFrame sourceFrame(source.GetDataSize());
 	while(source.ReadPacket(sourceFrame))
 	{
@@ -57,6 +63,22 @@ void XMReceiverMediaPatch::Main()
 			if(PIsDescendant(sinks[i].stream, XMMediaStream))
 			{
 				unsigned sessionID = source.GetSessionID();
+				
+				WORD sequenceNumber = sourceFrame.GetSequenceNumber();
+				DWORD timestamp = sourceFrame.GetTimestamp();
+				
+				if(sequenceNumber != (lastSequenceNumber + 1))
+				{
+					if(timestamp == 0)
+					{
+						// this is normally the first packet received
+						// and should not be treated as a lost packet
+						lastSequenceNumber = sequenceNumber;
+						break;
+					}
+					
+					needsPictureUpdate = TRUE;
+				}
 				
 				if(didStartMediaReceiver == FALSE)
 				{
@@ -88,7 +110,23 @@ void XMReceiverMediaPatch::Main()
 				dataPtr -= headerSize;
 				length += headerSize;
 				
-				_XMProcessPacket((void *)dataPtr, (unsigned)length, sessionID);
+				BOOL succ = _XMProcessPacket((void *)dataPtr, (unsigned)length, sessionID);
+				if(succ == FALSE)
+				{
+					needsPictureUpdate = TRUE;
+				}
+				
+				if((needsPictureUpdate == TRUE) && 
+				   (timestamp != lastTimestamp))
+				{
+					// only issue video update picture command when the
+					// timestamp changes
+					IssueVideoUpdatePictureCommand();
+					needsPictureUpdate = FALSE;
+				}
+				
+				lastSequenceNumber = sequenceNumber;
+				lastTimestamp = timestamp;
 			}
 			else
 			{
@@ -113,3 +151,25 @@ void XMReceiverMediaPatch::Main()
 	
 	//cout << "XMVideoReceivePatchTread ended" << endl;
 }
+
+void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
+											  BOOL fromSink)
+{
+	if(fromSink == FALSE)
+	{
+		notifier = theNotifier;
+		notifierSet = TRUE;
+	}
+	OpalMediaPatch::SetCommandNotifier(theNotifier, fromSink);
+}
+
+void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
+{
+	OpalVideoUpdatePicture command = OpalVideoUpdatePicture(-1, -1, -1);
+	
+	if(notifierSet == TRUE)
+	{
+		notifier(command, 0);
+	}
+}
+

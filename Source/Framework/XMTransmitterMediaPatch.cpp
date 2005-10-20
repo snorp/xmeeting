@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.3 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -79,6 +79,24 @@ void XMTransmitterMediaPatch::Close()
 	{
 		Sleep(10);
 	}
+}
+
+BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
+											 BOOL fromSink)
+{
+	if(fromSink)
+	{
+		PString commandName = command.GetName();
+		
+		// somehow the PIsDescendant() macro seems not to work for this
+		// class. Therefore we do a simple string compare
+		if(commandName == "Update Picture")
+		{
+			_XMUpdatePicture();
+			return TRUE;
+		}
+	}
+	return OpalMediaPatch::ExecuteCommand(command, fromSink);
 }
 
 void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStamp)

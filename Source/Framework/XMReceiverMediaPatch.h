@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.h,v 1.1 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.h,v 1.2 2005/10/20 11:55:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,9 +21,15 @@ public:
 	~XMReceiverMediaPatch();
 	
 	virtual void Main();
+	virtual void SetCommandNotifier(const PNotifier & notifier,
+									BOOL fromSink);
 	
 private:
+	void IssueVideoUpdatePictureCommand();
+	void test(OpalMediaCommand & command);
 	BOOL didStartMediaReceiver;
+	PNotifier notifier;
+	BOOL notifierSet;
 };
 
 #endif // __XM_RECEIVER_MEDIA_PATCH__
