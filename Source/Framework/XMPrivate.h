@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.14 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.15 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,13 +25,6 @@
 #import "XMVideoView.h"
 #import "XMAddressBookRecordSearchMatch.h"
 #import "XMGeneralPurposeURL.h"
-
-#define XM_FRAMEWORK_NOT_INITIALIZED 0
-#define XM_FRAMEWORK_INITIALIZED 1
-#define XM_FRAMEWORK_CLOSE_CALLED 2
-#define XM_FRAMEWORK_SEPARATE_THREADS 2
-
-#define XM_FRAMEWORK_ALL_THREADS_CLOSED XM_FRAMEWORK_CLOSE_CALLED + XM_FRAMEWORK_SEPARATE_THREADS
 
 extern unsigned _XMInitializedStatus;
 extern XMUtils *_XMUtilsSharedInstance;

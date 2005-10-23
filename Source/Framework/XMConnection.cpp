@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.4 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -86,9 +86,11 @@ void XMConnection::InitiateCall()
 void XMConnection::AcceptIncoming()
 {
 	if (!LockReadOnly())
+	{
 		return;
-	
-	if (phase != AlertingPhase) {
+	}
+	if (phase != AlertingPhase)
+	{
 		UnlockReadOnly();
 		return;
 	}
@@ -97,17 +99,19 @@ void XMConnection::AcceptIncoming()
 	phase = ConnectedPhase;
 	UnlockReadWrite();
 	UnlockReadOnly();
-	
+
 	OnConnected();
 	
 	if (!LockReadOnly())
+	{
 		return;
-	
-	if (mediaStreams.IsEmpty()) {
+	}
+	if (mediaStreams.IsEmpty())
+	{
 		UnlockReadOnly();
 		return;
 	}
-	
+
 	LockReadWrite();
 	phase = EstablishedPhase;
 	UnlockReadWrite();

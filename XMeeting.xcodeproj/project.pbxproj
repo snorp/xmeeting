@@ -14,6 +14,8 @@
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
 		D10AFEB407B3781700BBC8EA /* XMUtils.h in Resources */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
 		D10AFEB507B3781700BBC8EA /* XMUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFEB307B3781700BBC8EA /* XMUtils.m */; };
+		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
+		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
 		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
 		D121C702087D53D80097DEF7 /* XMCircularBuffer.cpp in Resources */ = {isa = PBXBuildFile; fileRef = D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */; };
 		D12211B50844D1820021D4CD /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D12211B40844D1820021D4CD /* XMAddressBookManager.m */; };
@@ -21,6 +23,7 @@
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D13232EE0906684D00F4D5A7 /* XMLocalAudioVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13232ED0906684D00F4D5A7 /* XMLocalAudioVideoView.m */; };
 		D13233A3090687FA00F4D5A7 /* XMInCallView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13233A2090687FA00F4D5A7 /* XMInCallView.m */; };
+		D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35408F90263007E4ABE /* transports.cxx */; };
 		D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13274F008C6F2BB00298F25 /* XMCallInfoView.m */; };
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
 		D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */ = {isa = PBXBuildFile; fileRef = D14587EE09013DD4004A1EDF /* XMCallStatistics.m */; };
@@ -60,8 +63,6 @@
 		D19714F108F9186100295E05 /* pwlib.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1B6057208F8F7740034B47F /* pwlib.dylib */; };
 		D197152E08F921F900295E05 /* opal.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE10B08F901F0007E4ABE /* opal.dylib */; };
 		D197153308F922C400295E05 /* pwlib.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1B6057208F8F7740034B47F /* pwlib.dylib */; };
-		D197173C08F9392000295E05 /* transports_patched.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D197173B08F9392000295E05 /* transports_patched.cxx */; };
-		D197174008F9394B00295E05 /* gkclient_patched.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D197173F08F9394B00295E05 /* gkclient_patched.cxx */; };
 		D197179508F94A6000295E05 /* XMOpalDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D197179408F94A6000295E05 /* XMOpalDispatcher.m */; };
 		D1971A5F08FA453F00295E05 /* XMMediaFormats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1971A5E08FA453F00295E05 /* XMMediaFormats.cpp */; };
 		D1971B7208FA736700295E05 /* XMEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1971B7108FA736700295E05 /* XMEndPoint.cpp */; };
@@ -824,8 +825,6 @@
 		D189805208241F11007CD286 /* XMBooleanCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMBooleanCell.m; path = Source/GUI/XMBooleanCell.m; sourceTree = "<group>"; };
 		D18BF5F007AFA006000CF993 /* XMCallbackBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallbackBridge.h; path = Source/Framework/XMCallbackBridge.h; sourceTree = "<group>"; };
 		D18BF5F107AFA006000CF993 /* XMCallbackBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallbackBridge.m; path = Source/Framework/XMCallbackBridge.m; sourceTree = "<group>"; };
-		D197173B08F9392000295E05 /* transports_patched.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = transports_patched.cxx; path = Patches/opal/src/opal/transports_patched.cxx; sourceTree = SOURCE_ROOT; };
-		D197173F08F9394B00295E05 /* gkclient_patched.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = gkclient_patched.cxx; path = Patches/opal/src/h323/gkclient_patched.cxx; sourceTree = SOURCE_ROOT; };
 		D197179308F94A6000295E05 /* XMOpalDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMOpalDispatcher.h; path = Source/Framework/XMOpalDispatcher.h; sourceTree = "<group>"; };
 		D197179408F94A6000295E05 /* XMOpalDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMOpalDispatcher.m; path = Source/Framework/XMOpalDispatcher.m; sourceTree = "<group>"; };
 		D1971A5D08FA453F00295E05 /* XMMediaFormats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMMediaFormats.h; path = Source/Framework/XMMediaFormats.h; sourceTree = "<group>"; };
@@ -1507,6 +1506,7 @@
 				D1E2DB8908F4720A00BE224E /* QuartzCore.framework in Frameworks */,
 				D197152E08F921F900295E05 /* opal.dylib in Frameworks */,
 				D197153308F922C400295E05 /* pwlib.dylib in Frameworks */,
+				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2680,7 +2680,6 @@
 			children = (
 				D1CEE31C08F90262007E4ABE /* channels.cxx */,
 				D1CEE31D08F90262007E4ABE /* gkclient.cxx */,
-				D197173F08F9394B00295E05 /* gkclient_patched.cxx */,
 				D1CEE32008F90262007E4ABE /* gkserver.cxx */,
 				D1CEE32108F90262007E4ABE /* h225ras.cxx */,
 				D1CEE32208F90262007E4ABE /* h235auth.cxx */,
@@ -2719,7 +2718,6 @@
 				D1CEE35208F90263007E4ABE /* pcss.cxx */,
 				D1CEE35308F90263007E4ABE /* transcoders.cxx */,
 				D1CEE35408F90263007E4ABE /* transports.cxx */,
-				D197173B08F9392000295E05 /* transports_patched.cxx */,
 			);
 			name = opal;
 			path = ../opal/src/opal;
@@ -3659,8 +3657,8 @@
 				D1CEE48F08F90263007E4ABE /* transcoders.cxx in Sources */,
 				D1CEE49208F90263007E4ABE /* jitter.cxx in Sources */,
 				D1CEE49308F90263007E4ABE /* rtp.cxx in Sources */,
-				D197173C08F9392000295E05 /* transports_patched.cxx in Sources */,
-				D197174008F9394B00295E05 /* gkclient_patched.cxx in Sources */,
+				D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */,
+				D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3846,14 +3844,16 @@
 		D11E93F308589A9200154C02 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_CW_ASM_SYNTAX = YES;
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_CW_ASM_SYNTAX = NO;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = XMeeting_Prefix.pch;
 				GCC_THREADSAFE_STATICS = YES;
@@ -3885,7 +3885,7 @@
 				PRODUCT_NAME = XMeeting;
 				WARNING_CFLAGS = "-Wno-long-double";
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			name = Deployment;
 		};
@@ -4017,7 +4017,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../pwlib/include;
 				INSTALL_PATH = "";
-				LIBRARY_STYLE = DYNAMIC;
+				LIBRARY_STYLE = STATIC;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4120,7 +4120,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
 				GCC_USE_GCC3_PFE_SUPPORT = YES;
@@ -4132,7 +4132,7 @@
 				);
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				LIBRARY_STYLE = DYNAMIC;
+				LIBRARY_STYLE = STATIC;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4143,7 +4143,7 @@
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				SKIP_INSTALL = YES;
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			name = Deployment;
 		};

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,7 @@
 	BOOL needsPictureUpdate;
 	
 	unsigned frameGrabRate;
+	unsigned transmitFrameGrabRate;
 	XMVideoSize videoSize;
 	CodecType codecType;
 	TimeScale timeScale;
@@ -50,7 +51,11 @@
 + (void)_startGrabbing;
 + (void)_stopGrabbing;
 
-+ (void)_startTransmittingWithCodec:(unsigned)codecType videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID;
++ (void)_startTransmittingWithCodec:(unsigned)codecType 
+						  videoSize:(XMVideoSize)videoSize 
+				 maxFramesPerSecond:(unsigned)maxFramesPerSecond
+						 maxBitrate:(unsigned)maxBitrate
+							session:(unsigned)sessionID;
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 
 + (void)_updatePicture;

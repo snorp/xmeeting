@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.12 2005/10/19 22:08:23 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.13 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,9 +62,6 @@
 	// First step to do!
 	XMInitFramework();
 	
-	// making sure that the preferences are set up
-	[XMPreferencesManager sharedInstance];
-	
 	// registering the call address providers
 	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
@@ -106,6 +103,9 @@
 							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
 	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
 							   name:XMNotification_FrameworkDidClose object:nil];
+	
+	// making sure that the preferences are loaded
+	[XMPreferencesManager sharedInstance];
 	
 	// start grabbing from the video sources
 	[[XMVideoManager sharedInstance] startGrabbing];

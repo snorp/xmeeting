@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.4 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,6 +165,10 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 
 void XMEndPoint::AcceptIncomingCall()
 {
+	if(incomingConnectionToken.IsEmpty())
+	{
+		return;
+	}
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(incomingConnectionToken, PSafeReadOnly);
 	if(connection != NULL)
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.3 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,7 @@
 
 #include "XMTransmitterMediaPatch.h"
 
+#include <math.h>
 #include <opal/mediastrm.h>
 
 #include "XMMediaFormats.h"
@@ -55,7 +56,31 @@ void XMTransmitterMediaPatch::Resume()
 		doesRunOwnThread = FALSE;
 		isTerminated = FALSE;
 		videoTransmitterPatch = this;
-		_XMStartMediaTransmit(_XMVideoCodec_H261, XMVideoSize_CIF, 2);
+		unsigned maxFramesPerSecond = UINT_MAX;
+		unsigned maxBitrate = UINT_MAX;
+		
+		PINDEX i;
+		for(i = 0; i < sinks.GetSize(); i++)
+		{
+			OpalMediaFormat mediaFormat = sinks[i].stream->GetMediaFormat();
+		
+			unsigned frameTime = mediaFormat.GetFrameTime();
+			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
+			unsigned bitrate = mediaFormat.GetBandwidth();
+			
+			// adjusting the maxFramesPerSecond / maxBitrate parameters
+			if(framesPerSecond < maxFramesPerSecond)
+			{
+				maxFramesPerSecond = framesPerSecond;
+			}
+			
+			if(bitrate < maxBitrate)
+			{
+				maxBitrate = bitrate;
+			}
+			
+		}
+		_XMStartMediaTransmit(_XMVideoCodec_H261, XMVideoSize_CIF, maxFramesPerSecond, maxBitrate, 2);
 	}
 	else
 	{
@@ -84,17 +109,10 @@ void XMTransmitterMediaPatch::Close()
 BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
 											 BOOL fromSink)
 {
-	if(fromSink)
+	if(fromSink && PIsDescendant(&command, OpalVideoUpdatePicture))
 	{
-		PString commandName = command.GetName();
-		
-		// somehow the PIsDescendant() macro seems not to work for this
-		// class. Therefore we do a simple string compare
-		if(commandName == "Update Picture")
-		{
-			_XMUpdatePicture();
-			return TRUE;
-		}
+		_XMUpdatePicture();
+		return TRUE;
 	}
 	return OpalMediaPatch::ExecuteCommand(command, fromSink);
 }

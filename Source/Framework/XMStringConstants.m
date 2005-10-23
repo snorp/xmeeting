@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.8 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.9 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -99,7 +99,7 @@ NSString *XMCodec_Video_H263 = @"h.263";
 NSString *XMKey_PreferencesUserName = @"XMeeting_UserName";
 NSString *XMKey_PreferencesAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 
-//NSString *XMKey_PreferencesBandwidthLimit = @"XMeeting_BandwidthLimit";
+NSString *XMKey_PreferencesBandwidthLimit = @"XMeeting_BandwidthLimit";
 NSString *XMKey_PreferencesUseAddressTranslation = @"XMeeting_UseAddressTranslation";
 NSString *XMKey_PreferencesExternalAddress = @"XMeeting_ExternalAddress";
 NSString *XMKey_PreferencesTCPPortBase = @"XMeeting_TCPPortBase";
@@ -111,8 +111,8 @@ NSString *XMKey_PreferencesAudioCodecList = @"XMeeting_AudioCodecList";
 NSString *XMKey_PreferencesAudioBufferSize = @"XMeeting_AudioBufferSize";
 
 NSString *XMKey_PreferencesEnableVideo = @"XMeeting_EnableVideo";
-//NSString *XMKey_PreferencesVideoFramesPerSecond = @"XMeeting_VideoFramesPerSecond";
-//NSString *XMKey_PreferencesVideoSize = @"XMeeting_VideoSize";
+NSString *XMKey_PreferencesVideoFramesPerSecond = @"XMeeting_VideoFramesPerSecond";
+NSString *XMKey_PreferencesPreferredVideoSize = @"XMeeting_PreferredVideoSize";
 NSString *XMKey_PreferencesVideoCodecList = @"XMeeting_VideoCodecList";
 
 NSString *XMKey_PreferencesEnableH323 = @"XMeeting_EnableH323";

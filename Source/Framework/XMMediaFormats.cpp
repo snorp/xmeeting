@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.3 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,9 +14,7 @@
 #define XM_MAX_FRAME_HEIGHT PVideoDevice::CIFHeight
 #define XM_MAX_FRAME_RATE 30
 
-#define XM_MAX_H261_BITRATE 128000
-
-#define new PNEW
+#define XM_MAX_H261_BITRATE 19200
 
 #pragma mark MediaFormat Definitions
 
@@ -54,6 +52,20 @@ const OpalVideoFormat & XMGetMediaFormat_H261_CIF()
 														XM_MAX_FRAME_RATE,
 														XM_MAX_H261_BITRATE);
 	return XMMediaFormat_H261_CIF;
+}
+
+#pragma mark Limiting the Video Bitrate
+
+static unsigned _maxVideoBitrate;
+
+void _XMSetMaxVideoBitrate(unsigned maxVideoBitrate)
+{
+	_maxVideoBitrate = maxVideoBitrate;
+}
+
+unsigned _XMGetMaxVideoBitrate()
+{
+	return _maxVideoBitrate;
 }
 
 #pragma mark XM_H261_VIDEO_QCIF methods
@@ -156,7 +168,7 @@ XM_H323_H261_Capability::XM_H323_H261_Capability(XMVideoSize videoSize)
 	}
 	
 	temporalSpatialTradeOffCapability = TRUE;
-	maxBitRate = XM_MAX_H261_BITRATE;
+	maxBitRate = _XMGetMaxVideoBitrate();
 	stillImageTransmission = TRUE;
 }
 

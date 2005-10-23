@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.2 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.3 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,6 +29,10 @@ extern const OpalVideoFormat & XMGetMediaFormat_H261_CIF();
 #define XM_MEDIA_FORMAT_VIDEO XMGetMediaFormat_Video()
 #define XM_MEDIA_FORMAT_H261_QCIF XMGetMediaFormat_H261_QCIF()
 #define XM_MEDIA_FORMAT_H261_CIF XMGetMediaFormat_H261_CIF()
+
+// limiting the video bitrate
+void _XMSetMaxVideoBitrate(unsigned maxVideoBitrate);
+unsigned _XMGetMaxVideoBitrate();
 
 // definition of the transcoders
 

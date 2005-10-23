@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.11 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.12 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,7 +76,8 @@ enum
 /**
  * Instructs the MediaTransmitter to start sending video data
  **/
-void _XMStartMediaTransmit(unsigned codec, XMVideoSize videoSize, unsigned sessionID);
+void _XMStartMediaTransmit(unsigned codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
+						   unsigned maxBitrate, unsigned sessionID);
 
 /**
  * Instructs the MediaTransmitter to stop sending video data

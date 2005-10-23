@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.5 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.6 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -362,7 +362,6 @@ databaseField:imageForRepresentedObject:";
 
 - (void)insertTab:(id)sender
 {
-	NSText *currentEditor = [self currentEditor];
 	unsigned selectedCompletionIndex = [completionsTableView selectedRow];
 	NSString *currentString = [currentCompletions objectAtIndex:selectedCompletionIndex];
 	

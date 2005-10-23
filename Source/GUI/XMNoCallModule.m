@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.12 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.13 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,9 +48,6 @@
 	
 	nibLoader = nil;
 	
-	callAddressManager = [[XMCallAddressManager sharedInstance] retain];
-	preferencesManager = [[XMPreferencesManager sharedInstance] retain];
-	
 	isCalling = NO;
 	
 	return self;
@@ -65,9 +62,6 @@
 	
 	[imageItem release];
 	
-	[callAddressManager release];
-	[preferencesManager release];
-	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[super dealloc];
@@ -75,16 +69,7 @@
 
 - (void)awakeFromNib
 {	
-	contentViewSize = [contentView frame].size;
-	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
-	
-	imageItem = [[NSMenuItem alloc] init];
-	[imageItem setImage:[NSImage imageNamed:@"CallHistory"]];
-	
-	[self _setupRecentCallsPullDownMenu];
-
-	[self _preferencesDidChange:nil];
-	
+	// First, register for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
@@ -113,7 +98,7 @@
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
 							   name:XMNotification_CallManagerDidReceiveIncomingCall
-							  object:nil];
+							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
 							   name:XMNotification_CallManagerDidClearCall
 							 object:nil];
@@ -126,6 +111,16 @@
 	[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
 							   name:XMNotification_CallHistoryCallAddressProviderDataDidChange
 							 object:nil];
+	
+	contentViewSize = [contentView frame].size;
+	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
+	
+	imageItem = [[NSMenuItem alloc] init];
+	[imageItem setImage:[NSImage imageNamed:@"CallHistory"]];
+	
+	[self _setupRecentCallsPullDownMenu];
+
+	[self _preferencesDidChange:nil];
 }
 
 #pragma mark XMMainWindowModule methods
@@ -202,7 +197,7 @@
 		return;
 	}
 	
-	[callAddressManager makeCallToAddress:callAddress];
+	[[XMCallAddressManager sharedInstance] makeCallToAddress:callAddress];
 }
 
 - (IBAction)changeActiveLocation:(id)sender
@@ -217,6 +212,7 @@
 	  completionsForString:(NSString *)uncompletedString
 	   indexOfSelectedItem:(unsigned *)indexOfSelectedItem
 {	
+	XMCallAddressManager *callAddressManager = [XMCallAddressManager sharedInstance];
 	NSArray *originalMatchedAddresses;
 	unsigned newUncompletedStringLength = [uncompletedString length];
 	if(newUncompletedStringLength <= uncompletedStringLength)
@@ -293,6 +289,7 @@
 
 - (void)_preferencesDidChange:(NSNotification *)notif
 {
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	[locationsPopUpButton removeAllItems];
 	[locationsPopUpButton addItemsWithTitles:[preferencesManager locationNames]];
 	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
@@ -323,7 +320,7 @@
 	// posted. However, in some cases, it may take some time (3-4) secs, in which the
 	// user cannot clear the call
 	
-	id<XMCallAddress> activeCallAddress = [callAddressManager activeCallAddress];
+	id<XMCallAddress> activeCallAddress = [[XMCallAddressManager sharedInstance] activeCallAddress];
 	[callAddressField setRepresentedObject:activeCallAddress];
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];

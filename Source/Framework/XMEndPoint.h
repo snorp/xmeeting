@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.3 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,8 @@ public:
 	void SetEnableVideo(BOOL enableVideo);
 
 private:
+	BOOL BeginAcceptIncomingCall();
+	BOOL CompleteAcceptIncomingCall();
 	PString incomingConnectionToken;
 	
 	BOOL enableVideo;

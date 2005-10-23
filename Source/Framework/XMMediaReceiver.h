@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.h,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMMediaReceiver.h,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,8 @@
 	XMVideoSize videoMediaSize;
 	
 	BOOL didSucceedDecodingFrame;
+	
+	BOOL doesClose;
 }
 
 - (id)_init;

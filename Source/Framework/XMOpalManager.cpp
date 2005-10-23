@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.13 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.14 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -152,9 +152,16 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 	}
 	else
 	{
-		limit *= 100;
+		// H.245 works with amounts of 100bit/s
+		limit /= 100;
 	}
-	h323EndPoint->SetInitialBandwidth(limit);
+	
+	// taking away the approximative amount of audio bandwidth
+	unsigned videoLimit = limit - 640;
+	
+	cout << "bandwidth limit: " << limit << " videoLimit: " << videoLimit << endl;
+	
+	_XMSetMaxVideoBitrate(videoLimit);
 }
 
 #pragma mark Video Setup Methods

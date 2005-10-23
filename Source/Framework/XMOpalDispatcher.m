@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.3 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -476,6 +476,7 @@ typedef enum _XMOpalDispatcherMessage
 		// and we wait until the call is cleared before shutting down the system entirely
 		[self _handleClearCallMessage:nil];
 		callID = UINT_MAX;
+		return;
 	}
 	// By using the default XMPreferences instance,
 	// we shutdown the subsystem
@@ -772,6 +773,7 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleRejectIncomingCallMessage:(NSArray *)messageComponents
 {
+	NSLog(@"Reject Call");
 	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
 	NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
 	unsigned theCallID = [idNumber unsignedIntValue];
@@ -969,7 +971,7 @@ typedef enum _XMOpalDispatcherMessage
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
 	unsigned theCallID = [number unsignedIntValue];
 	
-	if(theCallID != callID)
+	if((theCallID != callID) && (callID != UINT_MAX))
 	{
 		NSLog(@"CallID mismatch on MediaStreamClosed: %d to actual %d", theCallID, callID);
 		return;
@@ -1019,7 +1021,7 @@ typedef enum _XMOpalDispatcherMessage
 		_XMSetUserName(userName);
 	}
 	
-	//_XMSetBandwidthLimit([preferences bandwidthLimit]);
+	_XMSetBandwidthLimit([preferences bandwidthLimit]);
 	
 	const char *translationAddress = NULL;
 	if([preferences useAddressTranslation] == YES)
@@ -1046,8 +1048,13 @@ typedef enum _XMOpalDispatcherMessage
 	_XMSetAudioBufferSize([preferences audioBufferSize]);
 	
 	// ***** Adjusting the Video Preferences ***** //
+	BOOL enableVideo = [preferences enableVideo];
+	_XMSetEnableVideo(enableVideo);
 	
-	_XMSetEnableVideo([preferences enableVideo]);
+	if(enableVideo == YES)
+	{
+		[XMMediaTransmitter _setFrameGrabRate:[preferences videoFramesPerSecond]];
+	}
 	
 	// ***** Adjusting the Codec Order/Mask ***** //
 	

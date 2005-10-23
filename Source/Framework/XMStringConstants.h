@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.9 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.10 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -230,7 +230,7 @@ extern NSString *XMKey_PreferencesUserName;
 extern NSString *XMKey_PreferencesAutomaticallyAcceptIncomingCalls;
 
 // Network-specific keys
-//extern NSString *XMKey_PreferencesBandwidthLimit;
+extern NSString *XMKey_PreferencesBandwidthLimit;
 extern NSString *XMKey_PreferencesUseAddressTranslation;
 extern NSString *XMKey_PreferencesExternalAddress;
 extern NSString *XMKey_PreferencesTCPPortBase;
@@ -244,8 +244,8 @@ extern NSString *XMKey_PreferencesAudioCodecList;
 
 // video-specific keys
 extern NSString *XMKey_PreferencesEnableVideo;
-//extern NSString *XMKey_PreferencesVideoFramesPerSecond;
-//extern NSString *XMKey_PreferencesVideoSize;
+extern NSString *XMKey_PreferencesVideoFramesPerSecond;
+extern NSString *XMKey_PreferencesPreferredVideoSize;
 extern NSString *XMKey_PreferencesVideoCodecList;
 
 // H323-specific keys

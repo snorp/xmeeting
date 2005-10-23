@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,13 @@
 
 #import "XMSequenceGrabberVideoInputModule.h"
 #import "XMDummyVideoInputModule.h"
+
+#define XM_FRAMEWORK_NOT_INITIALIZED 0
+#define XM_FRAMEWORK_INITIALIZED 1
+#define XM_FRAMEWORK_CLOSE_CALLED 2
+#define XM_FRAMEWORK_SEPARATE_THREADS 2
+
+#define XM_FRAMEWORK_ALL_THREADS_CLOSED XM_FRAMEWORK_CLOSE_CALLED + XM_FRAMEWORK_SEPARATE_THREADS
 
 unsigned _XMInitializedStatus = XM_FRAMEWORK_NOT_INITIALIZED;
 XMUtils *_XMUtilsSharedInstance = nil;
@@ -78,7 +85,6 @@ void XMCloseFramework()
 }
 
 void _XMThreadExit() {
-	
 	_XMInitializedStatus++;
 	
 	if(_XMInitializedStatus == XM_FRAMEWORK_ALL_THREADS_CLOSED)

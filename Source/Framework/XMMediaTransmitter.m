@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.4 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,7 +113,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopGrabbing withComponents:nil];
 }
 
-+ (void)_startTransmittingWithCodec:(unsigned)codecType videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID
++ (void)_startTransmittingWithCodec:(unsigned)codecType 
+						  videoSize:(XMVideoSize)videoSize 
+				 maxFramesPerSecond:(unsigned)maxFramesPerSecond
+						 maxBitrate:(unsigned)maxBitrate
+							session:(unsigned)sessionID
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:codecType];
 	NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -123,11 +127,20 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	NSData *sizeData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
+	number = [[NSNumber alloc] initWithUnsignedInt:maxFramesPerSecond];
+	NSData *framesData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:maxBitrate];
+	NSData *bitrateData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
 	number = [[NSNumber alloc] initWithUnsignedInt:sessionID];
 	NSData *sessionData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	NSArray *components = [[NSArray alloc] initWithObjects:codecData, sizeData, sessionData, nil];
+	NSArray *components = [[NSArray alloc] initWithObjects:codecData, sizeData, framesData,
+															bitrateData, sessionData, nil];
 	
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartTransmitting withComponents:components];
 	
@@ -197,6 +210,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	needsPictureUpdate = NO;
 	
 	frameGrabRate = 20;
+	transmitFrameGrabRate = UINT_MAX;
 	videoSize = XMVideoSize_QCIF;
 	codecType = 0;
 	timeScale = 600;
@@ -500,6 +514,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	unsigned codecCode;
 	XMVideoSize requiredVideoSize;
+	unsigned bitrate;
 	
 	NSData *data = (NSData *)[components objectAtIndex:0];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -508,6 +523,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	data = (NSData *)[components objectAtIndex:1];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	requiredVideoSize = (XMVideoSize)[number unsignedIntValue];
+	
+	data = (NSData *)[components objectAtIndex:2];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	transmitFrameGrabRate = [number unsignedIntValue];
+	
+	data = (NSData *)[components objectAtIndex:3];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	bitrate = [number unsignedIntValue];
 	
 	switch(codecCode)
 	{
@@ -531,6 +554,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		{
 			[activeModule setInputFrameSize:frameDimensions];
 		}
+	}
+	
+	// check if the frameGrabRate needs to be adjusted
+	if((transmitFrameGrabRate < frameGrabRate) && (isGrabbing == YES))
+	{
+		NSLog(@"adjusting frameGrabRate to %d", frameGrabRate);
+		[activeModule setFrameGrabRate:transmitFrameGrabRate];
 	}
 	
 	// start grabbing, just to be sure
@@ -558,11 +588,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}
 	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 100);
+	/*err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 100);
 	if(err != noErr)
 	{
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
-	}
+	}*/
 	
 	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, true);
 	if(err != noErr)
@@ -570,13 +600,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"setallowFrameTimeChanges failed: %d", (int)err);
 	}
 	
-	err = ICMCompressionSessionOptionsSetDurationsNeeded(sessionOptions, true);
+	/*err = ICMCompressionSessionOptionsSetDurationsNeeded(sessionOptions, true);
 	if(err != noErr)
 	{
 		NSLog(@"SetDurationsNeeded failed: %d", (int)err);
-	}
+	}*/
 	
-	SInt32 averageDataRate = 100000;
+	// averageDataRate is in bytes/s
+	SInt32 averageDataRate = bitrate / 8;
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -645,6 +676,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		DisposeRTPMPDataReleaseUPP(dataReleaseProc);
 		sampleData.releaseProc = NULL;
 	}
+	
+	if(transmitFrameGrabRate < frameGrabRate)
+	{
+		[activeModule setFrameGrabRate:frameGrabRate];
+	}
+	
+	transmitFrameGrabRate = UINT_MAX;
 	
 	_XMDidStopTransmitting(2);
 	
@@ -855,6 +893,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		if(err != noErr)
 		{
 			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
+		}
+		
+		if(needsPictureUpdate == YES)
+		{
+			NSLog(@"Forcing keyframe");
 		}
 		
 		needsPictureUpdate = NO;

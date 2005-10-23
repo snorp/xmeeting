@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.12 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.13 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,8 +59,7 @@ const char *_XMGetUserName()
 
 void _XMSetBandwidthLimit(unsigned limit)
 {
-	// Currently not enabled
-	//theManager->SetBandwidthLimit(limit);
+	theManager->SetBandwidthLimit(limit);
 }
 
 void _XMSetTranslationAddress(const char *a)
@@ -129,8 +128,6 @@ void _XMSetDisabledCodecs(const char * const * codecs, unsigned codecCount)
 	codecsArray.AppendString("*speex*");
 	codecsArray.AppendString("*lpc*");
 	codecsArray.AppendString("*ms*");
-	//codecsArray.AppendString("*H.261(CIF)*");
-	//codecsArray.AppendString("*H.261(QCIF)*");
 	
 	theManager->SetMediaFormatMask(codecsArray);
 }

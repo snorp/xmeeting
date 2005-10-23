@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.5 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.6 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,17 +58,31 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	didSucceedDecodingFrame = YES;
 	
+	doesClose = NO;
+	
 	return self;
 }
 
 - (void)_close
 {
+	/*if(doesClose == YES)
+	{
+		return;
+	}
+	
+	doesClose = YES;
+	
+	if(videoDecompressionSession != NULL)
+	{
+		return;
+	}
+
+	_XMThreadExit();*/
 }
 
 - (void)dealloc
-{
+{	
 	[self _close];
-	
 	[super dealloc];
 }
 
@@ -112,6 +126,11 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 													withObject:nil waitUntilDone:NO];
 	
 	ExitMoviesOnThread();
+	
+	/*if(doesClose == YES)
+	{
+		_XMThreadExit();
+	}*/
 }
 
 - (BOOL)_processPacket:(UInt8*)data length:(unsigned)length session:(unsigned)sessionID

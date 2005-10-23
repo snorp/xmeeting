@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.7 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.8 2005/10/23 19:59:00 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,7 +52,7 @@
 	/* video settings */
 	BOOL		 enableVideo;					// Enables/disables video
 	unsigned	 videoFramesPerSecond;			// Framerate for sent video
-	XMVideoSize	 videoSize;						// The preferred video size for sent video
+	XMVideoSize	 preferredVideoSize;			// The preferred video size for sent video
 	NSMutableArray *videoCodecList;				// An array containing XMCodecListRecord instances
 
 	/* H.323-specific settings */
@@ -113,10 +113,8 @@
 
 #pragma mark Methods for Network settings
 
-/*
 - (unsigned)bandwidthLimit;
 - (void)setBandwidthLimit:(unsigned)limit;
-*/
 
 - (BOOL)useAddressTranslation;
 - (void)setUseAddressTranslation:(BOOL)flag;
@@ -151,13 +149,11 @@
 - (BOOL)enableVideo;
 - (void)setEnableVideo:(BOOL)flag;
 
-/*
 - (unsigned)videoFramesPerSecond;
 - (void)setVideoFramesPerSecond:(unsigned)value;
 
-- (XMVideoSize)videoSize;
-- (void)setVideoSize:(XMVideoSize)size;
-*/
+- (XMVideoSize)preferredVideoSize;
+- (void)setPreferredVideoSize:(XMVideoSize)size;
 
 - (NSArray *)videoCodecList;
 - (unsigned)videoCodecListCount;
