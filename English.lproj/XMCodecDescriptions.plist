@@ -8,9 +8,19 @@
 			<key>XMeeting_Bandwidth</key>
 			<string>64 kbit/s</string>
 			<key>XMeeting_Identifier</key>
-			<string>*g.711*</string>
+			<integer>1</integer>
 			<key>XMeeting_Name</key>
-			<string>G.711</string>
+			<string>G.711 uLaw</string>
+			<key>XMeeting_Quality</key>
+			<string>Good</string>
+		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>64 kbit/s</string>
+			<key>XMeeting_Identifier</key>
+			<integer>2</integer>
+			<key>XMeeting_Name</key>
+			<string>G.711 ALaw</string>
 			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>
@@ -21,7 +31,7 @@
 			<key>XMeeting_Bandwidth</key>
 			<string>64 - 768 kbit/s</string>
 			<key>XMeeting_Identifier</key>
-			<string>*h.261*</string>
+			<integer>-1</integer>
 			<key>XMeeting_Name</key>
 			<string>H.261</string>
 			<key>XMeeting_Quality</key>

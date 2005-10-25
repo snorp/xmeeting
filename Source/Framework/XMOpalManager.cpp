@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.14 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.15 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,8 +158,6 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 	
 	// taking away the approximative amount of audio bandwidth
 	unsigned videoLimit = limit - 640;
-	
-	cout << "bandwidth limit: " << limit << " videoLimit: " << videoLimit << endl;
 	
 	_XMSetMaxVideoBitrate(videoLimit);
 }

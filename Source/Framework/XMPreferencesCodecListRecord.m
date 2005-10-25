@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesCodecListRecord.m,v 1.1 2005/06/28 20:43:46 hfriederich Exp $
+ * $Id: XMPreferencesCodecListRecord.m,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,11 +21,11 @@
 	return nil;
 }
 
-- (id)_initWithIdentifier:(NSString *)theIdentifier enabled:(BOOL)enabled
+- (id)_initWithIdentifier:(XMCodecIdentifier)theIdentifier enabled:(BOOL)enabled
 {
 	self = [super init];
 	
-	identifier = [theIdentifier copy];
+	identifier = theIdentifier;
 	[self setEnabled:enabled];
 	
 	return self;
@@ -40,11 +40,11 @@
 	obj = [dict objectForKey:XMKey_PreferencesCodecListRecordIdentifier];
 	if(obj)
 	{
-		identifier = (NSString *)[obj copy];
+		identifier = (XMCodecIdentifier)[(NSNumber *)obj unsignedIntValue];
 	}
 	else
 	{
-		identifier = nil;
+		identifier = XMCodecIdentifier_UnknownCodec;
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesCodecListRecordIsEnabled];
@@ -71,7 +71,7 @@
 	
 	if([coder allowsKeyedCoding]) // use keyed coding
 	{
-		identifier = (NSString *)[[coder decodeObjectForKey:XMKey_PreferencesCodecListRecordIdentifier] retain];
+		identifier = (XMCodecIdentifier)[coder decodeIntForKey:XMKey_PreferencesCodecListRecordIdentifier];
 		[self setEnabled:[coder decodeBoolForKey:XMKey_PreferencesCodecListRecordIsEnabled]];
 	}
 	else // raise an exception
@@ -88,20 +88,13 @@
 {
 	if([coder allowsKeyedCoding])
 	{
-		[coder encodeObject:[self identifier] forKey:XMKey_PreferencesCodecListRecordIdentifier];
+		[coder encodeInt:(int)[self identifier] forKey:XMKey_PreferencesCodecListRecordIdentifier];
 		[coder encodeBool:[self isEnabled] forKey:XMKey_PreferencesCodecListRecordIsEnabled];
 	}
 	else
 	{
 		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 	}
-}
-
-- (void)dealloc
-{
-	[identifier release];
-	
-	[super dealloc];
 }
 
 #pragma mark General NSObject Functionality
@@ -122,7 +115,7 @@
 	
 	record = (XMPreferencesCodecListRecord *)object;
 	
-	if([[record identifier] isEqualToString:[self identifier]] &&
+	if([record identifier] == [self identifier] &&
 	   [record isEnabled] == [self isEnabled])
 	{
 		return YES;
@@ -137,7 +130,9 @@
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	NSNumber *number;
 	
-	[dict setObject:[self identifier] forKey:XMKey_PreferencesCodecListRecordIdentifier];
+	number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)[self identifier]];
+	[dict setObject:number forKey:XMKey_PreferencesCodecListRecordIdentifier];
+	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self isEnabled]];
 	[dict setObject:number forKey:XMKey_PreferencesCodecListRecordIsEnabled];
@@ -152,7 +147,7 @@
 {
 	if([key isEqualToString:XMKey_PreferencesCodecListRecordIdentifier])
 	{
-		return [self identifier];
+		return [NSNumber numberWithUnsignedInt:(unsigned)[self identifier]];
 	}
 	else if([key isEqualToString:XMKey_PreferencesCodecListRecordIsEnabled])
 	{
@@ -180,7 +175,7 @@
 
 #pragma mark Getter & Setter Methods
 
-- (NSString *)identifier;
+- (XMCodecIdentifier)identifier;
 {
 	return identifier;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.11 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.12 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,14 +112,10 @@ void _XMSetEnableVideo(bool enableVideo);
 #pragma mark Codec Functions
 
 /**
- * disables the codecs as listed in the array of strings
+ * Sets the ordered & disabled codec lists appropriately
  **/
-void _XMSetDisabledCodecs(const char * const * codecs, unsigned codecCount);
-
-/**
- * Maintains the codec preference order as listed in the array of strings
- **/
-void _XMSetCodecOrder(char const * const * codecs, unsigned codecCount);
+void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount,
+				  const char * const * disabledCodecs, unsigned disabledCodecCount);
 
 #pragma mark H.323 Setup Functions
 
@@ -191,6 +187,13 @@ void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp);
 void _XMAppendData(unsigned sessionID, void *data, unsigned length);
 void _XMSendPacket(unsigned sessionID, bool setMarkerBit);
 void _XMDidStopTransmitting(unsigned sessionID);
+
+#pragma mark MediaFormat Functions
+
+unsigned _XMMaxMediaFormatsPerCodecIdentifier();
+const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier);
+const char *_XMMediaFormatForCodecIdentifierWithVideoSize(XMCodecIdentifier codecIdentifier,
+														  XMVideoSize videoSize);
 
 #pragma mark Constants
 

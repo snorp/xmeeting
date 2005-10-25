@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.10 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.11 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -201,27 +201,6 @@ extern NSString *XMException_InvalidAction;
 extern NSString *XMException_InvalidParameter;
 extern NSString *XMException_UnsupportedCoder;
 extern NSString *XMException_InternalConsistencyFailure;
-
-#pragma mark Audio Codecs
-
-/**
- * List of currently available audio codecs. These strings
- * can be used as keys to access the corresponding codec descriptors.
- **/
-extern NSString *XMCodec_Audio_G711_ALaw;
-extern NSString *XMCodec_Audio_G711_uLaw;
-extern NSString *XMCodec_Audio_Speex;
-extern NSString *XMCodec_Audio_GSM;
-extern NSString *XMCodec_Audio_iLBC;
-
-#pragma mark Video Codecs
-
-/**
- * List of currently available video codecs. These strings can
- * be used as keys to access the corresponding codec descriptors.
- **/
-extern NSString *XMCodec_Video_H261;
-//extern NSString *XMCodec_Video_H263;
 
 #pragma mark XMPreferences Keys
 

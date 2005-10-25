@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.9 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.10 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMLocationPreferencesModule.h"
+
+#import "XMeeting.h"
 #import "XMPreferencesWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMLocation.h"
@@ -854,7 +856,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		return [NSNumber numberWithBool:[record isEnabled]];
 	}
 	
-	XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[record identifier]];
+	XMCodecIdentifier identifier = identifier = [record identifier];
+	XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:identifier];
 	return [codec propertyForKey:columnIdentifier];
 }
 

@@ -1,11 +1,12 @@
 /*
- * $Id: XMStringConstants.m,v 1.9 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.10 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMStringConstants.h"
 #import "XMTypes.h"
 #import "XMPrivate.h"
 
@@ -80,20 +81,6 @@ NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered = @"N
 NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled = @"Not allowed if gatekeeper usage is disabled in preferences";
 NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure = @"Parsing the infos for available codecs failed (%@)";
 
-#pragma mark Audio Codecs
-
-NSString *XMCodec_Audio_G711_ALaw = @"g.711-alaw";
-NSString *XMCodec_Audio_G711_uLaw = @"g.711-ulaw";
-NSString *XMCodec_Audio_Speex = @"speex";
-NSString *XMCodec_Audio_GSM = @"gsm";
-NSString *XMCodec_Audio_G726 = @"g.726";
-NSString *XMCodec_Audio_iLBC = @"ilbc";
-
-#pragma mark Video Codecs
-
-NSString *XMCodec_Video_H261 = @"h.261";
-NSString *XMCodec_Video_H263 = @"h.263";
-
 #pragma mark Keys
 
 NSString *XMKey_PreferencesUserName = @"XMeeting_UserName";
@@ -136,6 +123,9 @@ NSString *XMKey_CodecIdentifier = @"XMeeting_Identifier";
 NSString *XMKey_CodecName = @"XMeeting_Name";
 NSString *XMKey_CodecBandwidth = @"XMeeting_Bandwidth";
 NSString *XMKey_CodecQuality = @"XMeeting_Quality";
+NSString *XMKey_CodecTypes = @"XMeeting_Types";
+NSString *XMKey_CodecTypeVideoSize = @"XMeeting_VideoSize";
+NSString *XMKey_CodecTypeIdentifier = @"XMeeting_Identifier";
 
 NSString *XMKey_URLType = @"XMeeting_URLType";
 NSString *XMKey_URLAddress = @"XMeeting_Address";

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.9 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.10 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,6 +112,22 @@ typedef enum XMGatekeeperRegistrationFailReason
 	XMGatekeeperRegistrationFailReason_GatekeeperNotFound,
 	XMGatekeeperRegistrationFailReason_RegistrationReject
 } XMGatekeeperRegistrationFailReason;
+
+/**
+ * Defines the audio codecs
+ **/
+typedef enum XMCodecIdentifier
+{
+	XMCodecIdentifier_UnknownCodec = 0,
+	
+	// Audio Codecs
+	XMCodecIdentifier_G711_uLaw = 1,
+	XMCodecIdentifier_G711_ALaw,
+	
+	// Video Codecs
+	XMCodecIdentifier_H261 = -1
+	
+} XMCodecIdentifier;
 
 /**
  * Defines the various VideoSizes which are supported

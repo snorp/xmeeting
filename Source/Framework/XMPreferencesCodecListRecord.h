@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesCodecListRecord.h,v 1.1 2005/06/28 20:43:46 hfriederich Exp $
+ * $Id: XMPreferencesCodecListRecord.h,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,8 @@
 #ifndef __XM_PREFERENCES_CODEC_LIST_RECORD_H__
 #define __XM_PREFERENCES_CODEC_LIST_RECORD_H__
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import "XMTypes.h"
 	
 /**
  * An instance of XMPreferencesCodecListRecord encapsulates all relevant
@@ -21,8 +22,8 @@
  **/
 @interface XMPreferencesCodecListRecord : NSObject <NSCopying, NSCoding>
 {
-	NSString *identifier;	// the key to identify the codec
-	BOOL	  isEnabled;	// flag whether this codec is enabled or not
+	XMCodecIdentifier identifier;
+	BOOL isEnabled;
 }
 
 /**
@@ -39,7 +40,7 @@
 /**
  * Returns the codec identifier associated with this instance.
  **/
-- (NSString *)identifier;
+- (XMCodecIdentifier)identifier;
 
 /**
  * Dealing with the enabled/disabled status

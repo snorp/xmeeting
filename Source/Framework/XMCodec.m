@@ -1,13 +1,15 @@
 /*
- * $Id: XMCodec.m,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCodec.m,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMStringConstants.h"
 #import "XMCodec.h"
+
+#import "XMTypes.h"
+#import "XMStringConstants.h"
 #import "XMPrivate.h"
 
 @implementation XMCodec
@@ -23,38 +25,39 @@
 
 - (id)_initWithDictionary:(NSDictionary *)dict
 {
-	NSString *anIdentifier = [dict objectForKey:XMKey_CodecIdentifier];
-	NSString *aName = [dict objectForKey:XMKey_CodecName];
-	NSString *aBandwidth = [dict objectForKey:XMKey_CodecBandwidth];
-	NSString *aQuality = [dict objectForKey:XMKey_CodecQuality];
+	NSNumber *number = (NSNumber *)[dict objectForKey:XMKey_CodecIdentifier];
+	NSString *theName = (NSString *)[dict objectForKey:XMKey_CodecName];
+	NSString *theBandwidth = (NSString *)[dict objectForKey:XMKey_CodecBandwidth];
+	NSString *theQuality = (NSString *)[dict objectForKey:XMKey_CodecQuality];
 	
-	if(anIdentifier == nil || aName == nil || aBandwidth == nil || aQuality == nil)
+	if(number == nil || theName == nil || theBandwidth == nil || theQuality == nil)
 	{
 		[NSException raise:XMException_InternalConsistencyFailure
 					format:XMExceptionReason_CodecManagerInternalConsistencyFailure];
 	}
 	
-	return [self _initWithIdentifier:anIdentifier name:aName bandwidth:aBandwidth quality:aQuality];
+	XMCodecIdentifier theIdentifier = (XMCodecIdentifier)[number intValue];
+	
+	return [self _initWithIdentifier:theIdentifier name:theName bandwidth:theBandwidth quality:theQuality];
 }
 
-- (id)_initWithIdentifier:(NSString *)anIdentifier
-					 name:(NSString *)aName 
-				bandwidth:(NSString *)aBandwidth 
-				  quality:(NSString *)aQuality
+- (id)_initWithIdentifier:(XMCodecIdentifier)theIdentifier
+					 name:(NSString *)theName 
+				bandwidth:(NSString *)theBandwidth 
+				  quality:(NSString *)theQuality;
 {
 	self = [super init];
 	
-	identifier = [anIdentifier copy];
-	name = [aName copy];
-	bandwidth = [aBandwidth copy];
-	quality = [aQuality copy];
+	identifier = theIdentifier;
+	name = [theName copy];
+	bandwidth = [theBandwidth copy];
+	quality = [theQuality copy];
 	
 	return self;
 }
 
 - (void)dealloc
 {
-	[identifier release];
 	[name release];
 	[bandwidth release];
 	[quality release];
@@ -74,7 +77,7 @@
 	if([object isKindOfClass:[self class]])
 	{
 		XMCodec *codec = (XMCodec *)object;
-		if([identifier isEqualToString:[codec identifier]] &&
+		if(identifier == [codec identifier] &&
 		   [name isEqualToString:[codec name]] &&
 		   [bandwidth isEqualToString:[codec bandwidth]] &&
 		   [quality isEqualToString:[codec quality]])
@@ -87,11 +90,11 @@
 
 #pragma mark Accessors
 
-- (NSString *)propertyForKey:(NSString *)theKey
+- (NSObject *)propertyForKey:(NSString *)theKey
 {
 	if([theKey isEqualToString:XMKey_CodecIdentifier])
 	{
-		return identifier;
+		return [NSNumber numberWithInt:(int)identifier];
 	}
 	
 	if([theKey isEqualToString:XMKey_CodecName])
@@ -112,7 +115,7 @@
 	return nil;
 }
 
-- (NSString *)identifier
+- (XMCodecIdentifier)identifier
 {
 	return identifier;
 }

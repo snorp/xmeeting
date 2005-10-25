@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.6 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -559,7 +559,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	// check if the frameGrabRate needs to be adjusted
 	if((transmitFrameGrabRate < frameGrabRate) && (isGrabbing == YES))
 	{
-		NSLog(@"adjusting frameGrabRate to %d", frameGrabRate);
 		[activeModule setFrameGrabRate:transmitFrameGrabRate];
 	}
 	

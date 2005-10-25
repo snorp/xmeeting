@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPurposeURL.h,v 1.2 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMGeneralPurposeURL.h,v 1.3 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,7 @@
 #ifndef __XM_GENERAL_PURPOSE_URL_H__
 #define __XM_GENERAL_PURPOSE_URL_H__
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "XMTypes.h"
 #import "XMURL.h"
 

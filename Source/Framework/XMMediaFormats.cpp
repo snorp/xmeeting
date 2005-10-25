@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.3 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.4 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,9 @@
 #include "XMMediaFormats.h"
 
 #include <asn/h245.h>
+#include "XMBridge.h"
+
+#define XM_H261_ENCODING_NAME "H261"
 
 #define XM_MAX_FRAME_WIDTH PVideoDevice::CIFWidth
 #define XM_MAX_FRAME_HEIGHT PVideoDevice::CIFHeight
@@ -16,13 +19,28 @@
 
 #define XM_MAX_H261_BITRATE 19200
 
+#pragma mark MediaFormat Strings
+
+// Audio MediaFormats
+
+const char *_XMMediaFormatIdentifier_G711_uLaw = "*g.711-ulaw*";
+const char *_XMMediaFormatIdentifier_G711_ALaw = "*g.711-alaw*";
+
+// Video MediaFormats
+
+const char *_XMMediaFormatIdentifier_H261 = "*h.261*";
+
+const char *_XMMediaFormat_Video = "XMVideo";
+const char *_XMMediaFormat_H261_QCIF = "H.261 (QCIF)";
+const char *_XMMediaFormat_H261_CIF = "H.261 (CIF)";
+
 #pragma mark MediaFormat Definitions
 
 const OpalVideoFormat & XMGetMediaFormat_Video()
 {
-	static const OpalVideoFormat XMMediaFormat_Video(XM_VIDEO,
+	static const OpalVideoFormat XMMediaFormat_Video(_XMMediaFormat_Video,
 													 RTP_DataFrame::MaxPayloadType,
-													 XM_VIDEO,
+													 _XMMediaFormat_Video,
 													 XM_MAX_FRAME_WIDTH,
 													 XM_MAX_FRAME_HEIGHT,
 													 XM_MAX_FRAME_RATE,
@@ -32,9 +50,9 @@ const OpalVideoFormat & XMGetMediaFormat_Video()
 
 const OpalVideoFormat & XMGetMediaFormat_H261_QCIF()
 {
-	static const OpalVideoFormat XMMediaFormat_H261_QCIF(XM_H261_QCIF,
+	static const OpalVideoFormat XMMediaFormat_H261_QCIF(_XMMediaFormat_H261_QCIF,
 														 RTP_DataFrame::H261,
-														 "H261",
+														 XM_H261_ENCODING_NAME,
 														 PVideoDevice::QCIFWidth,
 														 PVideoDevice::QCIFHeight,
 														 XM_MAX_FRAME_RATE,
@@ -44,9 +62,9 @@ const OpalVideoFormat & XMGetMediaFormat_H261_QCIF()
 
 const OpalVideoFormat & XMGetMediaFormat_H261_CIF()
 {
-	static const OpalVideoFormat XMMediaFormat_H261_CIF(XM_H261_CIF,
+	static const OpalVideoFormat XMMediaFormat_H261_CIF(_XMMediaFormat_H261_CIF,
 														RTP_DataFrame::H261,
-														"H261",
+														XM_H261_ENCODING_NAME,
 														PVideoDevice::CIFWidth,
 														PVideoDevice::CIFHeight,
 														XM_MAX_FRAME_RATE,
@@ -209,7 +227,7 @@ unsigned XM_H323_H261_Capability::GetSubType() const
 
 PString XM_H323_H261_Capability::GetFormatName() const
 {
-	return cifMPI > 0 ? XM_H261_CIF : XM_H261_QCIF;
+	return cifMPI > 0 ? _XMMediaFormat_H261_CIF : _XMMediaFormat_H261_QCIF;
 }
 
 BOOL XM_H323_H261_Capability::OnSendingPDU(H245_VideoCapability & cap) const
@@ -287,4 +305,49 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	temporalSpatialTradeOffCapability = h261.m_temporalSpatialTradeOffCapability;
 	stillImageTransmission = h261.m_stillImageTransmission;
 	return TRUE;
+}
+
+#pragma mark XMBridge Functions
+
+unsigned _XMMaxMediaFormatsPerCodecIdentifier()
+{
+	return 2;
+}
+
+const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
+{
+	switch(codecIdentifier)
+	{
+		case XMCodecIdentifier_G711_uLaw:
+			return _XMMediaFormatIdentifier_G711_uLaw;
+		case XMCodecIdentifier_G711_ALaw:
+			return _XMMediaFormatIdentifier_G711_ALaw;
+		case XMCodecIdentifier_H261:
+			return _XMMediaFormatIdentifier_H261;
+		default:
+			return NULL;
+	}
+}
+
+const char *_XMMediaFormatForCodecIdentifierWithVideoSize(XMCodecIdentifier codecIdentifier,
+														  XMVideoSize videoSize)
+{
+	switch(codecIdentifier)
+	{
+		case XMCodecIdentifier_H261:
+			// H.261 knows only QCIF and CIF
+			if(videoSize == XMVideoSize_QCIF)
+			{
+				return _XMMediaFormat_H261_QCIF;
+			}
+			else if(videoSize == XMVideoSize_CIF)
+			{
+				return _XMMediaFormat_H261_CIF;
+			}
+			break;
+		default:
+			break;
+	}
+	
+	return NULL;
 }

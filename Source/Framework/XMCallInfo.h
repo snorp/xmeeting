@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.8 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,7 @@
 #ifndef __XM_CALL_INFO_H__
 #define __XM_CALL_INFO_H__
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 #import "XMTypes.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.3 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.4 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,11 +16,20 @@
 
 #include "XMTypes.h"
 
-// definition of the "XMeeting" video formats
+#pragma mark Audio Media Formats
 
-#define XM_VIDEO "XMVideo"
-#define XM_H261_QCIF "H.261 (QCIF)"
-#define XM_H261_CIF  "H.261 (CIF)"
+extern const char *_XMMediaFormatIdentifier_G711_uLaw;
+extern const char *_XMMediaFormatIdentifier_G711_ALaw;
+
+#pragma mark Video Media Formats
+
+extern const char *_XMMediaFormatIdentifier_H261;
+
+extern const char *_XMMediaFormat_Video;
+extern const char *_XMMediaFormat_H261_QCIF;
+extern const char *_XMMediaFormat_H261_CIF;
+
+// definition of the "XMeeting" video formats
 
 extern const OpalVideoFormat & XMGetMediaFormat_Video();
 extern const OpalVideoFormat & XMGetMediaFormat_H261_QCIF();
@@ -105,9 +114,9 @@ private:
 };
 
 #define XM_REGISTER_H323_CAPABILITIES \
-	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H261_QCIF, XM_H261_QCIF, H323_NO_EP_VAR) \
+	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H261_QCIF, _XMMediaFormat_H261_QCIF, H323_NO_EP_VAR) \
 		{ return new XM_H323_H261_Capability(XMVideoSize_QCIF); } \
-	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H261_CIF, XM_H261_CIF, H323_NO_EP_VAR) \
+	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H261_CIF, _XMMediaFormat_H261_CIF, H323_NO_EP_VAR) \
 		{ return new XM_H323_H261_Capability(XMVideoSize_CIF); }
 
 // macro for registering the media formats

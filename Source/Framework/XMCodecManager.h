@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.h,v 1.5 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCodecManager.h,v 1.6 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_CODEC_MANAGER_H__
 
 #import <Foundation/Foundation.h>
+#import "XMTypes.h"
 
 @class XMCodec;
 
@@ -27,26 +28,26 @@
 
 }
 
-/*
+/**
  * Returns the shared singleton instance of XMCodecManager
- */
+ **/
 + (XMCodecManager *)sharedInstance;
 
-/*
- * Access to codec descriptors by their identifier.
- * See XMStringConstants for a list of available codec identifiers
- */
-- (XMCodec *)codecForIdentifier:(NSString *)identifier;
+/**
+ * Access to codecs by their identifier.
+ * See XMTypes for a list of available codec identifiers
+ **/
+- (XMCodec *)codecForIdentifier:(XMCodecIdentifier)identifier;
 
-/*
+/**
  * Accessing the available audio codecs
- */
+ **/
 - (unsigned)audioCodecCount;
 - (XMCodec *)audioCodecAtIndex:(unsigned)index;
 
-/*
+/**
  * Accessing the available video codecs
- */
+ **/
 - (unsigned)videoCodecCount;
 - (XMCodec *)videoCodecAtIndex:(unsigned)index;
 

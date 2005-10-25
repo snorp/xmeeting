@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.8 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.9 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -414,7 +414,7 @@
 		
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager audioCodecAtIndex:i] identifier];
+			XMCodecIdentifier identifier = [[codecManager audioCodecAtIndex:i] identifier];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[audioCodecList addObject:record];
 			[record release];
@@ -467,7 +467,7 @@
 		
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager videoCodecAtIndex:i] identifier];
+			XMCodecIdentifier identifier = [[codecManager videoCodecAtIndex:i] identifier];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[videoCodecList addObject:record];
 			[record release];
@@ -597,7 +597,7 @@
 		}
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager audioCodecAtIndex:i] identifier];
+			XMCodecIdentifier identifier = [[codecManager audioCodecAtIndex:i] identifier];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[audioCodecList addObject:record];
 			[record release];
@@ -622,7 +622,7 @@
 		}
 		for(i = count; i < codecCount; i++)
 		{
-			NSString *identifier = [[codecManager videoCodecAtIndex:i] identifier];
+			XMCodecIdentifier identifier = [[codecManager videoCodecAtIndex:i] identifier];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[videoCodecList addObject:record];
 			[record release];
@@ -1560,7 +1560,7 @@
 		
 		for(i = 0; i < count; i++)
 		{
-			NSString *identifier = [[codecManager audioCodecAtIndex:i] identifier];
+			XMCodecIdentifier identifier = [[codecManager audioCodecAtIndex:i] identifier];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[audioCodecList addObject:record];
 			[record release];
@@ -1599,7 +1599,7 @@
 		
 		for(i = 0; i < count; i++)
 		{
-			NSString *identifier = [[codecManager videoCodecAtIndex:i] identifier];
+			XMCodecIdentifier identifier = [[codecManager videoCodecAtIndex:i] identifier];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
 			[videoCodecList addObject:record];
 			[record release];

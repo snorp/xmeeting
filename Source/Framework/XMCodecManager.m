@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.m,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCodecManager.m,v 1.3 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -115,7 +115,7 @@
 
 #pragma mark Methods for Accessing Codec Descriptors
 
-- (XMCodec *)codecForIdentifier:(NSString *)identifier
+- (XMCodec *)codecForIdentifier:(XMCodecIdentifier)identifier
 {
 	// check all audio codecs
 	int count = [audioCodecs count];
@@ -124,7 +124,7 @@
 	{
 		XMCodec *codec = (XMCodec *)[audioCodecs objectAtIndex:i];
 		
-		if([[codec identifier] isEqualToString:identifier])
+		if([codec identifier] == identifier)
 		{
 			return codec;
 		}
@@ -136,7 +136,7 @@
 	{
 		XMCodec *codec = (XMCodec *)[videoCodecs objectAtIndex:i];
 		
-		if([[codec identifier] isEqualToString:identifier])
+		if([codec identifier] == identifier)
 		{
 			return codec;
 		}

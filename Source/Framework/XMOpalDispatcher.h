@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.1 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,7 @@
 #ifndef __XM_OPAL_DISPATCHER_H__
 #define __XM_OPAL_DISPATCHER_H__
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 #import "XMPreferences.h"
 

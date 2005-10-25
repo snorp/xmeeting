@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.5 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,34 +36,6 @@
 - (void)_initiateSpecificCall:(XMGeneralPurposeURL *)url;
 
 - (void)_storeCall:(XMCallInfo *)callInfo;
-
-/*- (void)_prepareSubsystemSetup;
-- (void)_initiateSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
-	// called on a separate thread
-- (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferencesToUse;
-- (void)_shutdownSubsystem;
-- (void)_mainThreadHandleSubsystemSetupDidEnd;
-*/
-
-/*
-- (BOOL)_startIndirectCalling;
-- (void)_mainThreadHandleIncomingCall:(XMCallInfo *)callInfo;
-- (void)_mainThreadHandleCallEstablished:(NSArray *)infoArray;
-- (void)_mainThreadHandleCallCleared:(NSArray *)infoArray;
-- (void)_mainThreadHandleMediaStreamOpened:(NSArray *)infoArray;
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
-
-- (void)_mainThreadHandleH323Failure;
-- (void)_mainThreadHandleGatekeeperRegistrationStart;
-- (void)_mainThreadHandleGatekeeperRegistration;
-- (void)_mainThreadHandleGatekeeperUnregistration;
-- (void)_mainThreadHandleGatekeeperRegistrationFailure:(NSNumber *)reason;
-- (void)_checkGatekeeperRegistration:(NSTimer *)timer;
-
-- (void)_updateCallStatistics:(NSTimer *)timer;
-
-- (void)_storeCall:(XMCallInfo *)call;
-*/
 
 @end
 

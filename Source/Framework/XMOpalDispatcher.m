@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.5 2005/10/25 21:41:35 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1064,43 +1064,71 @@ typedef enum _XMOpalDispatcherMessage
 	unsigned disabledCodecsCount = 0;
 	unsigned i;
 	
-	// for simplicity, we allocate two buffers big enough to hold all codecs
-	char const** orderedCodecs = (char const**)malloc((audioCodecCount + videoCodecCount) * sizeof(char *));
-	char const** disabledCodecs = (char const**)malloc((audioCodecCount + videoCodecCount) * sizeof(char *));
+	// for simplicity, we allocate the buffers big enough to hold all codecs
+	unsigned orderedCodecsBufferSize = (audioCodecCount + videoCodecCount) * _XMMaxMediaFormatsPerCodecIdentifier() * sizeof(const char *);
+	unsigned disabledCodecsBufferSize = (audioCodecCount + videoCodecCount) * sizeof(const char *);
+	char const** orderedCodecs = (char const**)malloc(orderedCodecsBufferSize);
+	char const** disabledCodecs = (char const**)malloc(disabledCodecsBufferSize);
 	
 	for(i = 0; i < audioCodecCount; i++)
 	{
 		XMPreferencesCodecListRecord *record = [preferences audioCodecListRecordAtIndex:i];
-		const char *identifier = [[record identifier] cStringUsingEncoding:NSASCIIStringEncoding];
+		XMCodecIdentifier identifier = [record identifier];
+		const char *mediaFormatString = _XMMediaFormatForCodecIdentifier(identifier);
+		
 		if([record isEnabled])
 		{
-			orderedCodecs[orderedCodecsCount] = identifier;
+			orderedCodecs[orderedCodecsCount] = mediaFormatString;
 			orderedCodecsCount++;
 		}
 		else
 		{
-			disabledCodecs[disabledCodecsCount] = identifier;
-			disabledCodecsCount++;
-		}
-	}
-	for(i = 0; i < videoCodecCount; i++)
-	{
-		XMPreferencesCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
-		const char *identifier = [[record identifier] cStringUsingEncoding:NSASCIIStringEncoding];
-		if([record isEnabled])
-		{
-			orderedCodecs[orderedCodecsCount] = identifier;
-			orderedCodecsCount++;
-		}
-		else
-		{
-			disabledCodecs[disabledCodecsCount] = identifier;
+			disabledCodecs[disabledCodecsCount] = mediaFormatString;
 			disabledCodecsCount++;
 		}
 	}
 	
-	_XMSetCodecOrder(orderedCodecs, orderedCodecsCount);
-	_XMSetDisabledCodecs(disabledCodecs, disabledCodecsCount);
+	for(i = 0; i < videoCodecCount; i++)
+	{
+		XMPreferencesCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
+		XMCodecIdentifier identifier = [record identifier];
+	
+		if([record isEnabled])
+		{
+			XMVideoSize size = [preferences preferredVideoSize];
+			
+			const char *mediaFormatString = _XMMediaFormatForCodecIdentifierWithVideoSize(identifier, size);
+			if(mediaFormatString != NULL)
+			{
+				orderedCodecs[orderedCodecsCount] = mediaFormatString;
+				orderedCodecsCount++;
+			}
+			
+			if(size == XMVideoSize_QCIF)
+			{
+				size = XMVideoSize_CIF;
+			}
+			else
+			{
+				size = XMVideoSize_QCIF;
+			}
+			
+			mediaFormatString = _XMMediaFormatForCodecIdentifierWithVideoSize(identifier, size);
+			if(mediaFormatString != NULL)
+			{
+				orderedCodecs[orderedCodecsCount] = mediaFormatString;
+				orderedCodecsCount++;
+			}
+		}
+		else
+		{
+			const char *mediaFormatString = _XMMediaFormatForCodecIdentifier(identifier);
+			disabledCodecs[disabledCodecsCount] = mediaFormatString;
+			disabledCodecsCount++;
+		}
+	}
+	
+	_XMSetCodecs(orderedCodecs, orderedCodecsCount, disabledCodecs, disabledCodecsCount);
 	
 	free(orderedCodecs);
 	free(disabledCodecs);
