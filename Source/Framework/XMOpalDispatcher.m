@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.5 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.6 2005/10/28 06:59:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -773,7 +773,6 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleRejectIncomingCallMessage:(NSArray *)messageComponents
 {
-	NSLog(@"Reject Call");
 	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
 	NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
 	unsigned theCallID = [idNumber unsignedIntValue];

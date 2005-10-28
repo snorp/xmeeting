@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.4 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.5 2005/10/28 06:59:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,9 +185,9 @@ XM_H323_H261_Capability::XM_H323_H261_Capability(XMVideoSize videoSize)
 		cifMPI = 1;
 	}
 	
-	temporalSpatialTradeOffCapability = TRUE;
-	maxBitRate = _XMGetMaxVideoBitrate();
-	stillImageTransmission = TRUE;
+	temporalSpatialTradeOffCapability = FALSE;
+	maxBitRate = _XMGetMaxVideoBitrate() / 100; // H.245 uses bitrate units of 100bits/s
+	stillImageTransmission = FALSE;
 }
 
 PObject * XM_H323_H261_Capability::Clone() const

@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.3 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.4 2005/10/28 06:59:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,6 +165,7 @@ void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
 
 void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
 {
+	cout << "issuing videoUpdateCommand" << endl;
 	OpalVideoUpdatePicture command = OpalVideoUpdatePicture(-1, -1, -1);
 	
 	if(notifierSet == TRUE)

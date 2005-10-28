@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.5 2005/10/28 06:59:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,7 +57,7 @@ void XMTransmitterMediaPatch::Resume()
 		isTerminated = FALSE;
 		videoTransmitterPatch = this;
 		unsigned maxFramesPerSecond = UINT_MAX;
-		unsigned maxBitrate = UINT_MAX;
+		unsigned maxBitrate = _XMGetMaxVideoBitrate();
 		
 		PINDEX i;
 		for(i = 0; i < sinks.GetSize(); i++)
@@ -174,7 +174,7 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 		cout << "No VideoTransmitterPatch found (4)" << endl;
 		return;
 	}
-	
+		
 	RTP_DataFrame *frame = videoTransmitterPatch->dataFrame;
 	
 	frame->SetMarker(setMarker);

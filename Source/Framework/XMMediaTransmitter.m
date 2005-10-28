@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.6 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.7 2005/10/28 06:59:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -587,11 +587,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}
 	
-	/*err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 100);
+	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 100);
 	if(err != noErr)
 	{
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
-	}*/
+	}
 	
 	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, true);
 	if(err != noErr)
@@ -599,14 +599,15 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"setallowFrameTimeChanges failed: %d", (int)err);
 	}
 	
-	/*err = ICMCompressionSessionOptionsSetDurationsNeeded(sessionOptions, true);
+	err = ICMCompressionSessionOptionsSetDurationsNeeded(sessionOptions, true);
 	if(err != noErr)
 	{
 		NSLog(@"SetDurationsNeeded failed: %d", (int)err);
-	}*/
+	}
 	
 	// averageDataRate is in bytes/s
 	SInt32 averageDataRate = bitrate / 8;
+	NSLog(@"limiting dataRate to %d", averageDataRate);
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -826,6 +827,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		if(err != noErr)
 		{
 			NSLog(@"SetTimeScale failed: %d", (int)err);
+		}
+		
+		// Preventing the packetizer from creating packets
+		// greater than the ethernet packet size
+		err = RTPMPSetMaxPacketSize(mediaPacketizer, 1400);
+		if(err != noErr)
+		{
+			NSLog(@"SetMaxPacketSize failed: %d", (int)err);
 		}
 		
 		RTPMPDataReleaseUPP dataReleaseProc = NewRTPMPDataReleaseUPP(XMPacketizerDataReleaseProc);
