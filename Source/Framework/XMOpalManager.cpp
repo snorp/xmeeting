@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.16 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.17 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,6 +140,14 @@ OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source)
 	{
 		return new XMReceiverMediaPatch(source);
 	}
+}
+
+#pragma mark General Setup Methods
+
+void XMOpalManager::SetUserName(const PString & username)
+{
+	OpalManager::SetDefaultUserName(username);
+	h323EndPoint->SetDefaultDisplayName(username);
 }
 
 #pragma mark Network Setup Methods

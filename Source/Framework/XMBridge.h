@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.12 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.13 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,7 +140,8 @@ void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel);
 XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, 
 													const char *identifier, 
 													const char *username, 
-													const char *phoneNumber);
+													const char *phoneNumber,
+													const char *password);
 
 /**
  * Checks whether we still are registered at the gatekeeper or not.

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.10 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.11 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -171,9 +171,14 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (void)loadPreferences
 {	
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
+	// clearing any cached passwords
+	[preferencesManager clearTemporaryPasswords];
+	
 	// replacing the locations with a fresh set
 	[locations removeAllObjects];
-	[locations addObjectsFromArray:[[XMPreferencesManager sharedInstance] locations]];
+	[locations addObjectsFromArray:[preferencesManager locations]];
 	
 	// making sure that there is no wrong data saved
 	currentLocation = nil;
@@ -205,8 +210,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	// first, save the current location
 	[self _saveCurrentLocation];
 	
-	// then, give the changed locations to XMPreferencesManager
-	[[XMPreferencesManager sharedInstance] setLocations:locations];
+	// pass the changed locations to the preferences manager
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	[preferencesManager saveTemporaryPasswords];
+	[preferencesManager setLocations:locations];
 }
 
 #pragma mark User Interface Methods
@@ -540,6 +547,13 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	}
 	[gatekeeperPhoneNumberField setStringValue:string];
 	
+	string = [currentLocation temporaryGatekeeperPassword];
+	if(!string)
+	{
+		string = @"";
+	}
+	[gatekeeperPasswordField setStringValue:string];
+	
 	// loading the SIP section
 	
 	// loading the Audio section
@@ -637,6 +651,13 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		string = nil;
 	}
 	[currentLocation setGatekeeperPhoneNumber:string];
+	
+	string = [gatekeeperPasswordField stringValue];
+	if([string isEqualToString:@""])
+	{
+		string = nil;
+	}
+	[currentLocation setTemporaryGatekeeperPassword:string];
 	
 	// saving the SIP section
 	
@@ -757,6 +778,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[gatekeeperIDField setEnabled:flag];
 	[gatekeeperUserAliasField setEnabled:flag];
 	[gatekeeperPhoneNumberField setEnabled:flag];
+	[gatekeeperPasswordField setEnabled:flag];
 }
 
 - (void)_validateAudioOrderUserInterface

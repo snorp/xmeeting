@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.8 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,7 +26,8 @@ public:
 	BOOL EnableListeners(BOOL flag);
 	BOOL IsListening();
 	XMGatekeeperRegistrationFailReason SetGatekeeper(const PString & address, const PString & identifier,
-													const PString & username, const PString & phoneNumber);
+													 const PString & username, const PString & phoneNumber,
+													 const PString & password);
 	void CheckGatekeeperRegistration();
 	
 	// obtaining information about the connection
@@ -43,6 +44,14 @@ public:
 	
 	virtual void OnEstablished(OpalConnection & connection);
 	virtual void OnReleased(OpalConnection & connection);
+	
+	virtual H323Connection * CreateConnection(OpalCall & call,
+											  const PString & token,
+											  void * userData,
+											  OpalTransport & transport,
+											  const PString & alias,
+											  const H323TransportAddress & address,
+											  H323SignalPDU * setupPDU);
 private:
 	BOOL isListening;
 	BOOL didRegisterAtGatekeeper;

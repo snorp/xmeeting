@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.14 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.15 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,7 +47,7 @@ void _XMInitSubsystem()
 
 void _XMSetUserName(const char *string)
 {
-	theManager->SetDefaultUserName(string);
+	theManager->SetUserName(string);
 }
 
 const char *_XMGetUserName()
@@ -153,9 +153,11 @@ void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 	h323EndPoint->DisableH245Tunneling(!enableH245Tunnel);
 }
 
-XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, const char *identifier, const char *gkUsername, const char *phoneNumber)
+XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, const char *identifier, 
+													const char *gkUsername, const char *phoneNumber,
+													const char *password)
 {
-	return h323EndPoint->SetGatekeeper(address, identifier, gkUsername, phoneNumber);
+	return h323EndPoint->SetGatekeeper(address, identifier, gkUsername, phoneNumber, password);
 }
 
 void _XMCheckGatekeeperRegistration()

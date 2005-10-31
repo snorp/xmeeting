@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.16 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.17 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,16 +23,18 @@
 #import "XMMediaTransmitter.h"
 #import "XMMediaReceiver.h"
 #import "XMVideoView.h"
+#import "XMAddressBookManager.h"
 #import "XMAddressBookRecordSearchMatch.h"
 #import "XMGeneralPurposeURL.h"
 
 extern unsigned _XMInitializedStatus;
 extern XMUtils *_XMUtilsSharedInstance;
 extern XMCallManager *_XMCallManagerSharedInstance;
-extern XMOpalDispatcher *_XMOpalDispatcherSharedInstance;
 extern XMCodecManager *_XMCodecManagerSharedInstance;
 extern XMAudioManager *_XMAudioManagerSharedInstance;
 extern XMVideoManager *_XMVideoManagerSharedInstance;
+extern XMAddressBookManager *_XMAddressBookManagerSharedInstance;
+extern XMOpalDispatcher *_XMOpalDispatcherSharedInstance;
 extern XMMediaTransmitter *_XMMediaTransmitterSharedInstance;
 extern XMMediaReceiver *_XMMediaReceiverSharedInstance;
 
@@ -212,6 +214,13 @@ void _XMCheckCloseStatus();
 
 - (void)_startBusyIndicator;
 - (void)_stopBusyIndicator;
+
+@end
+
+@interface XMAddressBookManager (FrameworkMethods)
+
+- (id)_init;
+- (void)_close;
 
 @end
 

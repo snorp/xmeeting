@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.6 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.7 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,26 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 - (id)_init;
 - (void)_setup;
 - (void)_writeLocationsToUserDefaults;
+
+- (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
+- (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
+
+@end
+
+@interface XMPasswordRecord : NSObject {
+
+	NSString *serviceName;
+	NSString *accountName;
+	NSString *password;
+	
+}
+
+- (id)_initWithServiceName:(NSString *)serviceName accountName:(NSString *)accountName password:(NSString *)password;
+
+- (NSString *)_serviceName;
+- (NSString *)_accountName;
+- (NSString *)_password;
+- (void)_setPassword:(NSString *)password;
 
 @end
 
@@ -111,12 +131,21 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	
 	automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
 	
+	gatekeeperPasswords = [[NSMutableArray alloc] initWithCapacity:3];
+	temporaryGatekeeperPasswords = nil;
+	
 	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
 }
 
 - (void)dealloc
 {
 	[locations release];
+	
+	[gatekeeperPasswords release];
+	if(temporaryGatekeeperPasswords != nil)
+	{
+		[temporaryGatekeeperPasswords release];
+	}
 	
 	[super dealloc];
 }
@@ -273,6 +302,189 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	automaticallyAcceptIncomingCalls = flag;
 }
 
+- (NSString *)gatekeeperPasswordForLocation:(XMLocation *)location
+{
+	NSString *serviceName = [location gatekeeperAddress];
+	if(serviceName == nil)
+	{
+		serviceName = [location gatekeeperID];
+	}
+	NSString *accountName = [location gatekeeperUsername];
+	
+	if(serviceName == nil || accountName == nil)
+	{
+		return nil;
+	}
+	
+	unsigned count = [gatekeeperPasswords count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMPasswordRecord *record = (XMPasswordRecord *)[gatekeeperPasswords objectAtIndex:i];
+		
+		NSString *recordServiceName = [record _serviceName];
+		
+		if(![serviceName isEqualToString:recordServiceName])
+		{
+			continue;
+		}
+		
+		NSString *recordAccountName = [record _accountName];
+		if(![accountName isEqualToString:recordAccountName])
+		{
+			continue;
+		}
+		
+		// both service name and account name match
+		return [record _password];
+	}
+	
+	// this record is not yet existant
+	NSString *password = [self _passwordForServiceName:serviceName accountName:accountName];
+	XMPasswordRecord *record = [[XMPasswordRecord alloc] _initWithServiceName:serviceName accountName:accountName password:password];
+	[gatekeeperPasswords addObject:record];
+	[record release];
+	
+	return password;
+}
+
+- (NSString *)temporaryGatekeeperPasswordForLocation:(XMLocation *)location
+{
+	NSString *serviceName = [location gatekeeperAddress];
+	if(serviceName == nil)
+	{
+		serviceName = [location gatekeeperID];
+	}
+	NSString *accountName = [location gatekeeperUsername];
+	
+	if(serviceName == nil || accountName == nil)
+	{
+		return nil;
+	}
+	
+	if(temporaryGatekeeperPasswords == nil)
+	{
+		temporaryGatekeeperPasswords = [gatekeeperPasswords mutableCopy];
+	}
+	
+	unsigned count = [temporaryGatekeeperPasswords count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMPasswordRecord *record = (XMPasswordRecord *)[temporaryGatekeeperPasswords objectAtIndex:i];
+		
+		NSString *recordServiceName = [record _serviceName];
+		if(![serviceName isEqualToString:recordServiceName])
+		{
+			continue;
+		}
+		
+		NSString *recordAccountName = [record _accountName];
+		if(![accountName isEqualToString:recordAccountName])
+		{
+			continue;
+		}
+		
+		// both service name and account name match
+		return [record _password];
+	}
+	
+	// this record is not yet existant.
+	NSString *password = [self _passwordForServiceName:serviceName accountName:accountName];
+	XMPasswordRecord *record = [[XMPasswordRecord alloc] _initWithServiceName:serviceName accountName:accountName password:password];
+	[temporaryGatekeeperPasswords addObject:record];
+	[record release];
+	
+	return password;
+}
+
+- (void)setTemporaryGatekeeperPassword:(NSString *)password forLocation:(XMLocation *)location
+{
+	NSString *serviceName = [location gatekeeperAddress];
+	if(serviceName == nil)
+	{
+		serviceName = [location gatekeeperID];
+	}
+	NSString *accountName = [location gatekeeperUsername];
+	
+	if(serviceName == nil || accountName == nil)
+	{
+		return;
+	}
+	
+	if(temporaryGatekeeperPasswords == nil)
+	{
+		temporaryGatekeeperPasswords = [gatekeeperPasswords mutableCopy];
+	}
+	
+	unsigned count = [temporaryGatekeeperPasswords count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMPasswordRecord *record = (XMPasswordRecord *)[temporaryGatekeeperPasswords objectAtIndex:i];
+		
+		NSString *recordServiceName = [record _serviceName];
+		
+		if(![serviceName isEqualToString:recordServiceName])
+		{
+			continue;
+		}
+		
+		NSString *recordAccountName = [record _accountName];
+		if(![accountName isEqualToString:recordAccountName])
+		{
+			continue;
+		}
+		
+		// both service name and account name match
+		[record _setPassword:password];
+		return;
+	}
+	
+	// this location has not yet set a password
+	if(password != nil)
+	{
+		XMPasswordRecord *record = [[XMPasswordRecord alloc] _initWithServiceName:serviceName accountName:accountName password:password];
+		[temporaryGatekeeperPasswords addObject:record];
+		[record release];
+	}
+}
+
+- (void)saveTemporaryPasswords
+{
+	if(temporaryGatekeeperPasswords != nil)
+	{
+		[gatekeeperPasswords release];
+		gatekeeperPasswords = [temporaryGatekeeperPasswords mutableCopy];
+		
+		unsigned count = [gatekeeperPasswords count];
+		unsigned i;
+		
+		for(i = 0; i < count; i++)
+		{
+			XMPasswordRecord *record = (XMPasswordRecord *)[gatekeeperPasswords objectAtIndex:i];
+			
+			NSString *serviceName = [record _serviceName];
+			NSString *accountName = [record _accountName];
+			NSString *password = [record _password];
+			
+			[self _setPassword:password forServiceName:serviceName accountName:accountName];
+		}
+	}
+}
+
+- (void)clearTemporaryPasswords
+{
+	if(temporaryGatekeeperPasswords != nil)
+	{
+		[temporaryGatekeeperPasswords release];
+		temporaryGatekeeperPasswords = nil;
+	}
+}
+
 #pragma mark Private Methods
 
 - (void)_writeLocationsToUserDefaults
@@ -290,6 +502,203 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	
 	[userDefaults setObject:dictArray forKey:XMKey_Locations];
 	[dictArray release];
+}
+
+- (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
+{
+	OSStatus err = noErr;
+	UInt32 passwordLength;
+	const char *passwordString;
+	
+	UInt32 serviceNameLength = [serviceName length];
+	const char *serviceNameString = [serviceName cStringUsingEncoding:NSUTF8StringEncoding];
+	
+	UInt32 accountNameLength = [accountName length];
+	const char *accountNameString = [accountName cStringUsingEncoding:NSUTF8StringEncoding];
+	
+	err = SecKeychainFindGenericPassword(NULL,
+										 serviceNameLength,
+										 serviceNameString,
+										 accountNameLength,
+										 accountNameString,
+										 &passwordLength,
+										 (void **)&passwordString,
+										 NULL);
+	
+	if(err != noErr)
+	{
+		NSLog(@"SecKeychainFindGenericPassword failed: %d", (int)err);
+		return nil;
+	}
+	
+	NSString *password = [NSString stringWithCString:passwordString encoding:NSUTF8StringEncoding];
+	
+	err = SecKeychainItemFreeContent(NULL, (void *)passwordString);
+	
+	if(err != noErr)
+	{
+		NSLog(@"SecKeychainItemFreeContent failed: %d", (int)err);
+	}
+	
+	return password;
+}
+
+- (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName
+{
+	OSStatus err = noErr;
+	
+	UInt32 passwordLength;
+	const char *passwordString;
+	SecKeychainItemRef keychainItem;
+	
+	UInt32 serviceNameLength = [serviceName length];
+	const char *serviceNameString = [serviceName cStringUsingEncoding:NSUTF8StringEncoding];
+	
+	UInt32 accountNameLength = [accountName length];
+	const char *accountNameString = [accountName cStringUsingEncoding:NSUTF8StringEncoding];
+	
+	UInt32 newPasswordLength = 0;
+	const char *newPasswordString = NULL;
+	
+	if(password != nil)
+	{
+		newPasswordLength = [password length];
+		newPasswordString = [password cStringUsingEncoding:NSUTF8StringEncoding];
+	}
+	
+	// first, obtain the current password file (if any)
+	err = SecKeychainFindGenericPassword(NULL,
+										 serviceNameLength,
+										 serviceNameString,
+										 accountNameLength,
+										 accountNameString,
+										 &passwordLength,
+										 (void **)&passwordString,
+										 &keychainItem);
+	if(err == noErr)
+	{
+		if(newPasswordString == NULL)
+		{
+			// no password set, deleting the existing record
+			err = SecKeychainItemDelete(keychainItem);
+			if(err != noErr)
+			{
+				NSLog(@"SecKeychainItemDelete failed %d", (int)err);
+			}
+		}
+		else if(strcmp(passwordString, newPasswordString) == 0)
+		{
+			// no need to modify pwd
+			NSLog(@"old pwd equal new pwd");
+		}
+		else
+		{
+			// change the password
+			err = SecKeychainItemModifyAttributesAndData(keychainItem,
+														 NULL,
+														 newPasswordLength,
+														 newPasswordString);
+			if(err != noErr)
+			{
+				NSLog(@"SecKeychainItemModifyAttributesAndData failed: %d", (int)err);
+			}
+		}
+		
+		return;
+	}
+	
+	if(newPasswordString == NULL)
+	{
+		return;
+	}
+	
+	// no record existing yet, thus adding a new one
+	err = SecKeychainAddGenericPassword(NULL,
+										serviceNameLength,
+										serviceNameString,
+										accountNameLength,
+										accountNameString,
+										newPasswordLength,
+										(void *)newPasswordString,
+										NULL);
+	if(err != noErr)
+	{
+		NSLog(@"SecKeychainAddGenericPassword failed: %d", (int)err);
+	}
+}
+
+@end
+
+@implementation XMPasswordRecord
+
+- (id)_initWithServiceName:(NSString *)theServiceName accountName:(NSString *)theAccountName password:(NSString *)thePassword
+{
+	self = [super init];
+	
+	if(theServiceName != nil)
+	{
+		serviceName = [theServiceName copy];
+	}
+	else
+	{
+		serviceName = nil;
+	}
+	
+	if(theAccountName != nil)
+	{
+		accountName = [theAccountName copy];
+	}
+	else
+	{
+		accountName = nil;
+	}
+	
+	if(thePassword != nil)
+	{
+		password = [thePassword copy];
+	}
+	
+	return self;
+}
+
+- (void)dealloc
+{
+	if(serviceName != nil)
+	{
+		[serviceName release];
+	}
+	if(accountName != nil)
+	{
+		[accountName release];
+	}
+	if(password != nil)
+	{
+		[password release];
+	}
+	
+	[super dealloc];
+}
+
+- (NSString *)_serviceName
+{
+	return serviceName;
+}
+
+- (NSString *)_accountName
+{
+	return accountName;
+}
+
+- (NSString *)_password
+{
+	return password;
+}
+
+- (void)_setPassword:(NSString *)thePassword
+{
+	NSString *old = password;
+	password = [thePassword retain];
+	[old release];
 }
 
 @end

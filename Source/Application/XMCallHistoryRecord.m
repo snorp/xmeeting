@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.4 2005/10/20 19:21:05 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.5 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -156,6 +156,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	BOOL didChange = NO;
 	
 	// check for matches in the AddressBook database
+	
 	addressBookRecord = [[XMAddressBookManager sharedInstance] recordWithCallAddress:[self address]];
 	
 	if(addressBookRecord != nil)

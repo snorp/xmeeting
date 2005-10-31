@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.5 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.6 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,6 +58,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *gatekeeperIDField;
 	IBOutlet NSTextField *gatekeeperUserAliasField;
 	IBOutlet NSTextField *gatekeeperPhoneNumberField;
+	IBOutlet NSTextField *gatekeeperPasswordField;
 	
 	// SIP outlets
 	// have yet to come

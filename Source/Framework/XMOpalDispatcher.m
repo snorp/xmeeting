@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.6 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.7 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,9 +70,15 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleMediaStreamOpenedMessage:(NSArray *)messageComponents;
 - (void)_handleMediaStreamClosedMessage:(NSArray *)messageComponents;
 
-- (void)_doPreferencesSetup:(XMPreferences *)preferences withAddress:(NSString *)externalAddress verbose:(BOOL)verbose;
-- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose;
-- (void)_doGatekeeperSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
+- (void)_doPreferencesSetup:(XMPreferences *)preferences 
+				withAddress:(NSString *)externalAddress 
+		 gatekeeperPassword:(NSString *)gatekeeperPassword
+					verbose:(BOOL)verbose;
+- (void)_doH323Setup:(XMPreferences *)preferences gatekeeperPassword:(NSString *)gatekeeperPassword
+			 verbose:(BOOL)verbose;
+- (void)_doGatekeeperSetup:(XMPreferences *)preferences
+				  password:(NSString *)password
+				   verbose:(BOOL)verbose;
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
@@ -92,7 +98,17 @@ typedef enum _XMOpalDispatcherMessage
 {
 	NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
 	NSData *externalAddressData = [NSKeyedArchiver archivedDataWithRootObject:externalAddress];
-	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, externalAddressData, nil];
+	
+	// since the password data isn't directly contained within the preferences instance,
+	// we need to get the password string on this thread
+	NSString *gatekeeperPassword = nil;
+	if([preferences useGatekeeper] == YES)
+	{
+		gatekeeperPassword = [preferences gatekeeperPassword];
+	}
+	NSData *gatekeeperPasswordData = [NSKeyedArchiver archivedDataWithRootObject:gatekeeperPassword];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, externalAddressData, gatekeeperPasswordData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SetPreferences withComponents:components];
 	
@@ -102,7 +118,15 @@ typedef enum _XMOpalDispatcherMessage
 + (void)_retryEnableH323:(XMPreferences *)preferences
 {
 	NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, nil];
+	
+	NSString *gatekeeperPassword = nil;
+	if([preferences useGatekeeper] == YES)
+	{
+		gatekeeperPassword = [preferences gatekeeperPassword];
+	}
+	NSData *gatekeeperPasswordData = [NSKeyedArchiver archivedDataWithRootObject:gatekeeperPassword];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, gatekeeperPasswordData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetryEnableH323 withComponents:components];
 	
@@ -112,7 +136,15 @@ typedef enum _XMOpalDispatcherMessage
 + (void)_retryGatekeeperRegistration:(XMPreferences *)preferences
 {
 	NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, nil];
+	
+	NSString *gatekeeperPassword = nil;
+	if([preferences useGatekeeper] == YES)
+	{
+		gatekeeperPassword = [preferences gatekeeperPassword];
+	}
+	NSData *gatekeeperPasswordData = [NSKeyedArchiver archivedDataWithRootObject:gatekeeperPassword];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, gatekeeperPasswordData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetryGatekeeperRegistration withComponents:components];
 	
@@ -149,8 +181,15 @@ typedef enum _XMOpalDispatcherMessage
 	
 	NSData *externalAddressData = [NSKeyedArchiver archivedDataWithRootObject:externalAddress];
 	
+	NSString *gatekeeperPassword = nil;
+	if([preferences useGatekeeper] == YES)
+	{
+		gatekeeperPassword = [preferences gatekeeperPassword];
+	}
+	NSData *gatekeeperPasswordData = [NSKeyedArchiver archivedDataWithRootObject:gatekeeperPassword];
+	
 	NSArray *components = [[NSArray alloc] initWithObjects:addressData, protocolData, preferencesData,
-															externalAddressData, nil];
+															externalAddressData, gatekeeperPasswordData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_InitiateSpecificCall withComponents:components];
 	
@@ -481,7 +520,7 @@ typedef enum _XMOpalDispatcherMessage
 	// By using the default XMPreferences instance,
 	// we shutdown the subsystem
 	XMPreferences *preferences = [[XMPreferences alloc] init];
-	[self _doPreferencesSetup:preferences withAddress:nil verbose:NO];
+	[self _doPreferencesSetup:preferences withAddress:nil gatekeeperPassword:nil verbose:NO];
 	[preferences release];
 	
 	if(gatekeeperRegistrationCheckTimer != nil)
@@ -514,7 +553,10 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *externalAddressData = (NSData *)[components objectAtIndex:1];
 	NSString *externalAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:externalAddressData];
 	
-	[self _doPreferencesSetup:preferences withAddress:externalAddress verbose:YES];
+	NSData *gatekeeperPasswordData = (NSData *)[components objectAtIndex:2];
+	NSString *gatekeeperPassword = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:gatekeeperPasswordData];
+	
+	[self _doPreferencesSetup:preferences withAddress:externalAddress gatekeeperPassword:gatekeeperPassword verbose:YES];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
@@ -524,7 +566,10 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *preferencesData = (NSData *)[components objectAtIndex:0];
 	XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
 	
-	[self _doH323Setup:preferences verbose:YES];
+	NSData *gatekeeperPasswordData = (NSData *)[components objectAtIndex:1];
+	NSString *gatekeeperPassword = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:gatekeeperPasswordData];
+	
+	[self _doH323Setup:preferences gatekeeperPassword:gatekeeperPassword verbose:YES];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
@@ -534,7 +579,10 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *preferencesData = (NSData *)[components objectAtIndex:0];
 	XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
 	
-	[self _doGatekeeperSetup:preferences verbose:YES];
+	NSData *gatekeeperPasswordData = (NSData *)[components objectAtIndex:1];
+	NSString *gatekeeperPassword = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:gatekeeperPasswordData];
+	
+	[self _doGatekeeperSetup:preferences password:gatekeeperPassword verbose:YES];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
 												   withObject:nil
@@ -625,14 +673,16 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *protocolData = (NSData *)[messageComponents objectAtIndex:1];
 	NSData *preferencesData = (NSData *)[messageComponents objectAtIndex:2];
 	NSData *externalAddressData = (NSData *)[messageComponents objectAtIndex:3];
+	NSData *gatekeeperPasswordData = (NSData *)[messageComponents objectAtIndex:4];
 	
 	NSString *address = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:addressData];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
 	XMCallProtocol callProtocol = (XMCallProtocol)[number unsignedIntValue];
 	XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
 	NSString *externalAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:externalAddressData];
+	NSString *gatekeeperPassword = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:gatekeeperPasswordData];
 	
-	[self _doPreferencesSetup:preferences withAddress:externalAddress verbose:NO];
+	[self _doPreferencesSetup:preferences withAddress:externalAddress gatekeeperPassword:gatekeeperPassword verbose:NO];
 	
 	if((callProtocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
 	{
@@ -1009,6 +1059,7 @@ typedef enum _XMOpalDispatcherMessage
 }
 
 - (void)_doPreferencesSetup:(XMPreferences *)preferences withAddress:(NSString *)suppliedExternalAddress
+		 gatekeeperPassword:(NSString *)gatekeeperPassword
 					verbose:(BOOL)verbose
 {
 	// ***** Adjusting the general settings ***** //
@@ -1133,10 +1184,11 @@ typedef enum _XMOpalDispatcherMessage
 	free(disabledCodecs);
 	
 	// ***** Adjusting the H.323 Preferences ***** //
-	[self _doH323Setup:preferences verbose:verbose];
+	[self _doH323Setup:preferences gatekeeperPassword:gatekeeperPassword verbose:verbose];
 }
 
-- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose
+- (void)_doH323Setup:(XMPreferences *)preferences gatekeeperPassword:(NSString *)gatekeeperPassword
+			 verbose:(BOOL)verbose
 {
 	if([preferences enableH323] == YES)
 	{
@@ -1145,7 +1197,7 @@ typedef enum _XMOpalDispatcherMessage
 			_XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
 			
 			// setting up the gatekeeper
-			[self _doGatekeeperSetup:preferences verbose:verbose];
+			[self _doGatekeeperSetup:preferences password:gatekeeperPassword verbose:verbose];
 		}
 		else
 		{
@@ -1161,19 +1213,22 @@ typedef enum _XMOpalDispatcherMessage
 	else
 	{
 		// unregistering from the gk if registered
-		_XMSetGatekeeper(NULL, NULL, NULL, NULL);
+		_XMSetGatekeeper(NULL, NULL, NULL, NULL, NULL);
 		
 		// disabling the H.323 Listeners 
 		_XMEnableH323Listeners(NO);
 	}
 }
 
-- (void)_doGatekeeperSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
+- (void)_doGatekeeperSetup:(XMPreferences *)preferences 
+				  password:(NSString *)password
+				   verbose:(BOOL)verbose
 {
 	const char *gatekeeperAddress = NULL;
 	const char *gatekeeperID = NULL;
 	const char *gatekeeperUsername = NULL;
 	const char *gatekeeperPhoneNumber = NULL;
+	const char *gatekeeperPassword = NULL;
 	
 	if([preferences useGatekeeper] == YES)
 	{
@@ -1202,6 +1257,10 @@ typedef enum _XMOpalDispatcherMessage
 			{
 				gatekeeperPhoneNumber = [gkPhoneNumber cStringUsingEncoding:NSASCIIStringEncoding];
 			}
+			if(password != nil)
+			{
+				gatekeeperPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
+			}
 			
 			// inform the CallManager about the gk notification start
 			// The GK Registration may be a lengthy task, especially when
@@ -1221,7 +1280,8 @@ typedef enum _XMOpalDispatcherMessage
 	XMGatekeeperRegistrationFailReason failReason = _XMSetGatekeeper(gatekeeperAddress, 
 																	 gatekeeperID, 
 																	 gatekeeperUsername, 
-																	 gatekeeperPhoneNumber);
+																	 gatekeeperPhoneNumber,
+																	 gatekeeperPassword);
 	
 	if((failReason != XMGatekeeperRegistrationFailReason_NoFailure) && (verbose == YES))
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.6 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.7 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,9 @@ extern NSString *XMNotification_ActiveLocationDidChange;
 	NSMutableArray *locations;
 	int activeLocation;
 	BOOL automaticallyAcceptIncomingCalls;
+	
+	NSMutableArray *gatekeeperPasswords;
+	NSMutableArray *temporaryGatekeeperPasswords;
 }
 
 /**
@@ -90,7 +93,7 @@ extern NSString *XMNotification_ActiveLocationDidChange;
 - (unsigned)indexOfActiveLocation;
 
 /**
- * Makes the location found at index the active location
+ * Makes the location at index the active location
  **/
 - (void)activateLocationAtIndex:(unsigned)index;
 
@@ -108,6 +111,32 @@ extern NSString *XMNotification_ActiveLocationDidChange;
 
 - (BOOL)defaultAutomaticallyAcceptIncomingCalls;
 - (void)setDefaultAutomaticallyAcceptIncomingCalls:(BOOL)flag;
+
+/**
+ * Returns the gatekeeper password associated with location
+ **/
+- (NSString *)gatekeeperPasswordForLocation:(XMLocation *)location;
+
+/**
+ * Returns the temporary gatekeeper password associated with location
+ **/
+- (NSString *)temporaryGatekeeperPasswordForLocation:(XMLocation *)location;
+
+/**
+ * Sets the temporary password associated with location. This may affect other
+ * locations as well
+ **/
+- (void)setTemporaryGatekeeperPassword:(NSString *)password forLocation:(XMLocation *)location;
+
+/**
+ * Saves the temporarily stored passwords
+ **/
+- (void)saveTemporaryPasswords;
+
+/**
+ * Clears the temporary password cache
+ **/
+- (void)clearTemporaryPasswords;
 
 @end
 

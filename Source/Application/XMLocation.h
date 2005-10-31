@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.2 2005/05/24 15:21:01 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.3 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 extern NSString *XMKey_LocationName;
 
 @interface XMLocation : XMPreferences {
+	
 	NSString *name;
 	unsigned tag;
 }
@@ -35,12 +36,15 @@ extern NSString *XMKey_LocationName;
  **/
 - (XMLocation *)duplicateWithName:(NSString *)name;
 
+- (NSString *)temporaryGatekeeperPassword;
+- (void)setTemporaryGatekeeperPassword:(NSString *)password;
+
 @end
 
 @interface XMLocation (PrivateMethods)
 
 /**
- * internal optimisation to ensure correct object identification
+ * internal optimization to ensure correct object identification
  **/
 - (void)_updateTag;
 - (void)_setTag:(unsigned)tag;

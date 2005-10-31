@@ -47,6 +47,7 @@
                 externalAddressField = NSTextField; 
                 gatekeeperHostField = NSTextField; 
                 gatekeeperIDField = NSTextField; 
+                gatekeeperPasswordField = NSTextField; 
                 gatekeeperPhoneNumberField = NSTextField; 
                 gatekeeperUserAliasField = NSTextField; 
                 getExternalAddressButton = NSButton; 

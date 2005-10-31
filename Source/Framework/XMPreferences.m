@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.9 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.10 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1544,6 +1544,11 @@
 		gatekeeperPhoneNumber = [string copy];
 		[old release];
 	}
+}
+
+- (NSString *)gatekeeperPassword
+{
+	return nil;
 }
 
 #pragma mark Private Methods

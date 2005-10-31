@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.3 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.4 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,6 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 	
 	[location setName:[self name]];
 	[location _setTag:[self _tag]];
-	
 	
 	return location;
 }
@@ -134,6 +133,21 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 
 - (void)setAutoAnswerCalls:(BOOL)flag
 {
+}
+
+- (NSString *)gatekeeperPassword
+{
+	return [[XMPreferencesManager sharedInstance] gatekeeperPasswordForLocation:self];
+}
+
+- (NSString *)temporaryGatekeeperPassword
+{
+	return [[XMPreferencesManager sharedInstance] temporaryGatekeeperPasswordForLocation:self];
+}
+
+- (void)setTemporaryGatekeeperPassword:(NSString *)password
+{
+	[[XMPreferencesManager sharedInstance] setTemporaryGatekeeperPassword:password forLocation:self];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.8 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.9 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,6 +185,14 @@
 
 - (NSString *)gatekeeperPhoneNumber;
 - (void)setGatekeeperPhoneNumber:(NSString *)string;
+
+/**
+ * Returns the gatekeeper password associated with this preferences 
+ * instance. The default implementation simply returns nil all the time.
+ * It is up the application design to provide storage for the
+ * password data
+ **/
+- (NSString *)gatekeeperPassword;
 
 @end
 

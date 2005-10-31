@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.5 2005/10/31 22:11:50 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,10 +25,11 @@
 unsigned _XMInitializedStatus = XM_FRAMEWORK_NOT_INITIALIZED;
 XMUtils *_XMUtilsSharedInstance = nil;
 XMCallManager *_XMCallManagerSharedInstance = nil;
-XMOpalDispatcher *_XMOpalDispatcherSharedInstance = nil;
 XMCodecManager *_XMCodecManagerSharedInstance = nil;
 XMAudioManager *_XMAudioManagerSharedInstance = nil;
 XMVideoManager *_XMVideoManagerSharedInstance = nil;
+XMAddressBookManager *_XMAddressBookManagerSharedInstance = nil;
+XMOpalDispatcher *_XMOpalDispatcherSharedInstance = nil;
 XMMediaTransmitter *_XMMediaTransmitterSharedInstance = nil;
 XMMediaReceiver *_XMMediaReceiverSharedInstance = nil;
 
@@ -42,10 +43,11 @@ void XMInitFramework()
 	
 	_XMUtilsSharedInstance = [[XMUtils alloc] _init];
 	_XMCallManagerSharedInstance = [[XMCallManager alloc] _init];
-	_XMOpalDispatcherSharedInstance = [[XMOpalDispatcher alloc] _init];
 	_XMCodecManagerSharedInstance = [[XMCodecManager alloc] _init];
 	_XMAudioManagerSharedInstance = [[XMAudioManager alloc] _init];
 	_XMVideoManagerSharedInstance = [[XMVideoManager alloc] _init];
+	_XMAddressBookManagerSharedInstance = [[XMAddressBookManager alloc] _init];
+	_XMOpalDispatcherSharedInstance = [[XMOpalDispatcher alloc] _init];
 	_XMMediaTransmitterSharedInstance = [[XMMediaTransmitter alloc] _init];
 	_XMMediaReceiverSharedInstance = [[XMMediaReceiver alloc] _init];
 	
@@ -74,10 +76,11 @@ void XMCloseFramework()
 	
 	[_XMUtilsSharedInstance _close];
 	[_XMCallManagerSharedInstance _close];
-	[_XMOpalDispatcherSharedInstance _close];
 	[_XMCodecManagerSharedInstance _close];
 	[_XMAudioManagerSharedInstance _close];
 	[_XMVideoManagerSharedInstance _close];
+	[_XMAddressBookManagerSharedInstance _close];
+	[_XMOpalDispatcherSharedInstance _close];
 	[_XMMediaTransmitterSharedInstance _close];
 	[_XMMediaReceiverSharedInstance _close];
 	
@@ -95,9 +98,6 @@ void _XMThreadExit() {
 		[_XMCallManagerSharedInstance release];
 		_XMCallManagerSharedInstance = nil;
 		
-		[_XMOpalDispatcherSharedInstance release];
-		_XMOpalDispatcherSharedInstance = nil;
-		
 		[_XMCodecManagerSharedInstance release];
 		_XMCodecManagerSharedInstance = nil;
 		
@@ -106,6 +106,12 @@ void _XMThreadExit() {
 		
 		[_XMVideoManagerSharedInstance release];
 		_XMVideoManagerSharedInstance = nil;
+		
+		[_XMAddressBookManagerSharedInstance release];
+		_XMAddressBookManagerSharedInstance = nil;
+		
+		[_XMOpalDispatcherSharedInstance release];
+		_XMOpalDispatcherSharedInstance = nil;
 		
 		[_XMMediaTransmitterSharedInstance release];
 		_XMMediaTransmitterSharedInstance = nil;
