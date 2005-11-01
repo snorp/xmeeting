@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.17 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.18 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,8 +23,6 @@
 #import "XMMediaTransmitter.h"
 #import "XMMediaReceiver.h"
 #import "XMVideoView.h"
-#import "XMAddressBookManager.h"
-#import "XMAddressBookRecordSearchMatch.h"
 #import "XMGeneralPurposeURL.h"
 
 extern unsigned _XMInitializedStatus;
@@ -33,7 +31,6 @@ extern XMCallManager *_XMCallManagerSharedInstance;
 extern XMCodecManager *_XMCodecManagerSharedInstance;
 extern XMAudioManager *_XMAudioManagerSharedInstance;
 extern XMVideoManager *_XMVideoManagerSharedInstance;
-extern XMAddressBookManager *_XMAddressBookManagerSharedInstance;
 extern XMOpalDispatcher *_XMOpalDispatcherSharedInstance;
 extern XMMediaTransmitter *_XMMediaTransmitterSharedInstance;
 extern XMMediaReceiver *_XMMediaReceiverSharedInstance;
@@ -214,19 +211,6 @@ void _XMCheckCloseStatus();
 
 - (void)_startBusyIndicator;
 - (void)_stopBusyIndicator;
-
-@end
-
-@interface XMAddressBookManager (FrameworkMethods)
-
-- (id)_init;
-- (void)_close;
-
-@end
-
-@interface XMAddressBookRecordSearchMatch (FrameworkMethods)
-
-- (id)_initWithRecord:(ABPerson *)record propertyMatch:(XMAddressBookRecordPropertyMatch)propertyMatch;
 
 @end
 

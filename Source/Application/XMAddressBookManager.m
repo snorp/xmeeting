@@ -1,22 +1,30 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.5 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMAddressBookManager.h"
+
 #import <AddressBook/AddressBook.h>
 
-#import "XMAddressBookManager.h"
-#import "XMPrivate.h"
-#import "XMStringConstants.h"
 #import "XMAddressBookRecordSearchMatch.h"
 #import "XMURL.h"
 
+NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddressBookManagerDidChangeDatabaseNotification";
+
 @interface XMAddressBookManager (PrivateMethods)
 
+- (id)_init;
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
+
+@end
+
+@interface XMAddressBookRecordSearchMatch (FrameworkMethods)
+
+- (id)_initWithRecord:(ABPerson *)record propertyMatch:(XMAddressBookRecordPropertyMatch)propertyMatch;
 
 @end
 
@@ -45,12 +53,13 @@
 
 + (XMAddressBookManager *)sharedInstance
 {
-	if(_XMAddressBookManagerSharedInstance == nil)
+	static XMAddressBookManager *sharedInstance = nil;
+	if(sharedInstance == nil)
 	{
-		NSLog(@"Attempt to access XMAddressBookManager prior to initialization");
+		sharedInstance = [[XMAddressBookManager alloc] _init];
 	}
 	
-	return _XMAddressBookManagerSharedInstance;
+	return sharedInstance;
 }
 
 #pragma mark Init & Deallocation Methods
@@ -88,18 +97,13 @@
 	return self;
 }
 
-- (void)_close
+- (void)dealloc
 {
 	if(addressBook != nil)
 	{
 		[addressBook release];
 		addressBook = nil;
 	}
-}
-
-- (void)dealloc
-{
-	[self _close];
 	
 	[super dealloc];
 }

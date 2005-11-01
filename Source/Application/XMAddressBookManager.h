@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.5 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,11 @@
 #define __XM_ADDRESS_BOOK_MANAGER_H__
 
 #import <Foundation/Foundation.h>
-#import "XMTypes.h"
+#import "XMeeting.h"
 
-@class ABAddressBook, ABSearchElement, XMURL;
+extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
+
+@class ABAddressBook;
 
 @protocol XMAddressBookRecord;
 

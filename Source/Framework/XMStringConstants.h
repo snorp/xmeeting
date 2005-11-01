@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.11 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.12 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -193,7 +193,7 @@ extern NSString *XMNotification_VideoManagerDidEndReceivingVideo;
  * Posted when the database of the address book did change,
  * either internally or externally
  **/
-extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
+//extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
 
 #pragma mark Exceptions
 

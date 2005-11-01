@@ -1,22 +1,16 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.4 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.5 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMeeting.h"
 #import "XMAddressBookCallAddressProvider.h"
 
-@interface XMAddressBookRecordSearchMatch (XMCallAddressMethods)
-
-- (id<XMCallAddressProvider>)provider;
-- (XMURL *)url;
-- (NSString *)displayString;
-- (NSImage *)displayImage;
-
-@end
+#import "XMeeting.h"
+#import "XMAddressBookManager.h"
+#import "XMAddressBookRecordSearchMatch.h"
 
 @interface XMAddressBookCallAddressProvider (PrivateMethods)
 
@@ -196,30 +190,6 @@
 		}
 	}
 	return nil;
-}
-
-@end
-
-@implementation XMAddressBookRecordSearchMatch (XMCallAddressMethods)
-
-- (id<XMCallAddressProvider>)provider
-{
-	return [XMAddressBookCallAddressProvider sharedInstance];
-}
-
-- (XMURL *)url
-{
-	return [[self record] callURL];
-}
-
-- (NSString *)displayString
-{
-	return [[self record] displayName];
-}
-
-- (NSImage *)displayImage
-{
-	return [NSImage imageNamed:@"AddressBook"];
 }
 
 @end

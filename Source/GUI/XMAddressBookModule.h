@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.h,v 1.4 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMAddressBookModule.h,v 1.5 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,8 @@
 #define __XM_ADDRESS_BOOK_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
+
+#import "XMAddressBookManager.h"
 #import "XMMainWindowAdditionModule.h"
 
 @class ABPeoplePickerView, ABPerson, XMGeneralPurposeURL;

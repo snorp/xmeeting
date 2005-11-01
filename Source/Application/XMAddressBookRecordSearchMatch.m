@@ -1,14 +1,16 @@
 /*
- * $Id: XMAddressBookRecordSearchMatch.m,v 1.1 2005/06/28 20:43:46 hfriederich Exp $
+ * $Id: XMAddressBookRecordSearchMatch.m,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import <AddressBook/AddressBook.h>
-
 #import "XMAddressBookRecordSearchMatch.h"
+
+#import <AddressBook/AddressBook.h>
+#import "XMAddressBookManager.h"
+#import "XMAddressBookCallAddressProvider.h"
 
 @implementation XMAddressBookRecordSearchMatch
 
@@ -42,6 +44,26 @@
 - (XMAddressBookRecordPropertyMatch)propertyMatch
 {
 	return propertyMatch;
+}
+
+- (id<XMCallAddressProvider>)provider
+{
+	return [XMAddressBookCallAddressProvider sharedInstance];
+}
+
+- (XMURL *)url
+{
+	return [[self record] callURL];
+}
+
+- (NSString *)displayString
+{
+	return [[self record] displayName];
+}
+
+- (NSImage *)displayImage
+{
+	return [NSImage imageNamed:@"AddressBook"];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.10 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.11 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -145,6 +145,7 @@ typedef enum XMVideoSize
  * Defines which part of a record matched a search operation in the address book
  * database
  **/
+/*
 typedef enum XMAddressBookRecordPropertyMatch
 {
 	XMAddressBookRecordPropertyMatch_NoMatch = 0,
@@ -154,6 +155,7 @@ typedef enum XMAddressBookRecordPropertyMatch
 	XMAddressBookRecordPropertyMatch_CallAddressMatch,
 	XMAddressBookRecordPropertyMatchCount
 } XMAddressBookRecordPropertyMatch;
+*/
 
 /**
  * Defines the various types of URL's that the XMeeting framework understands

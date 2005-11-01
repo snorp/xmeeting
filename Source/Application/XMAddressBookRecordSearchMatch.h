@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecordSearchMatch.h,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMAddressBookRecordSearchMatch.h,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,18 @@
 #define __XM_ADDRESS_BOOK_RECORD_SEARCH_MATCH_H__
 
 #import <Foundation/Foundation.h>
-#import "XMTypes.h"
+
+#import "XMCallAddressManager.h"
+
+typedef enum XMAddressBookRecordPropertyMatch
+{
+	XMAddressBookRecordPropertyMatch_NoMatch = 0,
+	XMAddressBookRecordPropertyMatch_FirstNameMatch,
+	XMAddressBookRecordPropertyMatch_LastNameMatch,
+	XMAddressBookRecordPropertyMatch_CompanyMatch,
+	XMAddressBookRecordPropertyMatch_CallAddressMatch,
+	XMAddressBookRecordPropertyMatchCount
+} XMAddressBookRecordPropertyMatch;
 
 /**
  * Instances of this object encapsulate information about a
@@ -18,9 +29,11 @@
  * also the information which part of the record matched the searchString
  * is stored in this instance and can be queried
  **/
-@interface XMAddressBookRecordSearchMatch : NSObject {
+@interface XMAddressBookRecordSearchMatch : NSObject <XMCallAddress> {
+	
 	id record;
 	XMAddressBookRecordPropertyMatch propertyMatch;
+	
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.5 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.6 2005/11/01 08:27:14 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMCallHistoryRecord.h"
+
+#import "XMAddressBookManager.h"
 #import "XMCallHistoryCallAddressProvider.h"
 #import "XMSimpleAddressURL.h"
 
