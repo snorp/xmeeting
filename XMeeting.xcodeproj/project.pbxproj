@@ -686,6 +686,8 @@
 		D1ECCD3C08349255008EBAE3 /* XMInCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */; };
 		D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068D091756FA008A8974 /* XMAddressBookManager.m */; };
 		D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068F091756FA008A8974 /* XMAddressBookRecordSearchMatch.m */; };
+		D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */; };
+		D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1EF07510918B212008A8974 /* SetupAssistant.nib */; };
 		D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */; };
 		D1F61479086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */; };
 		D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */; };
@@ -1480,6 +1482,9 @@
 		D1EF068D091756FA008A8974 /* XMAddressBookManager.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookManager.m; path = Source/Application/XMAddressBookManager.m; sourceTree = "<group>"; };
 		D1EF068E091756FA008A8974 /* XMAddressBookRecordSearchMatch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAddressBookRecordSearchMatch.h; path = Source/Application/XMAddressBookRecordSearchMatch.h; sourceTree = "<group>"; };
 		D1EF068F091756FA008A8974 /* XMAddressBookRecordSearchMatch.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookRecordSearchMatch.m; path = Source/Application/XMAddressBookRecordSearchMatch.m; sourceTree = "<group>"; };
+		D1EF074A0918B1B3008A8974 /* XMSetupAssistantManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSetupAssistantManager.h; path = Source/SetupAssistant/XMSetupAssistantManager.h; sourceTree = "<group>"; };
+		D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSetupAssistantManager.m; path = Source/SetupAssistant/XMSetupAssistantManager.m; sourceTree = "<group>"; };
+		D1EF07520918B212008A8974 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SetupAssistant.nib; sourceTree = "<group>"; };
 		D1F6056908BA0E600005E9A0 /* XMMainWindowSupportModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMMainWindowSupportModule.h; path = Source/GUI/XMMainWindowSupportModule.h; sourceTree = "<group>"; };
 		D1F6067B08BBC5FC0005E9A0 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/LocalAudioVideoModule.nib; sourceTree = "<group>"; };
 		D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesCodecListRecord.h; path = Source/Framework/XMPreferencesCodecListRecord.h; sourceTree = "<group>"; };
@@ -1542,6 +1547,7 @@
 				D1A02A6C081E40360018BD11 /* PreferencesWindow */,
 				D1B4CD9408316D5900A444E1 /* GUI-Widgets */,
 				D15D5A2208C0BC7600C7D89C /* App Utilities */,
+				D1EF07470918B15A008A8974 /* Setup Assistant */,
 				D163333C07A01A8B003FD9C0 /* Framework */,
 			);
 			name = "Code Source";
@@ -2753,6 +2759,7 @@
 				D163945D083E19E300F7FD83 /* StatisticsModule.nib */,
 				D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */,
 				D1A02B24081E96D30018BD11 /* Preferences.nib */,
+				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -2784,6 +2791,15 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 			);
 			name = Other;
+			sourceTree = "<group>";
+		};
+		D1EF07470918B15A008A8974 /* Setup Assistant */ = {
+			isa = PBXGroup;
+			children = (
+				D1EF074A0918B1B3008A8974 /* XMSetupAssistantManager.h */,
+				D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */,
+			);
+			name = "Setup Assistant";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3348,6 +3364,7 @@
 				D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */,
 				D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */,
 				D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */,
+				D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3426,6 +3443,7 @@
 				D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */,
 				D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */,
 				D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */,
+				D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3786,6 +3804,14 @@
 				D1ECCD2F083491EB008EBAE3 /* English */,
 			);
 			name = NoCallModule.nib;
+			sourceTree = "<group>";
+		};
+		D1EF07510918B212008A8974 /* SetupAssistant.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D1EF07520918B212008A8974 /* English */,
+			);
+			name = SetupAssistant.nib;
 			sourceTree = "<group>";
 		};
 		D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */ = {

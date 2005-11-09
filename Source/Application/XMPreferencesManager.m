@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.7 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.8 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 NSString *XMNotification_PreferencesDidChange = @"XMeeting_PreferencesDidChange";
 NSString *XMNotification_ActiveLocationDidChange = @"XMeeting_ActiveLocationDidChange";
 
+NSString *XMKey_PreferencesAvailable = @"XMeeting_PreferencesAvailable";
 NSString *XMKey_Locations = @"XMeeting_Locations";
 NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 NSString *XMKey_AutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
@@ -21,7 +22,6 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 
 - (id)_init;
 - (void)_setup;
-- (void)_writeLocationsToUserDefaults;
 
 - (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
 - (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
@@ -33,7 +33,7 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	NSString *serviceName;
 	NSString *accountName;
 	NSString *password;
-	
+
 }
 
 - (id)_initWithServiceName:(NSString *)serviceName accountName:(NSString *)accountName password:(NSString *)password;
@@ -47,7 +47,7 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 
 @implementation XMPreferencesManager
 
-#pragma mark Init & Deallocation Methods
+#pragma mark Class Methods
 
 + (XMPreferencesManager *)sharedInstance
 {
@@ -61,6 +61,20 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 
 	return sharedInstance;
 }
+
++ (BOOL)doesHavePreferences
+{
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	
+	BOOL doesHavePreferences = [userDefaults boolForKey:XMKey_PreferencesAvailable];
+	
+	// this is a one-time check, thus next time we return YES
+	[userDefaults setBool:YES forKey:XMKey_PreferencesAvailable];
+	
+	return doesHavePreferences;
+}
+
+#pragma mark Init & Deallocation Methods
 
 - (id)init
 {
@@ -123,7 +137,7 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	// simply increase the stored value by one;
 	activeLocation = [userDefaults integerForKey:XMKey_ActiveLocation] - 1;
 	
-	if(activeLocation == -1 && [locations count] != 0)
+	if(activeLocation == -1)
 	{
 		// in this case, we automatically use the first location found
 		activeLocation = 0;
@@ -133,8 +147,6 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	
 	gatekeeperPasswords = [[NSMutableArray alloc] initWithCapacity:3];
 	temporaryGatekeeperPasswords = nil;
-	
-	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
 }
 
 - (void)dealloc
@@ -153,24 +165,39 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 #pragma mark Getting & Setting Methods
 
 - (void)synchronizeAndNotify
-{
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+{		
+	[self synchronize];
 	
-	[userDefaults setInteger:activeLocation forKey:XMKey_ActiveLocation];
-	
-	[self _writeLocationsToUserDefaults];
-	
-	// synchronize the database
-	[userDefaults synchronize];
-		
 	// post the notification
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter postNotificationName:XMNotification_PreferencesDidChange
 														object:self
 													  userInfo:nil];
 	[notificationCenter postNotificationName:XMNotification_ActiveLocationDidChange
 														object:self
 													  userInfo:nil];
+}
+
+- (void)synchronize
+{
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	
+	[userDefaults setInteger:activeLocation forKey:XMKey_ActiveLocation];
+	
+	unsigned count = [locations count];
+	unsigned i;
+	NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count];
+	for(i = 0; i < count; i++)
+	{
+		XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+		[dictArray addObject:[location dictionaryRepresentation]];
+	}
+	
+	[userDefaults setObject:dictArray forKey:XMKey_Locations];
+	[dictArray release];
+	
+	// synchronize the database
+	[userDefaults synchronize];
 }
 
 - (NSArray *)locations
@@ -190,19 +217,13 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 - (void)setLocations:(NSArray *)newLocations
 {
 	unsigned count = [newLocations count];
-	
-	if(count == 0)
-	{
-		// this isn't allowed and we simply return
-		return;
-	}
-	
 	unsigned i;
 	unsigned currentTag = [(XMLocation *)[locations objectAtIndex:activeLocation] _tag];
 	
-	// this is safe since locations is an internal variable and is never
-	// directly exposed to the outside
-	[locations removeAllObjects];
+	if(count != 0)
+	{
+		[locations removeAllObjects];
+	}
 	
 	// we have also to determine the index of the actual location since this could have changed
 	activeLocation = 0;
@@ -486,23 +507,6 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 }
 
 #pragma mark Private Methods
-
-- (void)_writeLocationsToUserDefaults
-{
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	
-	unsigned count = [locations count];
-	unsigned i;
-	NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count];
-	for(i = 0; i < count; i++)
-	{
-		XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
-		[dictArray addObject:[location dictionaryRepresentation]];
-	}
-	
-	[userDefaults setObject:dictArray forKey:XMKey_Locations];
-	[dictArray release];
-}
 
 - (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
 {

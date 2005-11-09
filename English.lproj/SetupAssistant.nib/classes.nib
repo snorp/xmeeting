@@ -1,0 +1,41 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {cancelAssistant = id; continueAssistant = id; goBackAssistant = id; }; 
+            CLASS = XMSetupAssistantManager; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                bandwidthLimitPopUp = NSPopUpButton; 
+                cancelButton = NSButton; 
+                contentBox = NSBox; 
+                continueButton = NSButton; 
+                enableVideoRadioButtons = NSMatrix; 
+                flCompletedView = NSView; 
+                flGeneralSettingsView = NSView; 
+                flIntroductionView = NSView; 
+                flLocationView = NSView; 
+                flNewLocationView = NSView; 
+                gatekeeperSettingsView = NSView; 
+                gkHostField = NSTextField; 
+                gkPasswordField = NSTextField; 
+                gkPhoneNumberField = NSTextField; 
+                gkUsernameField = NSTextField; 
+                goBackButton = NSButton; 
+                h323SettingsView = NSView; 
+                infoField = NSTextField; 
+                liCompletedView = NSView; 
+                liInfoView = NSView; 
+                locationNameField = NSTextField; 
+                locationRadioButtons = NSMatrix; 
+                modalDelegate = id; 
+                networkSettingsView = NSView; 
+                useGatekeeperRadioButtons = NSMatrix; 
+                userNameField = NSTextField; 
+                videoSettingsView = NSView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

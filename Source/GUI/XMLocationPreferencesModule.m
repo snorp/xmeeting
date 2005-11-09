@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.11 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.12 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMPreferencesWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMLocation.h"
+#import "XMSetupAssistantManager.h"
 #import "XMBooleanCell.h"
 
 NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPreferencesModule";
@@ -54,6 +55,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 // notification responding
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
+
+- (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)locations;
 
 @end
 
@@ -235,6 +238,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (IBAction)importLocations:(id)sender
 {
+	[[XMSetupAssistantManager sharedInstance] 
+			runImportLocationsAssistantModalForWindow:[contentView window]
+										modalDelegate:self
+									   didEndSelector:@selector(_importLocationsAssistantDidEndWithLocations:)];
 }
 
 - (IBAction)duplicateLocation:(id)sender
@@ -680,8 +687,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	BOOL flag = ([locations count] == 1) ? NO : YES;
 	[deleteLocationButton setEnabled:flag];
-	
-	[importLocationsButton setEnabled:NO];
 }
 
 - (void)_validateAddressTranslationUserInterface
@@ -933,6 +938,29 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	isFetchingExternalAddress = NO;
 	[self _validateExternalAddressUserInterface];
+}
+
+- (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)theLocations
+{
+	unsigned count = [theLocations count];
+	
+	if(count != 0)
+	{
+		unsigned index = [locations count];
+		
+		// adding the location
+		[locations addObjectsFromArray:theLocations];
+		
+		// validate the GUI
+		NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
+		[locationsTableView reloadData];
+		[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+		[sectionsTab selectFirstTabViewItem:self];
+		[self _validateLocationButtonUserInterface];
+		
+		[self defaultAction:self];
+		
+	}
 }
 
 @end

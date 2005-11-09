@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.9 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.10 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -74,16 +74,28 @@
 
 - (NSSize)contentViewSize
 {
+	if(contentView == nil)
+	{
+		[self contentView];
+	}
 	return [contentView preferredSize];
 }
 
 - (NSSize)contentViewMinSize
 {
+	if(contentView == nil)
+	{
+		[self contentView];
+	}
 	return [contentView minimumSize];
 }
 
 - (NSSize)contentViewMaxSize
 {
+	if(contentView == nil)
+	{
+		[self contentView];
+	}
 	return [contentView maximumSize];
 }
 
@@ -94,6 +106,8 @@
 
 - (void)becomeActiveModule
 {
+	[self contentView];
+	
 	[videoView startDisplayingRemoteVideo];
 	
 	didClearCall = NO;

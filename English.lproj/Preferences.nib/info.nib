@@ -44,18 +44,6 @@
 			<string>259</string>
 			<string>101</string>
 		</array>
-		<key>25</key>
-		<array>
-			<string>129</string>
-			<string>132</string>
-			<string>127</string>
-			<string>137</string>
-			<string>138</string>
-			<string>233</string>
-			<string>124</string>
-			<string>131</string>
-			<string>234</string>
-		</array>
 		<key>29</key>
 		<array>
 			<string>107</string>
@@ -73,12 +61,12 @@
 		</array>
 		<key>3</key>
 		<array>
-			<string>56</string>
-			<string>60</string>
-			<string>63</string>
-			<string>68</string>
-			<string>73</string>
 			<string>75</string>
+			<string>60</string>
+			<string>56</string>
+			<string>73</string>
+			<string>68</string>
+			<string>63</string>
 		</array>
 		<key>30</key>
 		<array>
@@ -87,7 +75,7 @@
 		</array>
 	</dict>
 	<key>IBLastGroupID</key>
-	<string>31</string>
+	<string>34</string>
 	<key>IBLockedObjects</key>
 	<array>
 		<integer>9</integer>

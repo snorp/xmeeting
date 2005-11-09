@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallView.m,v 1.2 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMInCallView.m,v 1.3 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,6 +98,7 @@
 {
 	if(showVideoContent == NO)
 	{
+		NSLog(@"returning minSize");
 		return [self minimumSize];
 	}
 	
@@ -199,7 +200,8 @@
 	unsigned contentWidth = (unsigned)frame.size.width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
 	
 	NSRect buttonContentFrame = [buttonContentView frame];
-	buttonContentFrame.size.width = contentWidth;
+	unsigned xPos = LEFT_CONTENT_MARGIN + (contentWidth - (int)buttonContentFrame.size.width) / 2;
+	buttonContentFrame.origin.x = xPos;
 	[buttonContentView setFrame:buttonContentFrame];
 	
 	NSRect statusContentFrame = [statusContentView frame];

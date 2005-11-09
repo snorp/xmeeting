@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.7 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.8 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,8 @@
 
 extern NSString *XMNotification_PreferencesDidChange;
 extern NSString *XMNotification_ActiveLocationDidChange;
+
+extern NSString *XMKey_Locations;
 
 /**
  * XMPreferencesManager deals with the various task concerning
@@ -47,12 +49,28 @@ extern NSString *XMNotification_ActiveLocationDidChange;
 + (XMPreferencesManager *)sharedInstance;
 
 /**
+ * Returns whether there exists a preferences file or not
+ **/
++ (BOOL)doesHavePreferences;
+
+/**
+ * Causes XMPreferencesManager to load the locations from the preferences
+ * and
+ **/
+
+/**
  * Instructs XMPreferencesManager to synchronize the UserDefaults
  * database and to post the PreferencesDidChange notification.
  * This is useful after major changes in the preferences
  * such as after closing the Preferences window
  **/
 - (void)synchronizeAndNotify;
+
+/**
+ * Synchronizes the UserDefaults database without any
+ * notifications being posted
+ **/
+- (void)synchronize;
 
 /**
  * returns an array containing the available locations on this system.
@@ -69,6 +87,9 @@ extern NSString *XMNotification_ActiveLocationDidChange;
  *
  * All elements in the array which are not instances of XMLocation
  * are simply ignored.
+ *
+ * If the locations array is empty, the locations set currently
+ * in preferencs is activated
  **/
 - (void)setLocations:(NSArray *)locations;
 

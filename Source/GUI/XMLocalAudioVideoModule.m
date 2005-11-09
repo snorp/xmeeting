@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.3 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.4 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,7 +55,18 @@
 	[contentView setShowVideoContent:showVideoContent];
 	
 	// configuring the video content
-	[videoDevicesPopUp setEnabled:NO];
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	NSArray *devices = [videoManager inputDevices];
+	if(devices == nil)
+	{
+		[videoDevicesPopUp setEnabled:NO];
+	}
+	else
+	{
+		[videoDevicesPopUp removeAllItems];
+		[videoDevicesPopUp addItemsWithTitles:devices];
+		[videoDevicesPopUp selectItemWithTitle:[videoManager selectedInputDevice]];
+	}
 	[localVideoView startDisplayingLocalVideo];
 	
 	// configuring the audio content

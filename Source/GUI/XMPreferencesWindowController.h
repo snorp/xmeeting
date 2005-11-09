@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.3 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.4 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,10 +10,6 @@
 #define __XM_PREFERENCES_WINDOW_CONTROLLER_H__
 
 #import <Cocoa/Cocoa.h>
-
-extern NSString *XMKey_PreferencesNibName;	// name of the preferences nib file
-extern NSString *XMKey_PreferencesToolbar;	// identifier for the preferences toolbar
-extern NSString *XMKey_ButtonToolbarItemIdentifier;	// identifier for the apply / restore buttons
 
 /**
  * The XMPreferencesWindowController singleton class manages the appearance

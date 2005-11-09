@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.13 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.14 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,8 @@
 #import "XMStatisticsModule.h"
 #import "XMCallHistoryModule.h"
 
+#import "XMSetupAssistantManager.h"
+
 @interface XMApplicationController (PrivateMethods)
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
@@ -44,6 +46,9 @@
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
 
+- (void)_showSetupAssistant;
+- (void)_setupApplication:(NSArray *)locations;
+
 @end
 
 @implementation XMApplicationController
@@ -59,32 +64,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notif
 {
-	// First step to do!
+	// Initialize the framework
 	XMInitFramework();
-	
-	// registering the call address providers
-	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
-	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
-	
-	noCallModule = [[XMNoCallModule alloc] init];
-	inCallModule = [[XMInCallModule alloc] init];
-	
-	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
-	
-	addressBookModule = [[XMAddressBookModule alloc] init];
-	//zeroConfModule = [[XMZeroConfModule alloc] init];
-	//dialPadModule = [[XMDialPadModule alloc] init];
-	//textChatModule = [[XMTextChatModule alloc] init];
-	statisticsModule = [[XMStatisticsModule alloc] init];
-	callHistoryModule = [[XMCallHistoryModule alloc] init];
-	
-	// show the main window
-	[[XMMainWindowController sharedInstance] showMainWindow];
-	
-	// start fetching the external address
-	XMUtils *utils = [XMUtils sharedInstance];
-	[utils localAddress];
-	[utils startFetchingExternalAddress];
 	
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -103,14 +84,15 @@
 							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
 	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
 							   name:XMNotification_FrameworkDidClose object:nil];
-	
-	// making sure that the preferences are loaded
-	[XMPreferencesManager sharedInstance];
-	
-	// start grabbing from the video sources
-	[[XMVideoManager sharedInstance] startGrabbing];
-	
-	incomingCallAlert = nil;
+		
+	if([XMPreferencesManager doesHavePreferences] == YES)
+	{
+		[self performSelector:@selector(_setupApplication:) withObject:nil afterDelay:0.0];
+	}
+	else
+	{
+		[self performSelector:@selector(_showSetupAssistant) withObject:nil afterDelay:0.0];
+	}
 }
 
 - (void)dealloc
@@ -124,6 +106,8 @@
 	//[textChatModule release];
 	[statisticsModule release];
 	[callHistoryModule release];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[super dealloc];
 }
@@ -337,6 +321,56 @@
 	}
 	
 	[alert release];
+}
+
+#pragma mark Private Methods
+
+- (void)_showSetupAssistant
+{
+	NSArray *locations = [[XMSetupAssistantManager sharedInstance] runFirstApplicationLaunchAssistant];
+
+	[self _setupApplication:locations];
+}
+
+- (void)_setupApplication:(NSArray *)locations
+{		
+	// registering the call address providers
+	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
+	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
+	
+	noCallModule = [[XMNoCallModule alloc] init];
+	inCallModule = [[XMInCallModule alloc] init];
+	
+	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
+	
+	addressBookModule = [[XMAddressBookModule alloc] init];
+	//zeroConfModule = [[XMZeroConfModule alloc] init];
+	//dialPadModule = [[XMDialPadModule alloc] init];
+	//textChatModule = [[XMTextChatModule alloc] init];
+	statisticsModule = [[XMStatisticsModule alloc] init];
+	callHistoryModule = [[XMCallHistoryModule alloc] init];
+	
+	// show the main window
+	[[XMMainWindowController sharedInstance] showMainWindow];
+	
+	// start fetching the external address
+	XMUtils *utils = [XMUtils sharedInstance];
+	[utils localAddress];
+	[utils startFetchingExternalAddress];
+	
+	// causing the PreferencesManager to activate the active location
+	// by calling XMCallManager -setActivePreferences:
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	[preferencesManager setLocations:locations];
+	if([locations count] != 0)
+	{
+		[preferencesManager synchronizeAndNotify];
+	}
+	
+	// start grabbing from the video sources
+	[[XMVideoManager sharedInstance] startGrabbing];
+	
+	incomingCallAlert = nil;
 }
 
 @end

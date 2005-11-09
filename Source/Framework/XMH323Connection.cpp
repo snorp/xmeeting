@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.1 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.2 2005/11/09 20:00:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,4 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 {
 	H323Connection::OnSendCapabilitySet(pdu);
-	
-	cout << "Sending terminal caps: " << pdu << endl;
 }
