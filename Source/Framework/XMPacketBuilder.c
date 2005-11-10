@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.2 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.3 2005/11/10 15:36:06 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -105,12 +105,10 @@ ComponentResult XMPacketBuilder_BeginPacketGroup(XMPacketBuilderGlobals globals,
 		err = paramErr;
 		goto bail;
 	}
+
+	// adjusting the timestamp to that it is an integer multiple of 3003
+	inTimeStamp = (inTimeStamp / 3003) * 3003;
 	
-	//printf("BeginPacketGroup called %d\n", inFlags);
-	/*
-	beginPacketGroup();
-	setTimeStamp(theTimeStamp);
-	 */
 	_XMSetTimeStamp(2, inTimeStamp);
 	
 bail:
