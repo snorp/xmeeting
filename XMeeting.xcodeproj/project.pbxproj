@@ -320,7 +320,7 @@
 		D1CEE19E08F9022B007E4ABE /* mcs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12508F9022B007E4ABE /* mcs.h */; };
 		D1CEE19F08F9022B007E4ABE /* t38.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12608F9022B007E4ABE /* t38.h */; };
 		D1CEE1A008F9022B007E4ABE /* x880.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12708F9022B007E4ABE /* x880.h */; };
-		D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12908F9022B007E4ABE /* allcodecs.h */; };
+		D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12908F9022B007E4ABE /* allcodecs.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D1CEE1A208F9022B007E4ABE /* g711codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12A08F9022B007E4ABE /* g711codec.h */; };
 		D1CEE1A308F9022B007E4ABE /* g726codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12B08F9022B007E4ABE /* g726codec.h */; };
 		D1CEE1A408F9022B007E4ABE /* g729codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12C08F9022B007E4ABE /* g729codec.h */; };
@@ -369,7 +369,7 @@
 		D1CEE1CF08F9022B007E4ABE /* sound.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15D08F9022B007E4ABE /* sound.h */; };
 		D1CEE1D008F9022B007E4ABE /* transmit.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15E08F9022B007E4ABE /* transmit.h */; };
 		D1CEE1D108F9022B007E4ABE /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15F08F9022B007E4ABE /* version.h */; };
-		D1CEE1D208F9022B007E4ABE /* alllids.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16108F9022B007E4ABE /* alllids.h */; };
+		D1CEE1D208F9022B007E4ABE /* alllids.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16108F9022B007E4ABE /* alllids.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D1CEE1D308F9022B007E4ABE /* ixjDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16208F9022B007E4ABE /* ixjDefs.h */; };
 		D1CEE1D408F9022B007E4ABE /* ixjidb.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16308F9022B007E4ABE /* ixjidb.h */; };
 		D1CEE1D508F9022B007E4ABE /* ixjlid.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16408F9022B007E4ABE /* ixjlid.h */; };
@@ -445,24 +445,24 @@
 		D1CEE39B08F90263007E4ABE /* private.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE24208F90262007E4ABE /* private.h */; };
 		D1CEE39C08F90263007E4ABE /* proto.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE24308F90262007E4ABE /* proto.h */; };
 		D1CEE39D08F90263007E4ABE /* unproto.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE24408F90262007E4ABE /* unproto.h */; };
-		D1CEE39E08F90263007E4ABE /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24808F90262007E4ABE /* add.c */; };
-		D1CEE39F08F90263007E4ABE /* code.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24908F90262007E4ABE /* code.c */; };
-		D1CEE3A008F90263007E4ABE /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24A08F90262007E4ABE /* decode.c */; };
-		D1CEE3A108F90263007E4ABE /* gsm_create.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24B08F90262007E4ABE /* gsm_create.c */; };
-		D1CEE3A208F90263007E4ABE /* gsm_decode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24C08F90262007E4ABE /* gsm_decode.c */; };
-		D1CEE3A308F90263007E4ABE /* gsm_destroy.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24D08F90262007E4ABE /* gsm_destroy.c */; };
-		D1CEE3A408F90263007E4ABE /* gsm_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24E08F90262007E4ABE /* gsm_encode.c */; };
-		D1CEE3A508F90263007E4ABE /* gsm_lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24F08F90262007E4ABE /* gsm_lpc.c */; };
-		D1CEE3A608F90263007E4ABE /* gsm_option.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25008F90262007E4ABE /* gsm_option.c */; };
-		D1CEE3A708F90263007E4ABE /* long_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25108F90262007E4ABE /* long_term.c */; };
-		D1CEE3A808F90263007E4ABE /* preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25208F90262007E4ABE /* preprocess.c */; };
-		D1CEE3A908F90263007E4ABE /* rpe.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25308F90262007E4ABE /* rpe.c */; };
-		D1CEE3AA08F90263007E4ABE /* short_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25408F90262007E4ABE /* short_term.c */; };
-		D1CEE3AB08F90263007E4ABE /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25508F90262007E4ABE /* table.c */; };
+		D1CEE39E08F90263007E4ABE /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24808F90262007E4ABE /* add.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE39F08F90263007E4ABE /* code.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24908F90262007E4ABE /* code.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc -DHAS_STDLIB_H"; }; };
+		D1CEE3A008F90263007E4ABE /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24A08F90262007E4ABE /* decode.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A108F90263007E4ABE /* gsm_create.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24B08F90262007E4ABE /* gsm_create.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc -DHAS_STDLIB_H -DHAS_STRING_H"; }; };
+		D1CEE3A208F90263007E4ABE /* gsm_decode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24C08F90262007E4ABE /* gsm_decode.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A308F90263007E4ABE /* gsm_destroy.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24D08F90262007E4ABE /* gsm_destroy.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc -DHAS_STDLIB_H"; }; };
+		D1CEE3A408F90263007E4ABE /* gsm_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24E08F90262007E4ABE /* gsm_encode.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A508F90263007E4ABE /* gsm_lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE24F08F90262007E4ABE /* gsm_lpc.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A608F90263007E4ABE /* gsm_option.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25008F90262007E4ABE /* gsm_option.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A708F90263007E4ABE /* long_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25108F90262007E4ABE /* long_term.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A808F90263007E4ABE /* preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25208F90262007E4ABE /* preprocess.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3A908F90263007E4ABE /* rpe.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25308F90262007E4ABE /* rpe.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3AA08F90263007E4ABE /* short_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25408F90262007E4ABE /* short_term.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
+		D1CEE3AB08F90263007E4ABE /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25508F90262007E4ABE /* table.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
 		D1CEE3AC08F90263007E4ABE /* gsmcodec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25608F90262007E4ABE /* gsmcodec.cxx */; };
 		D1CEE3AD08F90263007E4ABE /* h261codec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25708F90262007E4ABE /* h261codec.cxx */; };
 		D1CEE3AE08F90263007E4ABE /* anaFilter.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25908F90262007E4ABE /* anaFilter.c */; };
-		D1CEE3AF08F90263007E4ABE /* anaFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25A08F90262007E4ABE /* anaFilter.h */; };
+		D1CEE3AF08F90263007E4ABE /* anaFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25A08F90262007E4ABE /* anaFilter.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D1CEE3B008F90263007E4ABE /* constants.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25B08F90262007E4ABE /* constants.c */; };
 		D1CEE3B108F90263007E4ABE /* constants.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25C08F90262007E4ABE /* constants.h */; };
 		D1CEE3B208F90263007E4ABE /* createCB.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25D08F90262007E4ABE /* createCB.c */; };
@@ -4123,8 +4123,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(HOME)/pwlib/include",
-					"$(HOME)/opal/include",
+					../pwlib/include,
+					../opal/include,
 				);
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)\"";
