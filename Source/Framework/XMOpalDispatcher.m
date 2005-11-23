@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.7 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.8 2005/11/23 22:25:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -467,6 +467,7 @@ typedef enum _XMOpalDispatcherMessage
 			[self _handleRetryGatekeeperRegistrationMessage:[portMessage components]];
 			break;
 		case _XMOpalDispatcherMessage_InitiateCall:
+			NSLog(@"init");
 			[self _handleInitiateCallMessage:[portMessage components]];
 			break;
 		case _XMOpalDispatcherMessage_InitiateSpecificCall:

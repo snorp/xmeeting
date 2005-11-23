@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.5 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.6 2005/11/23 22:25:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,8 @@
 #include "XMBridge.h"
 
 #define XM_H261_ENCODING_NAME "H261"
+#define XM_H263_ENCODING_NAME "H263"
+#define XM_h264_ENCODING_NAME "H264"
 
 #define XM_MAX_FRAME_WIDTH PVideoDevice::CIFWidth
 #define XM_MAX_FRAME_HEIGHT PVideoDevice::CIFHeight
@@ -29,10 +31,16 @@ const char *_XMMediaFormatIdentifier_G711_ALaw = "*g.711-alaw*";
 // Video MediaFormats
 
 const char *_XMMediaFormatIdentifier_H261 = "*h.261*";
+const char *_XMMediaFormatIdentifier_H263 = "*h.263*";
+const char *_XMMediaFormatIdentifier_H264 = "*H.264*";
 
 const char *_XMMediaFormat_Video = "XMVideo";
 const char *_XMMediaFormat_H261_QCIF = "H.261 (QCIF)";
 const char *_XMMediaFormat_H261_CIF = "H.261 (CIF)";
+const char *_XMMediaFormat_H263_QCIF = "H.263 (QCIF)";
+const char *_XMMediaFormat_H263_CIF = "H.263 (CIF)";
+const char *_XMMediaFormat_H264_QCIF = "H.264 (QCIF)";
+const char *_XMMediaFormat_H264_CIF = "H.264 (CIF)";
 
 #pragma mark MediaFormat Definitions
 
@@ -343,6 +351,26 @@ const char *_XMMediaFormatForCodecIdentifierWithVideoSize(XMCodecIdentifier code
 			else if(videoSize == XMVideoSize_CIF)
 			{
 				return _XMMediaFormat_H261_CIF;
+			}
+			break;
+		case XMCodecIdentifier_H263:
+			if(videoSize == XMVideoSize_QCIF)
+			{
+				return _XMMediaFormat_H263_QCIF;
+			}
+			else if(videoSize == XMVideoSize_CIF)
+			{
+				return _XMMediaFormat_H263_CIF;
+			}
+			break;
+		case XMCodecIdentifier_H264:
+			if(videoSize == XMVideoSize_QCIF)
+			{
+				return _XMMediaFormat_H264_QCIF;
+			}
+			else if(videoSize == XMVideoSize_CIF)
+			{
+				return _XMMediaFormat_H264_CIF;
 			}
 			break;
 		default:

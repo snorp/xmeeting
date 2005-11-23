@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.8 2005/11/23 22:25:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,7 +98,7 @@ void _XMHandleMediaStreamClosed(unsigned callID, bool isIncomingStream, const ch
 
 #pragma mark MediaReceiver callbacks
 
-void _XMStartMediaTransmit(int codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
+void _XMStartMediaTransmit(XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
 						   unsigned maxBitrate, unsigned sessionID)
 {
 	// this is called from a thread without run loop and without autorelease pool
@@ -119,9 +119,9 @@ void _XMStopMediaTransmit(unsigned sessionID)
 	[autoreleasePool release];
 }
 
-void _XMStartMediaReceiving(unsigned codecType, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID)
+void _XMStartMediaReceiving(XMCodecIdentifier codecIdentifier, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID)
 {
-	[_XMMediaReceiverSharedInstance _startMediaReceivingWithCodec:codecType 
+	[_XMMediaReceiverSharedInstance _startMediaReceivingWithCodec:codecIdentifier
 													  payloadType:payloadType 
 														videoSize:videoSize 
 														  session:sessionID];

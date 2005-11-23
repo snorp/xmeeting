@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.4 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.5 2005/11/23 22:25:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,10 +24,16 @@ extern const char *_XMMediaFormatIdentifier_G711_ALaw;
 #pragma mark Video Media Formats
 
 extern const char *_XMMediaFormatIdentifier_H261;
+extern const char *_XMMediaFormatIdentifier_H263;
+extern const char *_XMMediaFormatIdentifier_H264;
 
 extern const char *_XMMediaFormat_Video;
 extern const char *_XMMediaFormat_H261_QCIF;
 extern const char *_XMMediaFormat_H261_CIF;
+extern const char *_XMMediaFormat_H263_QCIF;
+extern const char *_XMMediaFormat_H263_CIF;
+extern const char *_XMMediaFormat_H264_QCIF;
+extern const char *_XMMediaFormat_H264_CIF;
 
 // definition of the "XMeeting" video formats
 

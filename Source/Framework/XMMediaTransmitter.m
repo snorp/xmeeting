@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.8 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.9 2005/11/23 22:25:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,13 +113,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopGrabbing withComponents:nil];
 }
 
-+ (void)_startTransmittingWithCodec:(int)codecType 
++ (void)_startTransmittingWithCodec:(XMCodecIdentifier)codecIdentifier
 						  videoSize:(XMVideoSize)videoSize 
 				 maxFramesPerSecond:(unsigned)maxFramesPerSecond
 						 maxBitrate:(unsigned)maxBitrate
 							session:(unsigned)sessionID
 {
-	NSNumber *number = [[NSNumber alloc] initWithInt:codecType];
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:codecIdentifier];
 	NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
@@ -512,13 +512,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		return;
 	}
 	
-	int codecCode;
+	XMCodecIdentifier codecIdentifier;
 	XMVideoSize requiredVideoSize;
 	unsigned bitrate;
 	
 	NSData *data = (NSData *)[components objectAtIndex:0];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	codecCode = [number intValue];
+	codecIdentifier = [number unsignedIntValue];
 	
 	data = (NSData *)[components objectAtIndex:1];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -532,7 +532,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	bitrate = [number unsignedIntValue];
 	
-	switch(codecCode)
+	switch(codecIdentifier)
 	{
 		case XMCodecIdentifier_H261:
 			codecType = kH261CodecType;

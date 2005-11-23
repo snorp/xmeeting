@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.8 2005/11/23 22:25:30 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,7 +52,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	videoPacketReassembler = NULL;
 	videoDecompressionSession = NULL;
-	videoCodecType = 0;
+	videoCodecIdentifier = XMCodecIdentifier_UnknownCodec;
 	videoPayloadType = 0;
 	videoMediaSize = XMVideoSize_NoVideo;
 	
@@ -88,7 +88,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 #pragma mark Data Handling Methods
 
-- (void)_startMediaReceivingWithCodec:(unsigned)codecType payloadType:(unsigned)payloadType
+- (void)_startMediaReceivingWithCodec:(XMCodecIdentifier)codecIdentifier payloadType:(unsigned)payloadType
 								 videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID
 {
 	ComponentResult err = noErr;
@@ -99,7 +99,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		NSLog(@"EnterMoviesOnThread failed");
 	}
 	
-	videoCodecType = codecType;
+	videoCodecIdentifier = codecIdentifier;
 	videoPayloadType = payloadType;
 	videoMediaSize = videoSize;
 	
@@ -169,7 +169,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		// timeScale contains the sessionID to be used
 		RTPRssmInitParams initParams;
 		initParams.payloadType = videoPayloadType;
-		initParams.ssrc = videoCodecType;
+		initParams.ssrc = videoCodecIdentifier;
 		initParams.timeScale = sessionID;
 		err = RTPRssmInitialize(videoPacketReassembler, &initParams);
 		if(err != noErr)
@@ -218,7 +218,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
 		CodecType codecType;
 		
-		switch(videoCodecType)
+		switch(videoCodecIdentifier)
 		{
 			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
