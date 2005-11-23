@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.2 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,15 @@
 
 extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
 
+/**
+ * These properties are registered in the AddressBook database and
+ * can be used to query the AddressBook database directly.
+ * (type is kABStringProperty for the HumanReadableCallAddress
+ * and kABDataProperty for the CallAddress property)
+ **/
+extern NSString *XMAddressBookProperty_CallAddress;
+extern NSString *XMAddressBookProperty_HumanReadableCallAddress;
+
 @class ABAddressBook;
 
 @protocol XMAddressBookRecord;
@@ -27,11 +36,11 @@ extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
  * In addition, the search function enables to do a comprehensive search for
  * valid records in the context of the XMeeting framework.
  * A record is considered valid in the context of the XMeeting framework if it
- * contains an XMURL property. Only in this case is the XMeeting framework able
+ * contains an XMAddressResource property. Only in this case is the XMeeting framework able
  * to call this person.
  *
  * When searching the AddressBook database, the firstName, lastName, organizationName
- * and callURL properties are searched for matches. Other properties such as phoneNumbers
+ * and addressResource properties are searched for matches. Other properties such as phoneNumbers
  * are not searched
  **/
 @interface XMAddressBookManager : NSObject {
@@ -43,25 +52,25 @@ extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
 
 /**
  * Returns all records in the AddressBook database, even if they
- * are not valid, e.g do not have any call URL set.
+ * are not valid, e.g do not have any call address set.
  */
 - (NSArray *)records;
 
 /**
  * Returns all records in the AddressBook database which have a
- * call URL set and are therefore valid in the context of the
+ * call address set and are therefore valid in the context of the
  * XMeeting framework
  **/
 - (NSArray *)validRecords;
 
 /**
  * Creates a new record initialized with the parameters as specified and returns it
- * This does NOT add the record to the database, use -addRecord: to do so. All string/url
+ * This does NOT add the record to the database, use -addRecord: to do so. All string
  * values may be nil, but at least one value should not be nil.
  **/
 - (id)createRecordWithFirstName:(NSString *)firstName lastName:(NSString *)lastName
 					companyName:(NSString *)companyName isCompany:(BOOL)isCompany
-						callURL:(XMURL *)callURL;
+					callAddress:(XMAddressResource *)addressResource;
 
 /**
  * Adds the record to the AddressBook database. Returns whether this action
@@ -108,19 +117,19 @@ extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
 - (NSString *)lastName;
 - (NSString *)companyName;
 - (BOOL)isCompany;
-- (XMURL *)callURL;
+- (XMAddressResource *)callAddress;
 
 /**
  * This is the only property that can be changed
  * by the XMeeting framework.
  **/
-- (void)setCallURL:(XMURL *)callURL;
+- (void)setCallAddress:(XMAddressResource *)callAddress;
 
 /**
  * Returns a more human readable representation of the record's
  * call address
  **/
-- (NSString *)humanReadableCallURLRepresentation;
+- (NSString *)humanReadableCallAddress;
 
 /**
  * Returns a string useful for Display. This string takes

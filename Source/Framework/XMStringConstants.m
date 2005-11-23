@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.11 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.12 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,10 +125,8 @@ NSString *XMKey_CodecTypes = @"XMeeting_Types";
 NSString *XMKey_CodecTypeVideoSize = @"XMeeting_VideoSize";
 NSString *XMKey_CodecTypeIdentifier = @"XMeeting_Identifier";
 
-NSString *XMKey_URLType = @"XMeeting_URLType";
-NSString *XMKey_URLAddress = @"XMeeting_Address";
+NSString *XMKey_AddressResourceCallProtocol = @"XMeeting_CallProtocol";
+NSString *XMKey_AddressResourceAddress = @"XMeeting_Address";
+NSString *XMKey_AddressResourceHumanReadableAddress = @"XMeeting_HumanReadableAddress";
 
-#pragma mark Address Book Properties
-
-NSString *XMAddressBookProperty_CallURL = @"XMeeting_URL";
-NSString *XMAddressBookProperty_HumanReadableCallURLRepresentation = @"XMeeting_HumanReadableURLRepresentation";
+NSString *XMKey_GeneralPurposeAddressResource = @"XMeeting_GeneralPurposeAddressResource";

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.5 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -93,9 +93,9 @@
 - (id<XMCallAddressProvider>)provider;
 
 /**
- * Returns the URL associated with this instance
+ * Returns the addressResource associated with this instance
  **/
-- (XMURL *)url;
+- (XMAddressResource *)addressResource;
 
 /**
  * This method should return a string used for display

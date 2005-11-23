@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.6 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -220,7 +220,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		switch(videoCodecType)
 		{
-			case _XMVideoCodec_H261:
+			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
 				break;
 			default:

@@ -10,14 +10,14 @@
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Resources */ = {isa = PBXBuildFile; fileRef = D10AFE9407B3771F00BBC8EA /* XMCallManager.h */; };
+		D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFE9407B3771F00BBC8EA /* XMCallManager.h */; };
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
-		D10AFEB407B3781700BBC8EA /* XMUtils.h in Resources */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
+		D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
 		D10AFEB507B3781700BBC8EA /* XMUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFEB307B3781700BBC8EA /* XMUtils.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
 		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
-		D121C702087D53D80097DEF7 /* XMCircularBuffer.cpp in Resources */ = {isa = PBXBuildFile; fileRef = D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */; };
+		D1296DF509288A7A0077C77F /* psync.h in Headers */ = {isa = PBXBuildFile; fileRef = D1296DF409288A7A0077C77F /* psync.h */; };
 		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D13232EE0906684D00F4D5A7 /* XMLocalAudioVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13232ED0906684D00F4D5A7 /* XMLocalAudioVideoView.m */; };
@@ -29,37 +29,38 @@
 		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
-		D163336507A01BD5003FD9C0 /* XMApplicationController.h in Resources */ = {isa = PBXBuildFile; fileRef = D163336307A01BD5003FD9C0 /* XMApplicationController.h */; };
+		D163336507A01BD5003FD9C0 /* XMApplicationController.h in Headers */ = {isa = PBXBuildFile; fileRef = D163336307A01BD5003FD9C0 /* XMApplicationController.h */; };
 		D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D163336407A01BD5003FD9C0 /* XMApplicationController.m */; };
 		D16333E207A020D9003FD9C0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333E007A020D9003FD9C0 /* AudioToolbox.framework */; };
 		D16333E307A020D9003FD9C0 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333E107A020D9003FD9C0 /* AudioUnit.framework */; };
 		D16333EE07A020FF003FD9C0 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333ED07A020FF003FD9C0 /* CoreAudio.framework */; };
-		D16334CB07A1C036003FD9C0 /* XMBridge.h in Resources */ = {isa = PBXBuildFile; fileRef = D16334C907A1C036003FD9C0 /* XMBridge.h */; };
+		D16334CB07A1C036003FD9C0 /* XMBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D16334C907A1C036003FD9C0 /* XMBridge.h */; };
 		D16334CC07A1C036003FD9C0 /* XMBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D16334CA07A1C036003FD9C0 /* XMBridge.cpp */; };
-		D163350B07A1C576003FD9C0 /* XMOpalManager.h in Resources */ = {isa = PBXBuildFile; fileRef = D163350907A1C576003FD9C0 /* XMOpalManager.h */; };
+		D163350B07A1C576003FD9C0 /* XMOpalManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D163350907A1C576003FD9C0 /* XMOpalManager.h */; };
 		D163350C07A1C576003FD9C0 /* XMOpalManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D163350A07A1C576003FD9C0 /* XMOpalManager.cpp */; };
-		D163365007A456C4003FD9C0 /* XMProcess.h in Resources */ = {isa = PBXBuildFile; fileRef = D163364E07A456C4003FD9C0 /* XMProcess.h */; };
+		D163365007A456C4003FD9C0 /* XMProcess.h in Headers */ = {isa = PBXBuildFile; fileRef = D163364E07A456C4003FD9C0 /* XMProcess.h */; };
 		D163365107A456C4003FD9C0 /* XMProcess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D163364F07A456C4003FD9C0 /* XMProcess.cpp */; };
-		D163381D07A4E739003FD9C0 /* XMPreferences.h in Resources */ = {isa = PBXBuildFile; fileRef = D163381B07A4E739003FD9C0 /* XMPreferences.h */; };
+		D163381D07A4E739003FD9C0 /* XMPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = D163381B07A4E739003FD9C0 /* XMPreferences.h */; };
 		D163381E07A4E739003FD9C0 /* XMPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = D163381C07A4E739003FD9C0 /* XMPreferences.m */; };
-		D163382D07A4E7BC003FD9C0 /* XMTypes.h in Resources */ = {isa = PBXBuildFile; fileRef = D163382C07A4E7BC003FD9C0 /* XMTypes.h */; };
+		D163382D07A4E7BC003FD9C0 /* XMTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = D163382C07A4E7BC003FD9C0 /* XMTypes.h */; };
 		D1639417083E17A500F7FD83 /* DialPadModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1639415083E17A500F7FD83 /* DialPadModule.nib */; };
 		D163941C083E17ED00F7FD83 /* XMDialPadModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D163941B083E17ED00F7FD83 /* XMDialPadModule.m */; };
 		D163945F083E19E300F7FD83 /* StatisticsModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D163945D083E19E300F7FD83 /* StatisticsModule.nib */; };
 		D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639464083E1A0F00F7FD83 /* XMStatisticsModule.m */; };
 		D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */; };
 		D16394C3083E23D600F7FD83 /* CallHistoryModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */; };
-		D16395280840C57A00F7FD83 /* XMURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395270840C57A00F7FD83 /* XMURL.m */; };
-		D166CD6607B2312300BC27A6 /* XMVideoView.h in Resources */ = {isa = PBXBuildFile; fileRef = D166CD6407B2312300BC27A6 /* XMVideoView.h */; };
+		D16395280840C57A00F7FD83 /* XMAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395270840C57A00F7FD83 /* XMAddressResource.m */; };
+		D166CD6607B2312300BC27A6 /* XMVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D166CD6407B2312300BC27A6 /* XMVideoView.h */; };
 		D166CD6707B2312300BC27A6 /* XMVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D166CD6507B2312300BC27A6 /* XMVideoView.m */; };
-		D177D7A107B62C9500BD0172 /* XMCallInfo.h in Resources */ = {isa = PBXBuildFile; fileRef = D177D79F07B62C9500BD0172 /* XMCallInfo.h */; };
+		D177D7A107B62C9500BD0172 /* XMCallInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = D177D79F07B62C9500BD0172 /* XMCallInfo.h */; };
 		D177D7A207B62C9500BD0172 /* XMCallInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D177D7A007B62C9500BD0172 /* XMCallInfo.m */; };
 		D178D51608F58780006E9786 /* XMDummyVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */; };
 		D189803E082411AC007CD286 /* XMCodecDescriptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = D189803D082411AC007CD286 /* XMCodecDescriptions.plist */; };
-		D189805308241F11007CD286 /* XMBooleanCell.h in Resources */ = {isa = PBXBuildFile; fileRef = D189805108241F11007CD286 /* XMBooleanCell.h */; };
+		D189805308241F11007CD286 /* XMBooleanCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D189805108241F11007CD286 /* XMBooleanCell.h */; };
 		D189805408241F11007CD286 /* XMBooleanCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D189805208241F11007CD286 /* XMBooleanCell.m */; };
-		D18BF5F207AFA006000CF993 /* XMCallbackBridge.h in Resources */ = {isa = PBXBuildFile; fileRef = D18BF5F007AFA006000CF993 /* XMCallbackBridge.h */; };
+		D18BF5F207AFA006000CF993 /* XMCallbackBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D18BF5F007AFA006000CF993 /* XMCallbackBridge.h */; };
 		D18BF5F307AFA007000CF993 /* XMCallbackBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D18BF5F107AFA006000CF993 /* XMCallbackBridge.m */; };
+		D19628150924B4C1004892D0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D19628140924B4C1004892D0 /* Security.framework */; };
 		D19714F108F9186100295E05 /* pwlib.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1B6057208F8F7740034B47F /* pwlib.dylib */; };
 		D197152E08F921F900295E05 /* opal.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE10B08F901F0007E4ABE /* opal.dylib */; };
 		D197153308F922C400295E05 /* pwlib.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1B6057208F8F7740034B47F /* pwlib.dylib */; };
@@ -73,17 +74,17 @@
 		D197231608FB157000295E05 /* XMPacketReassembler.c in Sources */ = {isa = PBXBuildFile; fileRef = D197231308FB157000295E05 /* XMPacketReassembler.c */; };
 		D19729B308FBF8A000295E05 /* XMTransmitterMediaPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D19729B208FBF8A000295E05 /* XMTransmitterMediaPatch.cpp */; };
 		D1972B0308FC529C00295E05 /* XMPacketBuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = D1972B0008FC529C00295E05 /* XMPacketBuilder.c */; };
-		D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */; };
+		D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */; };
 		D1A02882081CBCC00018BD11 /* XMPreferencesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02880081CBCC00018BD11 /* XMPreferencesManager.m */; };
-		D1A02895081CBED00018BD11 /* XMLocation.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A02893081CBED00018BD11 /* XMLocation.h */; };
+		D1A02895081CBED00018BD11 /* XMLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02893081CBED00018BD11 /* XMLocation.h */; };
 		D1A02896081CBED00018BD11 /* XMLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02894081CBED00018BD11 /* XMLocation.m */; };
-		D1A02923081CD0700018BD11 /* XMeeting.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A02922081CD0700018BD11 /* XMeeting.h */; };
-		D1A02A77081E40580018BD11 /* XMPreferencesWindowController.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A02A75081E40580018BD11 /* XMPreferencesWindowController.h */; };
+		D1A02923081CD0700018BD11 /* XMeeting.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02922081CD0700018BD11 /* XMeeting.h */; };
+		D1A02A77081E40580018BD11 /* XMPreferencesWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02A75081E40580018BD11 /* XMPreferencesWindowController.h */; };
 		D1A02A78081E40580018BD11 /* XMPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02A76081E40580018BD11 /* XMPreferencesWindowController.m */; };
-		D1A02AB8081E4B8C0018BD11 /* XMPreferencesModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A02AB6081E4B8C0018BD11 /* XMPreferencesModule.h */; };
-		D1A02ADD081E56DB0018BD11 /* XMGeneralPreferencesModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A02ADB081E56DB0018BD11 /* XMGeneralPreferencesModule.h */; };
+		D1A02AB8081E4B8C0018BD11 /* XMPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02AB6081E4B8C0018BD11 /* XMPreferencesModule.h */; };
+		D1A02ADD081E56DB0018BD11 /* XMGeneralPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02ADB081E56DB0018BD11 /* XMGeneralPreferencesModule.h */; };
 		D1A02ADE081E56DB0018BD11 /* XMGeneralPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02ADC081E56DB0018BD11 /* XMGeneralPreferencesModule.m */; };
-		D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */; };
+		D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */; };
 		D1A02AEE081E57040018BD11 /* XMLocationPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */; };
 		D1A02B26081E96D30018BD11 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1A02B24081E96D30018BD11 /* Preferences.nib */; };
 		D1AF73DB084D02C200D50883 /* XMCallAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */; };
@@ -93,13 +94,13 @@
 		D1B06A5D086A9C5E00563EDB /* Microphone.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1B06A5B086A9C5E00563EDB /* Microphone.tiff */; };
 		D1B06A78086AA28A00563EDB /* XMLocalAudioVideoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B06A77086AA28A00563EDB /* XMLocalAudioVideoModule.m */; };
 		D1B409DA0879B42100C9EF33 /* XMSoundChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */; };
-		D1B4CC2A082F4E6800A444E1 /* XMMainWindowController.h in Resources */ = {isa = PBXBuildFile; fileRef = D1B4CC28082F4E6800A444E1 /* XMMainWindowController.h */; };
+		D1B4CC2A082F4E6800A444E1 /* XMMainWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B4CC28082F4E6800A444E1 /* XMMainWindowController.h */; };
 		D1B4CC2B082F4E6800A444E1 /* XMMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B4CC29082F4E6800A444E1 /* XMMainWindowController.m */; };
 		D1B4CC9A082F594C00A444E1 /* MainWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1B4CC98082F594C00A444E1 /* MainWindow.nib */; };
-		D1B4CCA5082F5BA100A444E1 /* XMMainWindowAdditionModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1B4CCA4082F5BA100A444E1 /* XMMainWindowAdditionModule.h */; };
-		D1B4CD9908316DF100A444E1 /* XMMouseOverButton.h in Resources */ = {isa = PBXBuildFile; fileRef = D1B4CD9708316DF100A444E1 /* XMMouseOverButton.h */; };
+		D1B4CCA5082F5BA100A444E1 /* XMMainWindowAdditionModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B4CCA4082F5BA100A444E1 /* XMMainWindowAdditionModule.h */; };
+		D1B4CD9908316DF100A444E1 /* XMMouseOverButton.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B4CD9708316DF100A444E1 /* XMMouseOverButton.h */; };
 		D1B4CD9A08316DF100A444E1 /* XMMouseOverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B4CD9808316DF100A444E1 /* XMMouseOverButton.m */; };
-		D1B4CFD60833911600A444E1 /* XMZeroConfModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1B4CFD40833911600A444E1 /* XMZeroConfModule.h */; };
+		D1B4CFD60833911600A444E1 /* XMZeroConfModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B4CFD40833911600A444E1 /* XMZeroConfModule.h */; };
 		D1B4CFD70833911600A444E1 /* XMZeroConfModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B4CFD50833911600A444E1 /* XMZeroConfModule.m */; };
 		D1B4D0070833937200A444E1 /* ZeroConfModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1B4D0050833937200A444E1 /* ZeroConfModule.nib */; };
 		D1B606C608F8F8410034B47F /* ptbuildopts.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B6062C08F8F8410034B47F /* ptbuildopts.h */; };
@@ -320,7 +321,7 @@
 		D1CEE19E08F9022B007E4ABE /* mcs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12508F9022B007E4ABE /* mcs.h */; };
 		D1CEE19F08F9022B007E4ABE /* t38.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12608F9022B007E4ABE /* t38.h */; };
 		D1CEE1A008F9022B007E4ABE /* x880.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12708F9022B007E4ABE /* x880.h */; };
-		D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12908F9022B007E4ABE /* allcodecs.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12908F9022B007E4ABE /* allcodecs.h */; settings = {ATTRIBUTES = (); }; };
 		D1CEE1A208F9022B007E4ABE /* g711codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12A08F9022B007E4ABE /* g711codec.h */; };
 		D1CEE1A308F9022B007E4ABE /* g726codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12B08F9022B007E4ABE /* g726codec.h */; };
 		D1CEE1A408F9022B007E4ABE /* g729codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12C08F9022B007E4ABE /* g729codec.h */; };
@@ -369,7 +370,7 @@
 		D1CEE1CF08F9022B007E4ABE /* sound.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15D08F9022B007E4ABE /* sound.h */; };
 		D1CEE1D008F9022B007E4ABE /* transmit.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15E08F9022B007E4ABE /* transmit.h */; };
 		D1CEE1D108F9022B007E4ABE /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15F08F9022B007E4ABE /* version.h */; };
-		D1CEE1D208F9022B007E4ABE /* alllids.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16108F9022B007E4ABE /* alllids.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		D1CEE1D208F9022B007E4ABE /* alllids.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16108F9022B007E4ABE /* alllids.h */; settings = {ATTRIBUTES = (); }; };
 		D1CEE1D308F9022B007E4ABE /* ixjDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16208F9022B007E4ABE /* ixjDefs.h */; };
 		D1CEE1D408F9022B007E4ABE /* ixjidb.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16308F9022B007E4ABE /* ixjidb.h */; };
 		D1CEE1D508F9022B007E4ABE /* ixjlid.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16408F9022B007E4ABE /* ixjlid.h */; };
@@ -462,7 +463,7 @@
 		D1CEE3AC08F90263007E4ABE /* gsmcodec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25608F90262007E4ABE /* gsmcodec.cxx */; };
 		D1CEE3AD08F90263007E4ABE /* h261codec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25708F90262007E4ABE /* h261codec.cxx */; };
 		D1CEE3AE08F90263007E4ABE /* anaFilter.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25908F90262007E4ABE /* anaFilter.c */; };
-		D1CEE3AF08F90263007E4ABE /* anaFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25A08F90262007E4ABE /* anaFilter.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		D1CEE3AF08F90263007E4ABE /* anaFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25A08F90262007E4ABE /* anaFilter.h */; settings = {ATTRIBUTES = (); }; };
 		D1CEE3B008F90263007E4ABE /* constants.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25B08F90262007E4ABE /* constants.c */; };
 		D1CEE3B108F90263007E4ABE /* constants.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25C08F90262007E4ABE /* constants.h */; };
 		D1CEE3B208F90263007E4ABE /* createCB.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25D08F90262007E4ABE /* createCB.c */; };
@@ -655,14 +656,14 @@
 		D1CEE48F08F90263007E4ABE /* transcoders.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35308F90263007E4ABE /* transcoders.cxx */; };
 		D1CEE49208F90263007E4ABE /* jitter.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35708F90263007E4ABE /* jitter.cxx */; };
 		D1CEE49308F90263007E4ABE /* rtp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35808F90263007E4ABE /* rtp.cxx */; };
-		D1D63D3707AA9A8800F1FB74 /* XMAudioManager.h in Resources */ = {isa = PBXBuildFile; fileRef = D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */; };
+		D1D63D3707AA9A8800F1FB74 /* XMAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */; };
 		D1D63D3807AA9A8800F1FB74 /* XMAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3607AA9A8800F1FB74 /* XMAudioManager.m */; };
-		D1D63D3F07AA9A9F00F1FB74 /* XMVideoManager.h in Resources */ = {isa = PBXBuildFile; fileRef = D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */; };
+		D1D63D3F07AA9A9F00F1FB74 /* XMVideoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */; };
 		D1D63D4007AA9A9F00F1FB74 /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
-		D1D63D4507AA9B2B00F1FB74 /* XMCodecManager.h in Resources */ = {isa = PBXBuildFile; fileRef = D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */; };
+		D1D63D4507AA9B2B00F1FB74 /* XMCodecManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */; };
 		D1D63D4607AA9B2B00F1FB74 /* XMCodecManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */; };
 		D1D9A46D08519C9200445833 /* XMStringConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D9A46C08519C9200445833 /* XMStringConstants.m */; };
-		D1DE52EF07C6474100343A8D /* XMH323EndPoint.h in Resources */ = {isa = PBXBuildFile; fileRef = D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */; };
+		D1DE52EF07C6474100343A8D /* XMH323EndPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */; };
 		D1DE52F007C6474100343A8D /* XMH323EndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */; };
 		D1E2DA1008F470D700BE224E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D1E2DA1608F470F200BE224E /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA1508F470F200BE224E /* QuickTime.framework */; };
@@ -675,14 +676,14 @@
 		D1EB18F00843DEC9002CEF53 /* CallHistory.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */; };
 		D1EB19360843E47F002CEF53 /* Window.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB19350843E47F002CEF53 /* Window.tiff */; };
 		D1ECCBF30833DDAD008EBAE3 /* TextChatModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */; };
-		D1ECCBF80833DDD5008EBAE3 /* XMTextChatModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCBF60833DDD5008EBAE3 /* XMTextChatModule.h */; };
+		D1ECCBF80833DDD5008EBAE3 /* XMTextChatModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCBF60833DDD5008EBAE3 /* XMTextChatModule.h */; };
 		D1ECCBF90833DDD5008EBAE3 /* XMTextChatModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCBF70833DDD5008EBAE3 /* XMTextChatModule.m */; };
-		D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD0308348C4E008EBAE3 /* XMMainWindowModule.h */; };
+		D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCD0308348C4E008EBAE3 /* XMMainWindowModule.h */; };
 		D1ECCD180834911C008EBAE3 /* InCallModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD160834911C008EBAE3 /* InCallModule.nib */; };
 		D1ECCD30083491EB008EBAE3 /* NoCallModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD2E083491EB008EBAE3 /* NoCallModule.nib */; };
-		D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD330834923D008EBAE3 /* XMNoCallModule.h */; };
+		D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCD330834923D008EBAE3 /* XMNoCallModule.h */; };
 		D1ECCD360834923D008EBAE3 /* XMNoCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */; };
-		D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD3908349255008EBAE3 /* XMInCallModule.h */; };
+		D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCD3908349255008EBAE3 /* XMInCallModule.h */; };
 		D1ECCD3C08349255008EBAE3 /* XMInCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */; };
 		D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068D091756FA008A8974 /* XMAddressBookManager.m */; };
 		D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068F091756FA008A8974 /* XMAddressBookRecordSearchMatch.m */; };
@@ -690,9 +691,9 @@
 		D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1EF07510918B212008A8974 /* SetupAssistant.nib */; };
 		D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */; };
 		D1F61479086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */; };
-		D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */; };
-		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressURL.m */; };
-		D1FE29CF07AFF4FB004337C9 /* XMPrivate.h in Resources */ = {isa = PBXBuildFile; fileRef = D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */; };
+		D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */; };
+		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */; };
+		D1FE29CF07AFF4FB004337C9 /* XMPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */; };
 		D1FE4EC608ED55F900AAFF98 /* XMMediaTransmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */; };
 		D1FE53F908F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */; };
 /* End PBXBuildFile section */
@@ -771,6 +772,7 @@
 		D1152F73084C61730057CA9D /* DefaultURL.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL.tiff; path = Resources/Images/DefaultURL.tiff; sourceTree = "<group>"; };
 		D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMCircularBuffer.cpp; path = Source/Framework/XMCircularBuffer.cpp; sourceTree = "<group>"; };
 		D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMCircularBuffer.h; path = Source/Framework/XMCircularBuffer.h; sourceTree = "<group>"; };
+		D1296DF409288A7A0077C77F /* psync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = psync.h; sourceTree = "<group>"; };
 		D132319E090526B700F4D5A7 /* HeadsetCam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HeadsetCam.tiff; path = Resources/Images/HeadsetCam.tiff; sourceTree = "<group>"; };
 		D13231CF09052FC500F4D5A7 /* Cam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Cam.tiff; path = Resources/Images/Cam.tiff; sourceTree = "<group>"; };
 		D13232EC0906684D00F4D5A7 /* XMLocalAudioVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocalAudioVideoView.h; path = Source/GUI/XMLocalAudioVideoView.h; sourceTree = "<group>"; };
@@ -813,8 +815,8 @@
 		D1639478083E234D00F7FD83 /* XMCallHistoryModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallHistoryModule.h; path = Source/GUI/XMCallHistoryModule.h; sourceTree = "<group>"; };
 		D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallHistoryModule.m; path = Source/GUI/XMCallHistoryModule.m; sourceTree = "<group>"; };
 		D16394C2083E23D600F7FD83 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CallHistoryModule.nib; sourceTree = "<group>"; };
-		D16395260840C57A00F7FD83 /* XMURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMURL.h; path = Source/Framework/XMURL.h; sourceTree = "<group>"; };
-		D16395270840C57A00F7FD83 /* XMURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMURL.m; path = Source/Framework/XMURL.m; sourceTree = "<group>"; };
+		D16395260840C57A00F7FD83 /* XMAddressResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressResource.h; path = Source/Framework/XMAddressResource.h; sourceTree = "<group>"; };
+		D16395270840C57A00F7FD83 /* XMAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressResource.m; path = Source/Framework/XMAddressResource.m; sourceTree = "<group>"; };
 		D16395600841B4E100F7FD83 /* XMCalltoURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCalltoURL.h; path = Source/Framework/XMCalltoURL.h; sourceTree = "<group>"; };
 		D16395610841B4E100F7FD83 /* XMCalltoURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCalltoURL.m; path = Source/Framework/XMCalltoURL.m; sourceTree = "<group>"; };
 		D166CD6407B2312300BC27A6 /* XMVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoView.h; path = Source/Framework/XMVideoView.h; sourceTree = "<group>"; };
@@ -828,6 +830,7 @@
 		D189805208241F11007CD286 /* XMBooleanCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMBooleanCell.m; path = Source/GUI/XMBooleanCell.m; sourceTree = "<group>"; };
 		D18BF5F007AFA006000CF993 /* XMCallbackBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallbackBridge.h; path = Source/Framework/XMCallbackBridge.h; sourceTree = "<group>"; };
 		D18BF5F107AFA006000CF993 /* XMCallbackBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallbackBridge.m; path = Source/Framework/XMCallbackBridge.m; sourceTree = "<group>"; };
+		D19628140924B4C1004892D0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		D197179308F94A6000295E05 /* XMOpalDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMOpalDispatcher.h; path = Source/Framework/XMOpalDispatcher.h; sourceTree = "<group>"; };
 		D197179408F94A6000295E05 /* XMOpalDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMOpalDispatcher.m; path = Source/Framework/XMOpalDispatcher.m; sourceTree = "<group>"; };
 		D1971A5D08FA453F00295E05 /* XMMediaFormats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMMediaFormats.h; path = Source/Framework/XMMediaFormats.h; sourceTree = "<group>"; };
@@ -1489,10 +1492,10 @@
 		D1F6067B08BBC5FC0005E9A0 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/LocalAudioVideoModule.nib; sourceTree = "<group>"; };
 		D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesCodecListRecord.h; path = Source/Framework/XMPreferencesCodecListRecord.h; sourceTree = "<group>"; };
 		D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesCodecListRecord.m; path = Source/Framework/XMPreferencesCodecListRecord.m; sourceTree = "<group>"; };
-		D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMGeneralPurposeURL.h; path = Source/Framework/XMGeneralPurposeURL.h; sourceTree = "<group>"; };
-		D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMGeneralPurposeURL.m; path = Source/Framework/XMGeneralPurposeURL.m; sourceTree = "<group>"; };
-		D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleAddressURL.h; path = Source/Application/XMSimpleAddressURL.h; sourceTree = "<group>"; };
-		D1F61AA008706A6900FDD4F0 /* XMSimpleAddressURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleAddressURL.m; path = Source/Application/XMSimpleAddressURL.m; sourceTree = "<group>"; };
+		D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMGeneralPurposeAddressResource.h; path = Source/Framework/XMGeneralPurposeAddressResource.h; sourceTree = "<group>"; };
+		D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMGeneralPurposeAddressResource.m; path = Source/Framework/XMGeneralPurposeAddressResource.m; sourceTree = "<group>"; };
+		D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleAddressResource.h; path = Source/Application/XMSimpleAddressResource.h; sourceTree = "<group>"; };
+		D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleAddressResource.m; path = Source/Application/XMSimpleAddressResource.m; sourceTree = "<group>"; };
 		D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPrivate.h; path = Source/Framework/XMPrivate.h; sourceTree = "<group>"; };
 		D1FE4EC408ED55F900AAFF98 /* XMMediaTransmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMMediaTransmitter.h; path = Source/Framework/XMMediaTransmitter.h; sourceTree = "<group>"; };
 		D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMMediaTransmitter.m; path = Source/Framework/XMMediaTransmitter.m; sourceTree = "<group>"; };
@@ -1515,6 +1518,7 @@
 				D197152E08F921F900295E05 /* opal.dylib in Frameworks */,
 				D197153308F922C400295E05 /* pwlib.dylib in Frameworks */,
 				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
+				D19628150924B4C1004892D0 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1560,6 +1564,7 @@
 				D1E2DA1508F470F200BE224E /* QuickTime.framework */,
 				D1E2DB8808F4720A00BE224E /* QuartzCore.framework */,
 				D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */,
+				D19628140924B4C1004892D0 /* Security.framework */,
 				D16333ED07A020FF003FD9C0 /* CoreAudio.framework */,
 				D16333E007A020D9003FD9C0 /* AudioToolbox.framework */,
 				D16333E107A020D9003FD9C0 /* AudioUnit.framework */,
@@ -1664,10 +1669,10 @@
 				D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */,
 				D166CD6407B2312300BC27A6 /* XMVideoView.h */,
 				D166CD6507B2312300BC27A6 /* XMVideoView.m */,
-				D16395260840C57A00F7FD83 /* XMURL.h */,
-				D16395270840C57A00F7FD83 /* XMURL.m */,
-				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeURL.h */,
-				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeURL.m */,
+				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
+				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
+				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
+				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */,
 				D16395600841B4E100F7FD83 /* XMCalltoURL.h */,
 				D16395610841B4E100F7FD83 /* XMCalltoURL.m */,
 				D197179308F94A6000295E05 /* XMOpalDispatcher.h */,
@@ -1794,8 +1799,8 @@
 				D163336407A01BD5003FD9C0 /* XMApplicationController.m */,
 				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
 				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
-				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressURL.h */,
-				D1F61AA008706A6900FDD4F0 /* XMSimpleAddressURL.m */,
+				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */,
+				D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */,
 				D1EF068C091756FA008A8974 /* XMAddressBookManager.h */,
 				D1EF068D091756FA008A8974 /* XMAddressBookManager.m */,
 				D1EF068E091756FA008A8974 /* XMAddressBookRecordSearchMatch.h */,
@@ -1984,6 +1989,7 @@
 				D1B6067F08F8F8410034B47F /* pprocess.h */,
 				D1B6068008F8F8410034B47F /* psharedptr.h */,
 				D1B6068108F8F8410034B47F /* pstring.h */,
+				D1296DF409288A7A0077C77F /* psync.h */,
 				D1B6068208F8F8410034B47F /* ptime.h */,
 				D1B6068308F8F8410034B47F /* qos.h */,
 				D1B6068408F8F8410034B47F /* remconn.h */,
@@ -2805,6 +2811,45 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		D19628BD0924B6BF004892D0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D163336507A01BD5003FD9C0 /* XMApplicationController.h in Headers */,
+				D16334CB07A1C036003FD9C0 /* XMBridge.h in Headers */,
+				D163350B07A1C576003FD9C0 /* XMOpalManager.h in Headers */,
+				D163365007A456C4003FD9C0 /* XMProcess.h in Headers */,
+				D163381D07A4E739003FD9C0 /* XMPreferences.h in Headers */,
+				D163382D07A4E7BC003FD9C0 /* XMTypes.h in Headers */,
+				D1D63D3707AA9A8800F1FB74 /* XMAudioManager.h in Headers */,
+				D1D63D3F07AA9A9F00F1FB74 /* XMVideoManager.h in Headers */,
+				D1D63D4507AA9B2B00F1FB74 /* XMCodecManager.h in Headers */,
+				D18BF5F207AFA006000CF993 /* XMCallbackBridge.h in Headers */,
+				D1FE29CF07AFF4FB004337C9 /* XMPrivate.h in Headers */,
+				D166CD6607B2312300BC27A6 /* XMVideoView.h in Headers */,
+				D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Headers */,
+				D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */,
+				D177D7A107B62C9500BD0172 /* XMCallInfo.h in Headers */,
+				D189805308241F11007CD286 /* XMBooleanCell.h in Headers */,
+				D1B4CC2A082F4E6800A444E1 /* XMMainWindowController.h in Headers */,
+				D1DE52EF07C6474100343A8D /* XMH323EndPoint.h in Headers */,
+				D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Headers */,
+				D1B4CCA5082F5BA100A444E1 /* XMMainWindowAdditionModule.h in Headers */,
+				D1B4CD9908316DF100A444E1 /* XMMouseOverButton.h in Headers */,
+				D1B4CFD60833911600A444E1 /* XMZeroConfModule.h in Headers */,
+				D1A02895081CBED00018BD11 /* XMLocation.h in Headers */,
+				D1A02923081CD0700018BD11 /* XMeeting.h in Headers */,
+				D1A02A77081E40580018BD11 /* XMPreferencesWindowController.h in Headers */,
+				D1A02AB8081E4B8C0018BD11 /* XMPreferencesModule.h in Headers */,
+				D1A02ADD081E56DB0018BD11 /* XMGeneralPreferencesModule.h in Headers */,
+				D1ECCBF80833DDD5008EBAE3 /* XMTextChatModule.h in Headers */,
+				D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Headers */,
+				D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Headers */,
+				D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Headers */,
+				D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D1B6056E08F8F7740034B47F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2956,6 +3001,7 @@
 				D1B6075708F8F8420034B47F /* ptlib.h in Headers */,
 				D1B6082808F8F86C0034B47F /* udp.h in Headers */,
 				D1B6088108F8F86D0034B47F /* uerror.h in Headers */,
+				D1296DF509288A7A0077C77F /* psync.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3147,6 +3193,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D11E93F108589A9200154C02 /* Build configuration list for PBXNativeTarget "XMeeting" */;
 			buildPhases = (
+				D19628BD0924B6BF004892D0 /* Headers */,
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
@@ -3307,45 +3354,13 @@
 			files = (
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				D163336507A01BD5003FD9C0 /* XMApplicationController.h in Resources */,
-				D16334CB07A1C036003FD9C0 /* XMBridge.h in Resources */,
-				D163350B07A1C576003FD9C0 /* XMOpalManager.h in Resources */,
-				D163365007A456C4003FD9C0 /* XMProcess.h in Resources */,
-				D163381D07A4E739003FD9C0 /* XMPreferences.h in Resources */,
-				D163382D07A4E7BC003FD9C0 /* XMTypes.h in Resources */,
-				D1D63D3707AA9A8800F1FB74 /* XMAudioManager.h in Resources */,
-				D1D63D3F07AA9A9F00F1FB74 /* XMVideoManager.h in Resources */,
-				D1D63D4507AA9B2B00F1FB74 /* XMCodecManager.h in Resources */,
-				D18BF5F207AFA006000CF993 /* XMCallbackBridge.h in Resources */,
-				D1FE29CF07AFF4FB004337C9 /* XMPrivate.h in Resources */,
-				D166CD6607B2312300BC27A6 /* XMVideoView.h in Resources */,
-				D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Resources */,
-				D10AFEB407B3781700BBC8EA /* XMUtils.h in Resources */,
-				D177D7A107B62C9500BD0172 /* XMCallInfo.h in Resources */,
-				D1DE52EF07C6474100343A8D /* XMH323EndPoint.h in Resources */,
-				D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Resources */,
-				D1A02895081CBED00018BD11 /* XMLocation.h in Resources */,
-				D1A02923081CD0700018BD11 /* XMeeting.h in Resources */,
-				D1A02A77081E40580018BD11 /* XMPreferencesWindowController.h in Resources */,
-				D1A02AB8081E4B8C0018BD11 /* XMPreferencesModule.h in Resources */,
-				D1A02ADD081E56DB0018BD11 /* XMGeneralPreferencesModule.h in Resources */,
-				D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Resources */,
 				D1A02B26081E96D30018BD11 /* Preferences.nib in Resources */,
 				D189803E082411AC007CD286 /* XMCodecDescriptions.plist in Resources */,
-				D189805308241F11007CD286 /* XMBooleanCell.h in Resources */,
-				D1B4CC2A082F4E6800A444E1 /* XMMainWindowController.h in Resources */,
 				D1B4CC9A082F594C00A444E1 /* MainWindow.nib in Resources */,
-				D1B4CCA5082F5BA100A444E1 /* XMMainWindowAdditionModule.h in Resources */,
-				D1B4CD9908316DF100A444E1 /* XMMouseOverButton.h in Resources */,
-				D1B4CFD60833911600A444E1 /* XMZeroConfModule.h in Resources */,
 				D1B4D0070833937200A444E1 /* ZeroConfModule.nib in Resources */,
 				D1ECCBF30833DDAD008EBAE3 /* TextChatModule.nib in Resources */,
-				D1ECCBF80833DDD5008EBAE3 /* XMTextChatModule.h in Resources */,
-				D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Resources */,
 				D1ECCD180834911C008EBAE3 /* InCallModule.nib in Resources */,
 				D1ECCD30083491EB008EBAE3 /* NoCallModule.nib in Resources */,
-				D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Resources */,
-				D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Resources */,
 				D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */,
 				D1639417083E17A500F7FD83 /* DialPadModule.nib in Resources */,
 				D163945F083E19E300F7FD83 /* StatisticsModule.nib in Resources */,
@@ -3360,7 +3375,6 @@
 				D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */,
 				D1B06A5C086A9C5E00563EDB /* Loudspeaker.tiff in Resources */,
 				D1B06A5D086A9C5E00563EDB /* Microphone.tiff in Resources */,
-				D121C702087D53D80097DEF7 /* XMCircularBuffer.cpp in Resources */,
 				D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */,
 				D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */,
 				D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */,
@@ -3406,7 +3420,7 @@
 				D163941C083E17ED00F7FD83 /* XMDialPadModule.m in Sources */,
 				D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */,
 				D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */,
-				D16395280840C57A00F7FD83 /* XMURL.m in Sources */,
+				D16395280840C57A00F7FD83 /* XMAddressResource.m in Sources */,
 				D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */,
 				D1AF73DB084D02C200D50883 /* XMCallAddressManager.m in Sources */,
 				D1AF744D084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m in Sources */,
@@ -3418,8 +3432,8 @@
 				D1BA7666086BEC5E007E6CEC /* XMCallHistoryRecord.m in Sources */,
 				D1BA776C086CB1E3007E6CEC /* XMCodec.m in Sources */,
 				D1F61479086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m in Sources */,
-				D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeURL.m in Sources */,
-				D1F61AA108706A6900FDD4F0 /* XMSimpleAddressURL.m in Sources */,
+				D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m in Sources */,
+				D1F61AA108706A6900FDD4F0 /* XMSimpleAddressResource.m in Sources */,
 				D1B409DA0879B42100C9EF33 /* XMSoundChannel.cpp in Sources */,
 				D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */,
 				D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */,
@@ -4011,6 +4025,7 @@
 				HEADER_SEARCH_PATHS = ../pwlib/include;
 				INSTALL_PATH = "";
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4050,6 +4065,7 @@
 				HEADER_SEARCH_PATHS = ../pwlib/include;
 				INSTALL_PATH = "";
 				LIBRARY_STYLE = STATIC;
+				MACH_O_TYPE = staticlib;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4089,6 +4105,7 @@
 				HEADER_SEARCH_PATHS = ../pwlib/include;
 				INSTALL_PATH = "";
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4129,6 +4146,7 @@
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4165,6 +4183,7 @@
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				LIBRARY_STYLE = STATIC;
+				MACH_O_TYPE = staticlib;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4201,6 +4220,7 @@
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
@@ -4246,6 +4266,7 @@
 				D1B6057A08F8F7A20034B47F /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
 		};
 		D1CEE1F708F9022C007E4ABE /* Build configuration list for PBXNativeTarget "opal" */ = {
 			isa = XCConfigurationList;
@@ -4255,6 +4276,7 @@
 				D1CEE1FA08F9022C007E4ABE /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
 		};
 /* End XCConfigurationList section */
 	};

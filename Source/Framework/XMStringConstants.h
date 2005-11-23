@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.12 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.13 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -252,20 +252,10 @@ extern NSString *XMKey_CodecName;
 extern NSString *XMKey_CodecBandwidth;
 extern NSString *XMKey_CodecQuality;
 
-#pragma mark XMURL and subclasses keys
+#pragma mark XMAddressResource and subclasses keys
 
-extern NSString *XMKey_URLType;
-extern NSString *XMKey_URLAddress;
-
-#pragma mark AddressBook Properties
-
-/**
- * These properties are registered in the AddressBook database and
- * can be used to query the AddressBook database directly.
- * (type is kABStringProperty for the HumanReadableURLRepresentation
- * and kABDataProperty for the URL property)
- **/
-extern NSString *XMAddressBookProperty_CallURL;
-extern NSString *XMAddressBookProperty_HumanReadableCallURLRepresentation;
+extern NSString *XMKey_AddressResourceCallProtocol;
+extern NSString *XMKey_AddressResourceAddress;
+extern NSString *XMKey_AddressResourceHumanReadableAddress;
 
 #endif // __XM_STRING_CONSTANTS_H__

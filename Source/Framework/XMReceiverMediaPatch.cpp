@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.4 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.5 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,19 +82,19 @@ void XMReceiverMediaPatch::Main()
 				
 				if(didStartMediaReceiver == FALSE)
 				{
-					unsigned codecType;
+					int codecType;
 					XMVideoSize mediaSize;
 					
 					OpalMediaFormat mediaFormat = source.GetMediaFormat();
 					
 					if(mediaFormat == XM_MEDIA_FORMAT_H261_QCIF)
 					{
-						codecType = _XMVideoCodec_H261;
+						codecType = XMCodecIdentifier_H261;
 						mediaSize = XMVideoSize_QCIF;
 					}
 					else if(mediaFormat == XM_MEDIA_FORMAT_H261_CIF)
 					{
-						codecType = _XMVideoCodec_H261;
+						codecType = XMCodecIdentifier_H261;
 						mediaSize = XMVideoSize_CIF;
 					}
 					

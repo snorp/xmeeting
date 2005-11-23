@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.5 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -80,7 +80,7 @@ void XMTransmitterMediaPatch::Resume()
 			}
 			
 		}
-		_XMStartMediaTransmit(_XMVideoCodec_H261, XMVideoSize_CIF, maxFramesPerSecond, maxBitrate, 2);
+		_XMStartMediaTransmit(XMCodecIdentifier_H261, XMVideoSize_CIF, maxFramesPerSecond, maxBitrate, 2);
 	}
 	else
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.h,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.h,v 1.2 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMeeting.h"
-#import "XMSimpleAddressURL.h"
+#import "XMSimpleAddressResource.h"
 
 /**
  * GeneralRecord defines a record nowhere else present
@@ -34,10 +34,10 @@ typedef enum XMCallHistoryRecordType
  * in the meantime, we should still be able to call the
  * address, without the AddressBook's name though. In
  * addition, if we are called from someone, we know the name
- * of the remote party as well, and we want to be able to
+ * of the remote party, and we want to be able to
  * store this information as well.
  **/
-@interface XMCallHistoryRecord : XMSimpleAddressURL {
+@interface XMCallHistoryRecord : XMSimpleAddressResource {
 	
 	NSString *displayString;
 	id addressBookRecord;

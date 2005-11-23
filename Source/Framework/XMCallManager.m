@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.5 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,7 +15,7 @@
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
-#import "XMURL.h"
+#import "XMAddressResource.h"
 #import "XMBridge.h"
 
 #define XM_H323_NOT_LISTENING 0
@@ -32,8 +32,8 @@
 - (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferences;
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
 
-- (void)_initiateCall:(XMURL *)url;
-- (void)_initiateSpecificCall:(XMGeneralPurposeURL *)url;
+- (void)_initiateCall:(XMAddressResource *)addressResource;
+- (void)_initiateSpecificCall:(XMGeneralPurposeAddressResource *)addressResource;
 
 - (void)_storeCall:(XMCallInfo *)callInfo;
 
@@ -191,7 +191,7 @@
 	return activeCall;
 }
 
-- (void)callURL:(XMURL *)remotePartyURL;
+- (void)makeCall:(XMAddressResource *)addressResource;
 {	
 	// invalid action checks
 	if(callManagerStatus != XM_CALL_MANAGER_READY)
@@ -200,17 +200,17 @@
 		return;
 	}
 	
-	if([remotePartyURL isKindOfClass:[XMGeneralPurposeURL class]])
+	if([addressResource isKindOfClass:[XMGeneralPurposeAddressResource class]])
 	{
-		XMGeneralPurposeURL *url = (XMGeneralPurposeURL *)remotePartyURL;
+		XMGeneralPurposeAddressResource *resource = (XMGeneralPurposeAddressResource *)addressResource;
 		
-		if([url _doesModifyPreferences:activePreferences])
+		if([resource _doesModifyPreferences:activePreferences])
 		{
-			[self _initiateSpecificCall:url];
+			[self _initiateSpecificCall:resource];
 		}
 	}
 	
-	[self _initiateCall:remotePartyURL];
+	[self _initiateCall:addressResource];
 }
 
 - (XMCallStartFailReason)callStartFailReason
@@ -702,10 +702,10 @@
 														object:self];
 }
 
-- (void)_initiateCall:(XMURL *)url
+- (void)_initiateCall:(XMAddressResource *)addressResource
 {
-	XMCallProtocol callProtocol = [url callProtocol];
-	NSString *address = [url address];
+	XMCallProtocol callProtocol = [addressResource callProtocol];
+	NSString *address = [addressResource address];
 	
 	// checking if the protocol is enabled. It may also be that the enabling failed for some reason!
 	if((callProtocol == XMCallProtocol_H323) && (h323ListeningStatus != XM_H323_LISTENING))
@@ -727,16 +727,16 @@
 	[XMOpalDispatcher _initiateCallToAddress:address protocol:callProtocol];
 }
 
-- (void)_initiateSpecificCall:(XMGeneralPurposeURL *)url
+- (void)_initiateSpecificCall:(XMGeneralPurposeAddressResource *)addressResource
 {
 	// In this case, we have to modify the subsystem before continuing
 	// to make the call. This is "specific calling" since the call
 	// is initated with a specific set of preferences
 	XMPreferences *modifiedPreferences = [activePreferences copy];
-	[url _modifyPreferences:modifiedPreferences];
+	[addressResource _modifyPreferences:modifiedPreferences];
 
-	XMCallProtocol callProtocol = [url callProtocol];
-	NSString *address = [url address];
+	XMCallProtocol callProtocol = [addressResource callProtocol];
+	NSString *address = [addressResource address];
 	
 	//Detection of call start failure conditions
 	if(callProtocol == XMCallProtocol_H323 && [modifiedPreferences enableH323] == NO)
@@ -754,8 +754,8 @@
 	else if(callProtocol == XMCallProtocol_H323 && 
 			[activePreferences useGatekeeper] == NO && 
 			[modifiedPreferences useGatekeeper] == YES &&
-			[url valueForKey:XMKey_PreferencesGatekeeperAddress] == nil &&
-			[url valueForKey:XMKey_PreferencesGatekeeperID] == nil)
+			[addressResource valueForKey:XMKey_PreferencesGatekeeperAddress] == nil &&
+			[addressResource valueForKey:XMKey_PreferencesGatekeeperID] == nil)
 	{
 		callStartFailReason = XMCallStartFailReason_GatekeeperUsedButNotSpecified;
 		

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.12 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.13 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,15 +68,10 @@ void _XMHandleMediaStreamClosed(unsigned callID, bool isIncomingStream, const ch
 
 #pragma mark MediaTransmitter & MediaReceiver callbacks
 
-enum
-{
-	_XMVideoCodec_H261 = 1
-};
-
 /**
  * Instructs the MediaTransmitter to start sending video data
  **/
-void _XMStartMediaTransmit(unsigned codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
+void _XMStartMediaTransmit(int codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
 						   unsigned maxBitrate, unsigned sessionID);
 
 /**

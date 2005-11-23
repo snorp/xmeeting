@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecordSearchMatch.m,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMAddressBookRecordSearchMatch.m,v 1.2 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,9 +51,9 @@
 	return [XMAddressBookCallAddressProvider sharedInstance];
 }
 
-- (XMURL *)url
+- (XMAddressResource *)addressResource
 {
-	return [[self record] callURL];
+	return (XMAddressResource *)[[self record] callAddress];
 }
 
 - (NSString *)displayString

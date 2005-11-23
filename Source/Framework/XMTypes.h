@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.12 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.13 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -144,26 +144,26 @@ typedef enum XMVideoSize
 /**
  * Defines the various types of URL's that the XMeeting framework understands
  **/
-typedef enum XMURLType
+/*typedef enum XMURLType
 {
 	XMURLType_GeneralPurposeURL = 0,
 	XMURLType_H323URL,
 	XMURLType_CalltoURL,
 	XMURLTypeCount
-} XMURLType;
+} XMURLType;*/
 
 /**
  * Defines the types of connection an XMCalltoURL instance can implement
  **/
-typedef enum XMCalltoURLType
+/*/typedef enum XMCalltoURLType
 {
 	XMCalltoURLType_Unknown = 0,
 	XMCalltoURLType_Direct,
 	XMCalltoURLType_Gatekeeper,
-	XMCalltoURLType_Directory,	/* not supported */
-	XMCalltoURLType_Gateway,	/* not supported */
+	XMCalltoURLType_Directory,	// not supported
+	XMCalltoURLType_Gateway,	// not supported
 	XMCalltoURLTypeCount
-} XMCalltoURLType;
+} XMCalltoURLType;*/
 
 #pragma mark Structs
 

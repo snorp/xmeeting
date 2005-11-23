@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.h,v 1.5 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMAddressBookModule.h,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 #import "XMAddressBookManager.h"
 #import "XMMainWindowAdditionModule.h"
 
-@class ABPeoplePickerView, ABPerson, XMGeneralPurposeURL;
+@class ABPeoplePickerView, ABPerson, XMGeneralPurposeAddressResource;
 
 @interface XMAddressBookModule : NSObject <XMMainWindowAdditionModule> {
 
@@ -54,13 +54,13 @@
 	IBOutlet NSButton *isOrganizationSwitch;
 	
 	ABPerson<XMAddressBookRecord> *editedRecord;
-	XMGeneralPurposeURL *editedURL;
+	XMGeneralPurposeAddressResource *editedAddress;
 	
 	NSNib *nibLoader;
 }
 
 - (IBAction)call:(id)sender;
-- (IBAction)editURL:(id)sender;
+- (IBAction)editAddress:(id)sender;
 - (IBAction)newRecord:(id)sender;
 - (IBAction)launchAddressBook:(id)sender;
 

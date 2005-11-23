@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.5 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -106,7 +106,7 @@
 		// to be entered. (not e.g. "callAddress" (displayName)". This eases the check
 		// since we only have to check wether uncompletedString is a Prefix to the
 		// call address.
-		NSString *callAddress = [record humanReadableCallURLRepresentation];
+		NSString *callAddress = [record humanReadableCallAddress];
 		if(![callAddress hasPrefix:uncompletedString])
 		{
 			// since uncompletedString is not a prefix to the callAddress, this record is
@@ -127,7 +127,7 @@
 		{
 			return nil;
 		}
-		NSString *callAddress = [record humanReadableCallURLRepresentation];
+		NSString *callAddress = [record humanReadableCallAddress];
 		return [NSString stringWithFormat:@"%@ <%@>", companyName, callAddress];
 	}
 	else
@@ -185,7 +185,7 @@
 				}
 			}
 			
-			NSString *callAddress = [record humanReadableCallURLRepresentation];
+			NSString *callAddress = [record humanReadableCallAddress];
 			return [NSString stringWithFormat:@"%@ <%@>", displayName, callAddress];
 		}
 	}

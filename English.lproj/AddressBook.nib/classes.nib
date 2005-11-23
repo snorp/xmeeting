@@ -12,7 +12,7 @@
                 call = id; 
                 callTypeSelected = id; 
                 cancelNewRecord = id; 
-                editURL = id; 
+                editAddress = id; 
                 endEditRecordSheet = id; 
                 gatekeeperTypeChanged = id; 
                 launchAddressBook = id; 

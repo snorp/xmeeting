@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassembler.c,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMPacketReassembler.c,v 1.4 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,11 +104,11 @@ ComponentResult XMPacketReassembler_Target(XMPacketReassemblerGlobals globals,
 ComponentResult XMPacketReassembler_Initialize(XMPacketReassemblerGlobals globals,
 											   RTPRssmInitParams *inInitParams)
 {	
-	unsigned codecType = inInitParams->ssrc;
+	int codecType = inInitParams->ssrc;
 	
 	switch(codecType)
 	{
-		case _XMVideoCodec_H261:
+		case XMCodecIdentifier_H261:
 			globals->codecType = kH261CodecType;
 			break;
 		default:

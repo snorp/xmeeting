@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.5 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,7 +51,7 @@
 + (void)_startGrabbing;
 + (void)_stopGrabbing;
 
-+ (void)_startTransmittingWithCodec:(unsigned)codecType 
++ (void)_startTransmittingWithCodec:(int)codecType 
 						  videoSize:(XMVideoSize)videoSize 
 				 maxFramesPerSecond:(unsigned)maxFramesPerSecond
 						 maxBitrate:(unsigned)maxBitrate

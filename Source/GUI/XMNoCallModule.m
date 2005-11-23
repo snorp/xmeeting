@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.13 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.14 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,7 @@
 #import "XMNoCallModule.h"
 #import "XMMainWindowController.h"
 #import "XMCallAddressManager.h"
-#import "XMSimpleAddressURL.h"
+#import "XMSimpleAddressResource.h"
 #import "XMCallHistoryCallAddressProvider.h"
 #import "XMCallHistoryRecord.h"
 #import "XMPreferencesManager.h"
@@ -267,8 +267,8 @@
 	
 	if(index == NSNotFound)
 	{
-		XMSimpleAddressURL *simpleAddressURL = [[[XMSimpleAddressURL alloc] initWithAddress:completedString] autorelease];
-		return simpleAddressURL;
+		XMSimpleAddressResource *simpleAddressResource = [[[XMSimpleAddressResource alloc] initWithAddress:completedString] autorelease];
+		return simpleAddressResource;
 	}
 	return [matchedAddresses objectAtIndex:index];
 }

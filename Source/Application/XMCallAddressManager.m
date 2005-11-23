@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.6 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,7 +125,7 @@
 	
 	activeCallAddress = [callAddress retain];
 
-	[[XMCallManager sharedInstance] callURL:[callAddress url]];
+	[[XMCallManager sharedInstance] makeCall:[callAddress addressResource]];
 }
 
 #pragma mark Private Methods

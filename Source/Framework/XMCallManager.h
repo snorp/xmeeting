@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.15 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.16 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,7 @@
 
 #import "XMTypes.h"
 
-@class XMPreferences, XMCallInfo, XMURL;
+@class XMPreferences, XMCallInfo, XMAddressResource;
 
 /**
  * XMCallManager is the central class in the XMeeting framework.
@@ -89,7 +89,7 @@
 
 /**
  * Returns the XMCallInfo instance describing the currently active call.
- * Returns nil if there is no active call or if -callURL: was called
+ * Returns nil if there is no active call or if -makeCall: was called
  * but the call attempt has not yet started.
  * After that XMNotification_CallManagerDidStartCalling has been posted,
  * this method will return the active call instance.
@@ -97,14 +97,14 @@
 - (XMCallInfo *)activeCall;
 
 /**
- * Calls the remoteParty using the specified call protocol
+ * Calls the remote party specified by address
  * If the call cannot be made for some reason, (e.g. calling
  * an H.323 client while H.323 is disabled) a notification 
  * (XMNotification_CallManagerCallStartFailed) is
  * posted. Otherwise, the final result of the call attempt will 
  * be posted through notifications
  **/
-- (void)callURL:(XMURL *)remotePartyURL;
+- (void)makeCall:(XMAddressResource *)address;
 
 /**
  * Returns the reason why the last call start failed.

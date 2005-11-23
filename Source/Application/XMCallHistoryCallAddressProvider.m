@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.2 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,7 +165,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 - (void)_didStartCalling:(NSNotification *)notif
 {
 	id<XMCallAddress> callAddress = [[XMCallAddressManager sharedInstance] activeCallAddress];
-	NSString *address = [[callAddress url] address];
+	NSString *address = [[callAddress addressResource] address];
 	
 	unsigned i;
 	unsigned count = [callHistoryRecords count];

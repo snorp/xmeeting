@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.7 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.8 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,7 +19,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 @interface ABPerson (XMCallAddressMethods)
 
 - (id<XMCallAddressProvider>)provider;
-- (XMURL *)url;
+- (XMAddressResource *)addressResource;
 - (NSString *)displayString;
 - (NSString *)displayImage;
 
@@ -62,15 +62,15 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	
 	[addressBookView setAutosaveName:XMAddressBookPeoplePickerViewAutosaveName];
 	[addressBookView setTarget:self];
-	[addressBookView setNameDoubleAction:@selector(editURL:)];
+	[addressBookView setNameDoubleAction:@selector(editAddress:)];
 	
-	// since the XMeeting framework stores the full XMURL string which is not very well
-	// human readable, we store a more human readable form under the
-	// XMAddressBookHumanReadableCallAddressProperty key. This way, we maintain
+	// The address resource is stored in a NSData representation to allow all relevant information
+	// to be stored. In addition, we store a more human readable form under
+	// XMAddressBookProperty_HumanReadableCallAddress. This way, we maintain
 	// both a more human readable representation to display in the PeoplePickerView and
-	// the complete call URL used for the XMeeting framework
-	[addressBookView addProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation];
-	[addressBookView setColumnTitle:@"Call Address" forProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation];
+	// the complete call address used for the XMeeting framework
+	[addressBookView addProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	[addressBookView setColumnTitle:@"Call Address" forProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	
 	// registering some notification
 	[[NSNotificationCenter defaultCenter] addObserver:self 
@@ -141,7 +141,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	[[XMCallAddressManager sharedInstance] makeCallToAddress:(id<XMCallAddress>)record];
 }
 
-- (IBAction)editURL:(id)sender
+- (IBAction)editAddress:(id)sender
 {
 	NSArray *selectedRecords = [addressBookView selectedRecords];
 	
@@ -186,13 +186,13 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 {	
 	if(sender == deleteButton)
 	{
-		[editedRecord setCallURL:nil];
+		[editedRecord setCallAddress:nil];
 	}
 	else if(sender == okButton)
 	{
-		if(!editedURL)
+		if(!editedAddress)
 		{
-			editedURL = [[XMGeneralPurposeURL alloc] init];
+			editedAddress = [[XMGeneralPurposeAddressResource alloc] init];
 		}
 		
 		NSString *addressPart;
@@ -200,14 +200,14 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		
 		if([callTypePopUp indexOfSelectedItem] == 0)
 		{ 
-			[editedURL setValue:nil forKey:XMKey_PreferencesUseGatekeeper];
+			[editedAddress setValue:nil forKey:XMKey_PreferencesUseGatekeeper];
 			
 			addressPart = [directCallAddressField stringValue];
 		}
 		else
 		{
 			NSNumber *number = [[NSNumber alloc] initWithBool:YES];
-			[editedURL setValue:number forKey:XMKey_PreferencesUseGatekeeper];
+			[editedAddress setValue:number forKey:XMKey_PreferencesUseGatekeeper];
 			[number release];
 			
 			addressPart = [gatekeeperCallAddressField stringValue];
@@ -218,10 +218,10 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 			}
 		}
 		
-		[editedURL setAddress:addressPart];
-		[editedURL setValue:gatekeeperHost forKey:XMKey_PreferencesGatekeeperAddress];
+		[editedAddress setAddress:addressPart];
+		[editedAddress setValue:gatekeeperHost forKey:XMKey_PreferencesGatekeeperAddress];
 
-		[editedRecord setCallURL:editedURL];
+		[editedRecord setCallAddress:editedAddress];
 		
 		// in case this is a new record, we add it. If the record is already contained,
 		// this method does nothing
@@ -236,9 +236,9 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	[addressBookView selectRecord:editedRecord byExtendingSelection:NO];
 	
 	[editedRecord release];
-	[editedURL release];
+	[editedAddress release];
 	editedRecord = nil;
-	editedURL = nil;
+	editedAddress = nil;
 	
 	[self _validateButtons];
 }
@@ -250,7 +250,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 														   lastName:[lastNameField stringValue]
 														companyName:[organizationField stringValue]
 														  isCompany:([isOrganizationSwitch state] == NSOnState)
-															callURL:nil];
+														callAddress:nil];
 	
 	[self cancelNewRecord:self];
 	
@@ -303,19 +303,19 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	
 	BOOL enableDeleteButton;
 	BOOL enableGatekeeperPart;
-	unsigned urlTypeIndex;
+	unsigned addressTypeIndex;
 	NSString *directCallAddress;
 	NSString *gatekeeperCallAddress;
 	unsigned gatekeeperTypeIndex;
 	NSString *gatekeeperAddress;
 	
-	editedURL = (XMGeneralPurposeURL *)[[record callURL] retain];
+	editedAddress = (XMGeneralPurposeAddressResource *)[[record callAddress] retain];
 	
-	if(!editedURL)
+	if(!editedAddress)
 	{
 		enableDeleteButton = NO;
 		enableGatekeeperPart = NO;
-		urlTypeIndex = 0;
+		addressTypeIndex = 0;
 		directCallAddress = @"";
 		gatekeeperCallAddress = @"";
 		gatekeeperTypeIndex = 0;
@@ -323,8 +323,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	}
 	else
 	{
-		NSString *address = [editedURL address];
-		NSNumber *number = [editedURL valueForKey:XMKey_PreferencesUseGatekeeper];
+		NSString *address = [editedAddress address];
+		NSNumber *number = [editedAddress valueForKey:XMKey_PreferencesUseGatekeeper];
 		
 		if(number && [number boolValue] == YES)
 		{
@@ -335,11 +335,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 			
 		if(enableGatekeeperPart)
 		{
-			urlTypeIndex = 1;
+			addressTypeIndex = 1;
 			directCallAddress = @"";
 			gatekeeperCallAddress = address;
 			
-			gatekeeperAddress = [editedURL valueForKey:XMKey_PreferencesGatekeeperUsername];
+			gatekeeperAddress = [editedAddress valueForKey:XMKey_PreferencesGatekeeperUsername];
 			if(gatekeeperAddress)
 			{
 				gatekeeperTypeIndex = 1;
@@ -352,7 +352,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		}
 		else
 		{
-			urlTypeIndex = 0;
+			addressTypeIndex = 0;
 			directCallAddress = address;
 			gatekeeperCallAddress = @"";
 			gatekeeperTypeIndex = 0;
@@ -362,7 +362,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		  
 	[deleteButton setEnabled:enableDeleteButton];
 	[self _validateEditRecordGUI:enableGatekeeperPart];
-	[callTypePopUp selectItemAtIndex:urlTypeIndex];
+	[callTypePopUp selectItemAtIndex:addressTypeIndex];
 	[directCallAddressField setStringValue:directCallAddress];
 	[gatekeeperCallAddressField setStringValue:gatekeeperCallAddress];
 	[gatekeeperMatrix selectCellWithTag:gatekeeperTypeIndex];
@@ -464,9 +464,9 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	return nil;
 }
 
-- (XMURL *)url
+- (XMAddressResource *)addressResource
 {
-	return [(ABPerson<XMAddressBookRecord> *)self callURL];
+	return [(ABPerson<XMAddressBookRecord> *)self callAddress];
 }
 
 - (NSString *)displayString

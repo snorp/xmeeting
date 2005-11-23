@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.6 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,7 @@
 
 #import "XMAddressBookManager.h"
 #import "XMCallHistoryCallAddressProvider.h"
-#import "XMSimpleAddressURL.h"
+#import "XMSimpleAddressResource.h"
 
 NSString *XMKey_CallHistoryRecordAddress = @"XMeeting_CallAddress";
 NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
@@ -92,13 +92,13 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 #pragma mark Getting the attributes
 
-- (XMURL *)url
+- (XMAddressResource *)addressResource
 {
 	if(type == XMCallHistoryRecordType_AddressBookRecord)
 	{
 		if(addressBookRecord != nil)
 		{
-			return [addressBookRecord callURL];
+			return (XMAddressResource *)[addressBookRecord callAddress];
 		}
 		return nil;
 	}

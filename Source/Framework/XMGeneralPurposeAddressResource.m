@@ -1,35 +1,50 @@
 /*
- * $Id: XMGeneralPurposeURL.m,v 1.2 2005/06/30 09:33:12 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.m,v 1.1 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
+#import "XMGeneralPurposeAddressResource.h"
+
 #import "XMStringConstants.h"
 #import "XMTypes.h"
-#import "XMGeneralPurposeURL.h"
 #import "XMPrivate.h"
 
-@implementation XMGeneralPurposeURL
+@implementation XMGeneralPurposeAddressResource
 
 #pragma mark Class Methods
 
++ (BOOL)canHandleStringRepresentation:(NSString *)stringRepresentation
+{
+	return NO;
+}
+
 + (BOOL)canHandleDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
-	NSNumber *number = (NSNumber *)[dictionaryRepresentation objectForKey:XMKey_URLType];
+	NSNumber *number = (NSNumber *)[dictionaryRepresentation objectForKey:XMKey_GeneralPurposeAddressResource];
 	
-	if(number != nil && [number unsignedIntValue] == XMURLType_GeneralPurposeURL)
+	if(number != nil)
 	{
 		return YES;
 	}
 	return NO;
 }
-		
-+ (XMGeneralPurposeURL *)urlWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
+
++ (XMGeneralPurposeAddressResource *)addressResourceWithStringRepresentation:(NSString *)stringRepresentation
 {
-	XMGeneralPurposeURL *generalPurposeURL = [[XMGeneralPurposeURL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
-	return [generalPurposeURL autorelease];
+	return nil;
+}
+		
++ (XMGeneralPurposeAddressResource *)addressResourceWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
+{
+	XMGeneralPurposeAddressResource *generalPurposeAddressResource = [[XMGeneralPurposeAddressResource alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
+	if(generalPurposeAddressResource != nil)
+	{
+		[generalPurposeAddressResource autorelease];
+	}
+	return generalPurposeAddressResource;
 }
 
 #pragma mark Init & Deallocation methods
@@ -37,8 +52,8 @@
 - (id)init
 {
 	dictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
-	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMURLType_GeneralPurposeURL];
-	[dictionary setObject:number forKey:XMKey_URLType];
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:1];
+	[dictionary setObject:number forKey:XMKey_GeneralPurposeAddressResource];
 	[number release];
 	
 	return self;
@@ -46,9 +61,9 @@
 
 - (id)initWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
-	NSNumber *number = [dictionaryRepresentation objectForKey:XMKey_URLType];
+	NSNumber *number = [dictionaryRepresentation objectForKey:XMKey_GeneralPurposeAddressResource];
 	
-	if(number == nil || [number unsignedIntValue] != XMURLType_GeneralPurposeURL)
+	if(number == nil)
 	{
 		[self release];
 		return nil;
@@ -68,6 +83,11 @@
 
 #pragma mark Getting different Representations
 
+- (NSString *)stringRepresentation
+{
+	return nil;
+}
+
 - (NSDictionary *)dictionaryRepresentation
 {
 	return [[dictionary copy] autorelease];
@@ -77,33 +97,47 @@
 
 - (XMCallProtocol)callProtocol
 {
+	// Replace that when SIP is enabled
 	return XMCallProtocol_H323;
 }
 
 - (NSString *)address
 {
-	return [dictionary objectForKey:XMKey_URLAddress];
+	return [dictionary objectForKey:XMKey_AddressResourceAddress];
 }
 
 - (void)setAddress:(NSString *)address
 {
 	if(address != nil)
 	{
-		[dictionary setObject:address forKey:XMKey_URLAddress];
+		[dictionary setObject:address forKey:XMKey_AddressResourceAddress];
 	}
 	else
 	{
-		[dictionary removeObjectForKey:XMKey_URLAddress];
+		[dictionary removeObjectForKey:XMKey_AddressResourceAddress];
 	}
 }
 
-- (NSString *)humanReadableRepresentation
+- (NSString *)humanReadableAddress
 {
 	return [self address];
 }
 
 - (id)valueForKey:(NSString *)key
 {
+	if([key isEqualToString:XMKey_GeneralPurposeAddressResource])
+	{
+		return nil;
+	}
+	if([key isEqualToString:XMKey_AddressResourceCallProtocol])
+	{
+		XMCallProtocol callProtocol = [self callProtocol];
+		return [NSNumber numberWithUnsignedInt:callProtocol];
+	}
+	if([key isEqualToString:XMKey_AddressResourceHumanReadableAddress])
+	{
+		return [self humanReadableAddress];
+	}
 	return [dictionary objectForKey:key];
 }
 
@@ -111,7 +145,11 @@
 {
 	BOOL correctType = YES;
 	
-	if([key isEqualToString:XMKey_URLAddress])
+	if([key isEqualToString:XMKey_AddressResourceCallProtocol])
+	{
+		// do nothing right now
+	}
+	else if([key isEqualToString:XMKey_AddressResourceAddress])
 	{
 		if([value isKindOfClass:[NSString class]])
 		{
@@ -173,8 +211,8 @@
 	{
 		NSString *key = [keys objectAtIndex:i];
 		
-		if([key isEqualToString:XMKey_URLType] ||
-		   [key isEqualToString:XMKey_URLAddress])
+		if([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
+		   [key isEqualToString:XMKey_AddressResourceAddress])
 		{
 			continue;
 		}
@@ -202,8 +240,8 @@
 	{
 		NSString *key = [keys objectAtIndex:i];
 		
-		if([key isEqualToString:XMKey_URLType] ||
-		   [key isEqualToString:XMKey_URLAddress])
+		if([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
+		   [key isEqualToString:XMKey_AddressResourceAddress])
 		{
 			continue;
 		}

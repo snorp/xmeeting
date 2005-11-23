@@ -1,15 +1,15 @@
 /*
- * $Id: XMSimpleAddressURL.m,v 1.1 2005/06/28 20:41:06 hfriederich Exp $
+ * $Id: XMSimpleAddressResource.m,v 1.1 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#import "XMSimpleAddressURL.h"
+#import "XMSimpleAddressResource.h"
 
 
-@implementation XMSimpleAddressURL
+@implementation XMSimpleAddressResource
 
 #pragma mark Init & Deallocation Methods
 
@@ -44,7 +44,7 @@
 	return nil;
 }
 
-- (XMURL *)url
+- (XMAddressResource *)addressResource
 {
 	return self;
 }
@@ -59,7 +59,7 @@
 	return XMCallProtocol_H323;
 }
 
-- (NSString *)humanReadableRepresentation
+- (NSString *)humanReadableAddress
 {
 	return [self address];
 }

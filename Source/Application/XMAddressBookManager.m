@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.2 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,9 +11,11 @@
 #import <AddressBook/AddressBook.h>
 
 #import "XMAddressBookRecordSearchMatch.h"
-#import "XMURL.h"
 
 NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddressBookManagerDidChangeDatabaseNotification";
+
+NSString *XMAddressBookProperty_CallAddress = @"XMeeting_CallAddress";
+NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReadableCallAddress";
 
 @interface XMAddressBookManager (PrivateMethods)
 
@@ -39,10 +41,10 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 - (NSString *)lastName;
 - (NSString *)companyName;
 - (BOOL)isCompany;
-- (XMURL *)callURL;
-- (void)setCallURL:(XMURL *)callURL;
+- (XMAddressResource *)callAddress;
+- (void)setCallAddress:(XMAddressResource *)callAddress;
 
-- (NSString *)humanReadableCallURLRepresentation;
+- (NSString *)humanReadableCallAddress;
 - (NSString *)displayName;
 
 @end
@@ -75,16 +77,16 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 {
 	addressBook = [[ABAddressBook sharedAddressBook] retain];
 	
-	// adding the XMAddressBook_CallURLProperty and the XMAddressBook_HumanReadableCallURLProperty
+	// adding XMAddressBookProperty_CallAddress and XMAddressBookProperty_HumanReadableCallAddress
 	// to the list of Properties in ABPerson
 	NSNumber *number = [[NSNumber alloc] initWithInt:kABDataProperty];
-	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMAddressBookProperty_CallURL, nil];
+	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMAddressBookProperty_CallAddress, nil];
 	[ABPerson addPropertiesAndTypes:dict];
 	[dict release];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithInt:kABStringProperty];
-	dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMAddressBookProperty_HumanReadableCallURLRepresentation, nil];
+	dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMAddressBookProperty_HumanReadableCallAddress, nil];
 	[ABPerson addPropertiesAndTypes:dict];
 	[dict release];
 	[number release];
@@ -128,7 +130,7 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 	{
 		ABPerson *person = (ABPerson *)[people objectAtIndex:i];
 		
-		if([person valueForProperty:XMAddressBookProperty_CallURL] != nil)
+		if([person valueForProperty:XMAddressBookProperty_CallAddress] != nil)
 		{
 			[validRecords addObject:person];
 		}
@@ -141,7 +143,7 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 
 - (id)createRecordWithFirstName:(NSString *)firstName lastName:(NSString *)lastName
 					companyName:(NSString *)companyName isCompany:(BOOL)isCompany
-						callURL:(XMURL *)callURL
+					callAddress:(XMAddressResource *)address
 {
 	ABPerson *newRecord = [[ABPerson alloc] init];
 	
@@ -165,7 +167,8 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 		[number release];
 	}
 	
-	[newRecord setValue:callURL forProperty:XMAddressBookProperty_CallURL];
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[address dictionaryRepresentation]];
+	[newRecord setValue:data forProperty:XMAddressBookProperty_CallAddress];
 	
 	return [newRecord autorelease];
 }
@@ -199,7 +202,7 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 	ABSearchElement *companyNameSearchElement = [ABPerson searchElementForProperty:kABOrganizationProperty label:nil key:nil
 																			 value:searchString
 																		comparison:kABPrefixMatchCaseInsensitive];
-	ABSearchElement *callAddressSearchElement = [ABPerson searchElementForProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation
+	ABSearchElement *callAddressSearchElement = [ABPerson searchElementForProperty:XMAddressBookProperty_HumanReadableCallAddress
 																			 label:nil key:nil value:searchString
 																		comparison:kABPrefixMatchCaseInsensitive];
 	NSArray *stringSearchElements = [[NSArray alloc] initWithObjects:firstNameSearchElement, lastNameSearchElement, companyNameSearchElement,
@@ -225,7 +228,7 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 		
 		if(mustBeValid)
 		{
-			if([record valueForProperty:XMAddressBookProperty_CallURL] == nil)
+			if([record valueForProperty:XMAddressBookProperty_CallAddress] == nil)
 			{
 				continue;
 			}
@@ -256,7 +259,7 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 
 - (id<XMAddressBookRecord>)recordWithCallAddress:(NSString *)callAddress
 {
-	ABSearchElement *callAddressSearchElement = [ABPerson searchElementForProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation
+	ABSearchElement *callAddressSearchElement = [ABPerson searchElementForProperty:XMAddressBookProperty_HumanReadableCallAddress
 																			 label:nil key:nil value:callAddress
 																		comparison:kABEqual];
 	
@@ -283,12 +286,13 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 
 - (BOOL)isValid
 {
-	if([self valueForProperty:XMAddressBookProperty_CallURL] != nil)
+	if([self valueForProperty:XMAddressBookProperty_CallAddress] != nil)
 	{
 		return YES;
 	}
 	return NO;
 }
+
 - (NSString *)firstName
 {
 	return [self valueForProperty:kABFirstNameProperty];
@@ -321,9 +325,9 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 	return NO;
 }
 
-- (XMURL *)callURL
+- (XMAddressResource *)callAddress
 {
-	NSData *data  = [self valueForProperty:XMAddressBookProperty_CallURL];
+	NSData *data  = [self valueForProperty:XMAddressBookProperty_CallAddress];
 	
 	if(data == nil)
 	{
@@ -331,30 +335,30 @@ NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddress
 	}
 	
 	NSDictionary *dictionary = (NSDictionary *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	XMURL *url = [XMURL urlWithDictionaryRepresentation:dictionary];
+	XMAddressResource *addressResource = [XMAddressResource addressResourceWithDictionaryRepresentation:dictionary];
 	
-	return url;
+	return addressResource;
 }
 
-- (void)setCallURL:(XMURL *)callURL
+- (void)setCallAddress:(XMAddressResource *)callAddress
 {
-	if(callURL)
+	if(callAddress)
 	{
-		NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[callURL dictionaryRepresentation]];
-		[self setValue:data forProperty:XMAddressBookProperty_CallURL];
-		[self setValue:[callURL humanReadableRepresentation] forProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation];
+		NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[callAddress dictionaryRepresentation]];
+		[self setValue:data forProperty:XMAddressBookProperty_CallAddress];
+		[self setValue:[callAddress humanReadableAddress] forProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	}
 	else
 	{
-		[self removeValueForProperty:XMAddressBookProperty_CallURL];
-		[self removeValueForProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation];
+		[self removeValueForProperty:XMAddressBookProperty_CallAddress];
+		[self removeValueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	}
 	[[ABAddressBook sharedAddressBook] save];
 }
 
-- (NSString *)humanReadableCallURLRepresentation
+- (NSString *)humanReadableCallAddress
 {
-	return [self valueForProperty:XMAddressBookProperty_HumanReadableCallURLRepresentation];
+	return [self valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 }
 
 - (NSString *)displayName

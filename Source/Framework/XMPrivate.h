@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.18 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.19 2005/11/23 19:28:44 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,7 @@
 #import "XMMediaTransmitter.h"
 #import "XMMediaReceiver.h"
 #import "XMVideoView.h"
-#import "XMGeneralPurposeURL.h"
+#import "XMGeneralPurposeAddressResource.h"
 
 extern unsigned _XMInitializedStatus;
 extern XMUtils *_XMUtilsSharedInstance;
@@ -214,7 +214,7 @@ void _XMCheckCloseStatus();
 
 @end
 
-@interface XMGeneralPurposeURL (FrameworkMethods)
+@interface XMGeneralPurposeAddressResource (FrameworkMethods)
 
 - (BOOL)_doesModifyPreferences:(XMPreferences *)preferences;
 - (void)_modifyPreferences:(XMPreferences *)preferences;
@@ -237,6 +237,11 @@ extern NSString *XMKey_CodecManagerVideoCodecs;
 extern NSString *XMKey_CodecTypes;
 extern NSString *XMKey_CodecTypeVideoSize;
 extern NSString *XMKey_CodecTypeIdentifier;
+
+/**
+ * XMAddressResource private keys
+ **/
+extern NSString *XMKey_GeneralPurposeAddressResource;
 
 /**
  * Exception reasons
