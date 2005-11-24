@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.8 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.9 2005/11/24 21:13:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -132,9 +132,12 @@ void _XMStopMediaReceiving(unsigned sessionID)
 	[_XMMediaReceiverSharedInstance _stopMediaReceivingForSession:sessionID];
 }
 
-bool _XMProcessPacket(void *packetData, unsigned length, unsigned sessionID)
+bool _XMProcessPacket(void *packetData, unsigned length, unsigned sessionID, unsigned *canReleasePackets)
 {
-	return [_XMMediaReceiverSharedInstance _processPacket:packetData length:length session:sessionID];
+	return [_XMMediaReceiverSharedInstance _processPacket:packetData 
+												   length:length 
+												  session:sessionID 
+										canReleasePackets:canReleasePackets];
 }
 
 void _XMUpdatePicture()

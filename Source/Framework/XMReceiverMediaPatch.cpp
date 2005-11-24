@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.6 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.7 2005/11/24 21:13:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,141 +15,159 @@
 #include "XMMediaStream.h"
 #include "XMCallbackBridge.h"
 
+#define XM_FRAME_POOL_GRANULARITY 8
+
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
 {
-	//cout << "Patch created" << endl;
-	didStartMediaReceiver = FALSE;
 	notifierSet = FALSE;
 }
 
 XMReceiverMediaPatch::~XMReceiverMediaPatch()
 {
-	//cout << "VideoReceivePatch destroyed" << endl;
 }
 
 void XMReceiverMediaPatch::Main()
 {
-	PINDEX i;
-	
-	inUse.Wait();
-	if (!source.IsSynchronous()) 
+	// Currently, audio is processed using the default OPAL facilities.
+	// Only video is processed using QuickTime
+	const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
+	if(_XMIsVideoMediaFormat(mediaFormat) == FALSE)
 	{
-		for(i = 0; i < sinks.GetSize(); i++) 
-		{
-			if (sinks[i].stream->IsSynchronous()) 
-			{
-				source.EnableJitterBuffer();
-				break;
-			}
-		}
+		OpalMediaPatch::Main();
+		return;
 	}
-	inUse.Signal();
 	
-	WORD lastSequenceNumber = 0;
-	DWORD lastTimestamp;
-	BOOL needsPictureUpdate = FALSE;
-	
-	RTP_DataFrame sourceFrame(source.GetDataSize());
-	while(source.ReadPacket(sourceFrame))
+	// Allocating a pool of RTP_DataFrame instances to reduce
+	// copy overhead
+	// sizeof(RTP_DataFrame *) = 4
+	// malloc has 16 byte granularity. Approximately 7-12 frames are used
+	// for H.261 CIF. Therefore, the pointer array size is incremented by 8
+	unsigned allocatedFrames = XM_FRAME_POOL_GRANULARITY;
+	RTP_DataFrame **dataFrames =  (RTP_DataFrame **)malloc(100 * sizeof(RTP_DataFrame *));
+	unsigned frameIndex = 0;
+	for(unsigned i = 0; i < XM_FRAME_POOL_GRANULARITY; i++)
 	{
-		inUse.Wait();
+		dataFrames[i] = new RTP_DataFrame(source.GetDataSize());
+	}
+	
+	// Read the first packet
+	BOOL firstRead = source.ReadPacket(*(dataFrames[frameIndex]));
+
+	if(firstRead == TRUE)
+	{
+		// Tell the media receiver to start processing packets
+		XMCodecIdentifier codecIdentifier;
+		XMVideoSize mediaSize;
+		unsigned sessionID = source.GetSessionID();
+		RTP_DataFrame::PayloadTypes payloadType = dataFrames[frameIndex]->GetPayloadType();
 		
-		FilterFrame(sourceFrame, source.GetMediaFormat());
-		
-		PINDEX size = sinks.GetSize();
-		for(i = 0; i < size; i++)
+		if(mediaFormat == XM_MEDIA_FORMAT_H261_QCIF)
 		{
-			if(PIsDescendant(sinks[i].stream, XMMediaStream))
+			codecIdentifier = XMCodecIdentifier_H261;
+			mediaSize = XMVideoSize_QCIF;
+		}
+		else if(mediaFormat == XM_MEDIA_FORMAT_H261_CIF)
+		{
+			codecIdentifier = XMCodecIdentifier_H261;
+			mediaSize = XMVideoSize_CIF;
+		}
+
+		_XMStartMediaReceiving(codecIdentifier, (unsigned)payloadType, mediaSize, sessionID);
+		
+		//looping & processing the packets
+		WORD lastSequenceNumber = 0;
+		DWORD lastTimestamp = 0;
+		BOOL needsPictureUpdate = FALSE;
+		
+		do {
+	
+			inUse.Wait();
+		
+			RTP_DataFrame *sourceFrame = dataFrames[frameIndex];
+		
+			FilterFrame(*sourceFrame, source.GetMediaFormat());
+		
+			WORD sequenceNumber = sourceFrame->GetSequenceNumber();
+			DWORD timestamp = sourceFrame->GetTimestamp();
+				
+			if(sequenceNumber != (lastSequenceNumber + 1) && (timestamp != 0))
 			{
-				unsigned sessionID = source.GetSessionID();
+				// do not issue when being the first packet
+				needsPictureUpdate = TRUE;
+			}
+			
+			// processing the packet
+			BYTE *dataPtr = sourceFrame->GetPayloadPtr();
+			PINDEX length = sourceFrame->GetPayloadSize();
+			PINDEX headerSize = sourceFrame->GetHeaderSize();
+			dataPtr -= headerSize;
+			length += headerSize;
 				
-				WORD sequenceNumber = sourceFrame.GetSequenceNumber();
-				DWORD timestamp = sourceFrame.GetTimestamp();
+			unsigned canReleasePackets = 0;
+			BOOL succ = _XMProcessPacket((void *)dataPtr, (unsigned)length, sessionID, &canReleasePackets);
+			
+			if(succ == FALSE && (timestamp != 0))
+			{
+				needsPictureUpdate = TRUE;
+			}
 				
-				if(sequenceNumber != (lastSequenceNumber + 1))
-				{
-					if(timestamp == 0)
-					{
-						// this is normally the first packet received
-						// and should not be treated as a lost packet
-						lastSequenceNumber = sequenceNumber;
-						//break;
-					}
-					
-					needsPictureUpdate = TRUE;
-				}
+			if((needsPictureUpdate == TRUE) && (timestamp != lastTimestamp))
+			{
+				// only issue video update picture command when the
+				// timestamp changes
+				IssueVideoUpdatePictureCommand();
+				needsPictureUpdate = FALSE;
+			}
 				
-				if(didStartMediaReceiver == FALSE)
-				{
-					XMCodecIdentifier codecIdentifier;
-					XMVideoSize mediaSize;
-					
-					OpalMediaFormat mediaFormat = source.GetMediaFormat();
-					
-					if(mediaFormat == XM_MEDIA_FORMAT_H261_QCIF)
-					{
-						codecIdentifier = XMCodecIdentifier_H261;
-						mediaSize = XMVideoSize_QCIF;
-					}
-					else if(mediaFormat == XM_MEDIA_FORMAT_H261_CIF)
-					{
-						codecIdentifier = XMCodecIdentifier_H261;
-						mediaSize = XMVideoSize_CIF;
-					}
-					
-					RTP_DataFrame::PayloadTypes payloadType = sourceFrame.GetPayloadType();
-					_XMStartMediaReceiving(codecIdentifier, (unsigned)payloadType, mediaSize, sessionID);
-					
-					didStartMediaReceiver = TRUE;
-				}
-				
-				BYTE *dataPtr = sourceFrame.GetPayloadPtr();
-				PINDEX length = sourceFrame.GetPayloadSize();
-				PINDEX headerSize = sourceFrame.GetHeaderSize();
-				dataPtr -= headerSize;
-				length += headerSize;
-				
-				BOOL succ = _XMProcessPacket((void *)dataPtr, (unsigned)length, sessionID);
-				if(succ == FALSE)
-				{
-					needsPictureUpdate = TRUE;
-				}
-				
-				if((needsPictureUpdate == TRUE) && 
-				   (timestamp != lastTimestamp))
-				{
-					// only issue video update picture command when the
-					// timestamp changes
-					IssueVideoUpdatePictureCommand();
-					needsPictureUpdate = FALSE;
-				}
-				
-				lastSequenceNumber = sequenceNumber;
-				lastTimestamp = timestamp;
+			if(canReleasePackets == 1)
+			{
+				// simply reset the frameIndex
+				frameIndex = 0;
 			}
 			else
 			{
-				sinks[i].WriteFrame(sourceFrame);
+				// increment the frameIndex, allocate a new RTP_DataFrame if needed.
+				// Also increase the size of the RTP_DataFrame pool if required
+				frameIndex++;
+				if(frameIndex == allocatedFrames)
+				{
+					if(allocatedFrames % XM_FRAME_POOL_GRANULARITY == 0)
+					{
+						dataFrames = (RTP_DataFrame **)realloc(dataFrames, (allocatedFrames + XM_FRAME_POOL_GRANULARITY) * sizeof(RTP_DataFrame *));
+					}
+					
+					dataFrames[frameIndex] = new RTP_DataFrame(source.GetDataSize());
+					allocatedFrames++;
+				}
 			}
-		}
 		
-		PINDEX len = sinks.GetSize();
+			// updating the variables
+			lastSequenceNumber = sequenceNumber;
+			lastTimestamp = timestamp;
+			
+			// check for loop termination conditions
+			PINDEX len = sinks.GetSize();
 		
-		inUse.Signal();
+			inUse.Signal();
+
+			if(len == 0)
+			{
+				break;
+			}
+		} while(source.ReadPacket(*(dataFrames[frameIndex])));
 		
-		if(len == 0)
-		{
-			break;
-		}
+		// End the media processing
+		_XMStopMediaReceiving(sessionID);
 	}
 	
-	if(didStartMediaReceiver == TRUE)
+	// release the used RTP_DataFrames
+	for(unsigned i = 0; i < allocatedFrames; i++)
 	{
-		_XMStopMediaReceiving(source.GetSessionID());
+		RTP_DataFrame *dataFrame = dataFrames[i];
+		delete dataFrame;
 	}
-	
-	//cout << "XMVideoReceivePatchTread ended" << endl;
+	free(dataFrames);
 }
 
 void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
@@ -165,7 +183,6 @@ void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
 
 void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
 {
-	cout << "issuing videoUpdateCommand" << endl;
 	OpalVideoUpdatePicture command = OpalVideoUpdatePicture(-1, -1, -1);
 	
 	if(notifierSet == TRUE)

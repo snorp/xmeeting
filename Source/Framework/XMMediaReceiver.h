@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.h,v 1.6 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMMediaReceiver.h,v 1.7 2005/11/24 21:13:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,7 @@
 	XMVideoSize videoMediaSize;
 	
 	BOOL didSucceedDecodingFrame;
+	BOOL canReleasePackets;
 	
 	BOOL doesClose;
 }
@@ -32,7 +33,7 @@
 - (void)_startMediaReceivingWithCodec:(XMCodecIdentifier)codecIdentifier payloadType:(unsigned)payloadType 
 							videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID;
 - (void)_stopMediaReceivingForSession:(unsigned)sessionID;
-- (BOOL)_processPacket:(UInt8 *)packet length:(unsigned)length session:(unsigned)sessionID;
+- (BOOL)_processPacket:(UInt8 *)packet length:(unsigned)length session:(unsigned)sessionID canReleasePackets:(unsigned *)canReleasePackets;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.6 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.7 2005/11/24 21:13:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,13 +13,15 @@
 
 #define XM_H261_ENCODING_NAME "H261"
 #define XM_H263_ENCODING_NAME "H263"
-#define XM_h264_ENCODING_NAME "H264"
+#define XM_H264_ENCODING_NAME "H264"
 
 #define XM_MAX_FRAME_WIDTH PVideoDevice::CIFWidth
 #define XM_MAX_FRAME_HEIGHT PVideoDevice::CIFHeight
 #define XM_MAX_FRAME_RATE 30
 
 #define XM_MAX_H261_BITRATE 19200
+#define XM_MAX_H263_BITRATE 19200
+#define XM_MAX_H264_BITRATE 19200
 
 #pragma mark MediaFormat Strings
 
@@ -80,6 +82,54 @@ const OpalVideoFormat & XMGetMediaFormat_H261_CIF()
 	return XMMediaFormat_H261_CIF;
 }
 
+const OpalVideoFormat & XMGetMediaFormat_H263_QCIF()
+{
+	static const OpalVideoFormat XMMediaFormat_H263_QCIF(_XMMediaFormat_H263_QCIF,
+														RTP_DataFrame::H261,
+														XM_H263_ENCODING_NAME,
+														PVideoDevice::CIFWidth,
+														PVideoDevice::CIFHeight,
+														XM_MAX_FRAME_RATE,
+														XM_MAX_H263_BITRATE);
+	return XMMediaFormat_H263_QCIF;
+}
+
+const OpalVideoFormat & XMGetMediaFormat_H263_CIF()
+{
+	static const OpalVideoFormat XMMediaFormat_H263_CIF(_XMMediaFormat_H263_CIF,
+														RTP_DataFrame::H261,
+														XM_H263_ENCODING_NAME,
+														PVideoDevice::CIFWidth,
+														PVideoDevice::CIFHeight,
+														XM_MAX_FRAME_RATE,
+														XM_MAX_H263_BITRATE);
+	return XMMediaFormat_H263_CIF;
+}
+
+const OpalVideoFormat & XMGetMediaFormat_H264_QCIF()
+{
+	static const OpalVideoFormat XMMediaFormat_H264_QCIF(_XMMediaFormat_H264_QCIF,
+														RTP_DataFrame::H261,
+														XM_H264_ENCODING_NAME,
+														PVideoDevice::CIFWidth,
+														PVideoDevice::CIFHeight,
+														XM_MAX_FRAME_RATE,
+														XM_MAX_H264_BITRATE);
+	return XMMediaFormat_H264_QCIF;
+}
+
+const OpalVideoFormat & XMGetMediaFormat_H264_CIF()
+{
+	static const OpalVideoFormat XMMediaFormat_H264_CIF(_XMMediaFormat_H264_CIF,
+														RTP_DataFrame::H261,
+														XM_H264_ENCODING_NAME,
+														PVideoDevice::CIFWidth,
+														PVideoDevice::CIFHeight,
+														XM_MAX_FRAME_RATE,
+														XM_MAX_H264_BITRATE);
+	return XMMediaFormat_H264_CIF;
+}
+
 #pragma mark Limiting the Video Bitrate
 
 static unsigned _maxVideoBitrate;
@@ -92,6 +142,19 @@ void _XMSetMaxVideoBitrate(unsigned maxVideoBitrate)
 unsigned _XMGetMaxVideoBitrate()
 {
 	return _maxVideoBitrate;
+}
+
+#pragma mark Identifying MediaFormats
+
+BOOL _XMIsVideoMediaFormat(const OpalMediaFormat & mediaFormat)
+{
+	if(mediaFormat == XM_MEDIA_FORMAT_H261_QCIF ||
+	   mediaFormat == XM_MEDIA_FORMAT_H261_CIF)
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 #pragma mark XM_H261_VIDEO_QCIF methods

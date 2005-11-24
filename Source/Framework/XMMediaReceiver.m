@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.8 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.9 2005/11/24 21:13:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	videoMediaSize = XMVideoSize_NoVideo;
 	
 	didSucceedDecodingFrame = YES;
+	canReleasePackets = NO;
 	
 	doesClose = NO;
 	
@@ -65,19 +66,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (void)_close
 {
-	/*if(doesClose == YES)
-	{
-		return;
-	}
-	
-	doesClose = YES;
-	
-	if(videoDecompressionSession != NULL)
-	{
-		return;
-	}
-
-	_XMThreadExit();*/
 }
 
 - (void)dealloc
@@ -126,14 +114,9 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 													withObject:nil waitUntilDone:NO];
 	
 	ExitMoviesOnThread();
-	
-	/*if(doesClose == YES)
-	{
-		_XMThreadExit();
-	}*/
 }
 
-- (BOOL)_processPacket:(UInt8*)data length:(unsigned)length session:(unsigned)sessionID
+- (BOOL)_processPacket:(UInt8*)data length:(unsigned)length session:(unsigned)sessionID canReleasePackets:(unsigned *)outCanReleasePackets
 {
 	ComponentResult err = noErr;
 	
@@ -163,9 +146,9 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		// we pass the required information to the XMPacketReassembler through
 		// the default RTPRssmInitParams call.
-		// However, the meaning of timeBase and timeScale are redefined as
+		// However, the meaning of ssrc and timeScale are redefined as
 		// follows:
-		// timeBase contains the codecType and
+		// ssrc contains the codecIdentifier and
 		// timeScale contains the sessionID to be used
 		RTPRssmInitParams initParams;
 		initParams.payloadType = videoPayloadType;
@@ -180,22 +163,35 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	}
 	
 	QTSStreamBuffer *streamBuffer = NULL;
-	err = QTSNewStreamBuffer(length, 0, &streamBuffer);
+	err = QTSNewStreamBuffer(0, 0, &streamBuffer);
 	if(err != noErr)
 	{
 		NSLog(@"Creating StreamBuffer failed: %d", (int)err);
 		return NO;
 	}
 	
+	streamBuffer->rptr = data;
+	streamBuffer->wptr = data + length;
+	/*
 	void *dest = streamBuffer->rptr;
 	memcpy(dest, data, length);
 	streamBuffer->wptr += length;
-	
+	*/
 	didSucceedDecodingFrame = YES;
+	canReleasePackets = NO;
 	
 	err = RTPRssmHandleNewPacket(videoPacketReassembler,
 								 streamBuffer,
 								 0);
+	if(canReleasePackets == NO)
+	{
+		*outCanReleasePackets = 0;
+	}
+	else
+	{
+		*outCanReleasePackets = 1;
+	}
+	
 	if(err != noErr)
 	{
 		NSLog(@"RTPRssmHandleNewPacket failed: %d", (int)err);
@@ -286,6 +282,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		NSLog(@"Decompression of the frame failed %d", (int)err);
 		didSucceedDecodingFrame = NO;
 	}
+	
+	canReleasePackets = YES;
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.14 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.15 2005/11/24 21:13:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,7 +94,7 @@ void _XMStopMediaReceiving(unsigned sessionID);
 /**
  * Forwads the received packet to the MediaReceiver
  **/
-bool _XMProcessPacket(void *packet, unsigned length, unsigned sessionID);
+bool _XMProcessPacket(void *packet, unsigned length, unsigned sessionID, unsigned *canReleasePackets);
 
 /**
  * Forwards the OpalVideoUpdatePicture media command to the
