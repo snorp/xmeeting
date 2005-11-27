@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassembler.c,v 1.5 2005/11/24 21:13:02 hfriederich Exp $
+ * $Id: XMPacketReassembler.c,v 1.6 2005/11/27 17:30:55 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -246,17 +246,6 @@ ComponentResult XMPacketReassembler_SendPacketList(XMPacketReassemblerGlobals gl
 	{
 		goto bail;
 	}
-	
-	RTPRssmPacket *packet = inPacketListHead;
-	do {
-		QTSStreamBuffer *buffer = packet->streamBuffer;
-		
-		buffer->rptr = (unsigned char *)(buffer+sizeof(QTSStreamBuffer));
-		buffer->wptr = (unsigned char *)(buffer+sizeof(QTSStreamBuffer));
-		
-		packet = packet->next;
-		
-	} while(packet != NULL);
 	
 	err = RTPRssmReleasePacketList(globals->reassembler,
 								   inPacketListHead);
