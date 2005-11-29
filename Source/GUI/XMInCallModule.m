@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.10 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.11 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMMainWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMInCallView.h"
+#import "XMSimpleVideoView.h"
 
 @interface XMInCallModule (PrivateMethods)
 
@@ -115,7 +116,7 @@
 
 - (void)becomeInactiveModule
 {
-	[videoView stopDisplayingRemoteVideo];
+	[videoView stopDisplayingVideo];
 }
 
 #pragma mark User Interface Methods

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.13 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.14 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -174,6 +174,32 @@ extern NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate;
 extern NSString *XMNotification_VideoManagerDidUpdateInputDeviceList;
 
 /**
+ * Posted when the VideoManager did start changing the video input device.
+ * Since this might be a lengthy task, the begin and end of this task
+ * are posted through notifications.
+ **/
+extern NSString *XMNotification_VideoManagerDidStartSelectedInputDeviceChange;
+
+/**
+ * Posted when the video input device did change.
+ **/
+extern NSString *XMNotification_VideoManagerDidChangeSelectedInputDevice;
+
+/**
+ * Posted when the VideoManager did start transmitting video to the remote
+ * party.
+ * When this notification is posted, the size of the transmitted video
+ * is also known
+ **/
+extern NSString *XMNotification_VideoManagerDidStartTransmittingVideo;
+
+/**
+ * Posted when the VideoManager no longer transmits video to the remote
+ * party.
+ **/
+extern NSString *XMNotification_VideoManagerDidEndTransmittingVideo;
+
+/**
  * Posted when the VideoManager did start receiving video from the remote
  * party.
  * When this notification is posted, the size of the remote video is also
@@ -186,14 +212,6 @@ extern NSString *XMNotification_VideoManagerDidStartReceivingVideo;
  * remote party
  **/
 extern NSString *XMNotification_VideoManagerDidEndReceivingVideo;
-
-#pragma mark XMAddressBookManager Notifications
-
-/**
- * Posted when the database of the address book did change,
- * either internally or externally
- **/
-//extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
 
 #pragma mark Exceptions
 

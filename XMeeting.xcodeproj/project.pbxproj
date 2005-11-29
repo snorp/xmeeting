@@ -14,6 +14,8 @@
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
 		D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
 		D10AFEB507B3781700BBC8EA /* XMUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFEB307B3781700BBC8EA /* XMUtils.m */; };
+		D10D49E4093CA220000DD61E /* XMWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = D10D49E2093CA220000DD61E /* XMWindow.h */; };
+		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
 		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
@@ -25,6 +27,10 @@
 		D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35408F90263007E4ABE /* transports.cxx */; };
 		D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13274F008C6F2BB00298F25 /* XMCallInfoView.m */; };
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
+		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
+		D134B974093B88190090271F /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
+		D134B9C4093B8D5C0090271F /* XMSimpleVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */; };
+		D134B9C5093B8D5C0090271F /* XMSimpleVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */; };
 		D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */ = {isa = PBXBuildFile; fileRef = D14587EE09013DD4004A1EDF /* XMCallStatistics.m */; };
 		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
@@ -51,7 +57,6 @@
 		D16394C3083E23D600F7FD83 /* CallHistoryModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */; };
 		D16395280840C57A00F7FD83 /* XMAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395270840C57A00F7FD83 /* XMAddressResource.m */; };
 		D166CD6607B2312300BC27A6 /* XMVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D166CD6407B2312300BC27A6 /* XMVideoView.h */; };
-		D166CD6707B2312300BC27A6 /* XMVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D166CD6507B2312300BC27A6 /* XMVideoView.m */; };
 		D177D7A107B62C9500BD0172 /* XMCallInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = D177D79F07B62C9500BD0172 /* XMCallInfo.h */; };
 		D177D7A207B62C9500BD0172 /* XMCallInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D177D7A007B62C9500BD0172 /* XMCallInfo.m */; };
 		D178D51608F58780006E9786 /* XMDummyVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */; };
@@ -659,7 +664,6 @@
 		D1D63D3707AA9A8800F1FB74 /* XMAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */; };
 		D1D63D3807AA9A8800F1FB74 /* XMAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3607AA9A8800F1FB74 /* XMAudioManager.m */; };
 		D1D63D3F07AA9A9F00F1FB74 /* XMVideoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */; };
-		D1D63D4007AA9A9F00F1FB74 /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
 		D1D63D4507AA9B2B00F1FB74 /* XMCodecManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */; };
 		D1D63D4607AA9B2B00F1FB74 /* XMCodecManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */; };
 		D1D9A46D08519C9200445833 /* XMStringConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D9A46C08519C9200445833 /* XMStringConstants.m */; };
@@ -769,6 +773,8 @@
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
 		D10AFEB307B3781700BBC8EA /* XMUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMUtils.m; path = Source/Framework/XMUtils.m; sourceTree = "<group>"; };
+		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMWindow.h; path = Source/GUI/XMWindow.h; sourceTree = "<group>"; };
+		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMWindow.m; path = Source/GUI/XMWindow.m; sourceTree = "<group>"; };
 		D1152F73084C61730057CA9D /* DefaultURL.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL.tiff; path = Resources/Images/DefaultURL.tiff; sourceTree = "<group>"; };
 		D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMCircularBuffer.cpp; path = Source/Framework/XMCircularBuffer.cpp; sourceTree = "<group>"; };
 		D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMCircularBuffer.h; path = Source/Framework/XMCircularBuffer.h; sourceTree = "<group>"; };
@@ -784,6 +790,9 @@
 		D132750608C6F38000298F25 /* XMRecentCallsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRecentCallsView.h; path = Source/GUI/XMRecentCallsView.h; sourceTree = "<group>"; };
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMRecentCallsView.m; path = Source/GUI/XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
+		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleVideoView.h; path = Source/GUI/XMSimpleVideoView.h; sourceTree = "<group>"; };
+		D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleVideoView.m; path = Source/GUI/XMSimpleVideoView.m; sourceTree = "<group>"; };
 		D14587ED09013DD4004A1EDF /* XMCallStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallStatistics.h; path = Source/Framework/XMCallStatistics.h; sourceTree = "<group>"; };
 		D14587EE09013DD4004A1EDF /* XMCallStatistics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallStatistics.m; path = Source/Framework/XMCallStatistics.m; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
@@ -820,7 +829,6 @@
 		D16395600841B4E100F7FD83 /* XMCalltoURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCalltoURL.h; path = Source/Framework/XMCalltoURL.h; sourceTree = "<group>"; };
 		D16395610841B4E100F7FD83 /* XMCalltoURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCalltoURL.m; path = Source/Framework/XMCalltoURL.m; sourceTree = "<group>"; };
 		D166CD6407B2312300BC27A6 /* XMVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoView.h; path = Source/Framework/XMVideoView.h; sourceTree = "<group>"; };
-		D166CD6507B2312300BC27A6 /* XMVideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMVideoView.m; path = Source/Framework/XMVideoView.m; sourceTree = "<group>"; };
 		D177D79F07B62C9500BD0172 /* XMCallInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallInfo.h; path = Source/Framework/XMCallInfo.h; sourceTree = "<group>"; };
 		D177D7A007B62C9500BD0172 /* XMCallInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallInfo.m; path = Source/Framework/XMCallInfo.m; sourceTree = "<group>"; };
 		D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMDummyVideoInputModule.h; path = Source/Framework/XMDummyVideoInputModule.h; sourceTree = "<group>"; };
@@ -1519,6 +1527,7 @@
 				D197153308F922C400295E05 /* pwlib.dylib in Frameworks */,
 				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
 				D19628150924B4C1004892D0 /* Security.framework in Frameworks */,
+				D134B910093B79020090271F /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1563,6 +1572,7 @@
 				D1E2DA0F08F470D700BE224E /* Cocoa.framework */,
 				D1E2DA1508F470F200BE224E /* QuickTime.framework */,
 				D1E2DB8808F4720A00BE224E /* QuartzCore.framework */,
+				D134B90F093B79020090271F /* OpenGL.framework */,
 				D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */,
 				D19628140924B4C1004892D0 /* Security.framework */,
 				D16333ED07A020FF003FD9C0 /* CoreAudio.framework */,
@@ -1668,7 +1678,6 @@
 				D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */,
 				D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */,
 				D166CD6407B2312300BC27A6 /* XMVideoView.h */,
-				D166CD6507B2312300BC27A6 /* XMVideoView.m */,
 				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
 				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
 				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
@@ -1854,6 +1863,10 @@
 		D1B4CD9408316D5900A444E1 /* GUI-Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				D10D49E2093CA220000DD61E /* XMWindow.h */,
+				D10D49E3093CA220000DD61E /* XMWindow.m */,
+				D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */,
+				D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */,
 				D1B4CD9708316DF100A444E1 /* XMMouseOverButton.h */,
 				D1B4CD9808316DF100A444E1 /* XMMouseOverButton.m */,
 				D189805108241F11007CD286 /* XMBooleanCell.h */,
@@ -2847,6 +2860,8 @@
 				D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Headers */,
 				D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Headers */,
 				D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Headers */,
+				D134B9C4093B8D5C0090271F /* XMSimpleVideoView.h in Headers */,
+				D10D49E4093CA220000DD61E /* XMWindow.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3396,10 +3411,8 @@
 				D163365107A456C4003FD9C0 /* XMProcess.cpp in Sources */,
 				D163381E07A4E739003FD9C0 /* XMPreferences.m in Sources */,
 				D1D63D3807AA9A8800F1FB74 /* XMAudioManager.m in Sources */,
-				D1D63D4007AA9A9F00F1FB74 /* XMVideoManager.m in Sources */,
 				D1D63D4607AA9B2B00F1FB74 /* XMCodecManager.m in Sources */,
 				D18BF5F307AFA007000CF993 /* XMCallbackBridge.m in Sources */,
-				D166CD6707B2312300BC27A6 /* XMVideoView.m in Sources */,
 				D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */,
 				D10AFEB507B3781700BBC8EA /* XMUtils.m in Sources */,
 				D177D7A207B62C9500BD0172 /* XMCallInfo.m in Sources */,
@@ -3458,6 +3471,9 @@
 				D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */,
 				D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */,
 				D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */,
+				D134B974093B88190090271F /* XMVideoManager.m in Sources */,
+				D134B9C5093B8D5C0090271F /* XMSimpleVideoView.m in Sources */,
+				D10D49E5093CA220000DD61E /* XMWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

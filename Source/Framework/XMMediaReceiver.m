@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.9 2005/11/24 21:13:02 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.10 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -305,7 +305,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 {
 	if((kICMDecompressionTracking_EmittingFrame & decompressionTrackingFlags) && pixelBuffer != NULL)
 	{
-		CIImage *remoteImage = [[CIImage alloc] initWithCVImageBuffer:(CVImageBufferRef)pixelBuffer];
-		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleRemoteImage:) withObject:remoteImage waitUntilDone:NO];
+		[_XMVideoManagerSharedInstance _handleRemoteVideoFrame:pixelBuffer];
 	}
 }

@@ -54,7 +54,8 @@
             OUTLETS = {progressIndicator = NSProgressIndicator; statusBar = NSTextField; }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }
+        {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {CLASS = XMWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }
     ); 
     IBVersion = 1; 
 }

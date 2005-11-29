@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.19 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.20 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -192,27 +192,25 @@ void _XMCheckCloseStatus();
 - (id)_init;
 - (void)_close;
 
-- (void)_addLocalVideoView:(XMVideoView *)videoView;
-- (void)_removeLocalVideoView:(XMVideoView *)videoView;
-- (void)_addRemoteVideoView:(XMVideoView *)videoView;
-- (void)_removeRemoteVideoView:(XMVideoView *)videoView;
-- (void)_drawLocalVideoInRect:(NSRect)rect;
-- (void)_drawRemoteVideoInRect:(NSRect)rect;
 - (void)_handleDeviceList:(NSArray *)deviceList;
 - (void)_handleInputDeviceChangeComplete:(NSString *)selectedDevice;
-- (void)_handlePreviewImage:(CIImage *)previewImage;
 - (void)_handleVideoReceivingStart:(NSNumber *)videoSize;
 - (void)_handleVideoReceivingEnd;
-- (void)_handleRemoteImage:(CIImage *)remoteImage;
+
+// runs NOT on the main thread!
+- (void)_handleLocalVideoFrame:(CVPixelBufferRef)frame;
+- (void)_handleRemoteVideoFrame:(CVPixelBufferRef)frame;
 
 @end
 
-@interface XMVideoView (FrameworkMethods)
+/*@interface XMVideoView (FrameworkMethods)
 
 - (void)_startBusyIndicator;
 - (void)_stopBusyIndicator;
 
-@end
+- (void)_renderLocalVideo:(CVOpenGLTextureRef)localVideo remoteVideo:(CVOpenGLTextureRef)remoteVideo;
+
+@end*/
 
 @interface XMGeneralPurposeAddressResource (FrameworkMethods)
 

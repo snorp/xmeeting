@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.12 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.13 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,8 +54,12 @@ NSString *XMNotification_AudioManagerInputVolumeDidChange = @"XMeetingAudioManag
 NSString *XMNotification_AudioManagerOutputVolumeDidChange = @"XMeetingAudioManagerOutputVolumeDidChangeNotification";
 NSString *XMNotification_AudioManagerDidUpdateDeviceList = @"XMeetingAudioManagerDidUpdateDeviceListNotification";
 
-NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate = @"XMeetingVideoManagerDidStartVideoInputDeviceListUpdateNotification";
+NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate = @"XMeetingVideoManagerDidStartInputDeviceListUpdateNotification";
 NSString *XMNotification_VideoManagerDidUpdateInputDeviceList = @"XMeetingVideoManagerDidUpdateInputDeviceListNotification";
+NSString *XMNotification_VideoManagerDidStartSelectedInputDeviceChange = @"XMeetingVideoManagerDidStartSelectedInputDeviceChange";
+NSString *XMNotification_VideoManagerDidChangeSelectedInputDevice = @"XMeetingVideoManagerDidChangeSelectedInputDevice";
+NSString *XMNotification_VideoManagerDidStartTransmittingVideo = @"XMeetingVideoManagerDidStartTransmittingVideo";
+NSString *XMNotification_VideoManagerDidEndTransmittingVideo = @"XMeetingVideoManagerDidStartTransmittingVideo";
 NSString *XMNotification_VideoManagerDidStartReceivingVideo = @"XMeetingVideoManagerDidStartReceivingVideoNotification";
 NSString *XMNotification_VideoManagerDidEndReceivingVideo = @"XMeetingVideoManagerDidEndReceivingVideoNotification";
 

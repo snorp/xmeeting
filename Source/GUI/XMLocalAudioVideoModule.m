@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.4 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.5 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMMainWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMLocalAudioVideoView.h"
+#import "XMSimpleVideoView.h"
 
 @interface XMLocalAudioVideoModule (PrivateMethods)
 
@@ -67,7 +68,11 @@
 		[videoDevicesPopUp addItemsWithTitles:devices];
 		[videoDevicesPopUp selectItemWithTitle:[videoManager selectedInputDevice]];
 	}
-	[localVideoView startDisplayingLocalVideo];
+	
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		[localVideoView startDisplayingLocalVideo];
+	}
 	
 	// configuring the audio content
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
@@ -147,6 +152,15 @@
 	int state = [contentDisclosure state];
 	
 	BOOL showAudioVideoContent = (state == NSOnState) ? YES : NO;
+	
+	if(showAudioVideoContent == YES)
+	{
+		[localVideoView startDisplayingLocalVideo];
+	}
+	else
+	{
+		[localVideoView stopDisplayingVideo];
+	}
 	[contentView setShowAudioVideoContent:showAudioVideoContent];
 
 	[contentView setContentVisible:NO];
@@ -308,6 +322,16 @@
 	XMLocation *location = [[XMPreferencesManager sharedInstance] activeLocation];
 	
 	BOOL showVideoContent = [location enableVideo];
+	
+	if(showVideoContent == YES)
+	{
+		[localVideoView startDisplayingLocalVideo];
+	}
+	else
+	{
+		[localVideoView stopDisplayingVideo];
+	}
+	
 	[contentView setShowVideoContent:showVideoContent];
 	
 	[contentView setContentVisible:NO];

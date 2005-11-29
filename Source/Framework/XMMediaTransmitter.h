@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.7 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.8 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,7 @@
 	NSPort *receivePort;
 	
 	NSArray *videoInputModules;
+	NSMutableArray *videoInputViews;
 	id<XMVideoInputModule> activeModule;
 	NSString *selectedDevice;
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoView.h,v 1.1 2005/10/06 15:04:42 hfriederich Exp $
+ * $Id: XMVideoView.h,v 1.2 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,41 +10,28 @@
 #define __XM_VIDEO_VIEW_H__
 
 #import <Cocoa/Cocoa.h>
+#import <QuartzCore/QuartzCore.h>
 
 /**
- * This class is used to display video on screen
- * you can specify whether to display the local
- * preview image or the remote video. Later,
- * direct PIP-Support is also planned
+ * This protocol declares the methods necessary to draw video
+ * from the XMeeting framework on screen
  **/
-@interface XMVideoView : NSView {
+@protocol XMVideoView <NSObject>
 	
-	unsigned displayType;
-	NSProgressIndicator *busyIndicator;
-	
-}
-
 /**
- * Starts/Stops to display the local video
- * Currently, displaying local or remote
- * video is mutually exclusively.
- * Calling this method stops any
- * remote video display in progress
- * and vice versa
+ * Called every time a video frame from either the local or
+ * remote video did change. both localVideo and remoteVideo
+ * may be NULL.
+ * This method is NOT always called on the main thread! The
+ * system is locked, however, so that it is not necessary
+ * to add locks to protect the OpenGL code.
+ * If, for some reason, you need to force drawing on the
+ * main thread, you can call -forceRenderingForView: of
+ * the VideoManager.
  **/
-- (void)startDisplayingLocalVideo;
-- (void)stopDisplayingLocalVideo;
-
-/**
- * Starts to display the remote video
- * Currently, displaying local or remote
- * video is mutually exclusively
- * Calling this method stops any
- * local video display in progress
- * and vice versa
- **/
-- (void)startDisplayingRemoteVideo;
-- (void)stopDisplayingRemoteVideo;
+- (void)renderLocalVideo:(CVOpenGLTextureRef)localVideo didChange:(BOOL)localVideoDidChange
+			 remoteVideo:(CVOpenGLTextureRef)remoteVideo didChange:(BOOL)remoteVideoDidChange
+				isForced:(BOOL)isForced;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.9 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.10 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,7 @@
  */
 
 #import "XMMediaTransmitter.h"
+
 #import "XMPacketBuilder.h"
 #import "XMVideoManager.h"
 #import "XMPrivate.h"
@@ -882,15 +883,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
 {	
-	//NSLog(@"got frame with timeValue: %d", (int)time);
-	// sending the preview image to the video manager
-	CIImage *previewImage = [[CIImage alloc] initWithCVImageBuffer:(CVImageBufferRef)frame];
-	
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handlePreviewImage:) withObject:previewImage waitUntilDone:NO];
-	
 	TimeValue convertedTime = (90000 / timeScale) * time;
 	TimeValue timeStamp = convertedTime - timeOffset;
 	lastTime = timeStamp;
+	
+	// handling the frame to the video manager to draw the preview image
+	// on screen
+	[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
 	
 	if(compressionSession != NULL)
 	{

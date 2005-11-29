@@ -21,7 +21,7 @@
                 audioOutputVolumeSlider = NSSlider; 
                 contentDisclosure = NSButton; 
                 contentView = XMLocalAudioVideoView; 
-                localVideoView = XMVideoView; 
+                localVideoView = XMSimpleVideoView; 
                 muteAudioInputSwitch = NSButton; 
                 muteAudioOutputSwitch = NSButton; 
                 videoDevicesPopUp = NSPopUpButton; 
@@ -38,7 +38,7 @@
             }; 
             SUPERCLASS = NSView; 
         }, 
-        {CLASS = XMVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+        {CLASS = XMSimpleVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }

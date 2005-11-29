@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.h,v 1.5 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMInCallModule.h,v 1.6 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,13 +12,13 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowModule.h"
 
-@class XMVideoView, XMInCallView;
+@class XMSimpleVideoView, XMInCallView;
 
 @interface XMInCallModule : NSObject <XMMainWindowModule> {
 
 	IBOutlet XMInCallView *contentView;
 	
-	IBOutlet XMVideoView *videoView;
+	IBOutlet XMSimpleVideoView *videoView;
 	IBOutlet NSButton *hangupButton;
 	IBOutlet NSTextField *remotePartyField;
 	

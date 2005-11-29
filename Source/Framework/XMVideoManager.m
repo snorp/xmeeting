@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.5 2005/10/20 19:21:06 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.6 2005/11/29 18:56:29 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,13 +12,18 @@
 #import "XMVideoManager.h"
 #import "XMMediaTransmitter.h"
 #import "XMVideoView.h"
-#import "XMSequenceGrabberVideoInputModule.h"
-#import "XMDummyVideoInputModule.h"
+
+static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink, 
+									   const CVTimeStamp *inNow, 
+									   const CVTimeStamp *inOutputTime, 
+									   CVOptionFlags flagsIn, 
+									   CVOptionFlags *flagsOut, 
+									   void *displayLinkContext);
 
 @interface XMVideoManager (PrivateMethods)
 
 - (id)_init;
-- (void)_startLocalBusyIndicators;
+- (void)_outputFrames;
 
 @end
 
@@ -50,50 +55,63 @@
 	self = [super init];
 	
 	videoInputModules = nil;
-	localVideoViews = [[NSMutableArray alloc] initWithCapacity:3];
-	remoteVideoViews = [[NSMutableArray alloc] initWithCapacity:3];
+	videoViews = [[NSMutableArray alloc] initWithCapacity:3];
 	
 	inputDevices = nil;
 	selectedInputDevice = nil;
 	
-	localVideoImage = nil;
-	localVideoImageRep = nil;
-	doesMirrorLocalVideo = NO;
-	mirrorTransformationMatrix.a = -1;
-	mirrorTransformationMatrix.b = 0;
-	mirrorTransformationMatrix.c = 0;
-	mirrorTransformationMatrix.d = 1;
-	mirrorTransformationMatrix.tx = 0;
-	mirrorTransformationMatrix.ty = 0;
-	
-	remoteVideoImage = nil;
-	remoteVideoImageRep = nil;
-	
-	transmitFrameRate = 20;
-	
-	needsToStopLocalBusyIndicators = YES;
-	
+	localVideoSize = XMVideoSize_NoVideo;
 	remoteVideoSize = XMVideoSize_NoVideo;
+	
+	// Initializing the OpenGL structures
+	videoLock = [[NSLock alloc] init];
+	
+	// Default Attributes, see QTQuartzPlayer sample code
+	NSOpenGLPixelFormatAttribute attributes[] = {
+		NSOpenGLPFAColorSize, (NSOpenGLPixelFormatAttribute)24,
+		NSOpenGLPFAAlphaSize, (NSOpenGLPixelFormatAttribute)8,
+		NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)32,
+		(NSOpenGLPixelFormatAttribute)0
+	};
+	
+	openGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+	openGLContext = [[NSOpenGLContext alloc] initWithFormat:openGLPixelFormat shareContext:nil];
+	CVOpenGLTextureCacheCreate(NULL, NULL, (CGLContextObj)[openGLContext CGLContextObj],
+							   (CGLPixelFormatObj)[openGLPixelFormat CGLPixelFormatObj],
+							   NULL, &textureCache);
+	
+	localVideoTexture = NULL;
+	localVideoTextureDidChange = NO;
+	remoteVideoTexture = NULL;
+	remoteVideoTextureDidChange = NO;
+	
+	CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
+	CVDisplayLinkSetOutputCallback(displayLink, &_XMDisplayLinkCallback, NULL);
+	CVDisplayLinkStart(displayLink);
 	
 	return self;
 }
 
 - (void)_close
-{
+{	
+	if(displayLink != NULL)
+	{
+		CVDisplayLinkStop(displayLink);
+		CVDisplayLinkRelease(displayLink);
+		displayLink = NULL;
+	}
+	
+	[videoLock lock];
+	
 	if(videoInputModules != nil)
 	{
 		[videoInputModules release];
 		videoInputModules = nil;
 	}
-	if(localVideoViews != nil)
+	if(videoViews != nil)
 	{
-		[localVideoViews release];
-		localVideoViews = nil;
-	}
-	if(remoteVideoViews != nil)
-	{
-		[remoteVideoViews release];
-		remoteVideoViews = nil;
+		[videoViews release];
+		videoViews = nil;
 	}
 	if(inputDevices != nil)
 	{
@@ -105,31 +123,30 @@
 		[selectedInputDevice release];
 		selectedInputDevice = nil;
 	}
-	if(localVideoImage != nil)
+	if(openGLPixelFormat != nil)
 	{
-		[localVideoImage release];
-		localVideoImage = nil;
+		[openGLPixelFormat release];
+		openGLPixelFormat = nil;
 	}
-	if(localVideoImageRep != nil)
+	if(openGLContext != nil)
 	{
-		[localVideoImageRep release];
-		localVideoImageRep = nil;
+		[openGLContext release];
+		openGLContext = nil;
 	}
-	if(remoteVideoImage != nil)
+	if(textureCache != NULL)
 	{
-		[remoteVideoImage release];
-		remoteVideoImage = nil;
+		CVOpenGLTextureCacheRelease(textureCache);
+		textureCache = NULL;
 	}
-	if(remoteVideoImageRep != nil)
-	{
-		[remoteVideoImageRep release];
-		remoteVideoImageRep = nil;
-	}
+	
+	[videoLock unlock];
 }
 
 - (void)dealloc
 {	
 	[self _close];
+	
+	[videoLock release];
 	
 	[super dealloc];
 }
@@ -159,30 +176,10 @@
 	{
 		[selectedInputDevice release];
 		selectedInputDevice = [inputDevice retain];
-		[self _startLocalBusyIndicators];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartSelectedInputDeviceChange object:self];
 		[XMMediaTransmitter _setDevice:selectedInputDevice];
 	}
-}
-
-- (BOOL)doesMirrorLocalVideo
-{
-	return doesMirrorLocalVideo;
-}
-
-- (void)setDoesMirrorLocalVideo:(BOOL)flag
-{
-	doesMirrorLocalVideo = flag;
-}
-
-- (unsigned)transmitFrameRate
-{
-	return transmitFrameRate;
-}
-
-- (void)setTransmitFrameRate:(unsigned)theRate
-{
-	transmitFrameRate = theRate;
-	[XMMediaTransmitter _setFrameGrabRate:transmitFrameRate];
 }
 
 - (void)startGrabbing
@@ -195,87 +192,59 @@
 	[XMMediaTransmitter _stopGrabbing];
 }
 
+- (XMVideoSize)localVideoSize
+{
+	return localVideoSize;
+}
+
 - (XMVideoSize)remoteVideoSize
 {
 	return remoteVideoSize;
 }
 
+- (void)addVideoView:(id<XMVideoView>)videoView
+{
+	[videoLock lock];
+	
+	[videoViews addObject:videoView];
+	[videoView renderLocalVideo:localVideoTexture didChange:YES 
+					remoteVideo:remoteVideoTexture didChange:YES
+					   isForced:YES];
+	
+	[videoLock unlock];
+}
+
+- (void)removeVideoView:(id<XMVideoView>)videoView
+{
+	[videoLock lock];
+	
+	[videoViews removeObject:videoView];
+	
+	[videoLock unlock];
+}
+
+- (NSOpenGLPixelFormat *)openGLPixelFormat
+{
+	return openGLPixelFormat;
+}
+
+- (NSOpenGLContext *)openGLContext
+{
+	return openGLContext;
+}
+
+- (void)forceRenderingForView:(id<XMVideoView>)videoView
+{
+	[videoLock lock];
+	
+	[videoView renderLocalVideo:localVideoTexture didChange:YES 
+					remoteVideo:remoteVideoTexture didChange:YES
+					   isForced:YES];
+	
+	[videoLock unlock];
+}
+
 #pragma mark Framework Methods
-
-- (void)_addLocalVideoView:(XMVideoView *)videoView
-{
-	[localVideoViews addObject:videoView];
-	
-	if(localVideoImage == nil)
-	{
-		[videoView _startBusyIndicator];
-	}
-	else
-	{
-		[videoView setNeedsDisplay:YES];
-	}
-}
-
-- (void)_removeLocalVideoView:(XMVideoView *)videoView
-{
-	[localVideoViews removeObject:videoView];
-	[videoView _stopBusyIndicator];
-}
-
-- (void)_addRemoteVideoView:(XMVideoView *)videoView
-{
-	[remoteVideoViews addObject:videoView];
-}
-
-- (void)_removeRemoteVideoView:(XMVideoView *)videoView
-{
-	[remoteVideoViews removeObject:videoView];
-}
-
-- (void)_drawLocalVideoInRect:(NSRect)rect
-{
-	if(localVideoImage != nil)
-	{
-		if(localVideoImageRep == nil)
-		{
-			localVideoImageRep = [[NSCIImageRep alloc] initWithCIImage:localVideoImage];
-		}
-		
-		BOOL result = [localVideoImageRep drawInRect:rect];
-
-		if(result == NO)
-		{
-			NSLog(@"drawing preview failed");
-		}
-		
-		return;
-	}
-	
-	NSEraseRect(rect);
-}
-
-- (void)_drawRemoteVideoInRect:(NSRect)rect
-{
-	if(remoteVideoImage != nil)
-	{
-		if(remoteVideoImageRep == nil)
-		{
-			remoteVideoImageRep = [[NSCIImageRep alloc] initWithCIImage:remoteVideoImage];
-		}
-		
-		BOOL result = [remoteVideoImageRep drawInRect:rect];
-		
-		if(result == NO)
-		{
-			NSLog(@"Drawing remote failed");
-		}
-		
-		return;
-	}
-	
-	NSEraseRect(rect);
-	NSFrameRect(rect);
-}
 
 - (void)_handleDeviceList:(NSArray *)deviceList
 {
@@ -283,7 +252,9 @@
 	
 	inputDevices = [deviceList copy];
 	
-	if(selectedInputDevice == nil || [inputDevices indexOfObject:selectedInputDevice] == NSNotFound)
+	BOOL firstRun = (selectedInputDevice == nil);
+	
+	if(firstRun == YES || [inputDevices indexOfObject:selectedInputDevice] == NSNotFound)
 	{
 		[selectedInputDevice release];
 		selectedInputDevice = [[inputDevices objectAtIndex:0] retain];
@@ -291,6 +262,10 @@
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidUpdateInputDeviceList
 														object:nil];
+	if(firstRun == YES)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidChangeSelectedInputDevice object:self];
+	}
 }
 
 - (void)_handleInputDeviceChangeComplete:(NSString *)device
@@ -300,47 +275,7 @@
 		[selectedInputDevice release];
 		selectedInputDevice = [device retain];
 	}
-	needsToStopLocalBusyIndicators = YES;
-}
-
-- (void)_handlePreviewImage:(CIImage *)previewImage
-{
-	if(localVideoImage != nil)
-	{
-		[localVideoImage release];
-		localVideoImage = nil;
-		
-		[localVideoImageRep release];
-		localVideoImageRep = nil;
-	}
-
-	// we inherit the retain count from the MediaTransmitter
-	localVideoImage = previewImage;
-	
-	if(doesMirrorLocalVideo)
-	{
-		CGRect imageExtent = [localVideoImage extent];
-		mirrorTransformationMatrix.tx = imageExtent.size.width;
-		
-		CIImage *image = [localVideoImage imageByApplyingTransform:mirrorTransformationMatrix];
-		[localVideoImage release];
-		localVideoImage = [image retain];
-	}
-	
-	unsigned count = [localVideoViews count];
-	unsigned i;
-	
-	for(i = 0; i < count; i++)
-	{
-		XMVideoView *videoView = (XMVideoView *)[localVideoViews objectAtIndex:i];
-		
-		if(needsToStopLocalBusyIndicators == YES)
-		{
-			[videoView _stopBusyIndicator];
-		}
-		[videoView setNeedsDisplay:YES];
-	}
-	needsToStopLocalBusyIndicators = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidChangeSelectedInputDevice object:self];
 }
 
 - (void)_handleVideoReceivingStart:(NSNumber *)videoSize
@@ -357,43 +292,105 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidEndReceivingVideo object:self];
 }
 
-- (void)_handleRemoteImage:(CIImage *)remoteImage
+- (void)_handleLocalVideoFrame:(CVPixelBufferRef)pixelBuffer
+{	
+	[videoLock lock];
+	
+	// preventing to run any drawing operation after -_close has been
+	// called
+	if(textureCache == NULL)
+	{
+		[videoLock unlock];
+		return;
+	}
+	
+	// transform the CVPixelBufferRef into an OpenGL texture
+	CVOpenGLTextureRef openGLTexture;
+	CVOpenGLTextureCacheCreateTextureFromImage(NULL, textureCache,
+											   pixelBuffer, NULL, &openGLTexture);
+	
+	if(localVideoTexture != NULL)
+	{
+		CVOpenGLTextureRelease(localVideoTexture);
+	}
+	localVideoTexture = openGLTexture;
+	CVOpenGLTextureCacheFlush(textureCache, 0);
+	
+	localVideoTextureDidChange = YES;
+	
+	[videoLock unlock];
+}
+
+- (void)_handleRemoteVideoFrame:(CVPixelBufferRef)pixelBuffer
 {
-	if(remoteVideoImage != nil)
+	[videoLock lock];
+	
+	// preventing to run any drawing operation after -_close has been
+	// called
+	if(textureCache == NULL)
 	{
-		[remoteVideoImage release];
-		remoteVideoImage = nil;
-		
-		[remoteVideoImageRep release];
-		remoteVideoImageRep = nil;
+		[videoLock unlock];
+		return;
 	}
 	
-	// we inherit the retain count from the MediaTransmitter
-	remoteVideoImage = remoteImage;
+	// transform the CVPixelBufferRef into an OpenGL texture
+	CVOpenGLTextureRef openGLTexture;
+	CVOpenGLTextureCacheCreateTextureFromImage(NULL, textureCache,
+											   pixelBuffer, NULL, &openGLTexture);
 	
-	unsigned count = [remoteVideoViews count];
-	unsigned i;
-	
-	for(i = 0; i < count; i++)
+	if(remoteVideoTexture != NULL)
 	{
-		XMVideoView *videoView = (XMVideoView *)[remoteVideoViews objectAtIndex:i];
-		
-		[videoView setNeedsDisplay:YES];
+		CVOpenGLTextureRelease(remoteVideoTexture);
 	}
+	remoteVideoTexture = openGLTexture;
+	CVOpenGLTextureCacheFlush(textureCache, 0);
+	
+	remoteVideoTextureDidChange = YES;
+	
+	[videoLock unlock];
 }
 
 #pragma mark Private Methods
 
-- (void)_startLocalBusyIndicators
+- (void)_outputFrames
 {
-	unsigned count = [localVideoViews count];
-	unsigned i;
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	for(i = 0; i < count; i++)
+	[videoLock lock];
+	
+	if(localVideoTextureDidChange == YES ||
+	   remoteVideoTextureDidChange == YES)
 	{
-		XMVideoView *videoView = (XMVideoView *)[localVideoViews objectAtIndex:i];
-		[videoView _startBusyIndicator];
+		unsigned count = [videoViews count];
+		unsigned i;
+	
+		for(i = 0; i < count; i++)
+		{
+			id<XMVideoView> videoView = (id<XMVideoView>)[videoViews objectAtIndex:i];
+			[videoView renderLocalVideo:localVideoTexture didChange:localVideoTextureDidChange 
+							remoteVideo:remoteVideoTexture didChange:remoteVideoTextureDidChange
+							   isForced:NO];
+		}
+		localVideoTextureDidChange = NO;
+		remoteVideoTextureDidChange = NO;
 	}
+	
+	[videoLock unlock];
+	
+	[autoreleasePool release];
 }
 
 @end
+
+#pragma mark Callbacks
+
+static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink, 
+									   const CVTimeStamp *inNow, 
+									   const CVTimeStamp *inOutputTime, 
+									   CVOptionFlags flagsIn, 
+									   CVOptionFlags *flagsOut, 
+									   void *displayLinkContext)
+{
+	[_XMVideoManagerSharedInstance _outputFrames];
+	return kCVReturnSuccess;
+}
