@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.10 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.11 2005/11/30 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -218,6 +218,9 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		{
 			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
+				break;
+			case XMCodecIdentifier_H263:
+				codecType = kH263CodecType;
 				break;
 			default:
 				NSLog(@"illegal codecType");

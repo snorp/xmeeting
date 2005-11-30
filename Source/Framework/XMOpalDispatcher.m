@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.9 2005/11/24 21:13:02 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.10 2005/11/30 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -989,8 +989,9 @@ typedef enum _XMOpalDispatcherMessage
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
 	BOOL isIncomingStream = [number boolValue];
 	
-	NSRange range = [codec rangeOfString:@"H.261"];
-	if(range.location == NSNotFound)
+	NSRange h261range = [codec rangeOfString:@"H.261"];
+	NSRange h263range = [codec rangeOfString:@"H.263"];
+	if(h261range.location == NSNotFound && h263range.location == NSNotFound)
 	{
 		if(isIncomingStream == YES)
 		{

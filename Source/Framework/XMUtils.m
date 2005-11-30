@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.4 2005/10/19 22:08:23 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.5 2005/11/30 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -390,10 +390,16 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 {
 	switch (videoSize)
 	{
+		case XMVideoSize_SQCIF:
+			return NSMakeSize(128, 96);
 		case XMVideoSize_QCIF:
 			return NSMakeSize(176, 144);
 		case XMVideoSize_CIF:
 			return NSMakeSize(352, 288);
+		case XMVideoSize_4CIF:
+			return NSMakeSize(704, 576);
+		case XMVideoSize_16CIF:
+			return NSMakeSize(1408, 1152);
 		default:
 			return NSMakeSize(0, 0);
 	}

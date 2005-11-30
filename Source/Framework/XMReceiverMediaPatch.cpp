@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.7 2005/11/24 21:13:02 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.8 2005/11/30 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,6 +71,25 @@ void XMReceiverMediaPatch::Main()
 		{
 			codecIdentifier = XMCodecIdentifier_H261;
 			mediaSize = XMVideoSize_CIF;
+		}
+		else if(mediaFormat == XM_MEDIA_FORMAT_H263_SQCIF)
+		{
+			codecIdentifier = XMCodecIdentifier_H263;
+			mediaSize = XMVideoSize_SQCIF;
+		}
+		else if(mediaFormat == XM_MEDIA_FORMAT_H263_QCIF)
+		{
+			codecIdentifier = XMCodecIdentifier_H263;
+			mediaSize = XMVideoSize_QCIF;
+		}
+		else if(mediaFormat == XM_MEDIA_FORMAT_H263_CIF)
+		{
+			codecIdentifier = XMCodecIdentifier_H263;
+			mediaSize = XMVideoSize_CIF;
+		}
+		else
+		{
+			cout << "ERROR: receiving Unknown media format" << endl;
 		}
 
 		_XMStartMediaReceiving(codecIdentifier, (unsigned)payloadType, mediaSize, sessionID);

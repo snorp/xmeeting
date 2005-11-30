@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.1 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.2 2005/11/30 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,6 +26,10 @@ public:
 					 unsigned options = 0);
 	
 	virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
+
+	virtual BOOL OpenLogicalChannel(const H323Capability & capability,
+									unsigned sessionID,
+									H323Channel::Directions dir);
 };
 
 #endif // __XM_H323_CONNECTION_H__

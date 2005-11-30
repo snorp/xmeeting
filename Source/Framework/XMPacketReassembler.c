@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassembler.c,v 1.6 2005/11/27 17:30:55 hfriederich Exp $
+ * $Id: XMPacketReassembler.c,v 1.7 2005/11/30 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -110,6 +110,9 @@ ComponentResult XMPacketReassembler_Initialize(XMPacketReassemblerGlobals global
 	{
 		case XMCodecIdentifier_H261:
 			globals->codecType = kH261CodecType;
+			break;
+		case XMCodecIdentifier_H263:
+			globals->codecType = kH263CodecType;
 			break;
 		default:
 			return paramErr;
