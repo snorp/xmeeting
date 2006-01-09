@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassembler.h,v 1.1 2005/10/11 09:03:10 hfriederich Exp $
+ * $Id: XMPacketReassembler.h,v 1.2 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,17 +11,15 @@
 
 #include <QuickTime/QuickTime.h>
 
+#define kXMPacketReassemblerComponentType kRTPReassemblerType
+#define kXMPacketReassemblerComponentSubType 'XMet'
+#define kXMPacketReassemblerComponentManufacturer 'XMet'
+
 /**
- * Registering the XMPacketBuilder QuickTime Component
+ * Registering the XMPacketReassembler QuickTime Component
  * so that it can be used where it is needed.
  **/
  Boolean XMRegisterPacketReassembler();
- 
- /**
- * Fills out componentDescription so that the resulting description
-  * can be used to find the XMPacketBuilder component
-  **/
- Boolean XMGetPacketReassemblerComponentDescription(ComponentDescription *componentDescription);
 
 #endif // __XM_PACKET_REASSEMBLER__
 

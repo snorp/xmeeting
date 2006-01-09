@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.8 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.9 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_H323_END_POINT_H__

@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.9 2005/11/24 21:13:02 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.10 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import <Cocoa/Cocoa.h>
@@ -70,42 +70,60 @@ void _XMHandleCallCleared(unsigned callID, XMCallEndReason endReason)
 	[autoreleasePool release];
 }
 
-void _XMHandleMediaStreamOpened(unsigned callID, bool isIncomingStream, const char *mediaFormat)
+void _XMHandleAudioStreamOpened(unsigned callID, const char *codec, bool isIncomingStream)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *name = [[NSString alloc] initWithCString:mediaFormat];
+	NSString *codecString = [[NSString alloc] initWithCString:codec encoding:NSASCIIStringEncoding];
 	
-	[XMOpalDispatcher _mediaStreamOpened:callID codec:name incoming:isIncomingStream];
+	[XMOpalDispatcher _audioStreamOpened:callID codec:codecString incoming:isIncomingStream];
 	
-	[name release];
+	[codecString release];
 	
 	[autoreleasePool release];
 }
 
-void _XMHandleMediaStreamClosed(unsigned callID, bool isIncomingStream, const char *mediaFormat)
+void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, XMVideoSize videoSize, bool isIncomingStream)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *name = [[NSString alloc] initWithCString:mediaFormat];
+	NSString *codecString = [[NSString alloc] initWithCString:codec encoding:NSASCIIStringEncoding];
 	
-	[XMOpalDispatcher _mediaStreamClosed:callID codec:name incoming:isIncomingStream];
+	[XMOpalDispatcher _videoStreamOpened:callID codec:codecString size:videoSize incoming:isIncomingStream];
 	
-	[name release];
+	[codecString release];
+	
+	[autoreleasePool release];
+}
+
+void _XMHandleAudioStreamClosed(unsigned callID, bool isIncomingStream)
+{
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMOpalDispatcher _audioStreamClosed:callID incoming:isIncomingStream];
+
+	[autoreleasePool release];
+}
+
+void _XMHandleVideoStreamClosed(unsigned callID, bool isIncomingStream)
+{
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMOpalDispatcher _videoStreamClosed:callID incoming:isIncomingStream];
 	
 	[autoreleasePool release];
 }
 
 #pragma mark MediaReceiver callbacks
 
-void _XMStartMediaTransmit(XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
-						   unsigned maxBitrate, unsigned sessionID)
+void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
+						   unsigned maxBitrate, unsigned payloadCode)
 {
 	// this is called from a thread without run loop and without autorelease pool
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMMediaTransmitter _startTransmittingWithCodec:codec videoSize:videoSize maxFramesPerSecond:maxFramesPerSecond
-										 maxBitrate:maxBitrate session:sessionID];
+	[XMMediaTransmitter _startTransmittingForSession:sessionID withCodec:codec videoSize:videoSize maxFramesPerSecond:maxFramesPerSecond
+										  maxBitrate:maxBitrate payloadCode:payloadCode];
 	
 	[autoreleasePool release];
 }
@@ -119,12 +137,12 @@ void _XMStopMediaTransmit(unsigned sessionID)
 	[autoreleasePool release];
 }
 
-void _XMStartMediaReceiving(XMCodecIdentifier codecIdentifier, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID)
+void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codecIdentifier, XMVideoSize videoSize, unsigned payloadType)
 {
-	[_XMMediaReceiverSharedInstance _startMediaReceivingWithCodec:codecIdentifier
-													  payloadType:payloadType 
-														videoSize:videoSize 
-														  session:sessionID];
+	[_XMMediaReceiverSharedInstance _startMediaReceivingForSession:sessionID
+														 withCodec:codecIdentifier
+														 videoSize:videoSize 
+													  payloadType:payloadType];
 }
 
 void _XMStopMediaReceiving(unsigned sessionID)
@@ -132,12 +150,11 @@ void _XMStopMediaReceiving(unsigned sessionID)
 	[_XMMediaReceiverSharedInstance _stopMediaReceivingForSession:sessionID];
 }
 
-bool _XMProcessPacket(void *packetData, unsigned length, unsigned sessionID, unsigned *canReleasePackets)
+bool _XMProcessFrame(unsigned sessionID, void *data, unsigned length)
 {
-	return [_XMMediaReceiverSharedInstance _processPacket:packetData 
-												   length:length 
-												  session:sessionID 
-										canReleasePackets:canReleasePackets];
+	return [_XMMediaReceiverSharedInstance _decodeFrameForSession:sessionID
+															 data:data
+														   length:length];
 }
 
 void _XMUpdatePicture()

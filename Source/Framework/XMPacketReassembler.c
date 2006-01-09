@@ -1,18 +1,18 @@
 /*
- * $Id: XMPacketReassembler.c,v 1.7 2005/11/30 23:49:46 hfriederich Exp $
+ * $Id: XMPacketReassembler.c,v 1.8 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005 Hannes Friederich. All rights reserved.
  */
 
-#include <QuickTime/QuickTime.h>
 #include "XMPacketReassembler.h"
+
+#include "XMTypes.h"
 #include "XMCallbackBridge.h"
+#include "XMH264PacketReassembler.h"
 
 #define kXMPacketReassemblerVersion (0x00010001)
-#define kXMPacketReassemblerComponentSubType FOUR_CHAR_CODE('XMet')
-#define kXMPacketReassemblerComponentManufacturer FOUR_CHAR_CODE('XMet')
 
 #define kXMMaxBufferSize 352*288*4
 
@@ -40,12 +40,17 @@ typedef struct
 #include <QuickTime/QTStreamingComponents.k.h>
 #include <QuickTime/ComponentDispatchHelper.c>
 
-extern void XMProcessFrame(const UInt8* data, unsigned length, unsigned sessionID);
+// This function is implemented in XMMediaReceiver.m
+//extern void _XMProcessFrame(UInt8* data, unsigned length, unsigned sessionID);
+
+#pragma mark RTPRssm functions
 
 ComponentResult XMPacketReassembler_Open(XMPacketReassemblerGlobals globals,
 										 ComponentInstance self)
 {
 	ComponentResult err = noErr;
+	
+	printf("Open XMPacketReassembler\n");
 	
 	globals = calloc( sizeof(XMPacketReassemblerGlobalsRecord), 1);
 	if(!globals)
@@ -104,15 +109,18 @@ ComponentResult XMPacketReassembler_Target(XMPacketReassemblerGlobals globals,
 ComponentResult XMPacketReassembler_Initialize(XMPacketReassemblerGlobals globals,
 											   RTPRssmInitParams *inInitParams)
 {	
-	int codecType = inInitParams->ssrc;
+	XMCodecIdentifier codecIdentifier = (XMCodecIdentifier)inInitParams->ssrc;
 	
-	switch(codecType)
+	switch(codecIdentifier)
 	{
 		case XMCodecIdentifier_H261:
 			globals->codecType = kH261CodecType;
 			break;
 		case XMCodecIdentifier_H263:
 			globals->codecType = kH263CodecType;
+			break;
+		case XMCodecIdentifier_H264:
+			globals->codecType = kH264CodecType;
 			break;
 		default:
 			return paramErr;
@@ -130,18 +138,52 @@ ComponentResult XMPacketReassembler_HandleNewPacket(XMPacketReassemblerGlobals g
 {
 	ComponentResult err = noErr;
 	
+	unsigned char *data = inStreamBuffer->rptr;
+	
 	if(globals->reassembler == NULL)
 	{
+		OSType subType;
+		
 		ComponentDescription componentDescription;
 		componentDescription.componentType = kRTPReassemblerType;
-		componentDescription.componentSubType = globals->codecType;
+		componentDescription.componentSubType = 0;
 		componentDescription.componentManufacturer = 0;
 		componentDescription.componentFlags = 0;
 		componentDescription.componentFlagsMask = 0;
 		
+		if(globals->codecType == kH261CodecType)
+		{
+			subType = kRTP261ReassemblerType;
+		}
+		else if(globals->codecType == kH263CodecType)
+		{
+			if(globals->payloadType == kRTPPayload_H263)
+			{
+				subType = kRTP263ReassemblerType;
+			}
+			else
+			{
+				subType = kRTP263PlusReassemblerType;
+			}
+		}
+		else if(globals->codecType == kH264CodecType)
+		{
+			subType = kXMH264PacketReassemblerComponentSubType;
+			componentDescription.componentType = kXMH264PacketReassemblerComponentType;
+			componentDescription.componentManufacturer = kXMH264PacketReassemblerComponentManufacturer;
+		}
+		else
+		{
+			printf("no valid video codec\n");
+			return paramErr;
+		}
+		
+		componentDescription.componentSubType = subType;
+		
 		Component reassemblerComponent = FindNextComponent(0, &componentDescription);
 		if(reassemblerComponent == NULL)
 		{
+			printf("not found\n");
 			err = qtsBadStateErr;
 			goto bail;
 		}
@@ -150,6 +192,7 @@ ComponentResult XMPacketReassembler_HandleNewPacket(XMPacketReassemblerGlobals g
 		err = OpenAComponent(reassemblerComponent, &reassembler);
 		if(err != noErr)
 		{
+			printf("not opened\n");
 			err = qtsBadStateErr;
 			goto bail;
 		}
@@ -161,8 +204,9 @@ ComponentResult XMPacketReassembler_HandleNewPacket(XMPacketReassemblerGlobals g
 		err = RTPRssmInitialize(reassembler, &initParams);
 		if(err != noErr)
 		{
-			err = qtsBadStateErr;
-			goto bail;
+			printf("coulnd't initialize reassembler\n");
+			//err = qtsBadStateErr;
+			//goto bail;
 		}
 		
 		err = CallComponentTarget(reassembler, globals->self);
@@ -172,12 +216,12 @@ ComponentResult XMPacketReassembler_HandleNewPacket(XMPacketReassemblerGlobals g
 			goto bail;
 		}
 		
-		err = RTPRssmSetPayloadHeaderLength(reassembler, 4);
+		/*err = RTPRssmSetPayloadHeaderLength(reassembler, 4);
 		if(err != noErr)
 		{
 			err = qtsBadStateErr;
 			goto bail;
-		}
+		}*/
 		
 		globals->reassembler = reassembler;
 	}
@@ -201,6 +245,7 @@ ComponentResult XMPacketReassembler_AdjustPacketParams(XMPacketReassemblerGlobal
 													   RTPRssmPacket *inPacket,
 													   SInt32 inFlags)
 {
+	RTPRssmAdjustPacketParams(globals->reassembler, inPacket, inFlags);
 	return noErr;
 }
 
@@ -222,8 +267,7 @@ ComponentResult XMPacketReassembler_SendPacketList(XMPacketReassemblerGlobals gl
 	//printf("SendPacketList called with flags: %d\n", inFlags);
 	ComponentResult err = noErr;
 	
-	// since the RTPRssmComputeChunkSize does not always return correct results, we allocate a buffer
-	// with enough size to handle this
+	// The chunkBuffer is used repeatedly, therefore we allocate it to the maximum buffer size available
 	if(globals->chunkBuffer == NULL)
 	{
 		UInt8 *buffer = malloc(kXMMaxBufferSize);
@@ -250,10 +294,10 @@ ComponentResult XMPacketReassembler_SendPacketList(XMPacketReassemblerGlobals gl
 		goto bail;
 	}
 	
-	err = RTPRssmReleasePacketList(globals->reassembler,
-								   inPacketListHead);
+	/*err = RTPRssmReleasePacketList(globals->reassembler,
+								   inPacketListHead);*/
 	
-	XMProcessFrame(chunkRecord.dataPtr, chunkRecord.dataSize, globals->sessionID);
+//	_XMProcessFrame(chunkRecord.dataPtr, chunkRecord.dataSize, globals->sessionID);
 	
 bail:
 	return err;
@@ -305,17 +349,18 @@ ComponentResult XMPacketReassembler_Reset(XMPacketReassemblerGlobals globals,
 	return err;
 }
 
+#pragma mark Setup Functions
+
 Boolean XMRegisterPacketReassembler()
 {	
 	ComponentDescription description;
 	Component registeredComponent = NULL;
-		
-	// Getting the correct description
-	Boolean result = XMGetPacketReassemblerComponentDescription(&description);
-	if(result == false)
-	{
-		goto bail;
-	}
+	
+	description.componentType = kXMPacketReassemblerComponentType;
+	description.componentSubType = kXMPacketReassemblerComponentSubType;
+	description.componentManufacturer = kXMPacketReassemblerComponentManufacturer;
+	description.componentFlags = 0;
+	description.componentFlagsMask = 0;
 		
 	// Registering the Component
 	ComponentRoutineUPP componentEntryPoint =
@@ -326,15 +371,4 @@ Boolean XMRegisterPacketReassembler()
 	
 bail:
 	return (registeredComponent == NULL ? false : true);
-}
-
-Boolean XMGetPacketReassemblerComponentDescription(ComponentDescription *componentDescription)
-{
-	componentDescription->componentType = kRTPReassemblerType;
-	componentDescription->componentSubType = kXMPacketReassemblerComponentSubType;
-	componentDescription->componentManufacturer = kXMPacketReassemblerComponentManufacturer;
-	componentDescription->componentFlags = 0;
-	componentDescription->componentFlagsMask = 0;
-	
-	return true;
 }

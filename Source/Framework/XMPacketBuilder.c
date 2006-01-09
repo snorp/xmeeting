@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.3 2005/11/10 15:36:06 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.4 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,8 +11,6 @@
 #include "XMBridge.h"
 
 #define kXMPacketBuilderVersion (0x00010001)
-#define kXMPacketBuilderComponentSubType FOUR_CHAR_CODE('XMet')
-#define kXMPacketBuilderComponentManufacturer FOUR_CHAR_CODE('XMet')
 
 typedef struct
 {
@@ -53,8 +51,8 @@ ComponentResult XMPacketBuilder_Open(XMPacketBuilderGlobals globals,
 	
 	globals->self  = self;
 	globals->target = self;
-	globals->packetGroupRef = 0;
-	globals->packetRef = 0;
+	globals->packetGroupRef = 1;
+	globals->packetRef = 1;
 	globals->repRef = 0;
 	
 bail:
@@ -98,7 +96,7 @@ ComponentResult XMPacketBuilder_BeginPacketGroup(XMPacketBuilderGlobals globals,
 	{
 		*outPacketGroup = (RTPPacketGroupRef)globals->packetGroupRef;
 		globals->packetGroupRef++;
-		globals->packetRef = 0;
+		//globals->packetRef = 0;
 	}
 	else
 	{
@@ -129,7 +127,7 @@ ComponentResult XMPacketBuilder_BeginPacket(XMPacketBuilderGlobals globals,
 	
 		globals->packetRef++;
 	}
-	else
+else
 	{
 		err = paramErr;
 		goto bail;
@@ -152,6 +150,10 @@ ComponentResult XMPacketBuilder_EndPacket(XMPacketBuilderGlobals globals,
 {
 	//printf("XMPacketBuilder_EndPacket called with ref %d %d\n", (int)inPacketGroup, (int)inPacket);
 	//endPacket();
+	if((int)inPacket != (globals->packetRef-1))
+	{
+		printf("ERROR PacketRef\n");
+	}
 	bool hasMarkerBitSet = (inFlags & 1);
 	_XMSendPacket(2, hasMarkerBitSet);
 	return noErr;
@@ -177,6 +179,12 @@ ComponentResult XMPacketBuilder_AddPacketLiteralData(XMPacketBuilderGlobals glob
 {
 	ComponentResult err = noErr;
 	
+	/*printf("addPacketLIteralData %d\n", inDataLength);
+	if(inDataLength == 2)
+	{
+		printf("%x %x\n", inData[0], inData[1]);
+	}*/
+	
 	if(outDataRef != NULL)
 	{
 		printf("RTPPacketRepeatedDataRef *dataRef != NULL\n");
@@ -200,7 +208,7 @@ ComponentResult XMPacketBuilder_AddPacketRepeatedData(XMPacketBuilderGlobals glo
 													  RTPPacketRef inPacket,
 													  RTPPacketRepeatedDataRef inDataRef)
 {
-	printf("AddPacketRepeatedData\n");
+	//printf("AddPacketRepeatedData\n");
 	return paramErr;
 }
 
@@ -215,7 +223,8 @@ ComponentResult XMPacketBuilder_AddPacketSampleData(XMPacketBuilderGlobals globa
 {
 	ComponentResult err = noErr;
 	
-	//printf("AddPacketSampleData\n");
+	//printf("AddPacketSampleData %d %d (%d)\n", inSampleOffset, (inSampleOffset+inSampleDataLength), inSampleDataLength);
+	
 	if(outDataRef != NULL)
 	{
 		printf("RTPPacketRepeatedDataRef Not NULL (2)\n");
@@ -230,6 +239,12 @@ ComponentResult XMPacketBuilder_AddPacketSampleData(XMPacketBuilderGlobals globa
 	}
 	
 	UInt8 *data = (UInt8 *)inSampleDataParams->data;
+	
+	/*if(inSampleOffset >= 5)
+	{
+		printf("%x %x %x %x %x\n", data[inSampleOffset-5], data[inSampleOffset-4], data[inSampleOffset-3], data[inSampleOffset-2], data[inSampleOffset-1]);
+	}*/
+	
 	data += inSampleOffset;
 	
 	//printf("Adding data length: %d\n", inSampleDataLength);
@@ -384,12 +399,11 @@ Boolean XMRegisterPacketBuilder()
 	ComponentDescription description;
 	Component registeredComponent = NULL;
 	
-	// Getting the correct description
-	Boolean result = XMGetPacketBuilderComponentDescription(&description);
-	if(result == false)
-	{
-		goto bail;
-	}
+	description.componentType = kXMPacketBuilderComponentType;
+	description.componentSubType = kXMPacketBuilderComponentSubType;
+	description.componentManufacturer = kXMPacketBuilderComponentManufacturer;
+	description.componentFlags = 0;
+	description.componentFlagsMask = 0;
 	
 	// Registering the Component
 	ComponentRoutineUPP componentEntryPoint =
@@ -407,15 +421,4 @@ bail:
 	{
 		return true;
 	}
-}
-
-Boolean XMGetPacketBuilderComponentDescription(ComponentDescription *componentDescription)
-{
-	componentDescription->componentType = kRTPPacketBuilderType;
-	componentDescription->componentSubType = kXMPacketBuilderComponentSubType;
-	componentDescription->componentManufacturer = kXMPacketBuilderComponentManufacturer;
-	componentDescription->componentFlags = 0;
-	componentDescription->componentFlagsMask = 0;
-	
-	return true;
 }

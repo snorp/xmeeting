@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.17 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.18 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #include "XMOpalManager.h"
@@ -103,12 +103,23 @@ BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStre
 		// first, we want to find out whether we are interested in this media stream or not
 		// We are only interested in the external codecs and not the internal PCM-16 format
 		// and XM_MEDIA_FORMAT_VIDEO
-		PString format = stream.GetMediaFormat();
-		if(!(format == OpalPCM16 ||
-			 format == XM_MEDIA_FORMAT_VIDEO))
+		OpalMediaFormat mediaFormat = stream.GetMediaFormat();
+		if(!(mediaFormat == OpalPCM16 ||
+			 mediaFormat == XM_MEDIA_FORMAT_VIDEO))
 		{
 			callID = connection.GetCall().GetToken().AsUnsigned();
-			_XMHandleMediaStreamOpened(callID, stream.IsSource(), format);
+			
+			if(_XMIsVideoMediaFormat(mediaFormat))
+			{
+				XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+				const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
+				
+				_XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, stream.IsSource());
+			}
+			else
+			{
+				_XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
+			}
 		}
 	}
 	
@@ -120,11 +131,19 @@ void XMOpalManager::OnClosedMediaStream(const OpalMediaStream & stream)
 	// first, we want to find out whether we are interested in this media stream or not
 	// We are only interested in the external codecs and not the internal PCM-16 format
 	// and XM_MEDIA_FORMAT_VIDEO
-	PString format = stream.GetMediaFormat();
-	if(!(format == OpalPCM16 ||
-		 format == XM_MEDIA_FORMAT_VIDEO))
+	OpalMediaFormat mediaFormat = stream.GetMediaFormat();
+	if(!(mediaFormat == OpalPCM16 ||
+		 mediaFormat == XM_MEDIA_FORMAT_VIDEO))
 	{
-		_XMHandleMediaStreamClosed(callID, stream.IsSource(), format);
+		
+		if(_XMIsVideoMediaFormat(mediaFormat))
+		{
+			_XMHandleVideoStreamClosed(callID, stream.IsSource());
+		}
+		else
+		{
+			_XMHandleAudioStreamClosed(callID, stream.IsSource());
+		}
 	}
 	
 	OpalManager::OnClosedMediaStream(stream);
@@ -160,9 +179,12 @@ void XMOpalManager::SetBandwidthLimit(unsigned limit)
 	}
 	
 	// taking away the approximative amount of audio bandwidth
-	unsigned videoLimit = limit - 64000;
-	
-	_XMSetMaxVideoBitrate(videoLimit);
+	videoBandwidthLimit = limit - 64000;
+}
+
+unsigned XMOpalManager::GetVideoBandwidthLimit()
+{
+	return videoBandwidthLimit;
 }
 
 #pragma mark Video Setup Methods

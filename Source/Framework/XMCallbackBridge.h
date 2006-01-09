@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.15 2005/11/24 21:13:02 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.16 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALLBACK_BRIDGE_H__
@@ -56,23 +56,32 @@ void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall);
 void _XMHandleCallCleared(unsigned callID, XMCallEndReason callEndReason);
 
 /**
- * This function is called every time a new media stream is opened.
+ * This function is called every time a new audio stream is opened.
  **/
-void _XMHandleMediaStreamOpened(unsigned callID, bool isIncomingStream, const char *mediaFormat);
+void _XMHandleAudioStreamOpened(unsigned callID, const char *codec, bool isIncomingStream);
 
 /**
- * This function is called every time an existing media stream is closed.
- * Note that the callID currently is set constantly to 0.
+ * This function is called every time a new video stream is opened.
  **/
-void _XMHandleMediaStreamClosed(unsigned callID, bool isIncomingStream, const char *mediaFormat);
+void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, XMVideoSize videoSize, bool isIncomingStream);
+
+/**
+ * This function is called every time an existing audio stream is closed.
+ **/
+void _XMHandleAudioStreamClosed(unsigned callID, bool isIncomingStream);
+
+/**
+ * This function is called every time an existing video stream is closed.
+ **/
+void _XMHandleVideoStreamClosed(unsigned callID, bool IsIncomingStream);
 
 #pragma mark MediaTransmitter & MediaReceiver callbacks
 
 /**
  * Instructs the MediaTransmitter to start sending video data
  **/
-void _XMStartMediaTransmit(XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
-						   unsigned maxBitrate, unsigned sessionID);
+void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
+						   unsigned maxBitrate, unsigned payloadCode);
 
 /**
  * Instructs the MediaTransmitter to stop sending video data
@@ -83,7 +92,7 @@ void _XMStopMediaTransmit(unsigned sessionID);
  * Tells the MediaReceiver to prepare for incoming data with codec,
  * RTP payload type and the sessionID
  **/
-void _XMStartMediaReceiving(XMCodecIdentifier codec, unsigned payloadType, XMVideoSize videoSize, unsigned sessionID);
+void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize,  unsigned payloadType);
 
 /**
  * Tells the MediaReceiver that the media stream for the session has
@@ -94,7 +103,7 @@ void _XMStopMediaReceiving(unsigned sessionID);
 /**
  * Forwads the received packet to the MediaReceiver
  **/
-bool _XMProcessPacket(void *packet, unsigned length, unsigned sessionID, unsigned *canReleasePackets);
+bool _XMProcessFrame(unsigned sessionID, void *packet, unsigned length);
 
 /**
  * Forwards the OpalVideoUpdatePicture media command to the

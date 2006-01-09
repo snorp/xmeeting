@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323Connection.h,v 1.2 2005/11/30 23:49:46 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.3 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_H323_CONNECTION_H__
@@ -11,6 +11,8 @@
 
 #include <ptlib.h>
 #include <h323/h323con.h>
+
+#include <h323/h323neg.h>
 
 class XMH323Connection : public H323Connection
 {
@@ -30,6 +32,21 @@ public:
 	virtual BOOL OpenLogicalChannel(const H323Capability & capability,
 									unsigned sessionID,
 									H323Channel::Directions dir);
+	virtual H323Channel * CreateRealTimeLogicalChannel(const H323Capability & capability,
+													   H323Channel::Directions dir,
+													   unsigned sessionID,
+													   const H245_H2250LogicalChannelParameters * param,
+													   RTP_QOS * rtpqos = NULL);
+	
+	virtual BOOL OnCreateLogicalChannel(const H323Capability & capability,
+										H323Channel::Directions dir,
+										unsigned & errorCode);
+	
+	virtual void OnSetLocalCapabilities();
+	
+private:
+	BOOL hasSetLocalCapabilities;
+	BOOL hasSentLocalCapabilities;
 };
 
 #endif // __XM_H323_CONNECTION_H__

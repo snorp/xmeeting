@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.5 2005/11/30 23:49:46 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.6 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -120,8 +120,7 @@
 			   [scanner scanString:@"." intoString:nil] &&
 			   [scanner scanInt:&fourthByte])
 			{
-				// we have an ip address. check that we haven't got the 127.0.0.1 address.
-				
+				// we have an IPv4 address. check that we haven't got the loopback address.
 				if(firstByte != 127 || secondByte != 0 || thirdByte != 0 || fourthByte != 1) // we have a different address
 				{
 					localAddress = [address retain];

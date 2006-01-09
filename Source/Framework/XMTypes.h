@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.15 2005/11/30 23:49:46 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.16 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -127,8 +127,7 @@ typedef enum XMCodecIdentifier
 	// Video Codecs
 	XMCodecIdentifier_H261 = 100,
 	XMCodecIdentifier_H263,
-	XMCodecIdentifier_H264,
-	XMCodecIdentifier_JPEG
+	XMCodecIdentifier_H264
 	
 } XMCodecIdentifier;
 

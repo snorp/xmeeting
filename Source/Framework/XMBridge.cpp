@@ -1,9 +1,9 @@
 /*
- * $Id: XMBridge.cpp,v 1.15 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.16 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #include "XMBridge.h"
@@ -60,6 +60,11 @@ const char *_XMGetUserName()
 void _XMSetBandwidthLimit(unsigned limit)
 {
 	theManager->SetBandwidthLimit(limit);
+}
+
+unsigned _XMGetVideoBandwidthLimit()
+{
+	return theManager->GetVideoBandwidthLimit();
 }
 
 void _XMSetTranslationAddress(const char *a)
@@ -130,6 +135,8 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	disabledCodecsArray.AppendString("*speex*");
 	disabledCodecsArray.AppendString("*lpc*");
 	disabledCodecsArray.AppendString("*ms*");
+	
+	//disabledCodecsArray.AppendString("*qth.264*");
 	
 	theManager->SetMediaFormatMask(disabledCodecsArray);
 	theManager->SetMediaFormatOrder(orderedCodecsArray);

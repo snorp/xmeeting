@@ -1,9 +1,9 @@
 /*
- * $Id: XMBridge.h,v 1.13 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.14 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 /**
@@ -46,21 +46,15 @@ extern "C" {
  **/
 void _XMInitSubsystem();
 
-/**
- * Used by XMCallManager to allow preferences initialization
- * in a separate thread
- **/
-//void initiateSubsystemSetup(void *preferences);
-
 #pragma mark General Setup Functions
 
 /**
-	* sets the user name to be used.
+ * sets the user name to be used.
  **/
 void _XMSetUserName(const char *string);
 
 /**
-	* Returns the current user name
+ * Returns the current user name
  * The value is obtained call-by-reference.
  **/
 const char *_XMGetUserName();
@@ -71,6 +65,12 @@ const char *_XMGetUserName();
  * sets the bandwidth limit to the value as specified
  **/
 void _XMSetBandwidthLimit(unsigned limit);
+
+/**
+ * Returns the maximum allowed video bitrate to satisfy
+ * the bandwidth limit
+ **/
+unsigned _XMGetVideoBandwidthLimit();
 
 /**
  * Sets the translation address (usually the NAT address)

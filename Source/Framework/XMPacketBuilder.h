@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.h,v 1.1 2005/10/12 21:07:40 hfriederich Exp $
+ * $Id: XMPacketBuilder.h,v 1.2 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,16 +11,14 @@
 
 #include <QuickTime/QuickTime.h>
 
+#define kXMPacketBuilderComponentType kRTPPacketBuilderType
+#define kXMPacketBuilderComponentSubType 'XMet'
+#define kXMPacketBuilderComponentManufacturer 'XMet'
+
 /**
  * Registering the XMPacketBuilder QuickTime Component
  * so that it can be used where it is needed.
  **/
 Boolean XMRegisterPacketBuilder();
-
-/**
- * Fills out componentDescription so that the resulting description
- * can be used to find the XMPacketBuilder component
- **/
-Boolean XMGetPacketBuilderComponentDescription(ComponentDescription *componentDescription);
 
 #endif // __XM_PACKET_BUILDER_H__

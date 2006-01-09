@@ -1,27 +1,27 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.11 2005/11/30 23:49:46 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.12 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMMediaReceiver.h"
 
 #import "XMPrivate.h"
-#import "XMVideoManager.h"
-#import "XMPacketReassembler.h"
-#import "XMCallbackBridge.h"
 #import "XMUtils.h"
+#import "XMVideoManager.h"
+#import "XMCallbackBridge.h"
+
+#define XM_PACKET_POOL_GRANULARITY 16
+#define XM_CHUNK_BUFFER_SIZE 352*288*4
 
 @interface XMMediaReceiver (PrivateMethods)
 
 - (id)_init;
-- (void)_processFrame:(const UInt8 *)data length:(unsigned)length session:(unsigned)session;
+- (BOOL)_processPacketGroup;
 
 @end
-
-void XMProcessFrame(const UInt8* data, unsigned length, unsigned sessionID);
 
 static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 										   OSStatus result,
@@ -48,18 +48,10 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 {	
 	self = [super init];
 	
-	XMRegisterPacketReassembler();
-	
-	videoPacketReassembler = NULL;
 	videoDecompressionSession = NULL;
 	videoCodecIdentifier = XMCodecIdentifier_UnknownCodec;
 	videoPayloadType = 0;
 	videoMediaSize = XMVideoSize_NoVideo;
-	
-	didSucceedDecodingFrame = YES;
-	canReleasePackets = NO;
-	
-	doesClose = NO;
 	
 	return self;
 }
@@ -76,8 +68,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 #pragma mark Data Handling Methods
 
-- (void)_startMediaReceivingWithCodec:(XMCodecIdentifier)codecIdentifier payloadType:(unsigned)payloadType
-								 videoSize:(XMVideoSize)videoSize session:(unsigned)sessionID
+- (void)_startMediaReceivingForSession:(unsigned)sessionID withCodec:(XMCodecIdentifier)codecIdentifier 
+							 videoSize:(XMVideoSize)videoSize payloadType:(unsigned)payloadType;
 {
 	ComponentResult err = noErr;
 	
@@ -88,8 +80,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	}
 	
 	videoCodecIdentifier = codecIdentifier;
-	videoPayloadType = payloadType;
 	videoMediaSize = videoSize;
+	videoPayloadType = payloadType;
 	
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoSize];
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingStart:)
@@ -104,104 +96,13 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		ICMDecompressionSessionRelease(videoDecompressionSession);
 		videoDecompressionSession = NULL;
 	}
-	if(videoPacketReassembler != NULL)
-	{
-		CloseComponent(videoPacketReassembler);
-		videoPacketReassembler = NULL;
-	}
 	
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingEnd)
 													withObject:nil waitUntilDone:NO];
-	
 	ExitMoviesOnThread();
 }
 
-- (BOOL)_processPacket:(UInt8*)data length:(unsigned)length session:(unsigned)sessionID canReleasePackets:(unsigned *)outCanReleasePackets
-{
-	ComponentResult err = noErr;
-	
-	if(videoPacketReassembler == NULL)
-	{
-		ComponentDescription componentDescription;
-		
-		if(XMGetPacketReassemblerComponentDescription(&componentDescription) == false)
-		{
-			NSLog(@"Obtaining PacketReassembler CompDesc failed");
-			return NO;
-		}
-		
-		Component reassemblerComponent = FindNextComponent(0, &componentDescription);
-		if(reassemblerComponent == NULL)
-		{
-			NSLog(@"Couldn't find packet reassembler component");
-			return NO;
-		}
-		
-		err = OpenAComponent(reassemblerComponent, &videoPacketReassembler);
-		if(err != noErr)
-		{
-			NSLog(@"Opening packetReassembler failed %d", (int)err);
-			return NO;
-		}
-		
-		// we pass the required information to the XMPacketReassembler through
-		// the default RTPRssmInitParams call.
-		// However, the meaning of ssrc and timeScale are redefined as
-		// follows:
-		// ssrc contains the codecIdentifier and
-		// timeScale contains the sessionID to be used
-		RTPRssmInitParams initParams;
-		initParams.payloadType = videoPayloadType;
-		initParams.ssrc = videoCodecIdentifier;
-		initParams.timeScale = sessionID;
-		err = RTPRssmInitialize(videoPacketReassembler, &initParams);
-		if(err != noErr)
-		{
-			NSLog(@"RTPRssmInitialize failed %d", (int)err);
-			return NO;
-		}
-	}
-	
-	QTSStreamBuffer *streamBuffer = NULL;
-	err = QTSNewStreamBuffer(0, 0, &streamBuffer);
-	if(err != noErr)
-	{
-		NSLog(@"Creating StreamBuffer failed: %d", (int)err);
-		return NO;
-	}
-	
-	streamBuffer->rptr = data;
-	streamBuffer->wptr = data + length;
-	/*
-	void *dest = streamBuffer->rptr;
-	memcpy(dest, data, length);
-	streamBuffer->wptr += length;
-	*/
-	didSucceedDecodingFrame = YES;
-	canReleasePackets = NO;
-	
-	err = RTPRssmHandleNewPacket(videoPacketReassembler,
-								 streamBuffer,
-								 0);
-	if(canReleasePackets == NO)
-	{
-		*outCanReleasePackets = 0;
-	}
-	else
-	{
-		*outCanReleasePackets = 1;
-	}
-	
-	if(err != noErr)
-	{
-		NSLog(@"RTPRssmHandleNewPacket failed: %d", (int)err);
-		return NO;
-	}
-		
-	return didSucceedDecodingFrame;		
-}
-
-- (void)_processFrame:(const UInt8 *)data length:(unsigned)length session:(unsigned)sessionID
+- (BOOL)_decodeFrameForSession:(unsigned)sessionID data:(UInt8 *)data length:(unsigned)length
 {
 	ComponentResult err = noErr;
 	
@@ -213,35 +114,108 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
 		CodecType codecType;
+		char *codecName;
 		
 		switch(videoCodecIdentifier)
 		{
 			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
+				codecName = "H.261";
 				break;
 			case XMCodecIdentifier_H263:
 				codecType = kH263CodecType;
+				codecName = "H.263";
+				break;
+			case XMCodecIdentifier_H264:
+				codecType =  kH264CodecType;
+				codecName = "H.264";
 				break;
 			default:
 				NSLog(@"illegal codecType");
-				return;
+				return NO;
 		}
 		
-		imageDesc = (ImageDescriptionHandle)NewHandleClear(sizeof ( **imageDesc ));
-		(**imageDesc).idSize = sizeof( **imageDesc);
+		imageDesc = (ImageDescriptionHandle)NewHandleClear(sizeof(**imageDesc)+4);
+		(**imageDesc).idSize = sizeof( **imageDesc)+4;
 		(**imageDesc).cType = codecType;
+		(**imageDesc).resvd1 = 0;
+		(**imageDesc).resvd2 = 0;
+		(**imageDesc).dataRefIndex = 0;
 		(**imageDesc).version = 1;
 		(**imageDesc).revisionLevel = 1;
-		(**imageDesc).vendor = FOUR_CHAR_CODE('XMet');
+		(**imageDesc).vendor = 'XMet';
 		(**imageDesc).temporalQuality = codecNormalQuality;
 		(**imageDesc).spatialQuality = codecNormalQuality;
 		(**imageDesc).width = (short)videoDimensions.width;
 		(**imageDesc).height = (short)videoDimensions.height;
+		(**imageDesc).hRes = Long2Fix(72);
+		(**imageDesc).vRes = Long2Fix(72);
 		(**imageDesc).dataSize = 0;
 		(**imageDesc).frameCount = 1;
+		CopyCStringToPascal(codecName, (**imageDesc).name);
+		(**imageDesc).depth = 24;
 		(**imageDesc).clutID = -1;
 		
+		/*
+		if(codecType == kH264CodecType)
+		{
+			UInt32 avccLength = _XMGetAVCCAtomLength();
+			if(avccLength == 0)
+			{
+				NSLog(@"AVCC Not yet ready");
+				DisposeHandle((Handle)imageDesc);
+				return;
+			}
+			
+			Handle avccHandle = NewHandleClear(avccLength);
+			Boolean result = _XMGetAVCCAtom((UInt8 *)*avccHandle);
+			
+			err = AddImageDescriptionExtension(imageDesc, avccHandle, 'avcC');
+			if(err != noErr)
+			{
+				NSLog(@"Add AVCC failed");
+				DisposeHandle((Handle)imageDesc);
+				DisposeHandle(avccHandle);
+				return;
+			}
+			
+			DisposeHandle(avccHandle);
+		}*/
+		
 		ICMDecompressionSessionOptionsRef sessionOptions = NULL;
+		err = ICMDecompressionSessionOptionsCreate(NULL, &sessionOptions);
+		if(err != noErr)
+		{
+			NSLog(@"DecompressionSessionOptionsCreate  failed %d", (int)err);
+		}
+		
+		/*if(codecType == kH263CodecType)
+		{
+			NSLog(@"Is H.263 codec to receive");
+			ComponentDescription componentDescription;
+			componentDescription.componentType = 'imdc';
+			componentDescription.componentSubType = 'h263';
+			componentDescription.componentManufacturer = 'appl';
+			componentDescription.componentFlags = 0;
+			componentDescription.componentFlagsMask = 0;
+			
+			Component decompressorComponent = FindNextComponent(0, &componentDescription);
+			if(decompressorComponent == NULL)
+			{
+				fprintf(stderr, "No such decompressor\n");
+			}
+			
+			err = ICMDecompressionSessionOptionsSetProperty(sessionOptions,
+															kQTPropertyClass_ICMDecompressionSessionOptions,
+															kICMDecompressionSessionOptionsPropertyID_DecompressorComponent,
+															sizeof(decompressorComponent),
+															&decompressorComponent);
+			if(err != noErr)
+			{
+				NSLog(@"No such codec found");
+			}
+		}*/
+		
 		ICMDecompressionTrackingCallbackRecord trackingCallbackRecord;
 		
 		trackingCallbackRecord.decompressionTrackingCallback = XMProcessDecompressedFrameProc;
@@ -275,7 +249,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		DisposeHandle((Handle)imageDesc);
 	}
-	
 	err = ICMDecompressionSessionDecodeFrame(videoDecompressionSession,
 											 data, length,
 											 NULL, NULL,
@@ -283,18 +256,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(err != noErr)
 	{
 		NSLog(@"Decompression of the frame failed %d", (int)err);
-		didSucceedDecodingFrame = NO;
+		return NO;
 	}
-	
-	canReleasePackets = YES;
+	return YES;
 }
 
 @end
-
-void XMProcessFrame(const UInt8* data, unsigned length, unsigned sessionID)
-{
-	[_XMMediaReceiverSharedInstance _processFrame:data length:length session:sessionID];
-}
 
 static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 										   OSStatus result,

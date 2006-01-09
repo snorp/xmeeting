@@ -10,6 +10,9 @@
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		D10157EE09409867000A9BA7 /* XMH263MediaPacketizer.h in Headers */ = {isa = PBXBuildFile; fileRef = D10157EC09409867000A9BA7 /* XMH263MediaPacketizer.h */; };
+		D10157EF09409867000A9BA7 /* XMH263MediaPacketizer.c in Sources */ = {isa = PBXBuildFile; fileRef = D10157ED09409867000A9BA7 /* XMH263MediaPacketizer.c */; };
+		D10157F309409882000A9BA7 /* XMH263MediaPacketizerDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = D10157F209409882000A9BA7 /* XMH263MediaPacketizerDispatch.h */; };
 		D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFE9407B3771F00BBC8EA /* XMCallManager.h */; };
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
 		D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
@@ -18,6 +21,7 @@
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
+		D110B8ED09597A100009D87A /* h261codec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25708F90262007E4ABE /* h261codec.cxx */; };
 		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
 		D1296DF509288A7A0077C77F /* psync.h in Headers */ = {isa = PBXBuildFile; fileRef = D1296DF409288A7A0077C77F /* psync.h */; };
 		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
@@ -32,6 +36,8 @@
 		D134B9C4093B8D5C0090271F /* XMSimpleVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */; };
 		D134B9C5093B8D5C0090271F /* XMSimpleVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */; };
 		D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */ = {isa = PBXBuildFile; fileRef = D14587EE09013DD4004A1EDF /* XMCallStatistics.m */; };
+		D147D6070970342B005DE11C /* XMRTPPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = D147D6050970342B005DE11C /* XMRTPPacket.h */; };
+		D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147D6060970342B005DE11C /* XMRTPPacket.cpp */; };
 		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
@@ -76,7 +82,6 @@
 		D1971F0C08FAB3F400295E05 /* XMMediaStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */; };
 		D197216B08FADEE300295E05 /* XMReceiverMediaPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */; };
 		D19722EC08FB127600295E05 /* XMMediaReceiver.m in Sources */ = {isa = PBXBuildFile; fileRef = D19722EB08FB127600295E05 /* XMMediaReceiver.m */; };
-		D197231608FB157000295E05 /* XMPacketReassembler.c in Sources */ = {isa = PBXBuildFile; fileRef = D197231308FB157000295E05 /* XMPacketReassembler.c */; };
 		D19729B308FBF8A000295E05 /* XMTransmitterMediaPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D19729B208FBF8A000295E05 /* XMTransmitterMediaPatch.cpp */; };
 		D1972B0308FC529C00295E05 /* XMPacketBuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = D1972B0008FC529C00295E05 /* XMPacketBuilder.c */; };
 		D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */; };
@@ -466,7 +471,6 @@
 		D1CEE3AA08F90263007E4ABE /* short_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25408F90262007E4ABE /* short_term.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
 		D1CEE3AB08F90263007E4ABE /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25508F90262007E4ABE /* table.c */; settings = {COMPILER_FLAGS = "-iquote../opal/src/codec/gsm/inc"; }; };
 		D1CEE3AC08F90263007E4ABE /* gsmcodec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25608F90262007E4ABE /* gsmcodec.cxx */; };
-		D1CEE3AD08F90263007E4ABE /* h261codec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25708F90262007E4ABE /* h261codec.cxx */; };
 		D1CEE3AE08F90263007E4ABE /* anaFilter.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25908F90262007E4ABE /* anaFilter.c */; };
 		D1CEE3AF08F90263007E4ABE /* anaFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE25A08F90262007E4ABE /* anaFilter.h */; settings = {ATTRIBUTES = (); }; };
 		D1CEE3B008F90263007E4ABE /* constants.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25B08F90262007E4ABE /* constants.c */; };
@@ -769,6 +773,9 @@
 		32CA4F630368D1EE00C91783 /* XMeeting_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMeeting_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* XMeeting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XMeeting.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D10157EC09409867000A9BA7 /* XMH263MediaPacketizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH263MediaPacketizer.h; path = Source/Framework/XMH263MediaPacketizer.h; sourceTree = "<group>"; };
+		D10157ED09409867000A9BA7 /* XMH263MediaPacketizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMH263MediaPacketizer.c; path = Source/Framework/XMH263MediaPacketizer.c; sourceTree = "<group>"; };
+		D10157F209409882000A9BA7 /* XMH263MediaPacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH263MediaPacketizerDispatch.h; path = Source/Framework/XMH263MediaPacketizerDispatch.h; sourceTree = "<group>"; };
 		D10AFE9407B3771F00BBC8EA /* XMCallManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallManager.h; path = Source/Framework/XMCallManager.h; sourceTree = "<group>"; };
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
@@ -795,6 +802,8 @@
 		D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleVideoView.m; path = Source/GUI/XMSimpleVideoView.m; sourceTree = "<group>"; };
 		D14587ED09013DD4004A1EDF /* XMCallStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallStatistics.h; path = Source/Framework/XMCallStatistics.h; sourceTree = "<group>"; };
 		D14587EE09013DD4004A1EDF /* XMCallStatistics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallStatistics.m; path = Source/Framework/XMCallStatistics.m; sourceTree = "<group>"; };
+		D147D6050970342B005DE11C /* XMRTPPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPPacket.h; path = Source/Framework/XMRTPPacket.h; sourceTree = "<group>"; };
+		D147D6060970342B005DE11C /* XMRTPPacket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMRTPPacket.cpp; path = Source/Framework/XMRTPPacket.cpp; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
 		D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMDatabaseField.h; path = Source/GUI/XMDatabaseField.h; sourceTree = "<group>"; };
@@ -853,9 +862,6 @@
 		D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMReceiverMediaPatch.cpp; path = Source/Framework/XMReceiverMediaPatch.cpp; sourceTree = "<group>"; };
 		D19722EA08FB127600295E05 /* XMMediaReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMMediaReceiver.h; path = Source/Framework/XMMediaReceiver.h; sourceTree = "<group>"; };
 		D19722EB08FB127600295E05 /* XMMediaReceiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMMediaReceiver.m; path = Source/Framework/XMMediaReceiver.m; sourceTree = "<group>"; };
-		D197231308FB157000295E05 /* XMPacketReassembler.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XMPacketReassembler.c; path = Source/Framework/XMPacketReassembler.c; sourceTree = "<group>"; };
-		D197231408FB157000295E05 /* XMPacketReassembler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMPacketReassembler.h; path = Source/Framework/XMPacketReassembler.h; sourceTree = "<group>"; };
-		D197231508FB157000295E05 /* XMPacketReassemblerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMPacketReassemblerDispatch.h; path = Source/Framework/XMPacketReassemblerDispatch.h; sourceTree = "<group>"; };
 		D19729B108FBF8A000295E05 /* XMTransmitterMediaPatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMTransmitterMediaPatch.h; path = Source/Framework/XMTransmitterMediaPatch.h; sourceTree = "<group>"; };
 		D19729B208FBF8A000295E05 /* XMTransmitterMediaPatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMTransmitterMediaPatch.cpp; path = Source/Framework/XMTransmitterMediaPatch.cpp; sourceTree = "<group>"; };
 		D1972B0008FC529C00295E05 /* XMPacketBuilder.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XMPacketBuilder.c; path = Source/Framework/XMPacketBuilder.c; sourceTree = "<group>"; };
@@ -1700,9 +1706,9 @@
 				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
 				D1972B0008FC529C00295E05 /* XMPacketBuilder.c */,
 				D1972B0208FC529C00295E05 /* XMPacketBuilderDispatch.h */,
-				D197231408FB157000295E05 /* XMPacketReassembler.h */,
-				D197231308FB157000295E05 /* XMPacketReassembler.c */,
-				D197231508FB157000295E05 /* XMPacketReassemblerDispatch.h */,
+				D10157EC09409867000A9BA7 /* XMH263MediaPacketizer.h */,
+				D10157ED09409867000A9BA7 /* XMH263MediaPacketizer.c */,
+				D10157F209409882000A9BA7 /* XMH263MediaPacketizerDispatch.h */,
 			);
 			name = "Obj-C";
 			sourceTree = "<group>";
@@ -1743,6 +1749,8 @@
 				D19729B208FBF8A000295E05 /* XMTransmitterMediaPatch.cpp */,
 				D197216908FADEE300295E05 /* XMReceiverMediaPatch.h */,
 				D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */,
+				D147D6050970342B005DE11C /* XMRTPPacket.h */,
+				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
 				D163364E07A456C4003FD9C0 /* XMProcess.h */,
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
 			);
@@ -2862,6 +2870,9 @@
 				D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Headers */,
 				D134B9C4093B8D5C0090271F /* XMSimpleVideoView.h in Headers */,
 				D10D49E4093CA220000DD61E /* XMWindow.h in Headers */,
+				D10157EE09409867000A9BA7 /* XMH263MediaPacketizer.h in Headers */,
+				D10157F309409882000A9BA7 /* XMH263MediaPacketizerDispatch.h in Headers */,
+				D147D6070970342B005DE11C /* XMRTPPacket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3461,7 +3472,6 @@
 				D1971F0C08FAB3F400295E05 /* XMMediaStream.cpp in Sources */,
 				D197216B08FADEE300295E05 /* XMReceiverMediaPatch.cpp in Sources */,
 				D19722EC08FB127600295E05 /* XMMediaReceiver.m in Sources */,
-				D197231608FB157000295E05 /* XMPacketReassembler.c in Sources */,
 				D19729B308FBF8A000295E05 /* XMTransmitterMediaPatch.cpp in Sources */,
 				D1972B0308FC529C00295E05 /* XMPacketBuilder.c in Sources */,
 				D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */,
@@ -3474,6 +3484,8 @@
 				D134B974093B88190090271F /* XMVideoManager.m in Sources */,
 				D134B9C5093B8D5C0090271F /* XMSimpleVideoView.m in Sources */,
 				D10D49E5093CA220000DD61E /* XMWindow.m in Sources */,
+				D10157EF09409867000A9BA7 /* XMH263MediaPacketizer.c in Sources */,
+				D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3577,7 +3589,6 @@
 				D1CEE3AA08F90263007E4ABE /* short_term.c in Sources */,
 				D1CEE3AB08F90263007E4ABE /* table.c in Sources */,
 				D1CEE3AC08F90263007E4ABE /* gsmcodec.cxx in Sources */,
-				D1CEE3AD08F90263007E4ABE /* h261codec.cxx in Sources */,
 				D1CEE3AE08F90263007E4ABE /* anaFilter.c in Sources */,
 				D1CEE3B008F90263007E4ABE /* constants.c in Sources */,
 				D1CEE3B208F90263007E4ABE /* createCB.c in Sources */,
@@ -3713,6 +3724,7 @@
 				D1CEE49308F90263007E4ABE /* rtp.cxx in Sources */,
 				D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */,
 				D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */,
+				D110B8ED09597A100009D87A /* h261codec.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

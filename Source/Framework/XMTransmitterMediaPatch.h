@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.h,v 1.3 2005/10/20 11:55:55 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.h,v 1.4 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 
 #include <ptlib.h>
 #include <opal/patch.h>
+
+#include "XMTypes.h"
 
 // The purpose of this class is to have an OpalMediaPatch
 // instance which doesn't spawn it's own thread.
@@ -48,6 +50,7 @@ private:
 	BOOL doesRunOwnThread;
 	BOOL isTerminated;
 	RTP_DataFrame *dataFrame;
+	XMCodecIdentifier codecIdentifier;
 };
 
 #endif // __XM_TRANSMITTER_MEDIA_PATCH__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.10 2005/11/30 23:49:46 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.11 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,8 +36,10 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_SetCallStatisticsUpdateInterval,
 	
 	// Media stream message
-	_XMOpalDispatcherMessage_MediaStreamOpened = 0x0300,
-	_XMOpalDispatcherMessage_MediaStreamClosed
+	_XMOpalDispatcherMessage_AudioStreamOpened = 0x0300,
+	_XMOpalDispatcherMessage_VideoStreamOpened,
+	_XMOpalDispatcherMessage_AudioStreamClosed,
+	_XMOpalDispatcherMessage_VideoStreamClosed
 	
 } _XMOpalDispatcherMessage;
 
@@ -67,8 +69,10 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleCallClearedMessage:(NSArray *)messageComponents;
 - (void)_handleSetCallStatisticsUpdateIntervalMessage:(NSArray *)messageComponents;
 
-- (void)_handleMediaStreamOpenedMessage:(NSArray *)messageComponents;
-- (void)_handleMediaStreamClosedMessage:(NSArray *)messageComponents;
+- (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents;
+- (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents;
+- (void)_handleAudioStreamClosedMessage:(NSArray *)messageComponents;
+- (void)_handleVideoStreamClosedMessage:(NSArray *)messageComponents;
 
 - (void)_doPreferencesSetup:(XMPreferences *)preferences 
 				withAddress:(NSString *)externalAddress 
@@ -322,7 +326,7 @@ typedef enum _XMOpalDispatcherMessage
 	[components release];
 }
 
-+ (void)_mediaStreamOpened:(unsigned)callID codec:(NSString *)codec incoming:(BOOL)isIncomingStream
++ (void)_audioStreamOpened:(unsigned)callID codec:(NSString *)codec incoming:(BOOL)isIncomingStream
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
 	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -336,12 +340,12 @@ typedef enum _XMOpalDispatcherMessage
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, incomingData, nil];
 	
-	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_MediaStreamOpened withComponents:components];
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_AudioStreamOpened withComponents:components];
 	
 	[components release];
 }
 
-+ (void)_mediaStreamClosed:(unsigned)callID codec:(NSString *)codec incoming:(BOOL)isIncomingStream
++ (void)_videoStreamOpened:(unsigned)callID codec:(NSString *)codec size:(XMVideoSize)videoSize incoming:(BOOL)isIncomingStream
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
 	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -349,13 +353,51 @@ typedef enum _XMOpalDispatcherMessage
 	
 	NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:codec];
 	
+	number = [[NSNumber alloc] initWithUnsignedInt:videoSize];
+	NSData *sizeData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
 	number = [[NSNumber alloc] initWithBool:isIncomingStream];
 	NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, incomingData, nil];
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, sizeData, incomingData, nil];
 	
-	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_MediaStreamClosed withComponents:components];
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_VideoStreamOpened withComponents:components];
+	
+	[components release];
+}
+
++ (void)_audioStreamClosed:(unsigned)callID incoming:(BOOL)isIncomingStream
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:isIncomingStream];
+	NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_AudioStreamClosed withComponents:components];
+	
+	[components release];
+}
+
++ (void)_videoStreamClosed:(unsigned)callID incoming:(BOOL)isIncomingStream
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:isIncomingStream];
+	NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_VideoStreamClosed withComponents:components];
 	
 	[components release];
 }
@@ -496,11 +538,17 @@ typedef enum _XMOpalDispatcherMessage
 		case _XMOpalDispatcherMessage_SetCallStatisticsUpdateInterval:
 			[self _handleSetCallStatisticsUpdateIntervalMessage:[portMessage components]];
 			break;
-		case _XMOpalDispatcherMessage_MediaStreamOpened:
-			[self _handleMediaStreamOpenedMessage:[portMessage components]];
+		case _XMOpalDispatcherMessage_AudioStreamOpened:
+			[self _handleAudioStreamOpenedMessage:[portMessage components]];
 			break;
-		case _XMOpalDispatcherMessage_MediaStreamClosed:
-			[self _handleMediaStreamClosedMessage:[portMessage components]];
+		case _XMOpalDispatcherMessage_VideoStreamOpened:
+			[self _handleVideoStreamOpenedMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_AudioStreamClosed:
+			[self _handleAudioStreamClosedMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_VideoStreamClosed:
+			[self _handleVideoStreamClosedMessage:[portMessage components]];
 			break;
 		default:
 			break;
@@ -970,7 +1018,7 @@ typedef enum _XMOpalDispatcherMessage
 	}
 }
 
-- (void)_handleMediaStreamOpenedMessage:(NSArray *)messageComponents
+- (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents
 {
 	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
@@ -978,7 +1026,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	if(theCallID != callID)
 	{
-		NSLog(@"CallID mismatch on MediaStreamOpened: %d to actual %d", theCallID, callID);
+		NSLog(@"CallID mismatch on AudioStreamOpened: %d to actual %d", theCallID, callID);
 		return;
 	}
 	
@@ -989,33 +1037,72 @@ typedef enum _XMOpalDispatcherMessage
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
 	BOOL isIncomingStream = [number boolValue];
 	
-	NSRange h261range = [codec rangeOfString:@"H.261"];
-	NSRange h263range = [codec rangeOfString:@"H.263"];
-	if(h261range.location == NSNotFound && h263range.location == NSNotFound)
+	if(isIncomingStream == YES)
 	{
-		if(isIncomingStream == YES)
-		{
-			[_XMCallManagerSharedInstance _handleIncomingAudioStreamOpened:codec];
-		}
-		else
-		{
-			[_XMCallManagerSharedInstance _handleOutgoingAudioStreamOpened:codec];
-		}
+		[_XMCallManagerSharedInstance _handleIncomingAudioStreamOpened:codec];
 	}
 	else
 	{
-		if(isIncomingStream == YES)
-		{
-			[_XMCallManagerSharedInstance _handleIncomingVideoStreamOpened:codec];
-		}
-		else
-		{
-			[_XMCallManagerSharedInstance _handleOutgoingVideoStreamOpened:codec];
-		}
+		[_XMCallManagerSharedInstance _handleOutgoingAudioStreamOpened:codec];
 	}
 }
 
-- (void)_handleMediaStreamClosedMessage:(NSArray *)messageComponents
+- (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [number unsignedIntValue];
+	
+	if(theCallID != callID)
+	{
+		NSLog(@"CallID mismatch on VideoStreamOpened: %d to actual %d", theCallID, callID);
+		return;
+	}
+	
+	NSData *codecData = (NSData *)[messageComponents objectAtIndex:1];
+	NSString *codec = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:codecData];
+	
+	NSData *sizeData = (NSData *)[messageComponents objectAtIndex:2];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:sizeData];
+	XMVideoSize videoSize = (XMVideoSize)[number unsignedIntValue];
+	
+	NSData *directionData = (NSData *)[messageComponents objectAtIndex:3];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
+	BOOL isIncomingStream = [number boolValue];
+	
+	NSString *sizeString = nil;
+	
+	switch(videoSize)
+	{
+		case XMVideoSize_SQCIF:
+			sizeString = @"SQCIF";
+			break;
+		case XMVideoSize_QCIF:
+			sizeString = @"QCIF";
+			break;
+		case XMVideoSize_CIF:
+			sizeString = @"CIF";
+			break;
+		default:
+			sizeString = @"UNKNOWN";
+			break;
+	}
+	
+	NSString *codecString = [[NSString alloc] initWithFormat:@"%@ (%@)", codec, sizeString];
+	
+	if(isIncomingStream == YES)
+	{
+		[_XMCallManagerSharedInstance _handleIncomingVideoStreamOpened:codecString];
+	}
+	else
+	{
+		[_XMCallManagerSharedInstance _handleOutgoingVideoStreamOpened:codecString];
+	}
+	
+	[codecString release];
+}
+
+- (void)_handleAudioStreamClosedMessage:(NSArray *)messageComponents
 {
 	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
@@ -1027,35 +1114,43 @@ typedef enum _XMOpalDispatcherMessage
 		return;
 	}
 	
-	NSData *codecData = (NSData *)[messageComponents objectAtIndex:1];
-	NSString *codec = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:codecData];
-	
-	NSData *directionData = (NSData *)[messageComponents objectAtIndex:2];
+	NSData *directionData = (NSData *)[messageComponents objectAtIndex:1];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
 	BOOL isIncomingStream = [number boolValue];
-	
-	NSRange range = [codec rangeOfString:@"H.261"];
-	if(range.location == NSNotFound)
+
+	if(isIncomingStream == YES)
 	{
-		if(isIncomingStream == YES)
-		{
-			[_XMCallManagerSharedInstance _handleIncomingAudioStreamClosed];
-		}
-		else
-		{
-			[_XMCallManagerSharedInstance _handleOutgoingAudioStreamClosed];
-		}
+		[_XMCallManagerSharedInstance _handleIncomingAudioStreamClosed];
 	}
 	else
 	{
-		if(isIncomingStream == YES)
-		{
-			[_XMCallManagerSharedInstance _handleIncomingVideoStreamClosed];
-		}
-		else
-		{
-			[_XMCallManagerSharedInstance _handleOutgoingVideoStreamClosed];
-		}
+		[_XMCallManagerSharedInstance _handleOutgoingAudioStreamClosed];
+	}
+}
+
+- (void)_handleVideoStreamClosedMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [number unsignedIntValue];
+	
+	if((theCallID != callID) && (callID != UINT_MAX))
+	{
+		NSLog(@"CallID mismatch on MediaStreamClosed: %d to actual %d", theCallID, callID);
+		return;
+	}
+	
+	NSData *directionData = (NSData *)[messageComponents objectAtIndex:1];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
+	BOOL isIncomingStream = [number boolValue];
+	
+	if(isIncomingStream == YES)
+	{
+		[_XMCallManagerSharedInstance _handleIncomingVideoStreamClosed];
+	}
+	else
+	{
+		[_XMCallManagerSharedInstance _handleOutgoingVideoStreamClosed];
 	}
 }
 
@@ -1116,11 +1211,11 @@ typedef enum _XMOpalDispatcherMessage
 	unsigned i;
 	
 	// for simplicity, we allocate the buffers big enough to hold all codecs
-	unsigned orderedCodecsBufferSize = (audioCodecCount + videoCodecCount) * _XMMaxMediaFormatsPerCodecIdentifier() * sizeof(const char *);
+	unsigned orderedCodecsBufferSize = (audioCodecCount + videoCodecCount) * sizeof(const char *);
 	unsigned disabledCodecsBufferSize = (audioCodecCount + videoCodecCount) * sizeof(const char *);
 	char const** orderedCodecs = (char const**)malloc(orderedCodecsBufferSize);
 	char const** disabledCodecs = (char const**)malloc(disabledCodecsBufferSize);
-	
+
 	for(i = 0; i < audioCodecCount; i++)
 	{
 		XMPreferencesCodecListRecord *record = [preferences audioCodecListRecordAtIndex:i];
@@ -1143,37 +1238,15 @@ typedef enum _XMOpalDispatcherMessage
 	{
 		XMPreferencesCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
 		XMCodecIdentifier identifier = [record identifier];
-	
+		const char *mediaFormatString = _XMMediaFormatForCodecIdentifier(identifier);
+		
 		if([record isEnabled])
 		{
-			XMVideoSize size = [preferences preferredVideoSize];
-			
-			const char *mediaFormatString = _XMMediaFormatForCodecIdentifierWithVideoSize(identifier, size);
-			if(mediaFormatString != NULL)
-			{
-				orderedCodecs[orderedCodecsCount] = mediaFormatString;
-				orderedCodecsCount++;
-			}
-			
-			if(size == XMVideoSize_QCIF)
-			{
-				size = XMVideoSize_CIF;
-			}
-			else
-			{
-				size = XMVideoSize_QCIF;
-			}
-			
-			mediaFormatString = _XMMediaFormatForCodecIdentifierWithVideoSize(identifier, size);
-			if(mediaFormatString != NULL)
-			{
-				orderedCodecs[orderedCodecsCount] = mediaFormatString;
-				orderedCodecsCount++;
-			}
+			orderedCodecs[orderedCodecsCount] = mediaFormatString;
+			orderedCodecsCount++;
 		}
 		else
 		{
-			const char *mediaFormatString = _XMMediaFormatForCodecIdentifier(identifier);
 			disabledCodecs[disabledCodecsCount] = mediaFormatString;
 			disabledCodecsCount++;
 		}
@@ -1195,7 +1268,10 @@ typedef enum _XMOpalDispatcherMessage
 	{
 		if(_XMEnableH323Listeners(YES) == YES)
 		{
-			_XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
+			//_XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
+			// Currently, fastStart has to be disabled as long as the Capability management system is not
+			// FastStart-Ready
+			_XMSetH323Functionality(NO, NO);
 			
 			// setting up the gatekeeper
 			[self _doGatekeeperSetup:preferences password:gatekeeperPassword verbose:verbose];

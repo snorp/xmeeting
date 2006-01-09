@@ -47,6 +47,16 @@
 			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>??? kbit/s</string>
+			<key>XMeeting_Identifier</key>
+			<integer>102</integer>
+			<key>XMeeting_Name</key>
+			<string>H.264</string>
+			<key>XMeeting_Quality</key>
+			<string>Very Good</string>
+		</dict>
 	</array>
 </dict>
 </plist>

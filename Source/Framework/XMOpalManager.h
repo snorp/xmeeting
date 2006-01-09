@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalManager.h,v 1.9 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.10 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_OPAL_MANAGER_H__
@@ -47,6 +47,7 @@ public:
 
 	/* Network setup methods */
 	void SetBandwidthLimit(unsigned limit);
+	unsigned GetVideoBandwidthLimit();
 	
 	/* Video setup methods */
 	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);
@@ -55,6 +56,8 @@ private:
 	BOOL IsOutgoingMedia(OpalMediaStream & stream);
 	
 	unsigned callID;
+	
+	unsigned videoBandwidthLimit;
 	
 	BOOL enableVideoTransmit;
 	BOOL enableVideoReceive;

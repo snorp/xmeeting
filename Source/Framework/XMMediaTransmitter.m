@@ -1,21 +1,22 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.10 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.11 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMMediaTransmitter.h"
 
-#import "XMPacketBuilder.h"
-#import "XMVideoManager.h"
 #import "XMPrivate.h"
-#import "XMUtils.h"
-#import "XMCallbackBridge.h"
+
+#import "XMPacketBuilder.h"
+#import "XMH263MediaPacketizer.h"
 
 #import "XMSequenceGrabberVideoInputModule.h"
 #import "XMDummyVideoInputModule.h"
+
+#import "XMCallbackBridge.h"
 
 typedef enum XMMediaTransmitterMessage
 {
@@ -114,13 +115,18 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopGrabbing withComponents:nil];
 }
 
-+ (void)_startTransmittingWithCodec:(XMCodecIdentifier)codecIdentifier
-						  videoSize:(XMVideoSize)videoSize 
-				 maxFramesPerSecond:(unsigned)maxFramesPerSecond
-						 maxBitrate:(unsigned)maxBitrate
-							session:(unsigned)sessionID
++ (void)_startTransmittingForSession:(unsigned)sessionID
+						   withCodec:(XMCodecIdentifier)codecIdentifier
+						   videoSize:(XMVideoSize)videoSize 
+				  maxFramesPerSecond:(unsigned)maxFramesPerSecond
+						  maxBitrate:(unsigned)maxBitrate
+						 payloadCode:(unsigned)payloadCode
 {
-	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:codecIdentifier];
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:sessionID];
+	NSData *sessionData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:codecIdentifier];
 	NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
@@ -136,12 +142,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	NSData *bitrateData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithUnsignedInt:sessionID];
-	NSData *sessionData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	number = [[NSNumber alloc] initWithUnsignedInt:payloadCode];
+	NSData *payloadData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	NSArray *components = [[NSArray alloc] initWithObjects:codecData, sizeData, framesData,
-															bitrateData, sessionData, nil];
+	NSArray *components = [[NSArray alloc] initWithObjects:sessionData, codecData, sizeData, framesData,
+															bitrateData, payloadData, nil];
 	
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartTransmitting withComponents:components];
 	
@@ -249,12 +255,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	_XMThreadExit();
 }
 
-#pragma mark MediTransmitterThread methods
+#pragma mark MediaTransmitterThread methods
 
 - (void)_runMediaTransmitterThread
 {	
 	EnterMovies();
 	XMRegisterPacketBuilder();
+	XMRegisterH263MediaPacketizer();
 	
 	[receivePort setDelegate:self];
 	[[NSRunLoop currentRunLoop] addPort:receivePort forMode:NSDefaultRunLoopMode];
@@ -298,6 +305,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	// we kill the associated thread after having cleaned up
 }
 
+#pragma mark Message handling methods
+
 - (void)handlePortMessage:(NSPortMessage *)portMessage
 {
 	XMMediaTransmitterMessage message = (XMMediaTransmitterMessage)[portMessage msgid];
@@ -336,8 +345,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			break;
 	}
 }
-
-#pragma mark Message handling methods
 
 - (void)_handleShutdownMessage
 {
@@ -517,26 +524,43 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	XMVideoSize requiredVideoSize;
 	unsigned bitrate;
 	
-	NSData *data = (NSData *)[components objectAtIndex:0];
+	OSType componentManufacturer;
+	BOOL doLimitDataRate = YES;
+	
+	NSData *data = (NSData *)[components objectAtIndex:1];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	codecIdentifier = [number unsignedIntValue];
 	
-	data = (NSData *)[components objectAtIndex:1];
+	data = (NSData *)[components objectAtIndex:2];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	requiredVideoSize = (XMVideoSize)[number unsignedIntValue];
 	
-	data = (NSData *)[components objectAtIndex:2];
+	data = (NSData *)[components objectAtIndex:3];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	transmitFrameGrabRate = [number unsignedIntValue];
 	
-	data = (NSData *)[components objectAtIndex:3];
+	data = (NSData *)[components objectAtIndex:4];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	bitrate = [number unsignedIntValue];
+	
+	data = (NSData *)[components objectAtIndex:5];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	payloadCode = [number unsignedIntValue];
 	
 	switch(codecIdentifier)
 	{
 		case XMCodecIdentifier_H261:
 			codecType = kH261CodecType;
+			componentManufacturer = 'appl';
+			break;
+		case XMCodecIdentifier_H263:
+			codecType = kH263CodecType;
+			componentManufacturer = 'surf';
+			doLimitDataRate = NO;
+			break;
+		case XMCodecIdentifier_H264:
+			codecType = kH264CodecType;
+			componentManufacturer = 'appl';
 			break;
 		default:
 			codecType = 0;
@@ -545,7 +569,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			return;
 	}
 	
-	NSSize frameDimensions = XMGetVideoFrameDimensions(videoSize);
+	NSSize frameDimensions = XMGetVideoFrameDimensions(requiredVideoSize);
 	
 	if(videoSize != requiredVideoSize)
 	{
@@ -582,7 +606,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"allowTemporalCompression failed: %d", (int)err);
 	}
 	
-	err = ICMCompressionSessionOptionsSetAllowFrameReordering(sessionOptions, true);
+	err = ICMCompressionSessionOptionsSetAllowFrameReordering(sessionOptions, false);
 	if(err != noErr)
 	{
 		NSLog(@"allow frame reordering failed: %d", (int)err);
@@ -594,7 +618,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
 	}
 	
-	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, true);
+	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, false);
 	if(err != noErr)
 	{
 		NSLog(@"setallowFrameTimeChanges failed: %d", (int)err);
@@ -617,6 +641,40 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	if(err != noErr)
 	{
 		NSLog(@"SetAverageDataRate failed: %d", (int)err);
+	}
+	
+	SInt32 maxFrameDelayCount = 0;
+	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+												  kQTPropertyClass_ICMCompressionSessionOptions,
+												  kICMCompressionSessionOptionsPropertyID_MaxFrameDelayCount,
+												  sizeof(maxFrameDelayCount),
+												  &maxFrameDelayCount);
+	if(err != noErr)
+	{
+		NSLog(@"SetMaxFrameDelayCount failed: %d", (int)err);
+	}
+	
+	ComponentDescription componentDescription;
+	componentDescription.componentType = 'imco';
+	componentDescription.componentSubType = codecType;
+	componentDescription.componentManufacturer = componentManufacturer;
+	componentDescription.componentFlags = 0;
+	componentDescription.componentFlagsMask = 0;
+		
+	Component compressorComponent = FindNextComponent(0, &componentDescription);
+	if(compressorComponent == NULL)
+	{
+		fprintf(stderr, "No such compressor\n");
+	}
+		
+	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+												  kQTPropertyClass_ICMCompressionSessionOptions,
+												  kICMCompressionSessionOptionsPropertyID_CompressorComponent,
+												  sizeof(compressorComponent),
+												  &compressorComponent);
+	if(err != noErr)
+	{
+		NSLog(@"No such codec found");
 	}
 	
 	encodedFrameOutputRecord.encodedFrameOutputCallback = XMPacketizeCompressedFrameProc;
@@ -697,188 +755,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	needsPictureUpdate = YES;
 }
 
-- (void)_grabFrame:(NSTimer *)timer
-{	
-	NSTimeInterval desiredTimeInterval = 1.0/frameGrabRate;
-	
-	// readjusting the timer interval if needed
-	if([frameGrabTimer timeInterval] != desiredTimeInterval)
-	{
-		[frameGrabTimer invalidate];
-		[frameGrabTimer release];
-		
-		
-		frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
-														 selector:@selector(_grabFrame:) userInfo:nil
-														  repeats:YES] retain];
-	}
-	
-	// calling the active module to grab a frame
-	BOOL result = [activeModule grabFrame];
-	
-	if(result == NO)
-	{
-		// an error occured, we switch to the dummy device
-		[self _updateDeviceListAndSelectDummy];
-	}
-}
-
-- (void)_updateDeviceListAndSelectDummy
-{
-	if(activeModule != nil)
-	{
-		[activeModule closeInputDevice];
-	}
-	
-	NSMutableArray *devices = [[NSMutableArray alloc] initWithCapacity:3];
-	unsigned moduleCount = [videoInputModules count];
-	unsigned i;
-	for(i = 0; i < moduleCount; i++)
-	{
-		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
-		[module refreshDeviceList];
-		[devices addObjectsFromArray:[module inputDevices]];
-	}
-	
-	activeModule = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:(moduleCount-1)];
-	selectedDevice = (NSString *)[[[activeModule inputDevices] objectAtIndex:0] retain];
-	
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
-													withObject:selectedDevice waitUntilDone:NO];
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												 waitUntilDone:NO];
-	[devices release];
-	
-	[activeModule openInputDevice:selectedDevice];
-}
-
-- (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame
-{
-	OSErr err = noErr;
-	
-	ImageDescriptionHandle imageDesc = NULL;
-	
-	err = ICMEncodedFrameGetImageDescription(encodedFrame, &imageDesc);
-	
-	if(mediaPacketizer == NULL)
-	{
-		OSType packetizerToUse;
-		
-		switch(codecType)
-		{
-			case kH261CodecType:
-				packetizerToUse = kRTP261MediaPacketizerType;
-				break;
-			default:
-				return qtsBadStateErr;
-		}
-		
-		ComponentDescription componentDescription;
-		componentDescription.componentType = kRTPMediaPacketizerType;
-		componentDescription.componentSubType = packetizerToUse;
-		componentDescription.componentManufacturer = 0;
-		componentDescription.componentFlags = 0;
-		componentDescription.componentFlagsMask = 0;
-		
-		Component component = FindNextComponent(0, &componentDescription);
-		if(component == NULL)
-		{
-			NSLog(@"No Packetizer found");
-		}
-		
-		err = OpenAComponent(component, &mediaPacketizer);
-		if(err != noErr)
-		{
-			NSLog(@"Open packetizer failed: %d", (int)err);
-		}
-		
-		err = RTPMPPreflightMedia(mediaPacketizer,
-								  VideoMediaType,
-								  (SampleDescriptionHandle)imageDesc);
-		if(err != noErr)
-		{
-			NSLog(@"PreflightMedia failed: %d", (int)err);
-		}
-		
-		err = RTPMPInitialize(mediaPacketizer, kRTPMPRealtimeModeFlag);
-		if(err != noErr)
-		{
-			NSLog(@"RTPMP initialize failed: %d", (int)err);
-		}
-		
-		XMGetPacketBuilderComponentDescription(&componentDescription);
-		
-		Component packetBuilderComponent = FindNextComponent(0, &componentDescription);
-		ComponentInstance packetBuilder;
-		err = OpenAComponent(packetBuilderComponent, &packetBuilder);
-		
-		err = RTPMPSetPacketBuilder(mediaPacketizer, packetBuilder);
-		if(err != noErr)
-		{
-			NSLog(@"SetPacketBuilder failed: %d", (int)err);
-		}
-		
-		err = RTPMPSetTimeBase(mediaPacketizer, NewTimeBase());
-		if(err != noErr)
-		{
-			NSLog(@"SetTimeBase failed: %d", (int)err);
-		}
-		
-		err = RTPMPSetTimeScale(mediaPacketizer, 90000);
-		if(err != noErr)
-		{
-			NSLog(@"SetTimeScale failed: %d", (int)err);
-		}
-		
-		// Preventing the packetizer from creating packets
-		// greater than the ethernet packet size
-		err = RTPMPSetMaxPacketSize(mediaPacketizer, 1400);
-		if(err != noErr)
-		{
-			NSLog(@"SetMaxPacketSize failed: %d", (int)err);
-		}
-		
-		RTPMPDataReleaseUPP dataReleaseProc = NewRTPMPDataReleaseUPP(XMPacketizerDataReleaseProc);
-		sampleData.version = 0;
-		sampleData.timeStamp = 0;
-		sampleData.duration = 0;
-		sampleData.playOffset = 0;
-		sampleData.playRate = fixed1;
-		sampleData.flags = 0;
-		sampleData.sampleDescSeed = 0;
-		sampleData.sampleRef = 0;
-		sampleData.releaseProc = dataReleaseProc;
-		sampleData.refCon = (void *)self;
-	}
-
-	sampleData.timeStamp = ICMEncodedFrameGetDecodeTimeStamp(encodedFrame);
-	sampleData.sampleDescription = (Handle)imageDesc;
-	sampleData.dataLength = ICMEncodedFrameGetDataSize(encodedFrame);
-	sampleData.data = ICMEncodedFrameGetDataPtr(encodedFrame);
-	
-	SInt32 outFlags;
-	err = RTPMPSetSampleData(mediaPacketizer, &sampleData, &outFlags);
-	if(err != noErr)
-	{
-		NSLog(@"SetSampleData  failed %d", (int)err);
-	}
-	if(kRTPMPStillProcessingData & outFlags)
-	{
-		NSLog(@"Still processing data");
-	}
-	
-	while(kRTPMPStillProcessingData & outFlags)
-	{
-		err = RTPMPIdle(mediaPacketizer, 0, &outFlags);
-		if(err != noErr)
-		{
-			NSLog(@"RTPMPIdle failed %d", (int)err);
-		}
-	}
-	
-	return err;
-}
-
 #pragma mark XMVideoInputManager Methods
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
@@ -945,6 +821,207 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 - (void)handleErrorWithCode:(ComponentResult)errorCode hintCode:(unsigned)hintCode
 {
 	NSLog(@"gotErrorReport: %d hint: %d", (int)errorCode, (int)hintCode);
+}
+
+#pragma mark Private Methods
+
+- (void)_grabFrame:(NSTimer *)timer
+{
+	NSTimeInterval desiredTimeInterval = 1.0/frameGrabRate;
+	
+	// readjusting the timer interval if needed
+	if([frameGrabTimer timeInterval] != desiredTimeInterval)
+	{
+		[frameGrabTimer invalidate];
+		[frameGrabTimer release];
+		
+		
+		frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
+														 selector:@selector(_grabFrame:) userInfo:nil
+														  repeats:YES] retain];
+	}
+	
+	// calling the active module to grab a frame
+	BOOL result = [activeModule grabFrame];
+	
+	if(result == NO)
+	{
+		// an error occured, we switch to the dummy device
+		[self _updateDeviceListAndSelectDummy];
+	}
+}
+
+- (void)_updateDeviceListAndSelectDummy
+{
+	if(activeModule != nil)
+	{
+		[activeModule closeInputDevice];
+	}
+	
+	NSMutableArray *devices = [[NSMutableArray alloc] initWithCapacity:3];
+	unsigned moduleCount = [videoInputModules count];
+	unsigned i;
+	for(i = 0; i < moduleCount; i++)
+	{
+		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
+		[module refreshDeviceList];
+		[devices addObjectsFromArray:[module inputDevices]];
+	}
+	
+	activeModule = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:(moduleCount-1)];
+	selectedDevice = (NSString *)[[[activeModule inputDevices] objectAtIndex:0] retain];
+	
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
+													withObject:selectedDevice waitUntilDone:NO];
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
+												 waitUntilDone:NO];
+	[devices release];
+	
+	[activeModule openInputDevice:selectedDevice];
+}
+
+- (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame
+{
+	OSErr err = noErr;
+	
+	ImageDescriptionHandle imageDesc;
+	
+	err = ICMEncodedFrameGetImageDescription(encodedFrame, &imageDesc);
+	
+	if(mediaPacketizer == NULL)
+	{
+		OSType packetizerToUse;
+		
+		switch(codecType)
+		{
+			case kH261CodecType:
+				packetizerToUse = kRTP261MediaPacketizerType;
+				break;
+			case kH263CodecType:
+				if(payloadCode >= kRTPPayload_FirstDynamic)
+				{
+					packetizerToUse = kRTP263PlusMediaPacketizerType;
+				}
+				else
+				{
+					packetizerToUse = kXMH263MediaPacketizerType;
+				}
+				break;
+			case kH264CodecType:
+				packetizerToUse = 'avc1';
+				break;
+			default:
+				return qtsBadStateErr;
+		}
+		
+		ComponentDescription componentDescription;
+		componentDescription.componentType = kRTPMediaPacketizerType;
+		componentDescription.componentSubType = packetizerToUse;
+		componentDescription.componentManufacturer = 0;
+		componentDescription.componentFlags = 0;
+		componentDescription.componentFlagsMask = 0;
+		
+		Component component = FindNextComponent(0, &componentDescription);
+		if(component == NULL)
+		{
+			NSLog(@"No Packetizer found");
+		}
+		
+		err = OpenAComponent(component, &mediaPacketizer);
+		if(err != noErr)
+		{
+			NSLog(@"Open packetizer failed: %d", (int)err);
+		}
+		
+		err = RTPMPPreflightMedia(mediaPacketizer,
+								  VideoMediaType,
+								  (SampleDescriptionHandle)imageDesc);
+		if(err != noErr)
+		{
+			NSLog(@"PreflightMedia failed: %d", (int)err);
+		}
+		
+		err = RTPMPInitialize(mediaPacketizer, kRTPMPRealtimeModeFlag);
+		if(err != noErr)
+		{
+			NSLog(@"RTPMP initialize failed: %d", (int)err);
+		}
+		
+		componentDescription.componentType = kXMPacketBuilderComponentType;
+		componentDescription.componentSubType = kXMPacketBuilderComponentSubType;
+		componentDescription.componentManufacturer = kXMPacketBuilderComponentManufacturer;
+		componentDescription.componentFlags = 0;
+		componentDescription.componentFlagsMask = 0;
+		
+		Component packetBuilderComponent = FindNextComponent(0, &componentDescription);
+		ComponentInstance packetBuilder;
+		err = OpenAComponent(packetBuilderComponent, &packetBuilder);
+		
+		err = RTPMPSetPacketBuilder(mediaPacketizer, packetBuilder);
+		if(err != noErr)
+		{
+			NSLog(@"SetPacketBuilder failed: %d", (int)err);
+		}
+		
+		err = RTPMPSetTimeBase(mediaPacketizer, NewTimeBase());
+		if(err != noErr)
+		{
+			NSLog(@"SetTimeBase failed: %d", (int)err);
+		}
+		
+		err = RTPMPSetTimeScale(mediaPacketizer, 90000);
+		if(err != noErr)
+		{
+			NSLog(@"SetTimeScale failed: %d", (int)err);
+		}
+		
+		// Preventing the packetizer from creating packets
+		// greater than the ethernet packet size
+		err = RTPMPSetMaxPacketSize(mediaPacketizer, 1438);
+		if(err != noErr)
+		{
+			NSLog(@"SetMaxPacketSize failed: %d", (int)err);
+		}
+		
+		RTPMPDataReleaseUPP dataReleaseProc = NewRTPMPDataReleaseUPP(XMPacketizerDataReleaseProc);
+		sampleData.version = 0;
+		sampleData.timeStamp = 0;
+		sampleData.duration = 0;
+		sampleData.playOffset = 0;
+		sampleData.playRate = fixed1;
+		sampleData.flags = 0;
+		sampleData.sampleDescSeed = 0;
+		sampleData.sampleRef = 0;
+		sampleData.releaseProc = dataReleaseProc;
+		sampleData.refCon = (void *)self;
+	}
+	
+	sampleData.timeStamp = ICMEncodedFrameGetDecodeTimeStamp(encodedFrame);
+	sampleData.sampleDescription = (Handle)imageDesc;
+	sampleData.dataLength = ICMEncodedFrameGetDataSize(encodedFrame);
+	sampleData.data = ICMEncodedFrameGetDataPtr(encodedFrame);
+	
+	SInt32 outFlags;
+	err = RTPMPSetSampleData(mediaPacketizer, &sampleData, &outFlags);
+	if(err != noErr)
+	{
+		NSLog(@"SetSampleData  failed %d", (int)err);
+	}
+	if(kRTPMPStillProcessingData & outFlags)
+	{
+		NSLog(@"Still processing data");
+	}
+	
+	while(kRTPMPStillProcessingData & outFlags)
+	{
+		err = RTPMPIdle(mediaPacketizer, 0, &outFlags);
+		if(err != noErr)
+		{
+			NSLog(@"RTPMPIdle failed %d", (int)err);
+		}
+	}
+	
+	return err;
 }
 
 @end

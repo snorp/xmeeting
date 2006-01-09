@@ -1,9 +1,9 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.7 2006/01/09 22:22:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #include "XMTransmitterMediaPatch.h"
@@ -11,6 +11,7 @@
 #include <math.h>
 #include <opal/mediastrm.h>
 
+#include "XMBridge.h"
 #include "XMMediaFormats.h"
 #include "XMMediaStream.h"
 #include "XMCallbackBridge.h"
@@ -23,6 +24,7 @@ XMTransmitterMediaPatch::XMTransmitterMediaPatch(OpalMediaStream & src)
 	doesRunOwnThread = TRUE;
 	isTerminated = FALSE;
 	dataFrame = NULL;
+	codecIdentifier = XMCodecIdentifier_UnknownCodec;
 }
 
 XMTransmitterMediaPatch::~XMTransmitterMediaPatch()
@@ -44,7 +46,6 @@ BOOL XMTransmitterMediaPatch::IsTerminated() const
 		return isTerminated;
 	}
 }
-	
 
 void XMTransmitterMediaPatch::Resume()
 {
@@ -56,17 +57,26 @@ void XMTransmitterMediaPatch::Resume()
 		doesRunOwnThread = FALSE;
 		isTerminated = FALSE;
 		videoTransmitterPatch = this;
-		unsigned maxFramesPerSecond = UINT_MAX;
-		unsigned maxBitrate = _XMGetMaxVideoBitrate();
 		
-		PINDEX i;
-		for(i = 0; i < sinks.GetSize(); i++)
+		PINDEX i = sinks.GetSize();
+		if(i > 0)
 		{
-			OpalMediaFormat mediaFormat = sinks[i].stream->GetMediaFormat();
-		
+			unsigned maxFramesPerSecond = UINT_MAX;
+			unsigned maxBitrate = _XMGetVideoBandwidthLimit();
+			
+			OpalMediaFormat mediaFormat = sinks[0].stream->GetMediaFormat();
+			
 			unsigned frameTime = mediaFormat.GetFrameTime();
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
 			unsigned bitrate = mediaFormat.GetBandwidth();
+			unsigned payloadCode = (unsigned)mediaFormat.GetPayloadType();
+			if(mediaFormat == XM_MEDIA_FORMAT_H263)
+			{
+				payloadCode = mediaFormat.GetFrameTime();
+			}
+			
+			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
+			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
 			
 			// adjusting the maxFramesPerSecond / maxBitrate parameters
 			if(framesPerSecond < maxFramesPerSecond)
@@ -79,8 +89,15 @@ void XMTransmitterMediaPatch::Resume()
 				maxBitrate = bitrate;
 			}
 			
+			if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
+			   videoSize == XMVideoSize_NoVideo)
+			{
+				cout << "Trying to open unknown codec for transmission" << endl;
+				return;
+			}
+			
+			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, payloadCode);
 		}
-		_XMStartMediaTransmit(XMCodecIdentifier_H261, XMVideoSize_CIF, maxFramesPerSecond, maxBitrate, 2);
 	}
 	else
 	{
@@ -129,13 +146,29 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 	
 	if(frame == NULL)
 	{
-		frame = new RTP_DataFrame(1900);
+		frame = new RTP_DataFrame(20000);
 		videoTransmitterPatch->dataFrame = frame;
 		frame->SetPayloadSize(0);
-		frame->SetPayloadType(RTP_DataFrame::H261);
+		
+		XMCodecIdentifier theCodec = videoTransmitterPatch->codecIdentifier;
+		
+		if(theCodec == XMCodecIdentifier_H261)
+		{
+			frame->SetPayloadType(RTP_DataFrame::H261);
+		}
+		else if(theCodec == XMCodecIdentifier_H263)
+		{
+			OpalMediaFormat mediaFormat = videoTransmitterPatch->sinks[0].stream->GetMediaFormat();
+			RTP_DataFrame::PayloadTypes payloadCode = (RTP_DataFrame::PayloadTypes)mediaFormat.GetFrameTime();
+			frame->SetPayloadType(payloadCode);
+		}
+		else if(theCodec == XMCodecIdentifier_H264)
+		{
+			frame->SetPayloadType(RTP_DataFrame::DynamicBase);
+		}
 	}
 	
-	frame->SetTimestamp((DWORD)timeStamp);
+	frame->SetTimestamp(timeStamp);
 }
 
 void XMTransmitterMediaPatch::AppendData(unsigned sessionID,
@@ -168,7 +201,7 @@ void XMTransmitterMediaPatch::AppendData(unsigned sessionID,
 }
 
 void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
-{
+{	
 	if(videoTransmitterPatch == NULL)
 	{
 		cout << "No VideoTransmitterPatch found (4)" << endl;

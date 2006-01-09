@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.9 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.10 2006/01/09 22:22:57 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,7 @@
  **/
 @interface XMUtils : NSObject {
 	
+	NSArray *localAddresses;
 	NSString *localAddress;
 	
 	BOOL isFetchingExternalAddress;
@@ -36,7 +37,12 @@
 + (XMUtils *)sharedInstance;
 
 /**
- * Returns the local address for this computer
+ * Returns the local addresses for this computer
+ **/
+- (NSArray *)localAddresses;
+
+/**
+ * Returns the first object of -localAddresses
  **/
 - (NSString *)localAddress;
 
