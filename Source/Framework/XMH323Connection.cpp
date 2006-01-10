@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.4 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.5 2006/01/10 15:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -159,12 +159,12 @@ void XMH323Connection::OnSetLocalCapabilities()
 	// yet produce visually good and consistent results.
 	if(enableH263Plus == TRUE)
 	{
-		H323Capability * capability = localCapabilities.FindCapability(XM_MEDIA_FORMAT_H263);
+		/*H323Capability * capability = localCapabilities.FindCapability(XM_MEDIA_FORMAT_H263);
 		
 		if(capability != NULL)
 		{
 			XM_H323_H263_Capability *h263Capability = (XM_H323_H263_Capability *)capability;
 			h263Capability->SetIsH263PlusCapability(TRUE);
-		}
+		}*/
 	}
 }

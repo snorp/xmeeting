@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.16 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.17 2006/01/10 15:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,7 +92,7 @@ void _XMStopMediaTransmit(unsigned sessionID);
  * Tells the MediaReceiver to prepare for incoming data with codec,
  * RTP payload type and the sessionID
  **/
-void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize,  unsigned payloadType);
+void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize);
 
 /**
  * Tells the MediaReceiver that the media stream for the session has
@@ -104,6 +104,16 @@ void _XMStopMediaReceiving(unsigned sessionID);
  * Forwads the received packet to the MediaReceiver
  **/
 bool _XMProcessFrame(unsigned sessionID, void *packet, unsigned length);
+
+/**
+ * Forwards a received SPS atom of a H.264 stream to the MediaReceiver
+ **/
+void _XMHandleH264SPSAtomData(void *data, unsigned length);
+
+/**
+ * Forwards a received PPS atom of a H.264 stream to the MediaReceiver
+ **/
+void _XMHandleH264PPSAtomData(void *data, unsigned length);
 
 /**
  * Forwards the OpalVideoUpdatePicture media command to the

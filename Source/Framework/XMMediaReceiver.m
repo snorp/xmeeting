@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.12 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.13 2006/01/10 15:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,8 +18,8 @@
 
 @interface XMMediaReceiver (PrivateMethods)
 
-- (id)_init;
-- (BOOL)_processPacketGroup;
+- (UInt32)_getH264AVCCAtomLength;
+- (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer;
 
 @end
 
@@ -50,7 +50,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	videoDecompressionSession = NULL;
 	videoCodecIdentifier = XMCodecIdentifier_UnknownCodec;
-	videoPayloadType = 0;
 	videoMediaSize = XMVideoSize_NoVideo;
 	
 	return self;
@@ -69,7 +68,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 #pragma mark Data Handling Methods
 
 - (void)_startMediaReceivingForSession:(unsigned)sessionID withCodec:(XMCodecIdentifier)codecIdentifier 
-							 videoSize:(XMVideoSize)videoSize payloadType:(unsigned)payloadType;
+							 videoSize:(XMVideoSize)videoSize;
 {
 	ComponentResult err = noErr;
 	
@@ -81,12 +80,19 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	videoCodecIdentifier = codecIdentifier;
 	videoMediaSize = videoSize;
-	videoPayloadType = payloadType;
 	
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoSize];
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingStart:)
 													withObject:number waitUntilDone:NO];
 	[number release];
+	
+	if(codecIdentifier == XMCodecIdentifier_H264)
+	{
+		h264SPSAtoms = (XMAtom *)malloc(32 * sizeof(XMAtom));
+		h264PPSAtoms = (XMAtom *)malloc(32 * sizeof(XMAtom));
+		numberOfH264SPSAtoms = 0;
+		numberOfH264PPSAtoms = 0;
+	}
 }
 
 - (void)_stopMediaReceivingForSession:(unsigned)sessionID
@@ -100,6 +106,25 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingEnd)
 													withObject:nil waitUntilDone:NO];
 	ExitMoviesOnThread();
+	
+	if(videoCodecIdentifier == XMCodecIdentifier_H264)
+	{
+		unsigned i;
+		
+		for(i = 0; i < numberOfH264SPSAtoms; i++)
+		{
+			free(h264SPSAtoms[i].data);
+		}
+		
+		free(h264SPSAtoms);
+		
+		for(i = 0; i < numberOfH264PPSAtoms; i++)
+		{
+			free(h264PPSAtoms[i].data);
+		}
+		
+		free(h264PPSAtoms);
+	}
 }
 
 - (BOOL)_decodeFrameForSession:(unsigned)sessionID data:(UInt8 *)data length:(unsigned)length
@@ -129,6 +154,11 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			case XMCodecIdentifier_H264:
 				codecType =  kH264CodecType;
 				codecName = "H.264";
+				if([self _getH264AVCCAtomLength] == 0)
+				{
+					NSLog(@"Can't create AVCC atom yet");
+					return NO;
+				}
 				break;
 			default:
 				NSLog(@"illegal codecType");
@@ -156,31 +186,17 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		(**imageDesc).depth = 24;
 		(**imageDesc).clutID = -1;
 		
-		/*
 		if(codecType == kH264CodecType)
 		{
-			UInt32 avccLength = _XMGetAVCCAtomLength();
-			if(avccLength == 0)
-			{
-				NSLog(@"AVCC Not yet ready");
-				DisposeHandle((Handle)imageDesc);
-				return;
-			}
+			UInt32 avccLength = [self _getH264AVCCAtomLength];
 			
 			Handle avccHandle = NewHandleClear(avccLength);
-			Boolean result = _XMGetAVCCAtom((UInt8 *)*avccHandle);
+			[self _createH264AVCCAtomInBuffer:(UInt8 *)*avccHandle];
 			
 			err = AddImageDescriptionExtension(imageDesc, avccHandle, 'avcC');
-			if(err != noErr)
-			{
-				NSLog(@"Add AVCC failed");
-				DisposeHandle((Handle)imageDesc);
-				DisposeHandle(avccHandle);
-				return;
-			}
 			
 			DisposeHandle(avccHandle);
-		}*/
+		}
 		
 		ICMDecompressionSessionOptionsRef sessionOptions = NULL;
 		err = ICMDecompressionSessionOptionsCreate(NULL, &sessionOptions);
@@ -188,33 +204,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		{
 			NSLog(@"DecompressionSessionOptionsCreate  failed %d", (int)err);
 		}
-		
-		/*if(codecType == kH263CodecType)
-		{
-			NSLog(@"Is H.263 codec to receive");
-			ComponentDescription componentDescription;
-			componentDescription.componentType = 'imdc';
-			componentDescription.componentSubType = 'h263';
-			componentDescription.componentManufacturer = 'appl';
-			componentDescription.componentFlags = 0;
-			componentDescription.componentFlagsMask = 0;
-			
-			Component decompressorComponent = FindNextComponent(0, &componentDescription);
-			if(decompressorComponent == NULL)
-			{
-				fprintf(stderr, "No such decompressor\n");
-			}
-			
-			err = ICMDecompressionSessionOptionsSetProperty(sessionOptions,
-															kQTPropertyClass_ICMDecompressionSessionOptions,
-															kICMDecompressionSessionOptionsPropertyID_DecompressorComponent,
-															sizeof(decompressorComponent),
-															&decompressorComponent);
-			if(err != noErr)
-			{
-				NSLog(@"No such codec found");
-			}
-		}*/
 		
 		ICMDecompressionTrackingCallbackRecord trackingCallbackRecord;
 		
@@ -259,6 +248,185 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		return NO;
 	}
 	return YES;
+}
+
+- (void)_handleH264SPSAtomData:(UInt8 *)data length:(unsigned)length
+{
+	// Check whether this atom is already stored
+	BOOL atomFound = NO;
+	unsigned i;
+	for(i = 0; i < numberOfH264SPSAtoms; i++)
+	{
+		UInt16 atomLength = h264SPSAtoms[i].length;
+		UInt8 *atomData = h264SPSAtoms[i].data;
+		BOOL isSameAtom = YES;
+		
+		if(atomLength == length)
+		{
+			unsigned j;
+			for(j = 0; j < length; j++)
+			{
+				if(atomData[j] != data[j])
+				{
+					isSameAtom = NO;
+					break;
+				}
+			}
+		}
+		
+		if(isSameAtom == YES)
+		{
+			atomFound = YES;
+			break;
+		}
+	}
+	
+	if(atomFound == NO)
+	{
+		UInt8 *atomData = (UInt8 *)malloc(length * sizeof(UInt8));
+		memcpy(atomData, data, length);
+		h264SPSAtoms[numberOfH264SPSAtoms].length = length;
+		h264SPSAtoms[numberOfH264SPSAtoms].data = atomData;
+		numberOfH264SPSAtoms++;
+	}
+}
+
+- (void)_handleH264PPSAtomData:(UInt8 *)data length:(unsigned)length
+{
+	// Check whether this atom is already stored
+	BOOL atomFound = NO;
+	unsigned i;
+	for(i = 0; i < numberOfH264PPSAtoms; i++)
+	{
+		UInt16 atomLength = h264PPSAtoms[i].length;
+		UInt8 *atomData = h264PPSAtoms[i].data;
+		BOOL isSameAtom = YES;
+		
+		if(atomLength == length)
+		{
+			unsigned j;
+			for(j = 0; j < length; j++)
+			{
+				if(atomData[j] != data[j])
+				{
+					isSameAtom = NO;
+					break;
+				}
+			}
+		}
+		
+		if(isSameAtom == YES)
+		{
+			atomFound = YES;
+			break;
+		}
+	}
+	
+	if(atomFound == NO)
+	{
+		UInt8 *atomData = (UInt8 *)malloc(length * sizeof(UInt8));
+		memcpy(atomData, data, length);
+		h264PPSAtoms[numberOfH264PPSAtoms].length = length;
+		h264PPSAtoms[numberOfH264PPSAtoms].data = atomData;
+		numberOfH264PPSAtoms++;
+	}
+}
+
+- (UInt32)_getH264AVCCAtomLength
+{
+	if(numberOfH264SPSAtoms == 0 || numberOfH264PPSAtoms == 0)
+	{
+		return 0;
+	}
+	
+	// 1 Byte for configurationVersion, AVCProfileIndication,
+	// profile_compatibility, AVCLevelIndication, lengthSizeMinusOne,
+	// numOfSequenceParameterSets, numOfPictureParameterSets each.
+	unsigned avccLength = 7;
+	
+	unsigned i;
+	for(i = 0; i < numberOfH264SPSAtoms; i++)
+	{
+		// two bytes for the length of the SPS Atom
+		avccLength += 2;
+		
+		avccLength += h264SPSAtoms[i].length;
+	}
+	for(i = 0; i < numberOfH264PPSAtoms; i++)
+	{
+		// two bytes for the length of the PPS Atom
+		avccLength += 2;
+		
+		avccLength += h264PPSAtoms[i].length;
+	}
+	
+	return avccLength;
+}
+
+- (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer
+{	
+	// Get the required information from the first SPS Atom
+	UInt8 *spsAtom = h264SPSAtoms[0].data;
+	UInt8 profile = spsAtom[1];
+	UInt8 compatibility = spsAtom[2];
+	UInt8 level = spsAtom[3];
+	
+	// configurationVersion is 1
+	buffer[0] = 1;
+	
+	// setting the profile indication
+	buffer[1] = profile;
+	
+	// setting the compatibility indication
+	buffer[2] = compatibility;
+	
+	// setting the level indication
+	buffer[3] = level;
+	
+	// lengthSizeMinusOne is 3 (4 bytes length)
+	buffer[4] = 0xff;
+	
+	// setting the number of SPS atoms
+	buffer[5] = numberOfH264SPSAtoms;
+	
+	unsigned index = 6;
+	unsigned i;
+	
+	for(i = 0; i < numberOfH264SPSAtoms; i++)
+	{
+		UInt16 length = h264SPSAtoms[i].length;
+		UInt8 *data = h264SPSAtoms[i].data;
+		
+		buffer[index] = (UInt8)(length >> 8);
+		buffer[index+1] = (UInt8)(length & 0x00ff);
+		
+		index += 2;
+		
+		UInt8 *dest = &(buffer[index]);
+		memcpy(dest, data, length);
+		
+		index += length;
+	}
+	
+	// setting the number of PPS atoms
+	buffer[index] = numberOfH264PPSAtoms;
+	index++;
+	
+	for(i = 0; i < numberOfH264PPSAtoms; i++)
+	{
+		UInt16 length = h264PPSAtoms[i].length;
+		UInt8 *data = h264PPSAtoms[i].data;
+		
+		buffer[index] = (UInt8)(length >> 8);
+		buffer[index+1] = (UInt8)(length & 0x00ff);
+		
+		index += 2;
+		
+		UInt8 *dest = &(buffer[index]);
+		memcpy(dest, data, length);
+		
+		index += length;
+	}
 }
 
 @end

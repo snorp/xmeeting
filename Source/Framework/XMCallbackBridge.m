@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.10 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.11 2006/01/10 15:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -137,12 +137,11 @@ void _XMStopMediaTransmit(unsigned sessionID)
 	[autoreleasePool release];
 }
 
-void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codecIdentifier, XMVideoSize videoSize, unsigned payloadType)
+void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codecIdentifier, XMVideoSize videoSize)
 {
 	[_XMMediaReceiverSharedInstance _startMediaReceivingForSession:sessionID
 														 withCodec:codecIdentifier
-														 videoSize:videoSize 
-													  payloadType:payloadType];
+														 videoSize:videoSize ];
 }
 
 void _XMStopMediaReceiving(unsigned sessionID)
@@ -155,6 +154,16 @@ bool _XMProcessFrame(unsigned sessionID, void *data, unsigned length)
 	return [_XMMediaReceiverSharedInstance _decodeFrameForSession:sessionID
 															 data:data
 														   length:length];
+}
+
+void _XMHandleH264SPSAtomData(void *data, unsigned length)
+{
+	[_XMMediaReceiverSharedInstance _handleH264SPSAtomData:data length:length];
+}
+
+void _XMHandleH264PPSAtomData(void *data, unsigned length)
+{
+	[_XMMediaReceiverSharedInstance _handleH264PPSAtomData:data length:length];
 }
 
 void _XMUpdatePicture()

@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.9 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.10 2006/01/10 15:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,7 +98,7 @@ void XMReceiverMediaPatch::Main()
 		XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 		XMVideoSize mediaSize = _XMGetMediaFormatSize(mediaFormat);
 		unsigned sessionID = source.GetSessionID();
-		RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
+		//RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
 		
 		// initialize the packet processing variables
 		DWORD currentTimestamp = packets[0]->GetTimestamp();
@@ -106,7 +106,22 @@ void XMReceiverMediaPatch::Main()
 		XMRTPPacket *firstPacketOfPacketGroup = NULL;
 		XMRTPPacket *lastPacketOfPacketGroup = NULL;
 		
-		_XMStartMediaReceiving(sessionID, codecIdentifier, mediaSize, (unsigned)payloadType);
+		switch(codecIdentifier)
+		{
+			case XMCodecIdentifier_H261:
+				packetReassembler = new XMH261RTPPacketReassembler();
+				break;
+			case XMCodecIdentifier_H263:
+				packetReassembler = new XMH263RTPPacketReassembler();
+				break;
+			case XMCodecIdentifier_H264:
+				packetReassembler = new XMH264RTPPacketReassembler();
+				break;
+			default:
+				break;
+		}
+		
+		_XMStartMediaReceiving(sessionID, codecIdentifier, mediaSize);
 		
 		// loop to receive packets and process them
 		do {
@@ -225,14 +240,7 @@ void XMReceiverMediaPatch::Main()
 				// the sequence number is not the expected one. Try to analyze
 				// the bitstream to determine whether this is the first packet
 				// of a packet group or not
-				switch(codecIdentifier)
-				{
-					case XMCodecIdentifier_H261:
-						isFirstPacket = IsFirstPacketOfH261Frame(thePacket);
-						break;
-					default:
-						break;
-				}
+				isFirstPacket = packetReassembler->IsFirstPacketOfFrame(thePacket);
 			}
 			if(isFirstPacket == TRUE)
 			{
@@ -273,14 +281,7 @@ void XMReceiverMediaPatch::Main()
 				BOOL result = TRUE;
 				PINDEX frameBufferSize = 0;
 				
-				switch(codecIdentifier)
-				{
-					case XMCodecIdentifier_H261:
-						result = CopyH261PacketsIntoFrameBuffer(firstPacketOfPacketGroup, frameBuffer, &frameBufferSize);
-						break;
-					default:
-						break;
-				}
+				result = packetReassembler->CopyPacketsIntoFrameBuffer(firstPacketOfPacketGroup, frameBuffer, &frameBufferSize);
 				
 				if(result == TRUE)
 				{
@@ -363,6 +364,7 @@ void XMReceiverMediaPatch::Main()
 	}
 	free(packets);
 	free(frameBuffer);
+	free(packetReassembler);
 }
 
 void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
@@ -384,66 +386,4 @@ void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
 	{
 		notifier(command, 0);
 	}
-}
-
-BOOL XMReceiverMediaPatch::IsFirstPacketOfH261Frame(XMRTPPacket *packet)
-{
-	BYTE *data = packet->GetPayloadPtr();
-	unsigned sbit = (data[0] >> 5) & 0x07;
-	
-	if((sbit == 0 && data[4] == 0 && data[5] == 1) ||
-	   (sbit != 0 && data[4] == 0 && data[5] == 0))
-	{
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-BOOL XMReceiverMediaPatch::CopyH261PacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameBufferSize)
-{
-	XMRTPPacket *packet = packetListHead;
-	unsigned bufferSize = 0;
-	
-	unsigned ebit;
-	
-	do {
-		
-		BYTE *dest = &(frameBuffer[bufferSize]);
-		BYTE *payload = packet->GetPayloadPtr();
-		PINDEX size = packet->GetPayloadSize();
-		ebit = (payload[0] >> 2) & 0x07;
-		
-		// dropping the H.261 header
-		payload += 4;
-		size -= 4;
-		
-		memcpy(dest, payload, size);
-		
-		bufferSize += size;
-		
-		packet = packet->next;
-		
-		if(packet == NULL)
-		{
-			break;
-		}
-		
-		if(ebit != 0)
-		{
-			bufferSize -= 1;
-		}
-		
-	} while(TRUE);
-	
-	// adding a PSC to the end of the stream so that the codec does render the frame
-	frameBuffer[bufferSize] = 0;
-	frameBuffer[bufferSize+1] = (1 << ebit);
-	frameBuffer[bufferSize+2] = 0;
-
-	bufferSize += 3;
-	
-	*frameBufferSize = bufferSize;
-	
-	return TRUE;
 }
