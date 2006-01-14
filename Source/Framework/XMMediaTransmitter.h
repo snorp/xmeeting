@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.9 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.10 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,9 +38,10 @@
 	TimeValue timeOffset;
 	TimeValue lastTime;
 	
-	unsigned payloadCode;
+	unsigned flags;
 	ICMCompressionSessionRef compressionSession;
 	ICMCompressionFrameOptionsRef compressionFrameOptions;
+	ComponentInstance compressor;
 	RTPMediaPacketizer mediaPacketizer;
 	RTPMPSampleDataParams sampleData;
 }
@@ -58,7 +59,7 @@
 						   videoSize:(XMVideoSize)videoSize 
 				  maxFramesPerSecond:(unsigned)maxFramesPerSecond
 						  maxBitrate:(unsigned)maxBitrate
-						 payloadCode:(unsigned)payloadCode;
+							   flags:(unsigned)flags;
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 
 + (void)_updatePicture;

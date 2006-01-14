@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.1 2006/01/10 15:13:21 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.2 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,27 +26,26 @@ BOOL XMH261RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 	return FALSE;
 }
 
-BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameBufferSize)
+BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
-	unsigned bufferSize = 0;
+	PINDEX frameLength = 0;
 	
-	unsigned ebit;
+	BYTE ebit;
 	
 	do {
 		
-		BYTE *dest = &(frameBuffer[bufferSize]);
-		BYTE *payload = packet->GetPayloadPtr();
-		PINDEX size = packet->GetPayloadSize();
-		ebit = (payload[0] >> 2) & 0x07;
+		BYTE *dest = &(frameBuffer[frameLength]);
+		BYTE *data = packet->GetPayloadPtr();
+		PINDEX dataLength = packet->GetPayloadSize();
+		ebit = (data[0] >> 2) & 0x07;
 		
 		// dropping the H.261 header
-		payload += 4;
-		size -= 4;
+		data += 4;
+		dataLength -= 4;
 		
-		memcpy(dest, payload, size);
-		
-		bufferSize += size;
+		memcpy(dest, data, dataLength);
+		frameLength += dataLength;
 		
 		packet = packet->next;
 		
@@ -57,19 +56,18 @@ BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		
 		if(ebit != 0)
 		{
-			bufferSize -= 1;
+			frameLength -= 1;
 		}
 		
 	} while(TRUE);
 	
 	// adding a PSC to the end of the stream so that the codec does render the frame
-	frameBuffer[bufferSize] = 0;
-	frameBuffer[bufferSize+1] = (1 << ebit);
-	frameBuffer[bufferSize+2] = 0;
+	frameBuffer[frameLength] = 0;
+	frameBuffer[frameLength+1] = (1 << ebit);
+	frameBuffer[frameLength+2] = 0;
+	frameLength += 3;
 	
-	bufferSize += 3;
-	
-	*frameBufferSize = bufferSize;
+	*outFrameLength = frameLength;
 	
 	return TRUE;
 }
@@ -91,44 +89,45 @@ BOOL XMH263RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 	return FALSE;
 }
 
-BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameBufferSize)
+BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
-	unsigned bufferSize = 0;
+	PINDEX frameLength = 0;
 	
 	BYTE ebit;
 	
 	do {
-		BYTE *dest = &(frameBuffer[bufferSize]);
-		BYTE *payload = packet->GetPayloadPtr();
-		PINDEX size = packet->GetPayloadSize();
 		
-		BYTE f = (payload[0] >> 7) & 0x01;
-		BYTE p = (payload[0] >> 6) & 0x01;
-		ebit = payload[0] & 0x07;
+		BYTE *dest = &(frameBuffer[frameLength]);
+		BYTE *data = packet->GetPayloadPtr();
+		PINDEX dataLength = packet->GetPayloadSize();
+		
+		BYTE f = (data[0] >> 7) & 0x01;
+		BYTE p = (data[0] >> 6) & 0x01;
+		ebit = data[0] & 0x07;
 		
 		if(f == 0)
 		{
 			// Mode A
-			payload += 4;
-			size -= 4;
+			data += 4;
+			dataLength -= 4;
 		}
 		else if(p == 0)
 		{
 			// Mode B
-			payload += 8;
-			size -= 8;
+			data += 8;
+			dataLength -= 8;
 		}
 		else
 		{
 			// Mode C
-			payload += 12;
-			size -= 12;
+			data += 12;
+			dataLength -= 12;
 		}
 		
-		memcpy(dest, payload, size);
+		memcpy(dest, data, dataLength);
 		
-		bufferSize += size;
+		frameLength += dataLength;
 		
 		packet = packet->next;
 		
@@ -139,85 +138,217 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		
 		if(ebit != 0)
 		{
-			bufferSize -= 1;
+			frameLength -= 1;
 		}
 		
 	} while(TRUE);
 	
-	*frameBufferSize = bufferSize;
+	*outFrameLength = frameLength;
 	
 	return TRUE;
 }
 
 BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
+	BYTE *data = packet->GetPayloadPtr();
+	
+	BYTE p = (data[0] >> 2) & 0x01;
+	BYTE plen = (data[0] & 0x01) << 4;
+	plen |= (data[1] >> 4) & 0x0f;
+	
+	if(p == 1 && (data[2] & 0xfc) == 0x80)
+	{
+		return TRUE;
+	}
+
 	return FALSE;
 }
 
-BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameBufferSize)
-{
-	return FALSE;
-}
-
-BOOL XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
-{
-	return FALSE;
-}
-
-BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameBufferSize)
+BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
-	unsigned bufferSize = 0;
+	PINDEX frameLength = 0;
 	
 	do {
 		
 		BYTE *data = packet->GetPayloadPtr();
-		WORD payloadSize = packet->GetPayloadSize();
+		WORD dataLength = packet->GetPayloadSize();
+		
+		// extracting the P, V and PLEN fields
+		BYTE p = (data[0] >> 2) & 0x01;
+		BYTE v = (data[0] >> 1) & 0x01;
+		BYTE plen = (data[0] & 0x01) << 4;
+		plen |= (data[1] >> 3) & 0x1f;
+		//BYTE pebit = data[1] & 0x07;
+		
+		if(v == 1)
+		{
+			dataLength += 1;
+		}
+		if(p == 1)
+		{
+			// inserting the two zero bytes of the start code
+			frameBuffer[frameLength] = 0;
+			frameBuffer[frameLength+1] = 0;
+			frameLength += 2;
+		}
+		
+		BYTE *dest = &(frameBuffer[frameLength]);
+		BYTE *src = &(data[2+v+plen]);
+		dataLength -= (2 + v + plen);
+		
+		memcpy(dest, src, dataLength);
+		frameLength += dataLength;
+		
+		packet = packet->next;
+		
+	} while(packet != NULL);
+	
+	*outFrameLength = frameLength;
+	return TRUE;
+}
+
+BOOL XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
+{
+	BYTE *data = packet->GetPayloadPtr();
+	BYTE packetType = data[0] & 0x1f;
+	
+	if(packetType == 7 || packetType == 8)
+	{
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
+{
+	XMRTPPacket *packet = packetListHead;
+	unsigned frameLength = 0;
+	
+	do {
+		
+		BYTE *data = packet->GetPayloadPtr();
+		WORD dataLength = packet->GetPayloadSize();
 		BYTE packetType = data[0] & 0x1f;
 		
+		// handling SPS Atoms
 		if(packetType == 7)
 		{
-			_XMHandleH264SPSAtomData(data, payloadSize);
+			_XMHandleH264SPSAtomData(data, dataLength);
 		}
+		// Handling PPS Atoms
 		else if(packetType == 8)
 		{
-			_XMHandleH264PPSAtomData(data, payloadSize);
+			_XMHandleH264PPSAtomData(data, dataLength);
 		}
+		// handling Single NAL Unit packets
 		else if(packetType > 0 && packetType < 24)
 		{
 			// Adding two zero bytes to have 4 byte length fields
-			frameBuffer[bufferSize] = 0;
-			frameBuffer[bufferSize + 1] = 0;
-			bufferSize += 2;
+			frameBuffer[frameLength] = 0;
+			frameBuffer[frameLength + 1] = 0;
+			frameLength += 2;
 			
 			// Adding the length of this NAL unit
-			WORD *lengthField = (WORD *)&(frameBuffer[bufferSize]);
-			lengthField[0] = payloadSize;
-			bufferSize += 2;
+			WORD *lengthField = (WORD *)&(frameBuffer[frameLength]);
+			lengthField[0] = dataLength;
+			frameLength += 2;
 			
-			BYTE *dest = &(frameBuffer[bufferSize]);
+			BYTE *dest = &(frameBuffer[frameLength]);
 			
-			memcpy(dest, data, payloadSize);
-			bufferSize += payloadSize;
+			memcpy(dest, data, dataLength);
+			frameLength += dataLength;
 		}
+		// handling STAP-A packets
 		else if(packetType == 24)
 		{
-			cout << "STAP A" << endl;
+			// The first byte is the STAP-A byte and is already read
+			unsigned index = 1;
+			
+			do {
+				
+				WORD *header = (WORD *)&(data[index]);
+				WORD unitLength = header[0];
+				
+				// Adding the length of the STAP-A NAL unit
+				frameBuffer[frameLength] = 0;
+				frameBuffer[frameLength+1] = 0;
+				frameBuffer[frameLength+2] = data[index];
+				frameBuffer[frameLength+3] = data[index+1];
+				
+				index += 2;
+				frameLength += 4;
+				
+				BYTE *dest = &(frameBuffer[frameLength]);
+				BYTE *src = &(data[index]);
+				
+				memcpy(dest, src, unitLength);
+				
+				frameLength += unitLength;
+				index += unitLength;
+				
+			} while(index < dataLength);
 		}
+		// Handling FU-A packets
 		else if(packetType == 28)
 		{
-			cout << "FU A" << endl;
+			// reading the NRI field
+			BYTE nri = data[0] & 0x60;
+			BYTE s = (data[1] >> 7) & 0x01;
+			BYTE e = (data[1] >> 6) & 0x01;
+			BYTE type = data[1] & 0x1f;
+			
+			// the first two data bytes are not added to the final frame
+			dataLength -= 2;
+			
+			// If the S bit is set, we scan past the packets ahead
+			// to determine the length of the complete NAL Unit
+			if(s == 1)
+			{
+				WORD totalNALLength = dataLength+1;
+				XMRTPPacket *thePacket = packet;
+				
+				while(e == 0)
+				{
+					thePacket = thePacket->next;
+					BYTE *thePacketData = thePacket->GetPayloadPtr();
+					PINDEX thePacketDataLength = thePacket->GetPayloadSize() - 2;
+					
+					totalNALLength += thePacketDataLength;
+					
+					e = (thePacketData[1] >> 6) & 0x01;
+				}
+				
+				// addint the NAL length information
+				frameBuffer[frameLength] = 0;
+				frameBuffer[frameLength+1] = 0;
+				
+				WORD *header = (WORD *)&(frameBuffer[frameLength+2]);
+				header[0] = totalNALLength;
+				
+				// Adding the NAL header byte
+				frameBuffer[frameLength+4] = 0;
+				frameBuffer[frameLength+4] |= nri;
+				frameBuffer[frameLength+4] |= type;
+				
+				frameLength += 5;
+			}
+			
+			BYTE *dest = &(frameBuffer[frameLength]);
+			BYTE *src = &(data[2]);
+			memcpy(dest, src, dataLength);
+			frameLength += dataLength;
 		}
 		else
 		{
-			cout << "UNKNOWN" << endl;
+			cout << "UNKNOWN NAL TYPE" << endl;
 		}
 		
 		packet = packet->next;
 		
 	} while(packet != NULL);
 	
-	*frameBufferSize = bufferSize;
+	*outFrameLength = frameLength;
 	
 	return TRUE;
 }

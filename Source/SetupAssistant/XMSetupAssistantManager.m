@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.1 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.2 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1264,7 +1264,6 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 	if(![keys containsObject:XMKey_PreferencesGatekeeperUsername])
 	{
 		[gkUsernameField setEnabled:NO];
-		NSLog(@"adjusting");
 		firstResponder = gkPhoneNumberField;
 	}
 	if(![keys containsObject:XMKey_PreferencesGatekeeperPhoneNumber])
@@ -1272,7 +1271,6 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 		[gkPhoneNumberField setEnabled:NO];
 		if(firstResponder == gkPhoneNumberField)
 		{
-			NSLog(@"b");
 			firstResponder = gkPasswordField;
 		}
 	}

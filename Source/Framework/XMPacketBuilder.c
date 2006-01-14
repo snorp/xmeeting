@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.4 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.5 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -148,8 +148,6 @@ ComponentResult XMPacketBuilder_EndPacket(XMPacketBuilderGlobals globals,
 										  UInt32 inTransmissionTimeOffset,
 										  UInt32 inDuration)
 {
-	//printf("XMPacketBuilder_EndPacket called with ref %d %d\n", (int)inPacketGroup, (int)inPacket);
-	//endPacket();
 	if((int)inPacket != (globals->packetRef-1))
 	{
 		printf("ERROR PacketRef\n");
@@ -163,9 +161,6 @@ ComponentResult XMPacketBuilder_EndPacketGroup(XMPacketBuilderGlobals globals,
 											   SInt32 inFlags,
 											   RTPPacketGroupRef inPacketGroup)
 {
-	//printf("XMPacketBuilder_EndPacketGroup called with ref %d\n", (int)inPacketGroup);
-//	printf("EndPacketGroup called\n");
-	//endPacketGroup();
 	return noErr;
 }
 
@@ -179,24 +174,14 @@ ComponentResult XMPacketBuilder_AddPacketLiteralData(XMPacketBuilderGlobals glob
 {
 	ComponentResult err = noErr;
 	
-	/*printf("addPacketLIteralData %d\n", inDataLength);
-	if(inDataLength == 2)
-	{
-		printf("%x %x\n", inData[0], inData[1]);
-	}*/
-	
 	if(outDataRef != NULL)
 	{
 		printf("RTPPacketRepeatedDataRef *dataRef != NULL\n");
 		err = paramErr;
 		goto bail;
-		//*outDataRef = (RTPPacketRepeatedDataRef)globals->repRef;
-	
-		//globals->repRef++;
 	}
 	
 	_XMAppendData(2, (void *)inData, (unsigned)inDataLength);
-	//addPacketData((void *)inData, inDataLength);
 	
 bail:
 	return err;
@@ -208,7 +193,6 @@ ComponentResult XMPacketBuilder_AddPacketRepeatedData(XMPacketBuilderGlobals glo
 													  RTPPacketRef inPacket,
 													  RTPPacketRepeatedDataRef inDataRef)
 {
-	//printf("AddPacketRepeatedData\n");
 	return paramErr;
 }
 
@@ -223,34 +207,18 @@ ComponentResult XMPacketBuilder_AddPacketSampleData(XMPacketBuilderGlobals globa
 {
 	ComponentResult err = noErr;
 	
-	//printf("AddPacketSampleData %d %d (%d)\n", inSampleOffset, (inSampleOffset+inSampleDataLength), inSampleDataLength);
-	
 	if(outDataRef != NULL)
 	{
 		printf("RTPPacketRepeatedDataRef Not NULL (2)\n");
 		err = paramErr;
 		goto bail;
-		
-		/*
-		*outDataRef = (RTPPacketRepeatedDataRef)globals->repRef;
-	
-		globals->repRef++;
-		 */
 	}
 	
 	UInt8 *data = (UInt8 *)inSampleDataParams->data;
 	
-	/*if(inSampleOffset >= 5)
-	{
-		printf("%x %x %x %x %x\n", data[inSampleOffset-5], data[inSampleOffset-4], data[inSampleOffset-3], data[inSampleOffset-2], data[inSampleOffset-1]);
-	}*/
-	
 	data += inSampleOffset;
 	
-	//printf("Adding data length: %d\n", inSampleDataLength);
-	
 	_XMAppendData(2, (void *)data, inSampleDataLength);
-	//addPacketData(data, inSampleDataLength);
 	
 bail:
 	return err;
@@ -266,14 +234,6 @@ ComponentResult XMPacketBuilder_AddPacketSampleData64 (XMPacketBuilderGlobals gl
 													   RTPPacketRepeatedDataRef *outDataRef )
 {
 	printf("AddPacketSampleData64\n");
-	/*
-	if(outDataRef != NULL)
-	{
-		*outDataRef = (RTPPacketRepeatedDataRef)globals->repRef;
-		
-		globals->repRef++;
-	}
-	 */
 	
 	return paramErr;
 }

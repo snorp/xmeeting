@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.11 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.12 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,8 @@
 #import "XMPrivate.h"
 
 #import "XMPacketBuilder.h"
-#import "XMH263MediaPacketizer.h"
+#import "XMRTPH263Packetizer.h"
+#import "XMRTPH264Packetizer.h"
 
 #import "XMSequenceGrabberVideoInputModule.h"
 #import "XMDummyVideoInputModule.h"
@@ -120,7 +121,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 						   videoSize:(XMVideoSize)videoSize 
 				  maxFramesPerSecond:(unsigned)maxFramesPerSecond
 						  maxBitrate:(unsigned)maxBitrate
-						 payloadCode:(unsigned)payloadCode
+							   flags:(unsigned)flags
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:sessionID];
 	NSData *sessionData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -142,12 +143,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	NSData *bitrateData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithUnsignedInt:payloadCode];
-	NSData *payloadData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	number = [[NSNumber alloc] initWithUnsignedInt:flags];
+	NSData *flagsData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:sessionData, codecData, sizeData, framesData,
-															bitrateData, payloadData, nil];
+															bitrateData, flagsData, nil];
 	
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartTransmitting withComponents:components];
 	
@@ -224,7 +225,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	compressionSession = NULL;
 	compressionFrameOptions = NULL;
-	mediaPacketizer = 0L;
+	compressor = NULL;
+	mediaPacketizer = NULL;
 	
 	return self;
 }
@@ -261,7 +263,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 {	
 	EnterMovies();
 	XMRegisterPacketBuilder();
-	XMRegisterH263MediaPacketizer();
+	XMRegisterRTPH263Packetizer();
+	XMRegisterRTPH264Packetizer();
 	
 	[receivePort setDelegate:self];
 	[[NSRunLoop currentRunLoop] addPort:receivePort forMode:NSDefaultRunLoopMode];
@@ -525,7 +528,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	unsigned bitrate;
 	
 	OSType componentManufacturer;
-	BOOL doLimitDataRate = YES;
 	
 	NSData *data = (NSData *)[components objectAtIndex:1];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -545,7 +547,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	data = (NSData *)[components objectAtIndex:5];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	payloadCode = [number unsignedIntValue];
+	flags = [number unsignedIntValue];
 	
 	switch(codecIdentifier)
 	{
@@ -556,7 +558,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		case XMCodecIdentifier_H263:
 			codecType = kH263CodecType;
 			componentManufacturer = 'surf';
-			doLimitDataRate = NO;
 			break;
 		case XMCodecIdentifier_H264:
 			codecType = kH264CodecType;
@@ -632,7 +633,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	// averageDataRate is in bytes/s
 	SInt32 averageDataRate = bitrate / 8;
-	NSLog(@"limiting dataRate to %d", averageDataRate);
+	//NSLog(@"limiting dataRate to %d", averageDataRate);
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -664,14 +665,61 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	Component compressorComponent = FindNextComponent(0, &componentDescription);
 	if(compressorComponent == NULL)
 	{
-		fprintf(stderr, "No such compressor\n");
+		NSLog(@"No such compressor");
 	}
+	
+	err = OpenAComponent(compressorComponent, &compressor);
+	if(err != noErr)
+	{
+		NSLog(@"Opening the component failed");
+	}
+	
+	if(codecIdentifier == XMCodecIdentifier_H264)
+	{
+		unsigned profile = (flags >> 4) & 0xf;
+		// The level is currently ignored
+		// using level 1.1 for QCIF and 1.3 for CIF
 		
+		Handle h264Settings = NewHandleClear(0);
+		
+		err = ImageCodecGetSettings(compressor, h264Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecGetSettings failed");
+		}
+		
+		// For some reason, the QTAtomContainer functions will crash if used on the atom
+		// container returned by ImageCodecGetSettings.
+		// Therefore, we have to parse the atoms self to set the correct settings.
+		unsigned settingsSize = GetHandleSize(h264Settings) / 4;
+		UInt32 *data = (UInt32 *)*h264Settings;
+		unsigned i;
+		for(i = 0; i < settingsSize; i++)
+		{
+			if(data[i] == FOUR_CHAR_CODE('sprf'))
+			{
+				i+=4;
+				data[i] = profile;
+			}
+			if(data[i] == FOUR_CHAR_CODE('susg'))
+			{
+				i+=4;
+				data[i] = 2;
+			}
+		}
+		
+		err = ImageCodecSetSettings(compressor, h264Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecSetSettings failed");
+		}
+	}
+	
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_CompressorComponent,
-												  sizeof(compressorComponent),
-												  &compressorComponent);
+												  sizeof(compressor),
+												  &compressor);
 	if(err != noErr)
 	{
 		NSLog(@"No such codec found");
@@ -723,6 +771,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		compressionSession = NULL;
 	}
 	
+	if(compressor != NULL)
+	{
+		CloseComponent(compressor);
+		compressor = NULL;
+	}
+	
 	if(mediaPacketizer != NULL)
 	{
 		CloseComponent(mediaPacketizer);
@@ -759,13 +813,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
 {	
+	[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
+	
 	TimeValue convertedTime = (90000 / timeScale) * time;
 	TimeValue timeStamp = convertedTime - timeOffset;
 	lastTime = timeStamp;
-	
-	// handling the frame to the video manager to draw the preview image
-	// on screen
-	[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
 	
 	if(compressionSession != NULL)
 	{
@@ -777,13 +829,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		{
 			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
 		}
-		
-		if(needsPictureUpdate == YES)
-		{
-			NSLog(@"Forcing keyframe");
-		}
-		
-		needsPictureUpdate = NO;
 		
 		err = ICMCompressionSessionEncodeFrame(compressionSession, 
 											   frame,
@@ -797,7 +842,22 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		{
 			NSLog(@"ICMCompressionSessionEncodeFrame failed %d", (int)err);
 		}
+		
+		needsPictureUpdate = NO;
 	}
+	/*else
+	{
+		[XMMediaTransmitter _startTransmittingForSession:2
+											   withCodec:XMCodecIdentifier_H264
+											   videoSize:XMVideoSize_CIF
+									  maxFramesPerSecond:30
+											  maxBitrate:48000
+												   flags:((1 << 8) + (1 << 4) + 5)];
+	}*/
+	
+	// handling the frame to the video manager to draw the preview image
+	// on screen
+	//[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
 }
 
 - (void)setTimeScale:(TimeScale)theTimeScale
@@ -881,12 +941,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 }
 
 - (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame
-{
+{	
 	OSErr err = noErr;
-	
+
 	ImageDescriptionHandle imageDesc;
 	
 	err = ICMEncodedFrameGetImageDescription(encodedFrame, &imageDesc);
+	
+	sampleData.flags = 0;
 	
 	if(mediaPacketizer == NULL)
 	{
@@ -898,17 +960,17 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 				packetizerToUse = kRTP261MediaPacketizerType;
 				break;
 			case kH263CodecType:
-				if(payloadCode >= kRTPPayload_FirstDynamic)
+				if(flags >= kRTPPayload_FirstDynamic)
 				{
 					packetizerToUse = kRTP263PlusMediaPacketizerType;
 				}
 				else
 				{
-					packetizerToUse = kXMH263MediaPacketizerType;
+					packetizerToUse = kXMRTPH263PacketizerType;
 				}
 				break;
 			case kH264CodecType:
-				packetizerToUse = 'avc1';
+				packetizerToUse = kXMRTPH264PacketizerType;
 				break;
 			default:
 				return qtsBadStateErr;
@@ -941,7 +1003,16 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			NSLog(@"PreflightMedia failed: %d", (int)err);
 		}
 		
-		err = RTPMPInitialize(mediaPacketizer, kRTPMPRealtimeModeFlag);
+		SInt32 packetizerFlags = kRTPMPRealtimeModeFlag;
+		if(codecType == kH264CodecType)
+		{
+			unsigned packetizationMode = (flags >> 8) & 0xf;
+			if(packetizationMode == 2)
+			{
+				packetizerFlags |= 2;
+			}
+		}
+		err = RTPMPInitialize(mediaPacketizer, packetizerFlags);
 		if(err != noErr)
 		{
 			NSLog(@"RTPMP initialize failed: %d", (int)err);
@@ -994,6 +1065,16 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		sampleData.sampleRef = 0;
 		sampleData.releaseProc = dataReleaseProc;
 		sampleData.refCon = (void *)self;
+		
+		if(codecType == kH264CodecType)
+		{
+			sampleData.flags = 1;
+		}
+	}
+	
+	if(needsPictureUpdate == YES && codecType == kH264CodecType)
+	{
+		sampleData.flags = 1;
 	}
 	
 	sampleData.timeStamp = ICMEncodedFrameGetDecodeTimeStamp(encodedFrame);

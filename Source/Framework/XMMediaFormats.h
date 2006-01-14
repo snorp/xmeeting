@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.8 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.9 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,6 +49,21 @@ extern const OpalVideoFormat & XMGetMediaFormat_H264();
 #define XM_MEDIA_FORMAT_H261 XMGetMediaFormat_H261()
 #define XM_MEDIA_FORMAT_H263 XMGetMediaFormat_H263()
 #define XM_MEDIA_FORMAT_H264 XMGetMediaFormat_H264()
+
+#pragma mark Constants
+
+#define XM_H264_PROFILE_BASELINE 1
+#define XM_H264_PROFILE_MAIN 2
+
+#define XM_H264_LEVEL_1		1
+#define XM_H264_LEVEL_1_B	2
+#define XM_H264_LEVEL_1_1	3
+#define XM_H264_LEVEL_1_2	4
+#define XM_H264_LEVEL_1_3	5
+#define XM_H264_LEVEL_2		6
+
+#define XM_H264_PACKETIZATION_MODE_SINGLE_NAL 1
+#define XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED 2
 
 #pragma mark managing MediaFormats
 
@@ -214,10 +229,17 @@ public:
 	BOOL IsValidCapabilityForSending() const;
 	BOOL IsValidCapabilityForReceiving() const;
 	
+	unsigned GetProfile() const;
+	unsigned GetLevel() const;
+	
 private:
-		
+	
 	unsigned maxBitRate;
+	WORD profile;
+	unsigned level;
 };
+
+#pragma mark Macros
 
 #define XM_REGISTER_H323_CAPABILITIES \
 	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H264, _XMMediaFormat_H264, H323_NO_EP_VAR) \
@@ -226,8 +248,6 @@ private:
 		{ return new XM_H323_H263_Capability(); } \
 	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H261, _XMMediaFormat_H261, H323_NO_EP_VAR) \
 		{ return new XM_H323_H261_Capability(); } \
-
-// macro for registering the media formats
 
 #define XM_REGISTER_FORMATS() \
 	XM_REGISTER_H323_CAPABILITIES \

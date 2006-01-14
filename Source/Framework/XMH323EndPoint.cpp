@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.11 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.12 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -97,13 +97,11 @@ XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString &
 		// or the username/password combination does change.
 		if(gatekeeper != NULL)
 		{
-			cout << "checking" << endl;
 			BOOL needsGatekeeperRegistrationChange = FALSE;
 		
 			if(address != NULL &&
 			   gatekeeper->GetTransport().GetRemoteAddress().IsEquivalent(address) == FALSE)
 			{
-				cout << "address differs" << endl;
 				needsGatekeeperRegistrationChange = TRUE;
 			}
 			
@@ -111,14 +109,12 @@ XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString &
 			   identifier != NULL && 
 			   gatekeeper->GetIdentifier() != identifier)
 			{
-				cout << "id differs" << endl;
 				needsGatekeeperRegistrationChange = TRUE;
 			}
 			
 			if(needsGatekeeperRegistrationChange == FALSE &&
 			   password != NULL)
 			{
-				cout << "has password" << endl;
 				// we check for a change in username/password change
 				if(gatekeeperUsername != username ||
 				   gatekeeperPassword != password)

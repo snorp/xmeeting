@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.h,v 1.4 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.h,v 1.5 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,6 +44,11 @@ public:
 	static void SendPacket(unsigned sessionID, BOOL setMarker);
 	
 	static void HandleDidStopTransmitting(unsigned sessionID);
+	
+	static void SetH263PayloadType(RTP_DataFrame::PayloadTypes payloadType);
+	static void SetH264Parameters(unsigned profile, unsigned level);
+	static void SetH264PacketizationMode(unsigned packetizationMode);
+	static unsigned GetH264PacketizationMode();
 	
 private:
 

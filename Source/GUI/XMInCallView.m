@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallView.m,v 1.3 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMInCallView.m,v 1.4 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,7 +98,6 @@
 {
 	if(showVideoContent == NO)
 	{
-		NSLog(@"returning minSize");
 		return [self minimumSize];
 	}
 	

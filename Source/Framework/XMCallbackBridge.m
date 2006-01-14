@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.11 2006/01/10 15:13:21 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.12 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -117,13 +117,13 @@ void _XMHandleVideoStreamClosed(unsigned callID, bool isIncomingStream)
 #pragma mark MediaReceiver callbacks
 
 void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
-						   unsigned maxBitrate, unsigned payloadCode)
+						   unsigned maxBitrate, unsigned flags)
 {
 	// this is called from a thread without run loop and without autorelease pool
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
 	[XMMediaTransmitter _startTransmittingForSession:sessionID withCodec:codec videoSize:videoSize maxFramesPerSecond:maxFramesPerSecond
-										  maxBitrate:maxBitrate payloadCode:payloadCode];
+										  maxBitrate:maxBitrate flags:flags];
 	
 	[autoreleasePool release];
 }

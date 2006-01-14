@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.7 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.8 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,10 @@
 #include "XMCallbackBridge.h"
 
 static XMTransmitterMediaPatch *videoTransmitterPatch = NULL;
+static RTP_DataFrame::PayloadTypes h263PayloadType;
+static unsigned h264Profile;
+static unsigned h264Level;
+static unsigned h264PacketizationMode;
 
 XMTransmitterMediaPatch::XMTransmitterMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
@@ -69,14 +73,27 @@ void XMTransmitterMediaPatch::Resume()
 			unsigned frameTime = mediaFormat.GetFrameTime();
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
 			unsigned bitrate = mediaFormat.GetBandwidth();
-			unsigned payloadCode = (unsigned)mediaFormat.GetPayloadType();
-			if(mediaFormat == XM_MEDIA_FORMAT_H263)
-			{
-				payloadCode = mediaFormat.GetFrameTime();
-			}
+			unsigned flags = 0;
 			
 			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+
+			if(codecIdentifier == XMCodecIdentifier_H263)
+			{
+				// If we're  sending H.263, we need to know which
+				// format to send. The payload code is submitted in the
+				// flags parameter
+				flags = h263PayloadType;
+			}
+			else if(codecIdentifier == XMCodecIdentifier_H264)
+			{
+				if(h264Level < XM_H264_LEVEL_1_3)
+				{
+					// With this level, we can only send QCIF images
+					videoSize = XMVideoSize_QCIF;
+				}
+				flags = (h264PacketizationMode << 8) + (h264Profile << 4) + h264Level;
+			}
 			
 			// adjusting the maxFramesPerSecond / maxBitrate parameters
 			if(framesPerSecond < maxFramesPerSecond)
@@ -96,7 +113,7 @@ void XMTransmitterMediaPatch::Resume()
 				return;
 			}
 			
-			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, payloadCode);
+			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, flags);
 		}
 	}
 	else
@@ -159,8 +176,8 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 		else if(theCodec == XMCodecIdentifier_H263)
 		{
 			OpalMediaFormat mediaFormat = videoTransmitterPatch->sinks[0].stream->GetMediaFormat();
-			RTP_DataFrame::PayloadTypes payloadCode = (RTP_DataFrame::PayloadTypes)mediaFormat.GetFrameTime();
-			frame->SetPayloadType(payloadCode);
+			RTP_DataFrame::PayloadTypes payloadType = h263PayloadType;
+			frame->SetPayloadType(payloadType);
 		}
 		else if(theCodec == XMCodecIdentifier_H264)
 		{
@@ -241,4 +258,25 @@ void XMTransmitterMediaPatch::HandleDidStopTransmitting(unsigned sessionID)
 	
 	videoTransmitterPatch->isTerminated = TRUE;
 	videoTransmitterPatch = NULL;
+}
+
+void XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::PayloadTypes payloadType)
+{
+	h263PayloadType = payloadType;
+}
+
+void XMTransmitterMediaPatch::SetH264Parameters(unsigned profile, unsigned level)
+{
+	h264Profile = profile;
+	h264Level = level;
+}
+
+void XMTransmitterMediaPatch::SetH264PacketizationMode(unsigned packetizationMode)
+{
+	h264PacketizationMode = packetizationMode;
+}
+
+unsigned XMTransmitterMediaPatch::GetH264PacketizationMode()
+{
+	return h264PacketizationMode;
 }

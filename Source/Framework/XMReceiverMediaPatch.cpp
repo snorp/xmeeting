@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.10 2006/01/10 15:13:21 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.11 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,7 +98,7 @@ void XMReceiverMediaPatch::Main()
 		XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 		XMVideoSize mediaSize = _XMGetMediaFormatSize(mediaFormat);
 		unsigned sessionID = source.GetSessionID();
-		//RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
+		RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
 		
 		// initialize the packet processing variables
 		DWORD currentTimestamp = packets[0]->GetTimestamp();
@@ -112,7 +112,14 @@ void XMReceiverMediaPatch::Main()
 				packetReassembler = new XMH261RTPPacketReassembler();
 				break;
 			case XMCodecIdentifier_H263:
-				packetReassembler = new XMH263RTPPacketReassembler();
+				if(payloadType == RTP_DataFrame::H263)
+				{
+					packetReassembler = new XMH263RTPPacketReassembler();
+				}
+				else
+				{
+					packetReassembler = new XMH263PlusRTPPacketReassembler();
+				}
 				break;
 			case XMCodecIdentifier_H264:
 				packetReassembler = new XMH264RTPPacketReassembler();
@@ -158,7 +165,6 @@ void XMReceiverMediaPatch::Main()
 				{
 					if(firstPacketOfPacketGroup != NULL)
 					{
-						cout << "Discarding old packet group" << endl;
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;
@@ -305,7 +311,6 @@ void XMReceiverMediaPatch::Main()
 			
 			if(processingSuccesful == FALSE)
 			{
-				cout << "Issuing update command" << endl;
 				IssueVideoUpdatePictureCommand();
 			}
 			

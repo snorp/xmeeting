@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.13 2006/01/10 15:13:21 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.14 2006/01/14 13:25:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -371,6 +371,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	UInt8 compatibility = spsAtom[2];
 	UInt8 level = spsAtom[3];
 	
+	
 	// configurationVersion is 1
 	buffer[0] = 1;
 	
@@ -392,7 +393,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	unsigned index = 6;
 	unsigned i;
 	
-	for(i = 0; i < numberOfH264SPSAtoms; i++)
+	for(i = 0; i < 1; i++)
 	{
 		UInt16 length = h264SPSAtoms[i].length;
 		UInt8 *data = h264SPSAtoms[i].data;
@@ -411,8 +412,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	// setting the number of PPS atoms
 	buffer[index] = numberOfH264PPSAtoms;
 	index++;
-	
-	for(i = 0; i < numberOfH264PPSAtoms; i++)
+
+	for(i = 0; i < 1; i++)
 	{
 		UInt16 length = h264PPSAtoms[i].length;
 		UInt8 *data = h264PPSAtoms[i].data;
@@ -427,6 +428,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		index += length;
 	}
+	
+	NSLog(@"Created AVCC Atom. There are %d SPS and %d PPS atoms to choose", numberOfH264SPSAtoms, numberOfH264PPSAtoms);
 }
 
 @end
