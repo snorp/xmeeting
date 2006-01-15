@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH264Packetizer.c,v 1.1 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMRTPH264Packetizer.c,v 1.2 2006/01/15 22:07:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,12 +126,12 @@ ComponentResult XMRTPH264Packetizer_PreflightMedia(XMRTPH264PacketizerGlobals gl
 	UInt8 *data = (UInt8 *)*avccExtension;
 	
 	UInt16 *spsLengthData = (UInt16 *)&(data[6]);
-	UInt16 spsAtomLength = spsLengthData[0];
+	UInt16 spsAtomLength = ntohs(spsLengthData[0]);
 	
 	UInt32 ppsAtomLengthIndex = 9 + spsAtomLength;
 	
 	UInt16 *ppsLengthData = (UInt16 *)&(data[ppsAtomLengthIndex]);
-	UInt16 ppsAtomLength = ppsLengthData[0];
+	UInt16 ppsAtomLength = ntohs(ppsLengthData[0]);
 	
 	globals->spsAtomData = malloc(spsAtomLength * sizeof(UInt8));
 	globals->ppsAtomData = malloc(ppsAtomLength * sizeof(UInt8));
@@ -219,7 +219,7 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		// Getting the size of this NAL unit
 		UInt32 *lengthPtr = (UInt32 *)&(data[index]);
 		index += 4;
-		UInt32 nalLength = lengthPtr[0];
+		UInt32 nalLength = ntohl(lengthPtr[0]);
 		
 		// If the NAL does not fit within one single packet,
 		// we have to use FU-A packets, which are only available

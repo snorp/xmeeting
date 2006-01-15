@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.2 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.3 2006/01/15 22:07:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -250,7 +250,7 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 			frameLength += 2;
 			
 			// Adding the length of this NAL unit
-			WORD *lengthField = (WORD *)&(frameBuffer[frameLength]);
+			PUInt16b *lengthField = (PUInt16b *)&frameBuffer[frameLength];
 			lengthField[0] = dataLength;
 			frameLength += 2;
 			
@@ -267,7 +267,7 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 			
 			do {
 				
-				WORD *header = (WORD *)&(data[index]);
+				PUInt16b *header = (PUInt16b *)&data[index];
 				WORD unitLength = header[0];
 				
 				// Adding the length of the STAP-A NAL unit
@@ -323,7 +323,7 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 				frameBuffer[frameLength] = 0;
 				frameBuffer[frameLength+1] = 0;
 				
-				WORD *header = (WORD *)&(frameBuffer[frameLength+2]);
+				PUInt16b *header = (PUInt16b *)&frameBuffer[frameLength+2];
 				header[0] = totalNALLength;
 				
 				// Adding the NAL header byte
