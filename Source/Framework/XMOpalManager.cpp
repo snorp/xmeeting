@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.18 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.19 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -111,10 +111,13 @@ BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStre
 			
 			if(_XMIsVideoMediaFormat(mediaFormat))
 			{
-				XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-				const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
-				
-				_XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, stream.IsSource());
+				if(!stream.IsSource())
+				{
+					XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+					const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
+					
+					_XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, false);
+				}
 			}
 			else
 			{

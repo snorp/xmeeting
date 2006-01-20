@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.11 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.12 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMOpalDispatcher.h"
@@ -1053,7 +1053,7 @@ typedef enum _XMOpalDispatcherMessage
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
 	unsigned theCallID = [number unsignedIntValue];
 	
-	if(theCallID != callID)
+	if(theCallID != 0 && theCallID != callID)
 	{
 		NSLog(@"CallID mismatch on VideoStreamOpened: %d to actual %d", theCallID, callID);
 		return;
@@ -1082,6 +1082,9 @@ typedef enum _XMOpalDispatcherMessage
 			break;
 		case XMVideoSize_CIF:
 			sizeString = @"CIF";
+			break;
+		case XMVideoSize_320_240:
+			sizeString = @"320x240";
 			break;
 		default:
 			sizeString = @"UNKNOWN";
@@ -1201,6 +1204,9 @@ typedef enum _XMOpalDispatcherMessage
 	{
 		[XMMediaTransmitter _setFrameGrabRate:[preferences videoFramesPerSecond]];
 	}
+	
+	BOOL enableH264LimitedMode = [preferences enableH264LimitedMode];
+	_XMSetEnableH264LimitedMode(enableH264LimitedMode);
 	
 	// ***** Adjusting the Codec Order/Mask ***** //
 	

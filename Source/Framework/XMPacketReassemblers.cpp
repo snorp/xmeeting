@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.3 2006/01/15 22:07:57 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.4 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,35 +31,55 @@ BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
 	
-	BYTE ebit;
+	BYTE ebit = 0;
 	
 	do {
-		
-		BYTE *dest = &(frameBuffer[frameLength]);
-		BYTE *data = packet->GetPayloadPtr();
-		PINDEX dataLength = packet->GetPayloadSize();
-		ebit = (data[0] >> 2) & 0x07;
-		
-		// dropping the H.261 header
-		data += 4;
-		dataLength -= 4;
-		
-		memcpy(dest, data, dataLength);
-		frameLength += dataLength;
-		
-		packet = packet->next;
-		
-		if(packet == NULL)
-		{
-			break;
-		}
 		
 		if(ebit != 0)
 		{
 			frameLength -= 1;
 		}
 		
-	} while(TRUE);
+		BYTE *data = packet->GetPayloadPtr();
+		PINDEX dataIndex = 0;
+		PINDEX dataLength = packet->GetPayloadSize();
+		
+		if(dataLength <= 4)
+		{
+			// prevent crashes if packet size too small.
+			// 4 bytes is the length of the H.261 payload header
+			return FALSE;
+		}
+		BYTE sbit = (data[0] >> 5) & 0x07;
+		ebit = (data[0] >> 2) & 0x07;
+		
+		// scanning past the H.261 header
+		dataIndex += 4;
+		dataLength -= 4;
+		
+		if(sbit != 0)
+		{
+			BYTE mask = (0xff >> sbit);
+			frameBuffer[frameLength] |= (data[dataIndex] & mask);
+			frameLength += 1;
+			dataIndex += 1;
+			dataLength -= 1;
+		}
+		
+		BYTE *dest = &frameBuffer[frameLength];
+		BYTE *src = &data[dataIndex];
+		dataLength -= 1;
+		
+		memcpy(dest, src, dataLength);
+		frameLength += dataLength;
+		
+		BYTE mask = (0xff << ebit);
+		frameBuffer[frameLength] = (src[dataLength] & mask);
+		frameLength += 1;
+		
+		packet = packet->next;
+		
+	} while(packet != NULL);
 	
 	// adding a PSC to the end of the stream so that the codec does render the frame
 	frameBuffer[frameLength] = 0;
@@ -102,6 +122,11 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		BYTE *data = packet->GetPayloadPtr();
 		PINDEX dataLength = packet->GetPayloadSize();
 		
+		if(dataLength <= 4)
+		{
+			return FALSE;
+		}
+		
 		BYTE f = (data[0] >> 7) & 0x01;
 		BYTE p = (data[0] >> 6) & 0x01;
 		ebit = data[0] & 0x07;
@@ -114,12 +139,20 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		}
 		else if(p == 0)
 		{
+			if(dataLength <= 8)
+			{
+				return FALSE;
+			}
 			// Mode B
 			data += 8;
 			dataLength -= 8;
 		}
 		else
 		{
+			if(dataLength <= 12)
+			{
+				return FALSE;
+			}
 			// Mode C
 			data += 12;
 			dataLength -= 12;
@@ -153,10 +186,13 @@ BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 	BYTE *data = packet->GetPayloadPtr();
 	
 	BYTE p = (data[0] >> 2) & 0x01;
+	BYTE v = (data[0] >> 1) & 0x01;
 	BYTE plen = (data[0] & 0x01) << 4;
-	plen |= (data[1] >> 4) & 0x0f;
+	plen |= (data[1] >> 3) & 0x0f;
 	
-	if(p == 1 && (data[2] & 0xfc) == 0x80)
+	// The first packet has p set to one and begins with
+	// a picture start code
+	if(p == 1 && (data[2+v+plen] & 0xfc) == 0x80)
 	{
 		return TRUE;
 	}
@@ -168,22 +204,26 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 {
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
-	
+
 	do {
 		
 		BYTE *data = packet->GetPayloadPtr();
 		WORD dataLength = packet->GetPayloadSize();
+		
+		if(dataLength <= 2)
+		{
+			return FALSE;
+		}
 		
 		// extracting the P, V and PLEN fields
 		BYTE p = (data[0] >> 2) & 0x01;
 		BYTE v = (data[0] >> 1) & 0x01;
 		BYTE plen = (data[0] & 0x01) << 4;
 		plen |= (data[1] >> 3) & 0x1f;
-		//BYTE pebit = data[1] & 0x07;
 		
-		if(v == 1)
+		if(dataLength <= (2+v+plen))
 		{
-			dataLength += 1;
+			return FALSE;
 		}
 		if(p == 1)
 		{
@@ -193,9 +233,82 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 			frameLength += 2;
 		}
 		
+		PINDEX offset = 2+v+plen;
+		
+		// If this is the first packet, we examine the H.323 picture header
+		if(packet == packetListHead)
+		{
+			BYTE *src = &data[offset];
+			BYTE sourceFormat = (src[2] >> 2) & 0x07;
+			
+			// QuickTime H.263 cannot understand the extended PTYPE header
+			// (PLUSPTYPE). With the very basic capability set declared so far,
+			// it should be possible to transform the PLUSPTYPE header into a
+			// normal PTYPE header. Fortunately, QuickTime fully understands 
+			// bitstreams where PSC isn't byte-aligned.
+			if(sourceFormat == 7)
+			{
+				BYTE tr = (src[0] & 0x03) << 6;
+				tr |= (src[1] >> 2) & 0x3f;
+			
+				BYTE ufep = (src[2] & 0x03) << 1;
+				ufep |= (src[3] >> 7) & 0x01;
+				
+				if(ufep == 0)
+				{
+					cout << "Cannot transform frame since UFEP == zero!!!!!!" << endl;
+					return FALSE;
+				}
+				
+				sourceFormat = (src[3] >> 4) & 0x07;
+				
+				if(((src[3] & 0x0f) != 0) ||
+				   (src[4] != 1) ||
+				   ((src[5] & 0xe3) != 0) ||
+				   ((src[6] & 0x70) != 0x10))
+				{
+					cout << "cannot transform frame since UFEP/MPPTYPE fields not zero" << endl;
+					printf("%x %x %x %x\n", src[3], src[4], src[5], src[6]);
+					return FALSE;
+				}
+				
+				BYTE pictureTypeCode = (src[5] >> 2) & 0x07;
+				if(pictureTypeCode > 1)
+				{
+					cout << "cannot transform frame since PictureTypeCode not valid" << endl;
+					return FALSE;
+				}
+				
+				BYTE cpm = (src[6] >> 3) & 0x01;
+				if(cpm == 1)
+				{
+					cout << "cannot transform frame since CPM is one" << endl;
+				}
+				
+				BYTE pquant = (src[6] & 0x07) << 2;
+				pquant |= (src[7] >> 6) & 0x03;
+			
+				src[0] = 0;
+				src[1] = 0;
+				src[2] = 0;
+				src[3] = 0x40;
+				src[4] = (tr << 1);
+				src[4] |= 0x01;
+				src[5] = 0;
+				src[5] |= (sourceFormat << 1);
+				src[5] |= (pictureTypeCode & 0x01);
+				src[6] = 0;
+				src[6] |= (pquant >> 1);
+				src[7] &= 0x3f;
+				src[7] |= (pquant & 0x01) << 7;
+				
+				offset += 3;
+			}
+		}
+		
 		BYTE *dest = &(frameBuffer[frameLength]);
-		BYTE *src = &(data[2+v+plen]);
-		dataLength -= (2 + v + plen);
+		BYTE *src = &(data[offset]);
+		dataLength -= offset;
 		
 		memcpy(dest, src, dataLength);
 		frameLength += dataLength;
@@ -210,10 +323,12 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 
 BOOL XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
+	// We only know for sure if this is the first packet of a packet group
+	// if the packet type yields and SPS packet.
 	BYTE *data = packet->GetPayloadPtr();
 	BYTE packetType = data[0] & 0x1f;
 	
-	if(packetType == 7 || packetType == 8)
+	if(packetType == 7)
 	{
 		return TRUE;
 	}
@@ -229,6 +344,10 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		
 		BYTE *data = packet->GetPayloadPtr();
 		WORD dataLength = packet->GetPayloadSize();
+		if(dataLength <= 1)
+		{
+			return FALSE;
+		}
 		BYTE packetType = data[0] & 0x1f;
 		
 		// handling SPS Atoms
@@ -292,6 +411,11 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		// Handling FU-A packets
 		else if(packetType == 28)
 		{
+			if(dataLength <= 2)
+			{
+				return FALSE;
+			}
+			
 			// reading the NRI field
 			BYTE nri = data[0] & 0x60;
 			BYTE s = (data[1] >> 7) & 0x01;

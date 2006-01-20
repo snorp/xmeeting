@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH264Packetizer.c,v 1.2 2006/01/15 22:07:58 hfriederich Exp $
+ * $Id: XMRTPH264Packetizer.c,v 1.3 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,7 @@ typedef struct
 #include <QuickTime/QTStreamingComponents.k.h>
 #include <QuickTime/ComponentDispatchHelper.c>
 
-#pragma mark Definitions
+#define XM_MAX_PACKET_LENGTH_HARD_LIMIT 3000
 
 #pragma mark Standard Component Calls
 
@@ -144,6 +144,21 @@ ComponentResult XMRTPH264Packetizer_PreflightMedia(XMRTPH264PacketizerGlobals gl
 	memcpy(globals->ppsAtomData, src, ppsAtomLength);
 	globals->ppsAtomLength = ppsAtomLength;
 	
+	printf("SPS: \n");
+	unsigned i;
+	for(i = 0; i < spsAtomLength; i++)
+	{
+		printf("%x ", globals->spsAtomData[i]);
+	}
+	printf("\n");
+	/*
+	printf("PPS: \n");
+	for(i = 0; i < ppsAtomLength; i++)
+	{
+		printf("%x ", globals->ppsAtomData[i]);
+	}
+	printf("\n");*/
+	
 	DisposeHandle(avccExtension);
 	return err;
 }
@@ -224,93 +239,95 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		// If the NAL does not fit within one single packet,
 		// we have to use FU-A packets, which are only available
 		// in the non-interleaved mode
-		if(nalLength > maxPacketLength)
+		if(nalLength > maxPacketLength && globals->useNonInterleavedMode == true)
 		{
-			if(globals->useNonInterleavedMode == false)
+			// Send some FU-A packets
+			UInt8 nri = (data[index] >> 5) & 0x03;
+			UInt8 type = data[index] & 0x1f;
+			
+			UInt32 remainingLength = nalLength;
+			index += 1;
+			remainingLength -= 1;
+		
+			while(remainingLength > 0)
 			{
-				printf("Cannot send NAL unit since too big!!!!\n");
-				index += nalLength;
-			}
-			else
-			{
-				// Send some FU-A packets
-				UInt8 nri = (data[index] >> 5) & 0x03;
-				UInt8 type = data[index] & 0x1f;
+				UInt8 s = 0;
+				UInt8 e = 0;
 				
-				UInt32 remainingLength = nalLength;
-				index += 1;
-				remainingLength -= 1;
-				
-				while(remainingLength > 0)
+				UInt32 sendDataLength = maxPacketLength-2;
+			
+				if(remainingLength == nalLength-1)
 				{
-					UInt8 s = 0;
-					UInt8 e = 0;
-					
-					UInt32 sendDataLength = maxPacketLength-2;
-					
-					if(remainingLength == nalLength-1)
-					{
-						s = 1;
-					}
-					else if(remainingLength <= (maxPacketLength - 2))
-					{
-						e = 1;
-						sendDataLength = remainingLength;
-					}
-					
-					UInt8 header[2];
-					
-					header[0] = 0;
-					header[0] |= (nri << 5);
-					header[0] |= 28;
-					header[1] = 0;
-					header[1] = (s << 7);
-					header[1] |= (e << 6);
-					header[1] |= type;
-				
-					RTPPacketRef packetRef;
-					RTPPBBeginPacket(packetBuilder,
-									 0,
-									 packetGroupRef,
-									 sendDataLength+2,
-									 &packetRef);
-					
-					RTPPBAddPacketLiteralData(packetBuilder,
-											  0,
-											  packetGroupRef,
-											  packetRef,
-											  header,
-											  2,
-											  NULL);
-					
-					RTPPBAddPacketSampleData(packetBuilder,
-											 0,
-											 packetGroupRef,
-											 packetRef,
-											 (RTPMPSampleDataParams *)sampleData,
-											 index,
-											 sendDataLength,
-											 NULL);
-					
-					index += sendDataLength;
-					remainingLength -= sendDataLength;
-					
-					SInt32 flags = 0;
-					if(index >= dataLength)
-					{
-						flags = 1;
-					}
-					RTPPBEndPacket(packetBuilder,
-								   flags,
-								   packetGroupRef,
-								   packetRef,
-								   0,
-								   0);
+					s = 1;
 				}
+				else if(remainingLength <= (maxPacketLength - 2))
+				{
+					e = 1;
+					sendDataLength = remainingLength;
+				}
+				
+				UInt8 header[2];
+				
+				header[0] = 0;
+				header[0] |= (nri << 5);
+				header[0] |= 28;
+				header[1] = 0;
+				header[1] = (s << 7);
+				header[1] |= (e << 6);
+				header[1] |= type;
+		
+				RTPPacketRef packetRef;
+				RTPPBBeginPacket(packetBuilder,
+								 0,
+								 packetGroupRef,
+								 sendDataLength+2,
+								 &packetRef);
+					
+				RTPPBAddPacketLiteralData(packetBuilder,
+										  0,
+										  packetGroupRef,
+										  packetRef,
+										  header,
+										  2,
+										  NULL);
+					
+				RTPPBAddPacketSampleData(packetBuilder,
+										 0,
+										 packetGroupRef,
+										 packetRef,
+										 (RTPMPSampleDataParams *)sampleData,
+										 index,
+										 sendDataLength,
+										 NULL);
+					
+				index += sendDataLength;
+				remainingLength -= sendDataLength;
+					
+				SInt32 flags = 0;
+				if(index >= dataLength)
+				{
+					flags = 1;
+				}
+				RTPPBEndPacket(packetBuilder,
+							   flags,
+							   packetGroupRef,
+							   packetRef,
+							   0,
+							   0);
 			}
+		}
+		else if(nalLength > XM_MAX_PACKET_LENGTH_HARD_LIMIT)
+		{
+			printf("Impossible to send too big NAL unit: %d\n", nalLength);
+			index += nalLength;
 		}
 		else
 		{
+			// Single NAL mode
+			if(nalLength > maxPacketLength)
+			{
+				printf("sending TOO big NAL %d\n", nalLength);
+			}
 			RTPPacketRef packetRef;
 			RTPPBBeginPacket(packetBuilder,
 							 0,
@@ -343,6 +360,11 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		
 	} while (index < dataLength);
 	
+	RTPPBEndPacketGroup(packetBuilder,
+						0,
+						packetGroupRef);
+	
+	*outFlags = 0;
 	return noErr;
 }
 

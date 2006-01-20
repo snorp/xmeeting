@@ -1,5 +1,5 @@
 /*
- * $Id: XMBooleanCell.m,v 1.1 2005/05/01 09:34:41 hfriederich Exp $
+ * $Id: XMBooleanCell.m,v 1.2 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,7 +15,7 @@
 {
 	self = [super init];
 	
-	[self setEditable:NO];
+	[super setEditable:NO];
 	[self setBezeled:NO];
 	[self setBordered:NO];
 	[self setButtonBordered:NO];
@@ -72,6 +72,16 @@
 	// NSTextField Cell
 	frame.origin.y -= 2;
 	[super drawWithFrame:frame inView:view];
+}
+
+- (BOOL)doesPopUp
+{
+	return [super isEnabled];
+}
+
+- (void)setDoesPopUp:(BOOL)flag
+{
+	[super setEnabled:flag];
 }
 
 @end

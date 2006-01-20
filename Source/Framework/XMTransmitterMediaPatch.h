@@ -1,9 +1,9 @@
 /*
- * $Id: XMTransmitterMediaPatch.h,v 1.5 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.h,v 1.6 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_TRANSMITTER_MEDIA_PATCH__
@@ -49,6 +49,8 @@ public:
 	static void SetH264Parameters(unsigned profile, unsigned level);
 	static void SetH264PacketizationMode(unsigned packetizationMode);
 	static unsigned GetH264PacketizationMode();
+	static BOOL GetH264EnableLimitedMode();
+	static void SetH264EnableLimitedMode(BOOL enableH264LimitedMode);
 	
 private:
 

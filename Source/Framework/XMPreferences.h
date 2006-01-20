@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferences.h,v 1.9 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.10 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_H__
@@ -52,8 +52,8 @@
 	/* video settings */
 	BOOL		 enableVideo;					// Enables/disables video
 	unsigned	 videoFramesPerSecond;			// Framerate for sent video
-	XMVideoSize	 preferredVideoSize;			// The preferred video size for sent video
 	NSMutableArray *videoCodecList;				// An array containing XMCodecListRecord instances
+	BOOL		 enableH264LimitedMode;			// Enables/disables the H.264 limited mode
 
 	/* H.323-specific settings */
 	BOOL		 enableH323;				// Flag to indicate whether H.323 is active or not
@@ -152,13 +152,13 @@
 - (unsigned)videoFramesPerSecond;
 - (void)setVideoFramesPerSecond:(unsigned)value;
 
-- (XMVideoSize)preferredVideoSize;
-- (void)setPreferredVideoSize:(XMVideoSize)size;
-
 - (NSArray *)videoCodecList;
 - (unsigned)videoCodecListCount;
 - (XMPreferencesCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index;
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
+
+- (BOOL)enableH264LimitedMode;
+- (void)setEnableH264LimitedMode:(BOOL)flag;
 
 #pragma mark H.323-specific Methods
 

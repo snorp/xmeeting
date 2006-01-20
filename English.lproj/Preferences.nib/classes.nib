@@ -42,6 +42,7 @@
                 duplicateLocationButton = NSButton; 
                 enableFastStartSwitch = NSButton; 
                 enableH245TunnelSwitch = NSButton; 
+                enableH264LimitedModeSwitch = NSButton; 
                 enableH323Switch = NSButton; 
                 enableVideoSwitch = NSButton; 
                 externalAddressField = NSTextField; 
@@ -72,7 +73,6 @@
                 useIPAddressTranslationSwitch = NSButton; 
                 videoCodecPreferenceOrderTableView = NSTableView; 
                 videoFrameRateField = NSTextField; 
-                videoSizePopUp = NSPopUpButton; 
             }; 
             SUPERCLASS = NSObject; 
         }, 

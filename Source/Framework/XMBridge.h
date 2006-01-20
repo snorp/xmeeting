@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.15 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.16 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -108,6 +108,8 @@ void _XMSetAudioBufferSize(unsigned value);
 #pragma mark Video Setup Functions
 
 void _XMSetEnableVideo(bool enableVideo);
+
+void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode);
 
 #pragma mark Codec Functions
 

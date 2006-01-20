@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferences.m,v 1.10 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.11 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMStringConstants.h"
@@ -162,17 +162,6 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesPreferredVideoSize])
-	{
-		if([value isKindOfClass:[NSNumber class]])
-		{
-			result = XM_VALID_VALUE;
-		}
-		else
-		{
-			result = XM_INVALID_VALUE_TYPE;
-		}
-	}
 	else if([key isEqualToString:XMKey_PreferencesEnableH323])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -305,8 +294,8 @@
 	
 	enableVideo = NO;
 	videoFramesPerSecond = 20;
-	preferredVideoSize = XMVideoSize_CIF;
 	videoCodecList = nil;
+	enableH264LimitedMode = NO;
 	
 	enableH323 = NO;
 	enableH245Tunnel = NO;
@@ -433,12 +422,6 @@
 		[self setVideoFramesPerSecond:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesPreferredVideoSize];
-	if(obj)
-	{
-		[self setPreferredVideoSize:[(NSNumber *)obj intValue]];
-	}
-	
 	obj = [dict objectForKey:XMKey_PreferencesVideoCodecList];
 	if(obj)
 	{
@@ -472,6 +455,12 @@
 			[videoCodecList addObject:record];
 			[record release];
 		}
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesEnableH264LimitedMode];
+	if(obj)
+	{
+		[self setEnableH264LimitedMode:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableH323];
@@ -545,8 +534,8 @@
 	
 	[preferences setEnableVideo:[self enableVideo]];
 	[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
-	[preferences setPreferredVideoSize:[self preferredVideoSize]];
 	[preferences _setVideoCodecList:[self _videoCodecList]];
+	[preferences setEnableH264LimitedMode:[self enableH264LimitedMode]];
 	
 	[preferences setEnableH323:[self enableH323]];
 	[preferences setEnableH245Tunnel:[self enableH245Tunnel]];
@@ -605,7 +594,6 @@
 		
 		[self setEnableVideo:[coder decodeBoolForKey:XMKey_PreferencesEnableVideo]];
 		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
-		[self setPreferredVideoSize:[coder decodeIntForKey:XMKey_PreferencesPreferredVideoSize]];
 		
 		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesVideoCodecList];
 		count = [array count];
@@ -627,6 +615,7 @@
 			[videoCodecList addObject:record];
 			[record release];
 		}
+		[self setEnableH264LimitedMode:[coder decodeBoolForKey:XMKey_PreferencesEnableH264LimitedMode]];
 		
 		[self setEnableH323:[coder decodeBoolForKey:XMKey_PreferencesEnableH323]];
 		[self setEnableH245Tunnel:[coder decodeBoolForKey:XMKey_PreferencesEnableH245Tunnel]];
@@ -667,8 +656,8 @@
 		
 		[coder encodeBool:[self enableVideo] forKey:XMKey_PreferencesEnableVideo];
 		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
-		[coder encodeInt:[self preferredVideoSize] forKey:XMKey_PreferencesPreferredVideoSize];
 		[coder encodeObject:[self _videoCodecList] forKey:XMKey_PreferencesVideoCodecList];
+		[coder encodeBool:[self enableH264LimitedMode] forKey:XMKey_PreferencesEnableH264LimitedMode];
 		
 		[coder encodeBool:[self enableH323] forKey:XMKey_PreferencesEnableH323];
 		[coder encodeBool:[self enableH245Tunnel] forKey:XMKey_PreferencesEnableH245Tunnel];
@@ -739,8 +728,8 @@
 	   
 	   [otherPreferences enableVideo] == [self enableVideo] &&
 	   [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
-	   [otherPreferences preferredVideoSize] == [self preferredVideoSize] &&
 	   [[otherPreferences _videoCodecList] isEqual:[self _videoCodecList]] &&
+	   [otherPreferences enableH264LimitedMode] == [self enableH264LimitedMode] &&
 
 	   [otherPreferences enableH323] == [self enableH323] &&
 	   [otherPreferences enableH245Tunnel] == [self enableH245Tunnel] &&
@@ -852,14 +841,6 @@
 		[dict setObject:number forKey:XMKey_PreferencesVideoFramesPerSecond];
 		[number release];
 	}
-	
-	integer = [self preferredVideoSize];
-	if(integer != XMVideoSize_NoVideo)
-	{
-		number = [[NSNumber alloc] initWithInt:integer];
-		[dict setObject:number forKey:XMKey_PreferencesPreferredVideoSize];
-		[number release];
-	}
 		
 	integer = [videoCodecList count];
 	arr = [[NSMutableArray alloc] initWithCapacity:integer];
@@ -869,6 +850,10 @@
 	}
 	[dict setObject:arr forKey:XMKey_PreferencesVideoCodecList];
 	[arr release];
+	
+	number = [[NSNumber alloc] initWithBool:[self enableH264LimitedMode]];
+	[dict setObject:number forKey:XMKey_PreferencesEnableH264LimitedMode];
+	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableH323]];
 	[dict setObject:number forKey:XMKey_PreferencesEnableH323];
@@ -969,13 +954,13 @@
 	{
 		return [NSNumber numberWithUnsignedInt:[self videoFramesPerSecond]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesPreferredVideoSize])
-	{
-		return [NSNumber numberWithUnsignedInt:[self preferredVideoSize]];
-	}
 	else if([key isEqualToString:XMKey_PreferencesVideoCodecList])
 	{
 		return [self videoCodecList];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableH264LimitedMode])
+	{
+		return [NSNumber numberWithBool:[self enableH264LimitedMode]];
 	}
 	else if([key isEqualToString:XMKey_PreferencesEnableH323])
 	{
@@ -1149,11 +1134,11 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesPreferredVideoSize])
+	else if([key isEqualToString:XMKey_PreferencesEnableH264LimitedMode])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
-			[self setPreferredVideoSize:[(NSNumber *)value unsignedIntValue]];
+			[self setEnableH264LimitedMode:[(NSNumber *)value boolValue]];
 		}
 		else
 		{
@@ -1414,16 +1399,6 @@
 	videoFramesPerSecond = value;
 }
 
-- (XMVideoSize)preferredVideoSize
-{
-	return preferredVideoSize;
-}
-
-- (void)setPreferredVideoSize:(XMVideoSize)size
-{
-	preferredVideoSize = size;
-}
-
 - (NSArray *)videoCodecList
 {
 	return [self _videoCodecList];
@@ -1442,6 +1417,16 @@
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
 	[[self _videoCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
+}
+
+- (BOOL)enableH264LimitedMode
+{
+	return enableH264LimitedMode;
+}
+
+- (void)setEnableH264LimitedMode:(BOOL)flag
+{
+	enableH264LimitedMode = flag;
 }
 
 #pragma mark H.323-specific Methods

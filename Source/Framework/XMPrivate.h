@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.20 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.21 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -176,7 +176,8 @@ void _XMCheckCloseStatus();
 - (id)_initWithIdentifier:(XMCodecIdentifier)identifier
 					 name:(NSString *)name
 				bandwidth:(NSString *)bandwidth
-				  quality:(NSString *)quality;
+				  quality:(NSString *)quality
+			   canDisable:(BOOL)canDisable;
 
 @end
 
@@ -228,13 +229,6 @@ extern NSString *XMKey_CodecManagerCodecDescriptionsFilename;
 extern NSString *XMKey_CodecManagerCodecDescriptionsFiletype;
 extern NSString *XMKey_CodecManagerAudioCodecs;
 extern NSString *XMKey_CodecManagerVideoCodecs;
-
-/**
- * XMCodec private keys
- **/
-extern NSString *XMKey_CodecTypes;
-extern NSString *XMKey_CodecTypeVideoSize;
-extern NSString *XMKey_CodecTypeIdentifier;
 
 /**
  * XMAddressResource private keys

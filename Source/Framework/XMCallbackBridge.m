@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.12 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.13 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -124,7 +124,6 @@ void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoS
 	
 	[XMMediaTransmitter _startTransmittingForSession:sessionID withCodec:codec videoSize:videoSize maxFramesPerSecond:maxFramesPerSecond
 										  maxBitrate:maxBitrate flags:flags];
-	
 	[autoreleasePool release];
 }
 

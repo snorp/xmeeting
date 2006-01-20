@@ -1,9 +1,9 @@
 /*
- * $Id: XMCodec.m,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMCodec.m,v 1.3 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCodec.h"
@@ -29,8 +29,9 @@
 	NSString *theName = (NSString *)[dict objectForKey:XMKey_CodecName];
 	NSString *theBandwidth = (NSString *)[dict objectForKey:XMKey_CodecBandwidth];
 	NSString *theQuality = (NSString *)[dict objectForKey:XMKey_CodecQuality];
+	NSNumber *theBoolean = (NSNumber *)[dict objectForKey:XMKey_CodecCanDisable];
 	
-	if(number == nil || theName == nil || theBandwidth == nil || theQuality == nil)
+	if(number == nil || theName == nil || theBandwidth == nil || theQuality == nil || theBoolean == nil)
 	{
 		[NSException raise:XMException_InternalConsistencyFailure
 					format:XMExceptionReason_CodecManagerInternalConsistencyFailure];
@@ -38,13 +39,16 @@
 	
 	XMCodecIdentifier theIdentifier = (XMCodecIdentifier)[number intValue];
 	
-	return [self _initWithIdentifier:theIdentifier name:theName bandwidth:theBandwidth quality:theQuality];
+	BOOL theCanDisableBoolean = [theBoolean boolValue];
+	
+	return [self _initWithIdentifier:theIdentifier name:theName bandwidth:theBandwidth quality:theQuality canDisable:theCanDisableBoolean];
 }
 
 - (id)_initWithIdentifier:(XMCodecIdentifier)theIdentifier
 					 name:(NSString *)theName 
 				bandwidth:(NSString *)theBandwidth 
-				  quality:(NSString *)theQuality;
+				  quality:(NSString *)theQuality
+			   canDisable:(BOOL)theCanDisableBoolean
 {
 	self = [super init];
 	
@@ -52,6 +56,7 @@
 	name = [theName copy];
 	bandwidth = [theBandwidth copy];
 	quality = [theQuality copy];
+	canDisable = theCanDisableBoolean;
 	
 	return self;
 }
@@ -80,7 +85,8 @@
 		if(identifier == [codec identifier] &&
 		   [name isEqualToString:[codec name]] &&
 		   [bandwidth isEqualToString:[codec bandwidth]] &&
-		   [quality isEqualToString:[codec quality]])
+		   [quality isEqualToString:[codec quality]] &&
+		   canDisable == [codec canDisable])
 		{
 			return YES;
 		}
@@ -111,6 +117,10 @@
 	{
 		return quality;
 	}
+	if([theKey isEqualToString:XMKey_CodecCanDisable])
+	{
+		return [NSNumber numberWithBool:canDisable];
+	}
 	
 	return nil;
 }
@@ -133,6 +143,11 @@
 - (NSString *)quality
 {
 	return quality;
+}
+
+- (BOOL)canDisable
+{
+	return canDisable;
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBooleanCell.h,v 1.1 2005/05/01 09:34:41 hfriederich Exp $
+ * $Id: XMBooleanCell.h,v 1.2 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,9 @@
 @interface XMBooleanCell : NSComboBoxCell {
 
 }
+
+- (BOOL)doesPopUp;
+- (void)setDoesPopUp:(BOOL)flag;
 
 @end
 

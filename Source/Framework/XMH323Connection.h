@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.4 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.5 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,7 +31,11 @@ public:
 	virtual BOOL OnReceivedCapabilitySet(const H323Capabilities & remoteCaps,
 										 const H245_MultiplexCapability *muxCap,
 										 H245_TerminalCapabilitySetReject & reject);
+	
+	virtual void OnSetLocalCapabilities();
 
+	virtual void SelectDefaultLogicalChannel(unsigned sessionID);
+	
 	virtual BOOL OpenLogicalChannel(const H323Capability & capability,
 									unsigned sessionID,
 									H323Channel::Directions dir);
@@ -44,8 +48,6 @@ public:
 	virtual BOOL OnCreateLogicalChannel(const H323Capability & capability,
 										H323Channel::Directions dir,
 										unsigned & errorCode);
-	
-	virtual void OnSetLocalCapabilities();
 	
 private:
 	BOOL hasSetLocalCapabilities;

@@ -1,9 +1,9 @@
 /*
- * $Id: XMStringConstants.m,v 1.13 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.14 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMStringConstants.h"
@@ -103,6 +103,7 @@ NSString *XMKey_PreferencesEnableVideo = @"XMeeting_EnableVideo";
 NSString *XMKey_PreferencesVideoFramesPerSecond = @"XMeeting_VideoFramesPerSecond";
 NSString *XMKey_PreferencesPreferredVideoSize = @"XMeeting_PreferredVideoSize";
 NSString *XMKey_PreferencesVideoCodecList = @"XMeeting_VideoCodecList";
+NSString *XMKey_PreferencesEnableH264LimitedMode = @"XMeeting_EnableH264LimitedMode";
 
 NSString *XMKey_PreferencesEnableH323 = @"XMeeting_EnableH323";
 NSString *XMKey_PreferencesEnableH245Tunnel = @"XMeeting_EnableH245Tunnel";
@@ -125,9 +126,7 @@ NSString *XMKey_CodecIdentifier = @"XMeeting_Identifier";
 NSString *XMKey_CodecName = @"XMeeting_Name";
 NSString *XMKey_CodecBandwidth = @"XMeeting_Bandwidth";
 NSString *XMKey_CodecQuality = @"XMeeting_Quality";
-NSString *XMKey_CodecTypes = @"XMeeting_Types";
-NSString *XMKey_CodecTypeVideoSize = @"XMeeting_VideoSize";
-NSString *XMKey_CodecTypeIdentifier = @"XMeeting_Identifier";
+NSString *XMKey_CodecCanDisable = @"XMeeting_CanDisable";
 
 NSString *XMKey_AddressResourceCallProtocol = @"XMeeting_CallProtocol";
 NSString *XMKey_AddressResourceAddress = @"XMeeting_Address";

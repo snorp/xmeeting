@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.8 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.9 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,6 +21,7 @@ static RTP_DataFrame::PayloadTypes h263PayloadType;
 static unsigned h264Profile;
 static unsigned h264Level;
 static unsigned h264PacketizationMode;
+static BOOL h264EnableLimitedMode = FALSE;
 
 XMTransmitterMediaPatch::XMTransmitterMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
@@ -87,11 +88,16 @@ void XMTransmitterMediaPatch::Resume()
 			}
 			else if(codecIdentifier == XMCodecIdentifier_H264)
 			{
-				if(h264Level < XM_H264_LEVEL_1_3)
+				if(h264PacketizationMode == XM_H264_PACKETIZATION_MODE_SINGLE_NAL)
 				{
-					// With this level, we can only send QCIF images
-					videoSize = XMVideoSize_QCIF;
+					// We send only at a limited bitrate to avoid too many
+					// NAL units which are TOO big to fit
+					if(bitrate > 384000)
+					{
+						bitrate = 384000;
+					}
 				}
+				
 				flags = (h264PacketizationMode << 8) + (h264Profile << 4) + h264Level;
 			}
 			
@@ -143,11 +149,23 @@ void XMTransmitterMediaPatch::Close()
 BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
 											 BOOL fromSink)
 {
-	if(fromSink && PIsDescendant(&command, OpalVideoUpdatePicture))
+	if(fromSink)
 	{
-		_XMUpdatePicture();
-		return TRUE;
+		if(PIsDescendant(&command, OpalVideoUpdatePicture))
+		{
+			_XMUpdatePicture();
+			return TRUE;
+		}
+		else if(PIsDescendant(&command, OpalTemporalSpatialTradeOff))
+		{
+			return TRUE;
+		}
+		else if(PIsDescendant(&command, OpalVideoFreezePicture))
+		{
+			return TRUE;
+		}
 	}
+	
 	return OpalMediaPatch::ExecuteCommand(command, fromSink);
 }
 
@@ -163,7 +181,7 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 	
 	if(frame == NULL)
 	{
-		frame = new RTP_DataFrame(20000);
+		frame = new RTP_DataFrame(3000);
 		videoTransmitterPatch->dataFrame = frame;
 		frame->SetPayloadSize(0);
 		
@@ -279,4 +297,14 @@ void XMTransmitterMediaPatch::SetH264PacketizationMode(unsigned packetizationMod
 unsigned XMTransmitterMediaPatch::GetH264PacketizationMode()
 {
 	return h264PacketizationMode;
+}
+
+BOOL XMTransmitterMediaPatch::GetH264EnableLimitedMode()
+{
+	return h264EnableLimitedMode;
+}
+
+void XMTransmitterMediaPatch::SetH264EnableLimitedMode(BOOL flag)
+{
+	h264EnableLimitedMode = flag;
 }

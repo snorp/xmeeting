@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.16 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.17 2006/01/20 17:17:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -120,6 +120,11 @@ void _XMSetEnableVideo(bool enableVideo)
 	callEndPoint->SetEnableVideo(enableVideo);
 }
 
+void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode)
+{
+	XMTransmitterMediaPatch::SetH264EnableLimitedMode(enableH264LimitedMode);
+}
+
 #pragma mark codec functions
 
 void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount,
@@ -129,14 +134,22 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	PStringArray disabledCodecsArray = PStringArray(disabledCodecCount, disabledCodecs, TRUE);
 	
 	// these codecs are currently disabled by default
-	disabledCodecsArray.AppendString("*g.726*");
-	disabledCodecsArray.AppendString("*gsm*");
-	disabledCodecsArray.AppendString("*ilbc*");
-	disabledCodecsArray.AppendString("*speex*");
-	disabledCodecsArray.AppendString("*lpc*");
-	disabledCodecsArray.AppendString("*ms*");
-	
-	//disabledCodecsArray.AppendString("*qth.264*");
+	disabledCodecsArray.AppendString("G.726-16k");
+	disabledCodecsArray.AppendString("G.726-24k");
+	disabledCodecsArray.AppendString("G.726-32k");
+	disabledCodecsArray.AppendString("G.726-40k");
+	disabledCodecsArray.AppendString("SpeexNarrow-18.2k");
+	disabledCodecsArray.AppendString("SpeexNarrow-5.95k");
+	disabledCodecsArray.AppendString("SpeexNarrow-8k");
+	disabledCodecsArray.AppendString("SpeexNarrow-11k");
+	disabledCodecsArray.AppendString("SpeexNarrow-15k");
+	disabledCodecsArray.AppendString("SpeexWide-20.6k");
+	disabledCodecsArray.AppendString("GSM-06.10");
+	disabledCodecsArray.AppendString("iLBC-13k3");
+	disabledCodecsArray.AppendString("iLBC-15k2");
+	disabledCodecsArray.AppendString("LPC-10");
+	disabledCodecsArray.AppendString("MS-GSM");
+	disabledCodecsArray.AppendString("MS-IMA-ADPCM");
 	
 	theManager->SetMediaFormatMask(disabledCodecsArray);
 	theManager->SetMediaFormatOrder(orderedCodecsArray);

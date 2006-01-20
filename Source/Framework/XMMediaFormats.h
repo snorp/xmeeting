@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.9 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.10 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,47 +140,58 @@ public:
 
 #pragma mark H.323 Capabilities
 
-class XM_H323_H261_Capability : public H323VideoCapability
+class XMH323VideoCapability : public H323VideoCapability
 {
-	PCLASSINFO(XM_H323_H261_Capability, H323VideoCapability);
+	PCLASSINFO(XMH323VideoCapability, H323VideoCapability);
+	
+public:
+	virtual BOOL IsValidCapabilityForSending() const = 0;
+	virtual BOOL IsValidCapabilityForReceiving() const = 0;
+	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const = 0;
+};
+
+class XM_H323_H261_Capability : public XMH323VideoCapability
+{
+	PCLASSINFO(XM_H323_H261_Capability, XMH323VideoCapability);
 	
 public:
 	XM_H323_H261_Capability();
 	virtual PObject * Clone() const;
-	Comparison Compare(const PObject & obj) const;
+	virtual Comparison Compare(const PObject & obj) const;
 	virtual unsigned GetSubType() const;
 	virtual PString GetFormatName() const;
 	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
 	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
 	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
 	
-	BOOL IsValidCapabilityForSending() const;
-	BOOL IsValidCapabilityForReceiving() const;
+	virtual BOOL IsValidCapabilityForSending() const;
+	virtual BOOL IsValidCapabilityForReceiving() const;
+	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
 	
 private:
 	unsigned cifMPI;
 	unsigned qcifMPI;
-	BOOL temporalSpatialTradeOffCapability;
 	unsigned maxBitRate;
-	BOOL stillImageTransmission;
 };
 
-class XM_H323_H263_Capability : public H323VideoCapability
+class XM_H323_H263_Capability : public XMH323VideoCapability
 {
-	PCLASSINFO(XM_H323_H263_Capability, H323VideoCapability);
+	PCLASSINFO(XM_H323_H263_Capability, XMH323VideoCapability);
 	
 public:
 	XM_H323_H263_Capability();
 	virtual PObject * Clone() const;
-	Comparison Compare(const PObject & obj) const;
+	virtual Comparison Compare(const PObject & obj) const;
 	virtual unsigned GetSubType() const;
 	virtual PString GetFormatName() const;
 	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
 	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
 	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
 	
-	BOOL IsValidCapabilityForSending() const;
-	BOOL IsValidCapabilityForReceiving() const;
+	virtual BOOL IsValidCapabilityForSending() const;
+	virtual BOOL IsValidCapabilityForReceiving() const;
+	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
+	
 	BOOL IsH263PlusCapability() const;
 	void SetIsH263PlusCapability(BOOL isH263PlusCapability);
 	
@@ -192,14 +203,6 @@ private :
 	unsigned cif16MPI;
 	
 	unsigned maxBitRate;
-	BOOL unrestrictedVector;
-	BOOL arithmeticCoding;
-	BOOL advancedPrediction;
-	BOOL pbFrames;
-	BOOL temporalSpatialTradeOffCapability;
-	
-	long unsigned hrd_B;
-	unsigned bppMaxKb;
 	
 	unsigned slowSqcifMPI;
 	unsigned slowQcifMPI;
@@ -207,27 +210,26 @@ private :
 	unsigned slowCif4MPI;
 	unsigned slowCif16MPI;
 	
-	BOOL errorCompensation;
-	
 	BOOL isH263PlusCapability;
 };
 
-class XM_H323_H264_Capability : public H323VideoCapability
+class XM_H323_H264_Capability : public XMH323VideoCapability
 {
-	PCLASSINFO(XM_H323_H264_Capability, H323VideoCapability);
+	PCLASSINFO(XM_H323_H264_Capability, XMH323VideoCapability);
 	
 public:
 	XM_H323_H264_Capability();
 	virtual PObject * Clone() const;
-	Comparison Compare(const PObject & obj) const;
+	virtual Comparison Compare(const PObject & obj) const;
 	virtual unsigned GetSubType() const;
 	virtual PString GetFormatName() const;
 	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
 	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
 	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
 	
-	BOOL IsValidCapabilityForSending() const;
-	BOOL IsValidCapabilityForReceiving() const;
+	virtual BOOL IsValidCapabilityForSending() const;
+	virtual BOOL IsValidCapabilityForReceiving() const;
+	virtual Comparison CompareTo(const XMH323VideoCapability  & obj) const;
 	
 	unsigned GetProfile() const;
 	unsigned GetLevel() const;

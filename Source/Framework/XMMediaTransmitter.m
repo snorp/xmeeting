@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.12 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.13 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -633,7 +633,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	// averageDataRate is in bytes/s
 	SInt32 averageDataRate = bitrate / 8;
-	//NSLog(@"limiting dataRate to %d", averageDataRate);
+	NSLog(@"limiting dataRate to %d", averageDataRate);
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -676,9 +676,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	if(codecIdentifier == XMCodecIdentifier_H264)
 	{
-		unsigned profile = (flags >> 4) & 0xf;
-		// The level is currently ignored
-		// using level 1.1 for QCIF and 1.3 for CIF
+		// Profile is currently fixed to Baseline
+		// The level is adjusted by the use of the
+		// bitrate, but the SPS returned reveals
+		// level 1.1 in case of QCIF and level 1.3
+		// in case of CIF
 		
 		Handle h264Settings = NewHandleClear(0);
 		
@@ -691,20 +693,26 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		// For some reason, the QTAtomContainer functions will crash if used on the atom
 		// container returned by ImageCodecGetSettings.
 		// Therefore, we have to parse the atoms self to set the correct settings.
+		unsigned i;
 		unsigned settingsSize = GetHandleSize(h264Settings) / 4;
 		UInt32 *data = (UInt32 *)*h264Settings;
-		unsigned i;
 		for(i = 0; i < settingsSize; i++)
 		{
 			if(data[i] == FOUR_CHAR_CODE('sprf'))
 			{
+				// Forcing Baseline profile
 				i+=4;
-				data[i] = profile;
+				data[i] = 1;
 			}
-			if(data[i] == FOUR_CHAR_CODE('susg'))
+			
+			// if video sent is CIF size, we set this flag to one to have the picture
+			// encoded in 5 slices instead of two.
+			// If QCIF is sent, this flag remains zero to send two slices instead of
+			// one.
+			else if(requiredVideoSize == XMVideoSize_CIF && data[i] == FOUR_CHAR_CODE('susg'))
 			{
 				i+=4;
-				data[i] = 2;
+				data[i] = 1;
 			}
 		}
 		
@@ -813,8 +821,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
 {	
-	[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
-	
 	TimeValue convertedTime = (90000 / timeScale) * time;
 	TimeValue timeStamp = convertedTime - timeOffset;
 	lastTime = timeStamp;
@@ -828,6 +834,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		if(err != noErr)
 		{
 			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
+		}
+		
+		if(needsPictureUpdate == YES)
+		{
+			NSLog(@"Forcing Keyframe");
 		}
 		
 		err = ICMCompressionSessionEncodeFrame(compressionSession, 
@@ -845,19 +856,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		needsPictureUpdate = NO;
 	}
-	/*else
-	{
-		[XMMediaTransmitter _startTransmittingForSession:2
-											   withCodec:XMCodecIdentifier_H264
-											   videoSize:XMVideoSize_CIF
-									  maxFramesPerSecond:30
-											  maxBitrate:48000
-												   flags:((1 << 8) + (1 << 4) + 5)];
-	}*/
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
-	//[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
+	[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
 }
 
 - (void)setTimeScale:(TimeScale)theTimeScale
@@ -943,6 +945,39 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 - (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame
 {	
 	OSErr err = noErr;
+	
+	/*static int set = 0;
+	if(set == 0)
+	{
+		
+		Handle h264Settings = NewHandleClear(0);
+		err = ImageCodecGetSettings(compressor, h264Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecGetSettings failed");
+		}
+		
+		// For some reason, the QTAtomContainer functions will crash if used on the atom
+		// container returned by ImageCodecGetSettings.
+		// Therefore, we have to parse the atoms self to set the correct settings.
+		unsigned settingsSize = GetHandleSize(h264Settings);
+		UInt8 *data = (UInt8 *)*h264Settings;
+		unsigned i;
+		for(i = 0; i < settingsSize; i++)
+		{
+			if(data[i] == 's')
+			{
+				printf("\n%c%c%c%c ", data[i], data[i+1], data[i+2], data[i+3]);
+				i+=4;
+			}
+			else
+			{
+				printf("%x ", data[i]);
+			}
+		}
+		printf("\n");
+		set = 1;
+	}*/
 
 	ImageDescriptionHandle imageDesc;
 	

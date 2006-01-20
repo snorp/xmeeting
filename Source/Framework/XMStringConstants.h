@@ -1,9 +1,9 @@
 /*
- * $Id: XMStringConstants.h,v 1.14 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.15 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_STRING_CONSTANTS_H__
@@ -244,6 +244,7 @@ extern NSString *XMKey_PreferencesEnableVideo;
 extern NSString *XMKey_PreferencesVideoFramesPerSecond;
 extern NSString *XMKey_PreferencesPreferredVideoSize;
 extern NSString *XMKey_PreferencesVideoCodecList;
+extern NSString *XMKey_PreferencesEnableH264LimitedMode;
 
 // H323-specific keys
 extern NSString *XMKey_PreferencesEnableH323;
@@ -269,6 +270,7 @@ extern NSString *XMKey_CodecIdentifier;
 extern NSString *XMKey_CodecName;
 extern NSString *XMKey_CodecBandwidth;
 extern NSString *XMKey_CodecQuality;
+extern NSString *XMKey_CodecCanDisable;
 
 #pragma mark XMAddressResource and subclasses keys
 

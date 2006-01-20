@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.3 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.4 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,7 +125,7 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		{
 			*bytes = 255;	// alpha value
 			bytes++;
-			*bytes = 255;	// red value
+			*bytes = 0;		// red value
 			bytes++;
 			*bytes = 0;		// green value
 			bytes++;

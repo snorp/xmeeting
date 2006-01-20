@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.11 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.12 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,6 +165,8 @@ void XMReceiverMediaPatch::Main()
 				{
 					if(firstPacketOfPacketGroup != NULL)
 					{
+						// Discarding the old packet group since incomplete
+						cout << "Discarding packet group" << endl;
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;

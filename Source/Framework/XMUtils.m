@@ -1,9 +1,9 @@
 /*
- * $Id: XMUtils.m,v 1.6 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.7 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMUtils.h"
@@ -399,6 +399,8 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 			return NSMakeSize(704, 576);
 		case XMVideoSize_16CIF:
 			return NSMakeSize(1408, 1152);
+		case XMVideoSize_320_240:
+			return NSMakeSize(320, 240);
 		default:
 			return NSMakeSize(0, 0);
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.14 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.15 2006/01/20 17:17:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,7 @@
 @interface XMMediaReceiver (PrivateMethods)
 
 - (UInt32)_getH264AVCCAtomLength;
+- (XMVideoSize)_getH264VideoSize;
 - (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer;
 
 @end
@@ -134,10 +135,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(videoDecompressionSession == NULL)
 	{
 		ImageDescriptionHandle imageDesc;
-		
 		NSSize videoDimensions;
-		
-		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
 		CodecType codecType;
 		char *codecName;
 		
@@ -159,11 +157,17 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 					NSLog(@"Can't create AVCC atom yet");
 					return NO;
 				}
+				else
+				{
+					videoMediaSize = [self _getH264VideoSize];
+				}
 				break;
 			default:
 				NSLog(@"illegal codecType");
 				return NO;
 		}
+		
+		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
 		
 		imageDesc = (ImageDescriptionHandle)NewHandleClear(sizeof(**imageDesc)+4);
 		(**imageDesc).idSize = sizeof( **imageDesc)+4;
@@ -237,6 +241,10 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		ICMDecompressionSessionOptionsRelease(sessionOptions);
 		
 		DisposeHandle((Handle)imageDesc);
+		
+		// Informing the application that we've started sending a certain codec. This is done here since
+		// in case of H.264, the size has to be extracted from the SPS atom.
+		_XMHandleVideoStreamOpened(0, codecName, videoMediaSize, true);
 	}
 	err = ICMDecompressionSessionDecodeFrame(videoDecompressionSession,
 											 data, length,
@@ -345,14 +353,16 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	unsigned avccLength = 7;
 	
 	unsigned i;
-	for(i = 0; i < numberOfH264SPSAtoms; i++)
+	//for(i = 0; i < numberOfH264SPSAtoms; i++)
+	for(i = 0; i < 1; i++)
 	{
 		// two bytes for the length of the SPS Atom
 		avccLength += 2;
 		
 		avccLength += h264SPSAtoms[i].length;
 	}
-	for(i = 0; i < numberOfH264PPSAtoms; i++)
+	//for(i = 0; i < numberOfH264PPSAtoms; i++)
+	for(i = 0; i < 1; i++)
 	{
 		// two bytes for the length of the PPS Atom
 		avccLength += 2;
@@ -361,6 +371,134 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	}
 	
 	return avccLength;
+}
+
+- (XMVideoSize)_getH264VideoSize
+{
+	if(numberOfH264SPSAtoms == 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	
+	const UInt8 *data = h264SPSAtoms[0].data;
+	UInt32 dataIndex;
+	UInt8 mask;
+	UInt8 bit;
+	UInt8 zero_counter;
+	UInt8 expGolombSymbol;
+	
+#define scanBit() \
+	mask >>= 1; \
+	if(mask == 0) { \
+		dataIndex++; \
+		mask = 0x80; \
+	}
+	
+#define readBit() \
+	bit = data[dataIndex] & mask; \
+	scanBit();
+	
+#define scanExpGolombSymbol() \
+	zero_counter = 0; \
+	readBit(); \
+	while(bit == 0) { \
+		zero_counter++; \
+		readBit(); \
+	} \
+	while(zero_counter != 0) { \
+		zero_counter--; \
+		scanBit(); \
+	}
+	
+#define readExpGolombSymbol() \
+	zero_counter = 0; \
+	readBit(); \
+	while(bit == 0) { \
+		zero_counter++; \
+		readBit(); \
+	} \
+	expGolombSymbol = (0x01 << zero_counter); \
+	while(zero_counter != 0) { \
+		zero_counter--; \
+		readBit(); \
+		if(bit != 0) { \
+			expGolombSymbol |= (0x01 << zero_counter); \
+		} \
+	} \
+	expGolombSymbol -= 1;
+	
+	// starting at byte 5 since the four first bytes are fixed-size
+	dataIndex = 4;
+	mask = 0x80;
+	
+	// scanning past seq_parameter_set_id
+	scanExpGolombSymbol();
+	
+	// scanning past log2_max_frame_num_minus_4
+	//scanExpGolombSymbol();
+	readExpGolombSymbol();
+	
+	//reading pic_order_cnt_type
+	readExpGolombSymbol();
+	
+	if(expGolombSymbol == 0)
+	{
+		// scanning past log2_max_pic_order_cnt_lsb_minus4
+		scanExpGolombSymbol();
+	}
+	else if(expGolombSymbol == 1)
+	{
+		printf("pic_order_cnt_type is one\n");
+		// scanning past delta_pic_order_always_zero_flag
+		scanBit();
+		
+		// scanning past offset_for_non_ref_pic
+		scanExpGolombSymbol();
+		
+		// scanning past offset_for_top_to_bottom_field
+		scanExpGolombSymbol();
+		
+		// reading num_ref_frames_in_pic_order_cnt_cycle
+		readExpGolombSymbol();
+		
+		UInt32 i;
+		for(i = 0; i < expGolombSymbol; i++)
+		{
+			// scanning past offset_for_ref_frame[i]
+			scanExpGolombSymbol();
+		}
+	}
+	
+	// scanning past num_ref_frames
+	scanExpGolombSymbol();
+	
+	// scanning past gaps_in_frame_num_value_allowed_flag
+	scanBit();
+	
+	// reading pic_width_in_mbs_minus1
+	readExpGolombSymbol();
+	UInt8 picWidthMinus1 = expGolombSymbol;
+	
+	// reading pic_height_in_mbs_minus1
+	readExpGolombSymbol();
+	UInt8 picHeightMinus1 = expGolombSymbol;
+	
+	if(picWidthMinus1 == 21 && picHeightMinus1 == 17)
+	{
+		return XMVideoSize_CIF;
+	}
+	else if(picWidthMinus1 == 10 && picHeightMinus1 == 8)
+	{
+		return XMVideoSize_QCIF;
+	}
+	else if(picWidthMinus1 == 19 && picHeightMinus1 == 14)
+	{
+		return XMVideoSize_320_240;
+	}
+	
+	printf("UNKNOWN H.264 Size\n");
+	// Return CIF to have at least a valid dimension
+	return XMVideoSize_CIF;
 }
 
 - (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer
@@ -387,47 +525,69 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	// lengthSizeMinusOne is 3 (4 bytes length)
 	buffer[4] = 0xff;
 	
-	// setting the number of SPS atoms
-	buffer[5] = numberOfH264SPSAtoms;
+	// There is only ever one SPS atom, or QuickTime will not
+	// understand the AVCC structure
+	buffer[5] = 1;
 	
 	unsigned index = 6;
-	unsigned i;
 	
-	for(i = 0; i < 1; i++)
-	{
-		UInt16 length = h264SPSAtoms[i].length;
-		UInt8 *data = h264SPSAtoms[i].data;
+	UInt16 length = h264SPSAtoms[0].length;
+	UInt8 *data = h264SPSAtoms[0].data;
 		
-		buffer[index] = (UInt8)(length >> 8);
-		buffer[index+1] = (UInt8)(length & 0x00ff);
+	buffer[index] = (UInt8)(length >> 8);
+	buffer[index+1] = (UInt8)(length & 0x00ff);
 		
-		index += 2;
+	index += 2;
 		
-		UInt8 *dest = &(buffer[index]);
-		memcpy(dest, data, length);
+	UInt8 *dest = &(buffer[index]);
+	memcpy(dest, data, length);
 		
-		index += length;
-	}
+	index += length;
 	
-	// setting the number of PPS atoms
-	buffer[index] = numberOfH264PPSAtoms;
+	// There is only ever one PPS atom, or QuickTime will not
+	// understand the AVCC structure
+	buffer[index] = 1;
 	index++;
-
-	for(i = 0; i < 1; i++)
+	
+	length = h264PPSAtoms[0].length;
+	data = h264PPSAtoms[0].data;
+		
+	buffer[index] = (UInt8)(length >> 8);
+	buffer[index+1] = (UInt8)(length & 0x00ff);
+		
+	index += 2;
+	
+	dest = &(buffer[index]);
+	memcpy(dest, data, length);
+	
+	index += length;
+	
+	printf("********\nReceived SPS and PPS Atoms:\n");
+	unsigned i;
+	for(i = 0; i < numberOfH264SPSAtoms; i++)
 	{
-		UInt16 length = h264PPSAtoms[i].length;
-		UInt8 *data = h264PPSAtoms[i].data;
-		
-		buffer[index] = (UInt8)(length >> 8);
-		buffer[index+1] = (UInt8)(length & 0x00ff);
-		
-		index += 2;
-		
-		UInt8 *dest = &(buffer[index]);
-		memcpy(dest, data, length);
-		
-		index += length;
+		UInt8 *data = h264SPSAtoms[i].data;
+		unsigned j;
+		printf("SPS [%d]\n", i);
+		for(j = 0; j < h264SPSAtoms[i].length; j++)
+		{
+			printf("%x ", data[j]);
+		}
+		printf("\n");
 	}
+
+	for(i = 0; i < numberOfH264PPSAtoms; i++)
+	{
+		UInt8 *data = h264PPSAtoms[i].data;
+		unsigned j;
+		printf("PPS [%d]\n", i);
+		for(j = 0; j < h264PPSAtoms[i].length; j++)
+		{
+			printf("%x ", data[j]);
+		}
+		printf("\n");
+	}
+	printf("********\n");
 	
 	NSLog(@"Created AVCC Atom. There are %d SPS and %d PPS atoms to choose", numberOfH264SPSAtoms, numberOfH264PPSAtoms);
 }

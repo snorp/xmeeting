@@ -1,9 +1,9 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.12 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.13 2006/01/20 17:17:04 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMLocationPreferencesModule.h"
@@ -100,6 +100,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	tableColumn = [videoCodecPreferenceOrderTableView tableColumnWithIdentifier:XMKey_InitialQualityIdentifier];
 	[tableColumn setIdentifier:XMKey_CodecQuality];
 	
+	// adjusting the autoresizing behaviour of the two codec tables
+	[audioCodecPreferenceOrderTableView setColumnAutoresizingStyle:NSTableViewLastColumnOnlyAutoresizingStyle];
+	[videoCodecPreferenceOrderTableView setColumnAutoresizingStyle:NSTableViewLastColumnOnlyAutoresizingStyle];
+	
 	// making the table view use a XMBoolean cell for the "enabled" column
 	XMBooleanCell *booleanCell = [[XMBooleanCell alloc] init];
 	
@@ -190,6 +194,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
 	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
 	[locationsTableView reloadData];
+	
+	currentLocation = (XMLocation *)[locations objectAtIndex:0];
+	[self _loadCurrentLocation];
 	
 	// validating the location buttons
 	[self _validateLocationButtonUserInterface];
@@ -368,7 +375,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[videoCodecPreferenceOrderTableView reloadData];
 	
 	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:newIndex];
-	[audioCodecPreferenceOrderTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+	[videoCodecPreferenceOrderTableView selectRowIndexes:indexSet byExtendingSelection:NO];
 	
 	[self defaultAction:self];
 }
@@ -434,7 +441,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	if(tableView == audioCodecPreferenceOrderTableView)
 	{
 		NSColor *colorToUse;
-		if([[currentLocation audioCodecListRecordAtIndex:rowIndex] isEnabled])
+		XMPreferencesCodecListRecord *codecRecord = [currentLocation audioCodecListRecordAtIndex:rowIndex];
+		if([codecRecord isEnabled])
 		{
 			colorToUse = [NSColor controlTextColor];
 		}
@@ -443,11 +451,19 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 			colorToUse = [NSColor disabledControlTextColor];
 		}
 		[aCell setTextColor:colorToUse];
+		
+		if([[aTableColumn identifier] isEqualToString:XMKey_EnabledIdentifier])
+		{
+			XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[codecRecord identifier]];
+			[(XMBooleanCell *)aCell setDoesPopUp:[codec canDisable]];
+			
+		}
 	}
 	if(tableView == videoCodecPreferenceOrderTableView)
 	{
 		NSColor *colorToUse;
-		if([[currentLocation videoCodecListRecordAtIndex:rowIndex] isEnabled])
+		XMPreferencesCodecListRecord *codecRecord = [currentLocation videoCodecListRecordAtIndex:rowIndex];
+		if([codecRecord isEnabled])
 		{
 			colorToUse = [NSColor controlTextColor];
 		}
@@ -456,6 +472,13 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 			colorToUse = [NSColor disabledControlTextColor];
 		}
 		[aCell setTextColor:colorToUse];
+		
+		if([[aTableColumn identifier] isEqualToString:XMKey_EnabledIdentifier])
+		{
+			XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[codecRecord identifier]];
+			[(XMBooleanCell *)aCell setDoesPopUp:[codec canDisable]];
+			
+		}
 	}
 }
 
@@ -573,18 +596,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	[videoFrameRateField setIntValue:[currentLocation videoFramesPerSecond]];
 	
-	state = [currentLocation preferredVideoSize];
-	if(state == XMVideoSize_QCIF)
-	{
-		state = 1;
-	}
-	else
-	{
-		state = 0;
-	}
-	[videoSizePopUp selectItemAtIndex:state];
-	
 	[videoCodecPreferenceOrderTableView reloadData];
+	
+	state = ([currentLocation enableH264LimitedMode] == YES) ? NSOnState : NSOffState;
+	[enableH264LimitedModeSwitch setState:state];
 	
 	// finally, it's time to validate some GUI-Elements
 	[self _validateAddressTranslationUserInterface];
@@ -592,7 +607,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[self _validateH323UserInterface];
 	[self _validateAudioOrderUserInterface];
 	[self _validateVideoUserInterface];
-	[self _validateVideoOrderUserInterface];
 }
 
 - (void)_saveCurrentLocation
@@ -677,8 +691,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	[currentLocation setVideoFramesPerSecond:[videoFrameRateField intValue]];
 	
-	XMVideoSize size = ([videoSizePopUp indexOfSelectedItem] == 0) ? XMVideoSize_CIF : XMVideoSize_QCIF;
-	[currentLocation setPreferredVideoSize:size];
+	flag = ([enableH264LimitedModeSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableH264LimitedMode:flag];
 }
 
 #pragma mark validate the user interface
@@ -810,23 +824,31 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	BOOL flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
 	
 	[videoFrameRateField setEnabled:flag];
-	[videoSizePopUp setEnabled:flag];
+	[videoCodecPreferenceOrderTableView setHidden:!flag];
+	[enableH264LimitedModeSwitch setEnabled:flag];
+	[self _validateVideoOrderUserInterface];
 }
 
 - (void)_validateVideoOrderUserInterface
 {
-	unsigned count = [currentLocation videoCodecListCount];
-	int selectedRow = [videoCodecPreferenceOrderTableView selectedRow];
-	BOOL enableUp = YES;
-	BOOL enableDown = YES;
+	BOOL enableFlag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
 	
-	if(selectedRow == 0)
+	BOOL enableUp = enableFlag;
+	BOOL enableDown = enableFlag;
+	
+	if(enableFlag == YES)
 	{
-		enableUp = NO;
-	}
-	if(selectedRow == (count -1))
-	{
-		enableDown = NO;
+		unsigned count = [currentLocation videoCodecListCount];
+		int selectedRow = [videoCodecPreferenceOrderTableView selectedRow];
+	
+		if(selectedRow == 0)
+		{
+			enableUp = NO;
+		}
+		if(selectedRow == (count -1))
+		{
+			enableDown = NO;
+		}
 	}
 	
 	[moveVideoCodecUpButton setEnabled:enableUp];
