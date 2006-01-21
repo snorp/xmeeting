@@ -1,9 +1,9 @@
 /*
- * $Id: XMZeroConfModule.m,v 1.5 2005/10/17 13:20:30 hfriederich Exp $
+ * $Id: XMZeroConfModule.m,v 1.6 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMZeroConfModule.h"
@@ -66,6 +66,11 @@
 
 - (void)becomeInactiveModule
 {
+}
+
+- (BOOL)isResizableWhenInSeparateWindow
+{
+	return YES;
 }
 
 @end

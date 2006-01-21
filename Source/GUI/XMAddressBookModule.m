@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.8 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.9 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import <AddressBook/AddressBook.h>
@@ -123,6 +123,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (void)becomeInactiveModule
 {
+}
+
+- (BOOL)isResizableWhenInSeparateWindow
+{
+	return YES;
 }
 
 #pragma mark Action Methods

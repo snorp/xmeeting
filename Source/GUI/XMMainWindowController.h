@@ -1,9 +1,9 @@
 /*
- * $Id: XMMainWindowController.h,v 1.5 2005/08/27 22:08:22 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.6 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_MAIN_WINDOW_CONTROLLER_H__

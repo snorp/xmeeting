@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallInfoView.m,v 1.1 2005/09/01 15:18:23 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.2 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMeeting.h"
@@ -633,6 +633,8 @@
 		return height;
 	}
 	
+	height += VERTICAL_SPACING;
+	
 	[self _createStrings];
 	[textDrawCell setFont:[XMCallInfoView _smallTextFont]];
 	
@@ -681,9 +683,16 @@
 	
 	if(callStartString == nil)
 	{
+		NSLog(@"2");
 		return height;
 	}
-	
+
+	if(remoteNumberString != nil ||
+	   remoteAddressString != nil ||
+	   remoteApplicationString != nil)
+	{
+		height += (SMALL_LINE_HEIGHT + VERTICAL_SPACING);
+	}
 	availableWidth = width - 3*TEXT_OFFSET;
 	
 	if(remoteNumberString != nil)
@@ -718,7 +727,13 @@
 		}
 	}
 	
-	height += VERTICAL_SPACING;
+	if(audioOutString != nil ||
+	   audioInString != nil ||
+	   videoOutString != nil ||
+	   videoInString != nil)
+	{
+		height += VERTICAL_SPACING;
+	}
 	availableWidth = width - 3*TEXT_OFFSET;
 	
 	if(audioOutString != nil && audioInString != nil)
@@ -739,6 +754,7 @@
 		height += 2*SMALL_LINE_HEIGHT + VERTICAL_SPACING;
 	}
 	
+	NSLog(@"3");
 	return height;
 }
 

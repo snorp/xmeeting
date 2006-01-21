@@ -1,9 +1,9 @@
 /*
- * $Id: XMMainWindowController.m,v 1.7 2005/10/19 22:09:17 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.8 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 
@@ -824,10 +824,20 @@ NSString *XMKey_WindowSaveNameFormat = @"XMeeting_BottomModule<%@>WindowFrame";
 	NSSize contentSize = [module contentViewSize];
 	NSRect contentRect = NSMakeRect(0, 0, contentSize.width, contentSize.height);
 	
+	// RMF Changed  AddressBook, and Log & Call history separate windows to be resizable.. 
+	//  call stats should not beresizable. Other module not resizeable? 
+	unsigned int mask = (NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask);
+	if([module isResizableWhenInSeparateWindow])
+	{
+		mask |= NSResizableWindowMask;
+	}
+	
 	NSWindow *separateWindow = [[NSWindow alloc] initWithContentRect:contentRect
-														   styleMask:(NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask)
+														   styleMask:mask
 															 backing:NSBackingStoreBuffered
 															   defer:NO];
+	
+	[separateWindow setContentMinSize:contentSize];	// RMF: don't allow resize smaller then default view size.
 	
 	[separateWindow setTitle:[module name]];
 	[separateWindow setContentView:contentView];

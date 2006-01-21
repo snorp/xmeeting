@@ -1,9 +1,9 @@
 /*
- * $Id: XMPrivate.h,v 1.21 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.22 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PRIVATE_H__

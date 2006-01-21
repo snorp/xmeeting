@@ -1,9 +1,9 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.4 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.5 2006/01/21 23:27:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMDummyVideoInputModule.h"
