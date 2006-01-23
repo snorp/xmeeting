@@ -1,9 +1,9 @@
 /*
- * $Id: XMMainWindowStatusBarController.m,v 1.7 2005/10/17 12:57:54 hfriederich Exp $
+ * $Id: XMMainWindowStatusBarController.m,v 1.8 2006/01/23 08:46:16 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMeeting.h"
@@ -32,11 +32,10 @@
 
 - (void)_setStatusBarString:(NSString *)statusBarString;
 
-#define XM_ANIMATION_TYPE int
 #define XM_NO_ANIMATION -1
-#define XM_KEEP_ANIMATION_TYPE 0
+#define XM_KEEP_ANIMATION 0
 #define XM_DO_ANIMATION 1
-- (void)_setStatusBarString:(NSString *)statusBarString animation:(XM_ANIMATION_TYPE)animationType;
+- (void)_setStatusBarString:(NSString *)statusBarString animation:(int)animationType;
 
 - (void)_clearStatusBar:(NSTimer *)timer;
 
@@ -49,7 +48,7 @@
 - (id)init
 {
 	displayClearTimer = nil;
-	progressIndicatorDoesAnimate = NO;
+	animationCounter = 0;
 	return self;
 }
 
@@ -242,10 +241,10 @@
 
 - (void)_setStatusBarString:(NSString *)statusBarString
 {
-	[self _setStatusBarString:statusBarString animation:XM_KEEP_ANIMATION_TYPE];
+	[self _setStatusBarString:statusBarString animation:XM_KEEP_ANIMATION];
 }
 
-- (void)_setStatusBarString:(NSString *)statusBarString animation:(XM_ANIMATION_TYPE)animationType
+- (void)_setStatusBarString:(NSString *)statusBarString animation:(int)animationType
 {
 	[statusBar setStringValue:statusBarString];
 	
@@ -254,12 +253,15 @@
 	switch(animationType)
 	{
 		case XM_NO_ANIMATION:
-			[progressIndicator stopAnimation:self];
-			progressIndicatorDoesAnimate = NO;
-			timeInterval = 4.0;
+			animationCounter--;
+			if(animationCounter == 0)
+			{
+				[progressIndicator stopAnimation:self];
+				timeInterval = 4.0;
+			}
 			break;
-		case XM_KEEP_ANIMATION_TYPE:
-			if(progressIndicatorDoesAnimate)
+		case XM_KEEP_ANIMATION:
+			if(animationCounter != 0)
 			{
 				timeInterval = 0.0;
 			}
@@ -269,9 +271,12 @@
 			}
 			break;
 		case XM_DO_ANIMATION:
-			[progressIndicator startAnimation:self];
-			progressIndicatorDoesAnimate = YES;
-			timeInterval = 0.0;
+			if(animationCounter == 0)
+			{
+				[progressIndicator startAnimation:self];
+				timeInterval = 0.0;
+			}
+			animationCounter++;
 		default:
 			break;
 	}
