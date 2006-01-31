@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.13 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.14 2006/01/31 19:39:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -613,7 +613,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}
 	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 100);
+	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 20);
 	if(err != noErr)
 	{
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
@@ -717,6 +717,34 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		}
 		
 		err = ImageCodecSetSettings(compressor, h264Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecSetSettings failed");
+		}
+	}
+	else if(codecIdentifier == XMCodecIdentifier_H263)
+	{
+		Handle h263Settings = NewHandleClear(0);
+		
+		err = ImageCodecGetSettings(compressor, h263Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecGetSettings failed");
+		}
+		
+		unsigned i;
+		unsigned settingsSize = GetHandleSize(h263Settings) / 4;
+		UInt32 *data = (UInt32 *)*h263Settings;
+		for(i = 0; i < settingsSize; i++)
+		{
+			if(data[i] == FOUR_CHAR_CODE('iCyc'))
+			{
+				// enabling the IntraCycleMacroblock option
+				i+=4;
+				data[i] = 1;
+			}
+		}
+		err = ImageCodecSetSettings(compressor, h263Settings);
 		if(err != noErr)
 		{
 			NSLog(@"ImageCodecSetSettings failed");
@@ -855,7 +883,29 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		}
 		
 		needsPictureUpdate = NO;
+		
+		Handle handle = NewHandleClear(0);
+		err = ImageCodecGetSettings(compressor, handle);
+		
+		UInt8 *data = (UInt8 *)*handle;
+		UInt32 size = GetHandleSize(handle);
+		UInt32 i;
+		
+		/*for(i = 0; i < size; i++)
+		{
+			printf("%x ", data[i]);
+		}
+		printf("\n");*/
 	}
+/*	else
+	{
+		[XMMediaTransmitter _startTransmittingForSession:2
+											  withCodec:XMCodecIdentifier_H263
+											  videoSize:XMVideoSize_CIF
+									 maxFramesPerSecond:30
+											 maxBitrate:40000000
+												  flags:0];
+	}*/
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
@@ -945,39 +995,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 - (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame
 {	
 	OSErr err = noErr;
-	
-	/*static int set = 0;
-	if(set == 0)
-	{
-		
-		Handle h264Settings = NewHandleClear(0);
-		err = ImageCodecGetSettings(compressor, h264Settings);
-		if(err != noErr)
-		{
-			NSLog(@"ImageCodecGetSettings failed");
-		}
-		
-		// For some reason, the QTAtomContainer functions will crash if used on the atom
-		// container returned by ImageCodecGetSettings.
-		// Therefore, we have to parse the atoms self to set the correct settings.
-		unsigned settingsSize = GetHandleSize(h264Settings);
-		UInt8 *data = (UInt8 *)*h264Settings;
-		unsigned i;
-		for(i = 0; i < settingsSize; i++)
-		{
-			if(data[i] == 's')
-			{
-				printf("\n%c%c%c%c ", data[i], data[i+1], data[i+2], data[i+3]);
-				i+=4;
-			}
-			else
-			{
-				printf("%x ", data[i]);
-			}
-		}
-		printf("\n");
-		set = 1;
-	}*/
 
 	ImageDescriptionHandle imageDesc;
 	
