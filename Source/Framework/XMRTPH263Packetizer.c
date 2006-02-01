@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263Packetizer.c,v 1.2 2006/01/31 19:39:38 hfriederich Exp $
+ * $Id: XMRTPH263Packetizer.c,v 1.3 2006/02/01 07:06:24 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -569,6 +569,20 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 	const UInt8 *data = sampleData->data;
 	UInt32 maxPacketLength = globals->maxPacketSize - 4;	// substracting 4 bytes for Mode A
 	UInt32 frameLength = sampleData->dataLength;
+	
+	// Adjusting data by substracting any zero bytes at the end
+	if(data[frameLength-1] == 0)
+	{
+		frameLength -= 1;
+		if(data[frameLength-1] == 0)
+		{
+			frameLength -= 1;
+			if(data[frameLength-1] == 0)
+			{
+				frameLength -= 1;
+			}
+		}
+	}
 
 	// Begin the packet group
 	RTPPBBeginPacketGroup(globals->packetBuilder,
@@ -721,7 +735,7 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 	if(remainingLength != 0)
 	{
 		//printf("Packing Rest as Mode A packet from %d to %d (%d)\n", dataStartIndex, dataStartIndex+remainingLength, remainingLength);
-		_XMRTPH263Packetizer_PacketizeCompleteGOBs(globals,
+		_XMRTPH263Packetizer_PacketizeCompleteGOBs(globals->packetBuilder,
 												   sampleData,
 												   packetGroupRef,
 												   sourceFormat,

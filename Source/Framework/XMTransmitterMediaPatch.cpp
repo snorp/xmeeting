@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.9 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.10 2006/02/01 07:06:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -171,6 +171,7 @@ BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
 
 void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStamp)
 {
+	cout << "setTimeStamp: " << timeStamp << endl;
 	if(videoTransmitterPatch == NULL)
 	{
 		cout << "No VideoTransmitterPatch found!" << endl;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.14 2006/01/31 19:39:38 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.15 2006/02/01 07:06:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -900,10 +900,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 /*	else
 	{
 		[XMMediaTransmitter _startTransmittingForSession:2
-											  withCodec:XMCodecIdentifier_H263
+											  withCodec:XMCodecIdentifier_H261
 											  videoSize:XMVideoSize_CIF
 									 maxFramesPerSecond:30
-											 maxBitrate:40000000
+											 maxBitrate:384000
 												  flags:0];
 	}*/
 	
@@ -1133,6 +1133,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	sampleData.sampleDescription = (Handle)imageDesc;
 	sampleData.dataLength = ICMEncodedFrameGetDataSize(encodedFrame);
 	sampleData.data = ICMEncodedFrameGetDataPtr(encodedFrame);
+	
+	printf("***** %d\n", sampleData.dataLength);
+	unsigned i;
+	for(i = 0; i < 8; i++)
+	{
+		printf("%x ", sampleData.data[i]);
+	}
+	printf("\n");
 	
 	SInt32 outFlags;
 	err = RTPMPSetSampleData(mediaPacketizer, &sampleData, &outFlags);
