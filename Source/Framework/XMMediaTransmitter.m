@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.15 2006/02/01 07:06:24 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.16 2006/02/01 09:26:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,6 +63,8 @@ typedef enum XMMediaTransmitterMessage
 - (void)_updateDeviceListAndSelectDummy;
 
 - (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame;
+
+- (void)_adjustH261Data:(UInt8 *)h261Data;
 
 @end
 
@@ -1132,7 +1134,15 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	sampleData.timeStamp = ICMEncodedFrameGetDecodeTimeStamp(encodedFrame);
 	sampleData.sampleDescription = (Handle)imageDesc;
 	sampleData.dataLength = ICMEncodedFrameGetDataSize(encodedFrame);
-	sampleData.data = ICMEncodedFrameGetDataPtr(encodedFrame);
+	
+	UInt8 *data = ICMEncodedFrameGetDataPtr(encodedFrame);
+	
+	if(codecType == kH261CodecType)
+	{
+		[self _adjustH261Data:data];
+	}
+	
+	sampleData.data = data;
 	
 	printf("***** %d\n", sampleData.dataLength);
 	unsigned i;
@@ -1163,6 +1173,53 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	}
 	
 	return err;
+}
+
+#define scanBit(theDataIndex, theMask) \
+{ \
+	theMask >>= 1; \
+		if(theMask == 0) { \
+			theDataIndex++; \
+				theMask = 0x80; \
+		} \
+}
+
+#define readBit(out, theData, theDataIndex, theMask) \
+{ \
+	out = theData[theDataIndex] & theMask; \
+		scanBit(theDataIndex, theMask); \
+}
+
+- (void)_adjustH261Data:(UInt8 *)h261Data
+{	
+	// In the H.261 standard, there are two bits in PTYPE which
+	// were originally unused. The first bit of them is now the
+	// flag defining the still image mode. If this mode isn't used,
+	// the flag should be set to one. This applies to the second
+	// unused bit as well. Unfortunately, QuickTime sets these two
+	// bits to zero, which causes problems on Tandberg devices.
+	// Therefore, these bits are here set to one
+	UInt32 dataIndex = 1;
+	UInt8 mask = 0x01;
+	
+	UInt8 bit;
+	readBit(bit, h261Data, dataIndex, mask);
+	
+	while(bit == 0)
+	{
+		readBit(bit, h261Data, dataIndex, mask);
+	}
+	
+	dataIndex += 1;
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	
+	h261Data[dataIndex] |= mask;
+	scanBit(dataIndex, mask);
+	h261Data[dataIndex] |= mask;
 }
 
 @end
