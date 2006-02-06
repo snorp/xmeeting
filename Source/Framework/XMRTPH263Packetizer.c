@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263Packetizer.c,v 1.3 2006/02/01 07:06:24 hfriederich Exp $
+ * $Id: XMRTPH263Packetizer.c,v 1.4 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -486,7 +486,7 @@ void _XMRTPH263Packetizer_PacketizeGOBPart(ComponentInstance packetBuilder,
 										   UInt8 mbStartBit,
 										   UInt32 indexOfMBAfterPacket,
 										   UInt8 bitOfMBAfterPacket,
-										   Boolean isLastPacket);
+										   Boolean isLastPacket);										   
 
 #pragma mark Standard Component Calls
 	
@@ -570,17 +570,16 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 	UInt32 maxPacketLength = globals->maxPacketSize - 4;	// substracting 4 bytes for Mode A
 	UInt32 frameLength = sampleData->dataLength;
 	
-	// Adjusting data by substracting any zero bytes at the end
-	if(data[frameLength-1] == 0)
+	// Adjusting data length by substracting any zero bytes at the end
+	if(data[frameLength-2] == 0 && data[frameLength-1] == 0)
 	{
-		frameLength -= 1;
-		if(data[frameLength-1] == 0)
+		if(data[frameLength-3] == 0)
+		{
+			frameLength -= 2;
+		}
+		else
 		{
 			frameLength -= 1;
-			if(data[frameLength-1] == 0)
-			{
-				frameLength -= 1;
-			}
 		}
 	}
 
@@ -710,7 +709,9 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 				
 				if(gobStartIndex == 0)
 				{
+					*outFlags = 0;
 					printf("ERROR: NO GOB start FOUND!\n");
+					return noErr;
 				}
 				else
 				{
@@ -982,7 +983,7 @@ void _XMRTPH263Packetizer_PacketizeLongGOB(ComponentInstance packetBuilder,
 										   UInt32 gobLength,
 										   Boolean isLastGOB)
 {
-	printf("Packing LONG GOB\n");
+	printf("LONG GOB\n");
 	// subtracting 8 bytes for Mode B header
 	maxPacketSize -= 8;
 	
@@ -1316,8 +1317,6 @@ void _XMRTPH263Packetizer_PacketizeLongGOB(ComponentInstance packetBuilder,
 		}
 	}
 	
-	printf("Second Part starts at index %d with mask %x\n", (mbStartIndex - gobStartIndex), mbStartBit);
-	
 	_XMRTPH263Packetizer_PacketizeGOBPart(packetBuilder,
 										  sampleData,
 										  packetGroup,
@@ -1488,40 +1487,37 @@ void _XMRTPH263Packetizer_PacketizeGOBPart(ComponentInstance packetBuilder,
 	UInt8 ebit;
 	switch(bitOfMBAfterPacket)
 	{
-		switch(bitOfMBAfterPacket)
-		{
-			case 0x80:
-				ebit = 0x00;
-				break;
-			case 0x40:
-				dataLength += 1;
-				ebit = 0x07;
-				break;
-			case 0x20:
-				dataLength += 1;
-				ebit = 0x06;
-				break;
-			case 0x10:
-				dataLength += 1;
-				ebit = 0x05;
-				break;
-			case 0x08:
-				dataLength += 1;
-				ebit = 0x04;
-				break;
-			case 0x04:
-				dataLength += 1;
-				ebit = 0x03;
-				break;
-			case 0x02:
-				dataLength += 1;
-				ebit = 0x02;
-				break;
-			case 0x01:
-				dataLength += 1;
-				ebit = 0x01;
-				break;
-		}
+		case 0x80:
+			ebit = 0x00;
+			break;
+		case 0x40:
+			dataLength += 1;
+			ebit = 0x07;
+			break;
+		case 0x20:
+			dataLength += 1;
+			ebit = 0x06;
+			break;
+		case 0x10:
+			dataLength += 1;
+			ebit = 0x05;
+			break;
+		case 0x08:
+			dataLength += 1;
+			ebit = 0x04;
+			break;
+		case 0x04:
+			dataLength += 1;
+			ebit = 0x03;
+			break;
+		case 0x02:
+			dataLength += 1;
+			ebit = 0x02;
+			break;
+		case 0x01:
+			dataLength += 1;
+			ebit = 0x01;
+			break;
 	}
 	header[0] |= (ebit & 0x07);
 	

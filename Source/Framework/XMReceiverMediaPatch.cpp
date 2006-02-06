@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.12 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.13 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -114,10 +114,12 @@ void XMReceiverMediaPatch::Main()
 			case XMCodecIdentifier_H263:
 				if(payloadType == RTP_DataFrame::H263)
 				{
+					cout << "Receiving RFC2190" << endl;
 					packetReassembler = new XMH263RTPPacketReassembler();
 				}
 				else
 				{
+					cout << "Receiving RFC2429" << endl;
 					packetReassembler = new XMH263PlusRTPPacketReassembler();
 				}
 				break;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.10 2006/02/01 07:06:24 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.11 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,6 +85,15 @@ void XMTransmitterMediaPatch::Resume()
 				// format to send. The payload code is submitted in the
 				// flags parameter
 				flags = h263PayloadType;
+				
+				if(h263PayloadType == RTP_DataFrame::H263)
+				{
+					cout << "Sending RFC2190" << endl;
+				}
+				else
+				{
+					cout << "Sending RFC2429" << endl;
+				}
 			}
 			else if(codecIdentifier == XMCodecIdentifier_H264)
 			{
@@ -92,9 +101,9 @@ void XMTransmitterMediaPatch::Resume()
 				{
 					// We send only at a limited bitrate to avoid too many
 					// NAL units which are TOO big to fit
-					if(bitrate > 384000)
+					if(bitrate > 320000)
 					{
-						bitrate = 384000;
+						bitrate = 320000;
 					}
 				}
 				
@@ -171,7 +180,6 @@ BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
 
 void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStamp)
 {
-	cout << "setTimeStamp: " << timeStamp << endl;
 	if(videoTransmitterPatch == NULL)
 	{
 		cout << "No VideoTransmitterPatch found!" << endl;
@@ -246,19 +254,28 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 		
 	RTP_DataFrame *frame = videoTransmitterPatch->dataFrame;
 	
-	frame->SetMarker(setMarker);
-	
-	videoTransmitterPatch->inUse.Wait();
-	
-	videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
-	
-	PINDEX i;
-	for(i = 0; i < videoTransmitterPatch->sinks.GetSize(); i++)
+	if(frame->GetPayloadSize() == 0)
 	{
-		BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
-		if(result == FALSE)
+		cout << "Dropping Frame To SEND" << endl;
+		frame->SetSequenceNumber(frame->GetSequenceNumber() + 1);
+	}
+	else
+	{
+	
+		frame->SetMarker(setMarker);
+	
+		videoTransmitterPatch->inUse.Wait();
+		
+		videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
+	
+		PINDEX i;
+		for(i = 0; i < videoTransmitterPatch->sinks.GetSize(); i++)
 		{
-			cout << "ERROR Writing frame to sink!" << endl;
+			BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
+			if(result == FALSE)
+			{
+				cout << "ERROR Writing frame to sink!" << endl;
+			}
 		}
 	}
 	
@@ -282,6 +299,11 @@ void XMTransmitterMediaPatch::HandleDidStopTransmitting(unsigned sessionID)
 void XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::PayloadTypes payloadType)
 {
 	h263PayloadType = payloadType;
+}
+
+RTP_DataFrame::PayloadTypes XMTransmitterMediaPatch::GetH263PayloadType()
+{
+	return h263PayloadType;
 }
 
 void XMTransmitterMediaPatch::SetH264Parameters(unsigned profile, unsigned level)

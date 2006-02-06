@@ -698,6 +698,8 @@
 		D1ECCD360834923D008EBAE3 /* XMNoCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */; };
 		D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCD3908349255008EBAE3 /* XMInCallModule.h */; };
 		D1ECCD3C08349255008EBAE3 /* XMInCallModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */; };
+		D1EEDEB70992514A000BF113 /* XMH323Channel.h in Headers */ = {isa = PBXBuildFile; fileRef = D1EEDEB50992514A000BF113 /* XMH323Channel.h */; };
+		D1EEDEB80992514A000BF113 /* XMH323Channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */; };
 		D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068D091756FA008A8974 /* XMAddressBookManager.m */; };
 		D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068F091756FA008A8974 /* XMAddressBookRecordSearchMatch.m */; };
 		D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */; };
@@ -1518,6 +1520,8 @@
 		D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMNoCallModule.m; path = Source/GUI/XMNoCallModule.m; sourceTree = "<group>"; };
 		D1ECCD3908349255008EBAE3 /* XMInCallModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMInCallModule.h; path = Source/GUI/XMInCallModule.h; sourceTree = "<group>"; };
 		D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInCallModule.m; path = Source/GUI/XMInCallModule.m; sourceTree = "<group>"; };
+		D1EEDEB50992514A000BF113 /* XMH323Channel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Channel.h; path = Source/Framework/XMH323Channel.h; sourceTree = "<group>"; };
+		D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Channel.cpp; path = Source/Framework/XMH323Channel.cpp; sourceTree = "<group>"; };
 		D1EF068C091756FA008A8974 /* XMAddressBookManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAddressBookManager.h; path = Source/Application/XMAddressBookManager.h; sourceTree = "<group>"; };
 		D1EF068D091756FA008A8974 /* XMAddressBookManager.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookManager.m; path = Source/Application/XMAddressBookManager.m; sourceTree = "<group>"; };
 		D1EF068E091756FA008A8974 /* XMAddressBookRecordSearchMatch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAddressBookRecordSearchMatch.h; path = Source/Application/XMAddressBookRecordSearchMatch.h; sourceTree = "<group>"; };
@@ -1776,6 +1780,8 @@
 				D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */,
 				D14F9A390914C673002486B2 /* XMH323Connection.h */,
 				D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */,
+				D1EEDEB50992514A000BF113 /* XMH323Channel.h */,
+				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
 				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
@@ -2922,6 +2928,7 @@
 				D147D9DB0973A83E005DE11C /* XMPacketReassemblers.h in Headers */,
 				D198B483097636F300180551 /* XMRTPH264Packetizer.h in Headers */,
 				D198B4880976371D00180551 /* XMRTPH264PacketizerDispatch.h in Headers */,
+				D1EEDEB70992514A000BF113 /* XMH323Channel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3538,6 +3545,7 @@
 				D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */,
 				D147DA1E0973ABEE005DE11C /* XMPacketReassemblers.cpp in Sources */,
 				D198B484097636F300180551 /* XMRTPH264Packetizer.c in Sources */,
+				D1EEDEB80992514A000BF113 /* XMH323Channel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

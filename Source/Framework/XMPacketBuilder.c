@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.6 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.7 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -90,6 +90,7 @@ ComponentResult XMPacketBuilder_BeginPacketGroup(XMPacketBuilderGlobals globals,
 												 UInt32 inTimeStamp,
 												 RTPPacketGroupRef *outPacketGroup)
 {
+	//printf("begin packet group\n");
 	ComponentResult err = noErr;
 	
 	if(outPacketGroup != NULL)
@@ -105,7 +106,6 @@ ComponentResult XMPacketBuilder_BeginPacketGroup(XMPacketBuilderGlobals globals,
 	}
 
 	// adjusting the timestamp to that it is an integer multiple of 3003
-	inTimeStamp = (inTimeStamp / 3003) * 3003;
 	
 	_XMSetTimeStamp(2, inTimeStamp);
 	
@@ -119,6 +119,7 @@ ComponentResult XMPacketBuilder_BeginPacket(XMPacketBuilderGlobals globals,
 											UInt32 inPacketMediaDataLength,
 											RTPPacketRef *outPacket)
 {
+	//printf("*\n");
 	ComponentResult err = noErr;
 	
 	if(outPacket != NULL)
@@ -127,7 +128,7 @@ ComponentResult XMPacketBuilder_BeginPacket(XMPacketBuilderGlobals globals,
 	
 		globals->packetRef++;
 	}
-else
+	else
 	{
 		err = paramErr;
 		goto bail;

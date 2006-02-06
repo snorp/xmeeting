@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.10 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.11 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,28 +20,43 @@
 	NSPort *receivePort;
 	
 	NSArray *videoInputModules;
-	NSMutableArray *videoInputViews;
 	id<XMVideoInputModule> activeModule;
 	NSString *selectedDevice;
 	
 	NSTimer *frameGrabTimer;
 	
 	BOOL isGrabbing;
-	BOOL isTransmitting;
-	BOOL needsPictureUpdate;
-	
 	unsigned frameGrabRate;
-	unsigned transmitFrameGrabRate;
-	XMVideoSize videoSize;
-	CodecType codecType;
 	TimeScale timeScale;
 	TimeValue timeOffset;
 	TimeValue lastTime;
 	
-	unsigned flags;
+	BOOL isTransmitting;
+	unsigned transmitFrameGrabRate;
+	XMVideoSize videoSize;
+	CodecType codecType;
+	OSType codecManufacturer;
+	unsigned codecSpecificCallFlags;
+	unsigned bitrateToUse;
+	
+	BOOL needsPictureUpdate;
+
+	BOOL useCompressionSessionAPI;
+	ComponentInstance compressor;
+	
 	ICMCompressionSessionRef compressionSession;
 	ICMCompressionFrameOptionsRef compressionFrameOptions;
-	ComponentInstance compressor;
+	
+	BOOL compressSequenceIsActive;
+	ImageSequence compressSequence;
+	ImageDescriptionHandle compressSequenceImageDescription;
+	Ptr compressSequenceCompressedFrame;
+	TimeValue compressSequencePreviousTimeStamp;
+	UInt32 compressSequenceFrameNumber;
+	UInt32 compressSequenceFrameCounter;
+	UInt32 compressSequenceLastVideoBytesSent;
+	UInt32 compressSequenceNonKeyFrameCounter;
+	
 	RTPMediaPacketizer mediaPacketizer;
 	RTPMPSampleDataParams sampleData;
 }
@@ -63,6 +78,8 @@
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 
 + (void)_updatePicture;
+
++ (void)_setVideoBytesSent:(unsigned)videoBytesSent;
 
 - (id)_init;
 - (void)_close;

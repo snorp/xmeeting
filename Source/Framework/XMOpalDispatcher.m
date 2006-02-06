@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.12 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.13 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,7 +33,6 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_CallEstablished,
 	_XMOpalDispatcherMessage_ClearCall,
 	_XMOpalDispatcherMessage_CallCleared,
-	_XMOpalDispatcherMessage_SetCallStatisticsUpdateInterval,
 	
 	// Media stream message
 	_XMOpalDispatcherMessage_AudioStreamOpened = 0x0300,
@@ -67,7 +66,6 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleCallEstablishedMessage:(NSArray *)messageComponents;
 - (void)_handleClearCallMessage:(NSArray *)messageComponents;
 - (void)_handleCallClearedMessage:(NSArray *)messageComponents;
-- (void)_handleSetCallStatisticsUpdateIntervalMessage:(NSArray *)messageComponents;
 
 - (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents;
 - (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents;
@@ -314,18 +312,6 @@ typedef enum _XMOpalDispatcherMessage
 	[components release];
 }
 
-+ (void)_setCallStatisticsUpdateInterval:(NSTimeInterval)timeInterval
-{
-	NSNumber *number = [[NSNumber alloc] initWithDouble:(double)timeInterval];
-	NSData *timeIntervalData = [NSKeyedArchiver archivedDataWithRootObject:number];
-	[number release];
-	NSArray *components = [[NSArray alloc] initWithObjects:timeIntervalData, nil];
-	
-	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SetCallStatisticsUpdateInterval withComponents:components];
-	
-	[components release];
-}
-
 + (void)_audioStreamOpened:(unsigned)callID codec:(NSString *)codec incoming:(BOOL)isIncomingStream
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
@@ -440,7 +426,6 @@ typedef enum _XMOpalDispatcherMessage
 	gatekeeperRegistrationCheckTimer = nil;
 	
 	callStatisticsUpdateIntervalTimer = nil;
-	callStatisticsUpdateInterval = 1;
 	
 	return self;
 }
@@ -534,9 +519,6 @@ typedef enum _XMOpalDispatcherMessage
 			break;
 		case _XMOpalDispatcherMessage_CallCleared:
 			[self _handleCallClearedMessage:[portMessage components]];
-			break;
-		case _XMOpalDispatcherMessage_SetCallStatisticsUpdateInterval:
-			[self _handleSetCallStatisticsUpdateIntervalMessage:[portMessage components]];
 			break;
 		case _XMOpalDispatcherMessage_AudioStreamOpened:
 			[self _handleAudioStreamOpenedMessage:[portMessage components]];
@@ -924,14 +906,11 @@ typedef enum _XMOpalDispatcherMessage
 												   withObject:remotePartyInformations
 												waitUntilDone:NO];
 	
-	if(callStatisticsUpdateInterval != 0)
-	{
-		callStatisticsUpdateIntervalTimer = [[NSTimer scheduledTimerWithTimeInterval:callStatisticsUpdateInterval 
-																			  target:self
-																			selector:@selector(_updateCallStatistics:)
-																			userInfo:nil
-																			 repeats:YES] retain];
-	}
+	callStatisticsUpdateIntervalTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0
+																		  target:self
+																		selector:@selector(_updateCallStatistics:)
+																		userInfo:nil
+																		 repeats:YES] retain];
 }
 
 - (void)_handleClearCallMessage:(NSArray *)messageComponents
@@ -986,36 +965,6 @@ typedef enum _XMOpalDispatcherMessage
 	}
 	
 	callID = 0;
-}
-
-- (void)_handleSetCallStatisticsUpdateIntervalMessage:(NSArray *)components
-{
-	NSData *intervalData = (NSData *)[components objectAtIndex:0];
-	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:intervalData];
-	callStatisticsUpdateInterval = (NSTimeInterval)[number doubleValue];
-	
-	if(callStatisticsUpdateIntervalTimer != nil)
-	{
-		if([callStatisticsUpdateIntervalTimer timeInterval] == callStatisticsUpdateInterval)
-		{
-			return;
-		}
-		else
-		{
-			[callStatisticsUpdateIntervalTimer invalidate];
-			[callStatisticsUpdateIntervalTimer release];
-			callStatisticsUpdateIntervalTimer = nil;
-		}
-	}
-	
-	if(callStatisticsUpdateInterval != 0.0)
-	{
-		callStatisticsUpdateIntervalTimer = [[NSTimer scheduledTimerWithTimeInterval:callStatisticsUpdateInterval
-																			  target:self
-																			selector:@selector(_updateCallStatistics:)
-																			userInfo:nil
-																			 repeats:YES] retain];
-	}
 }
 
 - (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents
@@ -1425,6 +1374,8 @@ typedef enum _XMOpalDispatcherMessage
 	XMCallStatistics *callStatistics = [[XMCallStatistics alloc] _init];
 	
 	_XMGetCallStatistics(callID, [callStatistics _callStatisticsRecord]);
+	
+	[XMMediaTransmitter _setVideoBytesSent:[callStatistics _callStatisticsRecord]->videoBytesSent];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallStatisticsUpdate:)
 												   withObject:callStatistics

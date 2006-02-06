@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.11 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.12 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -533,7 +533,7 @@ XM_H323_H263_Capability::XM_H323_H263_Capability()
 	slowCifMPI = 0;
 	slowCif4MPI = 0;
 	slowCif16MPI = 0;
-	isH263PlusCapability = TRUE;
+	isH263PlusCapability = FALSE;
 }
 
 PObject * XM_H323_H263_Capability::Clone() const
@@ -623,6 +623,12 @@ BOOL XM_H323_H263_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 	h263.m_pbFrames = FALSE;
 	h263.m_temporalSpatialTradeOffCapability = FALSE;
 	
+	h263.IncludeOptionalField(H245_H263VideoCapability::e_hrd_B);
+	h263.m_hrd_B = 0;
+	
+	h263.IncludeOptionalField(H245_H263VideoCapability::e_bppMaxKb);
+	h263.m_bppMaxKb = 0;
+	
 	if(slowSqcifMPI > 0 && sqcifMPI == 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_slowSqcifMPI);
@@ -649,11 +655,6 @@ BOOL XM_H323_H263_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 		h263.m_slowCif16MPI = slowCif16MPI;
 	}
 	
-	if(isH263PlusCapability == TRUE)
-	{
-		h263.IncludeOptionalField(H245_H263VideoCapability::e_h263Options);
-	}
-	
 	return TRUE;
 }
 
@@ -672,11 +673,6 @@ BOOL XM_H323_H263_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 	mode.m_advancedPrediction = FALSE;
 	mode.m_pbFrames = FALSE;
 	mode.m_errorCompensation = FALSE;
-	
-	if(isH263PlusCapability == TRUE)
-	{
-		mode.IncludeOptionalField(H245_H263VideoCapability::e_h263Options);
-	}
 	
 	return TRUE;
 }
@@ -805,13 +801,6 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	else
 	{
 		isH263PlusCapability = FALSE;
-	}
-	
-	// Since the RFC2190 packetizer currently is limited to mode A, we prevent the generation of
-	// too large GOBs by forcing a limit of 284 kbit/s on this stream.
-	if(isH263PlusCapability == FALSE && maxBitRate > 3840)
-	{
-		maxBitRate = 3840;
 	}
 	
 	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);

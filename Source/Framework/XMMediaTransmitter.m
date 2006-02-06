@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.16 2006/02/01 09:26:32 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.17 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,8 @@ typedef enum XMMediaTransmitterMessage
 	_XMMediaTransmitterMessage_StopGrabbing,
 	_XMMediaTransmitterMessage_StartTransmitting,
 	_XMMediaTransmitterMessage_StopTransmitting,
-	_XMMediaTransmitterMessage_UpdatePicture
+	_XMMediaTransmitterMessage_UpdatePicture,
+	_XMMediaTransmitterMessage_SetVideoBytesSent
 	
 } XMMediaTransmitterMessage;
 
@@ -57,12 +58,24 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleStartTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleStopTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleUpdatePictureMessage;
+- (void)_handleSetVideoBytesSentMessage:(NSArray *)messageComponents;
 
 - (void)_grabFrame:(NSTimer *)timer;
 
 - (void)_updateDeviceListAndSelectDummy;
 
-- (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame;
+- (void)_startCompressionSession;
+- (void)_stopCompressionSession;
+- (void)_compressionSessionCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp;
+
+- (void)_startCompressSequence;
+- (void)_stopCompressSequence;
+- (void)_compressSequenceCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp;
+
+- (OSStatus)_packetizeCompressedFrame:(UInt8 *)data 
+							   length:(UInt32)dataLength
+					 imageDescription:(ImageDescriptionHandle)imageDesc 
+							timeStamp:(UInt32)timeStamp;
 
 - (void)_adjustH261Data:(UInt8 *)h261Data;
 
@@ -175,6 +188,19 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_UpdatePicture withComponents:nil];
 }
 
++ (void)_setVideoBytesSent:(unsigned)videoBytesSent
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:videoBytesSent];
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
+	
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SetVideoBytesSent withComponents:components];
+	
+	[components release];
+}
+
 + (void)_sendMessage:(XMMediaTransmitterMessage)message withComponents:(NSArray *)components
 {
 	if(_XMMediaTransmitterSharedInstance == nil)
@@ -205,6 +231,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 {
 	self = [super init];
 	
+	receivePort = [[NSPort port] retain];
+	
 	XMSequenceGrabberVideoInputModule *seqGrabModule = [[XMSequenceGrabberVideoInputModule alloc] _init];
 	XMDummyVideoInputModule *dummyModule = [[XMDummyVideoInputModule alloc] _init];
 	
@@ -213,21 +241,39 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[seqGrabModule release];
 	[dummyModule release];
 	
-	receivePort = [[NSPort port] retain];
+	activeModule = nil;
+	selectedDevice = nil;
+	frameGrabTimer = nil;
 	
 	isGrabbing = NO;
-	isTransmitting = NO;
-	needsPictureUpdate = NO;
+	frameGrabRate = 30;
+	timeScale = 600;
+	timeOffset = 0;
+	lastTime = 1;
 	
-	frameGrabRate = 20;
+	isTransmitting = NO;
 	transmitFrameGrabRate = UINT_MAX;
 	videoSize = XMVideoSize_QCIF;
 	codecType = 0;
-	timeScale = 600;
+	codecSpecificCallFlags = 0;
+	bitrateToUse = 0;
+	
+	needsPictureUpdate = NO;
+	
+	useCompressionSessionAPI = NO;
+	compressor = NULL;
 	
 	compressionSession = NULL;
 	compressionFrameOptions = NULL;
-	compressor = NULL;
+	
+	compressSequenceIsActive = NO;
+	compressSequence = 0;
+	compressSequenceImageDescription = NULL;
+	compressSequenceCompressedFrame = NULL;
+	compressSequenceFrameCounter = 0;
+	compressSequenceLastVideoBytesSent = 0;
+	compressSequenceNonKeyFrameCounter = 0;
+	
 	mediaPacketizer = NULL;
 	
 	return self;
@@ -344,6 +390,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			break;
 		case _XMMediaTransmitterMessage_UpdatePicture:
 			[self _handleUpdatePictureMessage];
+			break;
+		case _XMMediaTransmitterMessage_SetVideoBytesSent:
+			[self _handleSetVideoBytesSentMessage:[portMessage components]];
 			break;
 		default:
 			// ignore it
@@ -527,9 +576,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	XMCodecIdentifier codecIdentifier;
 	XMVideoSize requiredVideoSize;
-	unsigned bitrate;
-	
-	OSType componentManufacturer;
 	
 	NSData *data = (NSData *)[components objectAtIndex:1];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -545,25 +591,28 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	data = (NSData *)[components objectAtIndex:4];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	bitrate = [number unsignedIntValue];
+	bitrateToUse = [number unsignedIntValue];
 	
 	data = (NSData *)[components objectAtIndex:5];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	flags = [number unsignedIntValue];
+	codecSpecificCallFlags = [number unsignedIntValue];
 	
 	switch(codecIdentifier)
 	{
 		case XMCodecIdentifier_H261:
 			codecType = kH261CodecType;
-			componentManufacturer = 'appl';
+			codecManufacturer = 'appl';
+			useCompressionSessionAPI = NO;
 			break;
 		case XMCodecIdentifier_H263:
 			codecType = kH263CodecType;
-			componentManufacturer = 'surf';
+			codecManufacturer = 'surf';
+			useCompressionSessionAPI = NO;
 			break;
 		case XMCodecIdentifier_H264:
 			codecType = kH264CodecType;
-			componentManufacturer = 'appl';
+			codecManufacturer = 'appl';
+			useCompressionSessionAPI = YES;
 			break;
 		default:
 			codecType = 0;
@@ -572,10 +621,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			return;
 	}
 	
-	NSSize frameDimensions = XMGetVideoFrameDimensions(requiredVideoSize);
-	
 	if(videoSize != requiredVideoSize)
 	{
+		NSSize frameDimensions = XMGetVideoFrameDimensions(requiredVideoSize);
+		
 		videoSize = requiredVideoSize;
 		
 		if(isGrabbing == YES)
@@ -593,199 +642,17 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	// start grabbing, just to be sure
 	[self _handleStartGrabbingMessage];
 	
-	ComponentResult err = noErr;
-	ICMEncodedFrameOutputRecord encodedFrameOutputRecord = {0};
-	ICMCompressionSessionOptionsRef sessionOptions = NULL;
-	
-	err = ICMCompressionSessionOptionsCreate(NULL, &sessionOptions);
-	if(err != noErr)
+	if(useCompressionSessionAPI == YES)
 	{
-		NSLog(@"ICMCompressionSessionOptionsCreate failed: %d", (int)err);
+		[self _startCompressionSession];
 	}
-	
-	err = ICMCompressionSessionOptionsSetAllowTemporalCompression(sessionOptions, true);
-	if(err != noErr)
+	else
 	{
-		NSLog(@"allowTemporalCompression failed: %d", (int)err);
-	}
-	
-	err = ICMCompressionSessionOptionsSetAllowFrameReordering(sessionOptions, false);
-	if(err != noErr)
-	{
-		NSLog(@"allow frame reordering failed: %d", (int)err);
-	}
-	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 20);
-	if(err != noErr)
-	{
-		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
-	}
-	
-	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, false);
-	if(err != noErr)
-	{
-		NSLog(@"setallowFrameTimeChanges failed: %d", (int)err);
-	}
-	
-	err = ICMCompressionSessionOptionsSetDurationsNeeded(sessionOptions, true);
-	if(err != noErr)
-	{
-		NSLog(@"SetDurationsNeeded failed: %d", (int)err);
-	}
-	
-	// averageDataRate is in bytes/s
-	SInt32 averageDataRate = bitrate / 8;
-	NSLog(@"limiting dataRate to %d", averageDataRate);
-	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
-												  kQTPropertyClass_ICMCompressionSessionOptions,
-												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
-												  sizeof(averageDataRate),
-												  &averageDataRate);
-	if(err != noErr)
-	{
-		NSLog(@"SetAverageDataRate failed: %d", (int)err);
-	}
-	
-	SInt32 maxFrameDelayCount = 0;
-	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
-												  kQTPropertyClass_ICMCompressionSessionOptions,
-												  kICMCompressionSessionOptionsPropertyID_MaxFrameDelayCount,
-												  sizeof(maxFrameDelayCount),
-												  &maxFrameDelayCount);
-	if(err != noErr)
-	{
-		NSLog(@"SetMaxFrameDelayCount failed: %d", (int)err);
-	}
-	
-	ComponentDescription componentDescription;
-	componentDescription.componentType = 'imco';
-	componentDescription.componentSubType = codecType;
-	componentDescription.componentManufacturer = componentManufacturer;
-	componentDescription.componentFlags = 0;
-	componentDescription.componentFlagsMask = 0;
-		
-	Component compressorComponent = FindNextComponent(0, &componentDescription);
-	if(compressorComponent == NULL)
-	{
-		NSLog(@"No such compressor");
-	}
-	
-	err = OpenAComponent(compressorComponent, &compressor);
-	if(err != noErr)
-	{
-		NSLog(@"Opening the component failed");
-	}
-	
-	if(codecIdentifier == XMCodecIdentifier_H264)
-	{
-		// Profile is currently fixed to Baseline
-		// The level is adjusted by the use of the
-		// bitrate, but the SPS returned reveals
-		// level 1.1 in case of QCIF and level 1.3
-		// in case of CIF
-		
-		Handle h264Settings = NewHandleClear(0);
-		
-		err = ImageCodecGetSettings(compressor, h264Settings);
-		if(err != noErr)
-		{
-			NSLog(@"ImageCodecGetSettings failed");
-		}
-		
-		// For some reason, the QTAtomContainer functions will crash if used on the atom
-		// container returned by ImageCodecGetSettings.
-		// Therefore, we have to parse the atoms self to set the correct settings.
-		unsigned i;
-		unsigned settingsSize = GetHandleSize(h264Settings) / 4;
-		UInt32 *data = (UInt32 *)*h264Settings;
-		for(i = 0; i < settingsSize; i++)
-		{
-			if(data[i] == FOUR_CHAR_CODE('sprf'))
-			{
-				// Forcing Baseline profile
-				i+=4;
-				data[i] = 1;
-			}
-			
-			// if video sent is CIF size, we set this flag to one to have the picture
-			// encoded in 5 slices instead of two.
-			// If QCIF is sent, this flag remains zero to send two slices instead of
-			// one.
-			else if(requiredVideoSize == XMVideoSize_CIF && data[i] == FOUR_CHAR_CODE('susg'))
-			{
-				i+=4;
-				data[i] = 1;
-			}
-		}
-		
-		err = ImageCodecSetSettings(compressor, h264Settings);
-		if(err != noErr)
-		{
-			NSLog(@"ImageCodecSetSettings failed");
-		}
-	}
-	else if(codecIdentifier == XMCodecIdentifier_H263)
-	{
-		Handle h263Settings = NewHandleClear(0);
-		
-		err = ImageCodecGetSettings(compressor, h263Settings);
-		if(err != noErr)
-		{
-			NSLog(@"ImageCodecGetSettings failed");
-		}
-		
-		unsigned i;
-		unsigned settingsSize = GetHandleSize(h263Settings) / 4;
-		UInt32 *data = (UInt32 *)*h263Settings;
-		for(i = 0; i < settingsSize; i++)
-		{
-			if(data[i] == FOUR_CHAR_CODE('iCyc'))
-			{
-				// enabling the IntraCycleMacroblock option
-				i+=4;
-				data[i] = 1;
-			}
-		}
-		err = ImageCodecSetSettings(compressor, h263Settings);
-		if(err != noErr)
-		{
-			NSLog(@"ImageCodecSetSettings failed");
-		}
-	}
-	
-	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
-												  kQTPropertyClass_ICMCompressionSessionOptions,
-												  kICMCompressionSessionOptionsPropertyID_CompressorComponent,
-												  sizeof(compressor),
-												  &compressor);
-	if(err != noErr)
-	{
-		NSLog(@"No such codec found");
-	}
-	
-	encodedFrameOutputRecord.encodedFrameOutputCallback = XMPacketizeCompressedFrameProc;
-	encodedFrameOutputRecord.encodedFrameOutputRefCon = (void *)self;
-	encodedFrameOutputRecord.frameDataAllocator = NULL;
-	
-	err = ICMCompressionSessionCreate(NULL, frameDimensions.width, frameDimensions.height, codecType,
-									  90000, sessionOptions, NULL, &encodedFrameOutputRecord,
-									  &compressionSession);
-	if(err != noErr)
-	{
-		NSLog(@"ICMCompressionSessionCreate failed: %d", (int)err);
-	}
-	
-	ICMCompressionSessionOptionsRelease(sessionOptions);
-	
-	err = ICMCompressionFrameOptionsCreate(NULL,
-										   compressionSession,
-										   &compressionFrameOptions);
-	if(err != noErr)
-	{
-		NSLog(@"ICMCompressionFrameOptionsCreate failed %d", (int)err);
+		[self _startCompressSequence];
 	}
 	
 	timeOffset = lastTime;
+	lastTime = 1;
 	
 	isTransmitting = YES;
 }
@@ -797,22 +664,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		return;
 	}
 	
-	if(compressionFrameOptions != NULL)
+	if(useCompressionSessionAPI == YES)
 	{
-		ICMCompressionFrameOptionsRelease(compressionFrameOptions);
-		compressionFrameOptions = NULL;
+		[self _stopCompressionSession];
 	}
-	
-	if(compressionSession != NULL)
+	else
 	{
-		ICMCompressionSessionRelease(compressionSession);
-		compressionSession = NULL;
-	}
-	
-	if(compressor != NULL)
-	{
-		CloseComponent(compressor);
-		compressor = NULL;
+		[self _stopCompressSequence];
 	}
 	
 	if(mediaPacketizer != NULL)
@@ -847,67 +705,75 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	needsPictureUpdate = YES;
 }
 
+- (void)_handleSetVideoBytesSentMessage:(NSArray *)components
+{
+	if(compressSequence != 0)
+	{
+		
+		NSData *data = (NSData *)[components objectAtIndex:0];
+		NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+		unsigned videoBytesSent = [number unsignedIntValue];
+		
+		long currentDataRate = (videoBytesSent - compressSequenceLastVideoBytesSent);
+		long dataRateWanted = (bitrateToUse / 8);
+		long overrun = currentDataRate - dataRateWanted;
+		
+		// avoid division by zero
+		if(compressSequenceFrameCounter == 0)
+		{
+			compressSequenceFrameCounter = 1;
+		}
+		
+		DataRateParams dataRateParams;
+		dataRateParams.dataRate = dataRateWanted;
+		dataRateParams.dataOverrun = overrun;
+		dataRateParams.frameDuration = 1000/compressSequenceFrameCounter;
+		dataRateParams.keyFrameRate = 0;
+		dataRateParams.minSpatialQuality = codecLowQuality;
+		dataRateParams.minTemporalQuality = codecLowQuality;
+		
+		OSStatus err = noErr;
+		err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
+		if(err != noErr)
+		{
+			NSLog(@"Setting data rate contraints failed %d", err);
+		}
+		
+		compressSequenceFrameCounter = 0;
+		compressSequenceLastVideoBytesSent = videoBytesSent;
+	}
+}
+
 #pragma mark XMVideoInputManager Methods
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
 {	
 	TimeValue convertedTime = (90000 / timeScale) * time;
 	TimeValue timeStamp = convertedTime - timeOffset;
+	
+	timeStamp -= (timeStamp % 3003);
+	
+	if(timeStamp <= lastTime && lastTime != 1)
+	{
+		timeStamp = lastTime + 3003;
+	}
+		
+	SInt32 timeStampDifference = (timeStamp - convertedTime);
+	if(timeStampDifference >= 3003)
+	{
+		return;
+	}
+	
 	lastTime = timeStamp;
 	
-	if(compressionSession != NULL)
+	if(useCompressionSessionAPI == YES)
 	{
-		OSErr err = noErr;
-		
-		err = ICMCompressionFrameOptionsSetForceKeyFrame(compressionFrameOptions,
-														 needsPictureUpdate);
-		if(err != noErr)
-		{
-			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
-		}
-		
-		if(needsPictureUpdate == YES)
-		{
-			NSLog(@"Forcing Keyframe");
-		}
-		
-		err = ICMCompressionSessionEncodeFrame(compressionSession, 
-											   frame,
-											   timeStamp, 
-											   0, 
-											   kICMValidTime_DisplayTimeStampIsValid,
-											   compressionFrameOptions, 
-											   NULL, 
-											   NULL);
-		if(err != noErr)
-		{
-			NSLog(@"ICMCompressionSessionEncodeFrame failed %d", (int)err);
-		}
-		
-		needsPictureUpdate = NO;
-		
-		Handle handle = NewHandleClear(0);
-		err = ImageCodecGetSettings(compressor, handle);
-		
-		UInt8 *data = (UInt8 *)*handle;
-		UInt32 size = GetHandleSize(handle);
-		UInt32 i;
-		
-		/*for(i = 0; i < size; i++)
-		{
-			printf("%x ", data[i]);
-		}
-		printf("\n");*/
+		[self _compressionSessionCompressFrame:frame timeStamp:timeStamp];
 	}
-/*	else
+	else
 	{
-		[XMMediaTransmitter _startTransmittingForSession:2
-											  withCodec:XMCodecIdentifier_H261
-											  videoSize:XMVideoSize_CIF
-									 maxFramesPerSecond:30
-											 maxBitrate:384000
-												  flags:0];
-	}*/
+		[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
+	}
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
@@ -948,7 +814,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	{
 		[frameGrabTimer invalidate];
 		[frameGrabTimer release];
-		
 		
 		frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
 														 selector:@selector(_grabFrame:) userInfo:nil
@@ -994,13 +859,458 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[activeModule openInputDevice:selectedDevice];
 }
 
-- (OSStatus)_packetizeCompressedFrame:(ICMEncodedFrameRef)encodedFrame
+- (void)_startCompressionSession
+{
+	ComponentResult err = noErr;
+	ICMEncodedFrameOutputRecord encodedFrameOutputRecord = {0};
+	ICMCompressionSessionOptionsRef sessionOptions = NULL;
+	
+	err = ICMCompressionSessionOptionsCreate(NULL, &sessionOptions);
+	if(err != noErr)
+	{
+		NSLog(@"ICMCompressionSessionOptionsCreate failed: %d", (int)err);
+	}
+	
+	err = ICMCompressionSessionOptionsSetAllowTemporalCompression(sessionOptions, true);
+	if(err != noErr)
+	{
+		NSLog(@"allowTemporalCompression failed: %d", (int)err);
+	}
+	
+	err = ICMCompressionSessionOptionsSetAllowFrameReordering(sessionOptions, false);
+	if(err != noErr)
+	{
+		NSLog(@"allow frame reordering failed: %d", (int)err);
+	}	
+	
+	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 120);
+	if(err != noErr)
+	{
+		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
+	}
+	
+	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, false);
+	if(err != noErr)
+	{
+		NSLog(@"setAllowFrameTimeChanges failed: %d", (int)err);
+	}
+	
+	err = ICMCompressionSessionOptionsSetDurationsNeeded(sessionOptions, true);
+	if(err != noErr)
+	{
+		NSLog(@"SetDurationsNeeded failed: %d", (int)err);
+	}
+	
+	// averageDataRate is in bytes/s
+	SInt32 averageDataRate = bitrateToUse / 8;
+	NSLog(@"limiting dataRate to %d", averageDataRate);
+	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+												  kQTPropertyClass_ICMCompressionSessionOptions,
+												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
+												  sizeof(averageDataRate),
+												  &averageDataRate);
+	if(err != noErr)
+	{
+		NSLog(@"SetAverageDataRate failed: %d", (int)err);
+	}
+	
+	SInt32 maxFrameDelayCount = 0;
+	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+												  kQTPropertyClass_ICMCompressionSessionOptions,
+												  kICMCompressionSessionOptionsPropertyID_MaxFrameDelayCount,
+												  sizeof(maxFrameDelayCount),
+												  &maxFrameDelayCount);
+	if(err != noErr)
+	{
+		NSLog(@"SetMaxFrameDelayCount failed: %d", (int)err);
+	}
+	
+	ComponentDescription componentDescription;
+	componentDescription.componentType = FOUR_CHAR_CODE('imco');
+	componentDescription.componentSubType = codecType;
+	componentDescription.componentManufacturer = codecManufacturer;
+	componentDescription.componentFlags = 0;
+	componentDescription.componentFlagsMask = 0;
+	
+	Component compressorComponent = FindNextComponent(0, &componentDescription);
+	if(compressorComponent == NULL)
+	{
+		NSLog(@"No such compressor");
+	}
+	
+	err = OpenAComponent(compressorComponent, &compressor);
+	if(err != noErr)
+	{
+		NSLog(@"Opening the component failed");
+	}
+	
+	if(codecType == FOUR_CHAR_CODE('avc1'))
+	{
+		// Profile is currently fixed to Baseline
+		// The level is adjusted by the use of the
+		// bitrate, but the SPS returned reveals
+		// level 1.1 in case of QCIF and level 1.3
+		// in case of CIF
+		
+		Handle h264Settings = NewHandleClear(0);
+		
+		err = ImageCodecGetSettings(compressor, h264Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecGetSettings failed");
+		}
+		
+		// For some reason, the QTAtomContainer functions will crash if used on the atom
+		// container returned by ImageCodecGetSettings.
+		// Therefore, we have to parse the atoms self to set the correct settings.
+		unsigned i;
+		unsigned settingsSize = GetHandleSize(h264Settings) / 4;
+		UInt32 *data = (UInt32 *)*h264Settings;
+		for(i = 0; i < settingsSize; i++)
+		{
+			if(data[i] == FOUR_CHAR_CODE('sprf'))
+			{
+				// Forcing Baseline profile
+				i+=4;
+				data[i] = 1;
+			}
+			
+			// if video sent is CIF size, we set this flag to one to have the picture
+			// encoded in 5 slices instead of two.
+			// If QCIF is sent, this flag remains zero to send two slices instead of
+			// one.
+			else if(videoSize == XMVideoSize_CIF && data[i] == FOUR_CHAR_CODE('susg'))
+			{
+				i+=4;
+				data[i] = 1;
+			}
+		}
+		
+		err = ImageCodecSetSettings(compressor, h264Settings);
+		if(err != noErr)
+		{
+			NSLog(@"ImageCodecSetSettings failed");
+		}
+	}
+	
+	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+												  kQTPropertyClass_ICMCompressionSessionOptions,
+												  kICMCompressionSessionOptionsPropertyID_CompressorComponent,
+												  sizeof(compressor),
+												  &compressor);
+	if(err != noErr)
+	{
+		NSLog(@"No such codec found");
+	}
+	
+	encodedFrameOutputRecord.encodedFrameOutputCallback = XMPacketizeCompressedFrameProc;
+	encodedFrameOutputRecord.encodedFrameOutputRefCon = (void *)self;
+	encodedFrameOutputRecord.frameDataAllocator = NULL;
+	
+	NSSize frameDimensions = XMGetVideoFrameDimensions(videoSize);
+	err = ICMCompressionSessionCreate(NULL, frameDimensions.width, frameDimensions.height, codecType,
+									  90000, sessionOptions, NULL, &encodedFrameOutputRecord,
+									  &compressionSession);
+	if(err != noErr)
+	{
+		NSLog(@"ICMCompressionSessionCreate failed: %d", (int)err);
+	}
+	
+	ICMCompressionSessionOptionsRelease(sessionOptions);
+	
+	err = ICMCompressionFrameOptionsCreate(NULL,
+										   compressionSession,
+										   &compressionFrameOptions);
+	if(err != noErr)
+	{
+		NSLog(@"ICMCompressionFrameOptionsCreate failed %d", (int)err);
+	}
+}
+
+- (void)_stopCompressionSession
+{
+	if(compressionFrameOptions != NULL)
+	{
+		ICMCompressionFrameOptionsRelease(compressionFrameOptions);
+		compressionFrameOptions = NULL;
+	}
+	
+	if(compressionSession != NULL)
+	{
+		ICMCompressionSessionRelease(compressionSession);
+		compressionSession = NULL;
+	}
+	
+	if(compressor != NULL)
+	{
+		CloseComponent(compressor);
+		compressor = NULL;
+	}
+}
+
+- (void)_compressionSessionCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp
+{
+	if(compressionSession != NULL)
+	{
+		OSErr err = noErr;
+		
+		err = ICMCompressionFrameOptionsSetForceKeyFrame(compressionFrameOptions,
+														 needsPictureUpdate);
+		if(err != noErr)
+		{
+			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
+		}
+		
+		if(needsPictureUpdate == YES)
+		{
+			NSLog(@"Forcing Keyframe");
+		}
+		
+		err = ICMCompressionSessionEncodeFrame(compressionSession, 
+											   frame,
+											   timeStamp, 
+											   0, 
+											   kICMValidTime_DisplayTimeStampIsValid,
+											   compressionFrameOptions, 
+											   NULL, 
+											   NULL);
+		if(err != noErr)
+		{
+			NSLog(@"ICMCompressionSessionEncodeFrame failed %d", (int)err);
+		}
+		
+		needsPictureUpdate = NO;
+	}
+}
+
+- (void)_startCompressSequence
+{
+	// Since the CompressSequence API needs a PixMap to be
+	// present when callling CompressSequenceBegin,
+	// we defer this task to _compressSequenceCompressFrame:timeStamp:
+	compressSequenceIsActive = YES;
+}
+
+- (void)_stopCompressSequence
+{
+	if(compressSequence != 0)
+	{
+		CDSequenceEnd(compressSequence);
+		compressSequence = 0;
+	}
+	
+	if(compressSequenceImageDescription != NULL)
+	{
+		DisposeHandle((Handle)compressSequenceImageDescription);
+		compressSequenceImageDescription = NULL;
+	}
+	
+	if(compressSequenceCompressedFrame != NULL)
+	{
+		DisposePtr(compressSequenceCompressedFrame);
+		compressSequenceCompressedFrame = NULL;
+	}
+	
+	if(compressor != NULL)
+	{
+		CloseComponent(compressor);
+		compressor = NULL;
+	}
+	
+	compressSequenceIsActive = NO;
+}
+
+- (void)_compressSequenceCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp
+{
+	if(compressSequenceIsActive == YES)
+	{
+		ComponentResult err = noErr;
+		
+		PixMap pixMap;
+		
+		CVPixelBufferLockBaseAddress(frame, 0);
+		
+		pixMap.baseAddr = CVPixelBufferGetBaseAddress(frame);
+		pixMap.rowBytes = 0x8000;
+		pixMap.rowBytes |= (CVPixelBufferGetBytesPerRow(frame) & 0x3fff);
+		pixMap.bounds.top = 0;
+		pixMap.bounds.left = 0;
+		pixMap.bounds.bottom = CVPixelBufferGetHeight(frame);
+		pixMap.bounds.right = CVPixelBufferGetWidth(frame);
+		pixMap.pmVersion = 0;
+		pixMap.packType = 0;
+		pixMap.packSize = 0;
+		pixMap.hRes = Long2Fix(72);
+		pixMap.vRes = Long2Fix(72);
+		pixMap.pixelType = 16;
+		pixMap.pixelSize = 32;
+		pixMap.cmpCount = 4;
+		pixMap.cmpSize = 8;
+		pixMap.pixelFormat = CVPixelBufferGetPixelFormatType(frame);
+		pixMap.pmTable = NULL;
+		pixMap.pmExt = NULL;
+		
+		PixMapPtr pixMapPtr = &pixMap;
+		
+		if(compressSequence == 0)
+		{
+			ComponentDescription componentDescription;
+			componentDescription.componentType = FOUR_CHAR_CODE('imco');
+			componentDescription.componentSubType = codecType;
+			componentDescription.componentManufacturer = codecManufacturer;
+			componentDescription.componentFlags = 0;
+			componentDescription.componentFlagsMask = 0;
+			
+			Component compressorComponent = FindNextComponent(0, &componentDescription);
+			if(compressorComponent == NULL)
+			{
+				NSLog(@"No such compressor");
+			}
+			
+			err = OpenAComponent(compressorComponent, &compressor);
+			if(err != noErr)
+			{
+				NSLog(@"Opening the component failed");
+			}
+			
+			compressSequenceImageDescription = (ImageDescriptionHandle)NewHandleClear(0);
+			
+			err = CompressSequenceBegin(&compressSequence,
+										&pixMapPtr,
+										NULL,
+										&(pixMap.bounds),
+										&(pixMap.bounds),
+										32,
+										codecType,
+										(CompressorComponent)compressor,
+										codecNormalQuality,
+										codecNormalQuality,
+										0,
+										NULL,
+										codecFlagUpdatePreviousComp,
+										compressSequenceImageDescription);
+			if(err != noErr)
+			{
+				NSLog(@"CompressSequenceBegin failed: %d", err);
+			}
+			
+			err = SetCSequencePreferredPacketSize(compressSequence, 1420);
+			if(err != noErr)
+			{
+				NSLog(@"Setting packet size failed %d", err);
+			}
+			
+			long maxCompressionSize;
+			err = GetMaxCompressionSize(&pixMapPtr,
+										&(pixMap.bounds),
+										0,
+										codecNormalQuality,
+										codecType,
+										(CompressorComponent)compressor,
+										&maxCompressionSize);
+			
+			if(err != noErr)
+			{
+				NSLog(@"GetMaxCompressionSize failed: %d", err);
+			}
+			
+			compressSequenceCompressedFrame = QTSNewPtr(maxCompressionSize,
+														kQTSMemAllocHoldMemory,
+														NULL);
+			
+			compressSequencePreviousTimeStamp = 0;
+			compressSequenceFrameNumber = 0;
+			
+			NSLog(@"limiting bitrate to %d", bitrateToUse);
+			DataRateParams dataRateParams;
+			dataRateParams.dataRate = (bitrateToUse / 8);
+			dataRateParams.dataOverrun = 0;
+			dataRateParams.frameDuration = 34;
+			dataRateParams.keyFrameRate = 0;
+			dataRateParams.minSpatialQuality = codecLowQuality;
+			dataRateParams.minTemporalQuality = codecLowQuality;
+			err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
+			if(err != noErr)
+			{
+				NSLog(@"Setting data rate contratints failed %d", err);
+			}
+			
+			compressSequenceFrameCounter = 0;
+			compressSequenceLastVideoBytesSent = 0;
+			compressSequenceNonKeyFrameCounter = 0;
+		}
+		
+		// rounding timeStamp to the next lower integer multiple of 3003
+		timeStamp -= (timeStamp % 3003);
+		
+		UInt32 numberOfFramesInBetween = 1;
+		if(compressSequencePreviousTimeStamp != 0)
+		{
+			numberOfFramesInBetween = (timeStamp - compressSequencePreviousTimeStamp) / 3003;
+			compressSequenceFrameNumber += numberOfFramesInBetween;
+		}
+		
+		err = SetCSequenceFrameNumber(compressSequence,
+									  compressSequenceFrameNumber);
+		if(err != noErr)
+		{
+			NSLog(@"SetFrameNumber failed %d", err);
+		}
+		
+		compressSequencePreviousTimeStamp = timeStamp;
+		
+		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
+		
+		if(compressSequenceNonKeyFrameCounter == 120)
+		{
+			needsPictureUpdate = YES;
+		}
+		
+		if(needsPictureUpdate == YES)
+		{
+			NSLog(@"Forcing Keyframe");
+			compressionFlags |= codecFlagForceKeyFrame;
+			compressSequenceNonKeyFrameCounter = 0;
+		}
+		else
+		{
+			compressSequenceNonKeyFrameCounter++;
+		}
+		
+		long dataLength;
+		err = CompressSequenceFrame(compressSequence,
+									&pixMapPtr,
+									&(pixMap.bounds),
+									compressionFlags,
+									compressSequenceCompressedFrame,
+									&dataLength,
+									NULL,
+									NULL);
+		if(err != noErr)
+		{
+			NSLog(@"CompressSequenceFrame failed: %d", err);
+			return;
+		}
+		
+		UInt8 *compressedData = (UInt8 *)compressSequenceCompressedFrame;
+		
+		[self _packetizeCompressedFrame:compressedData
+								 length:dataLength
+					   imageDescription:compressSequenceImageDescription
+							  timeStamp:timeStamp];
+		
+		compressSequenceFrameCounter += 1;
+		
+		needsPictureUpdate = NO;
+	}
+}
+
+- (OSStatus)_packetizeCompressedFrame:(UInt8 *)data 
+							   length:(UInt32)dataLength
+					 imageDescription:(ImageDescriptionHandle)imageDesc 
+							timeStamp:(UInt32)timeStamp
 {	
 	OSErr err = noErr;
-
-	ImageDescriptionHandle imageDesc;
-	
-	err = ICMEncodedFrameGetImageDescription(encodedFrame, &imageDesc);
 	
 	sampleData.flags = 0;
 	
@@ -1014,7 +1324,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 				packetizerToUse = kRTP261MediaPacketizerType;
 				break;
 			case kH263CodecType:
-				if(flags >= kRTPPayload_FirstDynamic)
+				if(codecSpecificCallFlags >= kRTPPayload_FirstDynamic)
 				{
 					packetizerToUse = kRTP263PlusMediaPacketizerType;
 				}
@@ -1060,7 +1370,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		SInt32 packetizerFlags = kRTPMPRealtimeModeFlag;
 		if(codecType == kH264CodecType)
 		{
-			unsigned packetizationMode = (flags >> 8) & 0xf;
+			unsigned packetizationMode = (codecSpecificCallFlags >> 8) & 0xf;
 			if(packetizationMode == 2)
 			{
 				packetizerFlags |= 2;
@@ -1122,6 +1432,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(codecType == kH264CodecType)
 		{
+			// The very first frame should include SPS / PPS atoms
 			sampleData.flags = 1;
 		}
 	}
@@ -1131,26 +1442,16 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		sampleData.flags = 1;
 	}
 	
-	sampleData.timeStamp = ICMEncodedFrameGetDecodeTimeStamp(encodedFrame);
+	sampleData.timeStamp = timeStamp;
 	sampleData.sampleDescription = (Handle)imageDesc;
-	sampleData.dataLength = ICMEncodedFrameGetDataSize(encodedFrame);
-	
-	UInt8 *data = ICMEncodedFrameGetDataPtr(encodedFrame);
+	sampleData.dataLength = dataLength;
 	
 	if(codecType == kH261CodecType)
 	{
 		[self _adjustH261Data:data];
 	}
 	
-	sampleData.data = data;
-	
-	printf("***** %d\n", sampleData.dataLength);
-	unsigned i;
-	for(i = 0; i < 8; i++)
-	{
-		printf("%x ", sampleData.data[i]);
-	}
-	printf("\n");
+	sampleData.data = (const UInt8 *)data;
 	
 	SInt32 outFlags;
 	err = RTPMPSetSampleData(mediaPacketizer, &sampleData, &outFlags);
@@ -1235,7 +1536,17 @@ OSStatus XMPacketizeCompressedFrameProc(void*						encodedFrameOutputRefCon,
 	if(err == noErr)
 	{
 		XMMediaTransmitter *mediaTransmitter = (XMMediaTransmitter *)encodedFrameOutputRefCon;
-		err = [mediaTransmitter _packetizeCompressedFrame:encodedFrame];
+		UInt8 *data = ICMEncodedFrameGetDataPtr(encodedFrame);
+		UInt32 dataLength = ICMEncodedFrameGetDataSize(encodedFrame);
+		UInt32 timeStamp = ICMEncodedFrameGetDecodeTimeStamp(encodedFrame);
+		ImageDescriptionHandle imageDesc;
+		
+		err = ICMEncodedFrameGetImageDescription(encodedFrame, &imageDesc);
+		if(err != noErr)
+		{
+			NSLog(@"ICMEncodedFrameGetImageDescription failed: %d", err);
+		}
+		err = [mediaTransmitter _packetizeCompressedFrame:data length:dataLength imageDescription:imageDesc timeStamp:timeStamp];
 	}
 	
 	return err;

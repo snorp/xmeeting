@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.7 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.8 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 
 #include "XMMediaFormats.h"
 #include "XMTransmitterMediaPatch.h"
+#include "XMH323Channel.h"
 
 XMH323Connection::XMH323Connection(OpalCall & call,
 								   H323EndPoint & endPoint,
@@ -66,6 +67,7 @@ BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCa
 {
 	BOOL result = H323Connection::OnReceivedCapabilitySet(remoteCaps, muxCap, reject);
 	
+	XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::H263);
 	XMTransmitterMediaPatch::SetH264PacketizationMode(XM_H264_PACKETIZATION_MODE_SINGLE_NAL);
 	
 	if(result == TRUE && muxCap != NULL && muxCap->GetTag() == H245_MultiplexCapability::e_h2250Capability)
@@ -89,7 +91,15 @@ BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCa
 					if(objectId == "0.0.8.241.0.0.0.1")
 					{
 						XMTransmitterMediaPatch::SetH264PacketizationMode(XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED);
-						break;
+					}
+				}
+				else if(payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_rfc_number)
+				{
+					const PASN_Integer & rfcNumber = payloadDescriptor;
+					
+					if(rfcNumber == 2429)
+					{
+						XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::DynamicBase);
 					}
 				}
 			}
@@ -172,25 +182,17 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 	{
 		XM_H323_H263_Capability & h263Capability = (XM_H323_H263_Capability &)capability;
 		isValidCapability = h263Capability.IsValidCapabilityForSending();
-		RTP_DataFrame::PayloadTypes payloadType;
-		if(isValidCapability == TRUE)
+
+		if(isValidCapability == TRUE && h263Capability.IsH263PlusCapability())
 		{
-			if(h263Capability.IsH263PlusCapability())
-			{
-				payloadType = RTP_DataFrame::DynamicBase;
-			}
-			else
-			{
-				payloadType = RTP_DataFrame::H263;
-			}
-			XMTransmitterMediaPatch::SetH263PayloadType(payloadType);
+			XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::DynamicBase);
 		}
 	}
 	else if(PIsDescendant(&capability, XM_H323_H264_Capability))
 	{
 		XM_H323_H264_Capability & h264Capability = (XM_H323_H264_Capability &)capability;
 		isValidCapability = h264Capability.IsValidCapabilityForSending();
-		if(isValidCapability == TRUE )//&& XMTransmitterMediaPatch::GetH264PacketizationMode() == XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED)
+		if(isValidCapability == TRUE )
 		{
 			XMTransmitterMediaPatch::SetH264Parameters(h264Capability.GetProfile(), h264Capability.GetLevel());
 		}
@@ -213,6 +215,47 @@ H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability
 															const H245_H2250LogicalChannelParameters * param,
 															RTP_QOS * rtpqos)
 {
+	if(PIsDescendant(&capability, XMH323VideoCapability))
+	{
+		RTP_Session * session;
+		
+		if (param != NULL) 
+		{
+			// We only support unicast IP at this time.
+			if (param->m_mediaControlChannel.GetTag() != H245_TransportAddress::e_unicastAddress)
+			{
+				return NULL;
+			}
+			
+			const H245_UnicastAddress & uaddr = param->m_mediaControlChannel;
+			if (uaddr.GetTag() != H245_UnicastAddress::e_iPAddress)
+			{
+				return NULL;
+			}
+			
+			sessionID = param->m_sessionID;
+		}
+		
+		session = UseSession(GetControlChannel(), sessionID, rtpqos);
+		if (session == NULL)
+		{
+			return NULL;
+		}
+		
+		((RTP_UDP *) session)->Reopen(dir == H323Channel::IsReceiver);
+		
+		XMH323Channel *theChannel = new XMH323Channel(*this, capability, dir, *session);
+		
+		if(PIsDescendant(&capability, XM_H323_H263_Capability))
+		{
+			if(XMTransmitterMediaPatch::GetH263PayloadType() == RTP_DataFrame::DynamicBase)
+			{
+				theChannel->SetDynamicRTPPayloadType(RTP_DataFrame::DynamicBase);
+			}
+		}
+		
+		return theChannel;
+	}
 	
 	H323Channel *channel = H323Connection::CreateRealTimeLogicalChannel(capability,
 																		dir,
@@ -223,16 +266,6 @@ H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability
 	{
 		H323_RealTimeChannel *realTimeChannel = (H323_RealTimeChannel *)channel;
 		realTimeChannel->SetDynamicRTPPayloadType(RTP_DataFrame::DynamicBase);
-	}
-	if(PIsDescendant(&capability, XM_H323_H263_Capability))
-	{
-		XM_H323_H263_Capability & h263Capability = (XM_H323_H263_Capability &)capability;
-		
-		if(h263Capability.IsH263PlusCapability())
-		{
-			H323_RealTimeChannel *realTimeChannel = (H323_RealTimeChannel *)channel;
-			realTimeChannel->SetDynamicRTPPayloadType(RTP_DataFrame::DynamicBase);
-		}
 	}
 	
 	return channel;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.4 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.5 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,7 +25,6 @@
 	NSTimer *gatekeeperRegistrationCheckTimer;
 	
 	NSTimer *callStatisticsUpdateIntervalTimer;
-	NSTimeInterval callStatisticsUpdateInterval;
 	
 }
 
@@ -50,7 +49,6 @@
 + (void)_callEstablished:(unsigned)callID incoming:(BOOL)isIncomingCall;
 + (void)_clearCall:(unsigned)callID;
 + (void)_callCleared:(unsigned)callID reason:(XMCallEndReason)callEndReason;
-+ (void)_setCallStatisticsUpdateInterval:(NSTimeInterval)interval;
 
 + (void)_audioStreamOpened:(unsigned)callID 
 					 codec:(NSString *)codec

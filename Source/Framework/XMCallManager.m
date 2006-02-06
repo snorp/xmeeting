@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.7 2005/11/23 22:25:30 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.8 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -373,18 +373,6 @@
 }
 
 #pragma mark InCall Methods
-
-- (NSTimeInterval)callStatisticsUpdateInterval
-{
-	return callStatisticsUpdateInterval;
-}
-
-- (void)setCallStatisticsUpdateInterval:(NSTimeInterval)interval
-{
-	callStatisticsUpdateInterval = interval;
-	
-	[XMOpalDispatcher _setCallStatisticsUpdateInterval:callStatisticsUpdateInterval];
-}
 
 #pragma mark Private & Framework Methods
 

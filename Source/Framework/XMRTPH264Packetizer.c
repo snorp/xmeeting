@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH264Packetizer.c,v 1.3 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMRTPH264Packetizer.c,v 1.4 2006/02/06 19:38:07 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,8 +37,6 @@ typedef struct
 #include <CoreServices/Components.k.h>
 #include <QuickTime/QTStreamingComponents.k.h>
 #include <QuickTime/ComponentDispatchHelper.c>
-
-#define XM_MAX_PACKET_LENGTH_HARD_LIMIT 3000
 
 #pragma mark Standard Component Calls
 
@@ -175,6 +173,7 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 												  const RTPMPSampleDataParams *sampleData,
 												  SInt32 *outFlags)
 {	
+	//printf("*******\n");
 	UInt32 maxPacketLength = globals->maxPacketSize;
 	const UInt8 *data = sampleData->data;
 	UInt32 dataLength = sampleData->dataLength;
@@ -236,11 +235,14 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		index += 4;
 		UInt32 nalLength = ntohl(lengthPtr[0]);
 		
+		//printf("NAL %d\n", nalLength);
+		
 		// If the NAL does not fit within one single packet,
 		// we have to use FU-A packets, which are only available
 		// in the non-interleaved mode
 		if(nalLength > maxPacketLength && globals->useNonInterleavedMode == true)
 		{
+			printf("Sending FU-A\n");
 			// Send some FU-A packets
 			UInt8 nri = (data[index] >> 5) & 0x03;
 			UInt8 type = data[index] & 0x1f;
@@ -316,18 +318,40 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 							   0);
 			}
 		}
-		else if(nalLength > XM_MAX_PACKET_LENGTH_HARD_LIMIT)
+		else if(nalLength > maxPacketLength)
 		{
+			// Generating a packet of zero length indicates to the subsystem
+			// to drop this packet and increment the RTP Sequence Number by
+			// one
 			printf("Impossible to send too big NAL unit: %d\n", nalLength);
+			RTPPacketRef packetRef;
+			RTPPBBeginPacket(packetBuilder,
+							 0,
+							 packetGroupRef,
+							 0,
+							 &packetRef);
+			
+			UInt8 empty[2];
+			empty[0] = 0;
+			empty[1] = 0;
+			RTPPBAddPacketLiteralData(packetBuilder,
+									  0,
+									  packetGroupRef,
+									  packetRef,
+									  empty,
+									  2,
+									  NULL);
+			
+			RTPPBEndPacket(packetBuilder,
+						   0,
+						   packetGroupRef,
+						   packetRef,
+						   0,
+						   0);
 			index += nalLength;
 		}
 		else
 		{
-			// Single NAL mode
-			if(nalLength > maxPacketLength)
-			{
-				printf("sending TOO big NAL %d\n", nalLength);
-			}
 			RTPPacketRef packetRef;
 			RTPPBBeginPacket(packetBuilder,
 							 0,
