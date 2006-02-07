@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.5 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.6 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,10 +65,6 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return device;
 }
 
-- (void)refreshDeviceList
-{
-}
-
 - (BOOL)openInputDevice:(NSString *)device
 {
 	[inputManager setTimeScale:600];
@@ -99,9 +95,11 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return YES;
 }
 
-- (void)setFrameGrabRate:(unsigned)theFrameGrabRate
+- (BOOL)setFrameGrabRate:(unsigned)theFrameGrabRate
 {
 	frameGrabRate = theFrameGrabRate;
+	
+	return YES;
 }
 
 - (BOOL)grabFrame
@@ -152,6 +150,40 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 }
 
 - (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device
+{
+	return nil;
+}
+
+- (BOOL)hasSettings
+{
+	return NO;
+}
+
+- (BOOL)requiresSettingsDialogWhenDeviceOpens
+{
+	return NO;
+}
+
+- (NSData *)getInternalSettings
+{
+	return nil;
+}
+
+- (void)applyInternalSettings:(NSData *)settings
+{
+}
+
+- (NSDictionary *)getSettings
+{
+	return nil;
+}
+
+- (BOOL)setSettings:(NSDictionary *)settings
+{
+	return NO;
+}
+
+- (NSView *)settingsViewForDevice:(NSString *)device
 {
 	return nil;
 }

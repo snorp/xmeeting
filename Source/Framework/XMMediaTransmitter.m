@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.17 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.18 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #import "XMRTPH264Packetizer.h"
 
 #import "XMSequenceGrabberVideoInputModule.h"
+#import "XMScreenVideoInputModule.h"
 #import "XMDummyVideoInputModule.h"
 
 #import "XMCallbackBridge.h"
@@ -44,6 +45,7 @@ typedef enum XMMediaTransmitterMessage
 + (void)_sendMessage:(XMMediaTransmitterMessage)message withComponents:(NSArray *)components;
 
 - (NSPort *)_receivePort;
+- (void)_sendDeviceList;
 - (void)_handleMediaTransmitterThreadDidExit;
 
 - (void)_runMediaTransmitThread;
@@ -81,6 +83,24 @@ typedef enum XMMediaTransmitterMessage
 
 @end
 
+@interface XMVideoInputModuleWrapper : NSObject <XMVideoModule> {
+
+	id<XMVideoInputModule> videoInputModule;
+	NSArray *devices;
+	BOOL isEnabled;
+}
+
+- (id)_initWithVideoInputModule:(id<XMVideoInputModule>)videoInputModule;
+
+- (id<XMVideoInputModule>)_videoInputModule;
+
+- (NSArray *)_devices;
+- (void)_setDevices:(NSArray *)devices;
+
+- (NSView *)_settingsViewForDevice:(NSString *)device;
+
+@end
+
 OSStatus XMPacketizeCompressedFrameProc(void*						encodedFrameOutputRefCon, 
 										ICMCompressionSessionRef	session, 
 										OSStatus					err,
@@ -99,10 +119,15 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_GetDeviceList withComponents:nil];
 }
 
-+ (void)_setDevice:(NSString *)device
++ (void)_selectModule:(unsigned)moduleIndex device:(NSString *)device
 {
-	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:device];
-	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:moduleIndex];
+	NSData *moduleData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSData *deviceData = [NSKeyedArchiver archivedDataWithRootObject:device];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:moduleData, deviceData, nil];
 	
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SetDevice withComponents:components];
 	
@@ -234,15 +259,26 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	receivePort = [[NSPort port] retain];
 	
 	XMSequenceGrabberVideoInputModule *seqGrabModule = [[XMSequenceGrabberVideoInputModule alloc] _init];
+	XMScreenVideoInputModule *screenModule = [[XMScreenVideoInputModule alloc] _init];
 	XMDummyVideoInputModule *dummyModule = [[XMDummyVideoInputModule alloc] _init];
 	
-	videoInputModules = [[NSArray alloc] initWithObjects:seqGrabModule, dummyModule, nil];
+	XMVideoInputModuleWrapper *seqGrabWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:seqGrabModule];
+	XMVideoInputModuleWrapper *screenWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:screenModule];
+	XMVideoInputModuleWrapper *dummyWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:dummyModule];
+		
+	videoInputModules = [[NSArray alloc] initWithObjects:seqGrabWrapper, screenWrapper, dummyWrapper, nil];
 	
 	[seqGrabModule release];
+	[screenModule release];
 	[dummyModule release];
+	
+	[seqGrabWrapper release];
+	[screenWrapper release];
+	[dummyWrapper release];
 	
 	activeModule = nil;
 	selectedDevice = nil;
+	
 	frameGrabTimer = nil;
 	
 	isGrabbing = NO;
@@ -300,6 +336,58 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	return receivePort;
 }
 
+- (void)_setDevice:(NSString *)deviceToSelect
+{
+	unsigned count = [videoInputModules count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		
+		NSArray *inputDevices = [moduleWrapper _devices];
+		
+		unsigned inputDeviceCount = [inputDevices count];
+		unsigned j;
+		
+		for(j = 0; j < inputDeviceCount; j++)
+		{
+			NSString *device = (NSString *)[inputDevices objectAtIndex:j];
+			if([device isEqualToString:deviceToSelect])
+			{
+				[XMMediaTransmitter _selectModule:i device:device];
+				return;
+			}
+		}
+	}
+	
+	// If the desired device isn't found, we select the dummy device
+	[XMMediaTransmitter _selectModule:(count-1) device:0];
+}
+
+- (void)_sendDeviceList
+{
+	unsigned i;
+	unsigned count = [videoInputModules count];
+	
+	NSMutableArray *devices = [[NSMutableArray alloc] initWithCapacity:5];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		
+		if([moduleWrapper isEnabled] == YES)
+		{
+			NSArray *inputDevices = [moduleWrapper _devices];
+			[devices addObjectsFromArray:inputDevices];
+		}
+	}
+	
+	[_XMVideoManagerSharedInstance _handleDeviceList:devices];
+	
+	[devices release];
+}
+
 - (void)_handleMediaTransmitterThreadDidExit
 {
 	_XMThreadExit();
@@ -318,18 +406,18 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[[NSRunLoop currentRunLoop] addPort:receivePort forMode:NSDefaultRunLoopMode];
 	
 	// initializing all modules
-	NSMutableArray *devices = [[NSMutableArray alloc] initWithCapacity:5];
 	BOOL activeModuleSet = NO;
 	unsigned count = [videoInputModules count];
 	unsigned i;
 	for(i = 0; i < count; i++)
 	{
-		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 		
 		[module setupWithInputManager:self];
 		NSArray *inputDevices = [module inputDevices];
 		
-		[devices addObjectsFromArray:inputDevices];
+		[moduleWrapper performSelectorOnMainThread:@selector(_setDevices:) withObject:inputDevices waitUntilDone:NO];
 		
 		if(activeModuleSet == NO)
 		{
@@ -342,12 +430,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 				activeModuleSet = YES;
 			}
 		}
-		
 	}
-	
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												 waitUntilDone:NO];
-	[devices release];
+
+	[self performSelectorOnMainThread:@selector(_sendDeviceList) withObject:nil waitUntilDone:NO];
 	
 	// running the run loop
 	[[NSRunLoop currentRunLoop] run];
@@ -410,7 +495,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	for(i = 0; i < count; i++)
 	{
-		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 		[module close];
 	}
 	
@@ -431,82 +517,65 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	unsigned count = [videoInputModules count];
 	unsigned i;
 	
-	NSMutableArray *devices = [[NSMutableArray alloc] initWithCapacity:5];
-	
 	for(i = 0; i < count; i++)
 	{
-		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 		
-		[module refreshDeviceList];
-		[devices addObjectsFromArray:[module inputDevices]];
+		NSArray *devices = [module inputDevices];
+		[moduleWrapper performSelectorOnMainThread:@selector(_setDevices:) withObject:devices waitUntilDone:NO];
 	}
 	
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												 waitUntilDone:NO];
-	[devices release];
+	[self performSelectorOnMainThread:@selector(_sendDeviceList) withObject:nil waitUntilDone:NO];
 }
 
 - (void)_handleSetDeviceMessage:(NSArray *)messageComponents
 {
 	NSData *data = [messageComponents objectAtIndex:0];
-	NSString *deviceToSelect = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	unsigned moduleIndex = [number unsignedIntValue];
+	
+	data = [messageComponents objectAtIndex:1];
+	NSString *device = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	
+	XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:moduleIndex];
+	id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 	
 	[selectedDevice release];
 	selectedDevice = nil;
 	
-	unsigned moduleCount = [videoInputModules count];
-	unsigned i;
+	BOOL didSucceed = YES;
 	
-	for(i = 0; i < moduleCount; i++)
+	if(isGrabbing == YES)
 	{
-		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
+		[activeModule closeInputDevice];
 		
-		NSArray *inputDevices = [module inputDevices];
-		
-		unsigned inputDeviceCount = [inputDevices count];
-		unsigned j;
-		
-		for(j = 0; j < inputDeviceCount; j++)
+		if(module != activeModule)
 		{
-			NSString *device = (NSString *)[inputDevices objectAtIndex:j];
-			if([device isEqualToString:deviceToSelect])
-			{
-				BOOL didSucceed = YES;
-				
-				if(isGrabbing == YES)
-				{
-					[activeModule closeInputDevice];
-					
-					if(module != activeModule)
-					{
-						[module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
-						[module setFrameGrabRate:frameGrabRate];
-					}
-					
-					didSucceed = [module openInputDevice:deviceToSelect];
-				}
-				
-				if(didSucceed == YES)
-				{
-					activeModule = module;
-					selectedDevice = [deviceToSelect retain];
-					
-					[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
-																	withObject:selectedDevice waitUntilDone:NO];
-					return;
-				}
-				else
-				{
-					activeModule = nil;
-				}
-			}
+			[module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+			[module setFrameGrabRate:frameGrabRate];
 		}
+		
+		didSucceed = [module openInputDevice:device];
 	}
 	
-	// either the desired device didn't exist or the module failed to open the device.
-	// We now 1) refresh the device list and 2) select the last module's only device
-	// which happens to be the dummy module/device
-	[self _updateDeviceListAndSelectDummy];
+	if(didSucceed == YES)
+	{
+		activeModule = module;
+		selectedDevice = [device retain];
+		
+		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
+														withObject:selectedDevice waitUntilDone:NO];
+	}
+	else
+	{
+		activeModule = nil;
+	
+		//The device could not be opened.
+		// We now 1) refresh the device list and 2) select the last module's only device
+		// which happens to be the dummy module/device
+		[self _updateDeviceListAndSelectDummy];
+	}
 }
 
 - (void)_handleSetFrameGrabRateMessage:(NSArray *)messageComponents
@@ -527,7 +596,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	[activeModule setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
 	[activeModule setFrameGrabRate:frameGrabRate];
-	BOOL result = [activeModule openInputDevice:[[activeModule inputDevices] objectAtIndex:0]];
+	BOOL result = [activeModule openInputDevice:selectedDevice];
 	
 	if(result == NO)
 	{
@@ -748,31 +817,34 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
 {	
-	TimeValue convertedTime = (90000 / timeScale) * time;
-	TimeValue timeStamp = convertedTime - timeOffset;
-	
-	timeStamp -= (timeStamp % 3003);
-	
-	if(timeStamp <= lastTime && lastTime != 1)
+	if(isTransmitting == YES)
 	{
-		timeStamp = lastTime + 3003;
-	}
+		TimeValue convertedTime = (90000 / timeScale) * time;
+		TimeValue timeStamp = convertedTime - timeOffset;
+	
+		timeStamp -= (timeStamp % 3003);
+	
+		if(timeStamp <= lastTime && lastTime != 1)
+		{
+			timeStamp = lastTime + 3003;
+		}
+	
+		lastTime = timeStamp;
 		
-	SInt32 timeStampDifference = (timeStamp - convertedTime);
-	if(timeStampDifference >= 3003)
-	{
-		return;
-	}
+		SInt32 timeStampDifference = (timeStamp - convertedTime);
+		if(timeStampDifference >= 3003)
+		{
+			return;
+		}
 	
-	lastTime = timeStamp;
-	
-	if(useCompressionSessionAPI == YES)
-	{
-		[self _compressionSessionCompressFrame:frame timeStamp:timeStamp];
-	}
-	else
-	{
-		[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
+		if(useCompressionSessionAPI == YES)
+		{
+			[self _compressionSessionCompressFrame:frame timeStamp:timeStamp];
+		}	
+		else
+		{
+			[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
+		}
 	}
 	
 	// handling the frame to the video manager to draw the preview image
@@ -837,24 +909,18 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		[activeModule closeInputDevice];
 	}
 	
-	NSMutableArray *devices = [[NSMutableArray alloc] initWithCapacity:3];
-	unsigned moduleCount = [videoInputModules count];
-	unsigned i;
-	for(i = 0; i < moduleCount; i++)
-	{
-		id<XMVideoInputModule> module = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:i];
-		[module refreshDeviceList];
-		[devices addObjectsFromArray:[module inputDevices]];
-	}
+	unsigned count = [videoInputModules count];
 	
-	activeModule = (id<XMVideoInputModule>)[videoInputModules objectAtIndex:(moduleCount-1)];
+	XMVideoInputModuleWrapper *dummyModuleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:(count-1)];
+	activeModule = [dummyModuleWrapper _videoInputModule];
+	
 	selectedDevice = (NSString *)[[[activeModule inputDevices] objectAtIndex:0] retain];
 	
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
 													withObject:selectedDevice waitUntilDone:NO];
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleDeviceList:) withObject:devices
-												 waitUntilDone:NO];
-	[devices release];
+	
+	// updating the device list
+	[self _handleGetDeviceListMessage];
 	
 	[activeModule openInputDevice:selectedDevice];
 }
@@ -1521,6 +1587,112 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	h261Data[dataIndex] |= mask;
 	scanBit(dataIndex, mask);
 	h261Data[dataIndex] |= mask;
+}
+
+@end
+
+@implementation XMVideoInputModuleWrapper
+
+#pragma mark Init & Deallocation Methods
+
+- (id)init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	[self release];
+	return nil;
+}
+
+- (id)_initWithVideoInputModule:(id<XMVideoInputModule>)theVideoInputModule
+{
+	videoInputModule = [theVideoInputModule retain];
+	devices = nil;
+	isEnabled = YES;
+	
+	return self;
+}
+
+- (void)dealloc
+{
+	[videoInputModule release];
+	[devices release];
+	
+	[super dealloc];
+}
+
+#pragma mark Internal Methods
+
+- (id<XMVideoInputModule>)_videoInputModule
+{
+	return videoInputModule;
+}
+
+- (NSArray *)_devices
+{
+	return devices;
+}
+
+- (void)_setDevices:(NSArray *)theDevices
+{
+	NSArray *old = devices;
+	devices = [theDevices retain];
+	[old release];
+}
+
+- (NSView *)_settingsViewForDevice:(NSString *)device
+{
+	if([videoInputModule hasSettings] == NO)
+	{
+		return nil;
+	}
+	
+	return [videoInputModule settingsViewForDevice:device];
+}
+
+#pragma mark XMVideoModule Methods
+
+- (NSString *)name
+{
+	return [videoInputModule name];
+}
+
+- (BOOL)isEnabled
+{
+	return isEnabled;
+}
+
+- (void)setEnabled:(BOOL)flag
+{
+	isEnabled = flag;
+}
+
+- (BOOL)hasSettings
+{
+	return [videoInputModule hasSettings];
+}
+
+- (NSDictionary *)getSettings
+{
+	if([videoInputModule hasSettings] == NO)
+	{
+		return nil;
+	}
+	
+	return [videoInputModule getSettings];
+}
+
+- (BOOL)setSettings:(NSDictionary *)settings
+{
+	if([videoInputModule hasSettings] == NO)
+	{
+		return NO;
+	}
+	
+	return [videoInputModule setSettings:settings];
+}
+
+- (NSView *)settingsView
+{
+	return [self _settingsViewForDevice:nil];
 }
 
 @end

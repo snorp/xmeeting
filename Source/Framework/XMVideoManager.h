@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.8 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.9 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 
 #import "XMTypes.h"
 #import "XMVideoView.h"
+#import "XMVideoModule.h"
 
 /**
  * The XMeeting framework uses a highly optimized, extensible
@@ -87,6 +88,32 @@
 - (void)setSelectedInputDevice:(NSString *)inputDevice;
 
 /**
+ * Returns whether the device specified has any settings or not
+ **/
+- (BOOL)deviceHasSettings:(NSString *)device;
+
+/**
+ * Returns whether this input device requires a settings dialog to be shown
+ * when the input device gets selected.
+ **/
+- (BOOL)requiresSettingsDialogWhenDeviceIsSelected:(NSString *)inputDevice;
+
+/**
+ * Returns a view handling the settings for the device specified
+ **/
+- (NSView *)settingsViewForDevice:(NSString *)device;
+
+/**
+ * Returns the number of video modules available
+ **/
+- (unsigned)videoModuleCount;
+
+/**
+ * Returns the video module at the index specified
+ **/
+- (id<XMVideoModule>)videoModuleAtIndex:(unsigned)index;
+
+/**
  * Starts the grabbing process
  **/
 - (void)startGrabbing;
@@ -128,7 +155,7 @@
 
 /**
  * Returns the OpenGL pixel format to be used when creating
- * OpenGL contexts to be used to render video
+ * OpenGL contexts used to render video
  **/
 - (NSOpenGLPixelFormat *)openGLPixelFormat;
 
@@ -148,6 +175,5 @@
 - (void)forceRenderingForView:(id<XMVideoView>)videoView;
 
 @end
-
 
 #endif // __XM_VIDEO_MANAGER_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.6 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.7 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -178,8 +178,23 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 		selectedInputDevice = [inputDevice retain];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartSelectedInputDeviceChange object:self];
-		[XMMediaTransmitter _setDevice:selectedInputDevice];
+		[_XMMediaTransmitterSharedInstance _setDevice:selectedInputDevice];
 	}
+}
+
+- (BOOL)requiresSettingsDialogWhenDeviceIsSelected:(NSString *)device
+{
+	return [_XMMediaTransmitterSharedInstance _requiresSettingsDialogWhenDeviceIsSelected:device];
+}
+
+- (unsigned)videoModuleCount
+{
+	return [_XMMediaTransmitterSharedInstance _videoModuleCount];
+}
+
+- (id<XMVideoModule>)videoModuleAtIndex:(unsigned)index
+{
+	return [_XMMediaTransmitterSharedInstance _videoModuleAtIndex:index];
 }
 
 - (void)startGrabbing

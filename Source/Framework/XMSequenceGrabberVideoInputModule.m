@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.5 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -138,80 +138,16 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (NSArray *)inputDevices
 {
-	if(deviceNames == nil)
+	if(deviceNames != nil)
 	{
-		ComponentResult err = noErr;
-		unsigned hintCode = 0;
-		
-		if(videoChannel == NULL)
-		{
-			// it wasn't possible to create the SGChannel, indicating
-			// that no video device is plugged in.
-			deviceNames = [[NSArray alloc] init];
-		}
-		else
-		{
-			err = SGGetChannelDeviceList(videoChannel, sgDeviceListIncludeInputs, &deviceList);
-			if(err != noErr)
-			{
-				hintCode = 0x002001;
-				[inputManager handleErrorWithCode:err hintCode:hintCode];
-				
-				deviceNames = [[NSArray alloc] init];
-			}
-			else
-			{
-				SGDeviceListRecord *deviceListRecord = (*deviceList);
-				NSMutableArray *namesArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
-				NSMutableArray *indexArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
-				unsigned i;
-		
-				for(i = 0; i < deviceListRecord->count; i++)
-				{
-					SGDeviceName deviceName = deviceListRecord->entry[i];
-			
-					if(deviceName.inputs != NULL)
-					{
-						unsigned j;
-						SGDeviceInputListRecord *inputListRecord = *deviceName.inputs;
-				
-						for(j = 0; j < inputListRecord->count; j++)
-						{
-							// this structure contains the actual human understandable name
-							SGDeviceInputName deviceInputName = inputListRecord->entry[j];
-							NSString *name = [[NSString alloc] initWithCString:(const char *)deviceInputName.name 
-																	  encoding:NSASCIIStringEncoding];
-					
-							// adding the name to the object
-							[namesArray addObject:name];
-							[name release];
-					
-							// caching the index of this device
-							XMSGDeviceNameIndex *deviceNameIndex = [[XMSGDeviceNameIndex alloc] _initWithDeviceIndex:i
-																									  inputNameIndex:j];
-							[indexArray addObject:deviceNameIndex];
-						}
-					}
-				}
-		
-				deviceNames = [namesArray copy];
-				deviceNameIndexes = [indexArray copy];
-		
-				[namesArray release];
-				[indexArray release];
-			}
-		}
+		[deviceNames release];
+		deviceNames = nil;
 	}
-	
-	return deviceNames;
-}
-
-- (void)refreshDeviceList
-{
-	[deviceNames release];
-	deviceNames = nil;
-	[deviceNameIndexes release];
-	deviceNameIndexes = nil;
+	if(deviceNameIndexes != nil)
+	{
+		[deviceNameIndexes release];
+		deviceNameIndexes = nil;
+	}
 	
 	if(deviceList != NULL)
 	{
@@ -237,6 +173,74 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			videoChannel = NULL;
 		}
 	}
+	
+	ComponentResult err = noErr;
+	unsigned hintCode = 0;
+		
+	if(videoChannel == NULL)
+	{
+		// it wasn't possible to create the SGChannel, indicating
+		// that no video device is plugged in.
+		deviceNames = [[NSArray alloc] init];
+	}
+	else
+	{
+		err = SGGetChannelDeviceList(videoChannel, sgDeviceListIncludeInputs, &deviceList);
+		if(err != noErr)
+		{
+			hintCode = 0x002001;
+			[inputManager handleErrorWithCode:err hintCode:hintCode];
+				
+			deviceNames = [[NSArray alloc] init];
+		}
+		else
+		{
+			SGDeviceListRecord *deviceListRecord = (*deviceList);
+			NSMutableArray *namesArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
+			NSMutableArray *indexArray = [[NSMutableArray alloc] initWithCapacity:deviceListRecord->count];
+			unsigned i;
+		
+			for(i = 0; i < deviceListRecord->count; i++)
+			{
+				SGDeviceName deviceName = deviceListRecord->entry[i];
+		
+				if(deviceName.inputs != NULL)
+				{
+					unsigned j;
+					SGDeviceInputListRecord *inputListRecord = *deviceName.inputs;
+				
+					for(j = 0; j < inputListRecord->count; j++)
+					{
+						// this structure contains the actual human understandable name
+						SGDeviceInputName deviceInputName = inputListRecord->entry[j];
+						NSString *name = [[NSString alloc] initWithCString:(const char *)deviceInputName.name 
+																  encoding:NSASCIIStringEncoding];
+					
+						// adding the name to the object
+						[namesArray addObject:name];
+						[name release];
+					
+						// caching the index of this device
+						XMSGDeviceNameIndex *deviceNameIndex = [[XMSGDeviceNameIndex alloc] _initWithDeviceIndex:i
+																									  inputNameIndex:j];
+						[indexArray addObject:deviceNameIndex];
+					}
+				}
+			}
+	
+			deviceNames = [namesArray copy];
+			deviceNameIndexes = [indexArray copy];
+		
+			[namesArray release];
+			[indexArray release];
+		}
+	}
+	
+	return deviceNames;
+}
+
+- (void)refreshDeviceList
+{
 }
 
 - (BOOL)openInputDevice:(NSString *)device
@@ -380,11 +384,13 @@ bail:
 	return result;
 }
 
-- (void)setFrameGrabRate:(unsigned)theFramesPerSecond
+- (BOOL)setFrameGrabRate:(unsigned)theFramesPerSecond
 {
 	framesPerSecond = theFramesPerSecond;
 
 	desiredFrameDuration = timeScale / framesPerSecond;
+	
+	return YES;
 }
 
 - (BOOL)grabFrame
@@ -441,6 +447,40 @@ bail:
 - (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device
 {
 	return @"No Description";
+}
+
+- (BOOL)hasSettings
+{
+	return NO;
+}
+
+- (BOOL)requiresSettingsDialogWhenDeviceOpens
+{
+	return NO;
+}
+
+- (NSData *)getInternalSettings
+{
+	return nil;
+}
+
+- (void)applyInternalSettings:(NSData *)settings
+{
+}
+
+- (NSDictionary *)getSettings
+{
+	return nil;
+}
+
+- (BOOL)setSettings:(NSDictionary *)settings
+{
+	return NO;
+}
+
+- (NSView *)settingsViewForDevice:(NSString *)device
+{
+	return nil;
 }
 
 #pragma mark Private Methods

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.4 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.5 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,141 +12,315 @@
 #import <Cocoa/Cocoa.h>
 #import <QuickTime/QuickTime.h>
 
-/**
- * This protocol declares the methods provided by
- * the VideoInput system for the modules
+@protocol XMVideoInputModule;
+
+/*!
+	@typedef	XMVideoInputManager
+	@abstract	This protocol declares the methods provided by the VideoInput system 
+				for the modules
+ 
+				To add an new VideoInputManager update
+				XMMediaTransmitter.m _init() function to add new item to the list.
  **/
 @protocol XMVideoInputManager <NSObject>
 
-/**
- * In order to allow for efficient processing of the grabbed frames, the frame
- * have to reside within a CVPixelBuffer structure, encoded using the
- * k32ARGBPixelFormat. This output is automatically created as part of an 
- * ICMDecompressionSession from the SequenceGrabber data for example
+/*!
+	@function   handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time;
+	@discussion	In order to allow for efficient processing of the grabbed frames, the frame
+				have to reside within a CVPixelBuffer structure, encoded using the
+				k32ARGBPixelFormat. This output is automatically created as part of an 
+				ICMDecompressionSession from the SequenceGrabber data for example
+ 
+				This method should be called on the same thread as -grabFrame is called.
+ 
+	@param		frame	A reference to the frame grabbed.
+	@param		time	timestamp of the grabed frame.
  **/
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame 
 					  time:(TimeValue)time;
 
-/**
- * Allows the module to set the timeScale of the
- * frames to be passed
+/*!
+	@function   setTimeScale;
+	@discussion	Allows the module to set the timeScale of the  frames to be passed.
+ 
+				This method should be called on the same thread as -openInputDevice is called.
+	@param		(TimeScale)timeScale   
  **/
 - (void)setTimeScale:(TimeScale)timeScale;
 
-/**
- * Tells the inputManager that the following frame timeStamps
- * start with zero again.
+/*!
+	@function   noteTimeStampReset;
+	@discussion	Tells the InputManager that the following frame timeStamps start with zero again.
+				
+				This method should be called on the same thread as -openInputDevice is called.
  **/
 - (void)noteTimeStampReset;
 
-/**
- * Allows the modules to report errors which occured during the
- * frame grabbing process. the errorCode should report which
- * error occured while the hint code may be used to indicate the place
- * where the error occured.
- * In case of an error, the module should be capable of continuing
- * anyway, do not rely on the grabbing process being aborted.
+/*!
+	@function	noteSettingsDidChangeForModule:(id<XMVideoInputModule>)module
+	@discussion	Tells the InputManager that the settings changed for the specific module.
+				This method should be called when the settings in a settings dialog change.
+				That way, the changes made can be applied immediately.
+ 
+				This method should be called on the main thread.
+ 
+	@param		module	A reference to the module whose settings did change.
+ **/
+- (void)noteSettingsDidChangeForModule:(id<XMVideoInputModule>)module;
+
+/*!
+	@function   handleErrorWithCode:(ComponentResult)errorCode hintCode:(unsigned)hintCode;
+	@discussion	Allows the modules to report errors which occured during the
+				frame grabbing process. the errorCode should report which
+				error occured while the hint code may be used to indicate the place
+				where the error occured.
+				In case of an error, the module should be capable of continuing
+				anyway, do not rely on the grabbing process being aborted.
+ 
+				This method should be called on the same thread as -openInputDevice and
+				-grabFrame are called.
+	 @param		(ComponentResult)errorCode   
+	 @param		(unsigned)hintCode   
  **/
 - (void)handleErrorWithCode:(ComponentResult)errorCode hintCode:(unsigned)hintCode;
 
 @end
 
-/**
- * This protocol declares the methods necessary for any video module to work
- * within the XMeeting framework. Since the video handling is done using
- * QuickTime, it is necessary that most of the data flow occurs withing the
- * QuickTime "world". Therefore, instances working as VideoInputModules
- * are required to return the data in the appropriate QuickTime data 
- * structures.
- * All module methods are called from a separate thread. Therefore, the
- * module should not interfere with the main thread in order to avoid 
- * race conditions.
+/*!
+	@typedef	XMVideoInputModule
+	@abstract	This protocol declares the methods necessary for any video module to work
+				within the XMeeting framework. Since the video handling is done using
+				QuickTime, it is necessary that most of the data flow occurs withing the
+				QuickTime "world". Therefore, instances working as VideoInputModules
+				are required to return the data in the appropriate QuickTime data 
+				structures.
+ 
+				All module methods are called from a separate thread unless explicitely
+				stated differently. Therefore, the module should not interfere with the
+				main thread in order to avoid race conditions.
  **/
 @protocol XMVideoInputModule <NSObject>
 
-/**
- * Returns a name appropriate for this module. This method may be called
- * on every thread, use only immutable strings here.
+/*!
+	@function   name;
+	@discussion	name of the video module. This method may be called
+				on every thread, use only immutable strings here.
+	
+	@result		Returns a name appropriate for this module.
  **/
 - (NSString *)name;
 
-/**
- * called to allow proper initialization of the module. The module should
- * not claim any unnecessary resources before this method has been called.
- * Do not create QuickTime device lists within the initializer for example,
- * since the actual modue-manager communication happens on a different
- * thread than the main thread.
- * The manager argument is a reference to the VideoInputManager where
- * the module can send the grabbed frames to and obtain additional information.
+/*!
+	@function   setupWithInputManager:(id<XMVideoInputManager>)manager;
+	@discussion	called to allow proper initialization of the module. The module should
+				not claim any unnecessary resources before this method has been called.
+	 
+				Do not create QuickTime device lists within the initializer for example,
+				since the actual modue-manager communication happens on a different
+				thread than the main thread.
+	 
+				The manager argument is a reference to the VideoInputManager where
+				the module can send the grabbed frames to and obtain additional information.
  **/
 - (void)setupWithInputManager:(id<XMVideoInputManager>)manager;
 
-/**
- * This method is called whenever the module is no longer used and use it
- * to release any resources claimed by initModule.
+/*!
+	@function   close;
+	@discussion	This method is called whenever the module is no longer used and use it
+				to release any resources claimed by -setupWithInputManager:.
  **/
 - (void)close;
 
-/**
- * Returns all devices this module is able to support. Since getting the
- * device list may be a lengthy task on some systems, the module should
- * cach the device list and only create a fresh one if refreshList ist
- * set to YES. This allows any freshly attached devices to be added to
- * the list
+/*!
+	@function   inputDevices;
+	@discussion	Returns all devices this module is able to support. The device list
+				returned is cached externally so that there is no need to optimize
+				in case of lengthy operations. This method is only called when really
+				needed.
+	@result		NSArray	all devices this module is able to support. 
  **/
 - (NSArray *)inputDevices;
 
-/**
- * Tells the module to refresh it's device list (if possible)
- **/
-- (void)refreshDeviceList;
-
-/**
- * Open the device specified with inputDevice and prepare it
- * for capturing. Return the success of this operation.
- **/
+/*!
+	@function   openInputDevice:(NSString *)inputDevice;
+	@discussion	Open the device specified with inputDevice and prepare it
+				for capturing. 
+	 
+	 @param     NSString	inputDevice	Name of the device.
+	 @result	BOOL		the success of this operation.
+	 **/
 - (BOOL)openInputDevice:(NSString *)inputDevice;
 
-/**
- * Closes the device just used and cleanup any used resources
- **/
+/*!
+	@function   closeInputDevice
+	@discussion	Closes the device used and cleanup any resources no longer used
+	@result		BOOL		the success of this operation.
+	 **/
 - (BOOL)closeInputDevice;
 
-/**
- * tells the receiver to produce frames with frameSize dimension.
- * This method may be called during a ongoing grab sequence, so the receiver
- * cannot rely on having the same frame size all the time.
- * Return whether the module can support the desired size or not.
- * This method is guaranteed to be called before any call to
- * -openInputDevice is made.
+/*!
+	@function   setInputFrameSize:(NSSize)frameSize;
+	@discussion	tells the receiver to produce frames with frameSize dimension.
+	
+	This method may be called during a ongoing grab sequence, so the receiver
+	cannot rely on having the same frame size all the time.
+	
+	This method is guaranteed to be called before any call to -openInputDevice is made.
+	 
+	@param      NSSize		frameSize	tells the receiver to produce this size.
+	 
+	@result		BOOL		Return whether the module can support the desired size or not.
  **/
 - (BOOL)setInputFrameSize:(NSSize)frameSize;
 
-/**
- * Tells the module which framerate currently is active.
- * This method may be called at any time, also during
- * active grab sessions.
- * This method is guarateed to be called before any call to
- * -openInputDevice: is made.
- * framesPerSecond is guaranteed to be greater than 0
+/*!
+	@function   setFrameGrabRate:(unsigned)frameGrabRate;
+	@discussion	Tells the module which framerate currently is active.
+	 
+	 This method may be called at any time, also during
+	 active grab sessions.
+	 
+	 This method is guarateed to be called before any call to
+	 -openInputDevice: is made.
+	 
+	 frameGrabRate is guaranteed to be greater than zero and no larger
+	 than 30.
+	 
+	 @param      unsigned		frameGrabRate	framerate.
+	 
+	 @result		BOOL		success status.
  **/
-- (void)setFrameGrabRate:(unsigned)frameGrabRate;
+- (BOOL)setFrameGrabRate:(unsigned)frameGrabRate;
 
-/**
- * Gives the module time to grab a frame.
- * Due to the different architecture which QuickTime uses,
- * it is not possible and neither desirable to have the modules
- * directly return a frame. Rather, the modules can send the data
- * using the methods of XMVideoInputManager
+/*!
+	@function   grabFrame;
+	@discussion	Gives the module time to grab a frame.
+	 
+	Due to the different architecture which QuickTime uses,
+	it is not possible and neither desirable to have the modules
+	directly return a frame. Rather, the modules can send the data
+	using the methods of XMVideoInputManager
+	 
+	Called by Timer from XMMediaTransmiiter.m
+	 
+	@result		BOOL		success status.
  **/
 - (BOOL)grabFrame;
 
-/**
- * Return a error description (localized if possible) which
- * describes errorCode. This method is guaranteed only to be
- * called on the main thread.
+/*!
+	@function   descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device;
+	@discussion	Return a error description (localized if possible) which
+				describes errorCode. 
+	 
+				This method is guaranteed only to be called on the main thread.
+	 
+	@param      unsigned		errorCode
+	 
+	@result		NSString 		a error description (localized if possible) 
  **/
 - (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device;
+
+/*!
+	@function	hasSettings;
+	@discussion	Returns whether this module has any adjustable settings or not.
+ 
+				This method will be called on the main thread.
+ 
+				The value returned should not change during the lifetime of this
+				module.
+ 
+	@result		BOOL	YES, if this module has settings, NO otherwise.
+  **/
+- (BOOL)hasSettings;
+
+/*!
+	@function	requiresSettingsDialogWhenDeviceOpens;
+	@discussion	If the module requires a settings dialog to show up when one of its devices
+				has been opened, return YES here. This might apply for a still image device
+				for example, where the user might choose which picture to send every time this
+				module is activated.
+ 
+				It is not guaranteed that a settings dialog will be displayed if
+				this method returns YES, though. The module should work properly even without
+				a settings dialog being displayed and adjusted. (For example, returning a black
+				frame)
+ 
+				This method will be called on the main thread.
+ 
+				This method is never called if -hasSettings returns NO.
+ 
+				The value returned here may change during the lifetime of this module.
+	@result		BOOL	YES, if an settings dialog should be displayed, NO otherwise.
+ **/
+- (BOOL)requiresSettingsDialogWhenDeviceOpens;
+
+/*!
+	@function	getInternalSettings;
+	@discussion	This method return the current settings of the module. Only the module
+				itself needs to be able to interpret the settings returned here.
+ 
+				This method will be called on the main thread.
+ 
+				This method is never called if -hasSettings returns NO.
+ 
+	@result		NSData	The Settings of this module
+ **/
+- (NSData *)getInternalSettings;
+
+/*!
+	@function	applyInternalSettings:(NSData *)settings;
+	@discussion	Asks the module to apply the settings returned by -getInternalSettings.
+ 
+				This method will not be called on the main thread but on the same thread as
+				-grabFrame is called.
+ 
+				This method is never called if -hasSettings returns NO.
+ 
+	@param		The settings previously returned by -getInternalSettings
+ **/
+- (void)applyInternalSettings:(NSData *)settings;
+
+/*!
+	@function	getSettings;
+	@discussion	Returns the current settings of this module in a data structure which
+				can be saved on disk. (UserDefaults for example) Therefore, only standard
+				data types should be contained in the dictionary returned.
+ 
+				This method will be called on the main thread.
+
+				This method is never called if -hasSettings returns NO.
+ 
+	@result		NSDictionary	A dictionary containing the settings for this module.
+ **/
+- (NSDictionary *)getSettings;
+
+/*!
+	@function	setSettings:(NSDictionary *)settings;
+	@discussion	Instructs the module to apply the settings contained in the dictionary.
+				If one of the devices of this module is active, -getInternalSettings will
+				be called after this method has been called.
+ 
+				This method will be called on the main thread.
+ 
+				This method is never called if -hasSettings returns NO.
+ 
+	@param		settings	A dictionary containing the settings for this module
+	@result		BOOL		The success of this operation.
+ **/
+- (BOOL)setSettings:(NSDictionary *)settings;
+
+/*!
+	@function	settingsViewForDevice:(NSString *)device;
+	@discussion	Returns a view to adjust the settings provided by this module. If the user
+				changes any settings in the view, -noteSettingsDidChangeForModule of the
+				input manager should be called.
+ 
+				This method will be called on the main thread.
+ 
+	@param		device	A reference to the device for which the settings apply, or nil if
+						the settings apply to no specific device.
+ **/
+- (NSView *)settingsViewForDevice:(NSString *)device;
 
 @end
 

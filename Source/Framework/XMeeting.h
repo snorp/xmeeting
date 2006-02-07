@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.h,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMeeting.h,v 1.8 2006/02/07 18:06:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,7 @@ void XMCloseFramework();
 
 #import "XMVideoManager.h"
 #import "XMVideoView.h"
+#import "XMVideoModule.h"
 
 #import "XMAddressResource.h"
 #import "XMGeneralPurposeAddressResource.h"

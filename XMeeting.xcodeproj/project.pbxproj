@@ -24,6 +24,11 @@
 		D110B8ED09597A100009D87A /* h261codec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25708F90262007E4ABE /* h261codec.cxx */; };
 		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
 		D1296DF509288A7A0077C77F /* psync.h in Headers */ = {isa = PBXBuildFile; fileRef = D1296DF409288A7A0077C77F /* psync.h */; };
+		D12E605B0998AFE9004EF9F8 /* XMVideoModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */; };
+		D12E61D20998FEEB004EF9F8 /* XMVideoInputModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D132789908C7A40800298F25 /* XMVideoInputModule.h */; };
+		D12E61D30998FEF5004EF9F8 /* XMPreferencesCodecListRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */; };
+		D12E627B0999168E004EF9F8 /* XMScreenVideoInputModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */; };
+		D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */; };
 		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D13232EE0906684D00F4D5A7 /* XMLocalAudioVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13232ED0906684D00F4D5A7 /* XMLocalAudioVideoView.m */; };
@@ -806,6 +811,9 @@
 		D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMCircularBuffer.cpp; path = Source/Framework/XMCircularBuffer.cpp; sourceTree = "<group>"; };
 		D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMCircularBuffer.h; path = Source/Framework/XMCircularBuffer.h; sourceTree = "<group>"; };
 		D1296DF409288A7A0077C77F /* psync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = psync.h; sourceTree = "<group>"; };
+		D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoModule.h; path = Source/Framework/XMVideoModule.h; sourceTree = "<group>"; };
+		D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMScreenVideoInputModule.h; path = Source/Framework/XMScreenVideoInputModule.h; sourceTree = "<group>"; };
+		D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMScreenVideoInputModule.m; path = Source/Framework/XMScreenVideoInputModule.m; sourceTree = "<group>"; };
 		D132319E090526B700F4D5A7 /* HeadsetCam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HeadsetCam.tiff; path = Resources/Images/HeadsetCam.tiff; sourceTree = "<group>"; };
 		D13231CF09052FC500F4D5A7 /* Cam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Cam.tiff; path = Resources/Images/Cam.tiff; sourceTree = "<group>"; };
 		D13232EC0906684D00F4D5A7 /* XMLocalAudioVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocalAudioVideoView.h; path = Source/GUI/XMLocalAudioVideoView.h; sourceTree = "<group>"; };
@@ -1724,6 +1732,7 @@
 				D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */,
 				D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */,
 				D166CD6407B2312300BC27A6 /* XMVideoView.h */,
+				D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */,
 				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
 				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
 				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
@@ -1741,6 +1750,8 @@
 				D132789908C7A40800298F25 /* XMVideoInputModule.h */,
 				D1FE53F708F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.h */,
 				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
+				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
+				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
 				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
 				D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */,
 				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
@@ -2929,6 +2940,10 @@
 				D198B483097636F300180551 /* XMRTPH264Packetizer.h in Headers */,
 				D198B4880976371D00180551 /* XMRTPH264PacketizerDispatch.h in Headers */,
 				D1EEDEB70992514A000BF113 /* XMH323Channel.h in Headers */,
+				D12E605B0998AFE9004EF9F8 /* XMVideoModule.h in Headers */,
+				D12E61D20998FEEB004EF9F8 /* XMVideoInputModule.h in Headers */,
+				D12E61D30998FEF5004EF9F8 /* XMPreferencesCodecListRecord.h in Headers */,
+				D12E627B0999168E004EF9F8 /* XMScreenVideoInputModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3546,6 +3561,7 @@
 				D147DA1E0973ABEE005DE11C /* XMPacketReassemblers.cpp in Sources */,
 				D198B484097636F300180551 /* XMRTPH264Packetizer.c in Sources */,
 				D1EEDEB80992514A000BF113 /* XMH323Channel.cpp in Sources */,
+				D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
