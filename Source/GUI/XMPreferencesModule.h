@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesModule.h,v 1.2 2005/04/30 20:14:59 hfriederich Exp $
+ * $Id: XMPreferencesModule.h,v 1.3 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,7 +52,7 @@
 - (NSView *)contentView;
 
 /**
- * The width of the preferences window is fixed to currently 600
+ * The width of the preferences window is fixed to currently 700 pixels.
  * This method returns the height of its contentView, so that
  * the window height is adjusted accordingly
  **/

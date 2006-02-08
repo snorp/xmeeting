@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.12 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.13 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,6 +82,8 @@
 
 + (void)_setVideoBytesSent:(unsigned)videoBytesSent;
 
++ (void)_sendSettings:(NSData *)settings toModule:(id<XMVideoInputModule>)module;
+
 - (id)_init;
 - (void)_close;
 
@@ -89,6 +91,7 @@
 - (BOOL)_deviceHasSettings:(NSString *)device;
 - (BOOL)_requiresSettingsDialogWhenDeviceIsSelected:(NSString *)device;
 - (NSView *)_settingsViewForDevice:(NSString *)device;
+- (void)_setDefaultSettingsForDevice:(NSString *)device;
 
 - (unsigned)_videoModuleCount;
 - (id<XMVideoModule>)_videoModuleAtIndex:(unsigned)index;

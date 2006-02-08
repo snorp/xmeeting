@@ -8,6 +8,9 @@
                 changeAudioOutputDevice = id; 
                 changeAudioOutputVolume = id; 
                 changeVideoDevice = id; 
+                closeVideoDeviceSettingsPanel = id; 
+                restoreDefaultSettings = id; 
+                showVideoDeviceSettings = id; 
                 toggleMuteAudioInput = id; 
                 toggleMuteAudioOutput = id; 
                 toggleShowContent = id; 
@@ -24,6 +27,9 @@
                 localVideoView = XMSimpleVideoView; 
                 muteAudioInputSwitch = NSButton; 
                 muteAudioOutputSwitch = NSButton; 
+                videoDeviceSettingsBox = NSBox; 
+                videoDeviceSettingsButton = NSButton; 
+                videoDeviceSettingsPanel = NSPanel; 
                 videoDevicesPopUp = NSPopUpButton; 
             }; 
             SUPERCLASS = NSObject; 

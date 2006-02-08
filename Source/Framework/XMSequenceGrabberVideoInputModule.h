@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.h,v 1.3 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.h,v 1.4 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,10 +37,33 @@
 	BOOL isGrabbing;
 	unsigned callbackMissCounter;
 	unsigned callbackStatus;
-
+	
+	unsigned short brightness;
+	unsigned short hue;
+	unsigned short saturation;
+	unsigned short contrast;
+	unsigned short sharpness;
+	
+	NSNib *nibLoader;
+	IBOutlet NSView *settingsView;
+	
+	IBOutlet NSSlider *brightnessSlider;
+	IBOutlet NSTextField *brightnessField;
+	IBOutlet NSSlider *hueSlider;
+	IBOutlet NSTextField *hueField;
+	IBOutlet NSSlider *saturationSlider;
+	IBOutlet NSTextField *saturationField;
+	IBOutlet NSSlider *contrastSlider;
+	IBOutlet NSTextField *contrastField;
+	IBOutlet NSSlider *sharpnessSlider;
+	IBOutlet NSTextField *sharpnessField;
 }
 
 - (id)_init;
+
+- (void)_setVideoValues:(NSArray *)values;
+
+- (IBAction)_sliderValueChanged:(id)sender;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.7 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.8 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -182,9 +182,24 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	}
 }
 
+- (BOOL)deviceHasSettings:(NSString *)device
+{
+	return [_XMMediaTransmitterSharedInstance _deviceHasSettings:device];
+}
+
 - (BOOL)requiresSettingsDialogWhenDeviceIsSelected:(NSString *)device
 {
 	return [_XMMediaTransmitterSharedInstance _requiresSettingsDialogWhenDeviceIsSelected:device];
+}
+
+- (NSView *)settingsViewForDevice:(NSString *)device
+{
+	return [_XMMediaTransmitterSharedInstance _settingsViewForDevice:device];
+}
+
+- (void)setDefaultSettingsForDevice:(NSString *)device
+{
+	[_XMMediaTransmitterSharedInstance _setDefaultSettingsForDevice:device];
 }
 
 - (unsigned)videoModuleCount

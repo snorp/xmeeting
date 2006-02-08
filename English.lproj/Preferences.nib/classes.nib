@@ -82,6 +82,19 @@
             LANGUAGE = ObjC; 
             OUTLETS = {applyButton = NSButton; buttonToolbarView = NSView; revertButton = NSButton; }; 
             SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {closeVideoModuleSettingsPanel = id; restoreDefaultVideoModuleSettings = id; }; 
+            CLASS = XMVideoPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                preferredVideoDevicePopUp = NSPopUpButton; 
+                videoModuleSettingsBox = NSBox; 
+                videoModuleSettingsPanel = NSPanel; 
+                videoModulesTableView = NSTableView; 
+            }; 
+            SUPERCLASS = NSObject; 
         }
     ); 
     IBVersion = 1; 

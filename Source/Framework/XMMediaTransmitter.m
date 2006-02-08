@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.18 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.19 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,15 +36,20 @@ typedef enum XMMediaTransmitterMessage
 	_XMMediaTransmitterMessage_StartTransmitting,
 	_XMMediaTransmitterMessage_StopTransmitting,
 	_XMMediaTransmitterMessage_UpdatePicture,
-	_XMMediaTransmitterMessage_SetVideoBytesSent
+	_XMMediaTransmitterMessage_SetVideoBytesSent,
+	
+	_XMMediaTransmitterMessage_SendSettingsToModule = 0x300
 	
 } XMMediaTransmitterMessage;
+
+@class XMVideoInputModuleWrapper;
 
 @interface XMMediaTransmitter (PrivateMethods)
 
 + (void)_sendMessage:(XMMediaTransmitterMessage)message withComponents:(NSArray *)components;
 
 - (NSPort *)_receivePort;
+- (XMVideoInputModuleWrapper *)_wrapperForDevice:(NSString *)device;
 - (void)_sendDeviceList;
 - (void)_handleMediaTransmitterThreadDidExit;
 
@@ -61,6 +66,7 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleStopTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleUpdatePictureMessage;
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)messageComponents;
+- (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents;
 
 - (void)_grabFrame:(NSTimer *)timer;
 
@@ -97,7 +103,9 @@ typedef enum XMMediaTransmitterMessage
 - (NSArray *)_devices;
 - (void)_setDevices:(NSArray *)devices;
 
+- (BOOL)_hasSettingsForDevice:(NSString *)device;
 - (NSView *)_settingsViewForDevice:(NSString *)device;
+- (void)_setDefaultSettingsForDevice:(NSString *)device;
 
 @end
 
@@ -222,6 +230,19 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
 	
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SetVideoBytesSent withComponents:components];
+	
+	[components release];
+}
+
++ (void)_sendSettings:(NSData *)settings toModule:(id<XMVideoInputModule>)module
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)module];
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:data, settings, nil];
+	
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SendSettingsToModule withComponents:components];
 	
 	[components release];
 }
@@ -365,6 +386,90 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[XMMediaTransmitter _selectModule:(count-1) device:0];
 }
 
+- (BOOL)_deviceHasSettings:(NSString *)device
+{
+	XMVideoInputModuleWrapper *moduleWrapper = [self _wrapperForDevice:device];
+	
+	if(moduleWrapper != nil)
+	{
+		return [moduleWrapper _hasSettingsForDevice:device];
+	}
+	
+	return NO;
+}
+
+- (BOOL)_requiresSettingsDialogWhenDeviceIsSelected:(NSString *)device
+{
+	XMVideoInputModuleWrapper *moduleWrapper = [self _wrapperForDevice:device];
+	
+	if(moduleWrapper != nil)
+	{
+		return [[moduleWrapper _videoInputModule] requiresSettingsDialogWhenDeviceOpens:device];
+	}
+	
+	return NO;
+}
+
+- (NSView *)_settingsViewForDevice:(NSString *)device
+{
+	XMVideoInputModuleWrapper *moduleWrapper = [self _wrapperForDevice:device];
+	
+	if(moduleWrapper != nil)
+	{
+		return [moduleWrapper _settingsViewForDevice:device];
+	}
+	
+	return nil;
+}
+
+- (void)_setDefaultSettingsForDevice:(NSString *)device
+{
+	XMVideoInputModuleWrapper *moduleWrapper = [self _wrapperForDevice:device];
+	
+	if(moduleWrapper != nil)
+	{
+		[moduleWrapper _setDefaultSettingsForDevice:device];
+	}
+}
+
+- (unsigned)_videoModuleCount
+{
+	// we're not returning the dummy device
+	unsigned count = [videoInputModules count];
+	
+	return (count-1);
+}
+
+- (id<XMVideoModule>)_videoModuleAtIndex:(unsigned)index
+{
+	unsigned count = [videoInputModules count];
+	
+	if(index == (count-1))
+	{
+		return nil;
+	}
+	
+	return [videoInputModules objectAtIndex:index];
+}
+
+- (XMVideoInputModuleWrapper *)_wrapperForDevice:(NSString *)device
+{
+	unsigned i;
+	unsigned count = [videoInputModules count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		
+		if([[moduleWrapper _devices] containsObject:device])
+		{
+			return moduleWrapper;
+		}
+	}
+	
+	return nil;
+}
+
 - (void)_sendDeviceList
 {
 	unsigned i;
@@ -478,6 +583,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			break;
 		case _XMMediaTransmitterMessage_SetVideoBytesSent:
 			[self _handleSetVideoBytesSentMessage:[portMessage components]];
+			break;
+		case _XMMediaTransmitterMessage_SendSettingsToModule:
+			[self _handleSendSettingsToModuleMessage:[portMessage components]];
 			break;
 		default:
 			// ignore it
@@ -813,6 +921,18 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	}
 }
 
+- (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents
+{
+	NSData *data = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	
+	id<XMVideoInputModule> module = (id<XMVideoInputModule>)[number unsignedIntValue];
+	
+	NSData *settings = (NSData *)[messageComponents objectAtIndex:1];
+	
+	[module applyInternalSettings:settings];
+}
+
 #pragma mark XMVideoInputManager Methods
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
@@ -867,6 +987,28 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		// lastTime minus one frame time (calculated using
 		// the current frame grab rate.
 		timeOffset = (-1 * lastTime) - (90000/frameGrabRate);
+	}
+}
+
+- (void)noteSettingsDidChangeForModule:(id<XMVideoInputModule>)module
+{
+	NSString *theSelectedDevice = [_XMVideoManagerSharedInstance selectedInputDevice];
+	
+	unsigned i;
+	unsigned count = [videoInputModules count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		if([moduleWrapper _videoInputModule] == module)
+		{
+			if([[moduleWrapper _devices] containsObject:theSelectedDevice])
+			{
+				NSData *settings = [module internalSettings];
+				[XMMediaTransmitter _sendSettings:settings toModule:module];
+			}
+			return;
+		}
 	}
 }
 
@@ -1638,14 +1780,29 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[old release];
 }
 
+- (BOOL)_hasSettingsForDevice:(NSString *)device
+{
+	return [videoInputModule hasSettingsForDevice:device];
+}
+
 - (NSView *)_settingsViewForDevice:(NSString *)device
 {
-	if([videoInputModule hasSettings] == NO)
+	if([videoInputModule hasSettingsForDevice:device] == NO)
 	{
 		return nil;
 	}
 	
 	return [videoInputModule settingsViewForDevice:device];
+}
+
+- (void)_setDefaultSettingsForDevice:(NSString *)device
+{
+	if([videoInputModule hasSettingsForDevice:device] == NO)
+	{
+		return;
+	}
+	
+	[videoInputModule setDefaultSettingsForDevice:device];
 }
 
 #pragma mark XMVideoModule Methods
@@ -1662,37 +1819,49 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)setEnabled:(BOOL)flag
 {
+	if(flag == isEnabled)
+	{
+		return;
+	}
+	
 	isEnabled = flag;
+	
+	[_XMMediaTransmitterSharedInstance _sendDeviceList];
 }
 
 - (BOOL)hasSettings
 {
-	return [videoInputModule hasSettings];
+	return [videoInputModule hasSettingsForDevice:nil];
 }
 
-- (NSDictionary *)getSettings
+- (NSDictionary *)permamentSettings
 {
-	if([videoInputModule hasSettings] == NO)
+	if([videoInputModule hasSettingsForDevice:nil] == NO)
 	{
 		return nil;
 	}
 	
-	return [videoInputModule getSettings];
+	return [videoInputModule permamentSettings];
 }
 
-- (BOOL)setSettings:(NSDictionary *)settings
+- (BOOL)setPermamentSettings:(NSDictionary *)settings
 {
-	if([videoInputModule hasSettings] == NO)
+	if([videoInputModule hasSettingsForDevice:nil] == NO)
 	{
 		return NO;
 	}
 	
-	return [videoInputModule setSettings:settings];
+	return [videoInputModule setPermamentSettings:settings];
 }
 
 - (NSView *)settingsView
 {
 	return [self _settingsViewForDevice:nil];
+}
+
+- (void)setDefaultSettings
+{
+	[self _setDefaultSettingsForDevice:nil];
 }
 
 @end

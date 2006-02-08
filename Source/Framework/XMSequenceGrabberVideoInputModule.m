@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.5 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.6 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,6 +62,8 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 - (BOOL)_disposeDecompressionSession;
 - (OSErr)_processGrabData:(Ptr)grabData length:(long)length time:(TimeValue)time;
 - (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer;
+- (void)_updateSliders;
+- (void)_updateTextFields;
 
 @end
 
@@ -101,6 +103,14 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	callbackMissCounter = 0;
 	callbackStatus = XM_CALLBACK_NEVER_CALLED;
 	
+	brightness = 0;
+	hue = 0;
+	saturation = 0;
+	contrast = 0;
+	sharpness = 0;
+	
+	nibLoader = nil;
+	
 	return self;
 }
 
@@ -111,6 +121,8 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	[deviceNameIndexes release];
 	[selectedDevice release];
 	
+	[nibLoader release];
+	
 	[super dealloc];
 }
 
@@ -118,7 +130,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (NSString *)name
 {
-	return @"SequenceGrabber Module";
+	return @"Live Camera Module";
 }
 
 - (void)setupWithInputManager:(id<XMVideoInputManager>)theInputManager
@@ -328,6 +340,130 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	callbackMissCounter = 0;
 	callbackStatus = XM_CALLBACK_NEVER_CALLED;
 	
+	// Obtaining values for Brightness etc.
+	
+	unsigned short theBrightness = 0;
+	unsigned short theHue = 0;
+	unsigned short theSaturation = 0;
+	unsigned short theContrast = 0;
+	unsigned short theSharpness = 0;
+	
+	ComponentInstance videoDigitizer = SGGetVideoDigitizerComponent(videoChannel);
+	
+	err = VDGetBrightness(videoDigitizer, &theBrightness);
+	if(err != noErr)
+	{
+		NSLog(@"VDGetBrightness failed :%d", err);
+		theBrightness = 0;
+	}
+	else
+	{
+		err = VDSetBrightness(videoDigitizer, &theBrightness);
+		if(err != noErr)
+		{
+			theBrightness = 0;
+		}
+		else if(theBrightness == 0)
+		{
+			theBrightness = 1;
+		}
+	}
+	
+	err = VDGetHue(videoDigitizer, &theHue);
+	if(err != noErr)
+	{
+		NSLog(@"VDGetHue failed: %d", err);
+		theHue = 0;
+	}
+	else
+	{
+		err = VDSetHue(videoDigitizer, &theHue);
+		if(err != noErr)
+		{
+			theHue = 0;
+		}
+		else if(theHue == 0)
+		{
+			theHue = 1;
+		}
+	}
+	
+	err = VDGetSaturation(videoDigitizer, &theSaturation);
+	if(err != noErr)
+	{
+		NSLog(@"VDGetSaturation failed: %d", err);
+		theSaturation = 0;
+	}
+	else
+	{
+		err = VDSetSaturation(videoDigitizer, &theSaturation);
+		if(err != noErr)
+		{
+			theSaturation = 0;
+		}
+		else if(theSaturation == 0)
+		{
+			theSaturation = 1;
+		}
+	}
+	
+	err = VDGetContrast(videoDigitizer, &theContrast);
+	if(err != noErr)
+	{
+		NSLog(@"VDGetContrast failed: %d", err);
+		theContrast = 0;
+	}
+	else
+	{
+		err = VDSetContrast(videoDigitizer, &theContrast);
+		if(err != noErr)
+		{
+			theContrast = 0;
+		}
+		else if(theContrast == 0)
+		{
+			theContrast = 1;
+		}
+	}
+	
+	err = VDGetSharpness(videoDigitizer, &theSharpness);
+	if(err != noErr)
+	{
+		NSLog(@"VDGetSharpness failed: %d", err);
+		theSharpness = 0;
+	}
+	else
+	{
+		err = VDSetSharpness(videoDigitizer, &theSharpness);
+		if(err != noErr)
+		{
+			theSharpness = 0;
+		}
+		else if(theSharpness == 0)
+		{
+			theSharpness = 1;
+		}
+	}
+	
+	NSNumber *theBrightnessNumber = [[NSNumber alloc] initWithUnsignedShort:theBrightness];
+	NSNumber *theHueNumber = [[NSNumber alloc] initWithUnsignedShort:theHue];
+	NSNumber *theSaturationNumber = [[NSNumber alloc] initWithUnsignedShort:theSaturation];
+	NSNumber *theContrastNumber = [[NSNumber alloc] initWithUnsignedShort:theContrast];
+	NSNumber *theSharpnessNumber = [[NSNumber alloc] initWithUnsignedShort:theSharpness];
+	
+	NSArray *values = [[NSArray alloc] initWithObjects:theBrightnessNumber, theHueNumber, theSaturationNumber,
+						theContrastNumber, theSharpnessNumber, nil];
+	
+	[self performSelectorOnMainThread:@selector(_setVideoValues:) withObject:values waitUntilDone:NO];
+	
+	[values release];
+	
+	[theBrightnessNumber release];
+	[theHueNumber release];
+	[theSaturationNumber release];	
+	[theContrastNumber release];
+	[theSharpnessNumber release];
+	
 	return YES;
 	
 bail:
@@ -449,38 +585,227 @@ bail:
 	return @"No Description";
 }
 
-- (BOOL)hasSettings
+- (BOOL)hasSettingsForDevice:(NSString *)device
+{
+	if(device == nil)
+	{
+		return NO;
+	}
+	
+	return YES;
+}
+
+- (BOOL)requiresSettingsDialogWhenDeviceOpens:(NSString *)device
 {
 	return NO;
 }
 
-- (BOOL)requiresSettingsDialogWhenDeviceOpens
+- (NSData *)internalSettings
 {
-	return NO;
-}
-
-- (NSData *)getInternalSettings
-{
-	return nil;
+	unsigned short theBrightness;
+	unsigned short theHue;
+	unsigned short theSaturation;
+	unsigned short theContrast;
+	unsigned short theSharpness;
+	
+	if(nibLoader == nil)
+	{
+		theBrightness = brightness;
+		theHue = hue;
+		theSaturation = saturation;
+		theContrast = contrast;
+		theSharpness = sharpness;
+	}
+	else
+	{
+		if([brightnessSlider isEnabled] == YES)
+		{
+			float brightnessValue = [brightnessSlider floatValue];
+			theBrightness = (unsigned short)(brightnessValue * 655.35f);
+			if(theBrightness == 0)
+			{
+				theBrightness = 1;
+			}
+		}
+		else
+		{
+			theBrightness = 0;
+		}
+		
+		if([hueSlider isEnabled] == YES)
+		{
+			float hueValue = [hueSlider floatValue];
+			theHue = (unsigned short)((hueValue + 180.0f) * 182.04166666666f);
+			if(theHue == 0)
+			{
+				theHue = 1;
+			}
+		}
+		else
+		{
+			theHue = 0;
+		}
+		
+		if([saturationSlider isEnabled] == YES)
+		{
+			float saturationValue = [saturationSlider floatValue];
+			theSaturation = (unsigned short)(saturationValue * 655.35f);
+			if(theSaturation == 0)
+			{
+				theSaturation = 1;
+			}
+		}
+		else
+		{
+			theSaturation = 0;
+		}
+		
+		if([contrastSlider isEnabled] == YES)
+		{
+			float contrastValue = [contrastSlider floatValue];
+			theContrast = (unsigned short)(contrastValue * 655.35f);
+			if(theContrast == 0)
+			{
+				theContrast = 1;
+			}
+		}
+		else
+		{
+			theContrast = 0;
+		}
+		
+		if([sharpnessSlider isEnabled] == YES)
+		{
+			float sharpnessValue = [sharpnessSlider floatValue];
+			theSharpness = (unsigned short)(sharpnessValue * 655.35f);
+			if(theSharpness == 0)
+			{
+				theSharpness = 1;
+			}
+		}
+		else
+		{
+			theSharpness = 0;
+		}
+	}
+	
+	NSNumber *theBrightnessNumber = [[NSNumber alloc] initWithUnsignedShort:theBrightness];
+	NSNumber *theHueNumber = [[NSNumber alloc] initWithUnsignedShort:theHue];
+	NSNumber *theSaturationNumber = [[NSNumber alloc] initWithUnsignedShort:theSaturation];
+	NSNumber *theContrastNumber = [[NSNumber alloc] initWithUnsignedShort:theContrast];
+	NSNumber *theSharpnessNumber = [[NSNumber alloc] initWithUnsignedShort:theSharpness];
+	
+	NSArray *values = [[NSArray alloc] initWithObjects:theBrightnessNumber, theHueNumber, theSaturationNumber,
+							theContrastNumber, theSharpnessNumber, nil];
+	
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:values];
+	
+	[values release];
+	
+	[theBrightnessNumber release];
+	[theHueNumber release];
+	[theSaturationNumber release];
+	[theContrastNumber release];
+	[theSharpnessNumber release];
+	
+	return data;
 }
 
 - (void)applyInternalSettings:(NSData *)settings
 {
+	ComponentResult err = noErr;
+	
+	if(videoChannel == NULL)
+	{
+		return;
+	}
+	
+	NSArray *array = (NSArray *)[NSKeyedUnarchiver unarchiveObjectWithData:settings];
+	
+	NSNumber *theBrightnessNumber = (NSNumber *)[array objectAtIndex:0];
+	NSNumber *theHueNumber = (NSNumber *)[array objectAtIndex:1];
+	NSNumber *theSaturationNumber = (NSNumber *)[array objectAtIndex:2];
+	NSNumber *theContrastNumber = (NSNumber *)[array objectAtIndex:3];
+	NSNumber *theSharpnessNumber = (NSNumber *)[array objectAtIndex:4];
+	
+	unsigned short theBrightness = [theBrightnessNumber unsignedShortValue];
+	unsigned short theHue = [theHueNumber unsignedShortValue];
+	unsigned short theSaturation = [theSaturationNumber unsignedShortValue];
+	unsigned short theContrast = [theContrastNumber unsignedShortValue];
+	unsigned short theSharpness = [theSharpnessNumber unsignedShortValue];
+	
+	ComponentInstance videoDigitizer = SGGetVideoDigitizerComponent(videoChannel);
+	
+	if(theBrightness != 0)
+	{
+		err = VDSetBrightness(videoDigitizer, &theBrightness);
+		if(err != noErr)
+		{
+			NSLog(@"VDSetBrightness failed: %d", err);
+		}
+	}
+	if(theHue != 0)
+	{
+		err = VDSetHue(videoDigitizer, &theHue);
+		if(err != noErr)
+		{
+			NSLog(@"VDSetHue failed: %d", err);
+		}
+	}
+	if(theSaturation != 0)
+	{
+		err = VDSetSaturation(videoDigitizer, &theSaturation);
+		if(err != noErr)
+		{
+			NSLog(@"VDSetSaturation failed: %d", err);
+		}
+	}
+	if(theContrast != 0)
+	{
+		err = VDSetContrast(videoDigitizer, &theContrast);
+		if(err != noErr)
+		{
+			NSLog(@"VDSetContrast failed: %d", err);
+		}
+	}
+	if(theSharpness != 0)
+	{
+		err = VDSetSharpness(videoDigitizer, &theSharpness);
+		if(err != noErr)
+		{
+			NSLog(@"VDSetSharpness failed: %d", err);
+		}
+	}
 }
 
-- (NSDictionary *)getSettings
+- (NSDictionary *)permamentSettings
 {
+	// there are no permament settings at this time
 	return nil;
 }
 
-- (BOOL)setSettings:(NSDictionary *)settings
+- (BOOL)setPermamentSettings:(NSDictionary *)settings
 {
 	return NO;
 }
 
 - (NSView *)settingsViewForDevice:(NSString *)device
 {
-	return nil;
+	if(nibLoader == nil)
+	{
+		nibLoader = [[NSNib alloc] initWithNibNamed:@"SequenceGrabberSettings" bundle:nil];
+		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+	}
+	
+	[self _updateSliders];
+	
+	return settingsView;
+}
+
+- (void)setDefaultSettingsForDevice:(NSString *)device
+{
+	[self _updateSliders];
+	[inputManager noteSettingsDidChangeForModule:self];
 }
 
 #pragma mark Private Methods
@@ -731,6 +1056,126 @@ bail:
 - (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer
 {
 	[inputManager handleGrabbedFrame:pixelBuffer time:lastTime];
+}
+
+- (void)_setVideoValues:(NSArray *)values
+{
+	NSNumber *number = [values objectAtIndex:0];
+	brightness = [number unsignedShortValue];
+	
+	number = [values objectAtIndex:1];
+	hue = [number unsignedShortValue];
+	
+	number = [values objectAtIndex:2];
+	saturation = [number unsignedShortValue];
+	
+	number = [values objectAtIndex:3];
+	contrast = [number unsignedShortValue];
+	
+	number = [values objectAtIndex:4];
+	sharpness = [number unsignedShortValue];
+	
+	if(nibLoader != nil)
+	{
+		[self _updateSliders];
+	}
+}
+
+- (IBAction)_sliderValueChanged:(id)sender
+{
+	[self _updateTextFields];
+	
+	[inputManager noteSettingsDidChangeForModule:self];
+}
+
+- (void)_updateSliders
+{
+	if(brightness == 0)
+	{
+		[brightnessSlider setFloatValue:0.0f];
+		[brightnessSlider setEnabled:NO];
+		[brightnessField setEnabled:NO];
+	}
+	else
+	{
+		float brightnessValue = (float)brightness / 655.35f;
+		[brightnessSlider setFloatValue:brightnessValue];
+		[brightnessSlider setEnabled:YES];
+		[brightnessField setEnabled:YES];
+	}
+	
+	if(hue == 0)
+	{
+		[hueSlider setFloatValue:0.0f];
+		[hueSlider setEnabled:NO];
+		[hueField setEnabled:NO];
+	}
+	else
+	{
+		float hueValue = ((float)hue / 182.04166666666666f) - 180.0f;
+		[hueSlider setFloatValue:hueValue];
+		[hueSlider setEnabled:YES];
+		[hueField setEnabled:YES];
+	}
+	
+	if(saturation == 0)
+	{
+		[saturationSlider setFloatValue:0.0f];
+		[saturationSlider setEnabled:NO];
+		[saturationField setEnabled:NO];
+	}
+	else
+	{
+		float saturationValue = (float)saturation / 655.35f;
+		[saturationSlider setFloatValue:saturationValue];
+		[saturationSlider setEnabled:YES];
+		[saturationField setEnabled:YES];
+	}
+	
+	if(contrast == 0)
+	{
+		[contrastSlider setFloatValue:0.0f];
+		[contrastSlider setEnabled:NO];
+		[contrastField setEnabled:NO];
+	}
+	else
+	{
+		float contrastValue = (float)contrast / 655.35f;
+		[contrastSlider setFloatValue:contrastValue];
+		[contrastSlider setEnabled:YES];
+		[contrastField setEnabled:YES];
+	}
+	
+	if(sharpness == 0)
+	{
+		[sharpnessSlider setFloatValue:0.0f];
+		[sharpnessSlider setEnabled:NO];
+		[sharpnessField setEnabled:NO];
+	}
+	else
+	{
+		float sharpnessValue = (float)sharpness / 655.35f;
+		[sharpnessSlider setFloatValue:sharpnessValue];
+		[sharpnessSlider setEnabled:YES];
+		[sharpnessField setEnabled:YES];
+	}
+	
+	[self _updateTextFields];
+}
+
+- (void)_updateTextFields
+{
+	float brightnessValue = [brightnessSlider floatValue];
+	float hueValue = [hueSlider floatValue];
+	float saturationValue = [saturationSlider floatValue];
+	float contrastValue = [contrastSlider floatValue];
+	float sharpnessValue = [sharpnessSlider floatValue];
+	
+	[brightnessField setFloatValue:brightnessValue];
+	[hueField setFloatValue:hueValue];
+	[saturationField setFloatValue:saturationValue];
+	[contrastField setFloatValue:contrastValue];
+	[sharpnessField setFloatValue:sharpnessValue];
 }
 
 @end

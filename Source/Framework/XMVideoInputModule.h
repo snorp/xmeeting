@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.5 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.6 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -221,17 +221,19 @@
 - (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device;
 
 /*!
-	@function	hasSettings;
-	@discussion	Returns whether this module has any adjustable settings or not.
+	@function	hasSettingsForDevice:(NSString *)device;
+	@discussion	Returns whether this module has any adjustable settings for the given device
+				or not. If the device parameter is nil, return whether this module has
+				general settings that apply for all kind of devices.
  
 				This method will be called on the main thread.
  
-				The value returned should not change during the lifetime of this
-				module.
+	@param		NSString	device	Device for which settings are requested or nil in case
+									general settings are requested.
  
-	@result		BOOL	YES, if this module has settings, NO otherwise.
+	@result		BOOL	YES, if this module has settings for the given device, NO otherwise.
   **/
-- (BOOL)hasSettings;
+- (BOOL)hasSettingsForDevice:(NSString *)device;
 
 /*!
 	@function	requiresSettingsDialogWhenDeviceOpens;
@@ -247,25 +249,24 @@
  
 				This method will be called on the main thread.
  
-				This method is never called if -hasSettings returns NO.
- 
 				The value returned here may change during the lifetime of this module.
+	@param		NSString	device	The device in question.
 	@result		BOOL	YES, if an settings dialog should be displayed, NO otherwise.
  **/
-- (BOOL)requiresSettingsDialogWhenDeviceOpens;
+- (BOOL)requiresSettingsDialogWhenDeviceOpens:(NSString *)device;
 
 /*!
 	@function	getInternalSettings;
 	@discussion	This method return the current settings of the module. Only the module
 				itself needs to be able to interpret the settings returned here.
+				If this module does not have any internal settings, return nil.
  
 				This method will be called on the main thread.
  
-				This method is never called if -hasSettings returns NO.
- 
-	@result		NSData	The Settings of this module
+	@result		NSData	The Settings of this module, or nil if this module does not have any
+						settings.
  **/
-- (NSData *)getInternalSettings;
+- (NSData *)internalSettings;
 
 /*!
 	@function	applyInternalSettings:(NSData *)settings;
@@ -274,40 +275,35 @@
 				This method will not be called on the main thread but on the same thread as
 				-grabFrame is called.
  
-				This method is never called if -hasSettings returns NO.
- 
 	@param		The settings previously returned by -getInternalSettings
  **/
 - (void)applyInternalSettings:(NSData *)settings;
 
 /*!
 	@function	getSettings;
-	@discussion	Returns the current settings of this module in a data structure which
+	@discussion	Returns permament settings of this module in a data structure which
 				can be saved on disk. (UserDefaults for example) Therefore, only standard
 				data types should be contained in the dictionary returned.
+				If this module does not have permament settings, return nil.
  
 				This method will be called on the main thread.
-
-				This method is never called if -hasSettings returns NO.
  
 	@result		NSDictionary	A dictionary containing the settings for this module.
  **/
-- (NSDictionary *)getSettings;
+- (NSDictionary *)permamentSettings;
 
 /*!
 	@function	setSettings:(NSDictionary *)settings;
 	@discussion	Instructs the module to apply the settings contained in the dictionary.
-				If one of the devices of this module is active, -getInternalSettings will
-				be called after this method has been called.
+				If the settings of this module change as a result of this operation,
+				the module should call -noteSettingsDidChangeForModule:.
  
 				This method will be called on the main thread.
- 
-				This method is never called if -hasSettings returns NO.
  
 	@param		settings	A dictionary containing the settings for this module
 	@result		BOOL		The success of this operation.
  **/
-- (BOOL)setSettings:(NSDictionary *)settings;
+- (BOOL)setPermamentSettings:(NSDictionary *)settings;
 
 /*!
 	@function	settingsViewForDevice:(NSString *)device;
@@ -321,6 +317,19 @@
 						the settings apply to no specific device.
  **/
 - (NSView *)settingsViewForDevice:(NSString *)device;
+
+/*!
+	@function	setDefaultSettingsForDevice:(NSString *)device
+	@discussion	Resets the settings applicable for device to the default values.
+				If device is nil, the general settings applicable to all devices
+				should be reset to default values.
+				If the settings of this module change as a result of this operation,
+				the module should call -noteSettingsDidChangeForModule:.
+ 
+				This method will be called on the main thread.
+	@param		NSString	device	The device in question
+ **/
+- (void)setDefaultSettingsForDevice:(NSString *)device;
 
 @end
 

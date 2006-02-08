@@ -29,6 +29,9 @@
 		D12E61D30998FEF5004EF9F8 /* XMPreferencesCodecListRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */; };
 		D12E627B0999168E004EF9F8 /* XMScreenVideoInputModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */; };
 		D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */; };
+		D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */; };
+		D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */; };
+		D12E64B00999F466004EF9F8 /* SequenceGrabberSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D12E64AE0999F466004EF9F8 /* SequenceGrabberSettings.nib */; };
 		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D13232EE0906684D00F4D5A7 /* XMLocalAudioVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13232ED0906684D00F4D5A7 /* XMLocalAudioVideoView.m */; };
@@ -814,6 +817,9 @@
 		D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoModule.h; path = Source/Framework/XMVideoModule.h; sourceTree = "<group>"; };
 		D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMScreenVideoInputModule.h; path = Source/Framework/XMScreenVideoInputModule.h; sourceTree = "<group>"; };
 		D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMScreenVideoInputModule.m; path = Source/Framework/XMScreenVideoInputModule.m; sourceTree = "<group>"; };
+		D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoPreferencesModule.h; path = Source/GUI/XMVideoPreferencesModule.h; sourceTree = "<group>"; };
+		D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMVideoPreferencesModule.m; path = Source/GUI/XMVideoPreferencesModule.m; sourceTree = "<group>"; };
+		D12E64AF0999F466004EF9F8 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SequenceGrabberSettings.nib; sourceTree = "<group>"; };
 		D132319E090526B700F4D5A7 /* HeadsetCam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HeadsetCam.tiff; path = Resources/Images/HeadsetCam.tiff; sourceTree = "<group>"; };
 		D13231CF09052FC500F4D5A7 /* Cam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Cam.tiff; path = Resources/Images/Cam.tiff; sourceTree = "<group>"; };
 		D13232EC0906684D00F4D5A7 /* XMLocalAudioVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocalAudioVideoView.h; path = Source/GUI/XMLocalAudioVideoView.h; sourceTree = "<group>"; };
@@ -1856,6 +1862,8 @@
 				D1A02ADC081E56DB0018BD11 /* XMGeneralPreferencesModule.m */,
 				D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */,
 				D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */,
+				D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */,
+				D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */,
 			);
 			name = PreferencesWindow;
 			sourceTree = "<group>";
@@ -2850,6 +2858,7 @@
 				D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */,
 				D1A02B24081E96D30018BD11 /* Preferences.nib */,
 				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
+				D12E64AE0999F466004EF9F8 /* SequenceGrabberSettings.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -2944,6 +2953,7 @@
 				D12E61D20998FEEB004EF9F8 /* XMVideoInputModule.h in Headers */,
 				D12E61D30998FEF5004EF9F8 /* XMPreferencesCodecListRecord.h in Headers */,
 				D12E627B0999168E004EF9F8 /* XMScreenVideoInputModule.h in Headers */,
+				D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3477,6 +3487,7 @@
 				D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */,
 				D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */,
 				D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */,
+				D12E64B00999F466004EF9F8 /* SequenceGrabberSettings.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3562,6 +3573,7 @@
 				D198B484097636F300180551 /* XMRTPH264Packetizer.c in Sources */,
 				D1EEDEB80992514A000BF113 /* XMH323Channel.cpp in Sources */,
 				D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */,
+				D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3846,6 +3858,14 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		D12E64AE0999F466004EF9F8 /* SequenceGrabberSettings.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D12E64AF0999F466004EF9F8 /* English */,
+			);
+			name = SequenceGrabberSettings.nib;
 			sourceTree = "<group>";
 		};
 		D1639415083E17A500F7FD83 /* DialPadModule.nib */ = {

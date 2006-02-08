@@ -8,8 +8,10 @@
 	<dict>
 		<key>20</key>
 		<string>595 516 90 79 0 0 1280 832 </string>
+		<key>291</key>
+		<string>280 452 720 207 0 0 1280 832 </string>
 		<key>7</key>
-		<string>280 435 720 242 0 0 1280 832 </string>
+		<string>491 513 720 242 0 0 1280 832 </string>
 		<key>9</key>
 		<string>280 343 720 425 0 0 1280 832 </string>
 	</dict>
@@ -79,16 +81,26 @@
 			<string>132</string>
 			<string>285</string>
 		</array>
+		<key>36</key>
+		<array>
+			<string>292</string>
+			<string>293</string>
+		</array>
+		<key>37</key>
+		<array>
+			<string>298</string>
+			<string>302</string>
+		</array>
 	</dict>
 	<key>IBLastGroupID</key>
-	<string>36</string>
+	<string>38</string>
 	<key>IBLockedObjects</key>
 	<array>
 		<integer>9</integer>
 	</array>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>9</integer>
+		<integer>291</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8G32</string>

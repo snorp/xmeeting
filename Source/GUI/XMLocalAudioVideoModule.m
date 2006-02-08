@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.5 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.6 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,8 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
+	[nibLoader release];
+	
 	[super dealloc];
 }
 
@@ -61,12 +63,23 @@
 	if(devices == nil)
 	{
 		[videoDevicesPopUp setEnabled:NO];
+		[videoDeviceSettingsButton setEnabled:NO];
 	}
 	else
 	{
+		NSString *device = [videoManager selectedInputDevice];
+		
 		[videoDevicesPopUp removeAllItems];
 		[videoDevicesPopUp addItemsWithTitles:devices];
-		[videoDevicesPopUp selectItemWithTitle:[videoManager selectedInputDevice]];
+		[videoDevicesPopUp selectItemWithTitle:device];
+		
+		BOOL settingsButtonIsEnabled = NO;
+		if([videoManager deviceHasSettings:device])
+		{
+			settingsButtonIsEnabled = YES;
+		}
+		
+		[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
 	}
 	
 	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
@@ -175,6 +188,37 @@
 	NSString *device = [videoDevicesPopUp titleOfSelectedItem];
 	
 	[videoManager setSelectedInputDevice:device];
+	
+	BOOL settingsButtonIsEnabled = NO;
+	if([videoManager deviceHasSettings:device])
+	{
+		settingsButtonIsEnabled = YES;
+	}
+	
+	[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
+}
+
+- (IBAction)showVideoDeviceSettings:(id)sender
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	NSString *device = [videoDevicesPopUp titleOfSelectedItem];
+	
+	NSView *settingsView = [videoManager settingsViewForDevice:device];
+	
+	NSRect panelFrame = [videoDeviceSettingsPanel frame];
+	
+	NSRect settingsViewFrame = [settingsView frame];
+	NSRect currentSettingsViewFrame = [videoDeviceSettingsBox frame];
+	
+	panelFrame.size.width += (settingsViewFrame.size.width - currentSettingsViewFrame.size.width);
+	panelFrame.size.height += (settingsViewFrame.size.height - currentSettingsViewFrame.size.height);
+	
+	[videoDeviceSettingsPanel setFrame:panelFrame display:NO];
+	
+	[videoDeviceSettingsBox setContentView:settingsView];
+	
+	[NSApp beginSheet:videoDeviceSettingsPanel modalForWindow:[contentView window] modalDelegate:self didEndSelector:nil contextInfo:NULL];
 }
 
 - (IBAction)changeAudioInputDevice:(id)sender
@@ -267,6 +311,23 @@
 	}
 }
 
+- (IBAction)restoreDefaultSettings:(id)sender
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	NSString *device = [videoDevicesPopUp titleOfSelectedItem];
+	
+	[videoManager setDefaultSettingsForDevice:device];
+}
+
+- (IBAction)closeVideoDeviceSettingsPanel:(id)sender
+{
+	[NSApp endSheet:videoDeviceSettingsPanel returnCode:NSOKButton];
+	[videoDeviceSettingsPanel orderOut:self];
+	
+	[videoDeviceSettingsBox setContentView:nil];
+}
+
 #pragma mark Private Methods
 
 - (void)_validateControls
@@ -291,10 +352,20 @@
 {
 	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
 	
+	NSString *device = [videoManager selectedInputDevice];
+	
 	[videoDevicesPopUp setEnabled:YES];
 	[videoDevicesPopUp removeAllItems];
 	[videoDevicesPopUp addItemsWithTitles:[videoManager inputDevices]];
-	[videoDevicesPopUp selectItemWithTitle:[videoManager selectedInputDevice]];
+	[videoDevicesPopUp selectItemWithTitle:device];
+	
+	BOOL settingsButtonIsEnabled = NO;
+	if([videoManager deviceHasSettings:device])
+	{
+		settingsButtonIsEnabled = YES;
+	}
+	
+	[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
 }
 
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif

@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.1 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.2 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -123,10 +123,9 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 
 - (void) doScreenCopy
 {
-
 	UInt8 *bytes;
 	UInt8 *screen;
-	unsigned j, top, bottom;
+	unsigned j, top;
 //	unsigned height = CVPixelBufferGetHeight(pixelBuffer);		// check current buffer.
 																// simple optimzation is to only copy rect passed.
 																// For now only copy row changed.
@@ -150,7 +149,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 		// Note: need to look out reference callback..
 }
 
-//#define optimzeScreenCopy 1
+#define optimzeScreenCopy 1
 - (void) doRefeshFromScreen: (CGRectCount) count rects: (const CGRect *)rectArray
 {
 #ifdef optimzeScreenCopy
@@ -205,7 +204,53 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 			//  	@"NSScreenNumber"	An NSNumber that contains the CGDirectDisplayID for the screen device. This key is only valid for the device description dictionary for an NSScreen.
 			aNum = [deviceDescription objectForKey: @"NSScreenNumber"];
 			displayID = [aNum intValue];
-		
+			NSLog(@"screen %@", deviceDescription);
+			
+/* 
+	2006-02-08 17:29:39.566 XMeeting[3348] screen {
+    NSDeviceBitsPerSample = 8; 
+    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
+    NSDeviceIsScreen = YES; 
+    NSDeviceResolution = <42900000 42900000 >; 
+    NSDeviceSize = <44a00000 44400000 >; 
+    NSScreenNumber = 1535231424; 
+}
+
+1024 x 768 - Millons:
+2006-02-08 17:31:29.909 XMeeting[3373] screen {
+    NSDeviceBitsPerSample = 8; 
+    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
+    NSDeviceIsScreen = YES; 
+    NSDeviceResolution = <42900000 42900000 >; 
+    NSDeviceSize = <44800000 44400000 >; 
+    NSScreenNumber = 1535231424; 
+}
+2006-02-08 17:31:29.913 XMeeting[3373] Screen Geometry Changed - (1024,768) Depth: 32, Samples: 3, rowBytesScreen 4096
+
+2006-02-08 17:32:49.837 XMeeting[3373] screen {
+    NSDeviceBitsPerSample = 8; 
+    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
+    NSDeviceIsScreen = YES; 
+    NSDeviceResolution = <42900000 42900000 >; 
+    NSDeviceSize = <44a00000 44400000 >; 
+    NSScreenNumber = 1535231424; 
+}
+2006-02-08 17:32:49.872 XMeeting[3373] Screen Geometry Changed - (1280,768) Depth: 32, Samples: 3, rowBytesScreen 5120
+
+
+Thousands of color:
+2006-02-08 17:34:09.579 XMeeting[3373] screen {
+    NSDeviceBitsPerSample = 8; 
+    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
+    NSDeviceIsScreen = YES; 
+    NSDeviceResolution = <42900000 42900000 >; 
+    NSDeviceSize = <44800000 44400000 >; 
+    NSScreenNumber = 1535231424; 
+}
+2006-02-08 17:34:09.616 XMeeting[3373] Screen Geometry Changed - (1024,768) Depth: 16, Samples: 3, rowBytesScreen 2048
+
+256 color does not work
+*/
 			CGRegisterScreenRefreshCallback(refreshCallback, self);
 		}
 
@@ -232,7 +277,7 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 - (BOOL)grabFrame
 {	UInt8 *bytes;
 	UInt8 *screen;
-	unsigned i, j;
+	unsigned j;
 	unsigned height;
 	
 	if(pixelBuffer == NULL)
@@ -246,31 +291,36 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 			  width,  height,
 			  CGDisplayBitsPerPixel(displayID), CGDisplaySamplesPerPixel(displayID), rowBytesScreen);
 		
-		unsigned usedBytes = 4*width*height;
+		unsigned usedBytes = rowBytesScreen*height;
+		OSType PixType;
+		if (rowBytesScreen == 4 * width) 
+			PixType = k32ARGBPixelFormat;		// 32bit color for video
+		else
+		if (rowBytesScreen == 3 * width) 
+			PixType = k24RGBPixelFormat;		// 24 bit color for video
+		else
+		if (rowBytesScreen == 2 * width) 
+			PixType = k16BE555PixelFormat;		// Thousands for video
+		else
+			PixType = k8IndexedPixelFormat;		// 256 color video
+	
 		void *pixels = malloc(usedBytes);	// creating a buffer for the pixels
-		unsigned count = width*height;
 		
 		bytes = (UInt8 *)pixels;
 		screen = CGDisplayBaseAddress(displayID);
 				
-		if (rowBytesScreen == 4 * width) {
-			NSLog(@"screen same");
-			needsUpdate = YES;
-			topLine = 0;
-			bottomLine = height;
-		}
-
-
-
-
+		needsUpdate = YES;
+		topLine = 0;
+		bottomLine = height;
+	
 		// creating the CVPixelBufferRef
 		
 		result = CVPixelBufferCreateWithBytes(NULL, (size_t)width, (size_t)height,
-											  k32ARGBPixelFormat, pixels, 4*width,
+											  PixType, pixels, rowBytesScreen,
 											  XMScreenPixelBufferReleaseCallback, NULL, NULL, &pixelBuffer);
 		
 		if(result != kCVReturnSuccess)
-		{
+		{	NSLog(@"ScreenModule failed: %d", result);
 			//[inputManager handleErrorWithCode:(ComponentResult)result hintCode:1];
 			return NO;
 		}
@@ -301,7 +351,7 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 		CVPixelBufferUnlockBaseAddress	(pixelBuffer, 0);	
 	#endif
 		[self doScreenCopy];
-		NSLog(@"update frame %d", timeStamp);
+		//NSLog(@"update frame %d", timeStamp);
 		[inputManager handleGrabbedFrame:pixelBuffer time:timeStamp];
 		[self setNeedsUpdate: NO];
 	}
@@ -314,17 +364,17 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 	return nil;
 }
 
-- (BOOL)hasSettings
+- (BOOL)hasSettingsForDevice:(NSString *)device
 {
 	return NO;
 }
 
-- (BOOL)requiresSettingsDialogWhenDeviceOpens
+- (BOOL)requiresSettingsDialogWhenDeviceOpens:(NSString *)device
 {
 	return NO;
 }
 
-- (NSData *)getInternalSettings
+- (NSData *)internalSettings
 {
 	return nil;
 }
@@ -333,12 +383,12 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 {
 }
 
-- (NSDictionary *)getSettings
+- (NSDictionary *)permamentSettings
 {
 	return nil;
 }
 
-- (BOOL)setSettings:(NSDictionary *)settings
+- (BOOL)setPermamentSettings:(NSDictionary *)settings
 {
 	return NO;
 }
@@ -346,6 +396,10 @@ void refreshCallback(CGRectCount count, const CGRect *rectArray, void *ignore) {
 - (NSView *)settingsViewForDevice:(NSString *)device
 {
 	return nil;
+}
+
+- (void)setDefaultSettingsForDevice:(NSString *)device
+{
 }
 
 // cleanup frame buffer...

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.9 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.10 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,6 +102,11 @@
  * Returns a view handling the settings for the device specified
  **/
 - (NSView *)settingsViewForDevice:(NSString *)device;
+
+/**
+ * Resets the settings for the device specified to default values
+ **/
+- (void)setDefaultSettingsForDevice:(NSString *)device;
 
 /**
  * Returns the number of video modules available

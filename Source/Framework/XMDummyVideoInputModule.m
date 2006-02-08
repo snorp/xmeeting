@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.6 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.7 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -154,17 +154,17 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return nil;
 }
 
-- (BOOL)hasSettings
+- (BOOL)hasSettingsForDevice:(NSString *)device
 {
 	return NO;
 }
 
-- (BOOL)requiresSettingsDialogWhenDeviceOpens
+- (BOOL)requiresSettingsDialogWhenDeviceOpens:(NSString *)device
 {
 	return NO;
 }
 
-- (NSData *)getInternalSettings
+- (NSData *)internalSettings
 {
 	return nil;
 }
@@ -173,12 +173,12 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 {
 }
 
-- (NSDictionary *)getSettings
+- (NSDictionary *)permamentSettings
 {
 	return nil;
 }
 
-- (BOOL)setSettings:(NSDictionary *)settings
+- (BOOL)setPermamentSettings:(NSDictionary *)settings
 {
 	return NO;
 }
@@ -186,6 +186,10 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 - (NSView *)settingsViewForDevice:(NSString *)device
 {
 	return nil;
+}
+
+- (void)setDefaultSettingsForDevice:(NSString *)device
+{
 }
 
 void XMDummyPixelBufferReleaseCallback(void *releaseRefCon, 

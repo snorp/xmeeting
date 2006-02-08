@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoModule.h,v 1.1 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMVideoModule.h,v 1.2 2006/02/08 23:25:54 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,10 +26,12 @@
  **/
 - (BOOL)hasSettings;
 
-- (NSDictionary *)getSettings;
-- (BOOL)setSettings:(NSDictionary *)settings;
+- (NSDictionary *)permamentSettings;
+- (BOOL)setPermamentSettings:(NSDictionary *)settings;
 
 - (NSView *)settingsView;
+
+- (void)setDefaultSettings;
 
 @end
 
