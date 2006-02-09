@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.7 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.8 2006/02/09 10:16:49 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -284,11 +284,36 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	SGDeviceListRecord *deviceListRecord = *deviceList;
 	SGDeviceName deviceName = deviceListRecord->entry[deviceIndex];
 	
+	err = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
+	if(err != noErr)
+	{
+		// this indicates that probably no video input device is attached
+		NSLog(@"SGNewChannel failed");
+		return NO;
+	}
+	
+	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
+	if(err != noErr)
+	{
+		hintCode = 0x004002;
+		goto bail;
+	}
+	
+	dataGrabUPP = NewSGDataUPP(XMSGProcessGrabDataProc);
+	err = SGSetDataProc(sequenceGrabber,
+						dataGrabUPP,
+						(long)self);
+	if(err != noErr)
+	{
+		hintCode = 0x004003;
+		goto bail;
+	}
+	
 	// we have to use the name of the device, not the input device name itself
 	err = SGSetChannelDevice(videoChannel, deviceName.name);
 	if(err != noErr)
 	{
-		hintCode = 0x004002;
+		hintCode = 0x004004;
 		goto bail;
 	}
 	
@@ -296,7 +321,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = SGSetChannelDeviceInput(videoChannel, inputNameIndex);
 	if(err != noErr)
 	{
-		hintCode = 0x004003;
+		hintCode = 0x004005;
 		goto bail;
 	}
 	
@@ -308,21 +333,21 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = SGSetChannelBounds(videoChannel, &rect);
 	if(err != noErr)
 	{
-		hintCode = 0x004004;
+		hintCode = 0x004006;
 		goto bail;
 	}
 	
 	err = SGPrepare(sequenceGrabber, false, true);
 	if(err != noErr)
 	{
-		hintCode = 0x004005;
+		hintCode = 0x004007;
 		goto bail;
 	}
 	
 	err = SGStartRecord(sequenceGrabber);
 	if(err != noErr)
 	{
-		hintCode = 0x004006;
+		hintCode = 0x004008;
 		goto bail;
 	}
 	
@@ -474,6 +499,12 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 bail:
 	// stopping any sequence if needed
 	SGStop(sequenceGrabber);
+
+	if(dataGrabUPP != NULL)
+	{
+		DisposeSGDataUPP(dataGrabUPP);
+		dataGrabUPP = NULL;
+	}
 	
 	[selectedDevice release];
 	selectedDevice = nil;
@@ -500,6 +531,12 @@ bail:
 	
 	[selectedDevice release];
 	selectedDevice = nil;
+	
+	if(SGDisposeChannel(sequenceGrabber, videoChannel) != noErr)
+	{
+		result = NO;
+	}
+	videoChannel = NULL;
 	
 	return result;
 }
@@ -848,13 +885,6 @@ bail:
 	{
 		hintCode = 0x001004;
 		goto bail;
-	}
-	
-	if([self _openAndConfigureChannel] == NO)
-	{
-		// Opening the channel failed, probably no video input
-		// device attached to the computer
-		videoChannel = NULL;
 	}
 	
 	return;
