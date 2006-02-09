@@ -84,7 +84,11 @@
             SUPERCLASS = NSWindowController; 
         }, 
         {
-            ACTIONS = {closeVideoModuleSettingsPanel = id; restoreDefaultVideoModuleSettings = id; }; 
+            ACTIONS = {
+                closeVideoModuleSettingsPanel = id; 
+                preferredVideoDeviceSelectionDidChange = id; 
+                restoreDefaultVideoModuleSettings = id; 
+            }; 
             CLASS = XMVideoPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {

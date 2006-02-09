@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.h,v 1.1 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.h,v 1.2 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,8 +24,12 @@ extern NSString *XMKey_VideoPreferencesModuleIdentifier;
 	
 	IBOutlet NSPanel *videoModuleSettingsPanel;
 	IBOutlet NSBox *videoModuleSettingsBox;
+	
+	NSMutableArray *disabledVideoModules;
 
 }
+
+- (IBAction)preferredVideoDeviceSelectionDidChange:(id)sender;
 
 - (IBAction)restoreDefaultVideoModuleSettings:(id)sender;
 - (IBAction)closeVideoModuleSettingsPanel:(id)sender;

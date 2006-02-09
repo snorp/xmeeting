@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.8 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.9 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@ NSString *XMKey_Locations = @"XMeeting_Locations";
 NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
 NSString *XMKey_AutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 NSString *XMKey_UserName = @"XMeeting_UserName";
+NSString *XMKey_DisabledVideoModules = @"XMeeting_DisabledVideoModules";
+NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
 
 @interface XMPreferencesManager (PrivateMethods)
 
@@ -25,6 +27,8 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 
 - (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
 - (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
+
+- (void)_setInitialVideoInputDevice:(NSNotification *)notif;
 
 @end
 
@@ -147,6 +151,36 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	
 	gatekeeperPasswords = [[NSMutableArray alloc] initWithCapacity:3];
 	temporaryGatekeeperPasswords = nil;
+	
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	NSArray *disabledVideoModules = [self disabledVideoModules];
+	if(disabledVideoModules != nil)
+	{
+		unsigned i;
+		unsigned count = [videoManager videoModuleCount];
+		
+		for(i = 0; i < count; i++)
+		{
+			id<XMVideoModule> module = [videoManager videoModuleAtIndex:i];
+			
+			NSString *identifier = [module identifier];
+			if([disabledVideoModules containsObject:identifier])
+			{
+				[module setEnabled:NO];
+			}
+		}
+	}
+	
+	if([videoManager inputDevices] != nil)
+	{
+		[self _setInitialVideoInputDevice:nil];
+	}
+	else
+	{
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_setInitialVideoInputDevice:)
+													 name:XMNotification_VideoManagerDidUpdateInputDeviceList
+												   object:nil];
+	}
 }
 
 - (void)dealloc
@@ -158,6 +192,8 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	{
 		[temporaryGatekeeperPasswords release];
 	}
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[super dealloc];
 }
@@ -242,6 +278,7 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	}
 	
 	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
+	
 }
 
 - (NSArray *)locationNames
@@ -506,6 +543,66 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	}
 }
 
+- (NSArray *)disabledVideoModules
+{
+	NSArray *disabledVideoModules = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_DisabledVideoModules];
+	
+	if(disabledVideoModules == nil)
+	{
+		return [NSArray array];
+	}
+	
+	return disabledVideoModules;
+}
+
+- (void)setDisabledVideoModules:(NSArray *)disabledVideoModules
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	if(disabledVideoModules == nil)
+	{
+		disabledVideoModules = [NSArray array];
+	}
+	
+	unsigned i;
+	unsigned count = [videoManager videoModuleCount];
+	
+	for(i = 0; i < count; i++)
+	{
+		id<XMVideoModule> module = [videoManager videoModuleAtIndex:i];
+		
+		NSString *identifier = [module identifier];
+		
+		if([disabledVideoModules containsObject:identifier])
+		{
+			[module setEnabled:NO];
+		}
+		else
+		{
+			[module setEnabled:YES];
+		}
+	}
+	
+	[[NSUserDefaults standardUserDefaults] setObject:disabledVideoModules forKey:XMKey_DisabledVideoModules];
+}
+
+- (NSString *)preferredVideoInputDevice
+{
+	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_PreferredVideoInputDevice];
+}
+
+- (void)setPreferredVideoInputDevice:(NSString *)device
+{
+	if(device == nil)
+	{
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferredVideoInputDevice];
+	}
+	else
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferredVideoInputDevice];
+	}
+}
+
 #pragma mark Private Methods
 
 - (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
@@ -628,6 +725,33 @@ NSString *XMKey_UserName = @"XMeeting_UserName";
 	if(err != noErr)
 	{
 		NSLog(@"SecKeychainAddGenericPassword failed: %d", (int)err);
+	}
+}
+
+- (void)_setInitialVideoInputDevice:(NSNotification *)notif
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	NSArray *devices = [videoManager inputDevices];
+	
+	NSString *device = [self preferredVideoInputDevice];
+	
+	if(device == nil)
+	{
+		device = [devices objectAtIndex:0];
+	}
+	else
+	{
+		if(![devices containsObject:device])
+		{
+			device = [devices objectAtIndex:0];
+		}
+	}
+	
+	[videoManager setSelectedInputDevice:device];
+	
+	if(notif != nil)
+	{
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_VideoManagerDidUpdateInputDeviceList object:nil];
 	}
 }
 

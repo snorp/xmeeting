@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.6 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.7 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -127,6 +127,11 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 }
 
 #pragma mark Module Methods
+
+- (NSString *)identifier
+{
+	return @"XMSequenceGrabberVideoInputModule";
+}
 
 - (NSString *)name
 {

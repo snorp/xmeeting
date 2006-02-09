@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.8 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.9 2006/02/09 01:43:10 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,6 +158,26 @@ extern NSString *XMKey_Locations;
  * Clears the temporary password cache
  **/
 - (void)clearTemporaryPasswords;
+
+/**
+ * Returns an array containing identifiers of the disabled video modules
+ **/
+- (NSArray *)disabledVideoModules;
+
+/**
+ * Sets which video modules are disabled and which aren't
+ **/
+- (void)setDisabledVideoModules:(NSArray *)disabledVideoModules;
+
+/**
+ * Returns the name of the preferred video input device.
+ **/
+- (NSString *)preferredVideoInputDevice;
+
+/**
+ * Sets the name of the preferred video input device.
+ **/
+- (void)setPreferredVideoInputDevice:(NSString *)device;
 
 @end
 

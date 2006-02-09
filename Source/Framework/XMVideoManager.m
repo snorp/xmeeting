@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.8 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.9 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -287,7 +287,8 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	if(firstRun == YES || [inputDevices indexOfObject:selectedInputDevice] == NSNotFound)
 	{
 		[selectedInputDevice release];
-		selectedInputDevice = [[inputDevices objectAtIndex:0] retain];
+		unsigned dummyIndex = [inputDevices count] - 1;
+		selectedInputDevice = [[inputDevices objectAtIndex:dummyIndex] retain];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidUpdateInputDeviceList

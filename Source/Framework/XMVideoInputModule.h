@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.6 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.7 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,9 +102,20 @@
 @protocol XMVideoInputModule <NSObject>
 
 /*!
+	@function	identifier;
+	@discussion	Unique, immutable and non-localized identifier of the module.
+				This identifier may be used to identify the module.
+				This method may be called on every thread, use only immutable strings
+				here.
+	@result		The unique identifier for this module.
+ **/
+- (NSString *)identifier;
+
+/*!
 	@function   name;
 	@discussion	name of the video module. This method may be called
 				on every thread, use only immutable strings here.
+				The name should be localized if possible.
 	
 	@result		Returns a name appropriate for this module.
  **/

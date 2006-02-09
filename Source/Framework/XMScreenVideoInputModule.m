@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.2 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.3 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,6 +59,11 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 	[screenNames release];
 	
 	[super dealloc];
+}
+
+- (NSString *)identifier
+{
+	return @"XMScreenVideoInputModule";
 }
 
 - (NSString *)name

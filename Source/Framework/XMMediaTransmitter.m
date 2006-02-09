@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.19 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.20 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -484,6 +484,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		if([moduleWrapper isEnabled] == YES)
 		{
 			NSArray *inputDevices = [moduleWrapper _devices];
+			
+			if(inputDevices == nil)
+			{
+				return;
+			}
 			[devices addObjectsFromArray:inputDevices];
 		}
 	}
@@ -511,7 +516,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[[NSRunLoop currentRunLoop] addPort:receivePort forMode:NSDefaultRunLoopMode];
 	
 	// initializing all modules
-	BOOL activeModuleSet = NO;
 	unsigned count = [videoInputModules count];
 	unsigned i;
 	for(i = 0; i < count; i++)
@@ -524,16 +528,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		[moduleWrapper performSelectorOnMainThread:@selector(_setDevices:) withObject:inputDevices waitUntilDone:NO];
 		
-		if(activeModuleSet == NO)
+		// initially selecting the dummy device
+		if(i == (count-1))
 		{
-			if([inputDevices count] != 0)
-			{
-				activeModule = module;
-				selectedDevice = (NSString *)[inputDevices objectAtIndex:0];
-				[selectedDevice retain];
-				
-				activeModuleSet = YES;
-			}
+			activeModule = module;
+			selectedDevice = (NSString *)[inputDevices objectAtIndex:0];
+			[selectedDevice retain];
 		}
 	}
 
@@ -1806,6 +1806,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 }
 
 #pragma mark XMVideoModule Methods
+
+- (NSString *)identifier
+{
+	return [videoInputModule identifier];
+}
 
 - (NSString *)name
 {

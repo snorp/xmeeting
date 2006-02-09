@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.7 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.8 2006/02/09 01:43:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,11 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	[device release];
 	
 	[super dealloc];
+}
+
+- (NSString *)identifier
+{
+	return @"XMDummyVideoInputModule";
 }
 
 - (NSString *)name
