@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.20 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.21 2006/02/09 01:56:53 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -493,7 +493,17 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		}
 	}
 	
+	NSString *device = [_XMVideoManagerSharedInstance selectedInputDevice];
+	
 	[_XMVideoManagerSharedInstance _handleDeviceList:devices];
+	
+	if(device != nil && ![devices containsObject:device])
+	{
+		NSLog(@"No longer exists");
+		unsigned dummyIndex = [videoInputModules count] - 1;
+		XMVideoInputModuleWrapper *dummyWrapper = [videoInputModules objectAtIndex:dummyIndex];
+		[XMMediaTransmitter _selectModule:dummyIndex device:[[dummyWrapper _devices] objectAtIndex:0]];
+	}
 	
 	[devices release];
 }
