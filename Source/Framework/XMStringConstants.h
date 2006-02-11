@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.15 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.16 2006/02/11 10:19:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,13 @@ extern NSString *XMNotification_UtilsDidStartFetchingExternalAddress;
  * from the XMUtils instance.
  **/
 extern NSString *XMNotification_UtilsDidEndFetchingExternalAddress;
+
+/**
+ * Posted every time the local addresses do change. This happens
+ * if the system configuration location changes or if a network
+ * cable is plugged in and the host gets connected to a network.
+ **/
+extern NSString *XMNotification_UtilsDidUpdateLocalAddresses;
 
 #pragma mark XMCallManager Notifications
 

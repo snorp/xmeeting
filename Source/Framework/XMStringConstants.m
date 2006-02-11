@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.14 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.15 2006/02/11 10:19:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@ NSString *XMNotification_FrameworkDidClose = @"XMeetingFrameworkDidCloseNotifica
 
 NSString *XMNotification_UtilsDidStartFetchingExternalAddress = @"XMeetingUtilsDidStartFetchingExternalAddressNotification";
 NSString *XMNotification_UtilsDidEndFetchingExternalAddress = @"XMeetingUtilsDidEndFetchingExternalAddressNotification";
+NSString *XMNotification_UtilsDidUpdateLocalAddresses = @"XMeetingUtilsDidUpdateLocalAddresses";
 
 NSString *XMNotification_CallManagerDidStartSubsystemSetup = @"XMeetingCallManagerDidStartSubsystemSetupNotification";
 NSString *XMNotification_CallManagerDidEndSubsystemSetup = @"XMeetingCallManagerDidEndSubsystemSetupNotification";

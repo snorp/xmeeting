@@ -1,14 +1,28 @@
 /*
- * $Id: XMUtils.m,v 1.7 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.8 2006/02/11 10:19:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
+#import <SystemConfiguration/SystemConfiguration.h>
+
 #import "XMUtils.h"
 #import "XMPrivate.h"
 #import "XMStringConstants.h"
+
+NSString *XMString_DynamicStoreName = @"XMeeting";
+NSString *XMString_DynamicStoreNotificationKey = @"State:/Network/Interface/.+/IPv4";
+
+void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info);
+
+@interface XMUtils (PrivateMethods)
+
+- (void)_urlLoadingTimeout:(NSTimer *)timer;
+- (void)_getLocalAddresses;
+
+@end
 
 @implementation XMUtils
 
@@ -34,7 +48,19 @@
 
 - (id)_init
 {
-	localAddress = nil;
+	dynamicStoreContext.version = 0;
+	dynamicStoreContext.info = NULL;
+	dynamicStoreContext.retain = NULL;
+	dynamicStoreContext.release = NULL;
+	dynamicStoreContext.copyDescription = NULL;
+	dynamicStore = SCDynamicStoreCreate(NULL, (CFStringRef)XMString_DynamicStoreName, _XMDynamicStoreCallback, &dynamicStoreContext);
+	CFRunLoopSourceRef runLoopSource = SCDynamicStoreCreateRunLoopSource(NULL, dynamicStore, 0);
+	CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+	CFRunLoopAddSource(runLoop, runLoopSource, kCFRunLoopCommonModes);
+	CFRelease(runLoopSource);
+	NSArray *notificationKeys = [[NSArray alloc] initWithObjects:XMString_DynamicStoreNotificationKey, nil];
+	SCDynamicStoreSetNotificationKeys(dynamicStore, NULL, (CFArrayRef)notificationKeys);
+	localAddresses = nil;
 	
 	isFetchingExternalAddress = NO;
 	didSucceedFetchingExternalAddress = YES;
@@ -43,15 +69,23 @@
 	externalAddress = nil;
 	externalAddressFetchFailReason = nil;
 	
+	[self _getLocalAddresses];
+	
 	return self;
 }
 
 - (void)_close
 {
-	if(localAddress != nil)
+	if(localAddresses != nil)
 	{
-		[localAddress release];
-		localAddress = nil;
+		[localAddresses release];
+		localAddresses = nil;
+	}
+	
+	if(dynamicStore != NULL)
+	{
+		CFRelease(dynamicStore);
+		dynamicStore = NULL;
 	}
 	
 	if(externalAddressURLConnection != nil)
@@ -96,46 +130,21 @@
 	[super dealloc];
 }
 
-#pragma mark Fetching local address
+#pragma mark Handling local addresses
+
+- (NSArray *)localAddresses
+{
+	return localAddresses;
+}
 
 - (NSString *)localAddress
 {
-	if(localAddress == nil)
+	if([localAddresses count] == 0)
 	{
-		NSArray *hostAddresses = [[NSHost currentHost] addresses];
-		unsigned count = [hostAddresses count];
-		unsigned i;
-		
-		for(i = 0; i < count; i++)
-		{
-			NSString *address = [hostAddresses objectAtIndex:i];
-			NSScanner *scanner = [[NSScanner alloc] initWithString:address];
-			int firstByte, secondByte, thirdByte, fourthByte;
-			
-			if([scanner scanInt:&firstByte] &&
-			   [scanner scanString:@"." intoString:nil] &&
-			   [scanner scanInt:&secondByte] &&
-			   [scanner scanString:@"." intoString:nil] &&
-			   [scanner scanInt:&thirdByte] &&
-			   [scanner scanString:@"." intoString:nil] &&
-			   [scanner scanInt:&fourthByte])
-			{
-				// we have an IPv4 address. check that we haven't got the loopback address.
-				if(firstByte != 127 || secondByte != 0 || thirdByte != 0 || fourthByte != 1) // we have a different address
-				{
-					localAddress = [address retain];
-				}
-			}
-			[scanner release];
-			
-			if(localAddress != nil)
-			{
-				break;
-			}
-		}
+		return nil;
 	}
 	
-	return localAddress;
+	return [localAddresses objectAtIndex:0];
 }
 
 #pragma mark Fetching External Address
@@ -183,30 +192,26 @@
 
 - (XMNATDetectionResult)natDetectionResult
 {	
-	NSString *theExternalAddress = [self externalAddress];
-	NSString *theLocalAddress = [self localAddress];
-	XMNATDetectionResult result;
-	
-	if(theLocalAddress == nil)
+	if([localAddresses count] == 0)
 	{
 		// we have no network interface!
-		result = XMNATDetectionResult_Error;
+		return XMNATDetectionResult_Error;
 	}
-	else if(theExternalAddress == nil)
+	else if(externalAddress == nil)
 	{
 		if([self didSucceedFetchingExternalAddress] == YES)
 		{
-			// no external address fetched yet
-			result = XMNATDetectionResult_Error;
+			// external address fetched
+			return XMNATDetectionResult_Error;
 		}
 		else
 		{
-			// we have no external address, thus we are not
-			// behind a NAT
-			result = XMNATDetectionResult_NoNAT;
+			// we have no external address. Thus, we have a network
+			// interface but we haven't access to the internet
+			return XMNATDetectionResult_NoNAT;
 		}
 	}
-	else if([theExternalAddress isEqualToString:theLocalAddress])
+	else if([localAddresses containsObject:externalAddress])
 	{
 		return XMNATDetectionResult_NoNAT;
 	}
@@ -250,22 +255,32 @@
 	if(externalAddressURLData != nil)
 	{
 		// parsing the data for the address string
-		NSCharacterSet *ipCharacters = [NSCharacterSet characterSetWithCharactersInString:@"0123456789."];
 		NSString *urlDataString = [[NSString alloc] initWithData:externalAddressURLData encoding:NSASCIIStringEncoding];
-		NSString *addressString;
 		NSScanner *scanner = [[NSScanner alloc] initWithString:urlDataString];
 		
-		if([scanner scanUpToCharactersFromSet:ipCharacters intoString:nil] &&
-		   [scanner scanCharactersFromSet:ipCharacters intoString:&addressString])
+		if([scanner scanString:@"<html><head><title>Current IP Check</title></head><body>Current IP Address: " intoString:nil])
 		{
-			externalAddress = [addressString retain];
+			int firstByte;
+			int secondByte;
+			int thirdByte;
+			int fourthByte;
+			if([scanner scanInt:&firstByte] && [scanner scanString:@"." intoString:nil] &&
+			   [scanner scanInt:&secondByte] && [scanner scanString:@"." intoString:nil] &&
+			   [scanner scanInt:&thirdByte] && [scanner scanString:@"." intoString:nil] &&
+			   [scanner scanInt:&fourthByte])
+			{
+				externalAddress = [[NSString alloc] initWithFormat:@"%d.%d.%d.%d", firstByte, secondByte, thirdByte, fourthByte];
+			}
+		}
+		
+		if(externalAddress != nil)
+		{
 			didSucceedFetchingExternalAddress = YES;
 		}
 		else
 		{
-			NSString *failReason = @"Invalid address returned";
-			externalAddressFetchFailReason = [failReason retain];
 			didSucceedFetchingExternalAddress = NO;
+			externalAddressFetchFailReason = @"Invalid Data";
 		}
 		
 		[scanner release];
@@ -274,6 +289,7 @@
 	else
 	{
 		didSucceedFetchingExternalAddress = NO;
+		externalAddressFetchFailReason = @"No Data";
 	}
 	
 	if(externalAddressURLConnection != nil)
@@ -337,6 +353,8 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
 }
 
+#pragma mark Private Methods
+
 - (void)_urlLoadingTimeout:(NSTimer *)timer
 {
 	[externalAddressURLConnection cancel];
@@ -365,6 +383,47 @@
 	isFetchingExternalAddress = NO;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
+}
+
+- (void)_getLocalAddresses
+{
+	NSString *interfacesKey = (NSString *)SCDynamicStoreKeyCreateNetworkInterface(NULL, kSCDynamicStoreDomainState);
+	NSDictionary *interfacesDict = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)interfacesKey);
+	NSArray *interfaces = (NSArray *)[interfacesDict objectForKey:@"Interfaces"];
+	NSMutableArray *addresses = [[NSMutableArray alloc] initWithCapacity:3];
+	
+	unsigned i;
+	unsigned count = [interfaces count];
+	
+	for(i = 0; i < count; i++)
+	{
+		NSString *interface = (NSString *)[interfaces objectAtIndex:i];
+		if([interface isEqualToString:@"lo0"])
+		{
+			continue;
+		}
+		NSString *interfaceKey = (NSString *)SCDynamicStoreKeyCreateNetworkInterfaceEntity(NULL, kSCDynamicStoreDomainState,
+																						   (CFStringRef)interface, kSCEntNetIPv4);
+		NSDictionary *interfaceDict = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)interfaceKey);
+		
+		if(interfaceDict != NULL)
+		{
+			NSArray *interfaceAddresses = [interfaceDict objectForKey:@"Addresses"];
+			[addresses addObjectsFromArray:interfaceAddresses];
+		}
+		[interfaceKey release];
+ 	}
+	
+	[interfacesKey release];
+	
+	if(localAddresses != nil)
+	{
+		[localAddresses release];
+	}
+	localAddresses = [addresses copy];
+	[addresses release];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidUpdateLocalAddresses object:self];
 }
 
 @end
@@ -414,4 +473,10 @@ float XMGetVideoHeightForWidth(float width)
 float XMGetVideoWidthForHeight(float height)
 {
 	return height * (11.0/9.0);
+}
+
+void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info)
+{
+	NSLog(@"CALLBACK called");
+	[_XMUtilsSharedInstance _getLocalAddresses];
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.8 2006/02/09 10:16:49 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.9 2006/02/11 10:19:08 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -256,10 +256,6 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	return deviceNames;
 }
 
-- (void)refreshDeviceList
-{
-}
-
 - (BOOL)openInputDevice:(NSString *)device
 {	
 	ComponentResult err = noErr;
@@ -284,19 +280,13 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	SGDeviceListRecord *deviceListRecord = *deviceList;
 	SGDeviceName deviceName = deviceListRecord->entry[deviceIndex];
 	
-	err = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
-	if(err != noErr)
+	if(videoChannel == NULL)
 	{
-		// this indicates that probably no video input device is attached
-		NSLog(@"SGNewChannel failed");
-		return NO;
-	}
-	
-	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
-	if(err != noErr)
-	{
-		hintCode = 0x004002;
-		goto bail;
+		if([self _openAndConfigureChannel] == NO)
+		{
+			hintCode = 0x004002;
+			goto bail;
+		}
 	}
 	
 	dataGrabUPP = NewSGDataUPP(XMSGProcessGrabDataProc);
@@ -340,14 +330,14 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = SGPrepare(sequenceGrabber, false, true);
 	if(err != noErr)
 	{
-		hintCode = 0x004007;
+		hintCode = 0x004006;
 		goto bail;
 	}
 	
 	err = SGStartRecord(sequenceGrabber);
 	if(err != noErr)
 	{
-		hintCode = 0x004008;
+		hintCode = 0x004007;
 		goto bail;
 	}
 	
@@ -549,7 +539,6 @@ bail:
 	
 	if(isGrabbing == YES)
 	{
-		
 		if([self _disposeDecompressionSession] == NO)
 		{
 			result = NO;
@@ -925,7 +914,6 @@ bail:
 - (BOOL)_openAndConfigureChannel
 {
 	ComponentResult err = noErr;
-	unsigned hintCode = 0;
 	
 	err = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
 	if(err != noErr)
@@ -937,31 +925,10 @@ bail:
 	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
 	if(err != noErr)
 	{
-		hintCode = 0x006001;
-		goto bail;
+		return NO;
 	}
-	
-	dataGrabUPP = NewSGDataUPP(XMSGProcessGrabDataProc);
-	err = SGSetDataProc(sequenceGrabber,
-						dataGrabUPP,
-						(long)self);
-	if(err != noErr)
-	{
-		hintCode = 0x006002;
-		goto bail;
-	}
-	
+
 	return YES;
-	
-bail:
-	if(dataGrabUPP != NULL)
-	{
-		DisposeSGDataUPP(dataGrabUPP);
-		dataGrabUPP = NULL;
-	}
-	
-	[inputManager handleErrorWithCode:err hintCode:hintCode];
-	return NO;
 }
 
 - (BOOL)_createDecompressionSession

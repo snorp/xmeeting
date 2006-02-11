@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.11 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.12 2006/02/11 10:19:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_UTILS_H__
 
 #import <Foundation/Foundation.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 #import "XMTypes.h"
 
 /**
@@ -18,8 +19,9 @@
  **/
 @interface XMUtils : NSObject {
 	
+	SCDynamicStoreRef dynamicStore;
+	SCDynamicStoreContext dynamicStoreContext;
 	NSArray *localAddresses;
-	NSString *localAddress;
 	
 	BOOL isFetchingExternalAddress;
 	BOOL didSucceedFetchingExternalAddress;
@@ -42,7 +44,8 @@
 - (NSArray *)localAddresses;
 
 /**
- * Returns the first object of -localAddresses
+ * Returns the first object of -localAddresses, or nil if there are no
+ * network addresses
  **/
 - (NSString *)localAddress;
 
