@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.11 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.12 2006/02/19 12:28:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -286,15 +286,34 @@
 	udpPortBase = 5000;
 	udpPortMax = 5099;
 	
-	// to reduce unnecessary copy overhead, we do not allocate any storage, indicating that
-	// this has yet to be done. In case of a copy operation, the array allocated here is never
-	// used.
 	audioBufferSize = 2;
-	audioCodecList = nil;
+	
+	unsigned audioCodecCount = [_XMCodecManagerSharedInstance audioCodecCount];
+	audioCodecList = [[NSMutableArray alloc] initWithCapacity:audioCodecCount];
+	unsigned i;
+	for(i = 0; i < audioCodecCount; i++)
+	{
+		XMCodec *audioCodec = [_XMCodecManagerSharedInstance audioCodecAtIndex:i];
+		XMCodecIdentifier identifier = [audioCodec identifier];
+		XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+		[audioCodecList addObject:record];
+		[record release];
+	}
 	
 	enableVideo = NO;
 	videoFramesPerSecond = 20;
-	videoCodecList = nil;
+	
+	unsigned videoCodecCount = [_XMCodecManagerSharedInstance videoCodecCount];
+	videoCodecList = [[NSMutableArray alloc] initWithCapacity:videoCodecCount];
+	for(i = 0; i < videoCodecCount; i++)
+	{
+		XMCodec *videoCodec = [_XMCodecManagerSharedInstance videoCodecAtIndex:i];
+		XMCodecIdentifier identifier = [videoCodec identifier];
+		XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+		[videoCodecList addObject:record];
+		[record release];
+	}
+	
 	enableH264LimitedMode = NO;
 	
 	enableH323 = NO;
@@ -378,34 +397,29 @@
 	obj = [dict objectForKey:XMKey_PreferencesAudioCodecList];
 	if(obj)
 	{
-		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		NSArray *arr = (NSArray *)obj;
 		unsigned count = [arr count];
+		unsigned audioCodecCount = [audioCodecList count];
 		unsigned i;
-		
-		audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithDictionary:dict];
 			
-			if([codecManager codecForIdentifier:[record identifier]] != nil)
+			unsigned j;
+			for(j = 0; j < audioCodecCount; j++)
 			{
-				[audioCodecList addObject:record];
+				XMPreferencesCodecListRecord *audioCodecRecord = (XMPreferencesCodecListRecord *)[audioCodecList objectAtIndex:j];
+				
+				if([record identifier] == [audioCodecRecord identifier])
+				{
+					[audioCodecList exchangeObjectAtIndex:i withObjectAtIndex:j];
+					[audioCodecRecord setEnabled:[record isEnabled]];
+					break;
+				}
 			}
-			[record release];
-		}
-		
-		// any newly added codecs are guaranteed to be found at the end of the array
-		count = [audioCodecList count];
-		unsigned codecCount = [codecManager audioCodecCount];
-		
-		for(i = count; i < codecCount; i++)
-		{
-			XMCodecIdentifier identifier = [[codecManager audioCodecAtIndex:i] identifier];
-			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[audioCodecList addObject:record];
+			
 			[record release];
 		}
 	}
@@ -425,34 +439,29 @@
 	obj = [dict objectForKey:XMKey_PreferencesVideoCodecList];
 	if(obj)
 	{
-		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		NSArray *arr = (NSArray *)obj;
 		unsigned count = [arr count];
-		int i;
-		
-		videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
+		unsigned videoCodecCount = [videoCodecList count];
+		unsigned i;
 		
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];
 			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithDictionary:dict];
 			
-			if([codecManager codecForIdentifier:[record identifier]] != nil)
+			unsigned j;
+			for(j = 0; j < videoCodecCount; j++)
 			{
-				[videoCodecList addObject:record];
+				XMPreferencesCodecListRecord *videoCodecRecord = (XMPreferencesCodecListRecord *)[videoCodecList objectAtIndex:j];
+				
+				if([record identifier] == [videoCodecRecord identifier])
+				{
+					[videoCodecList exchangeObjectAtIndex:i withObjectAtIndex:j];
+					[videoCodecRecord setEnabled:[record isEnabled]];
+					break;
+				}
 			}
-			[record release];
-		}
-		
-		// we have to include additional codec records in case new codecs were added to the system
-		count = [videoCodecList count];
-		unsigned codecCount = [codecManager videoCodecCount];
-		
-		for(i = count; i < codecCount; i++)
-		{
-			XMCodecIdentifier identifier = [[codecManager videoCodecAtIndex:i] identifier];
-			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[videoCodecList addObject:record];
+			
 			[record release];
 		}
 	}
@@ -555,7 +564,6 @@
 	
 	if([coder allowsKeyedCoding]) // use keyed coding
 	{
-		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
 		NSArray *array;
 		unsigned count, codecCount, i;
 		
@@ -573,23 +581,24 @@
 		
 		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesAudioCodecList];
 		count = [array count];
-		codecCount = [codecManager audioCodecCount];
-		audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
+		codecCount = [audioCodecList count];
 		
 		for(i = 0; i < count; i++)
 		{
 			XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[array objectAtIndex:i];
-			if([codecManager codecForIdentifier:[record identifier]] != nil)
+			
+			unsigned j;
+			for(j = 0; j < codecCount; j++)
 			{
-				[audioCodecList addObject:record];
+				XMPreferencesCodecListRecord *audioCodecRecord = (XMPreferencesCodecListRecord *)[audioCodecList objectAtIndex:j];
+				
+				if([audioCodecRecord identifier] == [record identifier])
+				{
+					[audioCodecRecord setEnabled:[record isEnabled]];
+					[audioCodecList exchangeObjectAtIndex:i withObjectAtIndex:j];
+					break;
+				}
 			}
-		}
-		for(i = count; i < codecCount; i++)
-		{
-			XMCodecIdentifier identifier = [[codecManager audioCodecAtIndex:i] identifier];
-			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[audioCodecList addObject:record];
-			[record release];
 		}
 		
 		[self setEnableVideo:[coder decodeBoolForKey:XMKey_PreferencesEnableVideo]];
@@ -597,24 +606,26 @@
 		
 		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesVideoCodecList];
 		count = [array count];
-		codecCount = [codecManager videoCodecCount];
-		videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
+		codecCount = [videoCodecList count];
 		
 		for(i = 0; i < count; i++)
 		{
 			XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[array objectAtIndex:i];
-			if([codecManager codecForIdentifier:[record identifier]] != nil)
+			
+			unsigned j;
+			for(j = 0; j < codecCount; j++)
 			{
-				[videoCodecList addObject:record];
+				XMPreferencesCodecListRecord *videoCodecRecord = (XMPreferencesCodecListRecord *)[videoCodecList objectAtIndex:j];
+				
+				if([videoCodecRecord identifier] == [record identifier])
+				{
+					[videoCodecRecord setEnabled:[record isEnabled]];
+					[videoCodecList exchangeObjectAtIndex:i withObjectAtIndex:j];
+					break;
+				}
 			}
 		}
-		for(i = count; i < codecCount; i++)
-		{
-			XMCodecIdentifier identifier = [[codecManager videoCodecAtIndex:i] identifier];
-			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[videoCodecList addObject:record];
-			[record release];
-		}
+		
 		[self setEnableH264LimitedMode:[coder decodeBoolForKey:XMKey_PreferencesEnableH264LimitedMode]];
 		
 		[self setEnableH323:[coder decodeBoolForKey:XMKey_PreferencesEnableH323]];
@@ -1540,81 +1551,58 @@
 
 - (NSMutableArray *)_audioCodecList
 {
-	if(audioCodecList == nil)
-	{
-		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
-		unsigned count = [codecManager audioCodecCount];
-		unsigned i;
-		
-		audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
-		
-		for(i = 0; i < count; i++)
-		{
-			XMCodecIdentifier identifier = [[codecManager audioCodecAtIndex:i] identifier];
-			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[audioCodecList addObject:record];
-			[record release];
-		}
-	}
 	return audioCodecList;
 }
 
 - (void)_setAudioCodecList:(NSArray *)list
-{
-	NSArray *old = audioCodecList;
-	
+{	
 	unsigned count = [list count];
 	unsigned i;
-	audioCodecList = [[NSMutableArray alloc] initWithCapacity:count];
+	unsigned audioCodecListCount = [audioCodecList count];
 	for(i = 0; i < count; i++)
 	{
 		XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[list objectAtIndex:i];
-		XMPreferencesCodecListRecord *copyOfRecord = [record copy];
-		[audioCodecList addObject:copyOfRecord];
-		[copyOfRecord release];
+		
+		unsigned j;
+		for(j = 0; j < audioCodecListCount; j++)
+		{
+			XMPreferencesCodecListRecord *audioCodecRecord = (XMPreferencesCodecListRecord *)[audioCodecList objectAtIndex:j];
+			if([record identifier] == [audioCodecRecord identifier])
+			{
+				[audioCodecRecord setEnabled:[record isEnabled]];
+				[audioCodecList exchangeObjectAtIndex:i withObjectAtIndex:j];
+				break;
+			}
+		}
 	}
-	
-	[old release];
 }
 
 - (NSMutableArray *)_videoCodecList
 {
-	if(videoCodecList == nil)
-	{
-		XMCodecManager *codecManager = [XMCodecManager sharedInstance];
-		unsigned count = [codecManager videoCodecCount];
-		unsigned i;
-		
-		videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
-		
-		for(i = 0; i < count; i++)
-		{
-			XMCodecIdentifier identifier = [[codecManager videoCodecAtIndex:i] identifier];
-			XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-			[videoCodecList addObject:record];
-			[record release];
-		}
-	}
-	
 	return videoCodecList;
 }
 
 - (void)_setVideoCodecList:(NSArray *)list
 {
-	NSArray *old = videoCodecList;
-	
 	unsigned count = [list count];
 	unsigned i;
-	videoCodecList = [[NSMutableArray alloc] initWithCapacity:count];
+	unsigned videoCodecListCount = [videoCodecList count];
 	for(i = 0; i < count; i++)
 	{
 		XMPreferencesCodecListRecord *record = (XMPreferencesCodecListRecord *)[list objectAtIndex:i];
-		XMPreferencesCodecListRecord *copyOfRecord = [record copy];
-		[videoCodecList addObject:copyOfRecord];
-		[copyOfRecord release];
+		
+		unsigned j;
+		for(j = 0; j < videoCodecListCount; j++)
+		{
+			XMPreferencesCodecListRecord *videoCodecRecord = (XMPreferencesCodecListRecord *)[videoCodecList objectAtIndex:j];
+			if([record identifier] == [videoCodecRecord identifier])
+			{
+				[videoCodecRecord setEnabled:[record isEnabled]];
+				[videoCodecList exchangeObjectAtIndex:i withObjectAtIndex:j];
+				break;
+			}
+		}
 	}
-	
-	[old release];
 }
 
 @end
