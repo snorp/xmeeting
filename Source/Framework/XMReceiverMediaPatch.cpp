@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.13 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.14 2006/02/20 17:27:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@
 
 #define XM_PACKET_POOL_GRANULARITY 8
 #define XM_FRAME_BUFFER_SIZE 352*288*4
+
+static BOOL isRFC2429 = FALSE;
 
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
@@ -119,8 +121,16 @@ void XMReceiverMediaPatch::Main()
 				}
 				else
 				{
-					cout << "Receiving RFC2429" << endl;
-					packetReassembler = new XMH263PlusRTPPacketReassembler();
+					if(isRFC2429 == TRUE)
+					{
+						cout << "Receiving RFC2429" << endl;
+						packetReassembler = new XMH263PlusRTPPacketReassembler();
+					}
+					else
+					{
+						cout << "Receiving RFC2190" << endl;
+						packetReassembler = new XMH263RTPPacketReassembler();
+					}
 				}
 				break;
 			case XMCodecIdentifier_H264:
@@ -374,6 +384,11 @@ void XMReceiverMediaPatch::Main()
 	free(packets);
 	free(frameBuffer);
 	free(packetReassembler);
+}
+
+void XMReceiverMediaPatch::SetIsRFC2429(BOOL flag)
+{
+	isRFC2429 = flag;
 }
 
 void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,

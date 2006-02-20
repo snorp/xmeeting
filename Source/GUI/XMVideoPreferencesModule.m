@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.2 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.3 2006/02/20 17:27:49 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,7 +16,8 @@
 NSString *XMKey_VideoPreferencesModuleIdentifier = @"XMeeting_VideoPreferencesModule";
 
 NSString *XMKey_NameIdentifier = @"Name";
-NSString *XMKey_EnabledIdentifier = @"Enabled";
+//NSString *XMKey_EnabledIdentifier = @"Enabled";
+#define XMKey_EnabledIdentifier @"Enabled"
 NSString *XMKey_SettingsIdentifier = @"Settings";
 
 NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.12 2006/02/19 12:28:02 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.13 2006/02/20 17:27:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -560,7 +560,7 @@
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	self = [super init];
+	self = [self init];
 	
 	if([coder allowsKeyedCoding]) // use keyed coding
 	{
@@ -1370,7 +1370,7 @@
 
 - (NSArray *)audioCodecList
 {
-	return [self _audioCodecList];
+	return audioCodecList;
 }
 
 - (unsigned)audioCodecListCount
@@ -1412,7 +1412,7 @@
 
 - (NSArray *)videoCodecList
 {
-	return [self _videoCodecList];
+	return videoCodecList;
 }
 
 - (unsigned)videoCodecListCount

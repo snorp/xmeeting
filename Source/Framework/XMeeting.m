@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.6 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.7 2006/02/20 17:27:48 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,8 +41,8 @@ void XMInitFramework()
 	}
 	
 	_XMUtilsSharedInstance = [[XMUtils alloc] _init];
-	_XMCallManagerSharedInstance = [[XMCallManager alloc] _init];
 	_XMCodecManagerSharedInstance = [[XMCodecManager alloc] _init];
+	_XMCallManagerSharedInstance = [[XMCallManager alloc] _init];
 	_XMAudioManagerSharedInstance = [[XMAudioManager alloc] _init];
 	_XMVideoManagerSharedInstance = [[XMVideoManager alloc] _init];
 	_XMOpalDispatcherSharedInstance = [[XMOpalDispatcher alloc] _init];

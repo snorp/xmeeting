@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.h,v 1.5 2006/01/10 15:13:22 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.h,v 1.6 2006/02/20 17:27:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,12 +27,11 @@ public:
 	virtual void SetCommandNotifier(const PNotifier & notifier,
 									BOOL fromSink);
 	
+	static void SetIsRFC2429(BOOL flag);
+	
 private:
 		
 	void IssueVideoUpdatePictureCommand();
-	
-	BOOL IsFirstPacketOfH261Frame(XMRTPPacket *packet);
-	BOOL CopyH261PacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameBufferSize);
 	
 	XMRTPPacketReassembler *packetReassembler;
 	
