@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.7 2006/02/20 17:27:48 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.8 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,13 +7,11 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <QuickTime/QuickTime.h>
 
 #import "XMeeting.h"
 #import "XMPrivate.h"
 #import "XMStringConstants.h"
-
-#import "XMSequenceGrabberVideoInputModule.h"
-#import "XMDummyVideoInputModule.h"
 
 #define XM_FRAMEWORK_NOT_INITIALIZED 0
 #define XM_FRAMEWORK_INITIALIZED 1
@@ -39,6 +37,9 @@ void XMInitFramework()
 		// The Framework is already initialized
 		return;
 	}
+	
+	// Entering QuickTime
+	EnterMovies();
 	
 	_XMUtilsSharedInstance = [[XMUtils alloc] _init];
 	_XMCodecManagerSharedInstance = [[XMCodecManager alloc] _init];

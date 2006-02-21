@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.h,v 1.1 2006/02/07 18:06:05 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.h,v 1.2 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,6 @@
 	unsigned frameGrabRate;
 	CVPixelBufferRef pixelBuffer;	// buffer returned on call (can this be a screen frame buffer?).
 									// Note: typedef CVBufferRef = CVImageBufferRef = CVPixelBufferRef;
-	unsigned timeStamp;
 }
 
 - (id)_init;

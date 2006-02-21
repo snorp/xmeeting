@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.13 2006/02/08 23:25:54 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.14 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,9 +28,6 @@
 	
 	BOOL isGrabbing;
 	unsigned frameGrabRate;
-	TimeScale timeScale;
-	TimeValue timeOffset;
-	TimeValue lastTime;
 	
 	BOOL isTransmitting;
 	unsigned transmitFrameGrabRate;
@@ -44,6 +41,9 @@
 
 	BOOL useCompressionSessionAPI;
 	ComponentInstance compressor;
+	
+	TimeValue previousTimeStamp;
+	struct timeval firstTime;
 	
 	ICMCompressionSessionRef compressionSession;
 	ICMCompressionFrameOptionsRef compressionFrameOptions;

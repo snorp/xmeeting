@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.9 2006/02/11 10:19:08 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.10 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -531,24 +531,22 @@ bail:
 	return result;
 }
 
-- (BOOL)setInputFrameSize:(NSSize)theFrameSize
-{
-	BOOL result = YES;
-	
+- (NSSize)setInputFrameSize:(NSSize)theFrameSize
+{	
 	frameSize = theFrameSize;
 	
 	if(isGrabbing == YES)
 	{
 		if([self _disposeDecompressionSession] == NO)
 		{
-			result = NO;
+			NSMakeSize(0, 0);
 		}
 		if([self _createDecompressionSession] == NO)
 		{
-			result = NO;
+			NSMakeSize(0, 0);
 		}
 	}
-	return result;
+	return frameSize;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFramesPerSecond
@@ -1013,9 +1011,6 @@ bail:
 			goto bail;
 		}
 		
-		[inputManager setTimeScale:timeScale];
-		[inputManager noteTimeStampReset];
-		
 		// we use this value to determine whether to drop a frame or not.
 		// this is necessary since SGIdle() does produce frames quite
 		// unregularly, sometimes even twice per call
@@ -1057,7 +1052,7 @@ bail:
 
 - (void)_processDecompressedFrame:(CVPixelBufferRef)pixelBuffer
 {
-	[inputManager handleGrabbedFrame:pixelBuffer time:lastTime];
+	[inputManager handleGrabbedFrame:pixelBuffer];
 }
 
 - (void)_setVideoValues:(NSArray *)values

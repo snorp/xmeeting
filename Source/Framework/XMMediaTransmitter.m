@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.21 2006/02/09 01:56:53 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.22 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -304,9 +304,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	isGrabbing = NO;
 	frameGrabRate = 30;
-	timeScale = 600;
-	timeOffset = 0;
-	lastTime = 1;
 	
 	isTransmitting = NO;
 	transmitFrameGrabRate = UINT_MAX;
@@ -319,6 +316,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	useCompressionSessionAPI = NO;
 	compressor = NULL;
+	
+	previousTimeStamp = 0;
+	firstTime.tv_sec = 0;
+	firstTime.tv_usec = 0;
 	
 	compressionSession = NULL;
 	compressionFrameOptions = NULL;
@@ -517,7 +518,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_runMediaTransmitterThread
 {	
-	EnterMovies();
+	EnterMoviesOnThread(kQTEnterMoviesFlagDontSetComponentsThreadMode);
 	XMRegisterPacketBuilder();
 	XMRegisterRTPH263Packetizer();
 	XMRegisterRTPH264Packetizer();
@@ -623,7 +624,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	// Since the run loop wil not exit as long as QuickTime is enabled, we have
 	// to kill the thread "by hand"
-	ExitMovies();
+	ExitMoviesOnThread();
 	
 	[self performSelectorOnMainThread:@selector(_handleMediaTransmitterThreadDidExit) withObject:nil waitUntilDone:NO];
 	
@@ -670,7 +671,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(module != activeModule)
 		{
-			[module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+			NSSize actualSize = [module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+			if(actualSize.height == 0 && actualSize.width == 0)
+			{
+				NSLog(@"Error with setInputFrameSize (2)");
+			}
 			[module setFrameGrabRate:frameGrabRate];
 		}
 		
@@ -712,7 +717,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		return;
 	}
 	
-	[activeModule setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+	NSSize actualSize = [activeModule setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+	if(actualSize.height == 0 && actualSize.width == 0)
+	{
+		NSLog(@"Error with setInputFrameSize (3)");
+	}
 	[activeModule setFrameGrabRate:frameGrabRate];
 	BOOL result = [activeModule openInputDevice:selectedDevice];
 	
@@ -816,7 +825,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(isGrabbing == YES)
 		{
-			[activeModule setInputFrameSize:frameDimensions];
+			NSSize actualSize = [activeModule setInputFrameSize:frameDimensions];
+			if(actualSize.height == 0 && actualSize.width == 0)
+			{
+				NSLog(@"Error with setInputFrameSize (1)");
+			}
 		}
 	}
 	
@@ -838,8 +851,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		[self _startCompressSequence];
 	}
 	
-	timeOffset = lastTime;
-	lastTime = 1;
+	previousTimeStamp = 0;
 	
 	isTransmitting = YES;
 }
@@ -882,8 +894,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	_XMDidStopTransmitting(2);
 	
-	timeOffset = 0;
-	
 	isTransmitting = NO;
 }
 
@@ -896,7 +906,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 {
 	if(compressSequence != 0)
 	{
-		
 		NSData *data = (NSData *)[components objectAtIndex:0];
 		NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 		unsigned videoBytesSent = [number unsignedIntValue];
@@ -945,27 +954,48 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 #pragma mark XMVideoInputManager Methods
 
-- (void)handleGrabbedFrame:(CVPixelBufferRef)frame time:(TimeValue)time
+- (void)handleGrabbedFrame:(CVPixelBufferRef)frame
 {	
 	if(isTransmitting == YES)
 	{
-		TimeValue convertedTime = (90000 / timeScale) * time;
-		TimeValue timeStamp = convertedTime - timeOffset;
-	
-		timeStamp -= (timeStamp % 3003);
-	
-		if(timeStamp <= lastTime && lastTime != 1)
-		{
-			timeStamp = lastTime + 3003;
-		}
-	
-		lastTime = timeStamp;
+		TimeValue timeStamp;
 		
-		SInt32 timeStampDifference = (timeStamp - convertedTime);
-		if(timeStampDifference >= 3003)
+		if(previousTimeStamp == 0)
 		{
-			return;
+			gettimeofday(&firstTime, NULL);
+			timeStamp = 3003;
 		}
+		else
+		{
+			struct timeval time;
+			
+			gettimeofday(&time, NULL);
+			
+			// calculating the time units passed in the 90khz clock.
+			long units = (time.tv_sec - firstTime.tv_sec) * 90000;
+			units += ((time.tv_usec - firstTime.tv_usec) * (90000.0 / 1000000.0));
+			
+			// rounding down to integer multiples of 3003 (29.97hz clock), 
+			// increasing by 3003 since the first timestamp has value 3003.
+			TimeValue calculatedTimeStamp = units - (units % 3003) + 3003;
+			
+			// make sure that the time stamp is strictly monotonically increasing
+			if(calculatedTimeStamp <= previousTimeStamp)
+			{
+				timeStamp = previousTimeStamp + 3003;
+				
+				if(timeStamp - calculatedTimeStamp >= 3003)
+				{
+					return;
+				}
+			}
+			else
+			{
+				timeStamp = calculatedTimeStamp;
+			}
+		}
+		
+		previousTimeStamp = timeStamp;
 	
 		if(useCompressionSessionAPI == YES)
 		{
@@ -976,28 +1006,19 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
 		}
 	}
+	else
+	{
+		[XMMediaTransmitter _startTransmittingForSession:2
+											  withCodec:XMCodecIdentifier_H261
+											  videoSize:XMVideoSize_CIF
+									 maxFramesPerSecond:30
+											 maxBitrate:384000
+												  flags:0];
+	}
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
 	[_XMVideoManagerSharedInstance _handleLocalVideoFrame:frame];
-}
-
-- (void)setTimeScale:(TimeScale)theTimeScale
-{
-	timeScale = theTimeScale;
-}
-
-- (void)noteTimeStampReset
-{
-	if(isTransmitting)
-	{
-		// we have to adjust the timeOffset so that the
-		// produced timeStamps are correctly moving onwards
-		// the new timeoffset is the negative value of the
-		// lastTime minus one frame time (calculated using
-		// the current frame grab rate.
-		timeOffset = (-1 * lastTime) - (90000/frameGrabRate);
-	}
 }
 
 - (void)noteSettingsDidChangeForModule:(id<XMVideoInputModule>)module
@@ -1458,9 +1479,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			compressSequenceNonKeyFrameCounter = 0;
 		}
 		
-		// rounding timeStamp to the next lower integer multiple of 3003
-		timeStamp -= (timeStamp % 3003);
-		
 		UInt32 numberOfFramesInBetween = 1;
 		if(compressSequencePreviousTimeStamp != 0)
 		{
@@ -1520,6 +1538,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		compressSequenceFrameCounter += 1;
 		
 		needsPictureUpdate = NO;
+		
+		CVPixelBufferUnlockBaseAddress(frame, 0);
 	}
 }
 
@@ -1528,6 +1548,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 					 imageDescription:(ImageDescriptionHandle)imageDesc 
 							timeStamp:(UInt32)timeStamp
 {	
+	NSLog(@"ts: %d", timeStamp);
+	return noErr;
+	
 	OSErr err = noErr;
 	
 	sampleData.flags = 0;

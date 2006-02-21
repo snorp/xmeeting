@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.7 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.8 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,27 +34,8 @@
 				This method should be called on the same thread as -grabFrame is called.
  
 	@param		frame	A reference to the frame grabbed.
-	@param		time	timestamp of the grabed frame.
  **/
-- (void)handleGrabbedFrame:(CVPixelBufferRef)frame 
-					  time:(TimeValue)time;
-
-/*!
-	@function   setTimeScale;
-	@discussion	Allows the module to set the timeScale of the  frames to be passed.
- 
-				This method should be called on the same thread as -openInputDevice is called.
-	@param		(TimeScale)timeScale   
- **/
-- (void)setTimeScale:(TimeScale)timeScale;
-
-/*!
-	@function   noteTimeStampReset;
-	@discussion	Tells the InputManager that the following frame timeStamps start with zero again.
-				
-				This method should be called on the same thread as -openInputDevice is called.
- **/
-- (void)noteTimeStampReset;
+- (void)handleGrabbedFrame:(CVPixelBufferRef)frame;
 
 /*!
 	@function	noteSettingsDidChangeForModule:(id<XMVideoInputModule>)module
@@ -171,18 +152,19 @@
 
 /*!
 	@function   setInputFrameSize:(NSSize)frameSize;
-	@discussion	tells the receiver to produce frames with frameSize dimension.
+	@discussion	tells the receiver to produce frames optimized for the frameSize dimension.
 	
 	This method may be called during a ongoing grab sequence, so the receiver
 	cannot rely on having the same frame size all the time.
 	
-	This method is guaranteed to be called before any call to -openInputDevice is made.
+	This method is guaranteed to be called at least once before any call to -openInputDevice is made.
 	 
-	@param      NSSize		frameSize	tells the receiver to produce this size.
+	@param      NSSize		frameSize	tells the receiver which size is desired
 	 
-	@result		BOOL		Return whether the module can support the desired size or not.
+	@result		NSSize		return the frame size the module is producing. If there is an error,
+							return {0.0, 0.0}
  **/
-- (BOOL)setInputFrameSize:(NSSize)frameSize;
+- (NSSize)setInputFrameSize:(NSSize)frameSize;
 
 /*!
 	@function   setFrameGrabRate:(unsigned)frameGrabRate;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.h,v 1.2 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.h,v 1.3 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,10 +19,7 @@
 	NSArray *device;
 	
 	NSSize size;
-	unsigned frameGrabRate;
 	CVPixelBufferRef pixelBuffer;
-	
-	unsigned timeStamp;
 }
 
 - (id)_init;

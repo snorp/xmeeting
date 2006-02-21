@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.8 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.9 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,9 +72,6 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 
 - (BOOL)openInputDevice:(NSString *)device
 {
-	[inputManager setTimeScale:600];
-	[inputManager noteTimeStampReset];
-	timeStamp = 0;
 	return YES;
 }
 
@@ -88,7 +85,7 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return YES;
 }
 
-- (BOOL)setInputFrameSize:(NSSize)theSize
+- (NSSize)setInputFrameSize:(NSSize)theSize
 {
 	size = theSize;
 	
@@ -97,13 +94,11 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		CVPixelBufferRelease(pixelBuffer);
 		pixelBuffer = NULL;
 	}
-	return YES;
+	return size;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFrameGrabRate
-{
-	frameGrabRate = theFrameGrabRate;
-	
+{	
 	return YES;
 }
 
@@ -148,8 +143,7 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		}
 	}
 	
-	[inputManager handleGrabbedFrame:pixelBuffer time:timeStamp];
-	timeStamp += (600 / frameGrabRate);
+	[inputManager handleGrabbedFrame:pixelBuffer];
 	
 	return YES;
 }

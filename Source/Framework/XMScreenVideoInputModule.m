@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.3 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.4 2006/02/21 22:38:59 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,7 +100,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 }
 
 
-- (BOOL)setInputFrameSize:(NSSize)theSize
+- (NSSize)setInputFrameSize:(NSSize)theSize
 {
 	size = theSize;
 	
@@ -109,7 +109,9 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 		CVPixelBufferRelease(pixelBuffer);
 		pixelBuffer = NULL;
 	}
-	return YES;
+	
+	// BOGUS: Fix this to return the correct size
+	return size;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFrameGrabRate
@@ -261,9 +263,6 @@ Thousands of color:
 
 	}	// end for i
 	
-	[inputManager setTimeScale:600];
-	[inputManager noteTimeStampReset];
-	timeStamp = 0;
 	return YES;
 }
 
@@ -357,10 +356,9 @@ Thousands of color:
 	#endif
 		[self doScreenCopy];
 		//NSLog(@"update frame %d", timeStamp);
-		[inputManager handleGrabbedFrame:pixelBuffer time:timeStamp];
+		[inputManager handleGrabbedFrame:pixelBuffer];
 		[self setNeedsUpdate: NO];
 	}
-	timeStamp += (600 / frameGrabRate);
 	return YES;
 }
 
