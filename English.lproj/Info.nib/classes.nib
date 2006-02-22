@@ -1,0 +1,18 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = XMInfoModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                gdsFld = NSTextField; 
+                gkFld = NSTextField; 
+                ipFld = NSTextField; 
+                statusFld = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
