@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.14 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.15 2006/02/22 16:12:32 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,7 @@
 #import "XMTextChatModule.h"
 #import "XMStatisticsModule.h"
 #import "XMCallHistoryModule.h"
+#import "XMInspectorController.h"
 
 #import "XMSetupAssistantManager.h"
 
@@ -104,6 +105,7 @@
 	//[zeroConfModule release];
 	//[dialPadModule release];
 	//[textChatModule release];
+	[infoModule release];
 	[statisticsModule release];
 	[callHistoryModule release];
 	
@@ -113,6 +115,32 @@
 }
 
 #pragma mark Action Methods
+
+
+- (IBAction)showInspector:(id)sender{
+	static XMInspectorController *instance;
+	if (!instance){
+		instance = [XMInspectorController instanceWithModules:[NSArray arrayWithObjects:infoModule, statisticsModule, callHistoryModule, nil] andName:@"Inspector"];
+		[NSBundle loadNibNamed:@"XMInspector" owner:[instance retain]];
+	}
+	else
+	{
+		[instance show];
+	}
+}
+
+- (IBAction)showTools:(id)sender{
+	static XMInspectorController *instance;
+	if (!instance){
+		instance = [XMInspectorController instanceWithModules:[NSArray arrayWithObjects:localAudioVideoModule, dialPadModule, nil] andName:@"Tools"];
+		[NSBundle loadNibNamed:@"XMInspector" owner:[instance retain]];
+	}
+	else
+	{
+		[instance show];
+	}
+}
+
 
 - (IBAction)showPreferences:(id)sender
 {
@@ -124,12 +152,21 @@
 	[[XMVideoManager sharedInstance] updateInputDeviceList];
 }
 
+#pragma mark -
+#pragma mark Get&Set
+- (XMAddressBookModule*)addressBookModule{
+	return addressBookModule;
+}
+
+
+#pragma mark -
 #pragma mark NSApplication delegate methods
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
 	XMCloseFramework();
 	
+	[[XMPreferencesManager sharedInstance] synchronize];
 	// wait for the FrameworkDidClose notification before terminating.
 	return NSTerminateLater;
 }
@@ -138,6 +175,7 @@
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
+	
 	[self performSelector:@selector(_displayIncomingCall) withObject:nil afterDelay:0.0];
 }
 
@@ -211,6 +249,8 @@
 	
 	[incomingCallAlert release];
 	incomingCallAlert = nil;
+	
+
 }
 
 - (void)_displayCallStartFailed
@@ -343,6 +383,7 @@
 	
 	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
 	
+	infoModule = [[XMInfoModule alloc] init];
 	addressBookModule = [[XMAddressBookModule alloc] init];
 	//zeroConfModule = [[XMZeroConfModule alloc] init];
 	//dialPadModule = [[XMDialPadModule alloc] init];

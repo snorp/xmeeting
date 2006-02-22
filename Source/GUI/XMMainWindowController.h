@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.6 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.7 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,57 +14,25 @@
 #import "XMMainWindowSupportModule.h"
 #import "XMMainWindowAdditionModule.h"
 
-@class XMMouseOverButton;
+@class XMMouseOverButton, XMOSDVideoView;
 
 /**
  * XMMainWindowController manages the content of the main
  * window. This is done by using modules as defined
  * in the thre interfaces XMMaindWindowModule,
  * XMMainWindowSupportModule and XMMainWindowAdditionModule.
- * XMMainWindowModule instances are displayed in the upper left,
- * "normal" part of the window. They can be resized (depending
- * on their settings).
+ * XMMainWindowModule instances are displayed in the main window.
  * XMMainWindowSupportModule instances are displayed in the right
- * region of the main window. Their size can be changed only
- * programmatically. When calculating the layout of the main window,
- * the size of the content view is guaranteed, although the height
- * may be bigger than requested.
+ * region of the main window.
+
  * XMMainWindowAdditionModule instances are displayed in the
- * bottom region of the main window. This bottom region
- * can be hidden or shown. The height of these modules is
- * fixed whereas the width does vary according to the other
- * active modules (main & support). In addition, these modules 
- * can also be shown in a separate window, allowing it
- * to display more than one module on screen at a time.
- *
- * +----------------+---------+
- * |                |         |
- * |				|         |
- * |      Main      | Support |
- * |				|         |
- * |				|         |
- * +----------------+---------+
- * +--------------------------+
- * |                          |
- * |          Bottom          |
- * |                          |
- * +--------------------------+
+ * inspector window. 
  **/
 @interface XMMainWindowController : NSWindowController {
 	
 	IBOutlet NSBox *mainContentBox;
-	IBOutlet NSBox *rightContentBox;
-	IBOutlet NSBox *bottomContentBox;
-	IBOutlet NSBox *separatorContentBox;
-	IBOutlet NSBox *statusBarContentBox;
 	
-	IBOutlet NSBox *horizontalSeparator;
-	
-	IBOutlet NSView *separatorContentView;
-	IBOutlet NSView *statusBarContentView;
-	
-	IBOutlet NSButton *additionContentDisclosure;
-	IBOutlet XMMouseOverButton *separateWindowButton;
+	XMOSDVideoView *selfView;
 	
 	NSMutableArray *mainModules;		// contains the main modules
 	NSMutableArray *supportModules;		// contains the support modules
@@ -77,6 +45,7 @@
 	unsigned activeAdditionModuleIndex;
 	
 	BOOL bottomIsExpanded;
+	BOOL selfViewShown;
 }
 
 /**
@@ -166,7 +135,7 @@
  **/
 - (IBAction)toggleShowAdditionContent:(id)sender;
 - (IBAction)showAdditionModuleInSeparateWindow:(id)sender;
-
+- (IBAction)showSelfView:(id)sender;
 @end
 
 #endif // __XM_MAIN_WINDOW_CONTROLLER_H__

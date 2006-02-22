@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallView.m,v 1.4 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMInCallView.m,v 1.5 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,11 +8,11 @@
 
 #import "XMInCallView.h"
 
-#define TOP_CONTENT_MARGIN 20
-#define BOTTOM_CONTENT_MARGIN 20
-#define LEFT_CONTENT_MARGIN 20
-#define RIGHT_CONTENT_MARGIN 5
-#define CONTENT_SPACING 10
+#define TOP_CONTENT_MARGIN 15
+#define BOTTOM_CONTENT_MARGIN 15
+#define LEFT_CONTENT_MARGIN 4
+#define RIGHT_CONTENT_MARGIN 4
+#define CONTENT_SPACING 2
 
 @interface XMInCallView (PrivateMethods)
 
@@ -27,15 +27,16 @@
 
 - (void)awakeFromNib
 {
-	[self addSubview:statusContentView];
 	[self addSubview:videoContentView];
-	[self addSubview:buttonContentView];
+	[self addSubview:statusContentView];
+	//[self addSubview:buttonContentView];
 	[self setAutoresizesSubviews:NO];
 	
 	NSRect statusContentFrame = [statusContentView frame];
-	NSRect buttonContentFrame = [buttonContentView frame];
+	//NSRect buttonContentFrame = [buttonContentView frame];
 	statusContentHeight = statusContentFrame.size.height;
-	buttonContentHeight = buttonContentFrame.size.height;
+	//buttonContentHeight = buttonContentFrame.size.height;
+	buttonContentHeight = 0;
 	minContentWidth = statusContentFrame.size.width;
 	
 	videoSize = XMVideoSize_CIF;
@@ -45,9 +46,9 @@
 	statusContentFrame.origin.x = LEFT_CONTENT_MARGIN;
 	[statusContentView setFrame:statusContentFrame];
 	
-	buttonContentFrame.origin.x = LEFT_CONTENT_MARGIN;
-	buttonContentFrame.origin.y = BOTTOM_CONTENT_MARGIN;
-	[buttonContentView setFrame:buttonContentFrame];
+	//buttonContentFrame.origin.x = LEFT_CONTENT_MARGIN;
+	//buttonContentFrame.origin.y = BOTTOM_CONTENT_MARGIN;
+	//[buttonContentView setFrame:buttonContentFrame];
 	
 	[self _validateContentViews];
 	
@@ -61,6 +62,11 @@
 - (void)setShowVideoContent:(BOOL)flag
 {
 	showVideoContent = flag;
+	
+	if (!flag){ //no video
+		videoSize = XMVideoSize_320_240;
+		showVideoContent = YES;
+	}
 	
 	[self _validateContentViews];
 }
@@ -76,8 +82,7 @@
 	unsigned height;
 	
 	width = LEFT_CONTENT_MARGIN + minContentWidth + RIGHT_CONTENT_MARGIN;
-	height = TOP_CONTENT_MARGIN + statusContentHeight + CONTENT_SPACING + 
-					buttonContentHeight + BOTTOM_CONTENT_MARGIN;
+	height = TOP_CONTENT_MARGIN + BOTTOM_CONTENT_MARGIN;
 	
 	if(showVideoContent == YES)
 	{
@@ -88,9 +93,8 @@
 			width = LEFT_CONTENT_MARGIN + (unsigned)theVideoSize.width + RIGHT_CONTENT_MARGIN;
 		}
 		
-		height += (unsigned)theVideoSize.height + CONTENT_SPACING;
+		height += (unsigned)theVideoSize.height;
 	}
-	
 	return NSMakeSize(width, height);
 }
 
@@ -98,12 +102,12 @@
 {
 	if(showVideoContent == NO)
 	{
+		NSLog(@"returning minSize");
 		return [self minimumSize];
 	}
 	
 	NSSize currentSize = [self frame].size;
 	NSSize requiredSize = XMGetVideoFrameDimensions(videoSize);
-	
 	unsigned width = currentSize.width;
 	
 	if(width < (unsigned)requiredSize.width)
@@ -113,10 +117,9 @@
 	unsigned contentWidth = width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
 	
 	unsigned videoHeight = XMGetVideoHeightForWidth(contentWidth);
-	
-	unsigned preferredHeight = BOTTOM_CONTENT_MARGIN + buttonContentHeight + CONTENT_SPACING + videoHeight + CONTENT_SPACING
-									+ statusContentHeight + TOP_CONTENT_MARGIN;
-	
+
+	unsigned preferredHeight = BOTTOM_CONTENT_MARGIN + videoHeight + TOP_CONTENT_MARGIN;
+
 	return NSMakeSize(width, preferredHeight);
 }
 
@@ -139,9 +142,9 @@
 		return resizeDifference;
 	}
 	
-	NSSize ownSize = [self frame].size;
+	NSSize ownSize = [self bounds].size;
 	
-	unsigned usedHeight = (TOP_CONTENT_MARGIN + statusContentHeight + 2*CONTENT_SPACING + buttonContentHeight + BOTTOM_CONTENT_MARGIN);
+	unsigned usedHeight = (TOP_CONTENT_MARGIN + BOTTOM_CONTENT_MARGIN);
 	
 	int minimumVideoHeight = minimumHeight - usedHeight;
 	
@@ -189,20 +192,13 @@
 - (void)_validateContentViews
 {
 	BOOL doHideVideoContent = !showVideoContent;
-	
 	[videoContentView setHidden:doHideVideoContent];
 }
 
 - (void)_layoutContent:(NSRect)frame
 {	
-	// counting away the margins
 	unsigned contentWidth = (unsigned)frame.size.width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
-	
-	NSRect buttonContentFrame = [buttonContentView frame];
-	unsigned xPos = LEFT_CONTENT_MARGIN + (contentWidth - (int)buttonContentFrame.size.width) / 2;
-	buttonContentFrame.origin.x = xPos;
-	[buttonContentView setFrame:buttonContentFrame];
-	
+
 	NSRect statusContentFrame = [statusContentView frame];
 	statusContentFrame.size.width = contentWidth;
 	statusContentFrame.origin.y = (unsigned)frame.size.height - TOP_CONTENT_MARGIN - statusContentHeight;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.14 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.15 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #import "XMCallHistoryRecord.h"
 #import "XMPreferencesManager.h"
 #import "XMDatabaseField.h"
+#import "XMApplicationController.h"
 
 @interface XMNoCallModule (PrivateMethods)
 
@@ -33,6 +34,8 @@
 - (void)_displayListeningStatusFieldInformation;
 - (void)_setupRecentCallsPullDownMenu;
 - (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender;
+
+- (void)_H323NotEnabled:(NSNotification*)notif;
 
 @end
 
@@ -111,7 +114,10 @@
 	[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
 							   name:XMNotification_CallHistoryCallAddressProviderDataDidChange
 							 object:nil];
-	
+	[notificationCenter addObserver:self selector:@selector(_H323NotEnabled:)
+							   name:XMNotification_CallManagerDidNotEnableH323
+							 object:nil];
+		
 	contentViewSize = [contentView frame].size;
 	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
 	
@@ -178,6 +184,24 @@
 }
 
 #pragma mark User Interface Methods
+- (IBAction)showSelfView:(id)sender{
+	[[XMMainWindowController sharedInstance] showSelfView:self];
+}
+
+- (IBAction)showInspector:(id)sender{
+	[[NSApp delegate] showInspector:self];
+}
+
+- (IBAction)showTools:(id)sender{
+	[[NSApp delegate] showTools:self];
+}
+
+
+
+- (IBAction)showAddressBookModuleSheet:(id)sender{
+	[[XMMainWindowController sharedInstance] showAdditionModule:[[NSApp delegate] addressBookModule]];
+}
+
 
 - (IBAction)call:(id)sender
 {
@@ -290,6 +314,7 @@
 - (void)_preferencesDidChange:(NSNotification *)notif
 {
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+
 	[locationsPopUpButton removeAllItems];
 	[locationsPopUpButton addItemsWithTitles:[preferencesManager locationNames]];
 	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
@@ -325,15 +350,14 @@
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
 	[statusFieldOne setStringValue:NSLocalizedString(@"Preparing to call...", @"")];
-	[statusFieldTwo setStringValue:@""];
 }
 
 - (void)_didStartCalling:(NSNotification *)notif
 {
 	[callButton setEnabled:YES];
-	[callButton setTitle:NSLocalizedString(@"Hangup", @"")];
+	[callButton setImage:[NSImage imageNamed:@"hangup_24.tif"]];
+	[callButton setAlternateImage:[NSImage imageNamed:@"hangup_24_down.tif"]];
 	[statusFieldOne setStringValue:NSLocalizedString(@"Calling...", @"")];
-	[statusFieldTwo setStringValue:@""];
 	
 	isCalling = YES;
 }
@@ -347,7 +371,7 @@
 
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif
 {
-	[statusFieldOne setStringValue:NSLocalizedString(@"Ringing Phone at Remote Party...", @"")];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Ringing...", @"")];
 }
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
@@ -361,7 +385,8 @@
 {
 	[locationsPopUpButton setEnabled:YES];
 	[callButton setEnabled:YES];
-	[callButton setTitle:NSLocalizedString(@"Call", @"")];
+	[callButton setImage:[NSImage imageNamed:@"Call_24.tif"]];
+	[callButton setAlternateImage:[NSImage imageNamed:@"Call_24_down.tif"]];
 	[self _displayListeningStatusFieldInformation];
 	isCalling = NO;
 }
@@ -372,14 +397,11 @@
 	
 	if(gatekeeperName != nil)
 	{
-		NSString *gatekeeperFormat = NSLocalizedString(@"Registered at gatekeeper: %@", @"");
-		NSString *gatekeeperString = [[NSString alloc] initWithFormat:gatekeeperFormat, gatekeeperName];
-		[statusFieldThree setStringValue:gatekeeperString];
-		[gatekeeperString release];
+		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
 	}
 	else
 	{
-		[statusFieldThree setStringValue:@""];
+		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
 	}
 }
 
@@ -390,6 +412,11 @@
 
 #pragma mark Private Methods
 
+- (void)_H323NotEnabled:(NSNotification*)notif{
+	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
+}
+
+
 - (void)_displayListeningStatusFieldInformation
 {
 	XMCallManager *callManager = [XMCallManager sharedInstance];
@@ -398,7 +425,7 @@
 	if(!isH323Listening)
 	{
 		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
-		[statusFieldTwo setStringValue:@""];
+		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 		return;
 	}
 		
@@ -408,27 +435,13 @@
 		
 	if(localAddress == nil)
 	{
-		[statusFieldOne setStringValue:NSLocalizedString(@"Offline (No Network Address)", @"")];
-		[statusFieldTwo setStringValue:@""];
+		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
+		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 		return;
 	}
 		
-	[statusFieldOne setStringValue:NSLocalizedString(@"Waiting for incoming calls", @"")];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Idle", @"")];
 	
-	if(externalAddress == nil || [externalAddress isEqualToString:localAddress])
-	{
-		NSString *displayFormat = NSLocalizedString(@"ip: %@", @"");
-		NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, localAddress];
-		[statusFieldTwo setStringValue:displayString];
-		[displayString release];
-	}
-	else
-	{
-		NSString *displayFormat = NSLocalizedString(@"ip: %@ (%@)", @"");
-		NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, localAddress, externalAddress];
-		[statusFieldTwo setStringValue:displayString];
-		[displayString release];
-	}
 }
 
 - (void)_setupRecentCallsPullDownMenu

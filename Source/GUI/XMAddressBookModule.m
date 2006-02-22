@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.9 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.10 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -86,6 +86,10 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	// validating the buttons
 	[self _validateButtons];
 	
+	//set up cog-wheel menu
+	[actionButton sendActionOn:NSLeftMouseDownMask];
+	[actionPopup selectItem: nil];
+	
 }
 
 - (NSString *)name
@@ -131,6 +135,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 }
 
 #pragma mark Action Methods
+
+- (IBAction)cogWheelAction:(id)sender{
+    [[actionPopup cell] performClickWithFrame:[sender frame] inView:[sender superview]];    
+	[actionPopup selectItem: nil];
+}
 
 - (IBAction)call:(id)sender
 {

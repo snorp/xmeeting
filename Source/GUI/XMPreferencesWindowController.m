@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.4 2005/06/23 12:35:57 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.5 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,7 +165,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 			[window center];
 		}
 	}
-	
+	[[self window] setLevel:NSScreenSaverWindowLevel+2]; //OSD is NSScreenSaverWindowLevel+1. This ensures it doesn't get over
 	[self showWindow:self];
 }
 

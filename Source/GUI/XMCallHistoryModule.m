@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.10 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.11 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,7 +140,7 @@
 
 - (NSString *)name
 {
-	return @"Call History";
+	return @"History";
 }
 
 - (NSImage *)image

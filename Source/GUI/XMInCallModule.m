@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.11 2005/11/29 18:56:29 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.12 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,7 @@
 #import "XMMainWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMInCallView.h"
-#import "XMSimpleVideoView.h"
+#import "XMOSDVideoView.h"
 
 @interface XMInCallModule (PrivateMethods)
 
@@ -111,12 +111,16 @@
 	
 	[videoView startDisplayingRemoteVideo];
 	
+	[videoView setShouldDisplayOSD:YES];
+	
 	didClearCall = NO;
 }
 
 - (void)becomeInactiveModule
 {
 	[videoView stopDisplayingVideo];
+	[videoView setShouldDisplayOSD:NO];
+	[videoView moduleWasDeactivated:self];
 }
 
 #pragma mark User Interface Methods
@@ -138,9 +142,17 @@
 	//loading the nib file if not already done
 	[self contentView];
 	
-	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];	
+	BOOL isVideoEnabled = [[[preferencesManager locations] objectAtIndex:[preferencesManager indexOfActiveLocation]] enableVideo]; 
+
+	if (!isVideoEnabled){
+		[videoView stopDisplayingVideo]; //display 'NO VIDEO' picture
+		[self _didStartReceivingVideo:nil];
+	}
 	
+	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
 	[remotePartyField setStringValue:remoteName];
+	
 }
 
 - (void)_didClearCall:(NSNotification *)notif
@@ -157,6 +169,9 @@
 	[contentView setVideoSize:videoSize];
 	
 	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfMainModule:self];
+
+	[videoView mouseEntered:[NSApp currentEvent]];
+
 }
 
 - (void)_activeLocationDidChange:(NSNotification *)notif

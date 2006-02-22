@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.13 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.14 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -120,7 +120,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 												 name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
 												 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
-	
+
 	XMUtils *utils = [XMUtils sharedInstance];
 	if([utils didSucceedFetchingExternalAddress] && [utils externalAddress] == nil)
 	{
@@ -129,6 +129,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		[utils startFetchingExternalAddress];
 		isFetchingExternalAddress = YES;
 	}
+	
+	[actionButton sendActionOn:NSLeftMouseDownMask];
+	[actionPopup selectItem: nil];
+
 }
 
 - (void)dealloc
@@ -158,7 +162,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (NSImage *)toolbarImage
 {
-	return nil;
+	return [NSImage imageNamed:@"locationPreferences.tif"];
 }
 
 - (NSString *)toolTipText
@@ -227,6 +231,12 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 }
 
 #pragma mark User Interface Methods
+
+- (IBAction)actionButton:(id)sender{
+    [[actionPopup cell] performClickWithFrame:[sender frame] inView:[sender superview]];    
+	[actionPopup selectItem: nil];
+}
+
 
 - (IBAction)defaultAction:(id)sender
 {

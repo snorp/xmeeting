@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.7 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.8 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,6 +82,10 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *newLocationNameField;
 	IBOutlet NSButton *newLocationOKButton;
 	IBOutlet NSButton *newLocationCancelButton;
+	
+	//other outlets
+	IBOutlet NSPopUpButton *actionPopup;
+	IBOutlet NSButton *actionButton;
 }
 
 // action methos for dealing with locations
@@ -115,6 +119,9 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
 // Action methods for the newLocation Sheet
 - (IBAction)endNewLocationSheet:(id)sender;
+
+//Other
+- (IBAction)actionButton:(id)sender;
 
 @end
 

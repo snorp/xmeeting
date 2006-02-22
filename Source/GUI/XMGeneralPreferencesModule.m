@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.4 2005/10/17 17:00:27 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.5 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,7 +51,7 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 
 - (NSImage *)toolbarImage
 {
-	return nil;
+	return [NSImage imageNamed:@"generalPreferences.tif"];
 }
 
 - (NSString *)toolTipText

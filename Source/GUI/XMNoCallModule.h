@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.6 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.7 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,8 +31,6 @@
 	IBOutlet NSButton *callButton;
 	
 	IBOutlet NSTextField *statusFieldOne;
-	IBOutlet NSTextField *statusFieldTwo;
-	IBOutlet NSTextField *statusFieldThree;
 	
 	// Optimizations for XMDatabaseField completions
 	unsigned uncompletedStringLength;
@@ -43,11 +41,19 @@
 	
 	NSMenuItem *imageItem;
 	
+	IBOutlet NSImageView *semaphoreView;
+
+	
 	BOOL isCalling;
 }
 
 - (IBAction)call:(id)sender;
 - (IBAction)changeActiveLocation:(id)sender;
+- (IBAction)showAddressBookModuleSheet:(id)sender;
+- (IBAction)showInspector:(id)sender;
+- (IBAction)showTools:(id)sender;
+- (IBAction)showSelfView:(id)sender;
+
 
 @end
 

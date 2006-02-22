@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.6 2005/10/17 12:57:53 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.7 2006/02/22 16:12:32 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 @class XMNoCallModule, XMInCallModule, XMLocalAudioVideoModule;
 @class XMAddressBookModule, XMZeroConfModule, XMDialPadModule;
 @class XMTextChatModule, XMStatisticsModule, XMCallHistoryModule;
+@class XMInfoModule;
 
 /**
  * XMApplicationController is responsible for the main menu and
@@ -33,8 +34,10 @@
 	XMTextChatModule *textChatModule;
 	XMStatisticsModule *statisticsModule;
 	XMCallHistoryModule *callHistoryModule;
+	XMInfoModule *infoModule;
 	
 	NSAlert *incomingCallAlert;
+	
 }
 
 /**
@@ -43,6 +46,13 @@
 - (IBAction)showPreferences:(id)sender;
 
 - (IBAction)updateDeviceLists:(id)sender;
+
+- (IBAction)showInspector:(id)sender;
+
+- (IBAction)showTools:(id)sender;
+
+//Get&Set
+- (XMAddressBookModule*)addressBookModule;
 
 @end
 

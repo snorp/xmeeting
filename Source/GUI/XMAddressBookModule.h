@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.h,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMAddressBookModule.h,v 1.7 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,10 @@
 	XMGeneralPurposeAddressResource *editedAddress;
 	
 	NSNib *nibLoader;
+	
+	//other outlets
+	IBOutlet NSPopUpButton *actionPopup;
+	IBOutlet NSButton *actionButton;
 }
 
 - (IBAction)call:(id)sender;
@@ -70,6 +74,9 @@
 
 - (IBAction)addNewRecord:(id)sender;
 - (IBAction)cancelNewRecord:(id)sender;
+
+- (IBAction)cogWheelAction:(id)sender;
+
 
 @end
 

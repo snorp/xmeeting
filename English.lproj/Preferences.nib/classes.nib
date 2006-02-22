@@ -14,6 +14,7 @@
         }, 
         {
             ACTIONS = {
+                actionButton = id; 
                 createNewLocation = id; 
                 defaultAction = id; 
                 deleteLocation = id; 
@@ -33,6 +34,8 @@
             CLASS = XMLocationPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                actionButton = NSButton; 
+                actionPopup = NSPopUpButton; 
                 audioBufferSizeSlider = NSSlider; 
                 audioCodecPreferenceOrderTableView = NSTableView; 
                 autoGetExternalAddressSwitch = NSButton; 

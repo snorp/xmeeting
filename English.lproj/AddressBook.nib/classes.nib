@@ -12,6 +12,7 @@
                 call = id; 
                 callTypeSelected = id; 
                 cancelNewRecord = id; 
+                cogWheelAction = id; 
                 editAddress = id; 
                 endEditRecordSheet = id; 
                 gatekeeperTypeChanged = id; 
@@ -21,6 +22,8 @@
             CLASS = XMAddressBookModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                actionButton = NSButton; 
+                actionPopup = NSPopUpButton; 
                 addressBookView = ABPeoplePickerView; 
                 callButton = NSButton; 
                 callTypePopUp = NSPopUpButton; 

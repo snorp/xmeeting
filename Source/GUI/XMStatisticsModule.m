@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.8 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.9 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #import "XMStatisticsModule.h"
 #import "XMApplicationFunctions.h"
 #import "XMMainWindowController.h"
+#import "XMInspectorController.h"
 
 @interface XMStatisticsModule (PrivateMethods)
 
@@ -64,7 +65,7 @@
 
 - (NSString *)name
 {
-	return @"Call Statistics";
+	return @"Statistics";
 }
 
 - (NSImage *)image
@@ -125,8 +126,7 @@
 - (IBAction)toggleShowExtraInformation:(id)sender
 {
 	isExpanded = !isExpanded;
-	
-	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfAdditionModule:self];
+	[[XMInspectorController instanceWithName:@"Inspector"] currentModuleSizeChanged:self];
 }
 
 #pragma mark TableView DataSource Methods

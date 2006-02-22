@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoView.h,v 1.1 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMLocalAudioVideoView.h,v 1.2 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,16 +16,9 @@
 	
 	IBOutlet NSView *audioContentView;
 	IBOutlet NSView *videoContentView;
-	IBOutlet NSView *disclosureContentView;
-	
-	BOOL contentVisible;
-	BOOL showAudioVideoContent;
-	BOOL showVideoContent;
+
 }
 
-- (void)setContentVisible:(BOOL)flag;
-- (void)setShowAudioVideoContent:(BOOL)flag;
-- (void)setShowVideoContent:(BOOL)flag;
 
 - (NSSize)requiredSize;
 

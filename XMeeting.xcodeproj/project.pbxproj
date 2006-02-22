@@ -7,6 +7,89 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A348FA50984E4210033FA95 /* IGPopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348F970984E4210033FA95 /* IGPopupView.h */; };
+		1A348FA60984E4210033FA95 /* IGPopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348F980984E4210033FA95 /* IGPopupView.m */; };
+		1A348FA70984E4210033FA95 /* XMInfoModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348F990984E4210033FA95 /* XMInfoModule.h */; };
+		1A348FA80984E4210033FA95 /* XMInfoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348F9A0984E4210033FA95 /* XMInfoModule.m */; };
+		1A348FA90984E4210033FA95 /* XMInspectorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348F9B0984E4210033FA95 /* XMInspectorController.h */; };
+		1A348FAA0984E4210033FA95 /* XMInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348F9C0984E4210033FA95 /* XMInspectorController.m */; };
+		1A348FAB0984E4210033FA95 /* XMOnScreenControllerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348F9D0984E4210033FA95 /* XMOnScreenControllerView.h */; };
+		1A348FAC0984E4210033FA95 /* XMOnScreenControllerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348F9E0984E4210033FA95 /* XMOnScreenControllerView.m */; };
+		1A348FAD0984E4210033FA95 /* XMOnScreenControllerWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348F9F0984E4210033FA95 /* XMOnScreenControllerWindow.h */; };
+		1A348FAE0984E4210033FA95 /* XMOnScreenControllerWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348FA00984E4210033FA95 /* XMOnScreenControllerWindow.m */; };
+		1A348FAF0984E4210033FA95 /* XMOpenGLUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348FA10984E4210033FA95 /* XMOpenGLUtilities.h */; };
+		1A348FB00984E4210033FA95 /* XMOpenGLUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348FA20984E4210033FA95 /* XMOpenGLUtilities.m */; };
+		1A348FB10984E4210033FA95 /* XMOSDVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A348FA30984E4210033FA95 /* XMOSDVideoView.h */; };
+		1A348FB20984E4210033FA95 /* XMOSDVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348FA40984E4210033FA95 /* XMOSDVideoView.m */; };
+		1A348FB70984E4520033FA95 /* Info.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FB30984E4520033FA95 /* Info.nib */; };
+		1A348FB80984E4520033FA95 /* XMInspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FB50984E4520033FA95 /* XMInspector.nib */; };
+		1A348FD20984E4680033FA95 /* camera_settings_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBA0984E4680033FA95 /* camera_settings_large_down.tif */; };
+		1A348FD30984E4680033FA95 /* camera_settings_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBB0984E4680033FA95 /* camera_settings_large.tif */; };
+		1A348FD40984E4680033FA95 /* fullscreen_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBC0984E4680033FA95 /* fullscreen_large_down.tif */; };
+		1A348FD50984E4680033FA95 /* fullscreen_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBD0984E4680033FA95 /* fullscreen_large.tif */; };
+		1A348FD60984E4680033FA95 /* hangup_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBE0984E4680033FA95 /* hangup_large_down.tif */; };
+		1A348FD70984E4680033FA95 /* hangup_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBF0984E4680033FA95 /* hangup_large.tif */; };
+		1A348FD80984E4680033FA95 /* Inspect_small.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC00984E4680033FA95 /* Inspect_small.tif */; };
+		1A348FD90984E4680033FA95 /* Inspect.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC10984E4680033FA95 /* Inspect.tiff */; };
+		1A348FDA0984E4680033FA95 /* inspector_bw_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC20984E4680033FA95 /* inspector_bw_large_down.tif */; };
+		1A348FDB0984E4680033FA95 /* inspector_bw_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC30984E4680033FA95 /* inspector_bw_large.tif */; };
+		1A348FDC0984E4680033FA95 /* pinp_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC40984E4680033FA95 /* pinp_large_down.tif */; };
+		1A348FDD0984E4680033FA95 /* pinp_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC50984E4680033FA95 /* pinp_large.tif */; };
+		1A348FDE0984E4680033FA95 /* pinpmode_classic_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC60984E4680033FA95 /* pinpmode_classic_large_down.tif */; };
+		1A348FDF0984E4680033FA95 /* pinpmode_classic_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC70984E4680033FA95 /* pinpmode_classic_large.tif */; };
+		1A348FE00984E4680033FA95 /* pinpmode_ichat_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC80984E4680033FA95 /* pinpmode_ichat_large_down.tif */; };
+		1A348FE10984E4680033FA95 /* pinpmode_ichat_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FC90984E4680033FA95 /* pinpmode_ichat_large.tif */; };
+		1A348FE20984E4680033FA95 /* pinpmode_sidebyside_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FCA0984E4680033FA95 /* pinpmode_sidebyside_large_down.tif */; };
+		1A348FE30984E4680033FA95 /* pinpmode_sidebyside_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FCB0984E4680033FA95 /* pinpmode_sidebyside_large.tif */; };
+		1A348FE40984E4680033FA95 /* semaphore_green.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FCC0984E4680033FA95 /* semaphore_green.tif */; };
+		1A348FE50984E4680033FA95 /* semaphore_red.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FCD0984E4680033FA95 /* semaphore_red.tif */; };
+		1A348FE60984E4680033FA95 /* semaphore_yellow.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FCE0984E4680033FA95 /* semaphore_yellow.tif */; };
+		1A348FE70984E4680033FA95 /* windowed_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FCF0984E4680033FA95 /* windowed_large_down.tif */; };
+		1A348FE80984E4680033FA95 /* windowed_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FD00984E4680033FA95 /* windowed_large.tif */; };
+		1A348FF10984E57F0033FA95 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A348FF00984E57F0033FA95 /* GLUT.framework */; };
+		1A3A07D4099C876A00F5DBAD /* generalPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A3A07D2099C876A00F5DBAD /* generalPreferences.tif */; };
+		1A3A07D5099C876A00F5DBAD /* sourcesPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A3A07D3099C876A00F5DBAD /* sourcesPreferences.tif */; };
+		1A42B4D109A9DEAF007773DA /* XMeeting.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1A42B4D009A9DEAF007773DA /* XMeeting.icns */; };
+		1A490EAF09974BAE0096261F /* XMAudioOnlyOSD.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A490EAD09974BAE0096261F /* XMAudioOnlyOSD.h */; };
+		1A490EB009974BAE0096261F /* XMAudioOnlyOSD.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A490EAE09974BAE0096261F /* XMAudioOnlyOSD.m */; };
+		1A490F830998EB850096261F /* mute_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A490F7F0998EB850096261F /* mute_large_down.tif */; };
+		1A490F840998EB850096261F /* mute_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A490F800998EB850096261F /* mute_large.tif */; };
+		1A490F850998EB850096261F /* unmute_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A490F810998EB850096261F /* unmute_large_down.tif */; };
+		1A490F860998EB850096261F /* unmute_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A490F820998EB850096261F /* unmute_large.tif */; };
+		1A490FC20998EF1D0096261F /* no_pinp_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A490FC00998EF1D0096261F /* no_pinp_large_down.tif */; };
+		1A490FC30998EF1D0096261F /* no_pinp_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A490FC10998EF1D0096261F /* no_pinp_large.tif */; };
+		1A5821C409A1DE7F00CBE017 /* locationPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A5821C309A1DE7F00CBE017 /* locationPreferences.tif */; };
+		1A9E27BE09A5BF3600E9A7CE /* Ringer.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 1A9E27BD09A5BF3600E9A7CE /* Ringer.aiff */; };
+		1AC7C1EF098665E2008521B4 /* no_video_screen.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AC7C1EE098665E2008521B4 /* no_video_screen.tif */; };
+		1ACBD4510992270500B88F0F /* Action_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44B0992270500B88F0F /* Action_Pressed.tiff */; };
+		1ACBD4520992270500B88F0F /* Action.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44C0992270500B88F0F /* Action.tiff */; };
+		1ACBD4530992270500B88F0F /* Add_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */; };
+		1ACBD4540992270500B88F0F /* Add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44E0992270500B88F0F /* Add.tiff */; };
+		1ACBD4550992270500B88F0F /* Remove_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44F0992270500B88F0F /* Remove_Pressed.tiff */; };
+		1ACBD4560992270500B88F0F /* Remove.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD4500992270500B88F0F /* Remove.tiff */; };
+		1AD42B5E09938EF500F92546 /* XMInCallOSD.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AD42B5C09938EF500F92546 /* XMInCallOSD.h */; };
+		1AD42B5F09938EF500F92546 /* XMInCallOSD.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AD42B5D09938EF500F92546 /* XMInCallOSD.m */; };
+		1AD42C390993BF1100F92546 /* pinp_off_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C350993BF1100F92546 /* pinp_off_large_down.tif */; };
+		1AD42C3A0993BF1100F92546 /* pinp_off_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C360993BF1100F92546 /* pinp_off_large.tif */; };
+		1AD42C3B0993BF1100F92546 /* pinp_on_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C370993BF1100F92546 /* pinp_on_large_down.tif */; };
+		1AD42C3C0993BF1100F92546 /* pinp_on_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C380993BF1100F92546 /* pinp_on_large.tif */; };
+		1ADAFBC70990E8B500F6C5FF /* Call_32_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBC50990E8B500F6C5FF /* Call_32_down.tif */; };
+		1ADAFBC80990E8B500F6C5FF /* Call_32.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBC60990E8B500F6C5FF /* Call_32.tif */; };
+		1ADAFBD90990EBA700F6C5FF /* addressBook_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD50990EBA700F6C5FF /* addressBook_24_down.tif */; };
+		1ADAFBDA0990EBA700F6C5FF /* addressBook_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD60990EBA700F6C5FF /* addressBook_24.tif */; };
+		1ADAFBDB0990EBA700F6C5FF /* Call_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */; };
+		1ADAFBDC0990EBA700F6C5FF /* Call_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD80990EBA700F6C5FF /* Call_24.tif */; };
+		1ADAFBE40990EFB800F6C5FF /* info_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBE20990EFB800F6C5FF /* info_24_down.tif */; };
+		1ADAFBE50990EFB800F6C5FF /* info_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBE30990EFB800F6C5FF /* info_24.tif */; };
+		1ADAFBEA0990F74700F6C5FF /* camera_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBE80990F74700F6C5FF /* camera_24_down.tif */; };
+		1ADAFBEB0990F74700F6C5FF /* camera_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBE90990F74700F6C5FF /* camera_24.tif */; };
+		1ADAFC010990FABD00F6C5FF /* hangup_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBFF0990FABD00F6C5FF /* hangup_24_down.tif */; };
+		1ADAFC020990FABD00F6C5FF /* hangup_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFC000990FABD00F6C5FF /* hangup_24.tif */; };
+		1AE62987099B7B4300793794 /* SequenceGrabberSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1AE62985099B7B4300793794 /* SequenceGrabberSettings.nib */; };
+		1AE62A4F099B9C8C00793794 /* tools_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AE62A4D099B9C8C00793794 /* tools_large_down.tif */; };
+		1AE62A50099B9C8C00793794 /* tools_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AE62A4E099B9C8C00793794 /* tools_large.tif */; };
+		1AF9E4A309A07E3600094163 /* tools_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AF9E4A109A07E3600094163 /* tools_24_down.tif */; };
+		1AF9E4A409A07E3600094163 /* tools_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AF9E4A209A07E3600094163 /* tools_24.tif */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -31,7 +114,6 @@
 		D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */; };
 		D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */; };
 		D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */; };
-		D12E64B00999F466004EF9F8 /* SequenceGrabberSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D12E64AE0999F466004EF9F8 /* SequenceGrabberSettings.nib */; };
 		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D13232EE0906684D00F4D5A7 /* XMLocalAudioVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13232ED0906684D00F4D5A7 /* XMLocalAudioVideoView.m */; };
@@ -41,8 +123,6 @@
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
 		D134B974093B88190090271F /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
-		D134B9C4093B8D5C0090271F /* XMSimpleVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */; };
-		D134B9C5093B8D5C0090271F /* XMSimpleVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */; };
 		D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */ = {isa = PBXBuildFile; fileRef = D14587EE09013DD4004A1EDF /* XMCallStatistics.m */; };
 		D147D6070970342B005DE11C /* XMRTPPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = D147D6050970342B005DE11C /* XMRTPPacket.h */; };
 		D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147D6060970342B005DE11C /* XMRTPPacket.cpp */; };
@@ -795,6 +875,89 @@
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1A348F970984E4210033FA95 /* IGPopupView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = IGPopupView.h; path = ../GUI/IGPopupView.h; sourceTree = "<group>"; };
+		1A348F980984E4210033FA95 /* IGPopupView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = IGPopupView.m; path = ../GUI/IGPopupView.m; sourceTree = "<group>"; };
+		1A348F990984E4210033FA95 /* XMInfoModule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMInfoModule.h; path = ../GUI/XMInfoModule.h; sourceTree = "<group>"; };
+		1A348F9A0984E4210033FA95 /* XMInfoModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMInfoModule.m; path = ../GUI/XMInfoModule.m; sourceTree = "<group>"; };
+		1A348F9B0984E4210033FA95 /* XMInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMInspectorController.h; path = ../GUI/XMInspectorController.h; sourceTree = "<group>"; };
+		1A348F9C0984E4210033FA95 /* XMInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMInspectorController.m; path = ../GUI/XMInspectorController.m; sourceTree = "<group>"; };
+		1A348F9D0984E4210033FA95 /* XMOnScreenControllerView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMOnScreenControllerView.h; path = ../GUI/XMOnScreenControllerView.h; sourceTree = "<group>"; };
+		1A348F9E0984E4210033FA95 /* XMOnScreenControllerView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMOnScreenControllerView.m; path = ../GUI/XMOnScreenControllerView.m; sourceTree = "<group>"; };
+		1A348F9F0984E4210033FA95 /* XMOnScreenControllerWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMOnScreenControllerWindow.h; path = ../GUI/XMOnScreenControllerWindow.h; sourceTree = "<group>"; };
+		1A348FA00984E4210033FA95 /* XMOnScreenControllerWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMOnScreenControllerWindow.m; path = ../GUI/XMOnScreenControllerWindow.m; sourceTree = "<group>"; };
+		1A348FA10984E4210033FA95 /* XMOpenGLUtilities.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMOpenGLUtilities.h; path = ../GUI/XMOpenGLUtilities.h; sourceTree = "<group>"; };
+		1A348FA20984E4210033FA95 /* XMOpenGLUtilities.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMOpenGLUtilities.m; path = ../GUI/XMOpenGLUtilities.m; sourceTree = "<group>"; };
+		1A348FA30984E4210033FA95 /* XMOSDVideoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMOSDVideoView.h; path = ../GUI/XMOSDVideoView.h; sourceTree = "<group>"; };
+		1A348FA40984E4210033FA95 /* XMOSDVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMOSDVideoView.m; path = ../GUI/XMOSDVideoView.m; sourceTree = "<group>"; };
+		1A348FB40984E4520033FA95 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Info.nib; sourceTree = "<group>"; };
+		1A348FB60984E4520033FA95 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/XMInspector.nib; sourceTree = "<group>"; };
+		1A348FBA0984E4680033FA95 /* camera_settings_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = camera_settings_large_down.tif; path = Resources/Images/camera_settings_large_down.tif; sourceTree = "<group>"; };
+		1A348FBB0984E4680033FA95 /* camera_settings_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = camera_settings_large.tif; path = Resources/Images/camera_settings_large.tif; sourceTree = "<group>"; };
+		1A348FBC0984E4680033FA95 /* fullscreen_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = fullscreen_large_down.tif; path = Resources/Images/fullscreen_large_down.tif; sourceTree = "<group>"; };
+		1A348FBD0984E4680033FA95 /* fullscreen_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = fullscreen_large.tif; path = Resources/Images/fullscreen_large.tif; sourceTree = "<group>"; };
+		1A348FBE0984E4680033FA95 /* hangup_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hangup_large_down.tif; path = Resources/Images/hangup_large_down.tif; sourceTree = "<group>"; };
+		1A348FBF0984E4680033FA95 /* hangup_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hangup_large.tif; path = Resources/Images/hangup_large.tif; sourceTree = "<group>"; };
+		1A348FC00984E4680033FA95 /* Inspect_small.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Inspect_small.tif; path = Resources/Images/Inspect_small.tif; sourceTree = "<group>"; };
+		1A348FC10984E4680033FA95 /* Inspect.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Inspect.tiff; path = Resources/Images/Inspect.tiff; sourceTree = "<group>"; };
+		1A348FC20984E4680033FA95 /* inspector_bw_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = inspector_bw_large_down.tif; path = Resources/Images/inspector_bw_large_down.tif; sourceTree = "<group>"; };
+		1A348FC30984E4680033FA95 /* inspector_bw_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = inspector_bw_large.tif; path = Resources/Images/inspector_bw_large.tif; sourceTree = "<group>"; };
+		1A348FC40984E4680033FA95 /* pinp_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_large_down.tif; path = Resources/Images/pinp_large_down.tif; sourceTree = "<group>"; };
+		1A348FC50984E4680033FA95 /* pinp_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_large.tif; path = Resources/Images/pinp_large.tif; sourceTree = "<group>"; };
+		1A348FC60984E4680033FA95 /* pinpmode_classic_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinpmode_classic_large_down.tif; path = Resources/Images/pinpmode_classic_large_down.tif; sourceTree = "<group>"; };
+		1A348FC70984E4680033FA95 /* pinpmode_classic_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinpmode_classic_large.tif; path = Resources/Images/pinpmode_classic_large.tif; sourceTree = "<group>"; };
+		1A348FC80984E4680033FA95 /* pinpmode_ichat_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinpmode_ichat_large_down.tif; path = Resources/Images/pinpmode_ichat_large_down.tif; sourceTree = "<group>"; };
+		1A348FC90984E4680033FA95 /* pinpmode_ichat_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinpmode_ichat_large.tif; path = Resources/Images/pinpmode_ichat_large.tif; sourceTree = "<group>"; };
+		1A348FCA0984E4680033FA95 /* pinpmode_sidebyside_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinpmode_sidebyside_large_down.tif; path = Resources/Images/pinpmode_sidebyside_large_down.tif; sourceTree = "<group>"; };
+		1A348FCB0984E4680033FA95 /* pinpmode_sidebyside_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinpmode_sidebyside_large.tif; path = Resources/Images/pinpmode_sidebyside_large.tif; sourceTree = "<group>"; };
+		1A348FCC0984E4680033FA95 /* semaphore_green.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = semaphore_green.tif; path = Resources/Images/semaphore_green.tif; sourceTree = "<group>"; };
+		1A348FCD0984E4680033FA95 /* semaphore_red.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = semaphore_red.tif; path = Resources/Images/semaphore_red.tif; sourceTree = "<group>"; };
+		1A348FCE0984E4680033FA95 /* semaphore_yellow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = semaphore_yellow.tif; path = Resources/Images/semaphore_yellow.tif; sourceTree = "<group>"; };
+		1A348FCF0984E4680033FA95 /* windowed_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = windowed_large_down.tif; path = Resources/Images/windowed_large_down.tif; sourceTree = "<group>"; };
+		1A348FD00984E4680033FA95 /* windowed_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = windowed_large.tif; path = Resources/Images/windowed_large.tif; sourceTree = "<group>"; };
+		1A348FF00984E57F0033FA95 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		1A3A07D2099C876A00F5DBAD /* generalPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = generalPreferences.tif; path = Resources/Images/generalPreferences.tif; sourceTree = "<group>"; };
+		1A3A07D3099C876A00F5DBAD /* sourcesPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = sourcesPreferences.tif; path = Resources/Images/sourcesPreferences.tif; sourceTree = "<group>"; };
+		1A42B4D009A9DEAF007773DA /* XMeeting.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = XMeeting.icns; path = Resources/XMeeting.icns; sourceTree = "<group>"; };
+		1A490EAD09974BAE0096261F /* XMAudioOnlyOSD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAudioOnlyOSD.h; path = ../GUI/XMAudioOnlyOSD.h; sourceTree = "<group>"; };
+		1A490EAE09974BAE0096261F /* XMAudioOnlyOSD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAudioOnlyOSD.m; path = ../GUI/XMAudioOnlyOSD.m; sourceTree = "<group>"; };
+		1A490F7F0998EB850096261F /* mute_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mute_large_down.tif; path = Resources/Images/mute_large_down.tif; sourceTree = "<group>"; };
+		1A490F800998EB850096261F /* mute_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mute_large.tif; path = Resources/Images/mute_large.tif; sourceTree = "<group>"; };
+		1A490F810998EB850096261F /* unmute_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = unmute_large_down.tif; path = Resources/Images/unmute_large_down.tif; sourceTree = "<group>"; };
+		1A490F820998EB850096261F /* unmute_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = unmute_large.tif; path = Resources/Images/unmute_large.tif; sourceTree = "<group>"; };
+		1A490FC00998EF1D0096261F /* no_pinp_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = no_pinp_large_down.tif; path = Resources/Images/no_pinp_large_down.tif; sourceTree = "<group>"; };
+		1A490FC10998EF1D0096261F /* no_pinp_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = no_pinp_large.tif; path = Resources/Images/no_pinp_large.tif; sourceTree = "<group>"; };
+		1A5821C309A1DE7F00CBE017 /* locationPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = locationPreferences.tif; path = Resources/Images/locationPreferences.tif; sourceTree = "<group>"; };
+		1A9E27BD09A5BF3600E9A7CE /* Ringer.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; name = Ringer.aiff; path = Resources/Sounds/Ringer.aiff; sourceTree = "<group>"; };
+		1AC7C1EE098665E2008521B4 /* no_video_screen.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = no_video_screen.tif; path = Resources/Images/no_video_screen.tif; sourceTree = "<group>"; };
+		1ACBD44B0992270500B88F0F /* Action_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Action_Pressed.tiff; path = Resources/Images/Action_Pressed.tiff; sourceTree = "<group>"; };
+		1ACBD44C0992270500B88F0F /* Action.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Action.tiff; path = Resources/Images/Action.tiff; sourceTree = "<group>"; };
+		1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Add_Pressed.tiff; path = Resources/Images/Add_Pressed.tiff; sourceTree = "<group>"; };
+		1ACBD44E0992270500B88F0F /* Add.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Add.tiff; path = Resources/Images/Add.tiff; sourceTree = "<group>"; };
+		1ACBD44F0992270500B88F0F /* Remove_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Remove_Pressed.tiff; path = Resources/Images/Remove_Pressed.tiff; sourceTree = "<group>"; };
+		1ACBD4500992270500B88F0F /* Remove.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Remove.tiff; path = Resources/Images/Remove.tiff; sourceTree = "<group>"; };
+		1AD42B5C09938EF500F92546 /* XMInCallOSD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMInCallOSD.h; path = ../GUI/XMInCallOSD.h; sourceTree = "<group>"; };
+		1AD42B5D09938EF500F92546 /* XMInCallOSD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInCallOSD.m; path = ../GUI/XMInCallOSD.m; sourceTree = "<group>"; };
+		1AD42C350993BF1100F92546 /* pinp_off_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_off_large_down.tif; path = Resources/Images/pinp_off_large_down.tif; sourceTree = "<group>"; };
+		1AD42C360993BF1100F92546 /* pinp_off_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_off_large.tif; path = Resources/Images/pinp_off_large.tif; sourceTree = "<group>"; };
+		1AD42C370993BF1100F92546 /* pinp_on_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_on_large_down.tif; path = Resources/Images/pinp_on_large_down.tif; sourceTree = "<group>"; };
+		1AD42C380993BF1100F92546 /* pinp_on_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_on_large.tif; path = Resources/Images/pinp_on_large.tif; sourceTree = "<group>"; };
+		1ADAFBC50990E8B500F6C5FF /* Call_32_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_32_down.tif; path = Resources/Images/Call_32_down.tif; sourceTree = "<group>"; };
+		1ADAFBC60990E8B500F6C5FF /* Call_32.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_32.tif; path = Resources/Images/Call_32.tif; sourceTree = "<group>"; };
+		1ADAFBD50990EBA700F6C5FF /* addressBook_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = addressBook_24_down.tif; path = Resources/Images/addressBook_24_down.tif; sourceTree = "<group>"; };
+		1ADAFBD60990EBA700F6C5FF /* addressBook_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = addressBook_24.tif; path = Resources/Images/addressBook_24.tif; sourceTree = "<group>"; };
+		1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_24_down.tif; path = Resources/Images/Call_24_down.tif; sourceTree = "<group>"; };
+		1ADAFBD80990EBA700F6C5FF /* Call_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_24.tif; path = Resources/Images/Call_24.tif; sourceTree = "<group>"; };
+		1ADAFBE20990EFB800F6C5FF /* info_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = info_24_down.tif; path = Resources/Images/info_24_down.tif; sourceTree = "<group>"; };
+		1ADAFBE30990EFB800F6C5FF /* info_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = info_24.tif; path = Resources/Images/info_24.tif; sourceTree = "<group>"; };
+		1ADAFBE80990F74700F6C5FF /* camera_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = camera_24_down.tif; path = Resources/Images/camera_24_down.tif; sourceTree = "<group>"; };
+		1ADAFBE90990F74700F6C5FF /* camera_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = camera_24.tif; path = Resources/Images/camera_24.tif; sourceTree = "<group>"; };
+		1ADAFBFF0990FABD00F6C5FF /* hangup_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hangup_24_down.tif; path = Resources/Images/hangup_24_down.tif; sourceTree = "<group>"; };
+		1ADAFC000990FABD00F6C5FF /* hangup_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hangup_24.tif; path = Resources/Images/hangup_24.tif; sourceTree = "<group>"; };
+		1AE62986099B7B4300793794 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SequenceGrabberSettings.nib; sourceTree = "<group>"; };
+		1AE62A4D099B9C8C00793794 /* tools_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = tools_large_down.tif; path = Resources/Images/tools_large_down.tif; sourceTree = "<group>"; };
+		1AE62A4E099B9C8C00793794 /* tools_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = tools_large.tif; path = Resources/Images/tools_large.tif; sourceTree = "<group>"; };
+		1AF9E4A109A07E3600094163 /* tools_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = tools_24_down.tif; path = Resources/Images/tools_24_down.tif; sourceTree = "<group>"; };
+		1AF9E4A209A07E3600094163 /* tools_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = tools_24.tif; path = Resources/Images/tools_24.tif; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -820,7 +983,6 @@
 		D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMScreenVideoInputModule.m; path = Source/Framework/XMScreenVideoInputModule.m; sourceTree = "<group>"; };
 		D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoPreferencesModule.h; path = Source/GUI/XMVideoPreferencesModule.h; sourceTree = "<group>"; };
 		D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMVideoPreferencesModule.m; path = Source/GUI/XMVideoPreferencesModule.m; sourceTree = "<group>"; };
-		D12E64AF0999F466004EF9F8 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SequenceGrabberSettings.nib; sourceTree = "<group>"; };
 		D132319E090526B700F4D5A7 /* HeadsetCam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HeadsetCam.tiff; path = Resources/Images/HeadsetCam.tiff; sourceTree = "<group>"; };
 		D13231CF09052FC500F4D5A7 /* Cam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Cam.tiff; path = Resources/Images/Cam.tiff; sourceTree = "<group>"; };
 		D13232EC0906684D00F4D5A7 /* XMLocalAudioVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocalAudioVideoView.h; path = Source/GUI/XMLocalAudioVideoView.h; sourceTree = "<group>"; };
@@ -833,8 +995,6 @@
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMRecentCallsView.m; path = Source/GUI/XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
 		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
-		D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleVideoView.h; path = Source/GUI/XMSimpleVideoView.h; sourceTree = "<group>"; };
-		D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleVideoView.m; path = Source/GUI/XMSimpleVideoView.m; sourceTree = "<group>"; };
 		D14587ED09013DD4004A1EDF /* XMCallStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallStatistics.h; path = Source/Framework/XMCallStatistics.h; sourceTree = "<group>"; };
 		D14587EE09013DD4004A1EDF /* XMCallStatistics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallStatistics.m; path = Source/Framework/XMCallStatistics.m; sourceTree = "<group>"; };
 		D147D6050970342B005DE11C /* XMRTPPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPPacket.h; path = Source/Framework/XMRTPPacket.h; sourceTree = "<group>"; };
@@ -1590,6 +1750,7 @@
 				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
 				D19628150924B4C1004892D0 /* Security.framework in Frameworks */,
 				D134B910093B79020090271F /* OpenGL.framework in Frameworks */,
+				1A348FF10984E57F0033FA95 /* GLUT.framework in Frameworks */,
 				D1C1E316099B8BEA00815263 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1617,6 +1778,7 @@
 		080E96DDFE201D6D7F000001 /* Code Source */ = {
 			isa = PBXGroup;
 			children = (
+				1A348F960984E4210033FA95 /* GUI */,
 				D1AF73E0084D02E400D50883 /* Application General */,
 				D1B4CC21082F4E0E00A444E1 /* MainWindow */,
 				D1A02899081CBED70018BD11 /* PreferencesManagement */,
@@ -1665,6 +1827,40 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		1A348F960984E4210033FA95 /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				1A348F970984E4210033FA95 /* IGPopupView.h */,
+				1A348F980984E4210033FA95 /* IGPopupView.m */,
+				1A348F990984E4210033FA95 /* XMInfoModule.h */,
+				1A348F9A0984E4210033FA95 /* XMInfoModule.m */,
+				1A348F9B0984E4210033FA95 /* XMInspectorController.h */,
+				1A348F9C0984E4210033FA95 /* XMInspectorController.m */,
+				1AD42B5C09938EF500F92546 /* XMInCallOSD.h */,
+				1AD42B5D09938EF500F92546 /* XMInCallOSD.m */,
+				1A490EAD09974BAE0096261F /* XMAudioOnlyOSD.h */,
+				1A490EAE09974BAE0096261F /* XMAudioOnlyOSD.m */,
+				1A348F9D0984E4210033FA95 /* XMOnScreenControllerView.h */,
+				1A348F9E0984E4210033FA95 /* XMOnScreenControllerView.m */,
+				1A348F9F0984E4210033FA95 /* XMOnScreenControllerWindow.h */,
+				1A348FA00984E4210033FA95 /* XMOnScreenControllerWindow.m */,
+				1A348FA10984E4210033FA95 /* XMOpenGLUtilities.h */,
+				1A348FA20984E4210033FA95 /* XMOpenGLUtilities.m */,
+				1A348FA30984E4210033FA95 /* XMOSDVideoView.h */,
+				1A348FA40984E4210033FA95 /* XMOSDVideoView.m */,
+			);
+			name = GUI;
+			path = Source/GUI;
+			sourceTree = "<group>";
+		};
+		1A9E27BB09A5BF1C00E9A7CE /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				1A9E27BD09A5BF3600E9A7CE /* Ringer.aiff */,
+			);
+			name = Sounds;
+			sourceTree = "<group>";
+		};
 		29B97314FDCFA39411CA2CEA /* XMeeting */ = {
 			isa = PBXGroup;
 			children = (
@@ -1691,6 +1887,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1A42B4D009A9DEAF007773DA /* XMeeting.icns */,
+				1A9E27BB09A5BF1C00E9A7CE /* Sounds */,
 				D1EB1897084379C5002CEF53 /* Images */,
 				D1EB1894084379B5002CEF53 /* Nibs */,
 				D1EB189A084379CE002CEF53 /* Other */,
@@ -1701,6 +1899,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1A348FF00984E57F0033FA95 /* GLUT.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -1759,9 +1958,9 @@
 				D19722EB08FB127600295E05 /* XMMediaReceiver.m */,
 				D132789908C7A40800298F25 /* XMVideoInputModule.h */,
 				D1FE53F708F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.h */,
-				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
 				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
 				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
+				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
 				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
 				D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */,
 				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
@@ -1936,8 +2135,6 @@
 			children = (
 				D10D49E2093CA220000DD61E /* XMWindow.h */,
 				D10D49E3093CA220000DD61E /* XMWindow.m */,
-				D134B9C2093B8D5B0090271F /* XMSimpleVideoView.h */,
-				D134B9C3093B8D5C0090271F /* XMSimpleVideoView.m */,
 				D1B4CD9708316DF100A444E1 /* XMMouseOverButton.h */,
 				D1B4CD9808316DF100A444E1 /* XMMouseOverButton.m */,
 				D189805108241F11007CD286 /* XMBooleanCell.h */,
@@ -2849,6 +3046,9 @@
 		D1EB1894084379B5002CEF53 /* Nibs */ = {
 			isa = PBXGroup;
 			children = (
+				1AE62985099B7B4300793794 /* SequenceGrabberSettings.nib */,
+				1A348FB30984E4520033FA95 /* Info.nib */,
+				1A348FB50984E4520033FA95 /* XMInspector.nib */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 				D1B4CC98082F594C00A444E1 /* MainWindow.nib */,
 				D1ECCD2E083491EB008EBAE3 /* NoCallModule.nib */,
@@ -2862,7 +3062,6 @@
 				D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */,
 				D1A02B24081E96D30018BD11 /* Preferences.nib */,
 				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
-				D12E64AE0999F466004EF9F8 /* SequenceGrabberSettings.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -2870,6 +3069,65 @@
 		D1EB1897084379C5002CEF53 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				1A5821C309A1DE7F00CBE017 /* locationPreferences.tif */,
+				1AF9E4A109A07E3600094163 /* tools_24_down.tif */,
+				1AF9E4A209A07E3600094163 /* tools_24.tif */,
+				1A3A07D2099C876A00F5DBAD /* generalPreferences.tif */,
+				1A3A07D3099C876A00F5DBAD /* sourcesPreferences.tif */,
+				1AE62A4D099B9C8C00793794 /* tools_large_down.tif */,
+				1AE62A4E099B9C8C00793794 /* tools_large.tif */,
+				1A490FC00998EF1D0096261F /* no_pinp_large_down.tif */,
+				1A490FC10998EF1D0096261F /* no_pinp_large.tif */,
+				1A490F7F0998EB850096261F /* mute_large_down.tif */,
+				1A490F800998EB850096261F /* mute_large.tif */,
+				1A490F810998EB850096261F /* unmute_large_down.tif */,
+				1A490F820998EB850096261F /* unmute_large.tif */,
+				1AD42C350993BF1100F92546 /* pinp_off_large_down.tif */,
+				1AD42C360993BF1100F92546 /* pinp_off_large.tif */,
+				1AD42C370993BF1100F92546 /* pinp_on_large_down.tif */,
+				1AD42C380993BF1100F92546 /* pinp_on_large.tif */,
+				1ACBD44B0992270500B88F0F /* Action_Pressed.tiff */,
+				1ACBD44C0992270500B88F0F /* Action.tiff */,
+				1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */,
+				1ACBD44E0992270500B88F0F /* Add.tiff */,
+				1ACBD44F0992270500B88F0F /* Remove_Pressed.tiff */,
+				1ACBD4500992270500B88F0F /* Remove.tiff */,
+				1ADAFBFF0990FABD00F6C5FF /* hangup_24_down.tif */,
+				1ADAFC000990FABD00F6C5FF /* hangup_24.tif */,
+				1ADAFBE80990F74700F6C5FF /* camera_24_down.tif */,
+				1ADAFBE90990F74700F6C5FF /* camera_24.tif */,
+				1ADAFBE20990EFB800F6C5FF /* info_24_down.tif */,
+				1ADAFBE30990EFB800F6C5FF /* info_24.tif */,
+				1ADAFBD50990EBA700F6C5FF /* addressBook_24_down.tif */,
+				1ADAFBD60990EBA700F6C5FF /* addressBook_24.tif */,
+				1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */,
+				1ADAFBD80990EBA700F6C5FF /* Call_24.tif */,
+				1ADAFBC50990E8B500F6C5FF /* Call_32_down.tif */,
+				1ADAFBC60990E8B500F6C5FF /* Call_32.tif */,
+				1AC7C1EE098665E2008521B4 /* no_video_screen.tif */,
+				1A348FBA0984E4680033FA95 /* camera_settings_large_down.tif */,
+				1A348FBB0984E4680033FA95 /* camera_settings_large.tif */,
+				1A348FBC0984E4680033FA95 /* fullscreen_large_down.tif */,
+				1A348FBD0984E4680033FA95 /* fullscreen_large.tif */,
+				1A348FBE0984E4680033FA95 /* hangup_large_down.tif */,
+				1A348FBF0984E4680033FA95 /* hangup_large.tif */,
+				1A348FC00984E4680033FA95 /* Inspect_small.tif */,
+				1A348FC10984E4680033FA95 /* Inspect.tiff */,
+				1A348FC20984E4680033FA95 /* inspector_bw_large_down.tif */,
+				1A348FC30984E4680033FA95 /* inspector_bw_large.tif */,
+				1A348FC40984E4680033FA95 /* pinp_large_down.tif */,
+				1A348FC50984E4680033FA95 /* pinp_large.tif */,
+				1A348FC60984E4680033FA95 /* pinpmode_classic_large_down.tif */,
+				1A348FC70984E4680033FA95 /* pinpmode_classic_large.tif */,
+				1A348FC80984E4680033FA95 /* pinpmode_ichat_large_down.tif */,
+				1A348FC90984E4680033FA95 /* pinpmode_ichat_large.tif */,
+				1A348FCA0984E4680033FA95 /* pinpmode_sidebyside_large_down.tif */,
+				1A348FCB0984E4680033FA95 /* pinpmode_sidebyside_large.tif */,
+				1A348FCC0984E4680033FA95 /* semaphore_green.tif */,
+				1A348FCD0984E4680033FA95 /* semaphore_red.tif */,
+				1A348FCE0984E4680033FA95 /* semaphore_yellow.tif */,
+				1A348FCF0984E4680033FA95 /* windowed_large_down.tif */,
+				1A348FD00984E4680033FA95 /* windowed_large.tif */,
 				D13231CF09052FC500F4D5A7 /* Cam.tiff */,
 				D132319E090526B700F4D5A7 /* HeadsetCam.tiff */,
 				D1EB19350843E47F002CEF53 /* Window.tiff */,
@@ -2944,7 +3202,6 @@
 				D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Headers */,
 				D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Headers */,
 				D1ECCD3B08349255008EBAE3 /* XMInCallModule.h in Headers */,
-				D134B9C4093B8D5C0090271F /* XMSimpleVideoView.h in Headers */,
 				D10D49E4093CA220000DD61E /* XMWindow.h in Headers */,
 				D10157EE09409867000A9BA7 /* XMRTPH263Packetizer.h in Headers */,
 				D10157F309409882000A9BA7 /* XMRTPH263PacketizerDispatch.h in Headers */,
@@ -2952,6 +3209,15 @@
 				D147D9DB0973A83E005DE11C /* XMPacketReassemblers.h in Headers */,
 				D198B483097636F300180551 /* XMRTPH264Packetizer.h in Headers */,
 				D198B4880976371D00180551 /* XMRTPH264PacketizerDispatch.h in Headers */,
+				1A348FA50984E4210033FA95 /* IGPopupView.h in Headers */,
+				1A348FA70984E4210033FA95 /* XMInfoModule.h in Headers */,
+				1A348FA90984E4210033FA95 /* XMInspectorController.h in Headers */,
+				1A348FAB0984E4210033FA95 /* XMOnScreenControllerView.h in Headers */,
+				1A348FAD0984E4210033FA95 /* XMOnScreenControllerWindow.h in Headers */,
+				1A348FAF0984E4210033FA95 /* XMOpenGLUtilities.h in Headers */,
+				1A348FB10984E4210033FA95 /* XMOSDVideoView.h in Headers */,
+				1AD42B5E09938EF500F92546 /* XMInCallOSD.h in Headers */,
+				1A490EAF09974BAE0096261F /* XMAudioOnlyOSD.h in Headers */,
 				D1EEDEB70992514A000BF113 /* XMH323Channel.h in Headers */,
 				D12E605B0998AFE9004EF9F8 /* XMVideoModule.h in Headers */,
 				D12E61D20998FEEB004EF9F8 /* XMVideoInputModule.h in Headers */,
@@ -3309,6 +3575,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+				1A0AB04F09ACA47300DD66BD /* ShellScript */,
 			);
 			buildRules = (
 				D163335407A01B47003FD9C0 /* PBXBuildRule */,
@@ -3365,6 +3632,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D1B6057708F8F7A20034B47F /* Build configuration list for PBXNativeTarget "pwlib" */;
 			buildPhases = (
+				1A348EAF0984CE640033FA95 /* ShellScript */,
 				D1B6056E08F8F7740034B47F /* Headers */,
 				D1B6056F08F8F7740034B47F /* Sources */,
 				D1B6057008F8F7740034B47F /* Frameworks */,
@@ -3491,11 +3759,103 @@
 				D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */,
 				D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */,
 				D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */,
-				D12E64B00999F466004EF9F8 /* SequenceGrabberSettings.nib in Resources */,
+				1A348FB70984E4520033FA95 /* Info.nib in Resources */,
+				1A348FB80984E4520033FA95 /* XMInspector.nib in Resources */,
+				1A348FD20984E4680033FA95 /* camera_settings_large_down.tif in Resources */,
+				1A348FD30984E4680033FA95 /* camera_settings_large.tif in Resources */,
+				1A348FD40984E4680033FA95 /* fullscreen_large_down.tif in Resources */,
+				1A348FD50984E4680033FA95 /* fullscreen_large.tif in Resources */,
+				1A348FD60984E4680033FA95 /* hangup_large_down.tif in Resources */,
+				1A348FD70984E4680033FA95 /* hangup_large.tif in Resources */,
+				1A348FD80984E4680033FA95 /* Inspect_small.tif in Resources */,
+				1A348FD90984E4680033FA95 /* Inspect.tiff in Resources */,
+				1A348FDA0984E4680033FA95 /* inspector_bw_large_down.tif in Resources */,
+				1A348FDB0984E4680033FA95 /* inspector_bw_large.tif in Resources */,
+				1A348FDC0984E4680033FA95 /* pinp_large_down.tif in Resources */,
+				1A348FDD0984E4680033FA95 /* pinp_large.tif in Resources */,
+				1A348FDE0984E4680033FA95 /* pinpmode_classic_large_down.tif in Resources */,
+				1A348FDF0984E4680033FA95 /* pinpmode_classic_large.tif in Resources */,
+				1A348FE00984E4680033FA95 /* pinpmode_ichat_large_down.tif in Resources */,
+				1A348FE10984E4680033FA95 /* pinpmode_ichat_large.tif in Resources */,
+				1A348FE20984E4680033FA95 /* pinpmode_sidebyside_large_down.tif in Resources */,
+				1A348FE30984E4680033FA95 /* pinpmode_sidebyside_large.tif in Resources */,
+				1A348FE40984E4680033FA95 /* semaphore_green.tif in Resources */,
+				1A348FE50984E4680033FA95 /* semaphore_red.tif in Resources */,
+				1A348FE60984E4680033FA95 /* semaphore_yellow.tif in Resources */,
+				1A348FE70984E4680033FA95 /* windowed_large_down.tif in Resources */,
+				1A348FE80984E4680033FA95 /* windowed_large.tif in Resources */,
+				1AC7C1EF098665E2008521B4 /* no_video_screen.tif in Resources */,
+				1ADAFBC70990E8B500F6C5FF /* Call_32_down.tif in Resources */,
+				1ADAFBC80990E8B500F6C5FF /* Call_32.tif in Resources */,
+				1ADAFBD90990EBA700F6C5FF /* addressBook_24_down.tif in Resources */,
+				1ADAFBDA0990EBA700F6C5FF /* addressBook_24.tif in Resources */,
+				1ADAFBDB0990EBA700F6C5FF /* Call_24_down.tif in Resources */,
+				1ADAFBDC0990EBA700F6C5FF /* Call_24.tif in Resources */,
+				1ADAFBE40990EFB800F6C5FF /* info_24_down.tif in Resources */,
+				1ADAFBE50990EFB800F6C5FF /* info_24.tif in Resources */,
+				1ADAFBEA0990F74700F6C5FF /* camera_24_down.tif in Resources */,
+				1ADAFBEB0990F74700F6C5FF /* camera_24.tif in Resources */,
+				1ADAFC010990FABD00F6C5FF /* hangup_24_down.tif in Resources */,
+				1ADAFC020990FABD00F6C5FF /* hangup_24.tif in Resources */,
+				1ACBD4510992270500B88F0F /* Action_Pressed.tiff in Resources */,
+				1ACBD4520992270500B88F0F /* Action.tiff in Resources */,
+				1ACBD4530992270500B88F0F /* Add_Pressed.tiff in Resources */,
+				1ACBD4540992270500B88F0F /* Add.tiff in Resources */,
+				1ACBD4550992270500B88F0F /* Remove_Pressed.tiff in Resources */,
+				1ACBD4560992270500B88F0F /* Remove.tiff in Resources */,
+				1AD42C390993BF1100F92546 /* pinp_off_large_down.tif in Resources */,
+				1AD42C3A0993BF1100F92546 /* pinp_off_large.tif in Resources */,
+				1AD42C3B0993BF1100F92546 /* pinp_on_large_down.tif in Resources */,
+				1AD42C3C0993BF1100F92546 /* pinp_on_large.tif in Resources */,
+				1A490F830998EB850096261F /* mute_large_down.tif in Resources */,
+				1A490F840998EB850096261F /* mute_large.tif in Resources */,
+				1A490F850998EB850096261F /* unmute_large_down.tif in Resources */,
+				1A490F860998EB850096261F /* unmute_large.tif in Resources */,
+				1A490FC20998EF1D0096261F /* no_pinp_large_down.tif in Resources */,
+				1A490FC30998EF1D0096261F /* no_pinp_large.tif in Resources */,
+				1AE62987099B7B4300793794 /* SequenceGrabberSettings.nib in Resources */,
+				1AE62A4F099B9C8C00793794 /* tools_large_down.tif in Resources */,
+				1AE62A50099B9C8C00793794 /* tools_large.tif in Resources */,
+				1A3A07D4099C876A00F5DBAD /* generalPreferences.tif in Resources */,
+				1A3A07D5099C876A00F5DBAD /* sourcesPreferences.tif in Resources */,
+				1AF9E4A309A07E3600094163 /* tools_24_down.tif in Resources */,
+				1AF9E4A409A07E3600094163 /* tools_24.tif in Resources */,
+				1A5821C409A1DE7F00CBE017 /* locationPreferences.tif in Resources */,
+				1A9E27BE09A5BF3600E9A7CE /* Ringer.aiff in Resources */,
+				1A42B4D109A9DEAF007773DA /* XMeeting.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1A0AB04F09ACA47300DD66BD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\nif [ $BUILD_STYLE == 'Deployment' ];\nthen\necho \"Stripping product\";\n/usr/bin/strip \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/${PRODUCT_NAME}\"\nelse\necho \"Product not stripped\";\nfi";
+		};
+		1A348EAF0984CE640033FA95 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D11072C0486CEB800E47090 /* Sources */ = {
@@ -3569,12 +3929,20 @@
 				D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */,
 				D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */,
 				D134B974093B88190090271F /* XMVideoManager.m in Sources */,
-				D134B9C5093B8D5C0090271F /* XMSimpleVideoView.m in Sources */,
 				D10D49E5093CA220000DD61E /* XMWindow.m in Sources */,
 				D10157EF09409867000A9BA7 /* XMRTPH263Packetizer.c in Sources */,
 				D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */,
 				D147DA1E0973ABEE005DE11C /* XMPacketReassemblers.cpp in Sources */,
 				D198B484097636F300180551 /* XMRTPH264Packetizer.c in Sources */,
+				1A348FA60984E4210033FA95 /* IGPopupView.m in Sources */,
+				1A348FA80984E4210033FA95 /* XMInfoModule.m in Sources */,
+				1A348FAA0984E4210033FA95 /* XMInspectorController.m in Sources */,
+				1A348FAC0984E4210033FA95 /* XMOnScreenControllerView.m in Sources */,
+				1A348FAE0984E4210033FA95 /* XMOnScreenControllerWindow.m in Sources */,
+				1A348FB00984E4210033FA95 /* XMOpenGLUtilities.m in Sources */,
+				1A348FB20984E4210033FA95 /* XMOSDVideoView.m in Sources */,
+				1AD42B5F09938EF500F92546 /* XMInCallOSD.m in Sources */,
+				1A490EB009974BAE0096261F /* XMAudioOnlyOSD.m in Sources */,
 				D1EEDEB80992514A000BF113 /* XMH323Channel.cpp in Sources */,
 				D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */,
 				D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */,
@@ -3856,20 +4224,36 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
+		1A348FB30984E4520033FA95 /* Info.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1A348FB40984E4520033FA95 /* English */,
+			);
+			name = Info.nib;
+			sourceTree = "<group>";
+		};
+		1A348FB50984E4520033FA95 /* XMInspector.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1A348FB60984E4520033FA95 /* English */,
+			);
+			name = XMInspector.nib;
+			sourceTree = "<group>";
+		};
+		1AE62985099B7B4300793794 /* SequenceGrabberSettings.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1AE62986099B7B4300793794 /* English */,
+			);
+			name = SequenceGrabberSettings.nib;
+			sourceTree = "<group>";
+		};
 		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
 			);
 			name = MainMenu.nib;
-			sourceTree = "<group>";
-		};
-		D12E64AE0999F466004EF9F8 /* SequenceGrabberSettings.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D12E64AF0999F466004EF9F8 /* English */,
-			);
-			name = SequenceGrabberSettings.nib;
 			sourceTree = "<group>";
 		};
 		D1639415083E17A500F7FD83 /* DialPadModule.nib */ = {
@@ -4030,8 +4414,10 @@
 		D11E93F308589A9200154C02 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = ppc;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEPLOYMENT_POSTPROCESSING = NO;
 				GCC_ALTIVEC_EXTENSIONS = NO;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_DYNAMIC_NO_PIC = YES;
@@ -4069,6 +4455,8 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				PREBINDING = YES;
 				PRODUCT_NAME = XMeeting;
+				SEPARATE_STRIP = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wno-long-double";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -4193,6 +4581,7 @@
 		D1B6057908F8F7A20034B47F /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = ppc;
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4310,6 +4699,7 @@
 		D1CEE1F908F9022C007E4ABE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = ppc;
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4323,8 +4713,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(HOME)/pwlib/include",
-					"$(HOME)/opal/include",
+					../pwlib/include,
+					../opal/include,
 				);
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)\"";

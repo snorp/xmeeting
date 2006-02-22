@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.9 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.10 2006/02/22 16:12:32 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,11 +140,13 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	// since NSUserDefaults returns 0 if no value for the Key is found, we
 	// simply increase the stored value by one;
 	activeLocation = [userDefaults integerForKey:XMKey_ActiveLocation] - 1;
-	
 	if(activeLocation == -1)
 	{
 		// in this case, we automatically use the first location found
 		activeLocation = 0;
+	}
+	else{
+		activeLocation++;
 	}
 	
 	automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
@@ -217,9 +219,8 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 - (void)synchronize
 {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	
+
 	[userDefaults setInteger:activeLocation forKey:XMKey_ActiveLocation];
-	
 	unsigned count = [locations count];
 	unsigned i;
 	NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count];

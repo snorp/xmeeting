@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.8 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.9 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -508,6 +508,12 @@
 	activeCall = [call retain];
 	
 	callManagerStatus = XM_CALL_MANAGER_IN_CALL;
+	
+	//Play sound! (the current ring comes from iChat. It may be wise to use a royalty-free one)
+	[[NSSound soundNamed:@"Ringer.aiff"] play];
+	
+	//deminiaturize on call
+	[[[NSApp windows] objectAtIndex:0] deminiaturize:self];
 	
 	if(automaticallyAcceptIncomingCalls == YES)
 	{

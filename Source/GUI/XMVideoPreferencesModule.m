@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.3 2006/02/20 17:27:49 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.4 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,7 +16,8 @@
 NSString *XMKey_VideoPreferencesModuleIdentifier = @"XMeeting_VideoPreferencesModule";
 
 NSString *XMKey_NameIdentifier = @"Name";
-//NSString *XMKey_EnabledIdentifier = @"Enabled";
+
+NSString *XMKey_EnableIdentifier_ = @"Enabled";
 #define XMKey_EnabledIdentifier @"Enabled"
 NSString *XMKey_SettingsIdentifier = @"Settings";
 
@@ -46,7 +47,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 	contentViewHeight = [contentView frame].size.height;
 	
 	XMBooleanCell *booleanCell = [[XMBooleanCell alloc] init];
-	NSTableColumn *column = [videoModulesTableView tableColumnWithIdentifier:XMKey_EnabledIdentifier];
+	NSTableColumn *column = [videoModulesTableView tableColumnWithIdentifier:XMKey_EnableIdentifier_];
 	[column setDataCell:booleanCell];
 	[booleanCell release];
 	
@@ -96,7 +97,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 
 - (NSImage *)toolbarImage
 {
-	return nil;
+	return [NSImage imageNamed:@"sourcesPreferences.tif"];
 }
 
 - (NSString *)toolTipText
@@ -161,7 +162,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 	{
 		return [videoModule name];
 	}
-	else if([columnIdentifier isEqualToString:XMKey_EnabledIdentifier])
+	else if([columnIdentifier isEqualToString:XMKey_EnableIdentifier_])
 	{
 		NSString *identifier = [videoModule identifier];
 		BOOL isEnabled = YES;

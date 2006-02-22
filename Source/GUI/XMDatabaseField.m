@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.6 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.7 2006/02/22 16:12:33 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -377,6 +377,7 @@ databaseField:imageForRepresentedObject:";
 	}
 	[self _hideCompletionsWindow];
 	[self _setNeedsDisplay];
+	
 }
 
 - (void)insertNewline:(id)sender
