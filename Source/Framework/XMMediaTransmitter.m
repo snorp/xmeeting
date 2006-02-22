@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.22 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.23 2006/02/22 23:28:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -78,6 +78,7 @@ typedef enum XMMediaTransmitterMessage
 
 - (void)_startCompressSequence;
 - (void)_stopCompressSequence;
+- (void)_restartCompressSequence;
 - (void)_compressSequenceCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp;
 
 - (OSStatus)_packetizeCompressedFrame:(UInt8 *)data 
@@ -687,6 +688,14 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		activeModule = module;
 		selectedDevice = [device retain];
 		
+		if(isTransmitting == YES)
+		{
+			if(useCompressionSessionAPI == NO)
+			{
+				[self _restartCompressSequence];
+			}
+		}
+		
 		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
 														withObject:selectedDevice waitUntilDone:NO];
 	}
@@ -1006,15 +1015,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
 		}
 	}
-	else
-	{
-		[XMMediaTransmitter _startTransmittingForSession:2
-											  withCodec:XMCodecIdentifier_H261
-											  videoSize:XMVideoSize_CIF
-									 maxFramesPerSecond:30
-											 maxBitrate:384000
-												  flags:0];
-	}
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
@@ -1327,6 +1327,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	// Since the CompressSequence API needs a PixMap to be
 	// present when callling CompressSequenceBegin,
 	// we defer this task to _compressSequenceCompressFrame:timeStamp:
+	compressSequenceFrameNumber = 0;
 	compressSequenceIsActive = YES;
 }
 
@@ -1359,15 +1360,21 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	compressSequenceIsActive = NO;
 }
 
+- (void)_restartCompressSequence
+{
+	[self _stopCompressSequence];
+	compressSequenceIsActive = YES;
+}
+
 - (void)_compressSequenceCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp
 {
 	if(compressSequenceIsActive == YES)
 	{
 		ComponentResult err = noErr;
 		
-		PixMap pixMap;
-		
 		CVPixelBufferLockBaseAddress(frame, 0);
+		
+		PixMap pixMap;
 		
 		pixMap.baseAddr = CVPixelBufferGetBaseAddress(frame);
 		pixMap.rowBytes = 0x8000;
@@ -1393,6 +1400,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(compressSequence == 0)
 		{
+			NSLog(@"initializing");
 			ComponentDescription componentDescription;
 			componentDescription.componentType = FOUR_CHAR_CODE('imco');
 			componentDescription.componentSubType = codecType;
@@ -1452,13 +1460,16 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			{
 				NSLog(@"GetMaxCompressionSize failed: %d", err);
 			}
+			else
+			{
+				NSLog(@"maxCompressionSize: %d", maxCompressionSize);
+			}
 			
 			compressSequenceCompressedFrame = QTSNewPtr(maxCompressionSize,
 														kQTSMemAllocHoldMemory,
 														NULL);
 			
 			compressSequencePreviousTimeStamp = 0;
-			compressSequenceFrameNumber = 0;
 			
 			NSLog(@"limiting bitrate to %d", bitrateToUse);
 			DataRateParams dataRateParams;
@@ -1548,9 +1559,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 					 imageDescription:(ImageDescriptionHandle)imageDesc 
 							timeStamp:(UInt32)timeStamp
 {	
-	NSLog(@"ts: %d", timeStamp);
-	return noErr;
-	
 	OSErr err = noErr;
 	
 	sampleData.flags = 0;

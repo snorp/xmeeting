@@ -2,13 +2,61 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            CLASS = IGPopupView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {theMenu = NSMenu; }; 
+            SUPERCLASS = NSPopUpButton; 
+        }, 
+        {
+            ACTIONS = {
+                showInspector = id; 
+                showPreferences = id; 
+                showTools = id; 
+                updateDeviceLists = id; 
+            }; 
+            CLASS = XMApplicationController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
             CLASS = XMDatabaseField; 
             LANGUAGE = ObjC; 
             OUTLETS = {dataSource = id; }; 
             SUPERCLASS = NSTextField; 
         }, 
         {
-            ACTIONS = {call = id; changeActiveLocation = id; }; 
+            ACTIONS = {clearCall = id; }; 
+            CLASS = XMInCallModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = XMInCallView; 
+                hangupButton = NSButton; 
+                remotePartyField = NSTextField; 
+                semaphoreView = NSImageView; 
+                videoView = XMOSDVideoView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                showAdditionModuleInSeparateWindow = id; 
+                showSelfView = id; 
+                toggleShowAdditionContent = id; 
+            }; 
+            CLASS = XMMainWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mainContentBox = NSBox; selfViewDrawer = NSDrawer; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                call = id; 
+                changeActiveLocation = id; 
+                showAddressBookModuleSheet = id; 
+                showInspector = id; 
+                showSelfView = id; 
+                showTools = id; 
+            }; 
             CLASS = XMNoCallModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -17,9 +65,8 @@
                 contentView = NSView; 
                 locationsPopUpButton = NSPopUpButton; 
                 recentCallsPopUpButton = NSPopUpButton; 
+                semaphoreView = NSImageView; 
                 statusFieldOne = NSTextField; 
-                statusFieldThree = NSTextField; 
-                statusFieldTwo = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 
         }

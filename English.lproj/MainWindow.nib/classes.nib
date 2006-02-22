@@ -7,6 +7,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = XMEventAwareWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
             ACTIONS = {
                 changeAudioInputDevice = id; 
@@ -31,20 +32,17 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {showAdditionModuleInSeparateWindow = id; toggleShowAdditionContent = id; }; 
+            ACTIONS = {
+                showAdditionModuleInSeparateWindow = id; 
+                showSelfView = id; 
+                toggleShowAdditionContent = id; 
+            }; 
             CLASS = XMMainWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                additionContentDisclosure = NSButton; 
-                bottomContentBox = NSBox; 
-                horizontalSeparator = NSBox; 
                 mainContentBox = NSBox; 
-                rightContentBox = NSBox; 
-                separateWindowButton = XMMouseOverButton; 
-                separatorContentBox = NSBox; 
-                separatorContentView = NSView; 
-                statusBarContentBox = NSBox; 
-                statusBarContentView = NSView; 
+                selfView = XMOSDVideoView; 
+                selfViewDrawer = NSDrawer; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
@@ -55,6 +53,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {CLASS = XMOSDVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = XMWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }
     ); 
     IBVersion = 1; 

@@ -130,6 +130,8 @@
 		D147DA1E0973ABEE005DE11C /* XMPacketReassemblers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */; };
 		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
+		D15B409109AD261D00A49EE7 /* jidctflt.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15B409009AD261D00A49EE7 /* jidctflt.cxx */; };
+		D15B409309AD262800A49EE7 /* tinyjpeg.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15B409209AD262800A49EE7 /* tinyjpeg.cxx */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D163336507A01BD5003FD9C0 /* XMApplicationController.h in Headers */ = {isa = PBXBuildFile; fileRef = D163336307A01BD5003FD9C0 /* XMApplicationController.h */; };
 		D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D163336407A01BD5003FD9C0 /* XMApplicationController.m */; };
@@ -1005,6 +1007,8 @@
 		D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMDatabaseField.h; path = Source/GUI/XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMDatabaseField.m; path = Source/GUI/XMDatabaseField.m; sourceTree = "<group>"; };
+		D15B409009AD261D00A49EE7 /* jidctflt.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = jidctflt.cxx; sourceTree = "<group>"; };
+		D15B409209AD262800A49EE7 /* tinyjpeg.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = tinyjpeg.cxx; sourceTree = "<group>"; };
 		D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationFunctions.h; path = Source/Application/XMApplicationFunctions.h; sourceTree = "<group>"; };
 		D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationFunctions.m; path = Source/Application/XMApplicationFunctions.m; sourceTree = "<group>"; };
 		D163336307A01BD5003FD9C0 /* XMApplicationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationController.h; path = Source/Application/XMApplicationController.h; sourceTree = "<group>"; };
@@ -2399,6 +2403,8 @@
 		D1B6078E08F8F86B0034B47F /* common */ = {
 			isa = PBXGroup;
 			children = (
+				D15B409209AD262800A49EE7 /* tinyjpeg.cxx */,
+				D15B409009AD261D00A49EE7 /* jidctflt.cxx */,
 				D1B6079008F8F86B0034B47F /* collect.cxx */,
 				D1B6079108F8F86B0034B47F /* contain.cxx */,
 				D1B6079208F8F86B0034B47F /* getdate.tab.c */,
@@ -3995,6 +4001,8 @@
 				D1B6087B08F8F86D0034B47F /* tlib.cxx in Sources */,
 				D1B6088008F8F86D0034B47F /* udll.cxx in Sources */,
 				D1B6088208F8F86D0034B47F /* uicmp.cxx in Sources */,
+				D15B409109AD261D00A49EE7 /* jidctflt.cxx in Sources */,
+				D15B409309AD262800A49EE7 /* tinyjpeg.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
