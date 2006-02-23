@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.9 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMMainWindowController.m,v 1.10 2006/02/23 10:33:04 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -407,8 +407,10 @@ NSLog(@"noteSizeValuesDidChangeOfAdditionModule called!");
 	
 	if (selfView == nil){
 		selfView = [[XMOSDVideoView alloc] init];
+
 		float width = originalWindowRect.size.width - 6.0;
-		float height = 3.0/4.0 * width;
+		float height = XMGetVideoHeightForWidth(width);
+				
 		[selfView setFrame:NSMakeRect(0.0, 0.0, width, height)];
 		[selfView setShouldDisplayOSD:NO];
 	}
@@ -417,7 +419,6 @@ NSLog(@"noteSizeValuesDidChangeOfAdditionModule called!");
 		newFrame.size.height += [selfView frame].size.height;
 		newFrame.origin.y -= [selfView frame].size.height;
 		[[self window] setFrame:newFrame display:YES animate:YES];	
-
 		[[[self window] contentView] addSubview:selfView];
 
 		NSPoint origin = NSMakePoint((newFrame.size.width - [selfView frame].size.width) / 2.0, [[mainModules objectAtIndex:0] contentViewSize].height + 15.0);
@@ -434,10 +435,10 @@ NSLog(@"noteSizeValuesDidChangeOfAdditionModule called!");
 		newFrame.size.height -= [selfView frame].size.height;
 		newFrame.origin.y += [selfView frame].size.height;
 		[[self window] setFrame:newFrame display:YES animate:YES];
-		
 		selfViewShown = NO;
 	}	
-	
+	[[self window] setMinSize:NSMakeSize(newFrame.size.width, newFrame.size.height - 20.0)];
+	[[self window] setMaxSize:NSMakeSize(newFrame.size.width, newFrame.size.height - 20.0)];
 
 }
 
