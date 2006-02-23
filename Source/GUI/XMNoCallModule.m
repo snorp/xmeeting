@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.15 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMNoCallModule.m,v 1.16 2006/02/23 14:15:54 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -318,11 +318,14 @@
 	[locationsPopUpButton removeAllItems];
 	[locationsPopUpButton addItemsWithTitles:[preferencesManager locationNames]];
 	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
+	
+	[self _gatekeeperRegistrationDidChange:nil];
 }
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
 {
 	[self _displayListeningStatusFieldInformation];
+
 }
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
@@ -397,11 +400,27 @@
 	
 	if(gatekeeperName != nil)
 	{
-		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
+		if (![[[XMPreferencesManager sharedInstance] activeLocation] useGatekeeper]){
+			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
+			[semaphoreView setToolTip:NSLocalizedString(@"Ready. Not using a gatekeeper",@"")];
+		}
+		else
+		{
+			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];	
+			[semaphoreView setToolTip:NSLocalizedString(@"Registered with gatekeeper",@"")];
+		}
 	}
 	else
 	{
-		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
+		if (![[[XMPreferencesManager sharedInstance] activeLocation] useGatekeeper]){
+			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
+			[semaphoreView setToolTip:NSLocalizedString(@"Ready. Not using a gatekeeper",@"")];
+		}
+		else
+		{
+			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];	
+			[semaphoreView setToolTip:NSLocalizedString(@"Gatekeeper registration failed",@"")];
+		}
 	}
 }
 
@@ -414,6 +433,8 @@
 
 - (void)_H323NotEnabled:(NSNotification*)notif{
 	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
+	[semaphoreView setToolTip:NSLocalizedString(@"H.323 not enabled",@"")];
+
 }
 
 
@@ -421,22 +442,23 @@
 {
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	BOOL isH323Listening = [callManager isH323Listening];
-	
+
 	if(!isH323Listening)
 	{
 		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
+		[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 is not listening)",@"")];
 		return;
 	}
 		
 	XMUtils *utils = [XMUtils sharedInstance];
-	NSString *externalAddress = [utils externalAddress];
 	NSString *localAddress = [utils localAddress];
 		
-	if(localAddress == nil)
+	if([[[XMPreferencesManager sharedInstance] activeLocation] useAddressTranslation] && localAddress == nil)
 	{
 		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
+		[semaphoreView setToolTip:NSLocalizedString(@"Offline (could not fetch external address)",@"")];
 		return;
 	}
 		

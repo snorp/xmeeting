@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.10 2006/02/23 10:33:04 zmit Exp $
+ * $Id: XMMainWindowController.m,v 1.11 2006/02/23 14:15:54 zmit Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -585,7 +585,9 @@ NSLog(@"noteSizeValuesDidChangeOfAdditionModule called!");
 	}
 	
 	if (selfViewShown){
-		[self showSelfView:self]; //close it
+		[selfView removeFromSuperviewWithoutNeedingDisplay];
+		[selfView stopDisplayingVideo];
+		selfViewShown = NO;
 	}
 	
 	// deactivating the old module

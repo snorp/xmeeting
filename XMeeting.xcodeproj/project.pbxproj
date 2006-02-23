@@ -130,8 +130,6 @@
 		D147DA1E0973ABEE005DE11C /* XMPacketReassemblers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */; };
 		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
-		D15B409109AD261D00A49EE7 /* jidctflt.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15B409009AD261D00A49EE7 /* jidctflt.cxx */; };
-		D15B409309AD262800A49EE7 /* tinyjpeg.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15B409209AD262800A49EE7 /* tinyjpeg.cxx */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D163336507A01BD5003FD9C0 /* XMApplicationController.h in Headers */ = {isa = PBXBuildFile; fileRef = D163336307A01BD5003FD9C0 /* XMApplicationController.h */; };
 		D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D163336407A01BD5003FD9C0 /* XMApplicationController.m */; };
@@ -335,7 +333,6 @@
 		D1B6074308F8F8420034B47F /* semaphor.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B108F8F8410034B47F /* semaphor.h */; };
 		D1B6074408F8F8420034B47F /* serchan.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B208F8F8410034B47F /* serchan.h */; };
 		D1B6074508F8F8420034B47F /* sfile.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B308F8F8410034B47F /* sfile.h */; };
-		D1B6074608F8F8420034B47F /* shmvideo.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B408F8F8410034B47F /* shmvideo.h */; };
 		D1B6074708F8F8420034B47F /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B508F8F8410034B47F /* socket.h */; };
 		D1B6074808F8F8420034B47F /* sound.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B608F8F8410034B47F /* sound.h */; };
 		D1B6074908F8F8420034B47F /* svcproc.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606B708F8F8410034B47F /* svcproc.h */; };
@@ -3364,7 +3361,6 @@
 				D1B6074308F8F8420034B47F /* semaphor.h in Headers */,
 				D1B6074408F8F8420034B47F /* serchan.h in Headers */,
 				D1B6074508F8F8420034B47F /* sfile.h in Headers */,
-				D1B6074608F8F8420034B47F /* shmvideo.h in Headers */,
 				D1B6074708F8F8420034B47F /* socket.h in Headers */,
 				D1B6074808F8F8420034B47F /* sound.h in Headers */,
 				D1B6074908F8F8420034B47F /* svcproc.h in Headers */,
@@ -4001,8 +3997,6 @@
 				D1B6087B08F8F86D0034B47F /* tlib.cxx in Sources */,
 				D1B6088008F8F86D0034B47F /* udll.cxx in Sources */,
 				D1B6088208F8F86D0034B47F /* uicmp.cxx in Sources */,
-				D15B409109AD261D00A49EE7 /* jidctflt.cxx in Sources */,
-				D15B409309AD262800A49EE7 /* tinyjpeg.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
