@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.10 2006/02/22 16:12:32 zmit Exp $
+ * $Id: XMPreferencesManager.m,v 1.11 2006/02/23 16:43:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -115,6 +115,10 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	[defaultsDict setObject:number forKey:XMKey_AutomaticallyAcceptIncomingCalls];
 	[number release];
 	
+	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMScreenVideoInputModule", nil];
+	[defaultsDict setObject:initialDisabledVideoModules forKey:XMKey_DisabledVideoModules];
+	[initialDisabledVideoModules release];
+	
 	// code to be written yet
 	[userDefaults registerDefaults:defaultsDict];
 	[defaultsDict release];
@@ -139,14 +143,14 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	
 	// since NSUserDefaults returns 0 if no value for the Key is found, we
 	// simply increase the stored value by one;
-	activeLocation = [userDefaults integerForKey:XMKey_ActiveLocation] - 1;
-	if(activeLocation == -1)
+	int index = [userDefaults integerForKey:XMKey_ActiveLocation];
+	if(index == 0)
 	{
-		// in this case, we automatically use the first location found
 		activeLocation = 0;
 	}
-	else{
-		activeLocation++;
+	else
+	{
+		activeLocation = (unsigned)(index-1);
 	}
 	
 	automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
@@ -220,7 +224,9 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
-	[userDefaults setInteger:activeLocation forKey:XMKey_ActiveLocation];
+	// increasing the integer by one since NSUserDefaults returns zero if the
+	// key isn't found in preferences
+	[userDefaults setInteger:(activeLocation+1) forKey:XMKey_ActiveLocation];
 	unsigned count = [locations count];
 	unsigned i;
 	NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count];

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.9 2006/02/09 01:43:10 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.10 2006/02/23 16:43:05 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,7 @@ extern NSString *XMKey_Locations;
 @interface XMPreferencesManager : NSObject {
 
 	NSMutableArray *locations;
-	int activeLocation;
+	unsigned activeLocation;
 	BOOL automaticallyAcceptIncomingCalls;
 	
 	NSMutableArray *gatekeeperPasswords;
