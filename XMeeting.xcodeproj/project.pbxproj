@@ -3854,8 +3854,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c";
+			shellPath = /bin/bash;
+			shellScript = "if [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Nothing to do\";\nelse\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
