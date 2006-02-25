@@ -30,6 +30,7 @@
                 videoDeviceSettingsBox = NSBox; 
                 videoDeviceSettingsButton = NSButton; 
                 videoDeviceSettingsPanel = NSPanel; 
+                videoDeviceSettingsView = XMOSDVideoView; 
                 videoDevicesPopUp = NSPopUpButton; 
                 videoDisabledFld = NSTextField; 
             }; 
@@ -45,8 +46,7 @@
             }; 
             SUPERCLASS = NSView; 
         }, 
-        {CLASS = XMOSDVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {CLASS = XMSimpleVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+        {CLASS = XMOSDVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }

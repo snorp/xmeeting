@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.7 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.8 2006/02/25 15:01:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -209,6 +209,8 @@
 	
 	[videoDeviceSettingsBox setContentView:settingsView];
 	
+	[videoDeviceSettingsView startDisplayingLocalVideo];
+	
 	[NSApp beginSheet:videoDeviceSettingsPanel modalForWindow:[contentView window] modalDelegate:self didEndSelector:nil contextInfo:NULL];
 }
 
@@ -315,6 +317,8 @@
 {
 	[NSApp endSheet:videoDeviceSettingsPanel returnCode:NSOKButton];
 	[videoDeviceSettingsPanel orderOut:self];
+	
+	[videoDeviceSettingsView stopDisplayingVideo];
 	
 	[videoDeviceSettingsBox setContentView:nil];
 }

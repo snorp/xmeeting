@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.6 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.7 2006/02/25 15:01:17 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,7 @@
 	IBOutlet NSTextField *videoDisabledFld;	
 	IBOutlet NSPanel *videoDeviceSettingsPanel;
 	IBOutlet NSBox *videoDeviceSettingsBox;
+	IBOutlet XMOSDVideoView *videoDeviceSettingsView;
 
 	NSNib *nibLoader;
 }
