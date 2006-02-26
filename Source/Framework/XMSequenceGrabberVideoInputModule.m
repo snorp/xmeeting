@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.10 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.11 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -531,7 +531,7 @@ bail:
 	return result;
 }
 
-- (NSSize)setInputFrameSize:(NSSize)theFrameSize
+- (BOOL)setInputFrameSize:(NSSize)theFrameSize
 {	
 	frameSize = theFrameSize;
 	
@@ -539,14 +539,14 @@ bail:
 	{
 		if([self _disposeDecompressionSession] == NO)
 		{
-			NSMakeSize(0, 0);
+			return NO;
 		}
 		if([self _createDecompressionSession] == NO)
 		{
-			NSMakeSize(0, 0);
+			return NO;
 		}
 	}
-	return frameSize;
+	return YES;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFramesPerSecond

@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.14 2006/02/20 17:27:48 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.15 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,7 +98,6 @@ void XMReceiverMediaPatch::Main()
 	{
 		// Tell the media receiver to prepare processing packets
 		XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
-		XMVideoSize mediaSize = _XMGetMediaFormatSize(mediaFormat);
 		unsigned sessionID = source.GetSessionID();
 		RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
 		
@@ -140,7 +139,7 @@ void XMReceiverMediaPatch::Main()
 				break;
 		}
 		
-		_XMStartMediaReceiving(sessionID, codecIdentifier, mediaSize);
+		_XMStartMediaReceiving(sessionID, codecIdentifier);
 		
 		// loop to receive packets and process them
 		do {

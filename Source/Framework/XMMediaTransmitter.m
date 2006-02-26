@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.23 2006/02/22 23:28:52 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.24 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -332,6 +332,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	compressSequenceFrameCounter = 0;
 	compressSequenceLastVideoBytesSent = 0;
 	compressSequenceNonKeyFrameCounter = 0;
+	compressSequenceScaleGWorld = NULL;
 	
 	mediaPacketizer = NULL;
 	
@@ -672,8 +673,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(module != activeModule)
 		{
-			NSSize actualSize = [module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
-			if(actualSize.height == 0 && actualSize.width == 0)
+			BOOL result = [module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+			if(result == NO)
 			{
 				NSLog(@"Error with setInputFrameSize (2)");
 			}
@@ -726,14 +727,15 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		return;
 	}
 	
-	NSSize actualSize = [activeModule setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
-	if(actualSize.height == 0 && actualSize.width == 0)
+	BOOL result = [activeModule setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+	if(result == NO)
 	{
-		NSLog(@"Error with setInputFrameSize (3)");
+		activeModule = nil;
+		[self _updateDeviceListAndSelectDummy];
 	}
 	[activeModule setFrameGrabRate:frameGrabRate];
-	BOOL result = [activeModule openInputDevice:selectedDevice];
 	
+	result = [activeModule openInputDevice:selectedDevice];
 	if(result == NO)
 	{
 		activeModule = nil;
@@ -834,8 +836,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(isGrabbing == YES)
 		{
-			NSSize actualSize = [activeModule setInputFrameSize:frameDimensions];
-			if(actualSize.height == 0 && actualSize.width == 0)
+			BOOL result = [activeModule setInputFrameSize:frameDimensions];
+			if(result == NO)
 			{
 				NSLog(@"Error with setInputFrameSize (1)");
 			}
@@ -1015,6 +1017,15 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
 		}
 	}
+	/*else
+	{
+		[XMMediaTransmitter _startTransmittingForSession:2
+											   withCodec:XMCodecIdentifier_H263
+											   videoSize:XMVideoSize_CIF
+									  maxFramesPerSecond:30
+											  maxBitrate:384000
+												   flags:0];
+	}*/
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
@@ -1357,6 +1368,18 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		compressor = NULL;
 	}
 	
+	if(compressSequenceScaleGWorld != NULL)
+	{
+		DisposeHandle((Handle)compressSequenceScaleImageDescription);
+		PixMapHandle pixMapHandle = GetGWorldPixMap(compressSequenceScaleGWorld);
+		free((**pixMapHandle).baseAddr);
+		(**pixMapHandle).baseAddr = NULL;
+		DisposeGWorld(compressSequenceScaleGWorld);
+		
+		compressSequenceScaleImageDescription = NULL;
+		compressSequenceScaleGWorld = NULL;
+	}
+	
 	compressSequenceIsActive = NO;
 }
 
@@ -1373,34 +1396,159 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		ComponentResult err = noErr;
 		
 		CVPixelBufferLockBaseAddress(frame, 0);
+		UInt32 width = CVPixelBufferGetWidth(frame);
+		UInt32 height = CVPixelBufferGetHeight(frame);
+		
+		BOOL needsToScaleImage = NO;
+		
+		if(videoSize == XMVideoSize_CIF)
+		{
+			if(width <= 176 || height <= 144)
+			{
+				needsToScaleImage = YES;
+			}
+		}
+		else if(videoSize == XMVideoSize_QCIF)
+		{
+			if(width > 176 || height > 144 || width <= 128 || height <= 96)
+			{
+				needsToScaleImage = YES;
+			}
+		}
+		else if(videoSize == XMVideoSize_SQCIF)
+		{
+			if(width > 128 || height > 96)
+			{
+				needsToScaleImage = YES;
+			}
+		}
+		else
+		{
+			NSLog(@"UNKNOWN VIDEO SIZE");
+			return;
+		}
 		
 		PixMap pixMap;
+		PixMapPtr pixMapPtr;
+		PixMapHandle pixMapHandle;
+		Rect dstRect;
 		
-		pixMap.baseAddr = CVPixelBufferGetBaseAddress(frame);
-		pixMap.rowBytes = 0x8000;
-		pixMap.rowBytes |= (CVPixelBufferGetBytesPerRow(frame) & 0x3fff);
-		pixMap.bounds.top = 0;
-		pixMap.bounds.left = 0;
-		pixMap.bounds.bottom = CVPixelBufferGetHeight(frame);
-		pixMap.bounds.right = CVPixelBufferGetWidth(frame);
-		pixMap.pmVersion = 0;
-		pixMap.packType = 0;
-		pixMap.packSize = 0;
-		pixMap.hRes = Long2Fix(72);
-		pixMap.vRes = Long2Fix(72);
-		pixMap.pixelType = 16;
-		pixMap.pixelSize = 32;
-		pixMap.cmpCount = 4;
-		pixMap.cmpSize = 8;
-		pixMap.pixelFormat = CVPixelBufferGetPixelFormatType(frame);
-		pixMap.pmTable = NULL;
-		pixMap.pmExt = NULL;
+		if(needsToScaleImage == NO)
+		{
+			pixMap.baseAddr = CVPixelBufferGetBaseAddress(frame);
+			pixMap.rowBytes = 0x8000;
+			pixMap.rowBytes |= (CVPixelBufferGetBytesPerRow(frame) & 0x3fff);
+			pixMap.bounds.top = 0;
+			pixMap.bounds.left = 0;
+			pixMap.bounds.bottom = height;
+			pixMap.bounds.right = width;
+			pixMap.pmVersion = 0;
+			pixMap.packType = 0;
+			pixMap.packSize = 0;
+			pixMap.hRes = Long2Fix(72);
+			pixMap.vRes = Long2Fix(72);
+			pixMap.pixelType = 16;
+			pixMap.pixelSize = 32;
+			pixMap.cmpCount = 4;
+			pixMap.cmpSize = 8;
+			pixMap.pixelFormat = CVPixelBufferGetPixelFormatType(frame);
+			pixMap.pmTable = NULL;
+			pixMap.pmExt = NULL;
 		
-		PixMapPtr pixMapPtr = &pixMap;
+			pixMapPtr = &pixMap;
+			pixMapHandle = &pixMapPtr;
+			dstRect.top = 0;
+			dstRect.left = 0;
+			dstRect.bottom = height;
+			dstRect.right = width;
+		}
+		else
+		{
+			NSLog(@"scaling");
+			Rect srcRect;
+			srcRect.top = 0;
+			srcRect.left = 0;
+			srcRect.right = width;
+			srcRect.bottom = height;
+			
+			dstRect.top = 0;
+			dstRect.left = 0;
+			
+			if(videoSize == XMVideoSize_CIF)
+			{
+				dstRect.right = 352;
+				dstRect.bottom = 288;
+			}
+			else if(videoSize == XMVideoSize_QCIF)
+			{
+				dstRect.right = 176;
+				dstRect.bottom = 144;
+			}
+			else
+			{
+				dstRect.right = 128;
+				dstRect.bottom = 96;
+			}
+			
+			if(compressSequenceScaleGWorld == NULL)
+			{
+				void *data = malloc(dstRect.right*dstRect.bottom*4);
+
+				err = QTNewGWorldFromPtr(&compressSequenceScaleGWorld,
+										 CVPixelBufferGetPixelFormatType(frame),
+										 &dstRect,
+										 NULL,
+										 NULL,
+										 0,
+										 data,
+										 dstRect.right*4);
+				if(err != noErr)
+				{
+					NSLog(@"QTNewGWorld failed: %d", err);
+				}
+				
+				compressSequenceScaleImageDescription = (ImageDescriptionHandle)NewHandleClear(sizeof(ImageDescription));
+				
+				(**compressSequenceScaleImageDescription).idSize = sizeof(ImageDescription);
+				(**compressSequenceScaleImageDescription).cType = kRawCodecType;
+				(**compressSequenceScaleImageDescription).resvd1 = 0;
+				(**compressSequenceScaleImageDescription).resvd2 = 0;
+				(**compressSequenceScaleImageDescription).dataRefIndex = 0;
+				(**compressSequenceScaleImageDescription).version = 0;
+				(**compressSequenceScaleImageDescription).revisionLevel = 0;
+				(**compressSequenceScaleImageDescription).vendor = 0;
+				(**compressSequenceScaleImageDescription).temporalQuality = 0;
+				(**compressSequenceScaleImageDescription).spatialQuality = codecNormalQuality;
+				(**compressSequenceScaleImageDescription).width = width;
+				(**compressSequenceScaleImageDescription).height = height;
+				(**compressSequenceScaleImageDescription).hRes = Long2Fix(72);
+				(**compressSequenceScaleImageDescription).vRes = Long2Fix(72);
+				(**compressSequenceScaleImageDescription).dataSize = CVPixelBufferGetBytesPerRow(frame) * CVPixelBufferGetHeight(frame);
+				CopyCStringToPascal("", (**compressSequenceScaleImageDescription).name);
+				(**compressSequenceScaleImageDescription).frameCount = 0;
+				(**compressSequenceScaleImageDescription).depth = 32;
+				(**compressSequenceScaleImageDescription).clutID = -1;
+			}
+			
+			SetGWorld(compressSequenceScaleGWorld, NULL);
+			
+			pixMapHandle = GetGWorldPixMap(compressSequenceScaleGWorld);
+			
+			err = DecompressImage(CVPixelBufferGetBaseAddress(frame),
+								  compressSequenceScaleImageDescription,
+								  pixMapHandle,
+								  &srcRect,
+								  &dstRect,
+								  0,
+								  NULL);
+			if(err != noErr)
+			{
+				NSLog(@"DecImage failed: %d", err);
+			}
+		}
 		
 		if(compressSequence == 0)
 		{
-			NSLog(@"initializing");
 			ComponentDescription componentDescription;
 			componentDescription.componentType = FOUR_CHAR_CODE('imco');
 			componentDescription.componentSubType = codecType;
@@ -1423,10 +1571,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			compressSequenceImageDescription = (ImageDescriptionHandle)NewHandleClear(0);
 			
 			err = CompressSequenceBegin(&compressSequence,
-										&pixMapPtr,
+										pixMapHandle,
 										NULL,
-										&(pixMap.bounds),
-										&(pixMap.bounds),
+										&dstRect,
+										&dstRect,
 										32,
 										codecType,
 										(CompressorComponent)compressor,
@@ -1448,8 +1596,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			}
 			
 			long maxCompressionSize;
-			err = GetMaxCompressionSize(&pixMapPtr,
-										&(pixMap.bounds),
+			err = GetMaxCompressionSize(pixMapHandle,
+										&dstRect,
 										0,
 										codecNormalQuality,
 										codecType,
@@ -1526,8 +1674,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		long dataLength;
 		err = CompressSequenceFrame(compressSequence,
-									&pixMapPtr,
-									&(pixMap.bounds),
+									pixMapHandle,
+									&dstRect,
 									compressionFlags,
 									compressSequenceCompressedFrame,
 									&dataLength,

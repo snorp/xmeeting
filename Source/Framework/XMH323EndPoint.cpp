@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.12 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.13 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,8 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	remoteNumber = "";
 	remoteAddress = "";
 	remoteApplication = "";
+	
+	SetInitialBandwidth(UINT_MAX);
 }
 
 XMH323EndPoint::~XMH323EndPoint()

@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.9 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.10 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,7 +85,7 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return YES;
 }
 
-- (NSSize)setInputFrameSize:(NSSize)theSize
+- (BOOL)setInputFrameSize:(NSSize)theSize
 {
 	size = theSize;
 	
@@ -94,7 +94,8 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		CVPixelBufferRelease(pixelBuffer);
 		pixelBuffer = NULL;
 	}
-	return size;
+	
+	return YES;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFrameGrabRate

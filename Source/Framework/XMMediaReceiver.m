@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.15 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.16 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,9 +16,51 @@
 #define XM_PACKET_POOL_GRANULARITY 16
 #define XM_CHUNK_BUFFER_SIZE 352*288*4
 
+#define scanBit() \
+mask >>= 1; \
+if(mask == 0) { \
+	dataIndex++; \
+		mask = 0x80; \
+}
+
+#define readBit() \
+bit = data[dataIndex] & mask; \
+scanBit();
+
+#define scanExpGolombSymbol() \
+zero_counter = 0; \
+readBit(); \
+while(bit == 0) { \
+	zero_counter++; \
+	readBit(); \
+} \
+while(zero_counter != 0) { \
+	zero_counter--; \
+	scanBit(); \
+}
+
+#define readExpGolombSymbol() \
+zero_counter = 0; \
+readBit(); \
+while(bit == 0) { \
+	zero_counter++; \
+	readBit(); \
+} \
+expGolombSymbol = (0x01 << zero_counter); \
+while(zero_counter != 0) { \
+	zero_counter--; \
+	readBit(); \
+	if(bit != 0) { \
+		expGolombSymbol |= (0x01 << zero_counter); \
+	} \
+} \
+expGolombSymbol -= 1;
+
 @interface XMMediaReceiver (PrivateMethods)
 
 - (UInt32)_getH264AVCCAtomLength;
+- (XMVideoSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length;
+- (XMVideoSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length;
 - (XMVideoSize)_getH264VideoSize;
 - (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer;
 
@@ -51,7 +93,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	videoDecompressionSession = NULL;
 	videoCodecIdentifier = XMCodecIdentifier_UnknownCodec;
-	videoMediaSize = XMVideoSize_NoVideo;
 	
 	return self;
 }
@@ -68,8 +109,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 #pragma mark Data Handling Methods
 
-- (void)_startMediaReceivingForSession:(unsigned)sessionID withCodec:(XMCodecIdentifier)codecIdentifier 
-							 videoSize:(XMVideoSize)videoSize;
+- (void)_startMediaReceivingForSession:(unsigned)sessionID withCodec:(XMCodecIdentifier)codecIdentifier;
 {
 	ComponentResult err = noErr;
 	
@@ -80,12 +120,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	}
 	
 	videoCodecIdentifier = codecIdentifier;
-	videoMediaSize = videoSize;
-	
-	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoSize];
-	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingStart:)
-													withObject:number waitUntilDone:NO];
-	[number release];
 	
 	if(codecIdentifier == XMCodecIdentifier_H264)
 	{
@@ -139,15 +173,19 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		CodecType codecType;
 		char *codecName;
 		
+		XMVideoSize videoMediaSize;
+		
 		switch(videoCodecIdentifier)
 		{
 			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
 				codecName = "H.261";
+				videoMediaSize = [self _getH261VideoSize:data length:length];
 				break;
 			case XMCodecIdentifier_H263:
 				codecType = kH263CodecType;
 				codecName = "H.263";
+				videoMediaSize = [self _getH263VideoSize:data length:length];
 				break;
 			case XMCodecIdentifier_H264:
 				codecType =  kH264CodecType;
@@ -165,6 +203,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			default:
 				NSLog(@"illegal codecType");
 				return NO;
+		}
+		
+		if(videoMediaSize == XMVideoSize_NoVideo)
+		{
+			NSLog(@"No valid data");
+			return NO;
 		}
 		
 		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
@@ -241,6 +285,11 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		ICMDecompressionSessionOptionsRelease(sessionOptions);
 		
 		DisposeHandle((Handle)imageDesc);
+		
+		number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoMediaSize];
+		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingStart:)
+														withObject:number waitUntilDone:NO];
+		[number release];
 		
 		// Informing the application that we've started sending a certain codec. This is done here since
 		// in case of H.264, the size has to be extracted from the SPS atom.
@@ -373,6 +422,97 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	return avccLength;
 }
 
+- (XMVideoSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length;
+{
+	UInt8 *data = frame;
+	UInt32 dataIndex = 0;
+	UInt8 mask = 0x80;
+	UInt8 bit;
+	
+	if(length < 4)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	
+	if(frame[0] == 0 &&
+	   frame[1] == 0 &&
+	   frame[2] == 0 &&
+	   frame[3] == 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	
+	// determining the PSC location
+	readBit();
+	while(bit == 0)
+	{
+		readBit();
+	}
+	
+	// scanning past the rest of PSC and TR
+	dataIndex++;
+	scanBit();
+	
+	// scanning past splitScreenIndicator
+	scanBit();
+	
+	// scanning past document camera indicator
+	scanBit();
+	
+	// scanning past Freeze picture release
+	scanBit();
+	
+	// reading Source Format
+	readBit();
+	
+	if(bit == 0)
+	{
+		return XMVideoSize_QCIF;
+	}
+	else
+	{
+		return XMVideoSize_CIF;
+	}
+}
+
+- (XMVideoSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length
+{
+	if(length < 5)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	
+	if(frame[0] == 0 &&
+	   frame[1] == 0 &&
+	   frame[2] == 0 &&
+	   frame[3] == 0 &&
+	   frame[4] == 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	
+	UInt8 data = frame[4];
+	UInt8 size = (data & 0x1c) >> 2;
+	
+	if(size == 1)
+	{
+		return XMVideoSize_SQCIF;
+	}
+	else if(size == 2)
+	{
+		return XMVideoSize_QCIF;
+	}
+	else if(size == 3)
+	{
+		return XMVideoSize_CIF;
+	}
+	else
+	{
+		NSLog(@"UNKNOWN H.263 size");
+		return XMVideoSize_NoVideo;
+	}
+}
+
 - (XMVideoSize)_getH264VideoSize
 {
 	if(numberOfH264SPSAtoms == 0)
@@ -386,47 +526,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	UInt8 bit;
 	UInt8 zero_counter;
 	UInt8 expGolombSymbol;
-	
-#define scanBit() \
-	mask >>= 1; \
-	if(mask == 0) { \
-		dataIndex++; \
-		mask = 0x80; \
-	}
-	
-#define readBit() \
-	bit = data[dataIndex] & mask; \
-	scanBit();
-	
-#define scanExpGolombSymbol() \
-	zero_counter = 0; \
-	readBit(); \
-	while(bit == 0) { \
-		zero_counter++; \
-		readBit(); \
-	} \
-	while(zero_counter != 0) { \
-		zero_counter--; \
-		scanBit(); \
-	}
-	
-#define readExpGolombSymbol() \
-	zero_counter = 0; \
-	readBit(); \
-	while(bit == 0) { \
-		zero_counter++; \
-		readBit(); \
-	} \
-	expGolombSymbol = (0x01 << zero_counter); \
-	while(zero_counter != 0) { \
-		zero_counter--; \
-		readBit(); \
-		if(bit != 0) { \
-			expGolombSymbol |= (0x01 << zero_counter); \
-		} \
-	} \
-	expGolombSymbol -= 1;
-	
+		
 	// starting at byte 5 since the four first bytes are fixed-size
 	dataIndex = 4;
 	mask = 0x80;
@@ -435,8 +535,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	scanExpGolombSymbol();
 	
 	// scanning past log2_max_frame_num_minus_4
-	//scanExpGolombSymbol();
-	readExpGolombSymbol();
+	scanExpGolombSymbol();
+	//readExpGolombSymbol();
 	
 	//reading pic_order_cnt_type
 	readExpGolombSymbol();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.14 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.15 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,8 @@
 	UInt32 compressSequenceFrameCounter;
 	UInt32 compressSequenceLastVideoBytesSent;
 	UInt32 compressSequenceNonKeyFrameCounter;
+	GWorldPtr compressSequenceScaleGWorld;
+	ImageDescriptionHandle compressSequenceScaleImageDescription;
 	
 	RTPMediaPacketizer mediaPacketizer;
 	RTPMPSampleDataParams sampleData;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.4 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.5 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,7 +100,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 }
 
 
-- (NSSize)setInputFrameSize:(NSSize)theSize
+- (BOOL)setInputFrameSize:(NSSize)theSize
 {
 	size = theSize;
 	
@@ -110,8 +110,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 		pixelBuffer = NULL;
 	}
 	
-	// BOGUS: Fix this to return the correct size
-	return size;
+	return YES;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFrameGrabRate

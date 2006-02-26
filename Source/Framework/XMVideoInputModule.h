@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.8 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.9 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -161,10 +161,9 @@
 	 
 	@param      NSSize		frameSize	tells the receiver which size is desired
 	 
-	@result		NSSize		return the frame size the module is producing. If there is an error,
-							return {0.0, 0.0}
+	@result		BOOL		return whether the receiver can handle this size or not.
  **/
-- (NSSize)setInputFrameSize:(NSSize)frameSize;
+- (BOOL)setInputFrameSize:(NSSize)frameSize;
 
 /*!
 	@function   setFrameGrabRate:(unsigned)frameGrabRate;

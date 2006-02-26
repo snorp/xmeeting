@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.18 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.19 2006/02/26 14:49:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,7 +92,7 @@ void _XMStopMediaTransmit(unsigned sessionID);
  * Tells the MediaReceiver to prepare for incoming data with codec,
  * RTP payload type and the sessionID
  **/
-void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize);
+void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codec);
 
 /**
  * Tells the MediaReceiver that the media stream for the session has
