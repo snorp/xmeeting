@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.8 2006/02/11 10:19:08 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.9 2006/02/27 14:38:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -135,16 +135,6 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 - (NSArray *)localAddresses
 {
 	return localAddresses;
-}
-
-- (NSString *)localAddress
-{
-	if([localAddresses count] == 0)
-	{
-		return nil;
-	}
-	
-	return [localAddresses objectAtIndex:0];
 }
 
 #pragma mark Fetching External Address
@@ -423,6 +413,8 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	localAddresses = [addresses copy];
 	[addresses release];
 	
+	[self startFetchingExternalAddress];
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidUpdateLocalAddresses object:self];
 }
 
@@ -477,6 +469,5 @@ float XMGetVideoWidthForHeight(float height)
 
 void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info)
 {
-	NSLog(@"CALLBACK called");
 	[_XMUtilsSharedInstance _getLocalAddresses];
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.16 2006/02/23 14:15:54 zmit Exp $
+ * $Id: XMNoCallModule.m,v 1.17 2006/02/27 14:38:18 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -452,9 +452,9 @@
 	}
 		
 	XMUtils *utils = [XMUtils sharedInstance];
-	NSString *localAddress = [utils localAddress];
+	NSArray *localAddresses = [utils localAddresses];
 		
-	if([[[XMPreferencesManager sharedInstance] activeLocation] useAddressTranslation] && localAddress == nil)
+	if([[[XMPreferencesManager sharedInstance] activeLocation] useAddressTranslation] && [localAddresses count] == 0)
 	{
 		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];

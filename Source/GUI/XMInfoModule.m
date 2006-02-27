@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMInfoModule.m,v 1.2 2006/02/27 14:38:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -133,42 +133,55 @@
 - (void)_displayListeningStatusFieldInformation
 {
 	XMCallManager *callManager = [XMCallManager sharedInstance];
+	XMUtils *utils = [XMUtils sharedInstance];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
 	BOOL isH323Listening = [callManager isH323Listening];
 	
 	if(!isH323Listening)
 	{
 		[statusFld setStringValue:NSLocalizedString(@"Offline", @"")];
 		[ipFld setStringValue:@""];
+		[ipFld setStringValue:@""];
 		return;
 	}
-	
-	XMUtils *utils = [XMUtils sharedInstance];
+
 	NSString *externalAddress = [utils externalAddress];
-	NSString *localAddress = [utils localAddress];
+	NSArray *localAddresses = [utils localAddresses];
+	unsigned localAddressCount = [localAddresses count];
 	
-	if(localAddress == nil)
+	if(localAddressCount == 0)
 	{
 		[statusFld setStringValue:NSLocalizedString(@"Offline (No Network Address)", @"")];
 		[ipFld setStringValue:@""];
+		[ipFld setToolTip:@""];
 		return;
 	}
 	
 	[statusFld setStringValue:NSLocalizedString(@"Idle", @"")];
 	
-	if(externalAddress == nil || [externalAddress isEqualToString:localAddress])
+	NSMutableString *ipAddressString = [[NSMutableString alloc] initWithCapacity:30];
+	unsigned i;
+	
+	for(i = 0; i < (localAddressCount-1); i++)
 	{
-		NSString *displayFormat = NSLocalizedString(@"%@", @"");
-		NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, localAddress];
-		[ipFld setStringValue:displayString];
-		[displayString release];
+		[ipAddressString appendString:[localAddresses objectAtIndex:i]];
+		[ipAddressString appendString:@", "];
 	}
-	else
+	[ipAddressString appendString:[localAddresses objectAtIndex:(localAddressCount-1)]];
+	
+	BOOL useAddressTranslation = [[preferencesManager activeLocation] useAddressTranslation];
+	
+	if(useAddressTranslation == YES && externalAddress != nil && ![localAddresses containsObject:externalAddress])
 	{
-		NSString *displayFormat = NSLocalizedString(@"%@ (%@)", @"");
-		NSString *displayString = [[NSString alloc] initWithFormat:displayFormat, localAddress, externalAddress];
-		[ipFld setStringValue:displayString];
-		[displayString release];
+		[ipAddressString appendString:@", "];
+		[ipAddressString appendString:externalAddress];
+		[ipAddressString appendString: @" (External)"];
 	}
+	
+	[ipFld setStringValue:ipAddressString];
+	[ipFld setToolTip:ipAddressString];
+	[ipAddressString release];
 }
 
 - (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif
@@ -181,20 +194,31 @@
 		NSString *gatekeeperString = [[NSString alloc] initWithFormat:gatekeeperFormat, gatekeeperName];
 		[gkFld setStringValue:gatekeeperString];
 		[gatekeeperString release];
+		
+		[gdsFld setTextColor:[NSColor controlTextColor]];
 	}
 	else
 	{
 		[gkFld setStringValue:@""];
+		[gdsFld setTextColor:[NSColor disabledControlTextColor]];
 	}
 }
 
 
 - (void)_preferencesDidChange:(NSNotification *)notif
 {
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];	
-	NSString* phone = [[[preferencesManager locations] objectAtIndex:[preferencesManager indexOfActiveLocation]] gatekeeperPhoneNumber]; 
-	[gdsFld setStringValue:phone];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	XMLocation *activeLocation = [preferencesManager activeLocation];
 	
+	if([activeLocation useGatekeeper] == YES)
+	{
+		NSString* phone = [activeLocation gatekeeperPhoneNumber]; 
+		[gdsFld setStringValue:phone];
+	}
+	else
+	{
+		[gdsFld setStringValue:@""];
+	}
 }
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif

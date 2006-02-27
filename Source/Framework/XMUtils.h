@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.12 2006/02/11 10:19:08 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.13 2006/02/27 14:38:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,12 +42,6 @@
  * Returns the local addresses for this computer
  **/
 - (NSArray *)localAddresses;
-
-/**
- * Returns the first object of -localAddresses, or nil if there are no
- * network addresses
- **/
-- (NSString *)localAddress;
 
 /**
  * Starts a search for the external address on the network interface.

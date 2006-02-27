@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.15 2006/02/22 16:12:32 zmit Exp $
+ * $Id: XMApplicationController.m,v 1.16 2006/02/27 14:38:16 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -396,7 +396,6 @@
 	
 	// start fetching the external address
 	XMUtils *utils = [XMUtils sharedInstance];
-	[utils localAddress];
 	[utils startFetchingExternalAddress];
 	
 	// causing the PreferencesManager to activate the active location
