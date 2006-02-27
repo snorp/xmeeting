@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.7 2006/02/27 15:32:28 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.8 2006/02/27 23:23:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 - (id)_init
 {
 	self = [super init];
+	
+	updateLock = [[NSLock alloc] init];
 	
 	// change this to allow for selecting any screen
 	
@@ -53,6 +55,8 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 - (void)dealloc
 {	if (displayID != NULL) 
 		[self closeInputDevice];
+	
+	[updateLock release];
 		
 	[inputManager release];
 	
@@ -137,6 +141,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 																// For now only copy row changed.
 	CVPixelBufferLockBaseAddress (pixelBuffer, 0);
   
+	[updateLock lock];
 		NSLog(@"%d to %d", topLine, bottomLine);
 		bytes = CVPixelBufferGetBaseAddress (pixelBuffer);
 		screen = CGDisplayBaseAddress(displayID);
@@ -149,13 +154,17 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 			bytes  += rowBytesScreen;
 		}
 		
+		topLine = CVPixelBufferGetHeight(pixelBuffer);
+		bottomLine = 0;
+		[updateLock unlock];
+		
 	CVPixelBufferUnlockBaseAddress	(pixelBuffer, 0);	
-	topLine = CVPixelBufferGetHeight(pixelBuffer);	// reset update area to nil.
-	bottomLine = 0;
+	//topLine = CVPixelBufferGetHeight(pixelBuffer);	// reset update area to nil.
+	//bottomLine = 0;
 		// Note: need to look out reference callback..
 }
 
-#define optimzeScreenCopy 1
+#define optimzeScreenCopy 0
 - (void) doRefeshFromScreen: (CGRectCount) count rects: (const CGRect *)rectArray
 {
 #ifdef optimzeScreenCopy
@@ -167,6 +176,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 	// simple optimzation is to only copy rect passed.
 	// For now only copy top row to last row changed.
 	
+	[updateLock lock];
 	
     for (i = 0; i < count; i++) {	// group of rect's.
 		top =  rectArray[i].origin.y;
@@ -174,6 +184,8 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 		if (top < topLine) topLine = top;
 		if (bottom > bottomLine) bottomLine = bottom;
 	}	// end for i
+	
+	[updateLock unlock];
 #endif
 }
 

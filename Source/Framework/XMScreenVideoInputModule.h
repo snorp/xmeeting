@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.h,v 1.2 2006/02/21 22:38:59 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.h,v 1.3 2006/02/27 23:23:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,6 +33,7 @@
 	unsigned rowBytesScreen;		// CGDisplayBytesPerRow(displayID);
 	BOOL	needsUpdate;
 	unsigned topLine, bottomLine;	// optimized copy only rows updated (0, height) == full screen.
+	NSLock *updateLock;
 	
 	NSRect  frameRect;				// location on the screen (not used yet).
 	
