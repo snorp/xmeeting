@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.11 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.12 2006/02/27 13:09:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,7 @@ BOOL XMTransmitterMediaPatch::IsTerminated() const
 	}
 	else
 	{
-		// since we don't run our own thread, the IsSuspended()
+		// since we don't run our own thread, the IsTerminated()
 		// method must return whether the MediaTransmitter is still
 		// transmitting media or not. This is required so that
 		// WaitForTermination() does behave correctly

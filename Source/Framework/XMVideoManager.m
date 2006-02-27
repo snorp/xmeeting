@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.9 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.10 2006/02/27 13:09:15 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -306,6 +306,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 		[selectedInputDevice release];
 		selectedInputDevice = [device retain];
 	}
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidChangeSelectedInputDevice object:self];
 }
 
@@ -319,6 +320,17 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)_handleVideoReceivingEnd
 {
 	remoteVideoSize = XMVideoSize_NoVideo;
+	
+	[videoLock lock];
+	
+	if(remoteVideoTexture != NULL)
+	{
+		CVOpenGLTextureRelease(remoteVideoTexture);
+		remoteVideoTexture = NULL;
+	}
+	CVOpenGLTextureCacheFlush(textureCache, 0);
+	
+	[videoLock unlock];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidEndReceivingVideo object:self];
 }
