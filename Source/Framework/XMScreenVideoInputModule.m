@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.6 2006/02/27 13:25:37 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.7 2006/02/27 15:32:28 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 
 	for (i= 0; i < [screens count]; i++) {
 			[screenNames addObject: [NSString stringWithFormat:deviceName, i]];	// one device for each screen.
-		#if 1
+		#if 0
 		NSScreen *aScreen = [[NSScreen screens] objectAtIndex:i];
 		NSDictionary *deviceDescription = [aScreen deviceDescription];
 		NSLog(@"screen %d, %@", i, deviceDescription);		// DEBUG
@@ -365,9 +365,9 @@ Thousands of color:
 	return YES;
 }
 
-- (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device
+- (NSString *)descriptionForErrorCode:(int)errorCode hintCode:(int)code device:(NSString *)device
 {
-	return nil;
+	return @"Cannot grab from screen with 256 colors";
 }
 
 - (BOOL)hasSettingsForDevice:(NSString *)device

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.11 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.12 2006/02/27 15:32:28 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -609,9 +609,20 @@ bail:
 	return YES;
 }
 
-- (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device
+- (NSString *)descriptionForErrorCode:(int)errorCode hintCode:(int)hintCode device:(NSString *)device
 {
-	return @"No Description";
+	NSString *formatString;
+	
+	if(hintCode == 0x005001)
+	{
+		formatString = @"Could not grab frames from the camera. Is the camera still attached to the computer?\nError: (%d, %x)\tDevice: %@";
+	}
+	else
+	{
+		formatString = @"An internal error occured in the Live Camera Module.\nError Codes: (%d, %x)\t Device: %@\nPlease report this problem to hfriederich@users.sourceforge.net";
+	}
+	NSString *errorString = [NSString stringWithFormat:formatString, errorCode, hintCode, device];
+	return errorString;
 }
 
 - (BOOL)hasSettingsForDevice:(NSString *)device

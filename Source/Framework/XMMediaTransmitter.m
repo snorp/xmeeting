@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.24 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.25 2006/02/27 15:32:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,6 +51,7 @@ typedef enum XMMediaTransmitterMessage
 - (NSPort *)_receivePort;
 - (XMVideoInputModuleWrapper *)_wrapperForDevice:(NSString *)device;
 - (void)_sendDeviceList;
+- (void)_handleErrorReport:(NSArray *)errorReport;
 - (void)_handleMediaTransmitterThreadDidExit;
 
 - (void)_runMediaTransmitThread;
@@ -502,13 +503,31 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	if(device != nil && ![devices containsObject:device])
 	{
-		NSLog(@"No longer exists");
 		unsigned dummyIndex = [videoInputModules count] - 1;
 		XMVideoInputModuleWrapper *dummyWrapper = [videoInputModules objectAtIndex:dummyIndex];
 		[XMMediaTransmitter _selectModule:dummyIndex device:[[dummyWrapper _devices] objectAtIndex:0]];
 	}
 	
 	[devices release];
+}
+
+- (void)_handleErrorReport:(NSArray *)report
+{
+	// BOGUS: Move Dialog outside of XMeeting framework
+	
+	NSNumber *indexNumber = [report objectAtIndex:0];
+	NSNumber *errorNumber = [report objectAtIndex:1];
+	NSNumber *hintNumber = [report objectAtIndex:2];
+	NSString *device = [report objectAtIndex:3];
+	
+	unsigned index = [indexNumber unsignedIntValue];
+	int errorCode = [errorNumber intValue];
+	int hintCode = [hintNumber intValue];
+	
+	id<XMVideoInputModule> module = [(XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:index] _videoInputModule];
+	NSString *description = [module descriptionForErrorCode:errorCode hintCode:hintCode device:device];
+	
+	NSRunAlertPanel(@"Problem with video device:", description, @"OK", nil, nil);
 }
 
 - (void)_handleMediaTransmitterThreadDidExit
@@ -663,7 +682,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 	
 	[selectedDevice release];
-	selectedDevice = nil;
+	selectedDevice = [device retain];
 	
 	BOOL didSucceed = YES;
 	
@@ -673,6 +692,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(module != activeModule)
 		{
+			activeModule = module;
+			
 			BOOL result = [module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
 			if(result == NO)
 			{
@@ -686,8 +707,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	if(didSucceed == YES)
 	{
-		activeModule = module;
-		selectedDevice = [device retain];
 		
 		if(isTransmitting == YES)
 		{
@@ -703,6 +722,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	else
 	{
 		activeModule = nil;
+		[selectedDevice release];
+		selectedDevice = nil;
 	
 		//The device could not be opened.
 		// We now 1) refresh the device list and 2) select the last module's only device
@@ -1054,9 +1075,40 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	}
 }
 
-- (void)handleErrorWithCode:(ComponentResult)errorCode hintCode:(unsigned)hintCode
+- (void)handleErrorWithCode:(int)errorCode hintCode:(int)hintCode
 {
-	NSLog(@"gotErrorReport: %d hint: %d", (int)errorCode, (int)hintCode);
+	NSNumber *errorCodeNumber = [[NSNumber alloc] initWithInt:errorCode];
+	NSNumber *hintCodeNumber = [[NSNumber alloc] initWithInt:hintCode];
+	
+	unsigned index = NSNotFound;
+	unsigned count = [videoInputModules count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMVideoInputModuleWrapper *wrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:i];
+		if([wrapper _videoInputModule] == activeModule)
+		{
+			index = i;
+			break;
+		}
+	}
+	
+	if(index == NSNotFound)
+	{
+		NSLog(@"ERROR: MODULE NOT FOUND");
+	}
+	
+	NSNumber *indexNumber = [[NSNumber alloc] initWithUnsignedInt:index];
+	
+	NSArray *objects = [[NSArray alloc] initWithObjects:indexNumber, errorCodeNumber, hintCodeNumber, selectedDevice, nil];
+	
+	[self performSelectorOnMainThread:@selector(_handleErrorReport:) withObject:objects waitUntilDone:NO];
+	
+	[objects release];
+	[indexNumber release];
+	[errorCodeNumber release];
+	[hintCodeNumber release];
 }
 
 #pragma mark Private Methods

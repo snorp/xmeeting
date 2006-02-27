@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.9 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.10 2006/02/27 15:32:28 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,7 +63,7 @@
 	 @param		(ComponentResult)errorCode   
 	 @param		(unsigned)hintCode   
  **/
-- (void)handleErrorWithCode:(ComponentResult)errorCode hintCode:(unsigned)hintCode;
+- (void)handleErrorWithCode:(int)errorCode hintCode:(int)hintCode;
 
 @end
 
@@ -202,15 +202,15 @@
 /*!
 	@function   descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device;
 	@discussion	Return a error description (localized if possible) which
-				describes errorCode. 
+				describes errorCode and hintCode. 
 	 
-				This method is guaranteed only to be called on the main thread.
+				This method is guaranteed to be called on the main thread.
 	 
 	@param      unsigned		errorCode
 	 
 	@result		NSString 		a error description (localized if possible) 
  **/
-- (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device;
+- (NSString *)descriptionForErrorCode:(int)errorCode hintCode:(int)hintCode device:(NSString *)device;
 
 /*!
 	@function	hasSettingsForDevice:(NSString *)device;

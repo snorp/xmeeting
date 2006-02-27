@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.10 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.11 2006/02/27 15:32:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -139,7 +139,6 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		
 		if(result != kCVReturnSuccess)
 		{
-			//[inputManager handleErrorWithCode:(ComponentResult)result hintCode:1];
 			return NO;
 		}
 	}
@@ -149,7 +148,7 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return YES;
 }
 
-- (NSString *)descriptionForErrorCode:(unsigned)errorCode device:(NSString *)device
+- (NSString *)descriptionForErrorCode:(int)errorCode hintCode:(int)hintCode device:(NSString *)device
 {
 	return nil;
 }
