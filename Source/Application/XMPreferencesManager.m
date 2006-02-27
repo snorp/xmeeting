@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.11 2006/02/23 16:43:05 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.12 2006/02/27 16:11:39 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,6 +29,8 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 - (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
 
 - (void)_setInitialVideoInputDevice:(NSNotification *)notif;
+
+- (void)_updateCallManagerPreferences:(NSNotification *)notif;
 
 @end
 
@@ -284,8 +286,21 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		}
 	}
 	
-	[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
+	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
+	if([callManager doesAllowModifications])
+	{
+		[callManager setActivePreferences:[locations objectAtIndex:activeLocation]];
+	}
+	else
+	{
+		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+		
+		[notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
+								   name:XMNotification_CallManagerDidClearCall object:nil];
+		[notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
+								   name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+	}
 }
 
 - (NSArray *)locationNames
@@ -332,7 +347,20 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 															object:self
 														  userInfo:nil];
 	
-		[[XMCallManager sharedInstance] setActivePreferences:[locations objectAtIndex:activeLocation]];
+		XMCallManager *callManager = [XMCallManager sharedInstance];
+		if([callManager doesAllowModifications])
+		{
+			[callManager setActivePreferences:[locations objectAtIndex:activeLocation]];
+		}
+		else
+		{
+			NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+			
+			[notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
+									   name:XMNotification_CallManagerDidClearCall object:nil];
+			[notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
+									   name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+		}
 	}
 }
 
@@ -759,6 +787,21 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	if(notif != nil)
 	{
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_VideoManagerDidUpdateInputDeviceList object:nil];
+	}
+}
+
+- (void)_updateCallManagerPreferences:(NSNotification *)notif
+{
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	
+	if([callManager doesAllowModifications])
+	{
+		[callManager setActivePreferences:[locations objectAtIndex:activeLocation]];
+		
+		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+		
+		[notificationCenter removeObserver:self name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+		[notificationCenter removeObserver:self name:XMNotification_CallManagerDidClearCall object:nil];
 	}
 }
 
