@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.8 2006/02/27 19:20:47 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.9 2006/02/27 19:53:13 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class XMNoCallModule, XMInCallModule, XMLocalAudioVideoModule;
+@class XMNoCallModule, XMInCallModule, XMBusyModule, XMLocalAudioVideoModule;
 @class XMAddressBookModule, XMZeroConfModule, XMDialPadModule;
 @class XMTextChatModule, XMStatisticsModule, XMCallHistoryModule;
 @class XMInfoModule;
@@ -25,6 +25,7 @@
 	
 	XMNoCallModule *noCallModule;
 	XMInCallModule *inCallModule;
+	XMBusyModule *busyModule;
 	
 	XMLocalAudioVideoModule *localAudioVideoModule;
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.17 2006/02/27 19:20:47 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.18 2006/02/27 19:53:13 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@
 #import "XMPreferencesWindowController.h"
 #import "XMNoCallModule.h"
 #import "XMInCallModule.h"
+#import "XMBusyModule.h"
 #import "XMLocalAudioVideoModule.h"
 #import "XMAddressBookModule.h"
 #import "XMZeroConfModule.h"
@@ -30,6 +31,8 @@
 
 @interface XMApplicationController (PrivateMethods)
 
+- (void)_didStartSubsystemSetup:(NSNotification *)notif;
+- (void)_didEndSubsystemSetup:(NSNotification *)notif;
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didEstablishCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
@@ -75,6 +78,10 @@
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
+	[notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
+							   name:XMNotification_CallManagerDidStartSubsystemSetup object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
+							   name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
 							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
@@ -104,6 +111,7 @@
 {
 	[noCallModule release];
 	[inCallModule release];
+	[busyModule release];
 	[localAudioVideoModule release];
 	[addressBookModule release];
 	//[zeroConfModule release];
@@ -181,6 +189,16 @@
 }
 
 #pragma mark Notification Methods
+
+- (void)_didStartSubsystemSetup:(NSNotification *)notif
+{
+	[[XMMainWindowController sharedInstance] showMainModule:busyModule];
+}
+
+- (void)_didEndSubsystemSetup:(NSNotification *)notif
+{
+	[[XMMainWindowController sharedInstance] showMainModule:noCallModule];
+}
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
@@ -404,6 +422,7 @@
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];
+	busyModule = [[XMBusyModule alloc] init];
 	
 	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
 	

@@ -96,6 +96,9 @@
 		D10157EE09409867000A9BA7 /* XMRTPH263Packetizer.h in Headers */ = {isa = PBXBuildFile; fileRef = D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */; };
 		D10157EF09409867000A9BA7 /* XMRTPH263Packetizer.c in Sources */ = {isa = PBXBuildFile; fileRef = D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */; };
 		D10157F309409882000A9BA7 /* XMRTPH263PacketizerDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */; };
+		D106DA5509B3899D00BAA8F1 /* XMBusyModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D106DA5309B3899D00BAA8F1 /* XMBusyModule.h */; };
+		D106DA5609B3899D00BAA8F1 /* XMBusyModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D106DA5409B3899D00BAA8F1 /* XMBusyModule.m */; };
+		D106DA9709B38BE600BAA8F1 /* BusyModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D106DA9509B38BE600BAA8F1 /* BusyModule.nib */; };
 		D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFE9407B3771F00BBC8EA /* XMCallManager.h */; };
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
 		D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
@@ -967,6 +970,9 @@
 		D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263Packetizer.h; path = Source/Framework/XMRTPH263Packetizer.h; sourceTree = "<group>"; };
 		D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMRTPH263Packetizer.c; path = Source/Framework/XMRTPH263Packetizer.c; sourceTree = "<group>"; };
 		D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PacketizerDispatch.h; path = Source/Framework/XMRTPH263PacketizerDispatch.h; sourceTree = "<group>"; };
+		D106DA5309B3899D00BAA8F1 /* XMBusyModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMBusyModule.h; path = Source/GUI/XMBusyModule.h; sourceTree = "<group>"; };
+		D106DA5409B3899D00BAA8F1 /* XMBusyModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMBusyModule.m; path = Source/GUI/XMBusyModule.m; sourceTree = "<group>"; };
+		D106DA9609B38BE600BAA8F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/BusyModule.nib; sourceTree = "<group>"; };
 		D10AFE9407B3771F00BBC8EA /* XMCallManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallManager.h; path = Source/Framework/XMCallManager.h; sourceTree = "<group>"; };
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
@@ -2107,6 +2113,8 @@
 				D1AF75FF084E57BB00D50883 /* XMMainWindowStatusBarController.m */,
 				D1ECCD330834923D008EBAE3 /* XMNoCallModule.h */,
 				D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */,
+				D106DA5309B3899D00BAA8F1 /* XMBusyModule.h */,
+				D106DA5409B3899D00BAA8F1 /* XMBusyModule.m */,
 				D1ECCD3908349255008EBAE3 /* XMInCallModule.h */,
 				D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */,
 				D13233A1090687FA00F4D5A7 /* XMInCallView.h */,
@@ -3056,6 +3064,7 @@
 				D1B4CC98082F594C00A444E1 /* MainWindow.nib */,
 				D1ECCD2E083491EB008EBAE3 /* NoCallModule.nib */,
 				D1ECCD160834911C008EBAE3 /* InCallModule.nib */,
+				D106DA9509B38BE600BAA8F1 /* BusyModule.nib */,
 				D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */,
 				D1CE4B67083CDF3900B66B5D /* AddressBook.nib */,
 				D1B4D0050833937200A444E1 /* ZeroConfModule.nib */,
@@ -3227,6 +3236,7 @@
 				D12E61D30998FEF5004EF9F8 /* XMPreferencesCodecListRecord.h in Headers */,
 				D12E627B0999168E004EF9F8 /* XMScreenVideoInputModule.h in Headers */,
 				D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */,
+				D106DA5509B3899D00BAA8F1 /* XMBusyModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3826,6 +3836,7 @@
 				1A5821C409A1DE7F00CBE017 /* locationPreferences.tif in Resources */,
 				1A9E27BE09A5BF3600E9A7CE /* Ringer.aiff in Resources */,
 				1A42B4D109A9DEAF007773DA /* XMeeting.icns in Resources */,
+				D106DA9709B38BE600BAA8F1 /* BusyModule.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3962,6 +3973,7 @@
 				D1EEDEB80992514A000BF113 /* XMH323Channel.cpp in Sources */,
 				D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */,
 				D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */,
+				D106DA5609B3899D00BAA8F1 /* XMBusyModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4270,6 +4282,14 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		D106DA9509B38BE600BAA8F1 /* BusyModule.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D106DA9609B38BE600BAA8F1 /* English */,
+			);
+			name = BusyModule.nib;
 			sourceTree = "<group>";
 		};
 		D1639415083E17A500F7FD83 /* DialPadModule.nib */ = {

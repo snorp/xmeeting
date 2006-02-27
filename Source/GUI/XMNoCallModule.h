@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.7 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMNoCallModule.h,v 1.8 2006/02/27 19:53:13 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,7 +42,6 @@
 	NSMenuItem *imageItem;
 	
 	IBOutlet NSImageView *semaphoreView;
-
 	
 	BOOL isCalling;
 }
