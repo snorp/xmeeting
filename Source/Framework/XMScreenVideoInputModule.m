@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.5 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.6 2006/02/27 13:25:37 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 
 	for (i= 0; i < [screens count]; i++) {
 			[screenNames addObject: [NSString stringWithFormat:deviceName, i]];	// one device for each screen.
-		#if 0
+		#if 1
 		NSScreen *aScreen = [[NSScreen screens] objectAtIndex:i];
 		NSDictionary *deviceDescription = [aScreen deviceDescription];
 		NSLog(@"screen %d, %@", i, deviceDescription);		// DEBUG
@@ -305,7 +305,10 @@ Thousands of color:
 		if (rowBytesScreen == 2 * width) 
 			PixType = k16BE555PixelFormat;		// Thousands for video
 		else
-			PixType = k8IndexedPixelFormat;		// 256 color video
+		{
+			[inputManager handleErrorWithCode:1 hintCode:1]; //256 color video
+			return NO;
+		}
 	
 		void *pixels = malloc(usedBytes);	// creating a buffer for the pixels
 		
@@ -325,6 +328,7 @@ Thousands of color:
 		if(result != kCVReturnSuccess)
 		{	NSLog(@"ScreenModule failed: %d", result);
 			//[inputManager handleErrorWithCode:(ComponentResult)result hintCode:1];
+			free(pixels);
 			return NO;
 		}
 	}
