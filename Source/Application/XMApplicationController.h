@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.7 2006/02/22 16:12:32 zmit Exp $
+ * $Id: XMApplicationController.h,v 1.8 2006/02/27 19:20:47 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,8 @@
 - (IBAction)showPreferences:(id)sender;
 
 - (IBAction)updateDeviceLists:(id)sender;
+
+- (IBAction)retryGatekeeperRegistration:(id)sender;
 
 - (IBAction)showInspector:(id)sender;
 

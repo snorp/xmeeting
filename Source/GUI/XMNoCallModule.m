@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.18 2006/02/27 18:50:27 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.19 2006/02/27 19:20:47 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -433,7 +433,7 @@
 
 - (void)_H323NotEnabled:(NSNotification*)notif{
 	// at the moment, treat as a fatal error if H.323 is not enabled.
-	[statusFieldOne setStringValue:NSLocalizedStirng(@"Offline", @"")];
+	[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
 	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 	[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 not enabled)",@"")];
 }

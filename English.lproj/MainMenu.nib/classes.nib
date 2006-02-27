@@ -3,6 +3,7 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
+                retryGatekeeperRegistration = id; 
                 showInspector = id; 
                 showPreferences = id; 
                 showTools = id; 

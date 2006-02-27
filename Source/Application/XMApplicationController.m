@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.16 2006/02/27 14:38:16 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.17 2006/02/27 19:20:47 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,10 +42,14 @@
 // terminating the application
 - (void)_frameworkClosed:(NSNotification *)notif;
 
+// displaying dialogs
 - (void)_displayIncomingCall;
 - (void)_displayCallStartFailed;
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
+
+// validating menu items
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
 
 - (void)_showSetupAssistant;
 - (void)_setupApplication:(NSArray *)locations;
@@ -150,6 +154,11 @@
 - (IBAction)updateDeviceLists:(id)sender
 {
 	[[XMVideoManager sharedInstance] updateInputDeviceList];
+}
+
+- (IBAction)retryGatekeeperRegistration:(id)sender
+{
+	[[XMCallManager sharedInstance] retryGatekeeperRegistration];
 }
 
 #pragma mark -
@@ -294,8 +303,7 @@
 	NSAlert *alert = [[NSAlert alloc] init];
 	
 	[alert setMessageText:NSLocalizedString(@"Enabling H.323 Failed", @"")];
-	[alert setInformativeText:NSLocalizedString(@"Unable to enable the H.323 subsystem (REASON) \
-	You will not be able to make H.323 calls", @"")];
+	[alert setInformativeText:NSLocalizedString(@"Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls", @"")];
 	
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
@@ -364,6 +372,22 @@
 }
 
 #pragma mark Private Methods
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	if([menuItem tag] == 101)
+	{
+		XMCallManager *callManager = [XMCallManager sharedInstance];
+		
+		if([callManager gatekeeperRegistrationFailReason] != XMGatekeeperRegistrationFailReason_NoFailure)
+		{
+			return YES;
+		}
+		return NO;
+	}
+	
+	return YES;
+}
 
 - (void)_showSetupAssistant
 {
