@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.17 2006/02/27 14:38:18 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.18 2006/02/27 18:50:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,7 @@
 - (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender;
 
 - (void)_H323NotEnabled:(NSNotification*)notif;
+- (void)_appendNetworkInterfacesString:(NSMutableString *)string;
 
 @end
 
@@ -397,31 +398,30 @@
 - (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif
 {
 	NSString *gatekeeperName = [[XMCallManager sharedInstance] gatekeeperName];
+	NSMutableString *toolTipString = [[NSMutableString alloc] initWithCapacity:50];
 	
 	if(gatekeeperName != nil)
 	{
-		if (![[[XMPreferencesManager sharedInstance] activeLocation] useGatekeeper]){
-			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
-			[semaphoreView setToolTip:NSLocalizedString(@"Ready. Not using a gatekeeper",@"")];
-		}
-		else
-		{
-			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];	
-			[semaphoreView setToolTip:NSLocalizedString(@"Registered with gatekeeper",@"")];
-		}
+		// gatekeeperName is only non-nil if using a gatekeeper
+		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];	
+		[toolTipString appendString:NSLocalizedString(@"Registered with gatekeeper\n\n",@"")];
 	}
 	else
 	{
 		if (![[[XMPreferencesManager sharedInstance] activeLocation] useGatekeeper]){
 			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
-			[semaphoreView setToolTip:NSLocalizedString(@"Ready. Not using a gatekeeper",@"")];
+			[toolTipString appendString:NSLocalizedString(@"Ready. Not using a gatekeeper\n\n",@"")];
 		}
 		else
 		{
-			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];	
-			[semaphoreView setToolTip:NSLocalizedString(@"Gatekeeper registration failed",@"")];
+			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
+			[toolTipString appendString:NSLocalizedString(@"Gatekeeper registration failed\n\n",@"")];
 		}
 	}
+	
+	[self _appendNetworkInterfacesString:toolTipString];
+	
+	[semaphoreView setToolTip:toolTipString];
 }
 
 - (void)_callHistoryDataDidChange:(NSNotification *)notif
@@ -432,11 +432,11 @@
 #pragma mark Private Methods
 
 - (void)_H323NotEnabled:(NSNotification*)notif{
-	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
-	[semaphoreView setToolTip:NSLocalizedString(@"H.323 not enabled",@"")];
-
+	// at the moment, treat as a fatal error if H.323 is not enabled.
+	[statusFieldOne setStringValue:NSLocalizedStirng(@"Offline", @"")];
+	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
+	[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 not enabled)",@"")];
 }
-
 
 - (void)_displayListeningStatusFieldInformation
 {
@@ -447,14 +447,14 @@
 	{
 		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
-		[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 is not listening)",@"")];
+		[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 is not enabled)",@"")];
 		return;
 	}
 		
 	XMUtils *utils = [XMUtils sharedInstance];
 	NSArray *localAddresses = [utils localAddresses];
 		
-	if([[[XMPreferencesManager sharedInstance] activeLocation] useAddressTranslation] && [localAddresses count] == 0)
+	if([localAddresses count] == 0)
 	{
 		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
@@ -463,7 +463,7 @@
 	}
 		
 	[statusFieldOne setStringValue:NSLocalizedString(@"Idle", @"")];
-	
+	[self _gatekeeperRegistrationDidChange:nil];
 }
 
 - (void)_setupRecentCallsPullDownMenu
@@ -499,6 +499,44 @@
 	
 	[callAddressField setRepresentedObject:record];
 	[[contentView window] makeFirstResponder:nil];
+}
+
+- (void)_appendNetworkInterfacesString:(NSMutableString *)addressString
+{
+	XMUtils *utils = [XMUtils sharedInstance];
+	
+	NSArray *localAddresses = [utils localAddresses];
+	NSString *externalAddress = [utils externalAddress];
+	BOOL useAddressTranslation = [[[XMPreferencesManager sharedInstance] activeLocation] useAddressTranslation];
+	
+	unsigned count = [localAddresses count];
+	if(count == 0)
+	{
+		[addressString appendString:@"No network addresses"];
+		return;
+	}
+	
+	[addressString appendString:@"Network Addresses:"];
+	
+	unsigned i;
+	for(i = 0; i < count; i++)
+	{
+		NSString *address = (NSString *)[localAddresses objectAtIndex:i];
+		[addressString appendString:@"\n"];
+		[addressString appendString:address];
+		
+		if(useAddressTranslation == YES && externalAddress != nil && [externalAddress isEqualToString:address])
+		{
+			[addressString appendString:@" (External)"];
+		}
+	}
+	
+	if(useAddressTranslation == YES && externalAddress != nil && ![localAddresses containsObject:externalAddress])
+	{
+		[addressString appendString:@"\n"];
+		[addressString appendString:externalAddress];
+		[addressString appendString:@" (External)"];
+	}
 }
 
 @end

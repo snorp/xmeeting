@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.13 2006/02/27 16:31:20 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.14 2006/02/27 18:50:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -282,7 +282,6 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 			if([location _tag] == currentTag)
 			{
 				activeLocation = i;
-				break;
 			}
 		}
 	}

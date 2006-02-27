@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.11 2006/02/27 15:32:28 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.12 2006/02/27 18:50:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -119,17 +119,51 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		// filling the buffer with a color (currently black)
 		UInt8 *bytes = (UInt8 *)pixels;
 		unsigned i;
-		unsigned count = width*height;
-		for(i = 0; i < count; i++)
+		unsigned count = height;
+		for(i = 0; i < height; i++)
 		{
-			*bytes = 255;	// alpha value
-			bytes++;
-			*bytes = 0;		// red value
-			bytes++;
-			*bytes = 0;		// green value
-			bytes++;
-			*bytes = 0;		// blue value
-			bytes++;
+			unsigned j;
+			for(j = 0; j < width; j++)
+			{
+				// alpha value
+				*bytes = 255;
+				bytes++;
+				
+				//red value
+				if(j < width/2)
+				{
+					*bytes = 255;
+				}
+				else
+				{
+					*bytes = 0;
+				}
+				bytes++;
+				
+				// green value
+				if(((j >= width/6) && (j < width/3)) ||
+				   ((j >= width/2) && (j < 5*width/6)))
+				{
+					*bytes = 255;
+				}
+				else
+				{
+					*bytes = 0;
+				}
+				bytes++;
+				
+				// blue value
+				if(((j >= width/3) && (j < width/2)) ||
+				   (j >= 2*width/3))
+				{
+					*bytes = 255;
+				}
+				else
+				{
+					*bytes = 0;
+				}
+				bytes++;
+			}
 		}
 		
 		// creating the CVPixelBufferRef

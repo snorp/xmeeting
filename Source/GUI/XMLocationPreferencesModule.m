@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.14 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.15 2006/02/27 18:50:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -227,6 +227,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	// pass the changed locations to the preferences manager
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	[preferencesManager saveTemporaryPasswords];
+	NSLog(@"SAVING LOCATIONS: %@", [locations description]);
 	[preferencesManager setLocations:locations];
 }
 
