@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.12 2006/02/27 16:11:39 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.13 2006/02/27 16:31:20 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -268,10 +268,10 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	if(count != 0)
 	{
 		[locations removeAllObjects];
+		activeLocation = 0;
 	}
 	
 	// we have also to determine the index of the actual location since this could have changed
-	activeLocation = 0;
 	for(i = 0; i < count; i++)
 	{
 		XMLocation *location = (XMLocation *)[newLocations objectAtIndex:i];
@@ -282,6 +282,7 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 			if([location _tag] == currentTag)
 			{
 				activeLocation = i;
+				break;
 			}
 		}
 	}
