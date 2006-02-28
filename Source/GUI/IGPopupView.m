@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: IGPopupView.m,v 1.2 2006/02/28 21:39:07 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -122,7 +122,6 @@
 #pragma mark -
 #pragma mark Event Handling
 - (void)mouseEntered:(NSEvent *)theEvent {
-//NSLog(@"entered");
     mouseOver=YES;
     [self setNeedsDisplay:YES];
 }
@@ -159,13 +158,16 @@
 #pragma mark -
 #pragma mark Tracking rect stuff
 - (void)_resetTrackingRect{
-	//NSLog(@"resetting tracking rect");
 	if ( trackingRect )
     {
         [self removeTrackingRect:trackingRect];
     }
-		
-	trackingRect=[self addTrackingRect:[self bounds] owner:self userData:@"rectData" assumeInside:NO];
+	
+	NSTrackingRectTag theTrackingRect=[self addTrackingRect:[self bounds] owner:self userData:@"rectData" assumeInside:NO];
+	if(theTrackingRect != 0)
+	{
+		trackingRect = theTrackingRect;
+	}
 	
 }
 

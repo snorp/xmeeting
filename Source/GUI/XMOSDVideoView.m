@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.2 2006/02/28 09:14:48 zmit Exp $
+ * $Id: XMOSDVideoView.m,v 1.3 2006/02/28 21:39:07 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1231,7 +1231,7 @@
 	downPoint.y -= videoCenterY;
 	
 	if (displayState == XM_DISPLAY_NO_VIDEO || displayState == XM_DISPLAY_LOCAL_VIDEO){
-		[[NSApp delegate] showTools:self];
+		//[[NSApp delegate] showTools:self];
 	}
 }
 
