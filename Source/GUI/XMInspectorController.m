@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMInspectorController.m,v 1.2 2006/02/28 09:14:48 zmit Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,7 +61,7 @@
 - (void)awakeFromNib{
 	[self _setupInterface];
 	[panel orderFront:self];
-	[panel setLevel:NSScreenSaverWindowLevel+2]; //OSD is NSScreenSaverWindowLevel+1. This ensures it doesn't get over
+	//[panel setLevel:NSScreenSaverWindowLevel+2]; //OSD is NSScreenSaverWindowLevel+1. This ensures it doesn't get over
 }
 
 - (void)dealloc{

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.h,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMOSDVideoView.h,v 1.2 2006/02/28 09:14:48 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,7 +37,7 @@
 	// only used to draw into the window draw buffer when
 	// the window does miniaturize or there is no local video
 	// (e.g. when the device is changed)
-	NSCIImageRep *ciLocalImageRep, *ciRemoteImageRep;
+	NSCIImageRep *ciRemoteImageRep;
 	NSImage *noVideoImage;
 	BOOL isMiniaturized;
 	BOOL isBusy;

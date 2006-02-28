@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMOSDVideoView.m,v 1.2 2006/02/28 09:14:48 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -179,7 +179,6 @@
 	displayState = XM_DISPLAY_NO_VIDEO;
 	previousSize = NSMakeSize(0, 0);
 	
-	ciLocalImageRep = nil;
 	ciRemoteImageRep = nil;
 	noVideoImage = nil;
 	
@@ -472,6 +471,14 @@
 	
 	// adjusting for any size changes
 	NSSize newSize = [self bounds].size;
+	
+	if (isMiniaturized && openGLTextureRemote != nil){
+		CIImage *image = [[CIImage alloc] initWithCVImageBuffer:openGLTextureRemote];
+		ciRemoteImageRep = [[NSCIImageRep alloc] initWithCIImage:image];
+		[image release];
+		[ciRemoteImageRep drawInRect:[self bounds]];
+		return;
+	}
 	
 	if (!NSEqualSizes(newSize, previousSize) || switchedPinPMode)
 	{
@@ -888,7 +895,7 @@
 		[osd setFrame:[self frame]];
 	}
 	[osd setOSDSize:size];
-	osdControllerWindow = [[XMOnScreenControllerWindow controllerWindowWithContollerView:osd andParentRect:viewRect] retain];
+	osdControllerWindow = [[XMOnScreenControllerWindow controllerWindowWithContollerView:osd parentRect:viewRect fullscreen:fullscreen] retain];
 	[osdControllerWindow openWithEffect:FadeInEffect];
 }
 

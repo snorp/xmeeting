@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.2 2006/02/28 09:14:48 zmit Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,7 @@
 @end
 
 @implementation XMOnScreenControllerWindow
-+ (id) controllerWindowWithContollerView:(NSView*)_view andParentRect:(NSRect)pRect
++ (id) controllerWindowWithContollerView:(NSView*)_view parentRect:(NSRect)pRect fullscreen:(BOOL)fullscreen
 {
 	XMOnScreenControllerWindow* superWindow;
 	if ((superWindow = [[super alloc] initWithContentRect:pRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES]) == nil) {
@@ -35,6 +35,10 @@
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter addObserver:superWindow selector:@selector(_windowWillMove:) name:NSWindowWillMoveNotification object:nil];
+
+	if (fullscreen){
+		[superWindow setLevel:NSScreenSaverWindowLevel+1];
+	}
 
 	return [superWindow autorelease];
 }
@@ -84,7 +88,6 @@
 			break;
 	}
 	
-	[self setLevel:NSScreenSaverWindowLevel+1];
 }
 
 
