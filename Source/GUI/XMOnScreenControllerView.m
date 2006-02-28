@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerView.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMOnScreenControllerView.m,v 1.2 2006/02/28 21:19:46 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -209,6 +209,11 @@
 		{
 			NSRect buttonRect = NSMakeRect(left_border, bottom_border, buttonWidth, buttonHeight);
 			[button setObject:[self _stringFromRect:buttonRect] forKey:@"Rect"];
+			if([[button objectForKey:@"Name"] isEqualToString:@"Hangup"])
+			{
+				[self removeAllToolTips];
+				[self addToolTipRect:buttonRect owner:self userData:nil];
+			}
 			[self _drawButton:button];
 			left_border += buttonWidth;
 		}
@@ -216,6 +221,10 @@
 
 }
 
+- (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
+{
+	return @"Hangup";
+}
 
 - (void)_drawBackground:(NSRect)aRect
 {
