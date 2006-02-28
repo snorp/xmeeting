@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.11 2006/02/23 14:15:54 zmit Exp $
+ * $Id: XMMainWindowController.m,v 1.12 2006/02/28 22:33:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,8 @@
 
 
 #import "XMMainWindowController.h"
+
+#import "XMPreferencesManager.h"
 #import "XMMouseOverButton.h"
 #import "XMCallManager.h"
 #import "XMVideoManager.h"
@@ -423,8 +425,11 @@ NSLog(@"noteSizeValuesDidChangeOfAdditionModule called!");
 
 		NSPoint origin = NSMakePoint((newFrame.size.width - [selfView frame].size.width) / 2.0, [[mainModules objectAtIndex:0] contentViewSize].height + 15.0);
 		[selfView setFrameOrigin:origin];
-						
-		[selfView startDisplayingLocalVideo];
+		
+		if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+		{
+			[selfView startDisplayingLocalVideo];
+		}
 	
 		selfViewShown = YES;
 	}
