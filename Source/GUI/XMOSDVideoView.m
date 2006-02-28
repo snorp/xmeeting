@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.4 2006/02/28 22:08:19 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.5 2006/02/28 22:28:02 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -412,7 +412,7 @@
 	if (noVideoImage == nil){
 		noVideoImage = [[NSImage imageNamed:@"no_video_screen.tif"] retain];
 	}
-	[noVideoImage drawInRect:[self frame] fromRect:NSMakeRect(0,0,320,240) operation:NSCompositeCopy fraction:1.0];
+	[noVideoImage drawInRect:[self bounds] fromRect:NSMakeRect(0,0,320,240) operation:NSCompositeCopy fraction:1.0];
 
 }
 
@@ -439,12 +439,26 @@
 	
 	if(isBusy == YES)
 	{
-		if([openGLContext view] != nil)
+		if(isForced == YES)
 		{
-			[openGLContext clearDrawable];
+			if([openGLContext view] != nil)
+			{
+				[openGLContext clearDrawable];
+			}
+			CIImage *image = [[CIImage alloc] initWithCVImageBuffer:localVideo];
+			ciRemoteImageRep = [[NSCIImageRep alloc] initWithCIImage:image];
+			[image release];
+			[ciRemoteImageRep drawInRect:[self bounds]];
 		}
-		NSEraseRect([self bounds]);
 		return;
+	}
+	else if(isForced == YES)
+	{
+		if(ciRemoteImageRep != nil)
+		{
+			[ciRemoteImageRep release];
+			ciRemoteImageRep = nil;
+		}
 	}
 
 	if(displayState == XM_DISPLAY_LOCAL_VIDEO)
@@ -860,7 +874,9 @@
 
 - (void)_didStartSelectedInputDeviceChange:(NSNotification *)notif
 {
-	if(displayState == XM_DISPLAY_LOCAL_VIDEO || displayState == XM_DISPLAY_LOCAL_AND_REMOTE_VIDEO)
+	// changed so that only showing busy indicator when showing local video
+	// remote video is not affected
+	if(displayState == XM_DISPLAY_LOCAL_VIDEO)
 	{
 		isBusy = YES;
 		
@@ -873,7 +889,7 @@
 
 - (void)_didChangeSelectedInputDevice:(NSNotification *)notif
 {
-	if((displayState == XM_DISPLAY_LOCAL_VIDEO || displayState == XM_DISPLAY_LOCAL_AND_REMOTE_VIDEO) && isBusy == YES)
+	if(displayState == XM_DISPLAY_LOCAL_VIDEO && isBusy == YES)
 	{
 		isBusy = NO;
 		
