@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.3 2006/02/28 21:39:07 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.4 2006/02/28 22:08:19 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -472,8 +472,24 @@
 	// adjusting for any size changes
 	NSSize newSize = [self bounds].size;
 	
-	if (isMiniaturized && openGLTextureRemote != nil){
+	// BOGUS: Change to capture complete scene into CIImage instead of only the remote video.
+	// (PiP or iChat-like etc.)
+	// Also, try to adjust colors as the CIImage data looks brighter (on my machine at least)
+	if (isMiniaturized && 
+		(displayState == XM_DISPLAY_REMOTE_VIDEO || displayState == XM_DISPLAY_LOCAL_AND_REMOTE_VIDEO) &&
+		openGLTextureRemote != nil)
+	{
 		CIImage *image = [[CIImage alloc] initWithCVImageBuffer:openGLTextureRemote];
+		ciRemoteImageRep = [[NSCIImageRep alloc] initWithCIImage:image];
+		[image release];
+		[ciRemoteImageRep drawInRect:[self bounds]];
+		return;
+	}
+	else if(isMiniaturized &&
+			displayState == XM_DISPLAY_LOCAL_VIDEO &&
+			openGLTextureLocal != nil)
+	{
+		CIImage *image = [[CIImage alloc] initWithCVImageBuffer:openGLTextureLocal];
 		ciRemoteImageRep = [[NSCIImageRep alloc] initWithCIImage:image];
 		[image release];
 		[ciRemoteImageRep drawInRect:[self bounds]];
