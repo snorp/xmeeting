@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.18 2006/02/27 19:53:13 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.19 2006/02/28 18:37:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -409,9 +409,8 @@
 
 - (void)_showSetupAssistant
 {
-	NSArray *locations = [[XMSetupAssistantManager sharedInstance] runFirstApplicationLaunchAssistant];
-
-	[self _setupApplication:locations];
+	[[XMSetupAssistantManager sharedInstance] runFirstApplicationLaunchAssistantWithDelegate:self
+																			  didEndSelector:@selector(_setupApplication:)];
 }
 
 - (void)_setupApplication:(NSArray *)locations

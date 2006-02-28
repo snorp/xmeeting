@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.9 2006/02/27 14:38:18 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.10 2006/02/28 18:37:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -151,7 +151,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 		
 		// since the timeoutInterval in NSURLRequest for some reason doesn't work, we do our own timeout by
 		// using a timer and sending a -cancel message to the NSURLConnection when the timer fires
-		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0 target:self
+		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self
 																	   selector:@selector(_urlLoadingTimeout:) 
 																	   userInfo:nil repeats:NO] retain];
 		
@@ -161,6 +161,11 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 		isFetchingExternalAddress = YES;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidStartFetchingExternalAddress object:self];
 	}
+}
+
+- (BOOL)isFetchingExternalAddress
+{
+	return isFetchingExternalAddress;
 }
 
 - (BOOL)didSucceedFetchingExternalAddress

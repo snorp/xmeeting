@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.13 2006/02/27 14:38:18 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.14 2006/02/28 18:37:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,6 +49,11 @@
  * sending the appropriate notification.
  **/
 - (void)startFetchingExternalAddress;
+
+/**
+ * Returns whether a search for the external address is running or not.
+ **/
+- (BOOL)isFetchingExternalAddress;
 
 /**
  * Returns whether the last action of an external address fetch

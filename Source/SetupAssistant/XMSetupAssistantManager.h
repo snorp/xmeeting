@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.1 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.2 2006/02/28 18:37:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,7 @@
 	NSString *locationFilePath;
 	unsigned currentKeysToAskIndex;
 	NSWindow *modalWindow;
-	id modalDelegate;
+	id delegate;
 	SEL didEndSelector;
 	
 	IBOutlet NSButton *continueButton;
@@ -61,6 +61,11 @@
 	
 	// networkSettings objects
 	IBOutlet NSPopUpButton *bandwidthLimitPopUp;
+	IBOutlet NSButton *useIPAddressTranslationSwitch;
+	IBOutlet NSTextField *externalAddressField;
+	IBOutlet NSButton *updateExternalAddressButton;
+	IBOutlet NSButton *automaticallyGetExternalAddressSwitch;
+	BOOL externalAddressIsValid;
 	
 	// h323Settings objects
 	IBOutlet NSMatrix *useGatekeeperRadioButtons;
@@ -80,10 +85,14 @@
 + (XMSetupAssistantManager *)sharedInstance;
 
 /**
- * Returns an array containing the freshly created
- * locations
+ * Runs the assistant in the first application launch mode. When the
+ * assistant has finished, didEndSelector is invoked. This selector
+ * should have the form -assistantDidEndWithLocations:(NSArray *)locations,
+ * locations contains the created location or zero elements in case the
+ * user canceled.
  **/
-- (NSArray *)runFirstApplicationLaunchAssistant;
+- (void)runFirstApplicationLaunchAssistantWithDelegate:(id)delegate
+										didEndSelector:(SEL)didEndSelector;
 
 /**
  * Runs the assistant to import locations. When the assistant
@@ -99,6 +108,10 @@
 - (IBAction)cancelAssistant:(id)sender;
 - (IBAction)continueAssistant:(id)sender;
 - (IBAction)goBackAssistant:(id)sender;
+
+// Action methods for Address Translation
+- (IBAction)validateAddressTranslationInterface:(id)sender;
+- (IBAction)updateExternalAddress:(id)sender;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.2 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.3 2006/02/28 18:37:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,13 +36,13 @@
 #define XM_GATEKEEPER_SETTINGS_VIEW_TAG 23
 #define XM_VIDEO_SETTINGS_VIEW_TAG 24
 
-NSString *XMKey_SetupAssistantNibName = @"SetupAssistant";
+#define XMKey_SetupAssistantNibName @"SetupAssistant"
 
-NSString *XMKey_KeysToAsk = @"XMeeting_KeysToAsk";
-NSString *XMKey_AppliesTo = @"XMeeting_AppliesTo";
-NSString *XMKey_Description = @"XMeeting_Description";
-NSString *XMKey_Keys = @"XMeeting_Keys";
-NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
+#define XMKey_KeysToAsk @"XMeeting_KeysToAsk"
+#define XMKey_AppliesTo @"XMeeting_AppliesTo"
+#define XMKey_Description @"XMeeting_Description"
+#define XMKey_Keys @"XMeeting_Keys"
+#define XMKey_GatekeeperPassword @"XMeeting_GatekeeperPassword"
 
 @interface XMSetupAssistantManager (PrivateMethods)
 
@@ -52,6 +52,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 - (void)_showNextViewForFirstApplicationLaunchMode;
 - (void)_showPreviousViewForFirstApplicationLaunchMode;
+- (void)_returnFromFirstApplicationLaunchAssistant:(int)returnCode;
 
 - (NSView *)_prepareFLGeneralSettings;
 - (void)_finishFLGeneralSettings;
@@ -92,6 +93,8 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 - (NSView *)_prepareLIGatekeeperSettings;
 - (void)_finishLIGatekeeperSettings;
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
 
 @end
 
@@ -156,8 +159,12 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 #pragma mark Public Methods
 
-- (NSArray *)runFirstApplicationLaunchAssistant
+- (void)runFirstApplicationLaunchAssistantWithDelegate:(id)theDelegate
+										didEndSelector:(SEL)theDidEndSelector
 {
+	delegate = theDelegate;
+	didEndSelector = theDidEndSelector;
+	
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
 	// triggering the nib loading if necessary
@@ -202,53 +209,8 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 	}
 	gkPassword = nil;
 	
-	int result = [NSApp runModalForWindow:[self window]];
-	
-	[self close];
-	
-	if(result == NSRunAbortedResponse)
-	{
-		[location release];
-		location = nil;
-		
-		if(locationImportData != nil)
-		{
-			[locationImportData release];
-			locationImportData = nil;
-		}
-		
-		[preferencesManager clearTemporaryPasswords];
-		
-		return [NSArray array];
-	}
-	
-	[preferencesManager setUserName:userName];
-	
-	NSArray *locationsArray = nil;
-	
-	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
-	{
-		if(gkPassword != nil && [location useGatekeeper] == YES)
-		{
-			[preferencesManager setTemporaryGatekeeperPassword:gkPassword forLocation:location];
-		}
-		
-		[location setEnableH323:YES];
-		
-		locationsArray = [NSArray arrayWithObject:location];
-		
-		[location release];
-		location = nil;
-	}
-	else
-	{
-		locationsArray = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
-	}
-	
-	[preferencesManager saveTemporaryPasswords];
-	[preferencesManager clearTemporaryPasswords];
-	
-	return locationsArray;
+	[[self window] center];
+	[self showWindow:self];
 }
 
 - (void)runImportLocationsAssistantModalForWindow:(NSWindow *)window 
@@ -256,7 +218,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 								   didEndSelector:(SEL)theDidEndSelector
 {
 	modalWindow = window;
-	modalDelegate = theModalDelegate;
+	delegate = theModalDelegate;
 	didEndSelector = theDidEndSelector;
 	
 	if(locationFilePath != nil)
@@ -287,14 +249,14 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE ||
 	   mode == XM_FIRST_APPLICATION_LAUNCH_IMPORT_LOCATIONS_MODE)
 	{
-		[NSApp abortModal];
+		[self _returnFromFirstApplicationLaunchAssistant:NSRunAbortedResponse];
 	}
 	else
 	{
 		[self close];
 		[NSApp endSheet:[self window]];
 		NSArray *array = [[NSArray alloc] init];
-		[modalDelegate performSelector:didEndSelector withObject:array];
+		[delegate performSelector:didEndSelector withObject:array];
 		[array release];
 	}
 }
@@ -328,6 +290,63 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 - (IBAction)terminate:(id)sender
 {
 	[NSApp terminate:sender];
+}
+
+- (IBAction)validateAddressTranslationInterface:(id)sender
+{
+	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	
+	[updateExternalAddressButton setEnabled:flag];
+	[automaticallyGetExternalAddressSwitch setEnabled:flag];
+	
+	if(flag == YES)
+	{
+		flag = ([automaticallyGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
+		[externalAddressField setEnabled:flag];
+		
+		if(flag == NO)
+		{
+			XMUtils *utils = [XMUtils sharedInstance];
+			NSString *externalAddress = [utils externalAddress];
+			NSString *displayString;
+			
+			if(externalAddress == nil)
+			{
+				if([utils isFetchingExternalAddress] == YES)
+				{
+					displayString = NSLocalizedString(@"Fetching...", @"");
+				}
+				else
+				{
+					displayString = NSLocalizedString(@"<Not available>", @"");
+				}
+				externalAddressIsValid = NO;
+			}
+			else
+			{
+				displayString = externalAddress;
+				externalAddressIsValid = YES;
+			}
+			
+			[externalAddressField setStringValue:displayString];
+		}
+		else
+		{
+			if(!externalAddressIsValid)
+			{
+				[externalAddressField setStringValue:@""];
+			}
+		}
+	}
+	else
+	{
+		[externalAddressField setEnabled:NO];
+	}
+}
+
+- (IBAction)updateExternalAddress:(id)sender
+{
+	[[XMUtils sharedInstance] startFetchingExternalAddress];
 }
 
 #pragma mark Delegate Methods
@@ -471,7 +490,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 			break;
 			
 		case XM_FL_COMPLETED_VIEW_TAG:
-			[NSApp stopModal];
+			[self _returnFromFirstApplicationLaunchAssistant:NSRunStoppedResponse];
 			
 		default:
 			return;
@@ -564,6 +583,58 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 	[self _setupButtons];
 }
 
+- (void)_returnFromFirstApplicationLaunchAssistant:(int)returnCode
+{
+	[self close];
+	
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
+	if(returnCode == NSRunAbortedResponse)
+	{
+		[location release];
+		location = nil;
+		
+		if(locationImportData != nil)
+		{
+			[locationImportData release];
+			locationImportData = nil;
+		}
+		
+		[preferencesManager clearTemporaryPasswords];
+		
+		[delegate performSelector:didEndSelector withObject:[NSArray array]];
+		return;
+	}
+	
+	[preferencesManager setUserName:userName];
+	
+	NSArray *locationsArray = nil;
+	
+	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
+	{
+		if(gkPassword != nil && [location useGatekeeper] == YES)
+		{
+			[preferencesManager setTemporaryGatekeeperPassword:gkPassword forLocation:location];
+		}
+		
+		[location setEnableH323:YES];
+		
+		locationsArray = [NSArray arrayWithObject:location];
+		
+		[location release];
+		location = nil;
+	}
+	else
+	{
+		locationsArray = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
+	}
+	
+	[preferencesManager saveTemporaryPasswords];
+	[preferencesManager clearTemporaryPasswords];
+	
+	[delegate performSelector:didEndSelector withObject:locationsArray];
+}
+
 - (NSView *)_prepareFLGeneralSettings
 {
 	[userNameField setStringValue:userName];
@@ -602,12 +673,62 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 - (void)_prepareFLNetworkSettings
 {
+	int state;
+	
+	XMUtils *utils = [XMUtils sharedInstance];
+	
+	if([utils externalAddress] == nil && [utils didSucceedFetchingExternalAddress] == YES)
+	{
+		[utils startFetchingExternalAddress];
+	}
+	
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	[notificationCenter addObserver:self selector:@selector(validateAddressTranslationInterface:)
+							   name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+							   name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+	
 	[bandwidthLimitPopUp selectItemWithTag:[location bandwidthLimit]];
+	
+	state = ([location useAddressTranslation] == YES) ? NSOnState : NSOffState;
+	[useIPAddressTranslationSwitch setState:state];
+	
+	NSString *externalAddress = [location externalAddress];
+	if(externalAddress == nil)
+	{
+		state = NSOnState;
+		externalAddress = @"";
+	}
+	else
+	{
+		state = NSOffState;
+	}
+	[externalAddressField setStringValue:externalAddress];
+	[automaticallyGetExternalAddressSwitch setState:state];
+	
+	[self validateAddressTranslationInterface:nil];
 }
 
 - (void)_finishFLNetworkSettings
 {
 	[location setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
+	
+	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	[location setUseAddressTranslation:flag];
+	
+	flag = ([automaticallyGetExternalAddressSwitch state] == NSOnState) ? YES : NO;
+	if(flag == YES)
+	{
+		[location setExternalAddress:nil];
+	}
+	else
+	{
+		[location setExternalAddress:[externalAddressField stringValue]];
+	}
+	
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+	[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 }
 
 - (void)_prepareFLH323Settings
@@ -858,7 +979,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 		[NSApp endSheet:[self window]];
 		
 		NSArray *importedLocations = [locationImportData objectForKey:XMKey_Locations];
-		[modalDelegate performSelector:didEndSelector withObject:importedLocations];
+		[delegate performSelector:didEndSelector withObject:importedLocations];
 		return;
 	}
 	
@@ -915,7 +1036,9 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_PreferencesBandwidthLimit])
+				if([keys containsObject:XMKey_PreferencesBandwidthLimit] ||
+				   [keys containsObject:XMKey_PreferencesUseAddressTranslation] ||
+				   [keys containsObject:XMKey_PreferencesExternalAddress])
 				{
 					nextView = networkSettingsView;
 					viewTag = XM_NETWORK_SETTINGS_VIEW_TAG;
@@ -1034,7 +1157,9 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_PreferencesBandwidthLimit])
+				if([keys containsObject:XMKey_PreferencesBandwidthLimit] ||
+				   [keys containsObject:XMKey_PreferencesUseAddressTranslation] ||
+				   [keys containsObject:XMKey_PreferencesExternalAddress])
 				{
 					nextView = networkSettingsView;
 					viewTag = XM_NETWORK_SETTINGS_VIEW_TAG;
@@ -1108,7 +1233,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 	if(returnCode == NSCancelButton)
 	{
 		NSArray *array = [[NSArray alloc] init];
-		[modalDelegate performSelector:didEndSelector withObject:array];
+		[delegate performSelector:didEndSelector withObject:array];
 		[array release];
 		return;
 	}
@@ -1132,7 +1257,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 			[alert runModal];
 			
 			NSArray *array = [[NSArray alloc] init];
-			[modalDelegate performSelector:didEndSelector withObject:array];
+			[delegate performSelector:didEndSelector withObject:array];
 			[array release];
 			return;
 		}
@@ -1149,7 +1274,7 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 		}
 		else
 		{
-			[modalDelegate performSelector:didEndSelector withObject:[dict objectForKey:XMKey_Locations]];
+			[delegate performSelector:didEndSelector withObject:[dict objectForKey:XMKey_Locations]];
 		}
 	}
 }
@@ -1192,6 +1317,52 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 		enableBandwidthLimit = YES;
 	}
 	[bandwidthLimitPopUp setEnabled:enableBandwidthLimit];
+	[bandwidthLimitPopUp selectItemWithTag:[theLocation bandwidthLimit]];
+	
+	int state = ([theLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
+	[useIPAddressTranslationSwitch setState:state];
+	
+	NSString *externalAddress = [theLocation externalAddress];
+	if(externalAddress == nil)
+	{
+		[automaticallyGetExternalAddressSwitch setState:NSOnState];
+		[externalAddressField setStringValue:@""];
+	}
+	else
+	{
+		[automaticallyGetExternalAddressSwitch setState:NSOffState];
+		[externalAddressField setStringValue:externalAddress];
+	}
+	
+	if([keys containsObject:XMKey_PreferencesExternalAddress])
+	{
+		[useIPAddressTranslationSwitch setEnabled:NO];
+		[automaticallyGetExternalAddressSwitch setEnabled:NO];
+		[updateExternalAddressButton setEnabled:NO];
+	}
+	else if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
+	{
+		XMUtils *utils = [XMUtils sharedInstance];
+		if([utils externalAddress] == nil && [utils didSucceedFetchingExternalAddress] == YES)
+		{
+			[utils startFetchingExternalAddress];
+		}
+		
+		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+		[notificationCenter addObserver:self selector:@selector(validateAddressTranslationInterface:)
+								   name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+		[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+								   name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+		
+		[self validateAddressTranslationInterface:nil];
+	}
+	else
+	{
+		[useIPAddressTranslationSwitch setEnabled:NO];
+		[externalAddressField setEnabled:NO];
+		[automaticallyGetExternalAddressSwitch setEnabled:NO];
+		[updateExternalAddressButton setEnabled:NO];
+	}
 }
 
 - (void)_finishLINetworkSettings
@@ -1213,9 +1384,40 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 		{
 			[locationToChange setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
 		}
+		
+		if([keys containsObject:XMKey_PreferencesExternalAddress])
+		{
+			[locationToChange setExternalAddress:[externalAddressField stringValue]];
+		}
+		else if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
+		{
+			BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+			[locationToChange setUseAddressTranslation:flag];
+			
+			flag = ([automaticallyGetExternalAddressSwitch state] == NSOnState) ? YES : NO;
+			if(flag == YES)
+			{
+				[locationToChange setExternalAddress:nil];
+			}
+			else
+			{
+				[locationToChange setExternalAddress:[externalAddressField stringValue]];
+			}
+		}
+	}
+
+	if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
+	{
+		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+		[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+		[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 	}
 	
 	[bandwidthLimitPopUp setEnabled:YES];
+	[useIPAddressTranslationSwitch setEnabled:YES];
+	[externalAddressField setEnabled:YES];
+	[automaticallyGetExternalAddressSwitch setEnabled:YES];
+	[updateExternalAddressButton setEnabled:YES];
 }
 
 - (NSView *)_prepareLIGatekeeperSettings
@@ -1332,6 +1534,16 @@ NSString *XMKey_GatekeeperPassword = @"XMeeting_GatekeeperPassword";
 	[gkUsernameField setEnabled:YES];
 	[gkPhoneNumberField setEnabled:YES];
 	[gkPasswordField setEnabled:YES];
+}
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	NSString *externalAddress = [[XMUtils sharedInstance] externalAddress];
+	if(externalAddress != nil)
+	{
+		[externalAddressField setStringValue:externalAddress];
+	}
+	[self validateAddressTranslationInterface:nil];
 }
 
 @end

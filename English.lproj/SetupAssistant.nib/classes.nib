@@ -2,15 +2,23 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {cancelAssistant = id; continueAssistant = id; goBackAssistant = id; }; 
+            ACTIONS = {
+                cancelAssistant = id; 
+                continueAssistant = id; 
+                goBackAssistant = id; 
+                updateExternalAddress = id; 
+                validateAddressTranslationInterface = id; 
+            }; 
             CLASS = XMSetupAssistantManager; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                automaticallyGetExternalAddressSwitch = NSButton; 
                 bandwidthLimitPopUp = NSPopUpButton; 
                 cancelButton = NSButton; 
                 contentBox = NSBox; 
                 continueButton = NSButton; 
                 enableVideoRadioButtons = NSMatrix; 
+                externalAddressField = NSTextField; 
                 flCompletedView = NSView; 
                 flGeneralSettingsView = NSView; 
                 flIntroductionView = NSView; 
@@ -30,7 +38,9 @@
                 locationRadioButtons = NSMatrix; 
                 modalDelegate = id; 
                 networkSettingsView = NSView; 
+                updateExternalAddressButton = NSButton; 
                 useGatekeeperRadioButtons = NSMatrix; 
+                useIPAddressTranslationSwitch = NSButton; 
                 userNameField = NSTextField; 
                 videoSettingsView = NSView; 
             }; 
