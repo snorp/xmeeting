@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.25 2006/02/27 15:32:28 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.26 2006/03/01 12:48:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1205,7 +1205,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	// averageDataRate is in bytes/s
 	SInt32 averageDataRate = bitrateToUse / 8;
-	NSLog(@"limiting dataRate to %d", averageDataRate);
+	//NSLog(@"limiting dataRate to %d", averageDataRate);
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -1363,11 +1363,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
 		}
 		
-		if(needsPictureUpdate == YES)
-		{
-			NSLog(@"Forcing Keyframe");
-		}
-		
 		err = ICMCompressionSessionEncodeFrame(compressionSession, 
 											   frame,
 											   timeStamp, 
@@ -1516,7 +1511,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		}
 		else
 		{
-			NSLog(@"scaling");
 			Rect srcRect;
 			srcRect.top = 0;
 			srcRect.left = 0;
@@ -1671,7 +1665,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			
 			compressSequencePreviousTimeStamp = 0;
 			
-			NSLog(@"limiting bitrate to %d", bitrateToUse);
+			//NSLog(@"limiting bitrate to %d", bitrateToUse);
 			DataRateParams dataRateParams;
 			dataRateParams.dataRate = (bitrateToUse / 8);
 			dataRateParams.dataOverrun = 0;
@@ -1715,7 +1709,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		if(needsPictureUpdate == YES)
 		{
-			NSLog(@"Forcing Keyframe");
 			compressionFlags |= codecFlagForceKeyFrame;
 			compressSequenceNonKeyFrameCounter = 0;
 		}

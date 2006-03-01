@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.8 2006/02/27 23:23:58 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.9 2006/03/01 12:48:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -142,7 +142,7 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 	CVPixelBufferLockBaseAddress (pixelBuffer, 0);
   
 	[updateLock lock];
-		NSLog(@"%d to %d", topLine, bottomLine);
+		//NSLog(@"%d to %d", topLine, bottomLine);
 		bytes = CVPixelBufferGetBaseAddress (pixelBuffer);
 		screen = CGDisplayBaseAddress(displayID);
 		bytes += (topLine * rowBytesScreen);

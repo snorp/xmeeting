@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH264Packetizer.c,v 1.4 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMRTPH264Packetizer.c,v 1.5 2006/03/01 12:48:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -242,7 +242,7 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		// in the non-interleaved mode
 		if(nalLength > maxPacketLength && globals->useNonInterleavedMode == true)
 		{
-			printf("Sending FU-A\n");
+			//printf("Sending FU-A\n");
 			// Send some FU-A packets
 			UInt8 nri = (data[index] >> 5) & 0x03;
 			UInt8 type = data[index] & 0x1f;
@@ -323,7 +323,7 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 			// Generating a packet of zero length indicates to the subsystem
 			// to drop this packet and increment the RTP Sequence Number by
 			// one
-			printf("Impossible to send too big NAL unit: %d\n", nalLength);
+			//printf("Impossible to send too big NAL unit: %d\n", nalLength);
 			RTPPacketRef packetRef;
 			RTPPBBeginPacket(packetBuilder,
 							 0,
