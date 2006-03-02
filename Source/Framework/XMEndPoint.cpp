@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.6 2005/10/28 06:59:57 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.7 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,9 +19,8 @@ XM_REGISTER_FORMATS();
 
 #pragma mark Constructor & Destructor
 
-XMEndPoint::XMEndPoint(OpalManager & manager,
-					   const char *prefix)
-: OpalEndPoint(manager, prefix, CanTerminateCall)
+XMEndPoint::XMEndPoint(OpalManager & manager)
+: OpalEndPoint(manager, "xm", CanTerminateCall)
 {
 }
 
@@ -113,7 +112,7 @@ BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty,
 			partyB = "h323:";
 			break;
 		case XMCallProtocol_SIP:
-			return FALSE;
+			partyB = "sip:";
 			break;
 		default:
 			return FALSE;

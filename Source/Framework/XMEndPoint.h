@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.4 2005/10/23 19:59:00 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.5 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,8 +23,7 @@ class XMEndPoint : public OpalEndPoint
 	PCLASSINFO(XMEndPoint, OpalEndPoint);
 
 public:
-	XMEndPoint(OpalManager & manager,
-			   const char *prefix = "xm");
+	XMEndPoint(OpalManager & manager);
 	~XMEndPoint();
 	
 	// Overriding EndPoint methods

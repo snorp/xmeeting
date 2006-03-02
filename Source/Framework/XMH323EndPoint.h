@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.9 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.10 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,12 +30,7 @@ public:
 													 const PString & password);
 	void CheckGatekeeperRegistration();
 	
-	// obtaining information about the connection
-	void GetCallInformation(PString & remoteName, 
-							PString & remoteNumber,
-							PString & remoteAddress,
-							PString & remoteApplication);
-	
+	// obtaining call statistics
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	
 	// overriding some callbacks
@@ -52,16 +47,13 @@ public:
 											  const PString & alias,
 											  const H323TransportAddress & address,
 											  H323SignalPDU * setupPDU);
+	
 private:
 	BOOL isListening;
 	BOOL didRegisterAtGatekeeper;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
 	PString connectionToken;
-	PString remoteName;
-	PString remoteNumber;
-	PString remoteAddress;
-	PString remoteApplication;
 };
 
 #endif // __XM_H323_END_POINT_H__

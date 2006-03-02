@@ -812,6 +812,12 @@
 		D1F61479086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */; };
 		D1F614E7086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */; };
 		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */; };
+		D1FD475709B650D500EB517B /* XMSIPEndPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FD475509B650D500EB517B /* XMSIPEndPoint.h */; };
+		D1FD475809B650D500EB517B /* XMSIPEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */; };
+		D1FD47CF09B6544B00EB517B /* sdp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FD47CB09B6544B00EB517B /* sdp.cxx */; };
+		D1FD47D009B6544B00EB517B /* sipcon.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FD47CC09B6544B00EB517B /* sipcon.cxx */; };
+		D1FD47D109B6544B00EB517B /* sipep.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FD47CD09B6544B00EB517B /* sipep.cxx */; };
+		D1FD47D209B6544B00EB517B /* sippdu.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FD47CE09B6544B00EB517B /* sippdu.cxx */; };
 		D1FE29CF07AFF4FB004337C9 /* XMPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */; };
 		D1FE4EC608ED55F900AAFF98 /* XMMediaTransmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */; };
 		D1FE53F908F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */; };
@@ -1733,6 +1739,12 @@
 		D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMGeneralPurposeAddressResource.m; path = Source/Framework/XMGeneralPurposeAddressResource.m; sourceTree = "<group>"; };
 		D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleAddressResource.h; path = Source/Application/XMSimpleAddressResource.h; sourceTree = "<group>"; };
 		D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleAddressResource.m; path = Source/Application/XMSimpleAddressResource.m; sourceTree = "<group>"; };
+		D1FD475509B650D500EB517B /* XMSIPEndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSIPEndPoint.h; path = Source/Framework/XMSIPEndPoint.h; sourceTree = "<group>"; };
+		D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMSIPEndPoint.cpp; path = Source/Framework/XMSIPEndPoint.cpp; sourceTree = "<group>"; };
+		D1FD47CB09B6544B00EB517B /* sdp.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sdp.cxx; sourceTree = "<group>"; };
+		D1FD47CC09B6544B00EB517B /* sipcon.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sipcon.cxx; sourceTree = "<group>"; };
+		D1FD47CD09B6544B00EB517B /* sipep.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sipep.cxx; sourceTree = "<group>"; };
+		D1FD47CE09B6544B00EB517B /* sippdu.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sippdu.cxx; sourceTree = "<group>"; };
 		D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPrivate.h; path = Source/Framework/XMPrivate.h; sourceTree = "<group>"; };
 		D1FE4EC408ED55F900AAFF98 /* XMMediaTransmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMMediaTransmitter.h; path = Source/Framework/XMMediaTransmitter.h; sourceTree = "<group>"; };
 		D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMMediaTransmitter.m; path = Source/Framework/XMMediaTransmitter.m; sourceTree = "<group>"; };
@@ -2009,6 +2021,8 @@
 				D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */,
 				D1EEDEB50992514A000BF113 /* XMH323Channel.h */,
 				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
+				D1FD475509B650D500EB517B /* XMSIPEndPoint.h */,
+				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
 				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
@@ -2672,8 +2686,9 @@
 			children = (
 				D1CEE20108F90261007E4ABE /* asn */,
 				D1CEE23008F90262007E4ABE /* codec */,
-				D1CEE31B08F90262007E4ABE /* h323 */,
 				D1CEE34708F90263007E4ABE /* opal */,
+				D1CEE31B08F90262007E4ABE /* h323 */,
+				D1FD47CA09B6544B00EB517B /* sip */,
 				D1CEE35608F90263007E4ABE /* rtp */,
 			);
 			name = Source;
@@ -3175,6 +3190,18 @@
 			name = "Setup Assistant";
 			sourceTree = "<group>";
 		};
+		D1FD47CA09B6544B00EB517B /* sip */ = {
+			isa = PBXGroup;
+			children = (
+				D1FD47CB09B6544B00EB517B /* sdp.cxx */,
+				D1FD47CC09B6544B00EB517B /* sipcon.cxx */,
+				D1FD47CD09B6544B00EB517B /* sipep.cxx */,
+				D1FD47CE09B6544B00EB517B /* sippdu.cxx */,
+			);
+			name = sip;
+			path = ../opal/src/sip;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -3237,6 +3264,7 @@
 				D12E627B0999168E004EF9F8 /* XMScreenVideoInputModule.h in Headers */,
 				D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */,
 				D106DA5509B3899D00BAA8F1 /* XMBusyModule.h in Headers */,
+				D1FD475709B650D500EB517B /* XMSIPEndPoint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3974,6 +4002,7 @@
 				D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */,
 				D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */,
 				D106DA5609B3899D00BAA8F1 /* XMBusyModule.m in Sources */,
+				D1FD475809B650D500EB517B /* XMSIPEndPoint.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4225,6 +4254,10 @@
 				D1F49D39097E67100010A324 /* smallft.c in Sources */,
 				D1F49D3B097E671F0010A324 /* speex_preprocess.c in Sources */,
 				D1F49D3D097E672D0010A324 /* speex.c in Sources */,
+				D1FD47CF09B6544B00EB517B /* sdp.cxx in Sources */,
+				D1FD47D009B6544B00EB517B /* sipcon.cxx in Sources */,
+				D1FD47D109B6544B00EB517B /* sipep.cxx in Sources */,
+				D1FD47D209B6544B00EB517B /* sippdu.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4450,10 +4483,7 @@
 		D11E93F308589A9200154C02 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = ppc;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_POSTPROCESSING = NO;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.13 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.14 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #include <ptclib/pils.h>
 
 #include "XMCallbackBridge.h"
+#include "XMOpalManager.h"
 #include "XMH323Connection.h"
 
 #pragma mark Init & Deallocation
@@ -26,10 +27,6 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	isListening = FALSE;
 	
 	connectionToken = "";
-	remoteName = "";
-	remoteNumber = "";
-	remoteAddress = "";
-	remoteApplication = "";
 	
 	SetInitialBandwidth(UINT_MAX);
 }
@@ -187,18 +184,7 @@ void XMH323EndPoint::CheckGatekeeperRegistration()
 	}
 }
 
-#pragma mark Getting call information
-
-void XMH323EndPoint::GetCallInformation(PString & theRemoteName,
-										PString & theRemoteNumber,
-										PString & theRemoteAddress,
-										PString & theRemoteApplication)
-{
-	theRemoteName = remoteName;
-	theRemoteNumber = remoteNumber;
-	theRemoteAddress = remoteAddress;
-	theRemoteApplication = remoteApplication;
-}
+#pragma mark Getting call statistics
 										
 void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 {
@@ -271,21 +257,31 @@ void XMH323EndPoint::OnRegistrationReject()
 
 void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 {
+	XMOpalManager * manager = (XMOpalManager *)(&GetManager());
+	
 	connectionToken = connection.GetToken();
-	remoteName = connection.GetRemotePartyName();
-	remoteNumber = connection.GetRemotePartyNumber();
-	remoteAddress = connection.GetRemotePartyAddress();
-	remoteApplication = connection.GetRemoteApplication();
+	
+	manager->SetCallInformation(connectionToken,
+								connection.GetRemotePartyName(),
+								connection.GetRemotePartyNumber(),
+								connection.GetRemotePartyAddress(),
+								connection.GetRemoteApplication());
 	
 	H323EndPoint::OnEstablished(connection);
 }
 
 void XMH323EndPoint::OnReleased(OpalConnection & connection)
-{	
-	remoteName = "";
-	remoteNumber = "";
-	remoteAddress = "";
-	remoteApplication = "";
+{
+	XMOpalManager * manager = (XMOpalManager *)(&GetManager());
+	PString empty = "";
+
+	manager->SetCallInformation(connectionToken,
+								empty,
+								empty,
+								empty,
+								empty);
+	
+	connectionToken = "";
 	
 	H323EndPoint::OnReleased(connection);
 }

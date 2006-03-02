@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.17 2006/01/20 17:17:03 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.18 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,7 @@
 #include "XMOpalManager.h"
 #include "XMEndPoint.h"
 #include "XMH323EndPoint.h"
+#include "XMSIPEndPoint.h"
 #include "XMSoundChannel.h"
 #include "XMTransmitterMediaPatch.h"
 
@@ -27,6 +28,9 @@ static XMEndPoint *callEndPoint = NULL;
 // reference to the H.323 Endpoint
 static XMH323EndPoint *h323EndPoint = NULL;
 
+// reference to the SIP Endpoint
+static XMSIPEndPoint *sipEndPoint = NULL;
+
 void _XMInitSubsystem()
 {
 	if(theManager == NULL)
@@ -38,6 +42,7 @@ void _XMInitSubsystem()
 		
 		callEndPoint = theManager->CallEndPoint();
 		h323EndPoint = theManager->H323EndPoint();
+		sipEndPoint = theManager->SIPEndPoint();
 		
 		XMSoundChannel::Init();
 	}
@@ -187,6 +192,11 @@ void _XMCheckGatekeeperRegistration()
 
 #pragma mark SIP Setup Functions
 
+bool _XMEnableSIPListeners(bool flag)
+{
+	return sipEndPoint->EnableListeners(flag);
+}
+
 #pragma mark Call Management functions
 
 unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty)
@@ -234,7 +244,7 @@ void _XMGetCallInformation(unsigned callID,
 	PString addressStr;
 	PString appStr;
 	
-	h323EndPoint->GetCallInformation(nameStr, numberStr, addressStr, appStr);
+	theManager->GetCallInformation(nameStr, numberStr, addressStr, appStr);
 	
 	*remoteName = nameStr;
 	*remoteNumber = numberStr;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.16 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.17 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -151,6 +151,8 @@ XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address,
 void _XMCheckGatekeeperRegistration();
 
 #pragma mark SIP Setup Functions
+
+bool _XMEnableSIPListeners(bool enable);
 
 #pragma mark Call Management functions
 

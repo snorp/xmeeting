@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.19 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.20 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,20 +40,31 @@ XMOpalManager::XMOpalManager()
 {
 	callEndPoint = NULL;
 	h323EndPoint = NULL;
+	sipEndPoint = NULL;
+	
+	connectionToken = "";
+	remoteName = "";
+	remoteNumber = "";
+	remoteAddress = "";
+	remoteApplication = "";
 }
 
 XMOpalManager::~XMOpalManager()
 {
 	delete callEndPoint;
 	delete h323EndPoint;
+	delete sipEndPoint;
 }
 
 void XMOpalManager::Initialise()
 {
 	callEndPoint = new XMEndPoint(*this);
 	h323EndPoint = new XMH323EndPoint(*this);
+	sipEndPoint = new XMSIPEndPoint(*this);
 	AddRouteEntry("xm:.*   = h323:<da>");
 	AddRouteEntry("h323:.* = xm:<da>");
+	AddRouteEntry("xm:.*   = h323:<da>");
+	AddRouteEntry("sip:.*  = xm:<da>");
 	
 	SetAutoStartTransmitVideo(TRUE);
 	SetAutoStartReceiveVideo(TRUE);
@@ -69,6 +80,61 @@ XMEndPoint * XMOpalManager::CallEndPoint()
 XMH323EndPoint * XMOpalManager::H323EndPoint()
 {
 	return h323EndPoint;
+}
+
+XMSIPEndPoint * XMOpalManager::SIPEndPoint()
+{
+	return sipEndPoint;
+}
+
+#pragma mark Getting / Setting Call Information
+
+void XMOpalManager::GetCallInformation(PString & theRemoteName,
+									   PString & theRemoteNumber,
+									   PString & theRemoteAddress,
+									   PString & theRemoteApplication) const
+{
+	theRemoteName = remoteName;
+	theRemoteNumber = remoteNumber;
+	theRemoteAddress = remoteAddress;
+	theRemoteApplication = remoteApplication;
+}
+
+void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
+									   const PString & theRemoteName,
+									   const PString & theRemoteNumber,
+									   const PString & theRemoteAddress,
+									   const PString & theRemoteApplication)
+{
+	BOOL isValid = FALSE;
+	
+	if(connectionToken == "")
+	{
+		cout << "setting connection token" << endl;
+		connectionToken = theConnectionToken;
+		isValid = TRUE;
+	}
+	else if(connectionToken == theConnectionToken)
+	{
+		isValid = TRUE;
+	}
+	
+	if(isValid == TRUE)
+	{
+		remoteName = theRemoteName;
+		remoteNumber = theRemoteNumber;
+		remoteAddress = theRemoteAddress;
+		remoteApplication = theRemoteApplication;
+		
+		if(remoteName == "" &&
+		   remoteNumber == "" &&
+		   remoteAddress == "" &&
+		   remoteApplication == "")
+		{
+			cout << "resetting connection token";
+			connectionToken = "";
+		}
+	}
 }
 
 #pragma mark overriding some callbacks

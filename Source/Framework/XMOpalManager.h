@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.10 2006/01/09 22:22:57 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.11 2006/03/02 22:35:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,11 +11,11 @@
 
 #include <ptlib.h>
 #include <opal/manager.h>
-#include <h323/h323ep.h>
 
 #include "XMTypes.h"
 #include "XMEndPoint.h"
 #include "XMH323EndPoint.h"
+#include "XMSIPEndPoint.h"
 
 class XMEndPoint;
 
@@ -33,7 +33,19 @@ public:
 	
 	/* Getting access to the endpoints */
 	XMH323EndPoint * H323EndPoint();
+	XMSIPEndPoint * SIPEndPoint();
 	XMEndPoint * CallEndPoint();
+	
+	/* getting/setting call information */
+	void GetCallInformation(PString & remoteName,
+							PString & remoteNumber,
+							PString & remoteAddress,
+							PString & remoteApplication) const;
+	void SetCallInformation(const PString & connectionToken,
+							const PString & remoteName,
+							const PString & remoteNumber,
+							const PString & remoteAddress,
+							const PString & remoteApplication);
 	
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
@@ -64,6 +76,13 @@ private:
 	
 	XMEndPoint *callEndPoint;
 	XMH323EndPoint *h323EndPoint;
+	XMSIPEndPoint *sipEndPoint;
+	
+	PString connectionToken;
+	PString remoteName;
+	PString remoteNumber;
+	PString remoteAddress;
+	PString remoteApplication;
 };
 
 #endif // __XM_OPAL_MANAGER_H__
