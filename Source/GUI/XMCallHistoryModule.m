@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.11 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMCallHistoryModule.m,v 1.12 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,7 +52,7 @@
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
-							   name:XMNotification_ActiveLocationDidChange object:nil];
+							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
 							   name:XMNotification_CallManagerDidStartCallInitiation object:nil];
@@ -321,7 +321,7 @@
 	NSString *gatekeeperAddress = [activeLocation gatekeeperAddress];
 	if(gatekeeperAddress == nil)
 	{
-		gatekeeperAddress = [activeLocation gatekeeperID];
+		//gatekeeperAddress = [activeLocation gatekeeperID];
 		
 		if(gatekeeperAddress == nil)
 		{

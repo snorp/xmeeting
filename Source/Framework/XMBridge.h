@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.17 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.18 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,7 +140,6 @@ void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel);
  * sets up the gatekeeper. If all variables are NULL, no gatekeeper is used
  **/
 XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, 
-													const char *identifier, 
 													const char *username, 
 													const char *phoneNumber,
 													const char *password);
@@ -153,6 +152,12 @@ void _XMCheckGatekeeperRegistration();
 #pragma mark SIP Setup Functions
 
 bool _XMEnableSIPListeners(bool enable);
+
+void _XMPrepareRegistrarSetup();
+void _XMUseRegistrar(const char *host,
+					 const char *username,
+					 const char *password);
+void _XMFinishRegistrarSetup();
 
 #pragma mark Call Management functions
 

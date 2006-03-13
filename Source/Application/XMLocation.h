@@ -1,9 +1,9 @@
 /*
- * $Id: XMLocation.h,v 1.3 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.4 2006/03/13 23:46:21 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_LOCATION_H__
@@ -13,11 +13,19 @@
 #import "XMeeting.h"
 
 extern NSString *XMKey_LocationName;
+extern NSString *XMKey_LocationH323AccountID;
+extern NSString *XMKey_LocationSIPAccountID;
 
 @interface XMLocation : XMPreferences {
 	
-	NSString *name;
 	unsigned tag;
+	NSString *name;
+	unsigned h323AccountTag;
+	unsigned sipAccountTag;
+	
+	NSString *gatekeeperPassword;
+	NSArray *registrarPasswords;
+	
 }
 
 /**
@@ -25,30 +33,31 @@ extern NSString *XMKey_LocationName;
  **/
 - (id)initWithName:(NSString *)theName;
 
-- (NSString *)name;
-- (void)setName:(NSString *)name;
-
 /**
  * Returns a duplicate of the location with the
  * new name set. Using this method is preferred instead
  * of -copy and then -setName: since it makes sure that
- * several internal optimisations work
+ * several internal optimizations work
  **/
 - (XMLocation *)duplicateWithName:(NSString *)name;
 
-- (NSString *)temporaryGatekeeperPassword;
-- (void)setTemporaryGatekeeperPassword:(NSString *)password;
+- (unsigned)tag;
 
-@end
+- (NSString *)name;
+- (void)setName:(NSString *)name;
 
-@interface XMLocation (PrivateMethods)
+- (unsigned)h323AccountTag;
+- (void)setH323AccountTag:(unsigned)tag;
+
+- (unsigned)sipAccountTag;
+- (void)setSIPAccountTag:(unsigned)tag;
 
 /**
- * internal optimization to ensure correct object identification
+ * Stores the information from the accounts in the data storage
+ * provided by the XMPreferences superclass so that the subsystem
+ * can be setup consistently
  **/
-- (void)_updateTag;
-- (void)_setTag:(unsigned)tag;
-- (unsigned)_tag;
+- (void)storeAccountInformationsInSubsystem;
 
 @end
 

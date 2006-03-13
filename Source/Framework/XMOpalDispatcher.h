@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.5 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.6 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,11 +26,15 @@
 	
 	NSTimer *callStatisticsUpdateIntervalTimer;
 	
+	NSLock *registrarRegistrationWaitLock;
+	
 }
 
 + (void)_setPreferences:(XMPreferences *)preferences externalAddress:(NSString *)externalAddress;
 + (void)_retryEnableH323:(XMPreferences *)preferences;
 + (void)_retryGatekeeperRegistration:(XMPreferences *)preferences;
++ (void)_retryEnableSIP:(XMPreferences *)preferences;
++ (void)_retryRegistrarRegistrations:(XMPreferences *)preferences;
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
 + (void)_initiateSpecificCallToAddress:(NSString *)address 
@@ -73,6 +77,10 @@
 	// Called every time the Framework unregisters from a gatekeeper
 	// Called on the OpalDispatcherThread, therefore safe
 - (void)_handleGatekeeperUnregistration;
+
+	// called every time the Framework completes SIP Registration
+    // may be called on any thread
+- (void)_handleRegistrarSetupCompleted;
 
 @end
 

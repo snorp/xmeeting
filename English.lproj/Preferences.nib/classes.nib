@@ -2,6 +2,46 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {
+                addH323Account = id; 
+                addSIPAccount = id; 
+                cancelH323AccountEdit = id; 
+                cancelSIPAccountEdit = id; 
+                deleteH323Account = id; 
+                deleteSIPAccount = id; 
+                editH323Account = id; 
+                editSIPAccount = id; 
+                endH323AccountEdit = id; 
+                endSIPAccountEdit = id; 
+            }; 
+            CLASS = XMAccountPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addH323AccountButton = NSButton; 
+                addSIPAccountButton = NSButton; 
+                contentView = NSView; 
+                deleteH323AccountButton = NSButton; 
+                deleteSIPAccountButton = NSButton; 
+                editH323AccountButton = NSButton; 
+                editH323AccountPanel = NSPanel; 
+                editSIPAccountButton = NSButton; 
+                editSIPAccountPanel = NSPanel; 
+                h323AccountNameField = NSTextField; 
+                h323AccountsTableView = NSTableView; 
+                h323GatekeeperHostField = NSTextField; 
+                h323PasswordField = NSTextField; 
+                h323PhoneNumberField = NSTextField; 
+                h323UsernameField = NSTextField; 
+                locationModule = XMLocationPreferencesModule; 
+                sipAccountNameField = NSTextField; 
+                sipAccountsTableView = NSTableView; 
+                sipPasswordField = NSTextField; 
+                sipRegistrarHostField = NSTextField; 
+                sipUsernameField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
             ACTIONS = {defaultAction = id; }; 
             CLASS = XMGeneralPreferencesModule; 
             LANGUAGE = ObjC; 
@@ -20,20 +60,23 @@
                 deleteLocation = id; 
                 duplicateLocation = id; 
                 endNewLocationSheet = id; 
+                gatekeeperAccountSelected = id; 
                 getExternalAddress = id; 
                 importLocations = id; 
                 moveAudioCodec = id; 
                 moveVideoCodec = id; 
                 renameLocation = id; 
+                sipAccountSelected = id; 
                 toggleAutoGetExternalAddress = id; 
                 toggleEnableH323 = id; 
+                toggleEnableSIP = id; 
                 toggleEnableVideo = id; 
                 toggleUseAddressTranslation = id; 
-                toggleUseGatekeeper = id; 
             }; 
             CLASS = XMLocationPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                accountModule = XMAccountPreferencesModule; 
                 actionButton = NSButton; 
                 actionPopup = NSPopUpButton; 
                 audioBufferSizeSlider = NSSlider; 
@@ -42,20 +85,18 @@
                 bandwidthLimitPopUp = NSPopUpButton; 
                 contentView = NSView; 
                 deleteLocationButton = NSButton; 
-                duplicateLocationButton = NSButton; 
                 enableFastStartSwitch = NSButton; 
                 enableH245TunnelSwitch = NSButton; 
                 enableH264LimitedModeSwitch = NSButton; 
                 enableH323Switch = NSButton; 
+                enableSIPSwitch = NSButton; 
                 enableVideoSwitch = NSButton; 
                 externalAddressField = NSTextField; 
                 gatekeeperHostField = NSTextField; 
-                gatekeeperIDField = NSTextField; 
-                gatekeeperPasswordField = NSTextField; 
                 gatekeeperPhoneNumberField = NSTextField; 
                 gatekeeperUserAliasField = NSTextField; 
                 getExternalAddressButton = NSButton; 
-                importLocationsButton = NSButton; 
+                h323AccountsPopUp = NSPopUpButton; 
                 locationsTableView = NSTableView; 
                 maxTCPPortField = NSTextField; 
                 maxUDPPortField = NSTextField; 
@@ -70,9 +111,10 @@
                 newLocationNameField = NSTextField; 
                 newLocationOKButton = NSButton; 
                 newLocationSheet = NSPanel; 
-                renameLocationButton = NSButton; 
+                registrarHostField = NSTextField; 
+                registrarUsernameField = NSTextField; 
                 sectionsTab = NSTabView; 
-                useGatekeeperSwitch = NSButton; 
+                sipAccountsPopUp = NSPopUpButton; 
                 useIPAddressTranslationSwitch = NSButton; 
                 videoCodecPreferenceOrderTableView = NSTableView; 
                 videoFrameRateField = NSTextField; 

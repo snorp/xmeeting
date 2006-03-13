@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.1 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.2 2006/03/13 23:46:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -133,9 +133,9 @@ NSString *gatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailRea
 	
 	switch(failReason)
 	{
-		case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
+		/*case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
 			failReasonString = @"No gatekeeper specified";
-			break;
+			break;*/
 		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
 			failReasonString = @"Gatekeeper not found";
 			break;

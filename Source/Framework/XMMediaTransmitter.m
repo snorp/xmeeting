@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.26 2006/03/01 12:48:57 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.27 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -261,7 +261,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	[portMessage setMsgid:(unsigned)message];
 	if([portMessage sendBeforeDate:[NSDate date]] == NO)
 	{
-		NSLog(@"Sending the message failed");
+		NSLog(@"Sending the message failed: %x", message);
 	}
 	[portMessage release];
 }
@@ -797,8 +797,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_handleStartTransmittingMessage:(NSArray *)components
 {
+	NSLog(@"HANDLE START TRANSMITTING");
 	if(isTransmitting == YES)
 	{
+		NSLog(@"ALREADY DONE");
 		return;
 	}
 	
@@ -936,7 +938,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)components
 {
-	if(compressSequence != 0)
+	/*if(compressSequence != 0)
 	{
 		NSData *data = (NSData *)[components objectAtIndex:0];
 		NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -969,7 +971,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		compressSequenceFrameCounter = 0;
 		compressSequenceLastVideoBytesSent = videoBytesSent;
-	}
+	}*/
 }
 
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents
@@ -1438,6 +1440,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_compressSequenceCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp
 {
+	NSLog(@"CompressSequenceCOMPRESS");
 	if(compressSequenceIsActive == YES)
 	{
 		ComponentResult err = noErr;
@@ -1665,7 +1668,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			
 			compressSequencePreviousTimeStamp = 0;
 			
-			//NSLog(@"limiting bitrate to %d", bitrateToUse);
+			bitrateToUse = 384000;
+			NSLog(@"limiting bitrate to %d", bitrateToUse);
 			DataRateParams dataRateParams;
 			dataRateParams.dataRate = (bitrateToUse / 8);
 			dataRateParams.dataOverrun = 0;
@@ -1717,6 +1721,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			compressSequenceNonKeyFrameCounter++;
 		}
 		
+		NSLog(@"Compressing");
+		
 		long dataLength;
 		err = CompressSequenceFrame(compressSequence,
 									pixMapHandle,
@@ -1726,6 +1732,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 									&dataLength,
 									NULL,
 									NULL);
+		NSLog(@"Compressing done");
 		if(err != noErr)
 		{
 			NSLog(@"CompressSequenceFrame failed: %d", err);
@@ -1745,6 +1752,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		CVPixelBufferUnlockBaseAddress(frame, 0);
 	}
+	
+	NSLog(@"CompressSequence COMPRESS DONE");
 }
 
 - (OSStatus)_packetizeCompressedFrame:(UInt8 *)data 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.5 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.6 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,7 +42,9 @@ public:
 	void OnShowIncoming(XMConnection & connection);
 	void AcceptIncomingCall();
 	void RejectIncomingCall();
-	void ClearCall(const PString & callToken);
+	
+	virtual void OnReleased(OpalConnection & connection);
+	virtual void OnEstablished(OpalConnection & connection);
 
 	void SetEnableVideo(BOOL enableVideo);
 

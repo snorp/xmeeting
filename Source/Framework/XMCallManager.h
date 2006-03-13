@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.17 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.18 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,7 @@
 	unsigned callManagerStatus;
 	
 	unsigned h323ListeningStatus;
+	unsigned sipListeningStatus;
 	
 	XMPreferences *activePreferences;
 	BOOL automaticallyAcceptIncomingCalls;
@@ -40,6 +41,10 @@
 	NSString *gatekeeperName;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
+	// SIP variables
+	NSMutableArray *registrarNames;
+	NSMutableArray *registrarRegistrationFailReasons;
+	
 	// InCall variables
 	NSTimeInterval callStatisticsUpdateInterval;
 	
@@ -48,7 +53,7 @@
 }
 
 /**
- * returns the one single, shared instance of this class
+ * returns the singleton, shared instance of this class
  **/
 + (XMCallManager *)sharedInstance;
 
@@ -130,6 +135,16 @@
 - (void)clearActiveCall;
 
 /**
+ * Returns the number of calls currently archived
+ **/
+- (unsigned)recentCallsCount;
+
+/**
+ * Returns the recent call at index
+ **/
+- (XMCallInfo *)recentCallAtIndex:(unsigned)index;
+
+/**
  * Returns the last calls made, NOT including any active call.
  * The most recent call is found at the lowest index.
  * The framework does not store any calls beyond the application
@@ -159,7 +174,7 @@
 
 /**
  * Call this method if the enabling of the H.323 subsystem failed somehow
- * (notified with XMNotification_CallManagerEnablingH323Failed)
+ * (notified with XMNotification_CallManagerDidNotEnableH323)
  * and you want to retry the subsystem setup process.
  * This method raises an exception if the H.323 subsystem is successfully
  * listening or if the current active preferences do not use H.323 at all!
@@ -168,13 +183,76 @@
 
 /**
  * Call this method if the gatekeeper registration failed somehow
- * (notified with XMNotification_CallManagerGatekeeperRegistrationFailed)
+ * (notified with XMNotification_CallManagerDidNotRegisterAtGatekeeper)
  * and you want to retry the gatekeeper registration process.
  * This method raises an exception if the gatekeeper registration was
- * succesful or if the current active preferences do not use a gatekeeper
+ * succesful or if the current active preferences does not use a gatekeeper
  * at all
  **/
 - (void)retryGatekeeperRegistration;
+
+#pragma mark SIP-specific methods
+
+/**
+ * Returns YES if all registrations were succesful or not.
+ **/
+- (BOOL)isRegisteredAtAllRegistrars;
+
+/**
+ * Returns the number of registrars the client is registered to at the
+ * moment.
+ **/
+- (unsigned)registrarCount;
+
+/**
+ * Returns the name of the registrar at index.
+ **/
+- (NSString *)registrarNameAtIndex:(unsigned)index;
+
+/**
+ * Returns the number of registration fail reason records the manager
+ * currently has. This is the same number as the number of registrars
+ * specified in the active XMPreferences instance.
+ **/
+- (unsigned)registrarRegistrationFailReasonCount;
+
+/**
+ * Returns the registration fail reason for the particular registrar at index.
+ **/
+- (XMRegistrarRegistrationFailReason)registrarRegistrationFailReasonAtIndex:(unsigned)index;
+
+/**
+ * Returns the complete array of registrar names for the active XMPreferences instance.
+ * If a registration attempt failed or is not yet completed, the appropriate slot
+ * is filled with NSNull.
+ **/
+- (NSArray *)registrarNames;
+
+/**
+ * Returns the status of the registration at the registrars provided.
+ * If there client has no registrars in the current preferences set,
+ * an empty array is returned.
+ **/
+- (NSArray *)registrarRegistrationFailReasons;
+
+/**
+ * Call this method if the enabling of the SIP subsystem failed somehow
+ * (notified with XMNotification_CallManagerDidNotEnableSIP)
+ * and you want to retry the subsystem setup process.
+ * This method raises an exception if the SIP subsystem is successfully
+ * listening or if the current active preferences do not use SIP at all!
+ **/
+- (void)retryEnableSIP;
+
+/**
+ * Call this method if one of the registrar registration failed somehow
+ * (notified with XMNotification_CallManagerNotRegisterAtRegistrar)
+ * and you want to retry the registrar registration process.
+ * This method raises an exception if all registrar registrations were
+ * succesful or if the current active preferences does not use registrars
+ * at all
+ **/
+- (void)retryRegistrarRegistrations;
 
 #pragma mark InCall functionality
 

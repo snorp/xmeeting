@@ -107,7 +107,6 @@
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
-		D110B8ED09597A100009D87A /* h261codec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE25708F90262007E4ABE /* h261codec.cxx */; };
 		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
 		D1296DF509288A7A0077C77F /* psync.h in Headers */ = {isa = PBXBuildFile; fileRef = D1296DF409288A7A0077C77F /* psync.h */; };
 		D12E605B0998AFE9004EF9F8 /* XMVideoModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */; };
@@ -126,6 +125,7 @@
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
 		D134B974093B88190090271F /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
+		D13C78E009B8205A006C6C3B /* XMOpalPatches.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */; };
 		D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */ = {isa = PBXBuildFile; fileRef = D14587EE09013DD4004A1EDF /* XMCallStatistics.m */; };
 		D147D6070970342B005DE11C /* XMRTPPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = D147D6050970342B005DE11C /* XMRTPPacket.h */; };
 		D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147D6060970342B005DE11C /* XMRTPPacket.cpp */; };
@@ -401,6 +401,13 @@
 		D1BA7632086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */; };
 		D1BA7666086BEC5E007E6CEC /* XMCallHistoryRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */; };
 		D1BA776C086CB1E3007E6CEC /* XMCodec.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BA776B086CB1E3007E6CEC /* XMCodec.m */; };
+		D1BB8B5E09BA2767000897D9 /* XMH323Account.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BB8B5C09BA2767000897D9 /* XMH323Account.h */; };
+		D1BB8B5F09BA2767000897D9 /* XMH323Account.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BB8B5D09BA2767000897D9 /* XMH323Account.m */; };
+		D1BB8BB209BA5F0A000897D9 /* XMSIPAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BB8BB009BA5F0A000897D9 /* XMSIPAccount.h */; };
+		D1BB8BB309BA5F0A000897D9 /* XMSIPAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BB8BB109BA5F0A000897D9 /* XMSIPAccount.m */; };
+		D1BB8E9709BB9BCD000897D9 /* XMAccountPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */; };
+		D1BB8E9809BB9BCD000897D9 /* XMAccountPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */; };
+		D1BB917409BCDF99000897D9 /* accountPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1BB917309BCDF99000897D9 /* accountPreferences.tif */; };
 		D1C1E316099B8BEA00815263 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */; };
 		D1CE4B62083CDED900B66B5D /* XMAddressBookModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */; };
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
@@ -1006,6 +1013,7 @@
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMRecentCallsView.m; path = Source/GUI/XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
 		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMOpalPatches.cpp; path = Source/Framework/XMOpalPatches.cpp; sourceTree = "<group>"; };
 		D14587ED09013DD4004A1EDF /* XMCallStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallStatistics.h; path = Source/Framework/XMCallStatistics.h; sourceTree = "<group>"; };
 		D14587EE09013DD4004A1EDF /* XMCallStatistics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallStatistics.m; path = Source/Framework/XMCallStatistics.m; sourceTree = "<group>"; };
 		D147D6050970342B005DE11C /* XMRTPPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPPacket.h; path = Source/Framework/XMRTPPacket.h; sourceTree = "<group>"; };
@@ -1313,6 +1321,13 @@
 		D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallHistoryRecord.m; path = Source/Application/XMCallHistoryRecord.m; sourceTree = "<group>"; };
 		D1BA776A086CB1E3007E6CEC /* XMCodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCodec.h; path = Source/Framework/XMCodec.h; sourceTree = "<group>"; };
 		D1BA776B086CB1E3007E6CEC /* XMCodec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCodec.m; path = Source/Framework/XMCodec.m; sourceTree = "<group>"; };
+		D1BB8B5C09BA2767000897D9 /* XMH323Account.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Account.h; path = Source/Application/XMH323Account.h; sourceTree = "<group>"; };
+		D1BB8B5D09BA2767000897D9 /* XMH323Account.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMH323Account.m; path = Source/Application/XMH323Account.m; sourceTree = "<group>"; };
+		D1BB8BB009BA5F0A000897D9 /* XMSIPAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSIPAccount.h; path = Source/Application/XMSIPAccount.h; sourceTree = "<group>"; };
+		D1BB8BB109BA5F0A000897D9 /* XMSIPAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSIPAccount.m; path = Source/Application/XMSIPAccount.m; sourceTree = "<group>"; };
+		D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAccountPreferencesModule.h; path = Source/GUI/XMAccountPreferencesModule.h; sourceTree = "<group>"; };
+		D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAccountPreferencesModule.m; path = Source/GUI/XMAccountPreferencesModule.m; sourceTree = "<group>"; };
+		D1BB917309BCDF99000897D9 /* accountPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = accountPreferences.tif; path = Resources/Images/accountPreferences.tif; sourceTree = "<group>"; };
 		D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D1CE4B60083CDED900B66B5D /* XMAddressBookModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookModule.h; path = Source/GUI/XMAddressBookModule.h; sourceTree = "<group>"; };
 		D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookModule.m; path = Source/GUI/XMAddressBookModule.m; sourceTree = "<group>"; };
@@ -1482,7 +1497,6 @@
 		D1CEE25408F90262007E4ABE /* short_term.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = short_term.c; sourceTree = "<group>"; };
 		D1CEE25508F90262007E4ABE /* table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = table.c; sourceTree = "<group>"; };
 		D1CEE25608F90262007E4ABE /* gsmcodec.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gsmcodec.cxx; sourceTree = "<group>"; };
-		D1CEE25708F90262007E4ABE /* h261codec.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h261codec.cxx; sourceTree = "<group>"; };
 		D1CEE25908F90262007E4ABE /* anaFilter.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = anaFilter.c; sourceTree = "<group>"; };
 		D1CEE25A08F90262007E4ABE /* anaFilter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = anaFilter.h; sourceTree = "<group>"; };
 		D1CEE25B08F90262007E4ABE /* constants.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = constants.c; sourceTree = "<group>"; };
@@ -2041,6 +2055,7 @@
 				D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */,
 				D163364E07A456C4003FD9C0 /* XMProcess.h */,
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
+				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
 			);
 			name = OPAL;
 			sourceTree = "<group>";
@@ -2070,6 +2085,10 @@
 			children = (
 				D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */,
 				D1A02880081CBCC00018BD11 /* XMPreferencesManager.m */,
+				D1BB8B5C09BA2767000897D9 /* XMH323Account.h */,
+				D1BB8B5D09BA2767000897D9 /* XMH323Account.m */,
+				D1BB8BB009BA5F0A000897D9 /* XMSIPAccount.h */,
+				D1BB8BB109BA5F0A000897D9 /* XMSIPAccount.m */,
 				D1A02893081CBED00018BD11 /* XMLocation.h */,
 				D1A02894081CBED00018BD11 /* XMLocation.m */,
 			);
@@ -2084,6 +2103,8 @@
 				D1A02AB6081E4B8C0018BD11 /* XMPreferencesModule.h */,
 				D1A02ADB081E56DB0018BD11 /* XMGeneralPreferencesModule.h */,
 				D1A02ADC081E56DB0018BD11 /* XMGeneralPreferencesModule.m */,
+				D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */,
+				D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */,
 				D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */,
 				D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */,
 				D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */,
@@ -2736,7 +2757,6 @@
 				D1CEE23C08F90262007E4ABE /* g729codec.cxx */,
 				D1CEE23D08F90262007E4ABE /* gsm */,
 				D1CEE25608F90262007E4ABE /* gsmcodec.cxx */,
-				D1CEE25708F90262007E4ABE /* h261codec.cxx */,
 				D1CEE25808F90262007E4ABE /* iLBC */,
 				D1CEE28808F90262007E4ABE /* ilbccodec.cxx */,
 				D1CEE28908F90262007E4ABE /* lpc10 */,
@@ -3097,6 +3117,7 @@
 			isa = PBXGroup;
 			children = (
 				1A5821C309A1DE7F00CBE017 /* locationPreferences.tif */,
+				D1BB917309BCDF99000897D9 /* accountPreferences.tif */,
 				1AF9E4A109A07E3600094163 /* tools_24_down.tif */,
 				1AF9E4A209A07E3600094163 /* tools_24.tif */,
 				1A3A07D2099C876A00F5DBAD /* generalPreferences.tif */,
@@ -3265,6 +3286,9 @@
 				D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */,
 				D106DA5509B3899D00BAA8F1 /* XMBusyModule.h in Headers */,
 				D1FD475709B650D500EB517B /* XMSIPEndPoint.h in Headers */,
+				D1BB8B5E09BA2767000897D9 /* XMH323Account.h in Headers */,
+				D1BB8BB209BA5F0A000897D9 /* XMSIPAccount.h in Headers */,
+				D1BB8E9709BB9BCD000897D9 /* XMAccountPreferencesModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3865,6 +3889,7 @@
 				1A9E27BE09A5BF3600E9A7CE /* Ringer.aiff in Resources */,
 				1A42B4D109A9DEAF007773DA /* XMeeting.icns in Resources */,
 				D106DA9709B38BE600BAA8F1 /* BusyModule.nib in Resources */,
+				D1BB917409BCDF99000897D9 /* accountPreferences.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4003,6 +4028,9 @@
 				D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */,
 				D106DA5609B3899D00BAA8F1 /* XMBusyModule.m in Sources */,
 				D1FD475809B650D500EB517B /* XMSIPEndPoint.cpp in Sources */,
+				D1BB8B5F09BA2767000897D9 /* XMH323Account.m in Sources */,
+				D1BB8BB309BA5F0A000897D9 /* XMSIPAccount.m in Sources */,
+				D1BB8E9809BB9BCD000897D9 /* XMAccountPreferencesModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4241,7 +4269,6 @@
 				D1CEE49308F90263007E4ABE /* rtp.cxx in Sources */,
 				D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */,
 				D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */,
-				D110B8ED09597A100009D87A /* h261codec.cxx in Sources */,
 				D1F49D1E097E553F0010A324 /* echocancel.cxx in Sources */,
 				D1F49D29097E66940010A324 /* mdf.c in Sources */,
 				D1F49D2A097E66980010A324 /* medfilter.c in Sources */,
@@ -4258,6 +4285,7 @@
 				D1FD47D009B6544B00EB517B /* sipcon.cxx in Sources */,
 				D1FD47D109B6544B00EB517B /* sipep.cxx in Sources */,
 				D1FD47D209B6544B00EB517B /* sippdu.cxx in Sources */,
+				D13C78E009B8205A006C6C3B /* XMOpalPatches.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4593,10 +4621,7 @@
 		D1B6057908F8F7A20034B47F /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = ppc;
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4674,10 +4699,7 @@
 		D1CEE1F908F9022C007E4ABE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = ppc;
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

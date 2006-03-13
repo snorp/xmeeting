@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.13 2006/02/20 17:27:48 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.14 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,7 @@
 
 @implementation XMPreferences
 
+#pragma mark -
 #pragma mark Framework Methods
 
 + (XM_VALUE_TEST_RESULT)_checkValue:(id)value forKey:(NSString *)key
@@ -195,29 +196,7 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesUseGatekeeper])
-	{
-		if([value isKindOfClass:[NSNumber class]])
-		{
-			result = XM_VALID_VALUE;
-		}
-		else
-		{
-			result = XM_INVALID_VALUE_TYPE;
-		}
-	}
 	else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
-	{
-		if(value == nil || [value isKindOfClass:[NSString class]])
-		{
-			result = XM_VALID_VALUE;
-		}
-		else
-		{
-			result = XM_INVALID_VALUE_TYPE;
-		}
-	}
-	else if([key isEqualToString:XMKey_PreferencesGatekeeperID])
 	{
 		if(value == nil || [value isKindOfClass:[NSString class]])
 		{
@@ -250,6 +229,39 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
+	else if([key isEqualToString:XMKey_PreferencesEnableSIP])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesRegistrarHosts])
+	{
+		if(value == nil || [value isKindOfClass:[NSArray class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesRegistrarUsernames])
+	{
+		if(value == nil || [value isKindOfClass:[NSArray class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
 	else
 	{
 		result = XM_INVALID_KEY;
@@ -269,6 +281,7 @@
 	return YES;
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -301,7 +314,7 @@
 	}
 	
 	enableVideo = NO;
-	videoFramesPerSecond = 20;
+	videoFramesPerSecond = 30;
 	
 	unsigned videoCodecCount = [_XMCodecManagerSharedInstance videoCodecCount];
 	videoCodecList = [[NSMutableArray alloc] initWithCapacity:videoCodecCount];
@@ -319,11 +332,13 @@
 	enableH323 = NO;
 	enableH245Tunnel = NO;
 	enableFastStart = NO;
-	useGatekeeper = NO;
 	gatekeeperAddress = nil;
-	gatekeeperID = nil;
 	gatekeeperUsername = nil;
 	gatekeeperPhoneNumber = nil;
+	
+	enableSIP = NO;
+	registrarHosts = [[NSArray alloc] init];
+	registrarUsernames = [[NSArray alloc] init];
 
 	return self;
 }
@@ -490,22 +505,10 @@
 		[self setEnableFastStart:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesUseGatekeeper];
-	if(obj)
-	{
-		[self setUseGatekeeper:[(NSNumber *)obj boolValue]];
-	}
-	
 	obj = [dict objectForKey:XMKey_PreferencesGatekeeperAddress];
 	if(obj)
 	{
 		[self setGatekeeperAddress:(NSString *)obj];
-	}
-	
-	obj = [dict objectForKey:XMKey_PreferencesGatekeeperID];
-	if(obj)
-	{
-		[self setGatekeeperID:(NSString *)obj];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesGatekeeperUsername];
@@ -518,6 +521,32 @@
 	if(obj)
 	{
 		[self setGatekeeperPhoneNumber:(NSString *)obj];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesEnableSIP];
+	if(obj)
+	{
+		[self setEnableSIP:[(NSNumber *)obj boolValue]];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesRegistrarHosts];
+	if(obj)
+	{
+		[self setRegistrarHosts:(NSArray *)obj];
+	}
+	else
+	{
+		[self setRegistrarHosts:[NSArray array]];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesRegistrarUsernames];
+	if(obj)
+	{
+		[self setRegistrarUsernames:(NSArray *)obj];
+	}
+	else
+	{
+		[self setRegistrarUsernames:[NSArray array]];
 	}
 	
 	return self;
@@ -549,11 +578,13 @@
 	[preferences setEnableH323:[self enableH323]];
 	[preferences setEnableH245Tunnel:[self enableH245Tunnel]];
 	[preferences setEnableFastStart:[self enableFastStart]];
-	[preferences setUseGatekeeper:[self useGatekeeper]];
 	[preferences setGatekeeperAddress:[self gatekeeperAddress]];
-	[preferences setGatekeeperID:[self gatekeeperID]];
 	[preferences setGatekeeperUsername:[self gatekeeperUsername]];
 	[preferences setGatekeeperPhoneNumber:[self gatekeeperPhoneNumber]];
+	
+	[preferences setEnableSIP:[self enableSIP]];
+	[preferences setRegistrarHosts:[self registrarHosts]];
+	[preferences setRegistrarUsernames:[self registrarUsernames]];
 
 	return preferences;
 }
@@ -631,11 +662,13 @@
 		[self setEnableH323:[coder decodeBoolForKey:XMKey_PreferencesEnableH323]];
 		[self setEnableH245Tunnel:[coder decodeBoolForKey:XMKey_PreferencesEnableH245Tunnel]];
 		[self setEnableFastStart:[coder decodeBoolForKey:XMKey_PreferencesEnableFastStart]];
-		[self setUseGatekeeper:[coder decodeBoolForKey:XMKey_PreferencesUseGatekeeper]];
 		[self setGatekeeperAddress:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperAddress]];
-		[self setGatekeeperID:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperID]];
 		[self setGatekeeperUsername:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperUsername]];
 		[self setGatekeeperPhoneNumber:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber]];
+		
+		[self setEnableSIP:[coder decodeBoolForKey:XMKey_PreferencesEnableSIP]];
+		[self setRegistrarHosts:[coder decodeObjectForKey:XMKey_PreferencesRegistrarHosts]];
+		[self setRegistrarUsernames:[coder decodeObjectForKey:XMKey_PreferencesRegistrarUsernames]];
 	}
 	else // raise an exception
 	{
@@ -673,11 +706,13 @@
 		[coder encodeBool:[self enableH323] forKey:XMKey_PreferencesEnableH323];
 		[coder encodeBool:[self enableH245Tunnel] forKey:XMKey_PreferencesEnableH245Tunnel];
 		[coder encodeBool:[self enableFastStart] forKey:XMKey_PreferencesEnableFastStart];
-		[coder encodeBool:[self useGatekeeper] forKey:XMKey_PreferencesUseGatekeeper];
 		[coder encodeObject:[self gatekeeperAddress] forKey:XMKey_PreferencesGatekeeperAddress];
-		[coder encodeObject:[self gatekeeperID] forKey:XMKey_PreferencesGatekeeperID];
 		[coder encodeObject:[self gatekeeperUsername] forKey:XMKey_PreferencesGatekeeperUsername];
 		[coder encodeObject:[self gatekeeperPhoneNumber] forKey:XMKey_PreferencesGatekeeperPhoneNumber];
+		
+		[coder encodeBool:[self enableSIP] forKey:XMKey_PreferencesEnableSIP];
+		[coder encodeObject:[self registrarHosts] forKey:XMKey_PreferencesRegistrarHosts];
+		[coder encodeObject:[self registrarUsernames] forKey:XMKey_PreferencesRegistrarUsernames];
 	}
 	else // raise an exception
 	{
@@ -695,13 +730,16 @@
 	[videoCodecList release];
 	
 	[gatekeeperAddress release];
-	[gatekeeperID release];
 	[gatekeeperUsername release];
 	[gatekeeperPhoneNumber release];
+	
+	[registrarHosts release];
+	[registrarUsernames release];
 	
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark General NSObject Functionality
 
 /**
@@ -745,11 +783,13 @@
 	   [otherPreferences enableH323] == [self enableH323] &&
 	   [otherPreferences enableH245Tunnel] == [self enableH245Tunnel] &&
 	   [otherPreferences enableFastStart] == [self enableFastStart] &&
-	   [otherPreferences useGatekeeper] == [self useGatekeeper] &&
 	   [[otherPreferences gatekeeperAddress] isEqualToString:[self gatekeeperAddress]] &&
-	   [[otherPreferences gatekeeperID] isEqualToString:[self gatekeeperID]] &&
 	   [[otherPreferences gatekeeperUsername] isEqualToString:[self gatekeeperUsername]] &&
-	   [[otherPreferences gatekeeperPhoneNumber] isEqualToString:[self gatekeeperPhoneNumber]])
+	   [[otherPreferences gatekeeperPhoneNumber] isEqualToString:[self gatekeeperPhoneNumber]] &&
+	   
+	   [otherPreferences enableSIP] == [self enableSIP] &&
+	   [[otherPreferences registrarHosts] isEqualToArray:[self registrarHosts]] &&
+	   [[otherPreferences registrarUsernames] isEqualToArray:[self registrarUsernames]])
 	{
 		return YES;
 	}
@@ -757,6 +797,7 @@
 	return NO;
 }
 
+#pragma mark -
 #pragma mark Getting Different Representations
 
 - (NSMutableDictionary *)dictionaryRepresentation
@@ -878,20 +919,10 @@
 	[dict setObject:number forKey:XMKey_PreferencesEnableFastStart];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:[self useGatekeeper]];
-	[dict setObject:number forKey:XMKey_PreferencesUseGatekeeper];
-	[number release];
-	
 	obj = [self gatekeeperAddress];
 	if(obj)
 	{
 		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperAddress];
-	}
-	
-	obj = [self gatekeeperID];
-	if(obj)
-	{
-		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperID];
 	}
 	
 	obj = [self gatekeeperUsername];
@@ -906,9 +937,26 @@
 		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperPhoneNumber];
 	}
 	
+	number = [[NSNumber alloc] initWithBool:[self enableSIP]];
+	[dict setObject:number forKey:XMKey_PreferencesEnableSIP];
+	[number release];
+	
+	obj = [self registrarHosts];
+	if([(NSArray *)obj count] != 0)
+	{
+		[dict setObject:obj forKey:XMKey_PreferencesRegistrarHosts];
+	}
+	
+	obj = [self registrarUsernames];
+	if([(NSArray *)obj count] != 0)
+	{
+		[dict setObject:obj forKey:XMKey_PreferencesRegistrarUsernames];
+	}
+	
 	return dict;
 }
 
+#pragma mark -
 #pragma mark Accesssing values through keys
 
 - (id)valueForKey:(NSString *)key
@@ -985,17 +1033,9 @@
 	{
 		return [NSNumber numberWithBool:[self enableFastStart]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesUseGatekeeper])
-	{
-		return [NSNumber numberWithBool:[self useGatekeeper]];
-	}
 	else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
 	{
 		return [self gatekeeperAddress];
-	}
-	else if([key isEqualToString:XMKey_PreferencesGatekeeperID])
-	{
-		return [self gatekeeperID];
 	}
 	else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername])
 	{
@@ -1004,6 +1044,18 @@
 	else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber])
 	{
 		return [self gatekeeperPhoneNumber];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableSIP])
+	{
+		return [NSNumber numberWithBool:[self enableSIP]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesRegistrarHosts])
+	{
+		return [self registrarHosts];
+	}
+	else if([key isEqualToString:XMKey_PreferencesRegistrarUsernames])
+	{
+		return [self registrarUsernames];
 	}
 	
 	return nil;
@@ -1189,33 +1241,11 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesUseGatekeeper])
-	{
-		if([value isKindOfClass:[NSNumber class]])
-		{
-			[self setUseGatekeeper:[(NSNumber *)value boolValue]];
-		}
-		else
-		{
-			correctType = NO;
-		}
-	}
 	else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
 	{
 		if(value == nil || [value isKindOfClass:[NSString class]])
 		{
 			[self setGatekeeperAddress:(NSString *)value];
-		}
-		else
-		{
-			correctType = NO;
-		}
-	}
-	else if([key isEqualToString:XMKey_PreferencesGatekeeperID])
-	{
-		if(value == nil || [value isKindOfClass:[NSString class]])
-		{
-			[self setGatekeeperID:(NSString *)value];
 		}
 		else
 		{
@@ -1244,6 +1274,39 @@
 			correctType = NO;
 		}
 	}
+	else if([key isEqualToString:XMKey_PreferencesEnableSIP])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableSIP:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesRegistrarHosts])
+	{
+		if([value isKindOfClass:[NSArray class]])
+		{
+			[self setRegistrarHosts:(NSArray *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesRegistrarUsernames])
+	{
+		if([value isKindOfClass:[NSArray class]])
+		{
+			[self setRegistrarUsernames:(NSArray *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
 	else
 	{
 		[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeValidKey];
@@ -1255,6 +1318,7 @@
 	}
 }
 
+#pragma mark -
 #pragma mark General Settings Methods
 
 - (NSString *)userName
@@ -1279,6 +1343,7 @@
 	automaticallyAcceptIncomingCalls = flag;
 }
 
+#pragma mark -
 #pragma mark Network-Settings Methods
 
 - (unsigned)bandwidthLimit
@@ -1356,6 +1421,7 @@
 	udpPortMax = port;
 }
 
+#pragma mark -
 #pragma mark Audio-specific Methods
 
 - (unsigned)audioBufferSize
@@ -1388,7 +1454,8 @@
 	[[self _audioCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
 }
 
-#pragma mark Video Accessor & Setter Methods
+#pragma mark -
+#pragma mark Video-specific Methods
 
 - (BOOL)enableVideo
 {
@@ -1440,6 +1507,7 @@
 	enableH264LimitedMode = flag;
 }
 
+#pragma mark -
 #pragma mark H.323-specific Methods
 
 - (BOOL)enableH323
@@ -1472,16 +1540,6 @@
 	enableFastStart = flag;
 }
 
-- (BOOL)useGatekeeper
-{
-	return useGatekeeper;
-}
-
-- (void)setUseGatekeeper:(BOOL)flag
-{
-	useGatekeeper = flag;
-}
-
 - (NSString *)gatekeeperAddress
 {
 	return gatekeeperAddress;
@@ -1493,21 +1551,6 @@
 	{
 		NSString *old = gatekeeperAddress;
 		gatekeeperAddress = [address copy];
-		[old release];
-	}
-}
-
-- (NSString *)gatekeeperID
-{
-	return gatekeeperID;
-}
-
-- (void)setGatekeeperID:(NSString *)string
-{
-	if(string != gatekeeperID)
-	{
-		NSString *old = gatekeeperID;
-		gatekeeperID = [string copy];
 		[old release];
 	}
 }
@@ -1542,11 +1585,90 @@
 	}
 }
 
+- (BOOL)usesGatekeeper
+{
+	if([self gatekeeperAddress] != nil &&
+	   ([self gatekeeperUsername] != nil || [self gatekeeperPhoneNumber] != nil))
+	{
+		return YES;
+	}
+	return NO;
+}
+
 - (NSString *)gatekeeperPassword
 {
 	return nil;
 }
 
+#pragma mark -
+#pragma mark SIP Methods
+
+- (BOOL)enableSIP
+{
+	return enableSIP;
+}
+
+- (void)setEnableSIP:(BOOL)flag
+{
+	enableSIP = flag;
+}
+
+- (NSArray *)registrarHosts
+{
+	return registrarHosts;
+}
+
+- (void)setRegistrarHosts:(NSArray *)hosts
+{
+	if(registrarHosts != hosts)
+	{
+		NSArray *old = registrarHosts;
+		registrarHosts = [hosts copy];
+		[old release];
+	}
+}
+
+- (NSArray *)registrarUsernames
+{
+	return registrarUsernames;
+}
+
+- (void)setRegistrarUsernames:(NSArray *)usernames
+{
+	if(registrarUsernames != usernames)
+	{
+		NSArray *old = registrarUsernames;
+		registrarUsernames = [usernames  copy];
+		[old release];
+	}
+}
+
+- (BOOL)usesRegistrars
+{
+	if([[self registrarHosts] count] != 0 &&
+	   [[self registrarUsernames] count] != 0)
+	{
+		return YES;
+	}
+	return NO;
+}
+
+- (NSArray *)registrarPasswords
+{
+	unsigned count = [[self registrarHosts] count];
+	unsigned i;
+	
+	NSMutableArray *pwds = [NSMutableArray arrayWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		[pwds addObject:[NSNull null]];
+	}
+	
+	return pwds;
+}
+
+#pragma mark -
 #pragma mark Private Methods
 
 - (NSMutableArray *)_audioCodecList

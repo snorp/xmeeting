@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.12 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMInCallModule.m,v 1.13 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,7 @@
 							   name:XMNotification_VideoManagerDidStartReceivingVideo object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
-							   name:XMNotification_ActiveLocationDidChange object:nil];
+							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	
 	return self;
 }

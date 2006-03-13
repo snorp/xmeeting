@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.10 2006/02/27 19:20:47 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.11 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,10 +22,15 @@
 #define XM_H323_LISTENING 1
 #define XM_H323_ERROR 2
 
+#define XM_SIP_NOT_LISTENING 0
+#define XM_SIP_LISTENING 1
+#define XM_SIP_ERROR 2
+
 #define XM_CALL_MANAGER_READY 0
 #define XM_CALL_MANAGER_SUBSYSTEM_SETUP 1
 #define XM_CALL_MANAGER_PREPARING_CALL 2
 #define XM_CALL_MANAGER_IN_CALL 3
+#define XM_CALL_MANAGER_TERMINATING_CALL 4
 
 @interface XMCallManager (PrivateMethods)
 
@@ -77,6 +82,7 @@
 	callManagerStatus = XM_CALL_MANAGER_READY;
 	
 	h323ListeningStatus = XM_H323_NOT_LISTENING;
+	sipListeningStatus = XM_SIP_NOT_LISTENING;
 	
 	activePreferences = [[XMPreferences alloc] init];
 	automaticallyAcceptIncomingCalls = NO;
@@ -87,6 +93,9 @@
 	
 	gatekeeperName = nil;
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+	
+	registrarNames = [[NSMutableArray alloc] initWithCapacity:1];
+	registrarRegistrationFailReasons = [[NSMutableArray alloc] initWithCapacity:1];
 	
 	callStatisticsUpdateInterval = 1.0;
 	
@@ -113,6 +122,18 @@
 	{
 		[gatekeeperName release];
 		gatekeeperName = nil;
+	}
+	
+	if(registrarNames != nil)
+	{
+		[registrarNames release];
+		registrarNames = nil;
+	}
+	
+	if(registrarRegistrationFailReasons != nil)
+	{
+		[registrarRegistrationFailReasons release];
+		registrarRegistrationFailReasons = nil;
 	}
 	
 	if(recentCalls != nil)
@@ -145,7 +166,7 @@
 
 - (BOOL)isSIPListening
 {
-	return NO;
+	return (sipListeningStatus == XM_SIP_LISTENING);
 }
 
 - (XMPreferences *)activePreferences
@@ -154,7 +175,7 @@
 }
 
 - (void)setActivePreferences:(XMPreferences *)prefs
-{
+{	
 	if(prefs == nil)
 	{
 		[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustNotBeNil];
@@ -178,7 +199,8 @@
 - (BOOL)isInCall
 {
 	if((callManagerStatus == XM_CALL_MANAGER_PREPARING_CALL) ||
-	   (callManagerStatus == XM_CALL_MANAGER_IN_CALL))
+	   (callManagerStatus == XM_CALL_MANAGER_IN_CALL) ||
+	   (callManagerStatus == XM_CALL_MANAGER_TERMINATING_CALL))
 	{
 		return YES;
 	}
@@ -265,11 +287,28 @@
 		return;
 	}
 	
+	if(callManagerStatus == XM_CALL_MANAGER_TERMINATING_CALL)
+	{
+		return;
+	}
+	
+	callManagerStatus = XM_CALL_MANAGER_TERMINATING_CALL;
+	
 	unsigned callID = [activeCall _callID];
 	
 	[activeCall _setCallStatus:XMCallStatus_Terminating];
 	
 	[XMOpalDispatcher _clearCall:callID];
+}
+
+- (unsigned)recentCallsCount
+{
+	return [recentCalls count];
+}
+
+- (XMCallInfo *)recentCallAtIndex:(unsigned)index
+{
+	return (XMCallInfo *)[recentCalls objectAtIndex:index];
 }
 
 - (NSArray *)recentCalls
@@ -340,7 +379,8 @@
 	if(callManagerStatus == XM_CALL_MANAGER_READY &&
 	   gatekeeperName == nil && 
 	   activePreferences != nil &&
-	   [activePreferences useGatekeeper])
+	   [activePreferences gatekeeperAddress] != nil &&
+	   [activePreferences gatekeeperUsername] != nil)
 	{
 		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
@@ -372,6 +412,144 @@
 	}
 }
 
+#pragma mark SIP specific Methods
+
+- (BOOL)isRegisteredAtAllRegistrars
+{
+	unsigned count = [registrarRegistrationFailReasons count];
+	if(count == 0)
+	{
+		return NO;
+	}
+	
+	BOOL didRegisterAll = YES;
+	
+	unsigned i;
+	for(i = 0; i < count; i++)
+	{
+		NSNumber *number = (NSNumber *)[registrarRegistrationFailReasons objectAtIndex:i];
+		XMRegistrarRegistrationFailReason failReason = (XMRegistrarRegistrationFailReason)[number unsignedIntValue];
+		if(failReason != XMRegistrarRegistrationFailReason_NoFailure)
+		{
+			didRegisterAll = NO;
+			break;
+		}
+	}
+	
+	return didRegisterAll;
+}
+
+- (unsigned)registrarCount
+{
+	return [registrarNames count];
+}
+
+- (NSString *)registrarNameAtIndex:(unsigned)index
+{
+	return (NSString *)[registrarNames objectAtIndex:index];
+}
+
+- (unsigned)registrarRegistrationFailReasonCount
+{
+	return [registrarRegistrationFailReasons count];
+}
+
+- (XMRegistrarRegistrationFailReason)registrarRegistrationFailReasonAtIndex:(unsigned)index
+{
+	NSNumber *number = (NSNumber *)[registrarRegistrationFailReasons objectAtIndex:index];
+	
+	return (XMRegistrarRegistrationFailReason)[number unsignedIntValue];
+}
+
+- (NSArray *)registrarNames
+{
+	NSArray *registrarNamesCopy = [registrarNames copy];
+	return [registrarNamesCopy autorelease];
+}
+
+- (NSArray *)registrarRegistrationFailReasons
+{
+	NSArray *copy = [registrarRegistrationFailReasons copy];
+	return [copy autorelease];
+}
+
+- (void)retryEnableSIP
+{
+	if(callManagerStatus == XM_CALL_MANAGER_READY &&
+	   sipListeningStatus == XM_SIP_ERROR && 
+	   activePreferences != nil &&
+	   [activePreferences enableSIP] == YES)
+	{
+		sipListeningStatus = XM_SIP_NOT_LISTENING;
+		
+		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
+															object:self];
+		
+		[XMOpalDispatcher _retryEnableSIP:activePreferences];
+	}
+	else
+	{
+		NSString *exceptionReason;
+		
+		if(callManagerStatus != XM_CALL_MANAGER_READY)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
+		}
+		else if([self isSIPListening] == YES)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPListening;
+		}
+		else if(activePreferences == nil)
+		{
+			exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
+		}
+		else
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPDisabled;
+		}
+		
+		[NSException raise:XMException_InvalidAction format:exceptionReason];
+	}
+}
+
+- (void)retryRegistrarRegistrations
+{
+	if(callManagerStatus == XM_CALL_MANAGER_READY &&
+	   [self isRegisteredAtAllRegistrars] == NO && 
+	   activePreferences != nil &&
+	   [[activePreferences registrarHosts] count] != 0)
+	{
+		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
+															object:self];
+		[XMOpalDispatcher _retryRegistrarRegistrations:activePreferences];
+	}
+	else
+	{
+		NSString *exceptionReason;
+		
+		if(callManagerStatus != XM_CALL_MANAGER_READY)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
+		}
+		else if([self isRegisteredAtAllRegistrars] == YES)
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionIfAllRegistrarsRegistered;
+		}
+		else if(activePreferences == nil)
+		{
+			exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
+		}
+		else
+		{
+			exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPDisabled;
+		}
+		
+		[NSException raise:XMException_InvalidAction format:exceptionReason];
+	}
+}
+
 #pragma mark InCall Methods
 
 #pragma mark Private & Framework Methods
@@ -386,7 +564,19 @@
 	}
 	
 	automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
+	
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+	
+	[registrarRegistrationFailReasons removeAllObjects];
+	
+	unsigned count = [[preferences registrarHosts] count];
+	unsigned i;
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMRegistrarRegistrationFailReason_NoFailure];
+	for(i = 0; i < count; i++)
+	{
+		[registrarRegistrationFailReasons addObject:number];
+	}
+	[number release];
 	
 	NSString *externalAddress = nil;
 	if([preferences useAddressTranslation])
@@ -416,6 +606,11 @@
 		h323ListeningStatus = XM_H323_NOT_LISTENING;
 	}
 	
+	if(sipListeningStatus == XM_SIP_ERROR)
+	{
+		sipListeningStatus = XM_SIP_NOT_LISTENING;
+	}
+	
 	// preparations complete
 	[XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
 }
@@ -436,9 +631,19 @@
 	{
 		h323ListeningStatus = XM_H323_LISTENING;
 	}
-	if(enableH323 == NO)
+	else if(enableH323 == NO)
 	{
 		h323ListeningStatus = XM_H323_NOT_LISTENING;
+	}
+	
+	BOOL enableSIP = [activePreferences enableSIP];
+	if((enableSIP == YES) && (sipListeningStatus != XM_SIP_ERROR))
+	{
+		sipListeningStatus = XM_SIP_LISTENING;
+	}
+	else if(enableSIP == NO)
+	{
+		sipListeningStatus = XM_SIP_NOT_LISTENING;
 	}
 	
 	if(needsSubsystemSetupAfterCallEnd == YES)
@@ -511,9 +716,11 @@
 	callManagerStatus = XM_CALL_MANAGER_IN_CALL;
 	
 	//Play sound! (the current ring comes from iChat. It may be wise to use a royalty-free one)
+	// BOGUS: Move outside Framework!
 	[[NSSound soundNamed:@"Ringer.aiff"] play];
 	
 	//deminiaturize on call
+	// BOGUS: Move outside Framework
 	[[[NSApp windows] objectAtIndex:0] deminiaturize:self];
 	
 	if(automaticallyAcceptIncomingCalls == YES)
@@ -748,10 +955,9 @@
 		return;
 	}
 	else if(callProtocol == XMCallProtocol_H323 && 
-			[activePreferences useGatekeeper] == NO && 
-			[modifiedPreferences useGatekeeper] == YES &&
-			[addressResource valueForKey:XMKey_PreferencesGatekeeperAddress] == nil &&
-			[addressResource valueForKey:XMKey_PreferencesGatekeeperID] == nil)
+			[activePreferences usesGatekeeper] == NO && 
+			[modifiedPreferences usesGatekeeper] == YES &&
+			[addressResource valueForKey:XMKey_PreferencesGatekeeperAddress] == nil)
 	{
 		callStartFailReason = XMCallStartFailReason_GatekeeperUsedButNotSpecified;
 		

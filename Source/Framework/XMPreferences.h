@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.10 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.11 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,11 +59,14 @@
 	BOOL		 enableH323;				// Flag to indicate whether H.323 is active or not
 	BOOL		 enableH245Tunnel;			// Enable H.245 Tunneling
 	BOOL		 enableFastStart;			// Enable H.323 Fast-Start
-	BOOL		 useGatekeeper;				// Set whether to use a gatekeeper or not
 	NSString	*gatekeeperAddress;			// A string with the address of the gatekeeper to use (domain or ip)
-	NSString	*gatekeeperID;				// A string describing the ID of the gatekeeper
 	NSString	*gatekeeperUsername;		// A string containing the username for gatekeeper registration
 	NSString	*gatekeeperPhoneNumber;		// A string containing the E164 number for gatekeeper registration
+	
+	/* SIP-specific settings */
+	BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
+	NSArray		*registrarHosts;			// An array containing host address strings
+	NSArray		*registrarUsernames;		// An array containing username strings
 }
 
 #pragma mark Init & Representation Methods
@@ -171,28 +174,73 @@
 - (BOOL)enableFastStart;
 - (void)setEnableFastStart:(BOOL)flag;
 
-- (BOOL)useGatekeeper;
-- (void)setUseGatekeeper:(BOOL)flag;
-
+/**
+ * If -gatekeeperAddress and -gatekeeperUsername return
+ * non-nil values, a registration attempt is made.
+ * If either of these values is nil, the preferences instance
+ * is considered not to use a gatekeeper
+ **/
 - (NSString *)gatekeeperAddress;
 - (void)setGatekeeperAddress:(NSString *)host;
 
-- (NSString *)gatekeeperID;
-- (void)setGatekeeperID:(NSString *)string;
-
 - (NSString *)gatekeeperUsername;
-- (void)setGatekeeperUsername:(NSString *)string;
+- (void)setGatekeeperUsername:(NSString *)username;
 
 - (NSString *)gatekeeperPhoneNumber;
-- (void)setGatekeeperPhoneNumber:(NSString *)string;
+- (void)setGatekeeperPhoneNumber:(NSString *)phoneNumber;
+
+/**
+ * Convenience method to determine whether a gatekeeper is used or not
+ **/
+- (BOOL)usesGatekeeper;
 
 /**
  * Returns the gatekeeper password associated with this preferences 
- * instance. The default implementation simply returns nil all the time.
+ * instance. The default implementation returns nil.
  * It is up the application design to provide storage for the
- * password data
+ * password data.
+ * This method should return nil if no password is set.
+ * The storage must be consistend when a copy is made. It is not required
+ * and not recommended either that the password will be stored through
+ * a dictionary representation or encoding into an NSData object.
  **/
 - (NSString *)gatekeeperPassword;
+
+#pragma mark SIP-specific Methods
+
+- (BOOL)enableSIP;
+- (void)setEnableSIP:(BOOL)flag;
+
+/**
+ * Since the underlying framework provides the possibility to register at
+ * multiple SIP registrars simultaneously, this instance allows to specify
+ * multiple registrars.
+ * The host at index i corresponds with the username found at index i in the username array and the
+ * password at index i.
+ * The arrays set by -setRegistrarHosts, -setRegistrarUsername and returned by -registrarPasswords
+ * must have the same number of elements. Only complete host/username pairs will be registered.
+ **/
+- (NSArray *)registrarHosts;
+- (void)setRegistrarHosts:(NSArray *)hosts;
+
+- (NSArray *)registrarUsernames;
+- (void)setRegistrarUsernames:(NSArray *)usernames;
+
+/**
+ * Convenience method to determine whether registrars are used or not
+ **/
+- (BOOL)usesRegistrars;
+
+/**
+ * Returns the registrar passwords associated with this preferences instance.
+ * The array returned must have the same number of elements as the arrays returned by
+ * -registrarHosts and -registrarUsernames
+ * The default implementation simply returns an array with the same size as the -registrarHosts array,
+ * filled with NSNull instances. It is up to the application design to provide storage for the password data.
+ * This storage must be consistent when -copy is called. It is not required, and not recommended either,
+ * to store the password data inside a dictionary or encode it into an NSData instance.
+ **/
+- (NSArray *)registrarPasswords;
 
 @end
 

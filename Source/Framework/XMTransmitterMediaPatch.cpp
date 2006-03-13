@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.12 2006/02/27 13:09:15 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.13 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,12 @@ void XMTransmitterMediaPatch::Resume()
 {
 	if(PIsDescendant(&source, XMMediaStream))
 	{
+		// If Resume has already been called, don't start the process again
+		if(doesRunOwnThread == FALSE)
+		{
+			return;
+		}
+
 		// we don't spawn a new thread but instead
 		// tell the MediaTransmitter to start transmitting
 		// the desired media
@@ -73,9 +79,9 @@ void XMTransmitterMediaPatch::Resume()
 			
 			unsigned frameTime = mediaFormat.GetFrameTime();
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
-			unsigned bitrate = mediaFormat.GetBandwidth();
+			unsigned bitrate = mediaFormat.GetBandwidth()*100;
 			unsigned flags = 0;
-			
+						
 			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
 
@@ -254,28 +260,19 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 		
 	RTP_DataFrame *frame = videoTransmitterPatch->dataFrame;
 	
-	if(frame->GetPayloadSize() == 0)
-	{
-		cout << "Dropping Frame To SEND" << endl;
-		frame->SetSequenceNumber(frame->GetSequenceNumber() + 1);
-	}
-	else
-	{
+	frame->SetMarker(setMarker);
 	
-		frame->SetMarker(setMarker);
-	
-		videoTransmitterPatch->inUse.Wait();
+	videoTransmitterPatch->inUse.Wait();
 		
-		videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
+	videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
 	
-		PINDEX i;
-		for(i = 0; i < videoTransmitterPatch->sinks.GetSize(); i++)
+	PINDEX i;
+	for(i = 0; i < videoTransmitterPatch->sinks.GetSize(); i++)
+	{
+		BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
+		if(result == FALSE)
 		{
-			BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
-			if(result == FALSE)
-			{
-				cout << "ERROR Writing frame to sink!" << endl;
-			}
+			cout << "ERROR Writing frame to sink!" << endl;
 		}
 	}
 	

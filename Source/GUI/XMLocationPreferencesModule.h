@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.8 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.9 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,11 +10,12 @@
 #define __XM_LOCATION_PREFERENCES_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
+
 #import "XMPreferencesModule.h"
 
 extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
-@class XMPreferencesWindowController, XMLocation;
+@class XMPreferencesWindowController, XMAccountPreferencesModule, XMLocation;
 
 @interface XMLocationPreferencesModule : NSObject <XMPreferencesModule> {
 	
@@ -24,16 +25,17 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSView *contentView;
 	float contentViewHeight;
 	
+	/* connection to the account modules */
+	IBOutlet XMAccountPreferencesModule *accountModule;
+	
 	/* outlets for the locations GUI */
 	
 	//main outlets
 	IBOutlet NSTableView *locationsTableView;
 	IBOutlet NSButton *newLocationButton;
-	IBOutlet NSButton *importLocationsButton;
-	IBOutlet NSButton *duplicateLocationButton;
 	IBOutlet NSButton *deleteLocationButton;
-	IBOutlet NSButton *renameLocationButton;
-	
+	IBOutlet NSPopUpButton *actionPopup;
+	IBOutlet NSButton *actionButton;
 	IBOutlet NSTabView *sectionsTab;
 	
 	// general outlets
@@ -53,15 +55,16 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSButton *enableH323Switch;
 	IBOutlet NSButton *enableH245TunnelSwitch;
 	IBOutlet NSButton *enableFastStartSwitch;
-	IBOutlet NSButton *useGatekeeperSwitch;
+	IBOutlet NSPopUpButton *h323AccountsPopUp;
 	IBOutlet NSTextField *gatekeeperHostField;
-	IBOutlet NSTextField *gatekeeperIDField;
 	IBOutlet NSTextField *gatekeeperUserAliasField;
 	IBOutlet NSTextField *gatekeeperPhoneNumberField;
-	IBOutlet NSTextField *gatekeeperPasswordField;
 	
 	// SIP outlets
-	// have yet to come
+	IBOutlet NSButton *enableSIPSwitch;
+	IBOutlet NSPopUpButton *sipAccountsPopUp;
+	IBOutlet NSTextField *registrarHostField;
+	IBOutlet NSTextField *registrarUsernameField;
 	
 	// Audio outlets
 	IBOutlet NSSlider *audioBufferSizeSlider;
@@ -82,10 +85,6 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *newLocationNameField;
 	IBOutlet NSButton *newLocationOKButton;
 	IBOutlet NSButton *newLocationCancelButton;
-	
-	//other outlets
-	IBOutlet NSPopUpButton *actionPopup;
-	IBOutlet NSButton *actionButton;
 }
 
 // action methos for dealing with locations
@@ -94,6 +93,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 - (IBAction)duplicateLocation:(id)sender;
 - (IBAction)deleteLocation:(id)sender;
 - (IBAction)renameLocation:(id)sender;
+- (IBAction)actionButton:(id)sender;
 
 // default action method.
 - (IBAction)defaultAction:(id)sender;
@@ -105,10 +105,11 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
 // H.323 action methods
 - (IBAction)toggleEnableH323:(id)sender;
-- (IBAction)toggleUseGatekeeper:(id)sender;
+- (IBAction)gatekeeperAccountSelected:(id)sender;
 
 // SIP action methods
-// none at present
+- (IBAction)toggleEnableSIP:(id)sender;
+- (IBAction)sipAccountSelected:(id)sender;
 
 // Audio action methods
 - (IBAction)moveAudioCodec:(id)sender;
@@ -120,8 +121,8 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 // Action methods for the newLocation Sheet
 - (IBAction)endNewLocationSheet:(id)sender;
 
-//Other
-- (IBAction)actionButton:(id)sender;
+// Infom when the accounts change
+- (void)noteAccountsDidChange;
 
 @end
 

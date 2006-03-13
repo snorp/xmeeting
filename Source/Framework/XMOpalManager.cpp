@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.20 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.21 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,7 +16,7 @@
 #include "XMReceiverMediaPatch.h"
 #include "XMProcess.h"
 
-#include <codec/h261codec.h>
+#include <ptlib.h>
 
 using namespace std;
 
@@ -63,7 +63,7 @@ void XMOpalManager::Initialise()
 	sipEndPoint = new XMSIPEndPoint(*this);
 	AddRouteEntry("xm:.*   = h323:<da>");
 	AddRouteEntry("h323:.* = xm:<da>");
-	AddRouteEntry("xm:.*   = h323:<da>");
+	AddRouteEntry("xm:.*   = sip:<da>");
 	AddRouteEntry("sip:.*  = xm:<da>");
 	
 	SetAutoStartTransmitVideo(TRUE);
@@ -104,14 +104,15 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 									   const PString & theRemoteName,
 									   const PString & theRemoteNumber,
 									   const PString & theRemoteAddress,
-									   const PString & theRemoteApplication)
+									   const PString & theRemoteApplication,
+									   XMCallProtocol theCallProtocol)
 {
 	BOOL isValid = FALSE;
 	
 	if(connectionToken == "")
 	{
-		cout << "setting connection token" << endl;
 		connectionToken = theConnectionToken;
+		callProtocol = theCallProtocol;
 		isValid = TRUE;
 	}
 	else if(connectionToken == theConnectionToken)
@@ -133,7 +134,25 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 		{
 			cout << "resetting connection token";
 			connectionToken = "";
+			callProtocol = XMCallProtocol_UnknownProtocol;
 		}
+	}
+}
+
+#pragma mark Getting Call Statistics
+
+void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
+{
+	switch(callProtocol)
+	{
+		case XMCallProtocol_H323:
+			h323EndPoint->GetCallStatistics(callStatistics);
+			return;
+		case XMCallProtocol_SIP:
+			sipEndPoint->GetCallStatistics(callStatistics);
+			return;
+		default:
+			return;
 	}
 }
 
@@ -141,6 +160,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {	
+	cout << "OnEstablishedCall" << endl;
 	BOOL isIncomingCall = TRUE;
 	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
 	if(PIsDescendant(&endPoint, XMEndPoint))
@@ -154,10 +174,17 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {
+	cout << "OnClearedCall " << *(PThread::Current()) << endl;
 	XMSoundChannel::StopChannels();
 	unsigned callID = call.GetToken().AsUnsigned();
 	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
+}
+
+void XMOpalManager::OnReleased(OpalConnection & connection)
+{
+	cout << "OnReleased: " << connection << endl;
+	OpalManager::OnReleased(connection);
 }
 
 BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.14 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.15 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,13 +70,11 @@ BOOL XMH323EndPoint::IsListening()
 }
 
 XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString & address,
-																 const PString & identifier,
 																 const PString & username,
 																 const PString & phoneNumber,
 																 const PString & password)
 {
-	
-	// By setting the user name , we clear all previously used aliases
+	// By setting the user name, we clear all previously used aliases
 	SetLocalUserName(GetManager().GetDefaultUserName());
 	
 	if(username != NULL)
@@ -88,7 +86,7 @@ XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString &
 		AddAliasName(phoneNumber);
 	}
 	
-	if(identifier != NULL || address != NULL)
+	if(address != NULL)
 	{
 		// If we are registered at a gatekeeper, we determine first whether we
 		// have to unregister from the existing gatekeeper or not.
@@ -98,23 +96,16 @@ XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString &
 		{
 			BOOL needsGatekeeperRegistrationChange = FALSE;
 		
-			if(address != NULL &&
-			   gatekeeper->GetTransport().GetRemoteAddress().IsEquivalent(address) == FALSE)
+			// check for different address
+			if(gatekeeper->GetTransport().GetRemoteAddress().IsEquivalent(address) == FALSE)
 			{
 				needsGatekeeperRegistrationChange = TRUE;
 			}
 			
-			if(needsGatekeeperRegistrationChange == FALSE &&
-			   identifier != NULL && 
-			   gatekeeper->GetIdentifier() != identifier)
+			// changes in username/phonenumber will be handled in the next info request response
+			// If the password changed, however, we have to rerun the registration process
+			if(needsGatekeeperRegistrationChange == FALSE && (password != NULL))
 			{
-				needsGatekeeperRegistrationChange = TRUE;
-			}
-			
-			if(needsGatekeeperRegistrationChange == FALSE &&
-			   password != NULL)
-			{
-				// we check for a change in username/password change
 				if(gatekeeperUsername != username ||
 				   gatekeeperPassword != password)
 				{
@@ -146,14 +137,14 @@ XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString &
 		didRegisterAtGatekeeper = FALSE;
 		gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 		
-		BOOL result = UseGatekeeper(address, identifier);
+		BOOL result = UseGatekeeper(address);
 		
 		if(result == TRUE && didRegisterAtGatekeeper == TRUE)
 		{
 			PString gatekeeperName = GetGatekeeper()->GetName();
 			_XMHandleGatekeeperRegistration(gatekeeperName);
 		}
-		else if (result == FALSE)
+		else if(result == FALSE)
 		{
 			if(gatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_NoFailure)
 			{
@@ -265,7 +256,8 @@ void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 								connection.GetRemotePartyName(),
 								connection.GetRemotePartyNumber(),
 								connection.GetRemotePartyAddress(),
-								connection.GetRemoteApplication());
+								connection.GetRemoteApplication(),
+								XMCallProtocol_H323);
 	
 	H323EndPoint::OnEstablished(connection);
 }
@@ -279,7 +271,8 @@ void XMH323EndPoint::OnReleased(OpalConnection & connection)
 								empty,
 								empty,
 								empty,
-								empty);
+								empty,
+								XMCallProtocol_H323);
 	
 	connectionToken = "";
 	

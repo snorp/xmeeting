@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.16 2006/02/27 19:20:47 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.17 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,9 @@
 #import "XMeeting.h"
 #import "XMPreferencesWindowController.h"
 #import "XMPreferencesManager.h"
+#import "XMAccountPreferencesModule.h"
+#import "XMH323Account.h"
+#import "XMSIPAccount.h"
 #import "XMLocation.h"
 #import "XMSetupAssistantManager.h"
 #import "XMBooleanCell.h"
@@ -39,15 +42,17 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 - (void)_validateAddressTranslationUserInterface;
 - (void)_validateExternalAddressUserInterface;
 - (void)_validateH323UserInterface;
-- (void)_validateGatekeeperUserInterface;
+- (void)_validateSIPUserInterface;
 - (void)_validateAudioOrderUserInterface;
 - (void)_validateVideoUserInterface;
 - (void)_validateVideoOrderUserInterface;
 
-// table view source methods
+// table view data source & delegate methods
 - (int)numberOfRowsInTableView:(NSTableView *)tableView;
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)column row:(int)rowIndex;
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
+- (void)tableViewSelectionDidChange:(NSNotification *)notif;
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)tableColumn row:(int)rowIndex;
 
 // modal delegate methods
 - (void)_newLocationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode context:(void *)context;
@@ -61,6 +66,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 @end
 
 @implementation XMLocationPreferencesModule
+
+#pragma mark -
+#pragma mark Init & Deallocation Methods
 
 - (id)init
 {
@@ -143,11 +151,12 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[super dealloc];
 }
 
-#pragma mark XMPreferencesModule protocol methdos
+#pragma mark -
+#pragma mark XMPreferencesModule methdos
 
 - (unsigned)position
 {
-	return 1;
+	return 2;
 }
 
 - (NSString *)identifier
@@ -184,15 +193,15 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {	
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
-	// clearing any cached passwords
-	[preferencesManager clearTemporaryPasswords];
-	
 	// replacing the locations with a fresh set
 	[locations removeAllObjects];
 	[locations addObjectsFromArray:[preferencesManager locations]];
 	
 	// making sure that there is no wrong data saved
 	currentLocation = nil;
+	
+	// preparing the h323 and SIP account pop up buttons
+	[self noteAccountsDidChange];
 	
 	// causing the table view to reload its data and select the first item
 	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
@@ -226,22 +235,11 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	// pass the changed locations to the preferences manager
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	[preferencesManager saveTemporaryPasswords];
 	[preferencesManager setLocations:locations];
 }
 
-#pragma mark User Interface Methods
-
-- (IBAction)actionButton:(id)sender{
-    [[actionPopup cell] performClickWithFrame:[sender frame] inView:[sender superview]];    
-	[actionPopup selectItem: nil];
-}
-
-
-- (IBAction)defaultAction:(id)sender
-{
-	[prefWindowController notePreferencesDidChange];
-}
+#pragma mark -
+#pragma mark Action Methods
 
 - (IBAction)createNewLocation:(id)sender
 {
@@ -307,6 +305,17 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[locationsTableView editColumn:0 row:index withEvent:nil select:YES];
 }
 
+- (IBAction)actionButton:(id)sender
+{
+    [[actionPopup cell] performClickWithFrame:[sender frame] inView:[sender superview]];    
+	[actionPopup selectItem: nil];
+}
+
+- (IBAction)defaultAction:(id)sender
+{
+	[prefWindowController notePreferencesDidChange];
+}
+
 - (IBAction)toggleUseAddressTranslation:(id)sender
 {
 	[self _validateAddressTranslationUserInterface];
@@ -336,9 +345,57 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[self defaultAction:self];
 }
 
-- (IBAction)toggleUseGatekeeper:(id)sender
+- (IBAction)gatekeeperAccountSelected:(id)sender
 {
-	[self _validateGatekeeperUserInterface];
+	unsigned index = [h323AccountsPopUp indexOfSelectedItem];
+	
+	NSLog(@"index: %d", index);
+	
+	if(index == 0)
+	{
+		[gatekeeperHostField setStringValue:@""];
+		[gatekeeperUserAliasField setStringValue:@""];
+		[gatekeeperPhoneNumberField setStringValue:@""];
+	}
+	else
+	{
+		index -= 2;
+		
+		XMH323Account *h323Account = [accountModule h323AccountAtIndex:index];
+		
+		[gatekeeperHostField setStringValue:[h323Account gatekeeper]];
+		[gatekeeperUserAliasField setStringValue:[h323Account username]];
+		[gatekeeperPhoneNumberField setStringValue:[h323Account phoneNumber]];
+	}
+	
+	[self defaultAction:self];
+}
+
+- (IBAction)toggleEnableSIP:(id)sender
+{
+	[self _validateSIPUserInterface];
+	[self defaultAction:self];
+}
+
+- (IBAction)sipAccountSelected:(id)sender
+{
+	unsigned index = [sipAccountsPopUp indexOfSelectedItem];
+	
+	if(index == 0)
+	{
+		[registrarHostField setStringValue:@""];
+		[registrarUsernameField setStringValue:@""];
+	}
+	else
+	{
+		index -= 2;
+		
+		XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:index];
+		
+		[registrarHostField setStringValue:[sipAccount registrar]];
+		[registrarUsernameField setStringValue:[sipAccount username]];
+	}
+	
 	[self defaultAction:self];
 }
 
@@ -407,11 +464,503 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[newLocationSheet orderOut:self];
 }
 
+#pragma mark -
+#pragma mark Account Module Methods
+
+- (void)noteAccountsDidChange
+{
+	NSLog(@"NOTE ACCOUNTS DID CHANGE");
+	unsigned h323AccountToSelect = 0;
+	unsigned h323AccountTag = 0;
+	unsigned sipAccountToSelect = 0;
+	unsigned sipAccountTag = 0;
+	
+	if(currentLocation != nil)
+	{
+		h323AccountTag = [currentLocation h323AccountTag];
+		sipAccountTag = [currentLocation sipAccountTag];
+	}
+	
+	/* updating the H323 accounts Pop Up */
+	[h323AccountsPopUp removeAllItems];
+	NSMenu *menu = [h323AccountsPopUp menu];
+	
+	NSMenuItem *noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", @"None")
+													  action:NULL
+											   keyEquivalent:@""];
+	[noneItem setTag:0];
+	[menu addItem:noneItem];
+	[noneItem release];
+	
+	unsigned count = [accountModule h323AccountCount];
+	unsigned i;
+	
+	if(count != 0)
+	{
+		[menu addItem:[NSMenuItem separatorItem]];
+	}
+	
+	for(i = 0; i < count; i++)
+	{
+		XMH323Account *h323Account = [accountModule h323AccountAtIndex:i];
+		
+		NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[h323Account name]
+														  action:NULL keyEquivalent:@""];
+		unsigned tag = [h323Account tag];
+		
+		[menuItem setTag:tag];
+		if(tag == h323AccountTag)
+		{
+			h323AccountToSelect = (i+2);
+		}
+		
+		[menu addItem:menuItem];
+		
+		[menuItem release];
+	}
+	
+	/* updating the SIP accounts Pop Up */
+	[sipAccountsPopUp removeAllItems];
+	menu = [sipAccountsPopUp menu];
+	
+	noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", @"None")
+										  action:NULL
+								   keyEquivalent:@""];
+	[noneItem setTag:0];
+	[menu addItem:noneItem];
+	[noneItem release];
+	
+	count = [accountModule sipAccountCount];
+	
+	if(count != 0)
+	{
+		[menu addItem:[NSMenuItem separatorItem]];
+	}
+	
+	for(i = 0; i < count; i++)
+	{
+		XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:i];
+		
+		NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[sipAccount name]
+														  action:NULL keyEquivalent:@""];
+		unsigned tag = [sipAccount tag];
+		[menuItem setTag:tag];
+		
+		if(sipAccountTag == tag)
+		{
+			sipAccountToSelect = (i+2);
+		}
+		
+		[menu addItem:menuItem];
+		
+		[menuItem release];
+	}
+	
+	[h323AccountsPopUp selectItemAtIndex:h323AccountToSelect];
+	[sipAccountsPopUp selectItemAtIndex:sipAccountToSelect];
+	
+	[self gatekeeperAccountSelected:self];
+	[self sipAccountSelected:self];
+}
+
+#pragma mark -
 #pragma mark delegate methods
 
 - (void)controlTextDidChange:(NSNotification *)notif
 {
 	// we simply want the same effect as the default action.
+	[self defaultAction:self];
+}
+
+#pragma mark -
+#pragma mark Adding a New Location
+
+- (void)_addLocation:(XMLocation *)location
+{	
+	// the current count is the later index for the new location
+	unsigned index = [locations count];
+	
+	// adding the location
+	[locations addObject:location];
+	
+	// validate the GUI
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
+	[locationsTableView reloadData];
+	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+	[sectionsTab selectFirstTabViewItem:self];
+	[self _validateLocationButtonUserInterface];
+	
+	[self defaultAction:self];
+}
+
+#pragma mark -
+#pragma mark Location Load & Save Methods
+
+- (void)_loadCurrentLocation
+{
+	int state;
+	NSString *string;
+	
+	// load the Network section
+	unsigned bandwidth = [currentLocation bandwidthLimit];
+	unsigned index = [bandwidthLimitPopUp indexOfItemWithTag:bandwidth];
+	[bandwidthLimitPopUp selectItemAtIndex:index];
+	
+	state = ([currentLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
+	[useIPAddressTranslationSwitch setState:state];
+	
+	string = [currentLocation externalAddress];
+	if(string == nil)	// this means that the external address is automatically picked
+	{
+		state = NSOnState;
+		string = @"";
+	}
+	else
+	{
+		state = NSOffState;
+	}
+	[externalAddressField setStringValue:string];
+	[autoGetExternalAddressSwitch setState:state];
+	
+	[minTCPPortField setIntValue:[currentLocation tcpPortBase]];
+	[maxTCPPortField setIntValue:[currentLocation tcpPortMax]];
+	[minUDPPortField setIntValue:[currentLocation udpPortBase]];
+	[maxUDPPortField setIntValue:[currentLocation udpPortMax]];
+	
+	// load the H.323 section
+	state = ([currentLocation enableH323] == YES) ? NSOnState : NSOffState;
+	[enableH323Switch setState:state];
+	
+	state = ([currentLocation enableH245Tunnel] == YES) ? NSOnState : NSOffState;
+	[enableH245TunnelSwitch setState:state];
+	
+	state = ([currentLocation enableFastStart] == YES) ? NSOnState : NSOffState;
+	[enableFastStartSwitch setState:state];
+	
+	unsigned gatekeeperAccountTag = [currentLocation h323AccountTag];
+	BOOL result = [h323AccountsPopUp selectItemWithTag:gatekeeperAccountTag];
+	if(result == NO)
+	{
+		[h323AccountsPopUp selectItemAtIndex:0];
+	}
+	// causing the account information to be displayed.
+	[self gatekeeperAccountSelected:self];
+	
+	// loading the SIP section
+	state = ([currentLocation enableSIP] == YES) ? NSOnState : NSOffState;
+	[enableSIPSwitch setState:state];
+	
+	unsigned sipAccountTag = [currentLocation sipAccountTag];
+	result = [sipAccountsPopUp selectItemWithTag:sipAccountTag];
+	if(result == NO)
+	{
+		[sipAccountsPopUp selectItemAtIndex:0];
+	}
+	// causing the account information to be displayed
+	[self sipAccountSelected:self];
+	
+	// loading the Audio section
+	[audioBufferSizeSlider setIntValue:[currentLocation audioBufferSize]];
+	[audioCodecPreferenceOrderTableView reloadData];
+	
+	// loading the Video section
+	state = ([currentLocation enableVideo] == YES) ? NSOnState : NSOffState;
+	[enableVideoSwitch setState:state];
+	
+	[videoFrameRateField setIntValue:[currentLocation videoFramesPerSecond]];
+	
+	[videoCodecPreferenceOrderTableView reloadData];
+	
+	state = ([currentLocation enableH264LimitedMode] == YES) ? NSOnState : NSOffState;
+	[enableH264LimitedModeSwitch setState:state];
+	
+	// finally, it's time to validate some GUI-Elements
+	[self _validateAddressTranslationUserInterface];
+	[self _validateExternalAddressUserInterface];
+	[self _validateH323UserInterface];
+	[self _validateSIPUserInterface];
+	[self _validateAudioOrderUserInterface];
+	[self _validateVideoUserInterface];
+}
+
+- (void)_saveCurrentLocation
+{
+	BOOL flag;
+	NSString *string;
+	
+	// saving the network section
+	[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
+	
+	flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setUseAddressTranslation:flag];
+	
+	string = [externalAddressField stringValue];
+	if([string isEqualToString:@""] || [autoGetExternalAddressSwitch state] == NSOnState)
+	{
+		string = nil;
+	}
+	[currentLocation setExternalAddress:string];
+	
+	[currentLocation setTCPPortBase:[minTCPPortField intValue]];
+	[currentLocation setTCPPortMax:[maxTCPPortField intValue]];
+	[currentLocation setUDPPortBase:[minUDPPortField intValue]];
+	[currentLocation setUDPPortMax:[maxUDPPortField intValue]];
+	
+	// saving the H.323 section
+	flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableH323:flag];
+	
+	flag = ([enableH245TunnelSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableH245Tunnel:flag];
+	
+	flag = ([enableFastStartSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableFastStart:flag];
+	
+	unsigned gatekeeperTag = [[h323AccountsPopUp selectedItem] tag];
+	[currentLocation setH323AccountTag:gatekeeperTag];
+	
+	// saving the SIP section
+	flag = ([enableSIPSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableSIP:flag];
+	
+	unsigned sipAccountTag = [[sipAccountsPopUp selectedItem] tag];
+	[currentLocation setSIPAccountTag:sipAccountTag];
+	
+	// saving the audio section
+	[currentLocation setAudioBufferSize:[audioBufferSizeSlider intValue]];
+	
+	// saving the video section
+	flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableVideo:flag];
+	
+	[currentLocation setVideoFramesPerSecond:[videoFrameRateField intValue]];
+	
+	flag = ([enableH264LimitedModeSwitch state] == NSOnState) ? YES : NO;
+	[currentLocation setEnableH264LimitedMode:flag];
+}
+
+#pragma mark -
+#pragma mark User Interface validation Methods
+
+- (void)_validateLocationButtonUserInterface
+{
+	BOOL flag = ([locations count] == 1) ? NO : YES;
+	[deleteLocationButton setEnabled:flag];
+}
+
+- (void)_validateAddressTranslationUserInterface
+{
+	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	
+	[autoGetExternalAddressSwitch setEnabled:flag];
+	[getExternalAddressButton setEnabled:flag];
+	
+	if(flag)
+	{
+		[self _validateExternalAddressUserInterface];
+	}
+	else
+	{
+		[externalAddressField setEnabled:NO];
+	}
+}
+
+- (void)_validateExternalAddressUserInterface
+{
+	BOOL flag = ([autoGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
+	[externalAddressField setEnabled:flag];
+	
+	NSColor *textColor;
+		
+	if(flag == NO)
+	{
+		XMUtils *utils = [XMUtils sharedInstance];
+		NSString *externalAddress = [utils externalAddress];
+		NSString *displayString;
+		
+		if(externalAddress == nil)
+		{
+			if(isFetchingExternalAddress)
+			{
+				displayString = NSLocalizedString(@"Fetching...", @"");
+			}
+			else
+			{
+				displayString = NSLocalizedString(@"<Not available>", @"");
+			}
+			textColor = [NSColor controlTextColor];
+			externalAddressIsValid = NO;
+		}
+		else
+		{
+			displayString = externalAddress;
+			textColor = [NSColor controlTextColor];
+			externalAddressIsValid = YES;
+		}
+		
+		[externalAddressField setStringValue:displayString];
+	}
+	else
+	{
+		if(!externalAddressIsValid)
+		{
+			[externalAddressField setStringValue:@""];
+		}
+		textColor = [NSColor controlTextColor];
+	}
+	
+	[externalAddressField setTextColor:textColor];		
+}
+
+- (void)_validateH323UserInterface
+{
+	BOOL flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
+	
+	[enableH245TunnelSwitch setEnabled:flag];
+	[enableFastStartSwitch setEnabled:flag];
+	[h323AccountsPopUp setEnabled:flag];
+}
+
+- (void)_validateSIPUserInterface
+{
+	BOOL flag = ([enableSIPSwitch state] == NSOnState) ? YES : NO;
+	
+	[sipAccountsPopUp setEnabled:flag];
+}
+
+- (void)_validateAudioOrderUserInterface
+{
+	unsigned count = [currentLocation audioCodecListCount];
+	int selectedRow = [audioCodecPreferenceOrderTableView selectedRow];
+	BOOL enableUp = YES;
+	BOOL enableDown = YES;
+	
+	if(selectedRow == 0)
+	{
+		enableUp = NO;
+	}
+	if(selectedRow == (count -1))
+	{
+		enableDown = NO;
+	}
+	[moveAudioCodecUpButton setEnabled:enableUp];
+	[moveAudioCodecDownButton setEnabled:enableDown];
+}
+
+- (void)_validateVideoUserInterface
+{
+	BOOL flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
+	
+	[videoFrameRateField setEnabled:flag];
+	[videoCodecPreferenceOrderTableView setHidden:!flag];
+	[enableH264LimitedModeSwitch setEnabled:flag];
+	[self _validateVideoOrderUserInterface];
+}
+
+- (void)_validateVideoOrderUserInterface
+{
+	BOOL enableFlag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
+	
+	BOOL enableUp = enableFlag;
+	BOOL enableDown = enableFlag;
+	
+	if(enableFlag == YES)
+	{
+		unsigned count = [currentLocation videoCodecListCount];
+		int selectedRow = [videoCodecPreferenceOrderTableView selectedRow];
+	
+		if(selectedRow == 0)
+		{
+			enableUp = NO;
+		}
+		if(selectedRow == (count -1))
+		{
+			enableDown = NO;
+		}
+	}
+	
+	[moveVideoCodecUpButton setEnabled:enableUp];
+	[moveVideoCodecDownButton setEnabled:enableDown];
+}
+
+#pragma mark -
+#pragma mark TableView dataSource & delegate methods
+
+- (int)numberOfRowsInTableView:(NSTableView *)tableView
+{
+	if(tableView == locationsTableView)
+	{
+		return [locations count];
+	}
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		return [currentLocation audioCodecListCount];
+	}
+	if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		return [currentLocation videoCodecListCount];
+	}
+	
+	return 0;
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)column row:(int)rowIndex
+{
+	if(tableView == locationsTableView)
+	{
+		return [(XMLocation *)[locations objectAtIndex:rowIndex] name];
+	}
+	
+	if(tableView != audioCodecPreferenceOrderTableView &&
+	   tableView != videoCodecPreferenceOrderTableView)
+	{
+		return nil;
+	}
+	
+	NSString *columnIdentifier = [column identifier];
+	XMPreferencesCodecListRecord *record;
+	
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		record = [currentLocation audioCodecListRecordAtIndex:rowIndex];
+	}
+	else if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		record = [currentLocation videoCodecListRecordAtIndex:rowIndex];
+	}
+	
+	if([columnIdentifier isEqualToString:XMKey_EnabledIdentifier])
+	{
+		return [NSNumber numberWithBool:[record isEnabled]];
+	}
+	
+	XMCodecIdentifier identifier = identifier = [record identifier];
+	XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:identifier];
+	return [codec propertyForKey:columnIdentifier];
+}
+
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if(tableView == locationsTableView)
+	{
+		if([anObject isKindOfClass:[NSString class]])
+		{
+			[(XMLocation *)[locations objectAtIndex:rowIndex] setName:(NSString *)anObject];
+		}
+	}
+	
+	if(tableView == audioCodecPreferenceOrderTableView)
+	{
+		[[currentLocation audioCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
+		[audioCodecPreferenceOrderTableView reloadData];
+	}
+	
+	if(tableView == videoCodecPreferenceOrderTableView)
+	{
+		[[currentLocation videoCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
+		[videoCodecPreferenceOrderTableView reloadData];
+	}
+	
 	[self defaultAction:self];
 }
 
@@ -492,459 +1041,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	}
 }
 
-
-#pragma mark Adding a New Location
-
-- (void)_addLocation:(XMLocation *)location
-{	
-	// the current count is the later index for the new location
-	unsigned index = [locations count];
-	
-	// adding the location
-	[locations addObject:location];
-	
-	// validate the GUI
-	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
-	[locationsTableView reloadData];
-	[locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
-	[sectionsTab selectFirstTabViewItem:self];
-	[self _validateLocationButtonUserInterface];
-	
-	[self defaultAction:self];
-}
-
-#pragma mark Load & Save a Location
-
-- (void)_loadCurrentLocation
-{
-	int state;
-	NSString *string;
-	
-	// load the Network section
-	unsigned bandwidth = [currentLocation bandwidthLimit];
-	unsigned index = [bandwidthLimitPopUp indexOfItemWithTag:bandwidth];
-	[bandwidthLimitPopUp selectItemAtIndex:index];
-	
-	state = ([currentLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
-	[useIPAddressTranslationSwitch setState:state];
-	
-	string = [currentLocation externalAddress];
-	if(string == nil)	// this means that the external address is automatically picked
-	{
-		state = NSOnState;
-		string = @"";
-	}
-	else
-	{
-		state = NSOffState;
-	}
-	[externalAddressField setStringValue:string];
-	[autoGetExternalAddressSwitch setState:state];
-	
-	[minTCPPortField setIntValue:[currentLocation tcpPortBase]];
-	[maxTCPPortField setIntValue:[currentLocation tcpPortMax]];
-	[minUDPPortField setIntValue:[currentLocation udpPortBase]];
-	[maxUDPPortField setIntValue:[currentLocation udpPortMax]];
-	
-	// load the H.323 section
-	state = ([currentLocation enableH323] == YES) ? NSOnState : NSOffState;
-	[enableH323Switch setState:state];
-	
-	state = ([currentLocation enableH245Tunnel] == YES) ? NSOnState : NSOffState;
-	[enableH245TunnelSwitch setState:state];
-	
-	state = ([currentLocation enableFastStart] == YES) ? NSOnState : NSOffState;
-	[enableFastStartSwitch setState:state];
-	
-	state = ([currentLocation useGatekeeper] == YES) ? NSOnState : NSOffState;
-	[useGatekeeperSwitch setState:state];
-	
-	string = [currentLocation gatekeeperAddress];
-	if(!string)
-	{
-		string = @"";
-	}
-	[gatekeeperHostField setStringValue:string];
-	
-	string = [currentLocation gatekeeperID];
-	if(!string)
-	{
-		string = @"";
-	}
-	[gatekeeperIDField setStringValue:string];
-	
-	string = [currentLocation gatekeeperUsername];
-	if(!string)
-	{
-		string = @"";
-	}
-	[gatekeeperUserAliasField setStringValue:string];
-	
-	string = [currentLocation gatekeeperPhoneNumber];
-	if(!string)
-	{
-		string = @"";
-	}
-	[gatekeeperPhoneNumberField setStringValue:string];
-	
-	string = [currentLocation temporaryGatekeeperPassword];
-	if(!string)
-	{
-		string = @"";
-	}
-	[gatekeeperPasswordField setStringValue:string];
-	
-	// loading the SIP section
-	
-	// loading the Audio section
-	[audioBufferSizeSlider setIntValue:[currentLocation audioBufferSize]];
-	[audioCodecPreferenceOrderTableView reloadData];
-	
-	// loading the Video section
-	state = ([currentLocation enableVideo] == YES) ? NSOnState : NSOffState;
-	[enableVideoSwitch setState:state];
-	
-	[videoFrameRateField setIntValue:[currentLocation videoFramesPerSecond]];
-	
-	[videoCodecPreferenceOrderTableView reloadData];
-	
-	state = ([currentLocation enableH264LimitedMode] == YES) ? NSOnState : NSOffState;
-	[enableH264LimitedModeSwitch setState:state];
-	
-	// finally, it's time to validate some GUI-Elements
-	[self _validateAddressTranslationUserInterface];
-	[self _validateExternalAddressUserInterface];
-	[self _validateH323UserInterface];
-	[self _validateAudioOrderUserInterface];
-	[self _validateVideoUserInterface];
-}
-
-- (void)_saveCurrentLocation
-{
-	BOOL flag;
-	NSString *string;
-	
-	// saving the network section
-	[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
-	
-	flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setUseAddressTranslation:flag];
-	
-	string = [externalAddressField stringValue];
-	if([string isEqualToString:@""] || [autoGetExternalAddressSwitch state] == NSOnState)
-	{
-		string = nil;
-	}
-	[currentLocation setExternalAddress:string];
-	
-	[currentLocation setTCPPortBase:[minTCPPortField intValue]];
-	[currentLocation setTCPPortMax:[maxTCPPortField intValue]];
-	[currentLocation setUDPPortBase:[minUDPPortField intValue]];
-	[currentLocation setUDPPortMax:[maxUDPPortField intValue]];
-	
-	// saving the H.323 section
-	flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableH323:flag];
-	
-	flag = ([enableH245TunnelSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableH245Tunnel:flag];
-	
-	flag = ([enableFastStartSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableFastStart:flag];
-	
-	flag = ([useGatekeeperSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setUseGatekeeper:flag];
-	
-	string = [gatekeeperHostField stringValue];
-	if([string isEqualToString:@""])
-	{
-		string = nil;
-	}
-	[currentLocation setGatekeeperAddress:string];
-	
-	string = [gatekeeperIDField stringValue];
-	if([string isEqualToString:@""])
-	{
-		string = nil;
-	}
-	[currentLocation setGatekeeperID:string];
-	
-	string = [gatekeeperUserAliasField stringValue];
-	if([string isEqualToString:@""])
-	{
-		string = nil;
-	}
-	[currentLocation setGatekeeperUsername:string];
-	
-	string = [gatekeeperPhoneNumberField stringValue];
-	if([string isEqualToString:@""])
-	{
-		string = nil;
-	}
-	[currentLocation setGatekeeperPhoneNumber:string];
-	
-	string = [gatekeeperPasswordField stringValue];
-	if([string isEqualToString:@""])
-	{
-		string = nil;
-	}
-	[currentLocation setTemporaryGatekeeperPassword:string];
-	
-	// saving the SIP section
-	
-	// saving the audio section
-	[currentLocation setAudioBufferSize:[audioBufferSizeSlider intValue]];
-	
-	// saving the video section
-	flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableVideo:flag];
-	
-	[currentLocation setVideoFramesPerSecond:[videoFrameRateField intValue]];
-	
-	flag = ([enableH264LimitedModeSwitch state] == NSOnState) ? YES : NO;
-	[currentLocation setEnableH264LimitedMode:flag];
-}
-
-#pragma mark validate the user interface
-
-- (void)_validateLocationButtonUserInterface
-{
-	BOOL flag = ([locations count] == 1) ? NO : YES;
-	[deleteLocationButton setEnabled:flag];
-}
-
-- (void)_validateAddressTranslationUserInterface
-{
-	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
-	
-	[autoGetExternalAddressSwitch setEnabled:flag];
-	[getExternalAddressButton setEnabled:flag];
-	
-	if(flag)
-	{
-		[self _validateExternalAddressUserInterface];
-	}
-	else
-	{
-		[externalAddressField setEnabled:NO];
-	}
-}
-
-- (void)_validateExternalAddressUserInterface
-{
-	BOOL flag = ([autoGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
-	[externalAddressField setEnabled:flag];
-	
-	NSColor *textColor;
-		
-	if(flag == NO)
-	{
-		XMUtils *utils = [XMUtils sharedInstance];
-		NSString *externalAddress = [utils externalAddress];
-		NSString *displayString;
-		
-		if(externalAddress == nil)
-		{
-			if(isFetchingExternalAddress)
-			{
-				displayString = NSLocalizedString(@"Fetching...", @"");
-			}
-			else
-			{
-				displayString = NSLocalizedString(@"<Not available>", @"");
-			}
-			textColor = [NSColor controlTextColor];
-			externalAddressIsValid = NO;
-		}
-		else
-		{
-			displayString = externalAddress;
-			textColor = [NSColor controlTextColor];
-			externalAddressIsValid = YES;
-		}
-		
-		[externalAddressField setStringValue:displayString];
-	}
-	else
-	{
-		if(!externalAddressIsValid)
-		{
-			[externalAddressField setStringValue:@""];
-		}
-		textColor = [NSColor controlTextColor];
-	}
-	
-	[externalAddressField setTextColor:textColor];		
-}
-
-- (void)_validateH323UserInterface
-{
-	BOOL flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
-	
-	[enableH245TunnelSwitch setEnabled:flag];
-	[enableFastStartSwitch setEnabled:flag];
-	[useGatekeeperSwitch setEnabled:flag];
-	
-	if(flag)	// the interface is active and we have to separately validate the gatekeeper GUI
-	{
-		[self _validateGatekeeperUserInterface];
-	}
-	else
-	{
-		[gatekeeperHostField setEnabled:NO];
-		[gatekeeperIDField setEnabled:NO];
-		[gatekeeperUserAliasField setEnabled:NO];
-		[gatekeeperPhoneNumberField setEnabled:NO];
-	}
-}
-
-- (void)_validateGatekeeperUserInterface
-{
-	// we are guaranteed that H.323 is enabled
-	BOOL flag = ([useGatekeeperSwitch state] == NSOnState) ? YES : NO;
-	
-	[gatekeeperHostField setEnabled:flag];
-	[gatekeeperIDField setEnabled:flag];
-	[gatekeeperUserAliasField setEnabled:flag];
-	[gatekeeperPhoneNumberField setEnabled:flag];
-	[gatekeeperPasswordField setEnabled:flag];
-}
-
-- (void)_validateAudioOrderUserInterface
-{
-	unsigned count = [currentLocation audioCodecListCount];
-	int selectedRow = [audioCodecPreferenceOrderTableView selectedRow];
-	BOOL enableUp = YES;
-	BOOL enableDown = YES;
-	
-	if(selectedRow == 0)
-	{
-		enableUp = NO;
-	}
-	if(selectedRow == (count -1))
-	{
-		enableDown = NO;
-	}
-	[moveAudioCodecUpButton setEnabled:enableUp];
-	[moveAudioCodecDownButton setEnabled:enableDown];
-}
-
-- (void)_validateVideoUserInterface
-{
-	BOOL flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
-	
-	[videoFrameRateField setEnabled:flag];
-	[videoCodecPreferenceOrderTableView setHidden:!flag];
-	[enableH264LimitedModeSwitch setEnabled:flag];
-	[self _validateVideoOrderUserInterface];
-}
-
-- (void)_validateVideoOrderUserInterface
-{
-	BOOL enableFlag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;
-	
-	BOOL enableUp = enableFlag;
-	BOOL enableDown = enableFlag;
-	
-	if(enableFlag == YES)
-	{
-		unsigned count = [currentLocation videoCodecListCount];
-		int selectedRow = [videoCodecPreferenceOrderTableView selectedRow];
-	
-		if(selectedRow == 0)
-		{
-			enableUp = NO;
-		}
-		if(selectedRow == (count -1))
-		{
-			enableDown = NO;
-		}
-	}
-	
-	[moveVideoCodecUpButton setEnabled:enableUp];
-	[moveVideoCodecDownButton setEnabled:enableDown];
-}
-
-#pragma mark tableViewSource methods
-
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
-{
-	if(tableView == locationsTableView)
-	{
-		return [locations count];
-	}
-	if(tableView == audioCodecPreferenceOrderTableView)
-	{
-		return [currentLocation audioCodecListCount];
-	}
-	if(tableView == videoCodecPreferenceOrderTableView)
-	{
-		return [currentLocation videoCodecListCount];
-	}
-	
-	return 0;
-}
-
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)column row:(int)rowIndex
-{
-	if(tableView == locationsTableView)
-	{
-		return [(XMLocation *)[locations objectAtIndex:rowIndex] name];
-	}
-	
-	if(tableView != audioCodecPreferenceOrderTableView &&
-	   tableView != videoCodecPreferenceOrderTableView)
-	{
-		return nil;
-	}
-	
-	NSString *columnIdentifier = [column identifier];
-	XMPreferencesCodecListRecord *record;
-	
-	if(tableView == audioCodecPreferenceOrderTableView)
-	{
-		record = [currentLocation audioCodecListRecordAtIndex:rowIndex];
-	}
-	else if(tableView == videoCodecPreferenceOrderTableView)
-	{
-		record = [currentLocation videoCodecListRecordAtIndex:rowIndex];
-	}
-	
-	if([columnIdentifier isEqualToString:XMKey_EnabledIdentifier])
-	{
-		return [NSNumber numberWithBool:[record isEnabled]];
-	}
-	
-	XMCodecIdentifier identifier = identifier = [record identifier];
-	XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:identifier];
-	return [codec propertyForKey:columnIdentifier];
-}
-
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
-{
-	if(tableView == locationsTableView)
-	{
-		if([anObject isKindOfClass:[NSString class]])
-		{
-			[(XMLocation *)[locations objectAtIndex:rowIndex] setName:(NSString *)anObject];
-		}
-	}
-	
-	if(tableView == audioCodecPreferenceOrderTableView)
-	{
-		[[currentLocation audioCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
-		[audioCodecPreferenceOrderTableView reloadData];
-	}
-	
-	if(tableView == videoCodecPreferenceOrderTableView)
-	{
-		[[currentLocation videoCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
-		[videoCodecPreferenceOrderTableView reloadData];
-	}
-	
-	[self defaultAction:self];
-}
-
+#pragma mark -
 #pragma mark Sheet Modal Delegate Methods
 
 - (void)_newLocationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode context:(void *)context
@@ -959,6 +1056,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	}
 }
 
+#pragma mark -
 #pragma mark Notification Responding Methods
 
 - (void)_didStartFetchingExternalAddress:(NSNotification *)notif

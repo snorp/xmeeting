@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.10 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMAddressBookModule.m,v 1.11 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -214,14 +214,14 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		
 		if([callTypePopUp indexOfSelectedItem] == 0)
 		{ 
-			[editedAddress setValue:nil forKey:XMKey_PreferencesUseGatekeeper];
+			//[editedAddress setValue:nil forKey:XMKey_PreferencesUseGatekeeper];
 			
 			addressPart = [directCallAddressField stringValue];
 		}
 		else
 		{
 			NSNumber *number = [[NSNumber alloc] initWithBool:YES];
-			[editedAddress setValue:number forKey:XMKey_PreferencesUseGatekeeper];
+			//[editedAddress setValue:number forKey:XMKey_PreferencesUseGatekeeper];
 			[number release];
 			
 			addressPart = [gatekeeperCallAddressField stringValue];
@@ -338,7 +338,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	else
 	{
 		NSString *address = [editedAddress address];
-		NSNumber *number = [editedAddress valueForKey:XMKey_PreferencesUseGatekeeper];
+		NSNumber *number = nil;//[editedAddress valueForKey:XMKey_PreferencesUseGatekeeper];
 		
 		if(number && [number boolValue] == YES)
 		{

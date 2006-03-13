@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.14 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.15 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,4 +185,11 @@ void _XMHandleGatekeeperRegistration(const char *gatekeeperName)
 void _XMHandleGatekeeperUnregistration()
 {
 	[_XMOpalDispatcherSharedInstance _handleGatekeeperUnregistration];
+}
+
+#pragma mark SIP specific Callbacks
+
+void _XMHandleRegistrarSetupCompleted()
+{
+	[_XMOpalDispatcherSharedInstance _handleRegistrarSetupCompleted];
 }

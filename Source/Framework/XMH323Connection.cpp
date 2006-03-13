@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.8 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.9 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,13 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 {
 	hasSetLocalCapabilities = FALSE;
 	hasSentLocalCapabilities = FALSE;
+	
+	cout << "XMH323Connection created: " << (int)this << endl;
+}
+
+XMH323Connection::~XMH323Connection()
+{
+	cout << "XMH323Connection destroyed " << (int)this << endl;
 }
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)

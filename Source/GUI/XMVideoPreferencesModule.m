@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.4 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.5 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,7 +82,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 
 - (unsigned)position
 {
-	return 2;
+	return 3;
 }
 
 - (NSString *)identifier

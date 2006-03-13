@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.19 2006/02/28 18:37:21 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.20 2006/03/13 23:46:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -348,10 +348,10 @@
 	
 	switch(failReason)
 	{
-		case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
+		/*case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
 			reasonText = NSLocalizedString(@"no gatekeeper specified", @"");
 			suggestionText = NSLocalizedString(@"Please specify a gatekeeper in preferences.", @"");
-			break;
+			break;*/
 		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
 			reasonText = NSLocalizedString(@"gatekeeper not found", @"");
 			suggestionText = NSLocalizedString(@"Please check your internet connection.", @"");

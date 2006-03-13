@@ -1,35 +1,85 @@
 /*
- * $Id: XMLocation.m,v 1.4 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.5 2006/03/13 23:46:21 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMLocation.h"
 
 #import "XMPreferencesManager.h"
+#import "XMH323Account.h"
+#import "XMSIPAccount.h"
 
 NSString *XMKey_LocationName = @"XMeeting_LocationName";
+NSString *XMKey_LocationH323AccountID = @"XMeeting_H323AccountID";
+NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
+
+@interface XMLocation (PrivateMethods)
+
+- (void)_setTag:(unsigned)tag;
+- (void)_setGatekeeperPassword:(NSString *)gkPassword registrarPasswords:(NSArray *)registrarPasswords;
+
+@end
+
+/**
+ * Important note for -initWithDictionary and -dictionaryRepresentation methods:
+ * Since the tag isn't persistent across application launches, not the tag is
+ * stored in the dictionary and read there from but rather the index of the
+ * account from the preferences manager.
+ **/
 
 @implementation XMLocation
+
+#pragma mark -
+#pragma mark Init & Deallocation Methods
 
 - (id)initWithName:(NSString *)theName
 {
 	self = [super init];
-	[self setName:theName];
+	
 	[self _setTag:0];
+	[self setName:theName];
+	
+	h323AccountTag = 0;
+	sipAccountTag = 0;
+	
+	gatekeeperPassword = nil;
+	registrarPasswords = nil;
 	
 	return self;
 }
 
 - (id)initWithDictionary:(NSDictionary *)dict
 {
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
 	self = [super initWithDictionary:dict];
 	
 	NSString *theName = (NSString *)[dict objectForKey:XMKey_LocationName];
-	[self setName:theName];
+	
 	[self _setTag:0];
+	[self setName:theName];
+	
+	NSNumber *number = (NSNumber *)[dict objectForKey:XMKey_LocationH323AccountID];
+	if(number != nil)
+	{
+		unsigned index = [number unsignedIntValue];
+		XMH323Account *h323Account = [preferencesManager h323AccountAtIndex:index];
+		h323AccountTag = [h323Account tag];
+	}
+	
+	number = (NSNumber *)[dict objectForKey:XMKey_LocationSIPAccountID];
+	if(number != nil)
+	{
+		unsigned index = [number unsignedIntValue];
+		XMSIPAccount *sipAccount = [preferencesManager sipAccountAtIndex:index];
+		sipAccountTag = [sipAccount tag];
+	}
+	
+	gatekeeperPassword = nil;
+	registrarPasswords = nil;
 	
 	return self;
 }
@@ -38,8 +88,13 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 {
 	XMLocation *location = (XMLocation *)[super copyWithZone:zone];
 	
+	[location _setTag:[self tag]];
 	[location setName:[self name]];
-	[location _setTag:[self _tag]];
+	
+	[location setH323AccountTag:[self h323AccountTag]];
+	[location setSIPAccountTag:[self sipAccountTag]];
+	
+	[location _setGatekeeperPassword:[self gatekeeperPassword] registrarPasswords:[self registrarPasswords]];
 	
 	return location;
 }
@@ -48,13 +103,21 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 {
 	[name release];
 	
+	[gatekeeperPassword release];
+	[registrarPasswords release];
+	
 	[super dealloc];
 }
+
+#pragma mark -
+#pragma mark NSObject functionality
 
 - (BOOL)isEqual:(id)object
 {
 	if ([super isEqual:object] && 
-			[[self name] isEqualToString:[(XMLocation *)object name]])
+		[[self name] isEqualToString:[(XMLocation *)object name]] &&
+		[self h323AccountTag] == [(XMLocation *)object h323AccountTag] &&
+		[self sipAccountTag] == [(XMLocation *)object sipAccountTag])
 	{
 		return YES;
 	}
@@ -62,9 +125,23 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 	return NO;
 }
 
+#pragma mark -
+#pragma mark Getting different representations
+
 - (NSMutableDictionary *)dictionaryRepresentation
 {
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
 	NSMutableDictionary *dict = [super dictionaryRepresentation];
+	
+	// removing unneded keys
+	[dict removeObjectForKey:XMKey_PreferencesUserName];
+	[dict removeObjectForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
+	[dict removeObjectForKey:XMKey_PreferencesGatekeeperAddress];
+	[dict removeObjectForKey:XMKey_PreferencesGatekeeperUsername];
+	[dict removeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber];
+	[dict removeObjectForKey:XMKey_PreferencesRegistrarHosts];
+	[dict removeObjectForKey:XMKey_PreferencesRegistrarUsernames];
 	
 	NSString *theName = [self name];
 	
@@ -73,7 +150,62 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 		[dict setObject:theName forKey:XMKey_LocationName];
 	}
 	
+	if(h323AccountTag != 0)
+	{
+		unsigned h323AccountCount = [preferencesManager h323AccountCount];
+		unsigned i;
+		
+		for(i = 0; i < h323AccountCount; i++)
+		{
+			XMH323Account *h323Account = [preferencesManager h323AccountAtIndex:i];
+			if([h323Account tag] == h323AccountTag)
+			{
+				NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
+				[dict setObject:number forKey:XMKey_LocationH323AccountID];
+				[number release];
+				break;
+			}
+		}
+	}
+	
+	if(sipAccountTag != 0)
+	{
+		unsigned sipAccountCount = [preferencesManager sipAccountCount];
+		unsigned i;
+		
+		for(i = 0; i < sipAccountCount; i++)
+		{
+			XMSIPAccount *sipAccount = [preferencesManager sipAccountAtIndex:i];
+			if([sipAccount tag] == sipAccountTag)
+			{
+				NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
+				[dict setObject:number forKey:XMKey_LocationSIPAccountID];
+				[number release];
+				break;
+			}
+		}
+	}
+	
 	return dict;
+}
+
+- (XMLocation *)duplicateWithName:(NSString *)theName
+{
+	XMLocation *duplicate = [self copy];
+	
+	// causing it to assign a new tag to the duplicate
+	[duplicate _setTag:0];
+	[duplicate setName:theName];
+	
+	return duplicate;
+}
+
+#pragma mark -
+#pragma mark Accessor methods
+
+- (unsigned)tag
+{
+	return tag;
 }
 
 - (NSString *)name
@@ -88,31 +220,98 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 	[old release];
 }
 
-- (XMLocation *)duplicateWithName:(NSString *)theName
+- (unsigned)h323AccountTag
 {
-	XMLocation *duplicate = [self copy];
-	[duplicate setName:theName];
-	[duplicate _updateTag];
+	return h323AccountTag;
+}
+
+- (void)setH323AccountTag:(unsigned)theTag
+{
+	h323AccountTag = theTag;
+}
+
+- (unsigned)sipAccountTag
+{
+	return sipAccountTag;
+}
+
+- (void)setSIPAccountTag:(unsigned)theTag
+{
+	sipAccountTag = theTag;
+}
+
+- (void)storeAccountInformationsInSubsystem
+{
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
-	return duplicate;
-}
-
-- (void)_updateTag
-{
-	static unsigned nextTag = 1;
+	// cleaning up from previous launch if needed
+	[gatekeeperPassword release];
+	gatekeeperPassword = nil;
 	
-	[self _setTag:nextTag];
-	nextTag++;
-}
-
-- (void)_setTag:(unsigned)newTag
-{
-	tag = newTag;
-}
-
-- (unsigned)_tag
-{
-	return tag;
+	[registrarPasswords release];
+	registrarPasswords = nil;
+	
+	BOOL didFillAccount = NO;
+	if(h323AccountTag != 0)
+	{
+		XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
+		if(h323Account != nil)
+		{
+			[self setGatekeeperAddress:[h323Account gatekeeper]];
+			[self setGatekeeperUsername:[h323Account username]];
+			[self setGatekeeperPhoneNumber:[h323Account phoneNumber]];
+			
+			gatekeeperPassword = [[h323Account password] copy];
+			
+			didFillAccount = YES;
+		}
+	}
+	
+	if(didFillAccount == NO)
+	{
+		[self setGatekeeperAddress:nil];
+		[self setGatekeeperUsername:nil];
+		[self setGatekeeperPhoneNumber:nil];
+	}
+	
+	didFillAccount = NO;
+	if(sipAccountTag != 0)
+	{
+		XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
+		if(sipAccountTag != 0)
+		{
+			NSString *registrar = [sipAccount registrar];
+			NSString *username = [sipAccount username];
+			
+			if(registrar != nil && username != nil)
+			{
+				NSArray *hosts = [[NSArray alloc] initWithObjects:registrar, nil];
+				[self setRegistrarHosts:hosts];
+				[hosts release];
+			
+				NSArray *usernames = [[NSArray alloc] initWithObjects:username, nil];
+				[self setRegistrarUsernames:usernames];
+				[usernames release];
+				
+				NSString *password = [sipAccount password];
+				if(password == nil)
+				{
+					password = (NSString *)[NSNull null];
+				}
+				registrarPasswords = [[NSArray alloc] initWithObjects:password, nil];
+			
+				didFillAccount = YES;
+			}
+		}
+	}
+	
+	if(didFillAccount == NO)
+	{
+		[self setRegistrarHosts:[NSArray array]];
+		[self setRegistrarUsernames:[NSArray array]];
+		
+		registrarPasswords = [[NSArray alloc] init];
+	}
 }
 
 #pragma mark overriding methods from XMPreferences
@@ -135,19 +334,58 @@ NSString *XMKey_LocationName = @"XMeeting_LocationName";
 {
 }
 
+- (BOOL)usesGatekeeper
+{
+	if(h323AccountTag != 0)
+	{
+		return YES;
+	}
+	return NO;
+}
+
 - (NSString *)gatekeeperPassword
 {
-	return [[XMPreferencesManager sharedInstance] gatekeeperPasswordForLocation:self];
+	return gatekeeperPassword;
 }
 
-- (NSString *)temporaryGatekeeperPassword
+- (BOOL)usesRegistrars
 {
-	return [[XMPreferencesManager sharedInstance] temporaryGatekeeperPasswordForLocation:self];
+	if(sipAccountTag != 0)
+	{
+		return YES;
+	}
+	return NO;
 }
 
-- (void)setTemporaryGatekeeperPassword:(NSString *)password
+- (NSArray *)registrarPasswords
 {
-	[[XMPreferencesManager sharedInstance] setTemporaryGatekeeperPassword:password forLocation:self];
+	return registrarPasswords;
+}
+
+#pragma mark -
+#pragma mark Private Methods
+
+- (void)_setTag:(unsigned)theTag
+{
+	static unsigned nextTag = 0;
+	
+	if(theTag == 0)
+	{
+		theTag = ++nextTag;
+	}
+	
+	tag = theTag;
+}
+
+- (void)_setGatekeeperPassword:(NSString *)gkPassword registrarPasswords:(NSArray *)theRegistrarPasswords
+{
+	NSObject *old = gatekeeperPassword;
+	gatekeeperPassword = [gkPassword copy];
+	[old release];
+	
+	old = registrarPasswords;
+	registrarPasswords = [theRegistrarPasswords copy];
+	[old release];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.10 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.11 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,8 +25,9 @@ public:
 	// Setup methods
 	BOOL EnableListeners(BOOL flag);
 	BOOL IsListening();
-	XMGatekeeperRegistrationFailReason SetGatekeeper(const PString & address, const PString & identifier,
-													 const PString & username, const PString & phoneNumber,
+	XMGatekeeperRegistrationFailReason SetGatekeeper(const PString & address,
+													 const PString & username, 
+													 const PString & phoneNumber,
 													 const PString & password);
 	void CheckGatekeeperRegistration();
 	

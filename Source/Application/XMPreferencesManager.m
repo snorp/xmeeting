@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.14 2006/02/27 18:50:21 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.15 2006/03/13 23:46:21 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,18 +7,23 @@
  */
 
 #import "XMPreferencesManager.h"
+
+#import "XMH323Account.h"
+#import "XMSIPAccount.h"
 #import "XMLocation.h"
 
-NSString *XMNotification_PreferencesDidChange = @"XMeeting_PreferencesDidChange";
-NSString *XMNotification_ActiveLocationDidChange = @"XMeeting_ActiveLocationDidChange";
+NSString *XMNotification_PreferencesManagerDidChangePreferences = @"XMeeting_PreferencesManagerDidChangePreferences";
+NSString *XMNotification_PreferencesManagerDidChangeActiveLocation = @"XMeeting_PreferencesManagerDidChangeActiveLocation";
 
-NSString *XMKey_PreferencesAvailable = @"XMeeting_PreferencesAvailable";
-NSString *XMKey_Locations = @"XMeeting_Locations";
-NSString *XMKey_ActiveLocation = @"XMeeting_ActiveLocation";
-NSString *XMKey_AutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
-NSString *XMKey_UserName = @"XMeeting_UserName";
-NSString *XMKey_DisabledVideoModules = @"XMeeting_DisabledVideoModules";
-NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
+NSString *XMKey_PreferencesManagerPreferencesAvailable = @"XMeeting_PreferencesAvailable";
+NSString *XMKey_PreferencesManagerH323Accounts = @"XMeeting_H323Accounts";
+NSString *XMKey_PreferencesManagerSIPAccounts = @"XMeeting_SIPAccounts";
+NSString *XMKey_PreferencesManagerLocations = @"XMeeting_Locations";
+NSString *XMKey_PreferencesManagerActiveLocation = @"XMeeting_ActiveLocation";
+NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
+NSString *XMKey_PreferencesManagerUserName = @"XMeeting_UserName";
+NSString *XMKey_PreferencesManagerDisabledVideoModules = @"XMeeting_DisabledVideoModules";
+NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
 
 @interface XMPreferencesManager (PrivateMethods)
 
@@ -34,25 +39,9 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 
 @end
 
-@interface XMPasswordRecord : NSObject {
-
-	NSString *serviceName;
-	NSString *accountName;
-	NSString *password;
-
-}
-
-- (id)_initWithServiceName:(NSString *)serviceName accountName:(NSString *)accountName password:(NSString *)password;
-
-- (NSString *)_serviceName;
-- (NSString *)_accountName;
-- (NSString *)_password;
-- (void)_setPassword:(NSString *)password;
-
-@end
-
 @implementation XMPreferencesManager
 
+#pragma mark -
 #pragma mark Class Methods
 
 + (XMPreferencesManager *)sharedInstance
@@ -72,14 +61,15 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	
-	BOOL doesHavePreferences = [userDefaults boolForKey:XMKey_PreferencesAvailable];
+	BOOL doesHavePreferences = [userDefaults boolForKey:XMKey_PreferencesManagerPreferencesAvailable];
 	
 	// this is a one-time check, thus next time we return YES
-	[userDefaults setBool:YES forKey:XMKey_PreferencesAvailable];
+	[userDefaults setBool:YES forKey:XMKey_PreferencesManagerPreferencesAvailable];
 	
 	return doesHavePreferences;
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -92,6 +82,10 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 - (id)_init
 {
 	self = [super init];
+	
+	h323Accounts = nil;
+	sipAccounts = nil;
+	locations = nil;
 	
 	return self;
 }
@@ -108,27 +102,61 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	XMLocation *defaultLocation = [[XMLocation alloc] initWithName:NSLocalizedString(@"<Default Location>", @"")];
 	NSDictionary *dict = [defaultLocation dictionaryRepresentation];
 	NSArray *defaultLocationArray = [NSArray arrayWithObject:dict];
-	[defaultsDict setObject:defaultLocationArray forKey:XMKey_Locations];
+	[defaultsDict setObject:defaultLocationArray forKey:XMKey_PreferencesManagerLocations];
 	[defaultLocation release];
 	
-	[defaultsDict setObject:NSFullUserName() forKey:XMKey_UserName];
+	[defaultsDict setObject:NSFullUserName() forKey:XMKey_PreferencesManagerUserName];
 	
 	NSNumber *number = [[NSNumber alloc] initWithBool:NO];
-	[defaultsDict setObject:number forKey:XMKey_AutomaticallyAcceptIncomingCalls];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls];
 	[number release];
 	
 	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMScreenVideoInputModule", nil];
-	[defaultsDict setObject:initialDisabledVideoModules forKey:XMKey_DisabledVideoModules];
+	[defaultsDict setObject:initialDisabledVideoModules forKey:XMKey_PreferencesManagerDisabledVideoModules];
 	[initialDisabledVideoModules release];
 	
 	// code to be written yet
 	[userDefaults registerDefaults:defaultsDict];
 	[defaultsDict release];
 	
+	/* getting the h323 accounts from UserDefaults */
+	h323Accounts = [[NSMutableArray alloc] initWithCapacity:1];
+	NSArray *dictArray = (NSArray *)[userDefaults objectForKey:XMKey_PreferencesManagerH323Accounts];
+	if(dictArray != nil)
+	{
+		unsigned count = [dictArray count];
+		unsigned i;
+		
+		for(i = 0; i < count; i++)
+		{
+			NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
+			XMH323Account *h323Account = [[XMH323Account alloc] initWithDictionary:dict];
+			[h323Accounts addObject:h323Account];
+			[h323Account release];
+		}
+	}
+	
+	/* getting the SIP accounts from UserDefaults */
+	sipAccounts = [[NSMutableArray alloc] initWithCapacity:1];
+	dictArray = (NSArray *)[userDefaults objectForKey:XMKey_PreferencesManagerSIPAccounts];
+	if(dictArray != nil)
+	{
+		unsigned count = [dictArray count];
+		unsigned i;
+		
+		for(i = 0; i < count; i++)
+		{
+			NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
+			XMSIPAccount *sipAccount = [[XMSIPAccount alloc] initWithDictionary:dict];
+			[sipAccounts addObject:sipAccount];
+			[sipAccount release];
+		}
+	}
+	
 	/* getting the locations list from UserDefaults */
 	locations = [[NSMutableArray alloc] initWithCapacity:1];
-	NSArray *dictArray = (NSArray *)[userDefaults objectForKey:XMKey_Locations];
-	if(dictArray)
+	dictArray = (NSArray *)[userDefaults objectForKey:XMKey_PreferencesManagerLocations];
+	if(dictArray != nil)
 	{
 		unsigned count = [dictArray count];
 		unsigned i;
@@ -137,7 +165,6 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		{
 			NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
 			XMLocation *location = [[XMLocation alloc] initWithDictionary:dict];
-			[location _updateTag];
 			[locations addObject:location];
 			[location release];
 		}
@@ -145,7 +172,7 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	
 	// since NSUserDefaults returns 0 if no value for the Key is found, we
 	// simply increase the stored value by one;
-	int index = [userDefaults integerForKey:XMKey_ActiveLocation];
+	int index = [userDefaults integerForKey:XMKey_PreferencesManagerActiveLocation];
 	if(index == 0)
 	{
 		activeLocation = 0;
@@ -155,10 +182,7 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		activeLocation = (unsigned)(index-1);
 	}
 	
-	automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
-	
-	gatekeeperPasswords = [[NSMutableArray alloc] initWithCapacity:3];
-	temporaryGatekeeperPasswords = nil;
+	automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls];
 	
 	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
 	NSArray *disabledVideoModules = [self disabledVideoModules];
@@ -193,20 +217,17 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 
 - (void)dealloc
 {
+	[h323Accounts release];
+	[sipAccounts release];
 	[locations release];
-	
-	[gatekeeperPasswords release];
-	if(temporaryGatekeeperPasswords != nil)
-	{
-		[temporaryGatekeeperPasswords release];
-	}
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[super dealloc];
 }
 
-#pragma mark Getting & Setting Methods
+#pragma mark -
+#pragma mark Synchronization Methods
 
 - (void)synchronizeAndNotify
 {		
@@ -214,10 +235,10 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	
 	// post the notification
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter postNotificationName:XMNotification_PreferencesDidChange
+	[notificationCenter postNotificationName:XMNotification_PreferencesManagerDidChangePreferences
 														object:self
 													  userInfo:nil];
-	[notificationCenter postNotificationName:XMNotification_ActiveLocationDidChange
+	[notificationCenter postNotificationName:XMNotification_PreferencesManagerDidChangeActiveLocation
 														object:self
 													  userInfo:nil];
 }
@@ -225,31 +246,195 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 - (void)synchronize
 {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-
-	// increasing the integer by one since NSUserDefaults returns zero if the
-	// key isn't found in preferences
-	[userDefaults setInteger:(activeLocation+1) forKey:XMKey_ActiveLocation];
-	unsigned count = [locations count];
+	
+	/* storing the H.323 accounts */
+	unsigned count = [h323Accounts count];
 	unsigned i;
 	NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count];
+	for(i = 0; i < count; i++)
+	{
+		XMH323Account *h323Account = (XMH323Account *)[h323Accounts objectAtIndex:i];
+		[dictArray addObject:[h323Account dictionaryRepresentation]];
+	}
+	[userDefaults setObject:dictArray forKey:XMKey_PreferencesManagerH323Accounts];
+	[dictArray release];
+	
+	/* storing the SIP accounts */
+	count = [sipAccounts count];
+	dictArray = [[NSMutableArray alloc] initWithCapacity:count];
+	for(i = 0; i < count; i++)
+	{
+		XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
+		[dictArray addObject:[sipAccount dictionaryRepresentation]];
+	}
+	[userDefaults setObject:dictArray forKey:XMKey_PreferencesManagerSIPAccounts];
+	[dictArray release];
+	
+	/* storing the locations */
+	count = [locations count];
+	dictArray = [[NSMutableArray alloc] initWithCapacity:count];
 	for(i = 0; i < count; i++)
 	{
 		XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
 		[dictArray addObject:[location dictionaryRepresentation]];
 	}
-	
-	[userDefaults setObject:dictArray forKey:XMKey_Locations];
+	[userDefaults setObject:dictArray forKey:XMKey_PreferencesManagerLocations];
 	[dictArray release];
+	
+	// increasing the integer by one since NSUserDefaults returns zero if the
+	// key isn't found in preferences
+	[userDefaults setInteger:(activeLocation+1) forKey:XMKey_PreferencesManagerActiveLocation];
 	
 	// synchronize the database
 	[userDefaults synchronize];
+}
+
+#pragma mark -
+#pragma mark Accessor Methods
+
+- (unsigned)h323AccountCount
+{
+	return [h323Accounts count];
+}
+
+- (XMH323Account *)h323AccountAtIndex:(unsigned)index
+{
+	return (XMH323Account *)[h323Accounts objectAtIndex:index];
+}
+
+- (XMH323Account *)h323AccountWithTag:(unsigned)tag
+{
+	unsigned count = [h323Accounts count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMH323Account *h323Account = (XMH323Account *)[h323Accounts objectAtIndex:i];
+		if([h323Account tag] == tag)
+		{
+			return h323Account;
+		}
+	}
+	
+	return nil;
+}
+
+- (NSArray *)h323Accounts
+{
+	unsigned count = [h323Accounts count];
+	unsigned i;
+	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		[arr addObject:[[h323Accounts objectAtIndex:i] copy]];
+	}
+	
+	return arr;
+}
+
+- (void)setH323Accounts:(NSArray *)accounts
+{
+	unsigned count = [accounts count];
+	unsigned i;
+	
+	if(count == 0)
+	{
+		return;
+	}
+		
+	[h323Accounts removeAllObjects];
+	
+	Class h323AccountClass = [XMH323Account class];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMH323Account *h323Account = (XMH323Account *)[accounts objectAtIndex:i];
+		
+		if([h323Account isKindOfClass:h323AccountClass])
+		{
+			[h323Account savePassword];
+			[h323Account clearPassword];
+			
+			[h323Accounts addObject:[h323Account copy]];
+		}
+	}
+}
+
+- (unsigned)sipAccountCount
+{
+	return [sipAccounts count];
+}
+
+- (XMSIPAccount *)sipAccountAtIndex:(unsigned)index
+{
+	return (XMSIPAccount *)[sipAccounts objectAtIndex:index];
+}
+
+- (XMSIPAccount *)sipAccountWithTag:(unsigned)tag
+{
+	unsigned count = [sipAccounts count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
+		if([sipAccount tag] == tag)
+		{
+			return sipAccount;
+		}
+	}
+	
+	return nil;
+}
+
+- (NSArray *)sipAccounts
+{
+	unsigned count = [sipAccounts count];
+	unsigned i;
+	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		[arr addObject:[[sipAccounts objectAtIndex:i] copy]];
+	}
+	
+	return arr;
+}
+
+- (void)setSIPAccounts:(NSArray *)accounts
+{
+	unsigned count = [accounts count];
+	unsigned i;
+	
+	if(count == 0)
+	{
+		return;
+	}
+	
+	[sipAccounts removeAllObjects];
+	
+	Class sipAccountClass = [XMSIPAccount class];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMSIPAccount *sipAccount = (XMSIPAccount *)[accounts objectAtIndex:i];
+		
+		if([sipAccount isKindOfClass:sipAccountClass])
+		{
+			[sipAccount savePassword];
+			[sipAccount clearPassword];
+			
+			[sipAccounts addObject:[sipAccount copy]];
+		}
+	}
 }
 
 - (NSArray *)locations
 {
 	unsigned count = [locations count];
 	unsigned i;
-	NSMutableArray *arr = [[[NSMutableArray alloc] initWithCapacity:count] autorelease];
+	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
 	
 	for(i = 0; i < count; i++)
 	{
@@ -263,7 +448,8 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 {
 	unsigned count = [newLocations count];
 	unsigned i;
-	unsigned currentTag = [(XMLocation *)[locations objectAtIndex:activeLocation] _tag];
+	
+	unsigned currentTag = [(XMLocation *)[locations objectAtIndex:activeLocation] tag];
 	
 	if(count != 0)
 	{
@@ -279,7 +465,7 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		if([location isKindOfClass:[XMLocation class]])
 		{
 			[locations addObject:[location copy]];
-			if([location _tag] == currentTag)
+			if([location tag] == currentTag)
 			{
 				activeLocation = i;
 			}
@@ -290,7 +476,9 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	
 	if([callManager doesAllowModifications])
 	{
-		[callManager setActivePreferences:[locations objectAtIndex:activeLocation]];
+		XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
+		[location storeAccountInformationsInSubsystem];
+		[callManager setActivePreferences:location];
 	}
 	else
 	{
@@ -343,14 +531,16 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		activeLocation = index;
 	
 		// post the notification
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_ActiveLocationDidChange
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_PreferencesManagerDidChangeActiveLocation
 															object:self
 														  userInfo:nil];
 	
 		XMCallManager *callManager = [XMCallManager sharedInstance];
 		if([callManager doesAllowModifications])
 		{
-			[callManager setActivePreferences:[locations objectAtIndex:activeLocation]];
+			XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
+			[location storeAccountInformationsInSubsystem];
+			[callManager setActivePreferences:location];
 		}
 		else
 		{
@@ -366,12 +556,12 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 
 - (NSString *)userName
 {
-	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_UserName];
+	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_PreferencesManagerUserName];
 }
 
 - (void)setUserName:(NSString *)name
 {
-	[[NSUserDefaults standardUserDefaults] setObject:name forKey:XMKey_UserName];
+	[[NSUserDefaults standardUserDefaults] setObject:name forKey:XMKey_PreferencesManagerUserName];
 }
 
 - (BOOL)automaticallyAcceptIncomingCalls
@@ -386,265 +576,25 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 
 - (BOOL)defaultAutomaticallyAcceptIncomingCalls
 {
-	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_AutomaticallyAcceptIncomingCalls];
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls];
 }
 
 - (void)setDefaultAutomaticallyAcceptIncomingCalls:(BOOL)flag
 {
-	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_AutomaticallyAcceptIncomingCalls];
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls];
 	automaticallyAcceptIncomingCalls = flag;
 }
 
-- (NSString *)gatekeeperPasswordForLocation:(XMLocation *)location
-{
-	NSString *serviceName = [location gatekeeperAddress];
-	if(serviceName == nil)
-	{
-		serviceName = [location gatekeeperID];
-	}
-	NSString *accountName = [location gatekeeperUsername];
-	
-	if(serviceName == nil || accountName == nil)
-	{
-		return nil;
-	}
-	
-	unsigned count = [gatekeeperPasswords count];
-	unsigned i;
-	
-	for(i = 0; i < count; i++)
-	{
-		XMPasswordRecord *record = (XMPasswordRecord *)[gatekeeperPasswords objectAtIndex:i];
-		
-		NSString *recordServiceName = [record _serviceName];
-		
-		if(![serviceName isEqualToString:recordServiceName])
-		{
-			continue;
-		}
-		
-		NSString *recordAccountName = [record _accountName];
-		if(![accountName isEqualToString:recordAccountName])
-		{
-			continue;
-		}
-		
-		// both service name and account name match
-		return [record _password];
-	}
-	
-	// this record is not yet existant
-	NSString *password = [self _passwordForServiceName:serviceName accountName:accountName];
-	XMPasswordRecord *record = [[XMPasswordRecord alloc] _initWithServiceName:serviceName accountName:accountName password:password];
-	[gatekeeperPasswords addObject:record];
-	[record release];
-	
-	return password;
-}
-
-- (NSString *)temporaryGatekeeperPasswordForLocation:(XMLocation *)location
-{
-	NSString *serviceName = [location gatekeeperAddress];
-	if(serviceName == nil)
-	{
-		serviceName = [location gatekeeperID];
-	}
-	NSString *accountName = [location gatekeeperUsername];
-	
-	if(serviceName == nil || accountName == nil)
-	{
-		return nil;
-	}
-	
-	if(temporaryGatekeeperPasswords == nil)
-	{
-		temporaryGatekeeperPasswords = [gatekeeperPasswords mutableCopy];
-	}
-	
-	unsigned count = [temporaryGatekeeperPasswords count];
-	unsigned i;
-	
-	for(i = 0; i < count; i++)
-	{
-		XMPasswordRecord *record = (XMPasswordRecord *)[temporaryGatekeeperPasswords objectAtIndex:i];
-		
-		NSString *recordServiceName = [record _serviceName];
-		if(![serviceName isEqualToString:recordServiceName])
-		{
-			continue;
-		}
-		
-		NSString *recordAccountName = [record _accountName];
-		if(![accountName isEqualToString:recordAccountName])
-		{
-			continue;
-		}
-		
-		// both service name and account name match
-		return [record _password];
-	}
-	
-	// this record is not yet existant.
-	NSString *password = [self _passwordForServiceName:serviceName accountName:accountName];
-	XMPasswordRecord *record = [[XMPasswordRecord alloc] _initWithServiceName:serviceName accountName:accountName password:password];
-	[temporaryGatekeeperPasswords addObject:record];
-	[record release];
-	
-	return password;
-}
-
-- (void)setTemporaryGatekeeperPassword:(NSString *)password forLocation:(XMLocation *)location
-{
-	NSString *serviceName = [location gatekeeperAddress];
-	if(serviceName == nil)
-	{
-		serviceName = [location gatekeeperID];
-	}
-	NSString *accountName = [location gatekeeperUsername];
-	
-	if(serviceName == nil || accountName == nil)
-	{
-		return;
-	}
-	
-	if(temporaryGatekeeperPasswords == nil)
-	{
-		temporaryGatekeeperPasswords = [gatekeeperPasswords mutableCopy];
-	}
-	
-	unsigned count = [temporaryGatekeeperPasswords count];
-	unsigned i;
-	
-	for(i = 0; i < count; i++)
-	{
-		XMPasswordRecord *record = (XMPasswordRecord *)[temporaryGatekeeperPasswords objectAtIndex:i];
-		
-		NSString *recordServiceName = [record _serviceName];
-		
-		if(![serviceName isEqualToString:recordServiceName])
-		{
-			continue;
-		}
-		
-		NSString *recordAccountName = [record _accountName];
-		if(![accountName isEqualToString:recordAccountName])
-		{
-			continue;
-		}
-		
-		// both service name and account name match
-		[record _setPassword:password];
-		return;
-	}
-	
-	// this location has not yet set a password
-	if(password != nil)
-	{
-		XMPasswordRecord *record = [[XMPasswordRecord alloc] _initWithServiceName:serviceName accountName:accountName password:password];
-		[temporaryGatekeeperPasswords addObject:record];
-		[record release];
-	}
-}
-
-- (void)saveTemporaryPasswords
-{
-	if(temporaryGatekeeperPasswords != nil)
-	{
-		[gatekeeperPasswords release];
-		gatekeeperPasswords = [temporaryGatekeeperPasswords mutableCopy];
-		
-		unsigned count = [gatekeeperPasswords count];
-		unsigned i;
-		
-		for(i = 0; i < count; i++)
-		{
-			XMPasswordRecord *record = (XMPasswordRecord *)[gatekeeperPasswords objectAtIndex:i];
-			
-			NSString *serviceName = [record _serviceName];
-			NSString *accountName = [record _accountName];
-			NSString *password = [record _password];
-			
-			[self _setPassword:password forServiceName:serviceName accountName:accountName];
-		}
-	}
-}
-
-- (void)clearTemporaryPasswords
-{
-	if(temporaryGatekeeperPasswords != nil)
-	{
-		[temporaryGatekeeperPasswords release];
-		temporaryGatekeeperPasswords = nil;
-	}
-}
-
-- (NSArray *)disabledVideoModules
-{
-	NSArray *disabledVideoModules = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_DisabledVideoModules];
-	
-	if(disabledVideoModules == nil)
-	{
-		return [NSArray array];
-	}
-	
-	return disabledVideoModules;
-}
-
-- (void)setDisabledVideoModules:(NSArray *)disabledVideoModules
-{
-	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
-	
-	if(disabledVideoModules == nil)
-	{
-		disabledVideoModules = [NSArray array];
-	}
-	
-	unsigned i;
-	unsigned count = [videoManager videoModuleCount];
-	
-	for(i = 0; i < count; i++)
-	{
-		id<XMVideoModule> module = [videoManager videoModuleAtIndex:i];
-		
-		NSString *identifier = [module identifier];
-		
-		if([disabledVideoModules containsObject:identifier])
-		{
-			[module setEnabled:NO];
-		}
-		else
-		{
-			[module setEnabled:YES];
-		}
-	}
-	
-	[[NSUserDefaults standardUserDefaults] setObject:disabledVideoModules forKey:XMKey_DisabledVideoModules];
-}
-
-- (NSString *)preferredVideoInputDevice
-{
-	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_PreferredVideoInputDevice];
-}
-
-- (void)setPreferredVideoInputDevice:(NSString *)device
-{
-	if(device == nil)
-	{
-		[[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferredVideoInputDevice];
-	}
-	else
-	{
-		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferredVideoInputDevice];
-	}
-}
-
-#pragma mark Private Methods
-
-- (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
+- (NSString *)passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
 {
 	OSStatus err = noErr;
 	UInt32 passwordLength;
 	const char *passwordString;
+	
+	if(serviceName == nil || accountName == nil)
+	{
+		return nil;
+	}
 	
 	UInt32 serviceNameLength = [serviceName length];
 	const char *serviceNameString = [serviceName cStringUsingEncoding:NSUTF8StringEncoding];
@@ -679,13 +629,18 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	return password;
 }
 
-- (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName
+- (void)setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName
 {
 	OSStatus err = noErr;
 	
 	UInt32 passwordLength;
 	const char *passwordString;
 	SecKeychainItemRef keychainItem;
+	
+	if(serviceName == nil || accountName == nil)
+	{
+		return;
+	}
 	
 	UInt32 serviceNameLength = [serviceName length];
 	const char *serviceNameString = [serviceName cStringUsingEncoding:NSUTF8StringEncoding];
@@ -743,6 +698,9 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		return;
 	}
 	
+	// If we get here, the keychain has not yet stored a password for the service name and
+	// account specified
+	
 	if(newPasswordString == NULL)
 	{
 		return;
@@ -762,6 +720,68 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 		NSLog(@"SecKeychainAddGenericPassword failed: %d", (int)err);
 	}
 }
+
+- (NSArray *)disabledVideoModules
+{
+	NSArray *disabledVideoModules = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_PreferencesManagerDisabledVideoModules];
+	
+	if(disabledVideoModules == nil)
+	{
+		return [NSArray array];
+	}
+	
+	return disabledVideoModules;
+}
+
+- (void)setDisabledVideoModules:(NSArray *)disabledVideoModules
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	if(disabledVideoModules == nil)
+	{
+		disabledVideoModules = [NSArray array];
+	}
+	
+	unsigned i;
+	unsigned count = [videoManager videoModuleCount];
+	
+	for(i = 0; i < count; i++)
+	{
+		id<XMVideoModule> module = [videoManager videoModuleAtIndex:i];
+		
+		NSString *identifier = [module identifier];
+		
+		if([disabledVideoModules containsObject:identifier])
+		{
+			[module setEnabled:NO];
+		}
+		else
+		{
+			[module setEnabled:YES];
+		}
+	}
+	
+	[[NSUserDefaults standardUserDefaults] setObject:disabledVideoModules forKey:XMKey_PreferencesManagerDisabledVideoModules];
+}
+
+- (NSString *)preferredVideoInputDevice
+{
+	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
+}
+
+- (void)setPreferredVideoInputDevice:(NSString *)device
+{
+	if(device == nil)
+	{
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
+	}
+	else
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
+	}
+}
+
+#pragma mark Private Methods
 
 - (void)_setInitialVideoInputDevice:(NSNotification *)notif
 {
@@ -796,87 +816,15 @@ NSString *XMKey_PreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice
 	
 	if([callManager doesAllowModifications])
 	{
-		[callManager setActivePreferences:[locations objectAtIndex:activeLocation]];
+		XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
+		[location storeAccountInformationsInSubsystem];
+		[callManager setActivePreferences:location];
 		
 		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 		
 		[notificationCenter removeObserver:self name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
 		[notificationCenter removeObserver:self name:XMNotification_CallManagerDidClearCall object:nil];
 	}
-}
-
-@end
-
-@implementation XMPasswordRecord
-
-- (id)_initWithServiceName:(NSString *)theServiceName accountName:(NSString *)theAccountName password:(NSString *)thePassword
-{
-	self = [super init];
-	
-	if(theServiceName != nil)
-	{
-		serviceName = [theServiceName copy];
-	}
-	else
-	{
-		serviceName = nil;
-	}
-	
-	if(theAccountName != nil)
-	{
-		accountName = [theAccountName copy];
-	}
-	else
-	{
-		accountName = nil;
-	}
-	
-	if(thePassword != nil)
-	{
-		password = [thePassword copy];
-	}
-	
-	return self;
-}
-
-- (void)dealloc
-{
-	if(serviceName != nil)
-	{
-		[serviceName release];
-	}
-	if(accountName != nil)
-	{
-		[accountName release];
-	}
-	if(password != nil)
-	{
-		[password release];
-	}
-	
-	[super dealloc];
-}
-
-- (NSString *)_serviceName
-{
-	return serviceName;
-}
-
-- (NSString *)_accountName
-{
-	return accountName;
-}
-
-- (NSString *)_password
-{
-	return password;
-}
-
-- (void)_setPassword:(NSString *)thePassword
-{
-	NSString *old = password;
-	password = [thePassword retain];
-	[old release];
 }
 
 @end

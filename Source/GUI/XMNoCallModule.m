@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.19 2006/02/27 19:20:47 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.20 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -77,7 +77,7 @@
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
-							   name:XMNotification_PreferencesDidChange 
+							   name:XMNotification_PreferencesManagerDidChangePreferences
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidEndFetchingExternalAddress
@@ -408,7 +408,7 @@
 	}
 	else
 	{
-		if (![[[XMPreferencesManager sharedInstance] activeLocation] useGatekeeper]){
+		if (![[[XMPreferencesManager sharedInstance] activeLocation] usesGatekeeper]){
 			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
 			[toolTipString appendString:NSLocalizedString(@"Ready. Not using a gatekeeper\n\n",@"")];
 		}

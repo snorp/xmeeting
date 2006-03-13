@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.7 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.8 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include "XMEndPoint.h"
 
 #include <h323/h323ep.h>
+#include <sip/sipep.h>
 
 #include "XMCallbackBridge.h"
 #include "XMConnection.h"
@@ -144,6 +145,10 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 	{
 		callProtocol = XMCallProtocol_H323;
 	}
+	else if(PIsDescendant(&endPoint, SIPEndPoint))
+	{
+		callProtocol = XMCallProtocol_SIP;
+	}
 	
 	if(callProtocol == XMCallProtocol_UnknownProtocol)
 	{
@@ -184,20 +189,36 @@ void XMEndPoint::RejectIncomingCall()
 	}
 }
 
-void XMEndPoint::ClearCall(const PString & token)
+/*void XMEndPoint::ClearCall(const PString & token)
 {
 	PSafePtr<OpalCall> call = GetManager().FindCallWithLock(token, PSafeReadOnly);
 	if(call != NULL)
 	{
+		cout << "trying to clear" << endl;
 		call->Clear();
+		cout << "done" << endl;
 	}
 	else
 	{
 		cout << "Clearing the Call failed (Call not found)" << endl;
 	}
-}
+}*/
 
 void XMEndPoint::SetEnableVideo(BOOL flag)
 {
 	enableVideo = flag;
+}
+
+
+void XMEndPoint::OnReleased(OpalConnection & connection)
+{
+	cout << "XMEndPoint::OnReleased: " << connection;
+	OpalEndPoint::OnReleased(connection);
+}
+
+void XMEndPoint::OnEstablished(OpalConnection & connection)
+{
+	cout << "XMEndPoint::OnEstablished: " << connection;
+	OpalEndPoint::OnEstablished(connection);
+	cout << "XMEndPoint::OnEstablished done" << endl;
 }

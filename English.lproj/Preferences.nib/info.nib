@@ -3,96 +3,85 @@
 <plist version="1.0">
 <dict>
 	<key>IBDocumentLocation</key>
-	<string>56 287 356 240 0 0 1280 1002 </string>
+	<string>25 96 356 240 0 0 1280 832 </string>
 	<key>IBEditorPositions</key>
 	<dict>
 		<key>20</key>
 		<string>595 516 90 79 0 0 1280 832 </string>
 		<key>291</key>
-		<string>280 579 720 207 0 0 1280 1002 </string>
+		<string>280 452 720 207 0 0 1280 832 </string>
+		<key>338</key>
+		<string>271 418 720 267 0 0 1280 832 </string>
 		<key>7</key>
 		<string>491 513 720 242 0 0 1280 832 </string>
 		<key>9</key>
-		<string>280 470 720 425 0 0 1280 1002 </string>
+		<string>73 356 720 385 0 0 1280 832 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>443.0</string>
 	<key>IBGroupedObjects</key>
 	<dict>
-		<key>21</key>
+		<key>1</key>
 		<array>
-			<string>76</string>
-			<string>77</string>
-			<string>78</string>
-			<string>79</string>
-			<string>103</string>
-			<string>104</string>
-			<string>105</string>
-			<string>106</string>
-		</array>
-		<key>24</key>
-		<array>
-			<string>102</string>
-			<string>259</string>
-			<string>101</string>
-		</array>
-		<key>29</key>
-		<array>
-			<string>107</string>
-			<string>108</string>
-			<string>109</string>
 			<string>115</string>
 			<string>117</string>
-			<string>110</string>
-			<string>111</string>
-			<string>112</string>
 			<string>231</string>
 			<string>232</string>
-			<string>113</string>
-			<string>114</string>
+		</array>
+		<key>2</key>
+		<array>
+			<string>138</string>
+			<string>137</string>
+			<string>286</string>
+			<string>233</string>
+			<string>234</string>
 		</array>
 		<key>3</key>
 		<array>
-			<string>75</string>
-			<string>60</string>
-			<string>56</string>
-			<string>73</string>
-			<string>68</string>
-			<string>63</string>
+			<string>433</string>
+			<string>100</string>
+			<string>98</string>
+			<string>432</string>
+			<string>96</string>
+			<string>431</string>
+			<string>426</string>
+			<string>425</string>
 		</array>
-		<key>30</key>
+		<key>6</key>
 		<array>
-			<string>84</string>
-			<string>83</string>
+			<string>70</string>
+			<string>71</string>
+			<string>72</string>
+			<string>80</string>
 		</array>
-		<key>34</key>
+		<key>7</key>
 		<array>
-			<string>131</string>
-			<string>132</string>
-			<string>285</string>
+			<string>103</string>
+			<string>76</string>
+			<string>77</string>
+			<string>104</string>
+			<string>78</string>
+			<string>105</string>
+			<string>106</string>
+			<string>79</string>
 		</array>
-		<key>36</key>
+		<key>8</key>
 		<array>
-			<string>292</string>
-			<string>293</string>
-		</array>
-		<key>37</key>
-		<array>
-			<string>298</string>
-			<string>302</string>
+			<string>448</string>
+			<string>457</string>
+			<string>447</string>
+			<string>456</string>
+			<string>451</string>
+			<string>450</string>
 		</array>
 	</dict>
 	<key>IBLastGroupID</key>
-	<string>38</string>
+	<string>9</string>
 	<key>IBLockedObjects</key>
 	<array>
 		<integer>9</integer>
 	</array>
-	<key>IBOpenObjects</key>
-	<array>
-		<integer>9</integer>
-	</array>
 	<key>IBSystem Version</key>
-	<string>8G32</string>
+	<string>8H14</string>
 </dict>
 </plist>

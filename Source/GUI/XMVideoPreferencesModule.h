@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.h,v 1.2 2006/02/09 01:43:11 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.h,v 1.3 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_VIDEO_PREFERENCES_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
+
 #import "XMPreferencesModule.h"
 
 extern NSString *XMKey_VideoPreferencesModuleIdentifier;

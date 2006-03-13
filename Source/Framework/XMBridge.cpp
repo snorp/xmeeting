@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.18 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.19 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -155,6 +155,7 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	disabledCodecsArray.AppendString("LPC-10");
 	disabledCodecsArray.AppendString("MS-GSM");
 	disabledCodecsArray.AppendString("MS-IMA-ADPCM");
+	disabledCodecsArray.AppendString("DUMMY");
 	
 	theManager->SetMediaFormatMask(disabledCodecsArray);
 	theManager->SetMediaFormatOrder(orderedCodecsArray);
@@ -178,11 +179,12 @@ void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 	h323EndPoint->DisableH245Tunneling(!enableH245Tunnel);
 }
 
-XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, const char *identifier, 
-													const char *gkUsername, const char *phoneNumber,
+XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, 
+													const char *gkUsername, 
+													const char *phoneNumber,
 													const char *password)
 {
-	return h323EndPoint->SetGatekeeper(address, identifier, gkUsername, phoneNumber, password);
+	return h323EndPoint->SetGatekeeper(address, gkUsername, phoneNumber, password);
 }
 
 void _XMCheckGatekeeperRegistration()
@@ -195,6 +197,23 @@ void _XMCheckGatekeeperRegistration()
 bool _XMEnableSIPListeners(bool flag)
 {
 	return sipEndPoint->EnableListeners(flag);
+}
+
+void _XMPrepareRegistrarSetup()
+{
+	sipEndPoint->PrepareRegistrarSetup();
+}
+
+void _XMUseRegistrar(const char *host,
+					 const char *username,
+					 const char *password)
+{
+	sipEndPoint->UseRegistrar(host, username, password);
+}
+
+void _XMFinishRegistrarSetup()
+{
+	sipEndPoint->FinishRegistrarSetup();
 }
 
 #pragma mark Call Management functions
@@ -255,7 +274,7 @@ void _XMGetCallInformation(unsigned callID,
 void _XMGetCallStatistics(unsigned callID,
 						  XMCallStatisticsRecord *callStatistics)
 {
-	h323EndPoint->GetCallStatistics(callStatistics);
+	theManager->GetCallStatistics(callStatistics);
 }
 
 #pragma mark MediaTransmitter Functions

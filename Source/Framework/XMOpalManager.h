@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.11 2006/03/02 22:35:54 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.12 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,11 +45,16 @@ public:
 							const PString & remoteName,
 							const PString & remoteNumber,
 							const PString & remoteAddress,
-							const PString & remoteApplication);
+							const PString & remoteApplication,
+							XMCallProtocol callProtocol);
+	
+	/* getting call statistics */
+	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
 	virtual void OnClearedCall(OpalCall & call);
+	virtual void OnReleased(OpalConnection & connection);
 	virtual BOOL OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream);
 	virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source);
@@ -83,6 +88,7 @@ private:
 	PString remoteNumber;
 	PString remoteAddress;
 	PString remoteApplication;
+	XMCallProtocol callProtocol;
 };
 
 #endif // __XM_OPAL_MANAGER_H__

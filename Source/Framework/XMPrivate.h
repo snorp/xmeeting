@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.22 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.23 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -250,9 +250,11 @@ extern NSString *XMExceptionReason_CallManagerInvalidActionIfH323Listening;
 extern NSString *XMExceptionReason_CallManagerInvalidActionIfH323Disabled;
 extern NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered;
 extern NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfSIPListening;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfSIPDisabled;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfAllRegistrarsRegistered;
+extern NSString *XMexceptionReason_CallManagerInvalidActionIfRegistrarsDisabled;
 
-extern NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallEstablished;
-extern NSString *XMExceptionReason_CallManagerInternalConsistencyFailureOnCallCleared;
 extern NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure;
 
 #endif // __XM_PRIVATE_H__

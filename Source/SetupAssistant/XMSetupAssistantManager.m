@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.3 2006/02/28 18:37:21 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.4 2006/03/13 23:46:27 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,6 +43,7 @@
 #define XMKey_Description @"XMeeting_Description"
 #define XMKey_Keys @"XMeeting_Keys"
 #define XMKey_GatekeeperPassword @"XMeeting_GatekeeperPassword"
+#define XMKey_Locations @"XMeeting_Locations"
 
 @interface XMSetupAssistantManager (PrivateMethods)
 
@@ -462,7 +463,7 @@
 			
 		case XM_H323_SETTINGS_VIEW_TAG:
 			[self _finishFLH323Settings];
-			if([location useGatekeeper] == YES)
+			if([location usesGatekeeper] == YES)
 			{
 				nextView = gatekeeperSettingsView;
 				viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
@@ -553,7 +554,7 @@
 			
 		case XM_VIDEO_SETTINGS_VIEW_TAG:
 			[self _finishFLVideoSettings];
-			if([location useGatekeeper] == YES)
+			if([location usesGatekeeper] == YES)
 			{
 				nextView = gatekeeperSettingsView;
 				viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
@@ -600,8 +601,6 @@
 			locationImportData = nil;
 		}
 		
-		[preferencesManager clearTemporaryPasswords];
-		
 		[delegate performSelector:didEndSelector withObject:[NSArray array]];
 		return;
 	}
@@ -612,9 +611,9 @@
 	
 	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
 	{
-		if(gkPassword != nil && [location useGatekeeper] == YES)
+		if(gkPassword != nil && [location usesGatekeeper] == YES)
 		{
-			[preferencesManager setTemporaryGatekeeperPassword:gkPassword forLocation:location];
+			//[preferencesManager setTemporaryGatekeeperPassword:gkPassword forLocation:location];
 		}
 		
 		[location setEnableH323:YES];
@@ -628,9 +627,6 @@
 	{
 		locationsArray = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
 	}
-	
-	[preferencesManager saveTemporaryPasswords];
-	[preferencesManager clearTemporaryPasswords];
 	
 	[delegate performSelector:didEndSelector withObject:locationsArray];
 }
@@ -733,15 +729,15 @@
 
 - (void)_prepareFLH323Settings
 {
-	int tag = ([location useGatekeeper] == YES) ? 0 : 1;
+	int tag = ([location usesGatekeeper] == YES) ? 0 : 1;
 	[useGatekeeperRadioButtons selectCellWithTag:tag];
 }
 
 - (void)_finishFLH323Settings
 {
 	int tag = [[useGatekeeperRadioButtons selectedCell] tag];
-	BOOL useGatekeeper = (tag == 0) ? YES : NO;
-	[location setUseGatekeeper:useGatekeeper];
+	BOOL usesGatekeeper = (tag == 0) ? YES : NO;
+	//[location setUseGatekeeper:useGatekeeper];
 }
 
 - (NSView *)_prepareFLGatekeeperSettings
@@ -1450,7 +1446,7 @@
 		gkPhoneNumber = @"";
 	}
 	
-	NSString *gkPwd = [preferencesManager temporaryGatekeeperPasswordForLocation:theLocation];
+	NSString *gkPwd = @"";
 	if(gkPwd == nil)
 	{
 		gkPwd = @"";
@@ -1527,7 +1523,6 @@
 		{
 			gkPwd = nil;
 		}
-		[preferencesManager setTemporaryGatekeeperPassword:gkPwd forLocation:[locations objectAtIndex:0]];
 	}
 	
 	[gkHostField setEnabled:YES];

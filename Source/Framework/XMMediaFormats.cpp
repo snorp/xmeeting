@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.12 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.13 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,7 @@
  */
 
 #include <asn/h245.h>
+#include <codec/h261codec.h>
 
 #include "XMMediaFormats.h"
 #include "XMBridge.h"
@@ -458,7 +459,7 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	{
 		maxBitRate = XM_MAX_H261_BITRATE;
 	}
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 
 	return TRUE;
 }
@@ -803,7 +804,7 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		isH263PlusCapability = FALSE;
 	}
 	
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 	
 	return TRUE;
 }
@@ -1151,7 +1152,7 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, width);
 	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, height);
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 
 	return TRUE;
 }

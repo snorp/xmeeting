@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.8 2006/02/25 15:01:17 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.9 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -119,10 +119,10 @@
 							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
-							   name:XMNotification_ActiveLocationDidChange object:nil];
+							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
-							   name:XMNotification_PreferencesDidChange 
+							   name:XMNotification_PreferencesManagerDidChangePreferences
 							 object:nil];
 	
 	

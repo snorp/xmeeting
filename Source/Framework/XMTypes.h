@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.17 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.18 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,7 +33,7 @@ typedef enum XMCallProtocol
 {
 	XMCallProtocol_UnknownProtocol = 0,
 	XMCallProtocol_H323,
-	XMCallProtocol_SIP,	/* Not yet supported */
+	XMCallProtocol_SIP,
 	XMCallProtocolCount
 } XMCallProtocol;
 
@@ -108,10 +108,21 @@ typedef enum XMGatekeeperRegistrationFailReason
 {
 	XMGatekeeperRegistrationFailReason_NoFailure = 0,
 	XMGatekeeperRegistrationFailReason_UnknownFailure,
-	XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified,
 	XMGatekeeperRegistrationFailReason_GatekeeperNotFound,
 	XMGatekeeperRegistrationFailReason_RegistrationReject
 } XMGatekeeperRegistrationFailReason;
+
+/**
+ * Defines the various SIP registrar registration fail reasons
+ **/
+typedef enum XMRegistrarRegistrationFailReason
+{
+	XMRegistrarRegistrationFailReason_NoFailure = 0,
+	XMRegistrarRegistrationFailReason_UnknownFailure,
+	XMRegistrarRegistrationFailReason_RegistrarNoFound,
+	XMRegistrarRegistrationFailReason_SecurityDenial,
+	XMRegistrarRegistrationFailReason_RegistrationReject
+} XMRegistrarRegistrationFailReason;
 
 /**
  * Defines the audio codecs

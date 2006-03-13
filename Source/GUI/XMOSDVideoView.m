@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.5 2006/02/28 22:28:02 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.6 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -263,13 +263,13 @@
 												   object:nil];
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_preferencesDidChange:)
-													 name:XMNotification_PreferencesDidChange 
+													 name:XMNotification_PreferencesManagerDidChangePreferences 
 												   object:nil];
 		
 		[self performSelector:@selector(_setTrackingRect) withObject:nil afterDelay:0.0001];
 	}
 	else{
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_PreferencesDidChange object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
 	}
 }
 

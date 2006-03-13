@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.16 2006/02/11 10:19:08 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.17 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -105,7 +105,7 @@ extern NSString *XMNotification_CallManagerDidClearCall;
 
 /**
  * Posted when the Framework couldn't enable the H323 subsystem. This
- * normally indicates a problems like the H.323 listener ports not open
+ * normally indicates problems like the H.323 listener ports not open
  * and so on
  **/
 extern NSString *XMNotification_CallManagerDidNotEnableH323;
@@ -136,6 +136,40 @@ extern NSString *XMNotification_CallManagerDidUnregisterFromGatekeeper;
  * Posted when the Framework failed to register at a gatekeeper
  **/
 extern NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper;
+
+/**
+ * Posted when the Framwork couldn't enable the SIP subsystem. This normally
+ * indicates problems like the SIP ports not open and so on
+ **/
+extern NSString *XMNotification_CallManagerDidNotEnableSIP;
+
+/**
+ * Posted when the Framwork did start registering at SIP registrars.
+ * This can be a lengthy task
+ **/
+extern NSString *XMNotification_CallManagerDidStartRegistrarRegistrationProcess;
+
+/**
+ * Posted when the Framework finished registereing at SIP registrars
+ **/
+extern NSString *XMNotification_CallManagerDidEndRegistrarRegistrationProcess;
+
+/**
+ * Posted when the Framwork succesfully registered at a SIP registrar.
+ * This notification is only posted when the Framework has a new registration
+ * made.
+ **/
+extern NSString *XMNotification_CallManagerDidRegisterAtRegistrar;
+
+/**
+ * Posted when the Framework unregistered from a SIP registrar
+ **/
+extern NSString *XMNotification_CallManagerDidUnregisterFromRegistrar;
+
+/**
+ * Posted when the Framework failed to register at the registrar
+ **/
+extern NSString *XMNotification_CallManagerDidNotRegisterAtRegistrar;
 
 /**
  * Posted when the appropriate media stream is opened
@@ -257,11 +291,14 @@ extern NSString *XMKey_PreferencesEnableH264LimitedMode;
 extern NSString *XMKey_PreferencesEnableH323;
 extern NSString *XMKey_PreferencesEnableH245Tunnel;
 extern NSString *XMKey_PreferencesEnableFastStart;
-extern NSString *XMKey_PreferencesUseGatekeeper;
 extern NSString *XMKey_PreferencesGatekeeperAddress;
-extern NSString *XMKey_PreferencesGatekeeperID;
 extern NSString *XMKey_PreferencesGatekeeperUsername;
 extern NSString *XMKey_PreferencesGatekeeperPhoneNumber;
+
+// SIP-specific keys
+extern NSString *XMKey_PreferencesEnableSIP;
+extern NSString *XMKey_PreferencesRegistrarHosts;
+extern NSString *XMKey_PreferencesRegistrarUsernames;
 
 #pragma mark XMPreferencesCodecListRecord Keys
 

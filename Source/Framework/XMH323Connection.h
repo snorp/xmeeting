@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.5 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.6 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,6 +26,7 @@ public:
 					 const PString & alias,
 					 const H323TransportAddress & address,
 					 unsigned options = 0);
+	~XMH323Connection();
 	
 	virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
 	virtual BOOL OnReceivedCapabilitySet(const H323Capabilities & remoteCaps,

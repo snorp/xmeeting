@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.4 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.5 2006/03/13 23:46:23 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -218,7 +218,7 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 		// extracting the P, V and PLEN fields
 		BYTE p = (data[0] >> 2) & 0x01;
 		BYTE v = (data[0] >> 1) & 0x01;
-		BYTE plen = (data[0] & 0x01) << 4;
+		BYTE plen = (data[0] & 0x01) << 5;
 		plen |= (data[1] >> 3) & 0x1f;
 		
 		if(dataLength <= (2+v+plen))

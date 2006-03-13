@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.2 2006/02/27 14:38:18 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.3 2006/03/13 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,7 +49,7 @@
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
-							   name:XMNotification_PreferencesDidChange 
+							   name:XMNotification_PreferencesManagerDidChangePreferences
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_displayListeningStatusFieldInformation)
 							   name:XMNotification_UtilsDidEndFetchingExternalAddress
@@ -210,7 +210,7 @@
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	XMLocation *activeLocation = [preferencesManager activeLocation];
 	
-	if([activeLocation useGatekeeper] == YES)
+	if([activeLocation usesGatekeeper] == YES)
 	{
 		NSString* phone = [activeLocation gatekeeperPhoneNumber]; 
 		[gdsFld setStringValue:phone];
