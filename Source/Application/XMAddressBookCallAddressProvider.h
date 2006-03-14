@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.h,v 1.3 2005/10/31 22:11:50 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.h,v 1.4 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_CALL_ADDRESS_PROVIDER_H__

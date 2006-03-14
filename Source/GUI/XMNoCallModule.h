@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.8 2006/02/27 19:53:13 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.9 2006/03/14 22:44:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,15 +10,17 @@
 #define __XM_NO_CALL_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowModule.h"
 
-@class XMAddressBookManager, XMDatabaseField, XMCallAddressManager, XMPreferencesManager;
+#import "XMMainWindowModule.h"
+#import "XMDatabaseField.h"
+
+@class XMAddressBookManager, XMCallAddressManager, XMPreferencesManager;
 
 /**
  * XMNoCallModule is the main window module displayed when the
  * application is not in a call.
  **/
-@interface XMNoCallModule : NSObject <XMMainWindowModule> {
+@interface XMNoCallModule : NSObject <XMMainWindowModule, XMDatabaseFieldDataSource> {
 	
 	// XMMainWindowModule Outlets and variables
 	IBOutlet NSView *contentView;

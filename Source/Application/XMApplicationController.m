@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationController.m,v 1.20 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.21 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMApplicationController.h"
@@ -416,8 +416,8 @@
 - (void)_setupApplication:(NSArray *)locations
 {		
 	// registering the call address providers
-	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
+	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];

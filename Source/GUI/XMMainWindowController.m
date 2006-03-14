@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.12 2006/02/28 22:33:38 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.13 2006/03/14 22:44:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -629,8 +629,8 @@ NSLog(@"noteSizeValuesDidChangeOfAdditionModule called!");
 	// resizing the window
 	[mainContentBox setContentView:nil];
 	[window setFrame:windowFrame display:YES animate:YES];
-	[module becomeActiveModule];
 	[mainContentBox setContentView:[module contentView]];
+	[module becomeActiveModule];
 	
 	// setting the correct minSize values
 	NSSize minSize = windowFrame.size;

@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.6 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.7 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAddressBookCallAddressProvider.h"
@@ -190,6 +190,12 @@
 		}
 	}
 	return nil;
+}
+
+- (NSArray *)allAddresses
+{
+	XMAddressBookManager *addressBookManager = [XMAddressBookManager sharedInstance];
+	return [addressBookManager validRecords];
 }
 
 @end

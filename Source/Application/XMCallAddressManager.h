@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.5 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.6 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_ADDRESS_MANAGER_H__
@@ -47,6 +47,11 @@
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
 
 /**
+ * Returns all available addresses
+ **/
+- (NSArray *)allAddresses;
+
+/**
  * Returns the call address instance which currently is being called (or in a call).
  * Returns nil if there is no address the receiver tries to call.
  **/
@@ -76,6 +81,12 @@
  * If uncompletedString does not match the resource, this method should return nil.
  */
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
+
+/**
+ * This method should return all id<XMCallResource> instances that this instance can
+ * provide
+ **/
+- (NSArray *)allAddresses;
 
 @end
 

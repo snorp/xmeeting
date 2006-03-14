@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.2 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.3 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallHistoryCallAddressProvider.h"
@@ -158,6 +158,26 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 		return [record displayString];
 	}
 	return nil;
+}
+
+- (NSArray *)allAddresses
+{
+	unsigned i;
+	unsigned count = [callHistoryRecords count];
+	
+	NSMutableArray *addresses = [NSMutableArray arrayWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
+		
+		if([record type] == XMCallHistoryRecordType_GeneralRecord)
+		{
+			[addresses addObject:record];
+		}
+	}
+	
+	return addresses;
 }
 
 #pragma mark Private Methods

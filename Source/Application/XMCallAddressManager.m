@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.7 2005/11/23 19:28:44 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.8 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallAddressManager.h"
@@ -110,6 +110,24 @@
 	return [provider completionStringForAddress:address uncompletedString:uncompletedString];
 }
 
+- (NSArray *)allAddresses
+{
+	unsigned i;
+	unsigned count = [callAddressProviders count];
+	
+	NSMutableArray *addresses = [NSMutableArray arrayWithCapacity:20];
+	
+	for(i = 0; i < count; i++)
+	{
+		id<XMCallAddressProvider> provider = (id<XMCallAddressProvider>)[callAddressProviders objectAtIndex:i];
+		NSArray *addr = [provider allAddresses];
+		
+		[addresses addObjectsFromArray:addr];
+	}
+	
+	return addresses;
+}
+
 - (id<XMCallAddress>)activeCallAddress
 {
 	return activeCallAddress;
@@ -120,6 +138,13 @@
 	if(activeCallAddress != nil)
 	{
 		NSLog(@"Illegal, active callAddress not nil");
+		return;
+	}
+	
+	if(callAddress == nil ||
+	   [[[callAddress addressResource] address] isEqualToString:@""])
+	{
+		NSLog(@"nil or EMPTY ADDRESS!");
 		return;
 	}
 	

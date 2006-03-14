@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationController.h,v 1.9 2006/02/27 19:53:13 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.10 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_APPLICATION_CONTROLLER_H__

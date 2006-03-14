@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookRecordSearchMatch.h,v 1.1 2005/11/01 08:27:14 hfriederich Exp $
+ * $Id: XMAddressBookRecordSearchMatch.h,v 1.2 2006/03/14 22:44:38 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_RECORD_SEARCH_MATCH_H__

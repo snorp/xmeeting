@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.20 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.21 2006/03/14 22:44:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -178,6 +178,7 @@
 
 - (void)becomeActiveModule
 {
+	[[contentView window] makeFirstResponder:callAddressField];
 }
 
 - (void)becomeInactiveModule
@@ -196,8 +197,6 @@
 - (IBAction)showTools:(id)sender{
 	[[NSApp delegate] showTools:self];
 }
-
-
 
 - (IBAction)showAddressBookModuleSheet:(id)sender{
 	[[XMMainWindowController sharedInstance] showAdditionModule:[[NSApp delegate] addressBookModule]];
@@ -221,7 +220,7 @@
 		NSLog(@"ERROR: NO REPRESENTED OBJECT!");
 		return;
 	}
-	
+
 	[[XMCallAddressManager sharedInstance] makeCallToAddress:callAddress];
 }
 
@@ -308,6 +307,29 @@
 {
 	NSImage *image = [(id<XMCallAddress>)representedObject displayImage];
 	return image;
+}
+
+- (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField
+{
+	id representedObject = [databaseField representedObject];
+	
+	if(representedObject == nil ||
+	   [(id<XMCallAddress>)representedObject displayImage] == nil)
+	{
+		return [NSArray arrayWithObjects:@"H.323", @"SIP", nil];
+	}
+	return [NSArray array];
+}
+
+- (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption
+{
+	NSLog(@"USER SELECTED %@", imageOption);
+}
+
+- (NSArray *)pulldownObjectsForDatabaseField:(XMDatabaseField *)databaseField
+{
+	XMCallAddressManager *callAddressManager = [XMCallAddressManager sharedInstance];
+	return [callAddressManager allAddresses];
 }
 
 #pragma mark Notification Methods

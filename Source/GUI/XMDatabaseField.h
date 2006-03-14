@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.h,v 1.3 2005/06/23 12:35:56 hfriederich Exp $
+ * $Id: XMDatabaseField.h,v 1.4 2006/03/14 22:44:40 hfriederich Exp $
  *
  * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@protocol XMDatabaseFieldDataSource;
+
 /**
  * XMDatabaseFields extends the functionality of NSTextField
  * by allowing the data source to return an array of possible
@@ -20,13 +22,15 @@
  **/
 @interface XMDatabaseField : NSTextField {
 	
-	IBOutlet id dataSource;
+	IBOutlet id<XMDatabaseFieldDataSource> dataSource;
 	
-	NSWindow *completionsWindow;
-	NSScrollView *completionsScrollView;
-	NSTableView *completionsTableView;
-	NSArray *currentCompletions;
-	BOOL completionsWindowIsShown;
+	NSWindow *pulldownWindow;
+	NSScrollView *pulldownScrollView;
+	NSTableView *pulldownTableView;
+	NSArray *tableData;
+	BOOL windowIsShown;
+	BOOL isOverDisclosure;
+	unsigned pulldownMode;
 	
 	BOOL shouldFetchCompletions;
 	
@@ -35,17 +39,35 @@
 	id representedObject;
 	
 	NSImage *defaultImage;
+	
+	NSTrackingRectTag disclosureTrackingRect;
 }
 
+/**
+ * Gets / Sets the data source for this view
+ **/
 - (id)dataSource;
 - (void)setDataSource:(id)dataSource;
 
+/**
+ * Gets / Sets the default image for this view
+ **/
 - (NSImage *)defaultImage;
 - (void)setDefaultImage:(NSImage *)image;
 
+/**
+ * Gets / Sets the current represented object in
+ * this view
+ **/
 - (id)representedObject;
 - (void)setRepresentedObject:(id)representedObject;
 
+/**
+ * Causes the editing operation to end. The pull down menu
+ * will disappear if open, the edited text will be replaced
+ * by a text from the data source and the image will be adjusted
+ * if needed
+ **/
 - (void)endEditing;
 
 @end
@@ -58,32 +80,56 @@
 /**
  * Asks the data source to return an array of available completions
  * for the given uncompletedString. The data source may specify
- * which item to select and display in thetext field by 
+ * which item to select and display in the text field by 
  * setting indexOfSelectedItem accordingly.
  * This method is required to implement.
  **/
 - (NSArray *)databaseField:(XMDatabaseField *)databaseField 
-		 completionsForString:(NSString *)uncompletedString
-		  indexOfSelectedItem:(unsigned *)indexOfSelectedItem;
+	  completionsForString:(NSString *)uncompletedString
+	   indexOfSelectedItem:(unsigned *)indexOfSelectedItem;
 
 /**
  * Asks the data source to return a represented object for the given completedString
  * This allows the dataSource to return a more complex object than a single NSString instance.
- * This Method is required to implement
+ * This method is required to implement
  **/
 - (id)databaseField:(XMDatabaseField *)databaseField representedObjectForCompletedString:(NSString *)completedString;
 
 /**
  * The data source is queried for a display name for the represented object.
- * This Method is required to implement
+ * This method is required to implement
  **/
 - (NSString *)databaseField:(XMDatabaseField *)databaseField displayStringForRepresentedObject:(id)representedObject;
 
-/**
+/** 
  * This method may return an image for the represented object, or nil if there is no appropriate
- * image. In this case, the default image is used if there is one specified
+ * image. In this case, the default image is used if there is one specified.
+ * This method is required to implement.
  **/
 - (NSImage *)databaseField:(XMDatabaseField *)databaseField imageForRepresentedObject:(id)representedObject;
+
+/**
+ * Asks the data source to return an array of NSString instances. These instances will be displayed
+ * in a pull down menu when the user clicks on the image in the view. If the array contains no elements,
+ * no pull down menu appears.
+ * This method is required to implement
+ **/
+- (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField;
+
+/**
+ * Informs the data source that the user selected one of the text options.
+ * This method is required to implement
+ **/
+- (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption;
+
+/**
+ * Asks the data source to return an array of objects that the user can choose from. This array
+ * will be shown in a pull down menu if the user clicks on the disclosure at the right side of the view. 
+ * If the user chooses an item in the pull down menu, the corresponding object will be taken as the
+ * represented object and the view is displayed accordingly.
+ * This method is required to implement
+ **/
+- (NSArray *)pulldownObjectsForDatabaseField:(XMDatabaseField *)databaseField;
 
 @end
 

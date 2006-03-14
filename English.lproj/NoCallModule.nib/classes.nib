@@ -21,7 +21,7 @@
         {
             CLASS = XMDatabaseField; 
             LANGUAGE = ObjC; 
-            OUTLETS = {dataSource = id; }; 
+            OUTLETS = {dataSource = id; representedObject = id; }; 
             SUPERCLASS = NSTextField; 
         }, 
         {
