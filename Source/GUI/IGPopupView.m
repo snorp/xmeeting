@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.3 2006/03/14 12:12:00 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.4 2006/03/14 12:31:34 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -62,7 +62,6 @@
 -(void)awakeFromNib{
 	showingTitleOfSelectedItem = YES;
 
-    [self addCursorRect:[self frame] cursor:[NSCursor pointingHandCursor]];
     [self setPullsDown:NO];
 	
 }
