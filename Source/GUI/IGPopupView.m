@@ -1,9 +1,9 @@
 /*
- * $Id: IGPopupView.m,v 1.4 2006/03/14 12:31:34 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.5 2006/03/14 23:06:00 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
- * Copyright (c) 2005 Ivan Guajana. All rights reserved.
+ * Copyright (c) 2005-2006 Ivan Guajana. All rights reserved.
  */
 #import "IGPopupView.h"
 

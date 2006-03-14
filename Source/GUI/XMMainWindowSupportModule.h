@@ -1,9 +1,9 @@
 /*
- * $Id: XMMainWindowSupportModule.h,v 1.1 2005/11/09 20:00:27 hfriederich Exp $
+ * $Id: XMMainWindowSupportModule.h,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_MAIN_WINDOW_SUPPORT_MODULE_H__

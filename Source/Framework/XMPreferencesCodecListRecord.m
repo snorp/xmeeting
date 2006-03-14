@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesCodecListRecord.m,v 1.2 2005/10/25 21:41:35 hfriederich Exp $
+ * $Id: XMPreferencesCodecListRecord.m,v 1.3 2006/03/14 23:05:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMStringConstants.h"

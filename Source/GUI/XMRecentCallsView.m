@@ -1,9 +1,9 @@
 /*
- * $Id: XMRecentCallsView.m,v 1.2 2005/10/17 12:57:54 hfriederich Exp $
+ * $Id: XMRecentCallsView.m,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMeeting.h"

@@ -1,9 +1,9 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.6 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.7 2006/03/14 23:06:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Ivan Guajana. All rights reserved.
+ * Copyright (c) 2005-2006 Ivan Guajana. All rights reserved.
  */
 
 #import "XMOSDVideoView.h"

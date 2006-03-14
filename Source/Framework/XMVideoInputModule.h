@@ -1,9 +1,9 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.10 2006/02/27 15:32:28 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.11 2006/03/14 23:05:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_VIDEO_INPUT_MODULE_H__

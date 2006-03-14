@@ -1,9 +1,9 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.3 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.4 2006/03/14 23:05:57 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Andreas Fenkart, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Andreas Fenkart, Hannes Friederich. All rights reserved.
  */
 
 #include "XMBridge.h"

@@ -1,9 +1,9 @@
 /*
- * $Id: XMDatabaseField.m,v 1.8 2006/03/14 22:44:40 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.9 2006/03/14 23:06:00 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMDatabaseField.h"

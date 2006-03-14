@@ -1,9 +1,9 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.4 2006/03/13 23:46:27 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.5 2006/03/14 23:06:09 hfriederich Exp $
  *
- * Copyright (c) 2005 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
 #import "XMSetupAssistantManager.h"
