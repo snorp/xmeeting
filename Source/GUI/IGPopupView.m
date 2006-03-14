@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.2 2006/02/28 21:39:07 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.3 2006/03/14 12:12:00 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -61,9 +61,6 @@
 
 -(void)awakeFromNib{
 	showingTitleOfSelectedItem = YES;
-
-	[[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(_frameDidChange:) name:NSViewFrameDidChangeNotification object:[[self window] contentView]];
-	[[[self window] contentView] setPostsFrameChangedNotifications:YES];
 
     [self addCursorRect:[self frame] cursor:[NSCursor pointingHandCursor]];
     [self setPullsDown:NO];
@@ -176,6 +173,15 @@
 }
 
 - (void) viewDidMoveToWindow {
+	
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	
+	[notificationCenter removeObserver:self name:NSViewFrameDidChangeNotification object:nil];
+	if([self window] != nil)
+	{
+		[notificationCenter  addObserver:self selector:@selector(_frameDidChange:) name:NSViewFrameDidChangeNotification object:[[self window] contentView]];
+	}
+	
 	[self _resetTrackingRect];
 }
 
