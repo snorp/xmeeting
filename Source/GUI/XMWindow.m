@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.m,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMWindow.m,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,22 @@ NSString *XMNotification_WindowWillMinimize = @"XMeetingWindowWillMinimizeNotifi
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_WindowWillMinimize
 														object:self];
 	[super miniaturize:sender];
+}
+
+@end
+
+@implementation XMChildWindow
+
+/**
+ * This undocumented method returns NO if the window has no
+ * title bar. If NO is returned, all controls drawn are grayed
+ * and without any visible indication to user interaction.
+ * Therefore, YES is returned here to achieve the desired behaviour.
+ * If anyone knows a better solution, don't hesitate to report it...
+ **/
+- (BOOL)_hasActiveControls
+{
+	return YES;
 }
 
 @end

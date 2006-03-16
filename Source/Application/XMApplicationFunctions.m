@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.3 2006/03/14 23:05:50 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,7 +8,7 @@
 
 #import "XMApplicationFunctions.h"
 
-NSString *byteString(unsigned bytes)
+NSString *XMByteString(unsigned bytes)
 {
 	double value;
 	
@@ -33,7 +33,7 @@ NSString *byteString(unsigned bytes)
 	}
 }
 
-NSString *timeString(unsigned time)
+NSString *XMTimeString(unsigned time)
 {
 	unsigned hours = time / (60 * 60);
 	unsigned minutes = (time / 60) - (60 * hours);
@@ -49,12 +49,12 @@ NSString *timeString(unsigned time)
 	}
 }
 
-NSString *dateFormatString()
+NSString *XMDateFormatString()
 {
 	return @"%Y-%m-%d %H:%M:%S";
 }
 
-NSString *callEndReasonString(XMCallEndReason callEndReason)
+NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
 {
 	NSString *reasonString;
 	
@@ -127,7 +127,7 @@ NSString *callEndReasonString(XMCallEndReason callEndReason)
 		
 }
 
-NSString *gatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailReason failReason)
+NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailReason failReason)
 {
 	NSString *failReasonString;
 	

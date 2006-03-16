@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.h,v 1.3 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.h,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,8 +19,8 @@
  **/
 typedef enum XMCallHistoryRecordType
 {
-	XMCallHistoryRecordType_GeneralRecord = 0,
-	XMCallHistoryRecordType_AddressBookRecord,
+	XMCallHistoryRecordType_GeneralRecord = 0, // this record has no match in the Address Book
+	XMCallHistoryRecordType_AddressBookRecord, // this record has a match in the Address Book
 	XMCallHistoryRecordTypeCount
 } XMCallHistoryRecordType;
 
@@ -45,7 +45,7 @@ typedef enum XMCallHistoryRecordType
 
 }
 
-- (id)initWithAddress:(NSString *)address displayString:(NSString *)displayString;
+- (id)initWithAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol displayString:(NSString *)displayString;
 
 - (id)initWithDictionaryRepresentation:(NSDictionary *)dictionary;
 

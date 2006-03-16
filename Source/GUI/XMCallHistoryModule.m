@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.12 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.13 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -47,7 +47,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addAdditionModule:self];
+	//[[XMMainWindowController sharedInstance] addAdditionModule:self];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
@@ -330,7 +330,7 @@
 	}
 	
 	XMGatekeeperRegistrationFailReason failReason = [[XMCallManager sharedInstance] gatekeeperRegistrationFailReason];
-	NSString *failReasonString = gatekeeperRegistrationFailReasonString(failReason);
+	NSString *failReasonString = XMGatekeeperRegistrationFailReasonString(failReason);
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Failed to register at gatekeeper \"%@\" (%@)",
 		gatekeeperAddress, failReasonString];
@@ -433,7 +433,7 @@
 		date = [[NSDate alloc] init];
 		createdDate = YES;
 	}
-	NSString *dateString = [date descriptionWithCalendarFormat:dateFormatString() timeZone:nil locale:nil];
+	NSString *dateString = [date descriptionWithCalendarFormat:XMDateFormatString() timeZone:nil locale:nil];
 	
 	if(createdDate == YES)
 	{

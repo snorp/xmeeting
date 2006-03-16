@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.8 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.9 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,7 @@
 #import "XMSimpleAddressResource.h"
 
 NSString *XMKey_CallHistoryRecordAddress = @"XMeeting_CallAddress";
+NSString *XMKey_CallHistoryRecordProtocol = @"XMeeting_Protocol";
 NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 @interface XMCallHistoryRecord(PrivateMethods)
@@ -33,16 +34,16 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	return nil;
 }
 
-- (id)initWithAddress:(NSString *)theAddress displayString:(NSString *)theDisplayString
+- (id)initWithAddress:(NSString *)theAddress protocol:(XMCallProtocol)theCallProtocol displayString:(NSString *)theDisplayString
 {
-	if(theAddress == nil || theDisplayString == nil)
+	if(theAddress == nil || theCallProtocol == XMCallProtocol_UnknownProtocol || theDisplayString == nil)
 	{
 		// this condition isn't allowed!
 		[self release];
 		return nil;
 	}
 	
-	self = [super initWithAddress:theAddress];
+	self = [super initWithAddress:theAddress callProtocol:theCallProtocol];
 	
 	displayString = [theDisplayString copy];
 	
@@ -59,9 +60,17 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 - (id)initWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
 	NSString *theCallAddress = [dictionaryRepresentation objectForKey:XMKey_CallHistoryRecordAddress];
+	NSNumber *theCallProtocolNumber = [dictionaryRepresentation objectForKey:XMKey_CallHistoryRecordProtocol];
 	NSString *theDisplayString = [dictionaryRepresentation objectForKey:XMKey_CallHistoryRecordDisplayString];
 	
-	self = [self initWithAddress:theCallAddress displayString:theDisplayString];
+	XMCallProtocol theCallProtocol = XMCallProtocol_H323;
+	
+	if(theCallProtocolNumber != nil)
+	{
+		theCallProtocol = (XMCallProtocol)[theCallProtocolNumber unsignedIntValue];
+	}
+	
+	self = [self initWithAddress:theCallAddress protocol:theCallProtocol displayString:theDisplayString];
 	
 	return self;
 }
@@ -86,8 +95,15 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (NSDictionary *)dictionaryRepresentation
 {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[self address], XMKey_CallHistoryRecordAddress,
-											displayString, XMKey_CallHistoryRecordDisplayString, nil];
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:[self callProtocol]];
+	
+	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:[self address], XMKey_CallHistoryRecordAddress,
+																	number, XMKey_CallHistoryRecordProtocol,
+																	displayString, XMKey_CallHistoryRecordDisplayString, nil];
+	
+	[number release];
+	
+	return dict;
 }
 
 #pragma mark Getting the attributes

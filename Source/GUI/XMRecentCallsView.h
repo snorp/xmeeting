@@ -1,5 +1,5 @@
 /*
- * $Id: XMRecentCallsView.h,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMRecentCallsView.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+/**
+ * This view manages the a set of XMCallInfoView instances which represent
+ * the recent calls made.
+ **/
 @interface XMRecentCallsView : NSView {
 	
 	IBOutlet NSScrollView *scrollView;

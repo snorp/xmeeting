@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.6 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.7 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,11 +16,14 @@
 @protocol XMCallAddressProvider;
 
 /**
- * XMCallResourceManager encapsulates functionality used to
+ * XMCallAddressManager encapsulates functionality used to
  * obtain resources which can be called. It allows to search
  * for resources matching the search string and allows other
  * parts of the application to initiate a call to a certain
- * resource
+ * resource.
+ * Always use this class to initiate calls and never use the
+ * XMCallManager API directly to ensure consistent application
+ * look and behaviour.
  **/
 @interface XMCallAddressManager : NSObject {
 	

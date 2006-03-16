@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallView.m,v 1.6 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMInCallView.m,v 1.7 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -116,7 +116,7 @@
 	}
 	unsigned contentWidth = width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
 	
-	unsigned videoHeight = XMGetVideoHeightForWidth(contentWidth);
+	unsigned videoHeight = XMGetVideoHeightForWidth(contentWidth, XMVideoSize_CIF);
 
 	unsigned preferredHeight = BOTTOM_CONTENT_MARGIN + videoHeight + TOP_CONTENT_MARGIN;
 
@@ -151,8 +151,8 @@
 	int availableWidth = (int)ownSize.width + (int)resizeDifference.width - LEFT_CONTENT_MARGIN - RIGHT_CONTENT_MARGIN;
 	int availableHeight = (int)ownSize.height + (int)resizeDifference.height - usedHeight;
 	
-	int calculatedWidth = (int)XMGetVideoWidthForHeight(availableHeight);
-	int calculatedHeight = (int)XMGetVideoHeightForWidth(availableWidth);
+	int calculatedWidth = (int)XMGetVideoWidthForHeight(availableHeight, XMVideoSize_CIF);
+	int calculatedHeight = (int)XMGetVideoHeightForWidth(availableWidth, XMVideoSize_CIF);
 	
 	if(calculatedHeight <= minimumVideoHeight)
 	{
@@ -208,7 +208,7 @@
 	unsigned usedHeight = 0;
 	if(showVideoContent == YES)
 	{
-		unsigned videoHeight = (unsigned)XMGetVideoHeightForWidth(contentWidth);
+		unsigned videoHeight = (unsigned)XMGetVideoHeightForWidth(contentWidth, XMVideoSize_CIF);
 		
 		usedHeight += videoHeight + CONTENT_SPACING;
 		

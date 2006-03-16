@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.h,v 1.5 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMDatabaseField.h,v 1.6 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,7 +18,12 @@
  * by allowing the data source to return an array of possible
  * completions to an entered string. The completions are displayed
  * in a pull-down menu, the same way as when the user entered
- * an uncomplete URL in Safari.
+ * an uncomplete URL in Safari. In addition to that, an url-like
+ * image can be displayed at the beginning of the text field to indicate
+ * the kind of text entered. This is similar to Safari behaviour.
+ * Last, but not least, there is an NSComboBox-like pull down menu
+ * available if the user clicks on the button at the right side of the
+ * control.
  **/
 @interface XMDatabaseField : NSTextField {
 	

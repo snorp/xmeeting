@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.h,v 1.2 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,10 @@
 
 extern NSString *XMNotification_CallHistoryCallAddressProviderDataDidChange;
 
+/**
+ * This class implements the XMCallAddressProvider protocol for providing
+ * search result on the recent calls made
+ **/
 @interface XMCallHistoryCallAddressProvider : NSObject <XMCallAddressProvider> {
 	
 	BOOL isActiveCallAddressProvider;

@@ -24,13 +24,13 @@
                 audioOutputDevicesPopUp = NSPopUpButton; 
                 audioOutputVolumeSlider = NSSlider; 
                 contentView = XMLocalAudioVideoView; 
-                localVideoView = XMOSDVideoView; 
+                localVideoView = XMLocalVideoView; 
                 muteAudioInputSwitch = NSButton; 
                 muteAudioOutputSwitch = NSButton; 
                 videoDeviceSettingsBox = NSBox; 
                 videoDeviceSettingsButton = NSButton; 
                 videoDeviceSettingsPanel = NSPanel; 
-                videoDeviceSettingsView = XMOSDVideoView; 
+                videoDeviceSettingsView = XMLocalVideoView; 
                 videoDevicesPopUp = NSPopUpButton; 
                 videoDisabledFld = NSTextField; 
             }; 
@@ -46,7 +46,7 @@
             }; 
             SUPERCLASS = NSView; 
         }, 
-        {CLASS = XMOSDVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+        {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }

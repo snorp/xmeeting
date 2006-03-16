@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.14 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.15 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addMainModule:self];
+	//[[XMMainWindowController sharedInstance] addMainModule:self];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
@@ -168,7 +168,7 @@
 	
 	[contentView setVideoSize:videoSize];
 	
-	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfMainModule:self];
+	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
 
 	[videoView mouseEntered:[NSApp currentEvent]];
 

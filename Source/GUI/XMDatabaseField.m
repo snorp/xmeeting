@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.9 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.10 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 #define COMPLETIONS_WINDOW 0
 #define IMAGE_OPTIONS_WINDOW 1
 #define PULLDOWN_OBJECTS_WINDOW 2
+#define WINDOW_UPDATE_MODE 3
 
 /**
  * A subclass of NSWindow is required in order to obtain
@@ -183,6 +184,8 @@
 	[old release];
 	
 	[[self cell] _setImage:image];
+	
+	[self setNeedsDisplay:YES];
 }
 
 - (id)representedObject
@@ -308,6 +311,7 @@
 		}
 		else
 		{
+			[self insertTab:self];
 			returnValue = NO;
 		}
 	}
@@ -380,8 +384,22 @@
 
 - (void)insertTab:(id)sender
 {
-	unsigned selectedIndex = [pulldownTableView selectedRow];
-	NSString *string = [tableData objectAtIndex:selectedIndex];
+	NSString *string;
+	
+	if(windowIsShown == YES)
+	{
+		unsigned selectedIndex = [pulldownTableView selectedRow];
+		string = [tableData objectAtIndex:selectedIndex];
+	}
+	else
+	{
+		string = [self stringValue];
+		if(dataSource != nil)
+		{
+			unsigned index;
+			[dataSource databaseField:self completionsForString:string indexOfSelectedItem:&index];
+		}
+	}
 	
 	if(dataSource != nil)
 	{
@@ -392,8 +410,9 @@
 				[representedObject release];
 				representedObject = nil;
 			}
-		
+			NSLog(@"asking for represented object");
 			representedObject = [[dataSource databaseField:self representedObjectForCompletedString:string] retain];
+			NSLog(@"GOT %@", [representedObject description]);
 			[self _displayRepresentedObject];
 		}
 		else if(pulldownMode == PULLDOWN_OBJECTS_WINDOW)
@@ -445,6 +464,8 @@
 		}
 		if(dataSource != nil)
 		{
+			[self endEditing];
+			
 			NSArray *pulldownObjects = [dataSource pulldownObjectsForDatabaseField:self];
 			unsigned count = [pulldownObjects count];
 			
@@ -542,6 +563,15 @@
 	// do nothing. This way, the cursor rects will be just perfect...
 }
 
+- (void)viewWillStartLiveResize
+{
+	if(windowIsShown)
+	{
+		[self endEditing];
+		[self _hideWindow];
+	}
+}
+
 #pragma mark Methods controlling the completionsTableView
 
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
@@ -633,25 +663,16 @@
 		[currentEditor setString:completedString];
 		[currentEditor setSelectedRange:selectionRange];
 	}
-	else if(pulldownMode == PULLDOWN_OBJECTS_WINDOW)
-	{
-		// replacing the old string with the new one
-		NSText *currentEditor = [self currentEditor];
-		
-		id object = [tableData objectAtIndex:indexOfObject];
-		NSString *string = [dataSource databaseField:self displayStringForRepresentedObject:object];
-		
-		NSRange selectionRange = NSMakeRange(0, [string length]);
-		[currentEditor setString:string];
-		[currentEditor setSelectedRange:selectionRange];
-	}
 }
 
 - (void)_displayWindow:(unsigned)mode;
 {
 	NSWindow *parentWindow = [self window];
 	
-	pulldownMode = mode;
+	if(mode != WINDOW_UPDATE_MODE)
+	{
+		pulldownMode = mode;
+	}
 	
 	// calculate the completion window position
 	NSRect frame = [self frame];
@@ -660,44 +681,55 @@
 	NSPoint screenPoint = [parentWindow convertBaseToScreen:windowPoint];
 	
 	// calculating the size, adjusting the scrollers accordingly
-	unsigned numberOfItems = [tableData count];
-	if(numberOfItems > 5)
+	if(mode != WINDOW_UPDATE_MODE)
 	{
-		numberOfItems = 5;
-		[pulldownScrollView setHasVerticalScroller:YES];
+		unsigned numberOfItems = [tableData count];
+		if(numberOfItems > 5)
+		{
+			numberOfItems = 5;
+			[pulldownScrollView setHasVerticalScroller:YES];
+		}
+		else
+		{
+			[pulldownScrollView setHasVerticalScroller:NO];
+		}
+	
+		// calculating the window's size
+		float height = (float)([pulldownTableView rowHeight] * numberOfItems);
+		float width;
+	
+		if(pulldownMode == COMPLETIONS_WINDOW)
+		{
+			width = frame.size.width - DISCLOSURE_WIDTH;
+		}
+		else if(pulldownMode == IMAGE_OPTIONS_WINDOW)
+		{
+			width = 50.0;
+		}
+		else
+		{
+			width = frame.size.width;
+		}
+		NSRect menuWindowFrame = NSMakeRect(screenPoint.x, screenPoint.y - height, width, height);
+		[pulldownWindow setFrame:menuWindowFrame display:NO];
+		[pulldownTableView sizeToFit];
+		[pulldownTableView reloadData];
+		[pulldownWindow makeFirstResponder:pulldownScrollView];
+	
+		// display on screen if necessary
+		if(!windowIsShown)
+		{
+			[parentWindow addChildWindow:pulldownWindow ordered:NSWindowAbove];
+			windowIsShown = YES;
+		}
 	}
 	else
 	{
-		[pulldownScrollView setHasVerticalScroller:NO];
-	}
-	
-	// calculating the window's size
-	float height = (float)([pulldownTableView rowHeight] * numberOfItems);
-	float width;
-	
-	if(pulldownMode == COMPLETIONS_WINDOW)
-	{
-		width = frame.size.width - DISCLOSURE_WIDTH;
-	}
-	else if(pulldownMode == IMAGE_OPTIONS_WINDOW)
-	{
-		width = 50.0;
-	}
-	else
-	{
-		width = frame.size.width;
-	}
-	NSRect menuWindowFrame = NSMakeRect(screenPoint.x, screenPoint.y - height, width, height);
-	[pulldownWindow setFrame:menuWindowFrame display:NO];
-	[pulldownTableView sizeToFit];
-	[pulldownTableView reloadData];
-	[pulldownWindow makeFirstResponder:pulldownScrollView];
-	
-	// display on screen if necessary
-	if(!windowIsShown)
-	{
-		[parentWindow addChildWindow:pulldownWindow ordered:NSWindowAbove];
-		windowIsShown = YES;
+		NSRect frame = [pulldownWindow frame];
+		frame.origin.x = screenPoint.x;
+		frame.origin.y = screenPoint.y;
+		
+		[pulldownWindow setFrame:frame display:YES];
 	}
 }
 

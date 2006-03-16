@@ -7,50 +7,11 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
-        {CLASS = XMEventAwareWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
-            ACTIONS = {
-                changeAudioInputDevice = id; 
-                changeAudioInputVolume = id; 
-                changeAudioOutputDevice = id; 
-                changeAudioOutputVolume = id; 
-                changeVideoDevice = id; 
-                toggleMuteAudioInput = id; 
-                toggleMuteAudioOutput = id; 
-            }; 
-            CLASS = XMLocalAudioVideoController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                audioInputDevicesPopUp = NSPopUpButton; 
-                audioInputVolumeSlider = NSSlider; 
-                audioOutputDevicesPopUp = NSPopUpButton; 
-                audioOutputVolumeSlider = NSSlider; 
-                muteAudioInputSwitch = NSButton; 
-                muteAudioOutputSwitch = NSButton; 
-                videoDevicesPopUp = NSPopUpButton; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                showAdditionModuleInSeparateWindow = id; 
-                showSelfView = id; 
-                toggleShowAdditionContent = id; 
-            }; 
+            ACTIONS = {showSelfView = id; }; 
             CLASS = XMMainWindowController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                mainContentBox = NSBox; 
-                selfView = XMOSDVideoView; 
-                selfViewDrawer = NSDrawer; 
-            }; 
             SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            CLASS = XMMainWindowStatusBarController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {progressIndicator = NSProgressIndicator; statusBar = NSTextField; }; 
-            SUPERCLASS = NSObject; 
         }, 
         {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {CLASS = XMOSDVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 

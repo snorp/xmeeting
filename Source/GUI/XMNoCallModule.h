@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.10 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 #import "XMMainWindowModule.h"
 #import "XMDatabaseField.h"
 
-@class XMAddressBookManager, XMCallAddressManager, XMPreferencesManager;
+@class XMLocalVideoView;
 
 /**
  * XMNoCallModule is the main window module displayed when the
@@ -24,15 +24,18 @@
 	
 	// XMMainWindowModule Outlets and variables
 	IBOutlet NSView *contentView;
-	NSSize contentViewSize;
+	
+	NSSize contentViewSizeWithSelfViewHidden;
+	NSSize contentViewSizeWithSelfViewShown;
+	NSSize currentContentViewSizeWithSelfViewShown;
 	
 	// GUI Outlets
-	IBOutlet NSPopUpButton *recentCallsPopUpButton;
-	IBOutlet XMDatabaseField *callAddressField;
+	IBOutlet XMLocalVideoView *selfView;
+	IBOutlet NSImageView *semaphoreView;
+	IBOutlet NSTextField *statusField;
 	IBOutlet NSPopUpButton *locationsPopUpButton;
+	IBOutlet XMDatabaseField *callAddressField;
 	IBOutlet NSButton *callButton;
-	
-	IBOutlet NSTextField *statusFieldOne;
 	
 	// Optimizations for XMDatabaseField completions
 	unsigned uncompletedStringLength;
@@ -41,19 +44,16 @@
 	
 	NSNib *nibLoader;
 	
-	NSMenuItem *imageItem;
-	
-	IBOutlet NSImageView *semaphoreView;
-	
+	BOOL doesShowSelfView;
 	BOOL isCalling;
 }
 
 - (IBAction)call:(id)sender;
 - (IBAction)changeActiveLocation:(id)sender;
-- (IBAction)showAddressBookModuleSheet:(id)sender;
+- (IBAction)showAddressBook:(id)sender;
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
-- (IBAction)showSelfView:(id)sender;
+- (IBAction)toggleShowSelfView:(id)sender;
 
 
 @end

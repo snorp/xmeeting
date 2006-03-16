@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.11 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.12 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -176,8 +176,23 @@
  * on videoView after the system has been locked properly.
  * This method works also for views which arent't registered
  * using -addVideoView.
+ * This method is useful if a view needs to draw on the
+ * main thread.
  **/
 - (void)forceRenderingForView:(id<XMVideoView>)videoView;
+
+/**
+ * Causes the video manager to lock all video drawing code.
+ * Use this method if you need to change some OpenGL setup.
+ * The corresponding method -unlockVideoSystem should be
+ * called as soon as possible after this call.
+ **/
+- (void)lockVideoSystem;
+
+/**
+ * Unlocks the video system again
+ **/
+- (void)unlockVideoSystem;
 
 @end
 

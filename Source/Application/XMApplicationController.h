@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.10 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,7 +19,9 @@
 /**
  * XMApplicationController is responsible for the main menu and
  * is the NSApplication's delegate. In addition, this class
- * manages the application initialization and termination.
+ * manages the application initialization and termination and controls
+ * the appearance of various GUI elements on screen.
+ * (windows, alert panels)
  **/
 @interface XMApplicationController : NSObject {
 	

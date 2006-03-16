@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.h,v 1.1 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMSIPAccount.h,v 1.2 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,12 @@ extern NSString *XMKey_SIPAccountName;
 extern NSString *XMKey_SIPAccountRegistrar;
 extern NSString *XMKey_SIPAccountUsername;
 
+/**
+ * An SIP account instance encapsulates all information required so that the client
+ * can register at a SIP registrar.
+ *
+ * The locations then point to an account to define it's registrar settings.
+ **/
 @interface XMSIPAccount : NSObject <NSCopying> {
 
 	unsigned tag;

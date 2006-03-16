@@ -1,5 +1,5 @@
 /*
- * $Id: XMZeroConfModule.m,v 1.6 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMZeroConfModule.m,v 1.7 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addAdditionModule:self];
+	//[[XMMainWindowController sharedInstance] addAdditionModule:self];
 	
 	return self;
 }

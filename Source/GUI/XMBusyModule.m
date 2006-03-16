@@ -1,5 +1,5 @@
 /*
- * $Id: XMBusyModule.m,v 1.1 2006/02/27 19:53:13 hfriederich Exp $
+ * $Id: XMBusyModule.m,v 1.2 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addMainModule:self];
+	[[XMMainWindowController sharedInstance] addModule:self];
 	
 	nibLoader = nil;
 	

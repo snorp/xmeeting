@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.10 2006/02/28 18:37:21 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -462,14 +462,42 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 	}
 }
 
-float XMGetVideoHeightForWidth(float width)
+float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize)
 {
-	return width * (9.0/11.0);
+	if(videoSize == XMVideoSize_NoVideo)
+	{
+		return 0;
+	}
+	if(videoSize == XMVideoSize_SQCIF ||
+	   videoSize == XMVideoSize_320_240)
+	{
+		// 4:3 aspect ratio
+		return width * (3.0 / 4.0);
+	}
+	else
+	{
+		// 9:11 aspect ratio
+		return width * (9.0 / 11.0);
+	}
 }
 
-float XMGetVideoWidthForHeight(float height)
+float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize)
 {
-	return height * (11.0/9.0);
+	if(videoSize == XMVideoSize_NoVideo)
+	{
+		return 0;
+	}
+	if(videoSize == XMVideoSize_SQCIF ||
+	   videoSize == XMVideoSize_320_240)
+	{
+		// 4:3 aspect ratio
+		return height * (4.0 / 3.0);
+	}
+	else
+	{
+		// 11:9 aspect ratio
+		return height * (11.0 / 9.0);
+	}
 }
 
 void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info)

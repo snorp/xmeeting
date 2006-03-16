@@ -1,5 +1,5 @@
 /*
- * $Id: XMSimpleAddressResource.m,v 1.2 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMSimpleAddressResource.m,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,9 +13,11 @@
 
 #pragma mark Init & Deallocation Methods
 
-- (id)initWithAddress:(NSString *)theAddress
+- (id)initWithAddress:(NSString *)theAddress callProtocol:(XMCallProtocol)theCallProtocol
 {
 	address = [theAddress copy];
+	
+	callProtocol = theCallProtocol;
 	
 	return self;
 }
@@ -56,7 +58,12 @@
 
 - (XMCallProtocol)callProtocol
 {
-	return XMCallProtocol_H323;
+	return callProtocol;
+}
+
+- (void)setCallProtocol:(XMCallProtocol)theCallProtocol
+{
+	callProtocol = theCallProtocol;
 }
 
 - (NSString *)humanReadableAddress

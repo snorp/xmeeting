@@ -1,18 +1,19 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.10 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
+#import "XMeeting.h"
+
 #import "XMLocalAudioVideoModule.h"
 
-#import "XMeeting.h"
-#import "XMMainWindowController.h"
 #import "XMPreferencesManager.h"
+#import "XMMainWindowController.h"
 #import "XMLocalAudioVideoView.h"
-#import "XMOSDVideoView.h"
+#import "XMLocalVideoView.h"
 
 @interface XMLocalAudioVideoModule (PrivateMethods)
 
@@ -32,7 +33,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addSupportModule:self];
+	//[[XMMainWindowController sharedInstance] addSupportModule:self];
 	
 	nibLoader = nil;
 	
@@ -76,15 +77,6 @@
 		[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
 	}
 	
-	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
-	{
-		[localVideoView startDisplayingLocalVideo];
-	}
-	else
-	{
-		[localVideoView stopDisplayingVideo];
-	}
-	
 	// configuring the audio content
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	[audioInputDevicesPopUp removeAllItems];
@@ -126,7 +118,7 @@
 							 object:nil];
 	
 	
-	[localVideoView setShouldDisplayOSD:NO]; //No OSD for local video view
+	//[localVideoView setShouldDisplayOSD:NO]; //No OSD for local video view
 	[self _preferencesDidChange:nil];
 	
 }
@@ -159,6 +151,15 @@
 
 - (void)becomeActiveModule
 {
+	NSLog(@"becomeActive");
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		[localVideoView startDisplayingLocalVideo];
+	}
+	else
+	{
+		[localVideoView stopDisplayingLocalVideo];
+	}
 }
 
 - (void)becomeInactiveModule
@@ -209,9 +210,9 @@
 	
 	[videoDeviceSettingsBox setContentView:settingsView];
 	
-	[videoDeviceSettingsView startDisplayingLocalVideo];
-	
 	[NSApp beginSheet:videoDeviceSettingsPanel modalForWindow:[contentView window] modalDelegate:self didEndSelector:nil contextInfo:NULL];
+	
+	[videoDeviceSettingsView startDisplayingLocalVideo];
 }
 
 - (IBAction)changeAudioInputDevice:(id)sender
@@ -318,7 +319,7 @@
 	[NSApp endSheet:videoDeviceSettingsPanel returnCode:NSOKButton];
 	[videoDeviceSettingsPanel orderOut:self];
 	
-	[videoDeviceSettingsView stopDisplayingVideo];
+	[videoDeviceSettingsView stopDisplayingLocalVideo];
 	
 	[videoDeviceSettingsBox setContentView:nil];
 }
@@ -411,10 +412,10 @@
 	}
 	else
 	{
-		[localVideoView stopDisplayingVideo];
+		[localVideoView stopDisplayingLocalVideo];
 	}
 	
-	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfSupportModule:self];
+	//[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfSupportModule:self];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.21 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.22 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -192,12 +192,12 @@
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
-	[[XMMainWindowController sharedInstance] showMainModule:busyModule];
+	[[XMMainWindowController sharedInstance] showModule:busyModule];
 }
 
 - (void)_didEndSubsystemSetup:(NSNotification *)notif
 {
-	[[XMMainWindowController sharedInstance] showMainModule:noCallModule];
+	[[XMMainWindowController sharedInstance] showModule:noCallModule];
 }
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
@@ -208,7 +208,7 @@
 
 - (void)_didEstablishCall:(NSNotification *)notif
 {
-	[[XMMainWindowController sharedInstance] showMainModule:inCallModule];
+	[[XMMainWindowController sharedInstance] showModule:inCallModule];
 }
 
 - (void)_didClearCall:(NSNotification *)notif
@@ -217,7 +217,7 @@
 	{
 		[NSApp abortModal];
 	}
-	[[XMMainWindowController sharedInstance] showMainModule:noCallModule];
+	[[XMMainWindowController sharedInstance] showModule:noCallModule];
 }
 
 - (void)_didNotStartCalling:(NSNotification *)notif

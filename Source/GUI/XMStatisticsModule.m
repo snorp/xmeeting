@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.9 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMStatisticsModule.m,v 1.10 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,7 +22,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addAdditionModule:self];
+	//[[XMMainWindowController sharedInstance] addAdditionModule:self];
 	
 	nibLoader = nil;
 	activeCall = nil;
@@ -427,7 +427,7 @@
 		
 		[callInformationBox setHidden:NO];
 		[remotePartyNameField setStringValue:[activeCall remoteName]];
-		[callDurationField setStringValue:timeString((unsigned)[activeCall callDuration])];
+		[callDurationField setStringValue:XMTimeString((unsigned)[activeCall callDuration])];
 	}
 	
 	[roundTripDelayField setIntValue:[activeCall roundTripDelay]];

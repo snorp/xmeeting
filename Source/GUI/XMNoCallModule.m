@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.22 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.23 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,15 +7,17 @@
  */
 
 #import "XMeeting.h"
+
 #import "XMNoCallModule.h"
-#import "XMMainWindowController.h"
+
+#import "XMApplicationController.h"
 #import "XMCallAddressManager.h"
 #import "XMSimpleAddressResource.h"
-#import "XMCallHistoryCallAddressProvider.h"
-#import "XMCallHistoryRecord.h"
 #import "XMPreferencesManager.h"
-#import "XMDatabaseField.h"
-#import "XMApplicationController.h"
+#import "XMMainWindowController.h"
+#import "XMLocalVideoView.h"
+
+#define VIDEO_INSET 5
 
 @interface XMNoCallModule (PrivateMethods)
 
@@ -32,7 +34,6 @@
 - (void)_callHistoryDataDidChange:(NSNotification *)notif;
 
 - (void)_displayListeningStatusFieldInformation;
-- (void)_setupRecentCallsPullDownMenu;
 - (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender;
 
 - (void)_H323NotEnabled:(NSNotification*)notif;
@@ -44,7 +45,7 @@
 
 - (id)init
 {
-	[[XMMainWindowController sharedInstance] addMainModule:self];
+	[[XMMainWindowController sharedInstance] addModule:self];
 	
 	uncompletedStringLength = 0;
 	matchedAddresses = nil;
@@ -52,6 +53,7 @@
 	
 	nibLoader = nil;
 	
+	doesShowSelfView = NO;
 	isCalling = NO;
 	
 	return self;
@@ -63,9 +65,7 @@
 	[completions release];
 	
 	[nibLoader release];
-	
-	[imageItem release];
-	
+
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[super dealloc];
@@ -112,20 +112,22 @@
 	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
 							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper
 							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
+	/*[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
 							   name:XMNotification_CallHistoryCallAddressProviderDataDidChange
-							 object:nil];
+							 object:nil];*/
 	[notificationCenter addObserver:self selector:@selector(_H323NotEnabled:)
 							   name:XMNotification_CallManagerDidNotEnableH323
 							 object:nil];
 		
-	contentViewSize = [contentView frame].size;
+	contentViewSizeWithSelfViewHidden = [contentView frame].size;
+	contentViewSizeWithSelfViewShown = contentViewSizeWithSelfViewHidden;
+	currentContentViewSizeWithSelfViewShown = contentViewSizeWithSelfViewShown;
+	
+	// substracting the space used by the self view
+	contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
+	
+	
 	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
-	
-	imageItem = [[NSMenuItem alloc] init];
-	[imageItem setImage:[NSImage imageNamed:@"CallHistory"]];
-	
-	[self _setupRecentCallsPullDownMenu];
 
 	[self _preferencesDidChange:nil];
 }
@@ -152,7 +154,11 @@
 	// if not already done, this triggers the loading of the nib file
 	[self contentView];
 	
-	return contentViewSize;
+	if(doesShowSelfView == YES)
+	{
+		return currentContentViewSizeWithSelfViewShown;
+	}
+	return contentViewSizeWithSelfViewHidden;
 }
 
 - (NSSize)contentViewMinSize
@@ -160,7 +166,11 @@
 	// if not already done, this triggers the loading of the nib file
 	[self contentView];
 	
-	return contentViewSize;
+	if(doesShowSelfView == YES)
+	{
+		return contentViewSizeWithSelfViewShown;
+	}
+	return contentViewSizeWithSelfViewHidden;
 }
 
 - (NSSize)contentViewMaxSize
@@ -168,11 +178,54 @@
 	// if not already done, this triggers the loading of the nib file
 	[self contentView];
 	
-	return contentViewSize;
+	if(doesShowSelfView == YES)
+	{
+		return NSMakeSize(5000, 5000);
+	}
+	return contentViewSizeWithSelfViewHidden;
 }
 
 - (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight
 {
+	if(doesShowSelfView == NO)
+	{
+		return resizeDifference;
+	}
+	
+	NSSize size = [contentView bounds].size;
+	
+	unsigned usedHeight = contentViewSizeWithSelfViewHidden.height + VIDEO_INSET;
+	
+	int minimumVideoHeight = contentViewSizeWithSelfViewShown.height - usedHeight;
+	int currentVideoHeight = (int)size.height - usedHeight;
+	
+	int availableWidth = (int)size.width + (int)resizeDifference.width - 2*VIDEO_INSET;
+	int newHeight = currentVideoHeight + (int)resizeDifference.height;
+	
+	int calculatedWidth = (int)XMGetVideoWidthForHeight(newHeight, XMVideoSize_CIF);
+	int calculatedHeightFromWidth = (int)XMGetVideoHeightForWidth(availableWidth, XMVideoSize_CIF);
+	
+	if(calculatedHeightFromWidth <= minimumVideoHeight)
+	{
+		// set the height to the minimum height
+		resizeDifference.height = minimumVideoHeight - currentVideoHeight;
+	}
+	else
+	{
+		if(calculatedWidth < availableWidth)
+		{
+			// the height value takes precedence
+			int widthDifference = availableWidth - calculatedWidth;
+			resizeDifference.width -= widthDifference;
+		}
+		else
+		{
+			// the width value takes precedence
+			int heightDifference = newHeight - calculatedHeightFromWidth;
+			resizeDifference.height -= heightDifference;
+		}
+	}
+	
 	return resizeDifference;
 }
 
@@ -185,9 +238,26 @@
 {
 }
 
+#pragma mark -
 #pragma mark User Interface Methods
-- (IBAction)showSelfView:(id)sender{
-	[[XMMainWindowController sharedInstance] showSelfView:self];
+
+- (IBAction)toggleShowSelfView:(id)sender
+{
+	if(doesShowSelfView == NO)
+	{
+		doesShowSelfView = YES;
+		[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
+		[selfView startDisplayingLocalVideo];
+	}
+	else
+	{
+		[selfView stopDisplayingLocalVideo];
+		
+		currentContentViewSizeWithSelfViewShown = [contentView bounds].size;
+
+		doesShowSelfView = NO;
+		[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
+	}
 }
 
 - (IBAction)showInspector:(id)sender{
@@ -199,9 +269,8 @@
 }
 
 - (IBAction)showAddressBookModuleSheet:(id)sender{
-	[[XMMainWindowController sharedInstance] showAdditionModule:[[NSApp delegate] addressBookModule]];
+	//[[XMMainWindowController sharedInstance] showAdditionModule:[[NSApp delegate] addressBookModule]];
 }
-
 
 - (IBAction)call:(id)sender
 {
@@ -239,6 +308,7 @@
 	XMCallAddressManager *callAddressManager = [XMCallAddressManager sharedInstance];
 	NSArray *originalMatchedAddresses;
 	unsigned newUncompletedStringLength = [uncompletedString length];
+	
 	if(newUncompletedStringLength <= uncompletedStringLength)
 	{
 		// there may be more valid records than up to now, therefore
@@ -282,6 +352,7 @@
 	}
 	[originalMatchedAddresses release];
 	uncompletedStringLength = newUncompletedStringLength;
+	
 	return completions;
 }
 
@@ -291,7 +362,7 @@
 	
 	if(index == NSNotFound)
 	{
-		XMSimpleAddressResource *simpleAddressResource = [[[XMSimpleAddressResource alloc] initWithAddress:completedString] autorelease];
+		XMSimpleAddressResource *simpleAddressResource = [[[XMSimpleAddressResource alloc] initWithAddress:completedString callProtocol:XMCallProtocol_H323] autorelease];
 		return simpleAddressResource;
 	}
 	return [matchedAddresses objectAtIndex:index];
@@ -323,7 +394,14 @@
 
 - (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption
 {
-	NSLog(@"USER SELECTED %@", imageOption);
+	if([imageOption isEqualToString:@"H.323"])
+	{
+		[callAddressField setDefaultImage:[NSImage imageNamed:@"H323URL_Disclosure"]];
+	}
+	else
+	{
+		[callAddressField setDefaultImage:[NSImage imageNamed:@"SIPURL_Disclosure"]];
+	}
 }
 
 - (NSArray *)pulldownObjectsForDatabaseField:(XMDatabaseField *)databaseField
@@ -375,7 +453,7 @@
 	[callAddressField setRepresentedObject:activeCallAddress];
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
-	[statusFieldOne setStringValue:NSLocalizedString(@"Preparing to call...", @"")];
+	[statusField setStringValue:NSLocalizedString(@"Preparing to call...", @"")];
 }
 
 - (void)_didStartCalling:(NSNotification *)notif
@@ -383,7 +461,7 @@
 	[callButton setEnabled:YES];
 	[callButton setImage:[NSImage imageNamed:@"hangup_24.tif"]];
 	[callButton setAlternateImage:[NSImage imageNamed:@"hangup_24_down.tif"]];
-	[statusFieldOne setStringValue:NSLocalizedString(@"Calling...", @"")];
+	[statusField setStringValue:NSLocalizedString(@"Calling...", @"")];
 	
 	isCalling = YES;
 }
@@ -397,14 +475,14 @@
 
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif
 {
-	[statusFieldOne setStringValue:NSLocalizedString(@"Ringing...", @"")];
+	[statusField setStringValue:NSLocalizedString(@"Ringing...", @"")];
 }
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
-	[statusFieldOne setStringValue:NSLocalizedString(@"Incoming Call", @"")];
+	[statusField setStringValue:NSLocalizedString(@"Incoming Call", @"")];
 }
 
 - (void)_didClearCall:(NSNotification *)notif
@@ -446,16 +524,11 @@
 	[semaphoreView setToolTip:toolTipString];
 }
 
-- (void)_callHistoryDataDidChange:(NSNotification *)notif
-{
-	[self _setupRecentCallsPullDownMenu];
-}
-
 #pragma mark Private Methods
 
 - (void)_H323NotEnabled:(NSNotification*)notif{
 	// at the moment, treat as a fatal error if H.323 is not enabled.
-	[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
+	[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
 	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 	[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 not enabled)",@"")];
 }
@@ -467,7 +540,7 @@
 
 	if(!isH323Listening)
 	{
-		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
+		[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 		[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 is not enabled)",@"")];
 		return;
@@ -478,49 +551,14 @@
 		
 	if([localAddresses count] == 0)
 	{
-		[statusFieldOne setStringValue:NSLocalizedString(@"Offline", @"")];
+		[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
 		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 		[semaphoreView setToolTip:NSLocalizedString(@"Offline (could not fetch external address)",@"")];
 		return;
 	}
 		
-	[statusFieldOne setStringValue:NSLocalizedString(@"Idle", @"")];
+	[statusField setStringValue:NSLocalizedString(@"Idle", @"")];
 	[self _gatekeeperRegistrationDidChange:nil];
-}
-
-- (void)_setupRecentCallsPullDownMenu
-{
-	[recentCallsPopUpButton setMenu:nil];
-	
-	NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
-	[menu addItem:imageItem];
-	NSArray *recentCalls = [[XMCallHistoryCallAddressProvider sharedInstance] recentCalls];
-	
-	unsigned i;
-	unsigned count = [recentCalls count];
-	
-	for(i = 0; i < count; i++)
-	{
-		XMCallHistoryRecord *record = [recentCalls objectAtIndex:i];
-		NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[record displayString] action:@selector(_recentCallsPopUpButtonAction:) keyEquivalent:@""];
-		[menuItem setTarget:self];
-		[menuItem setTag:i];
-		[menu addItem:menuItem];
-		[menuItem release];
-	}
-	
-	[recentCallsPopUpButton setMenu:menu];
-	[menu release];
-}
-
-- (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender
-{
-	unsigned index = [sender tag];
-	NSArray *recentCalls = [[XMCallHistoryCallAddressProvider sharedInstance] recentCalls];
-	XMCallHistoryRecord *record = [recentCalls objectAtIndex:index];
-	
-	[callAddressField setRepresentedObject:record];
-	[[contentView window] makeFirstResponder:nil];
 }
 
 - (void)_appendNetworkInterfacesString:(NSMutableString *)addressString

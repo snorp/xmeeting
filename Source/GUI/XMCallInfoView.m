@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.2 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -766,7 +766,7 @@
 	}
 	
 	NSDate *endDate = [callInfo callEndDate];
-	endDateString = [[endDate descriptionWithCalendarFormat:dateFormatString()
+	endDateString = [[endDate descriptionWithCalendarFormat:XMDateFormatString()
 												   timeZone:nil
 													 locale:nil] retain];
 	
@@ -779,19 +779,19 @@
 		callDirectionString = @"Direction: In";
 	}
 	
-	NSString *endReason = callEndReasonString([callInfo callEndReason]);
+	NSString *endReason = XMCallEndReasonString([callInfo callEndReason]);
 	endReasonString = [[NSString alloc] initWithFormat:@"Call End Reason: %@", endReason];
 	
 	NSDate *startDate = [callInfo callInitiationDate];
 	if(startDate != nil)
 	{
-		NSString *startDateString = [startDate descriptionWithCalendarFormat:dateFormatString()
+		NSString *startDateString = [startDate descriptionWithCalendarFormat:XMDateFormatString()
 																	timeZone:nil
 																	  locale:nil];
 		callStartString = [[NSString alloc] initWithFormat:@"Start: %@", startDateString];
 		callEndString = [[NSString alloc] initWithFormat:@"End: %@", endDateString];
 		
-		NSString *callDuration = timeString((unsigned)[callInfo callDuration]);
+		NSString *callDuration = XMTimeString((unsigned)[callInfo callDuration]);
 		callDurationString = [[NSString alloc] initWithFormat:@"Duration: %@", callDuration];
 		
 		NSString *remoteNumber = [callInfo remoteNumber];
@@ -815,28 +815,28 @@
 		NSString *audioCodecOut = [callInfo outgoingAudioCodec];
 		if(audioCodecOut != nil)
 		{
-			NSString *bytesSentString = byteString([callInfo audioBytesSent]);
+			NSString *bytesSentString = XMByteString([callInfo audioBytesSent]);
 			audioOutString = [[NSString alloc] initWithFormat:@"%@ sent using <%@>", bytesSentString, audioCodecOut];
 		}
 		
 		NSString *audioCodecIn = [callInfo incomingAudioCodec];
 		if(audioCodecIn != nil)
 		{
-			NSString *bytesReceivedString = byteString([callInfo audioBytesReceived]);
+			NSString *bytesReceivedString = XMByteString([callInfo audioBytesReceived]);
 			audioInString = [[NSString alloc] initWithFormat:@"%@ received using <%@>", bytesReceivedString, audioCodecIn];
 		}
 		
 		NSString *videoCodecOut = [callInfo outgoingVideoCodec];
 		if(videoCodecOut != nil)
 		{
-			NSString *bytesSentString = byteString([callInfo videoBytesSent]);
+			NSString *bytesSentString = XMByteString([callInfo videoBytesSent]);
 			videoOutString = [[NSString alloc] initWithFormat:@"%@ sent using <%@>", bytesSentString, videoCodecOut];
 		}
 		
 		NSString *videoCodecIn = [callInfo incomingVideoCodec];
 		if(videoCodecIn != nil)
 		{
-			NSString *bytesReceivedString = byteString([callInfo videoBytesReceived]);
+			NSString *bytesReceivedString = XMByteString([callInfo videoBytesReceived]);
 			videoInString = [[NSString alloc] initWithFormat:@"%@ received using <%@>", bytesReceivedString, videoCodecIn];
 		}
 	}

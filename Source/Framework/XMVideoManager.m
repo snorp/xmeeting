@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.11 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.12 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,9 +85,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	remoteVideoTexture = NULL;
 	remoteVideoTextureDidChange = NO;
 	
-	CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
-	CVDisplayLinkSetOutputCallback(displayLink, &_XMDisplayLinkCallback, NULL);
-	CVDisplayLinkStart(displayLink);
+	displayLink = NULL;
 	
 	return self;
 }
@@ -215,11 +213,25 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)startGrabbing
 {
 	[XMMediaTransmitter _startGrabbing];
+	
+	if(displayLink == NULL)
+	{
+		CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
+		CVDisplayLinkSetOutputCallback(displayLink, &_XMDisplayLinkCallback, NULL);
+		CVDisplayLinkStart(displayLink);
+	}
 }
 
 - (void)stopGrabbing
 {
 	[XMMediaTransmitter _stopGrabbing];
+	
+	if(displayLink != NULL)
+	{
+		CVDisplayLinkStop(displayLink);
+		CVDisplayLinkRelease(displayLink);
+		displayLink = NULL;
+	}
 }
 
 - (XMVideoSize)localVideoSize
@@ -237,6 +249,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	[videoLock lock];
 	
 	[videoViews addObject:videoView];
+	
 	[videoView renderLocalVideo:localVideoTexture didChange:YES 
 					remoteVideo:remoteVideoTexture didChange:YES
 					   isForced:YES];
@@ -271,6 +284,16 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 					remoteVideo:remoteVideoTexture didChange:YES
 					   isForced:YES];
 	
+	[videoLock unlock];
+}
+
+- (void)lockVideoSystem
+{
+	[videoLock lock];
+}
+
+- (void)unlockVideoSystem
+{
 	[videoLock unlock];
 }
 

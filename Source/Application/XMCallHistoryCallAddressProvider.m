@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.3 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -211,7 +211,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	}
 	
 	// the address is not in the call history, thus creating a new instance.
-	XMCallHistoryRecord *record = [[XMCallHistoryRecord alloc] initWithAddress:address displayString:[callAddress displayString]];
+	XMCallHistoryRecord *record = [[XMCallHistoryRecord alloc] initWithAddress:address protocol:XMCallProtocol_H323 displayString:[callAddress displayString]];
 	
 	if(count == 10)
 	{

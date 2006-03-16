@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.5 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.6 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -9,8 +9,12 @@
 
 
 @interface IGPopupView (PrivateMethods)
+
+- (void)_createBezierPaths;
+
 - (void)_resetTrackingRect;
-- (void)_frameDidChange;
+- (void)_frameDidChange:(NSNotification *)notif;
+
 @end
 
 @implementation IGPopupView
@@ -20,8 +24,6 @@
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
-            oval=[[NSBezierPath alloc] init];
-            triangle=[[NSBezierPath alloc] init];
             title=@"";
             
             //initialize  variables
@@ -39,19 +41,8 @@
             keys[1]=NSForegroundColorAttributeName;
             titleAttributes = [[NSDictionary alloc] initWithObjects:attributes forKeys:keys count:2]; 
             titleAttributesOver=[[NSDictionary alloc] initWithObjects:attributesOver forKeys:keys count:2];
-            
-            //create paths
-            //...oval
-            [oval appendBezierPathWithArcWithCenter:NSMakePoint(frameRect.size.height/2.0+2.0,frameRect.size.height/2.0) radius:frameRect.size.height/2.0-2 startAngle:270.0 endAngle:90.0 clockwise:YES];
-            [oval appendBezierPathWithArcWithCenter:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0,frameRect.size.height/2.0) radius:frameRect.size.height/2.0-2 startAngle:90.0 endAngle:270.0 clockwise:YES];
-            [oval lineToPoint:NSMakePoint(frameRect.size.height/2.0,2.0)];
-            
-            //...triangle
-            [triangle moveToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0, frameRect.size.height/2.0+fontSize/4.0)];
-            
-            [triangle lineToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0+fontSize/2.5, frameRect.size.height/2.0-fontSize/4.0)];
-            [triangle lineToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0-fontSize/2.5, frameRect.size.height/2.0-fontSize/4.0)];
-            [triangle lineToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0, frameRect.size.height/2.0+fontSize/4.0)];
+			
+			[self _createBezierPaths];
 
 			theMenu = [[NSMenu alloc] init];
 			[self setMenu:theMenu];
@@ -59,11 +50,11 @@
 	return self;
 }
 
--(void)awakeFromNib{
+-(void)awakeFromNib
+{
 	showingTitleOfSelectedItem = YES;
 
     [self setPullsDown:NO];
-	
 }
 
 - (void)drawRect:(NSRect)rect
@@ -102,6 +93,13 @@
 	//draw the text
     [title drawAtPoint:NSMakePoint(rect.size.height/2.0+5.0,rect.size.height/2.0-fontSize/2.0-2) withAttributes:((!mouseOver && [self isEnabled])?titleAttributesOver:titleAttributes)];
     
+}
+
+- (void)setFrame:(NSRect)frame
+{
+	[super setFrame:frame];
+	
+	[self _createBezierPaths];
 }
 
 #pragma mark -
@@ -153,7 +151,33 @@
 
 #pragma mark -
 #pragma mark Tracking rect stuff
-- (void)_resetTrackingRect{
+
+- (void)_createBezierPaths
+{
+	[oval release];
+	[triangle release];
+	
+	oval=[[NSBezierPath alloc] init];
+	triangle=[[NSBezierPath alloc] init];
+	
+	NSRect frameRect = [self frame];
+	
+	//create paths
+	//...oval
+	[oval appendBezierPathWithArcWithCenter:NSMakePoint(frameRect.size.height/2.0+2.0,frameRect.size.height/2.0) radius:frameRect.size.height/2.0-2 startAngle:270.0 endAngle:90.0 clockwise:YES];
+	[oval appendBezierPathWithArcWithCenter:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0,frameRect.size.height/2.0) radius:frameRect.size.height/2.0-2 startAngle:90.0 endAngle:270.0 clockwise:YES];
+	[oval lineToPoint:NSMakePoint(frameRect.size.height/2.0,2.0)];
+	
+	//...triangle
+	[triangle moveToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0, frameRect.size.height/2.0+fontSize/4.0)];
+	
+	[triangle lineToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0+fontSize/2.5, frameRect.size.height/2.0-fontSize/4.0)];
+	[triangle lineToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0-fontSize/2.5, frameRect.size.height/2.0-fontSize/4.0)];
+	[triangle lineToPoint:NSMakePoint(frameRect.size.width-frameRect.size.height/2.0-2-fontSize/2.0, frameRect.size.height/2.0+fontSize/4.0)];
+}
+
+- (void)_resetTrackingRect
+{
 	if ( trackingRect )
     {
         [self removeTrackingRect:trackingRect];
@@ -167,7 +191,8 @@
 	
 }
 
-- (void)_frameDidChange:(NSNotification *)notif{
+- (void)_frameDidChange:(NSNotification *)notif
+{
 	[self _resetTrackingRect];
 }
 

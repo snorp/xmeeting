@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.4 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.5 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,15 @@ extern NSString *XMKey_LocationName;
 extern NSString *XMKey_LocationH323AccountID;
 extern NSString *XMKey_LocationSIPAccountID;
 
+/**
+ * Overrides the default XMPreferences instance to provide the following
+ * functions:
+ * - Name for the location
+ * - Uses Accounts to store Gatekeeper / Registrar settings
+ * - Provides storage for password data from Gatekeeper / Registrar
+ * - Keeps a tag to identify instances which were copied. Required for safe
+ *   editing of preferences
+ **/
 @interface XMLocation : XMPreferences {
 	
 	unsigned tag;

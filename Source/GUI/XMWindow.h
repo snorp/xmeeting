@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.h,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMWindow.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,17 @@ extern NSString *XMNotification_WindowWillMinimize;
  **/
 @interface XMWindow : NSWindow {
 
+}
+
+@end
+
+/**
+ * This class implements a couple of modifications to the default
+ * NSWindow methods which allows this window to be used as a child
+ * window to the main window while the controls remain active
+ **/
+@interface XMChildWindow : NSWindow {
+	
 }
 
 @end

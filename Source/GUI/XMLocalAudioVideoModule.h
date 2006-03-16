@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.8 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.9 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,13 +12,13 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowSupportModule.h"
 
-@class XMSimpleVideoView, XMOSDVideoView, XMLocalAudioVideoView;
+@class XMLocalVideoView, XMLocalAudioVideoView;
 
 @interface XMLocalAudioVideoModule : NSObject <XMMainWindowSupportModule> {
 	
 	IBOutlet XMLocalAudioVideoView *contentView;
 	
-	IBOutlet XMOSDVideoView *localVideoView;
+	IBOutlet XMLocalVideoView *localVideoView;
 	IBOutlet NSPopUpButton *videoDevicesPopUp;
 	IBOutlet NSButton *videoDeviceSettingsButton;
 	IBOutlet NSPopUpButton *audioInputDevicesPopUp;
@@ -30,7 +30,7 @@
 	IBOutlet NSTextField *videoDisabledFld;	
 	IBOutlet NSPanel *videoDeviceSettingsPanel;
 	IBOutlet NSBox *videoDeviceSettingsBox;
-	IBOutlet XMOSDVideoView *videoDeviceSettingsView;
+	IBOutlet XMLocalVideoView *videoDeviceSettingsView;
 
 	NSNib *nibLoader;
 }

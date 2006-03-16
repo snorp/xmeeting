@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.h,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMCallInfoView.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,10 @@
 
 @class XMCallInfo;
 
+/**
+ * This class displays all possible information about recent calls
+ * made in a user-friendly manner.
+ **/
 @interface XMCallInfoView : NSControl {
 	
 	XMCallInfo *callInfo;

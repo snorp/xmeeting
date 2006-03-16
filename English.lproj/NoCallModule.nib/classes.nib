@@ -8,35 +8,12 @@
             SUPERCLASS = NSPopUpButton; 
         }, 
         {
-            ACTIONS = {
-                showInspector = id; 
-                showPreferences = id; 
-                showTools = id; 
-                updateDeviceLists = id; 
-            }; 
-            CLASS = XMApplicationController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
             CLASS = XMDatabaseField; 
             LANGUAGE = ObjC; 
             OUTLETS = {dataSource = id; representedObject = id; }; 
             SUPERCLASS = NSTextField; 
         }, 
-        {
-            ACTIONS = {clearCall = id; }; 
-            CLASS = XMInCallModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentView = XMInCallView; 
-                hangupButton = NSButton; 
-                remotePartyField = NSTextField; 
-                semaphoreView = NSImageView; 
-                videoView = XMOSDVideoView; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
+        {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {
             ACTIONS = {
                 showAdditionModuleInSeparateWindow = id; 
@@ -52,10 +29,10 @@
             ACTIONS = {
                 call = id; 
                 changeActiveLocation = id; 
-                showAddressBookModuleSheet = id; 
+                showAddressBook = id; 
                 showInspector = id; 
-                showSelfView = id; 
                 showTools = id; 
+                toggleShowSelfView = id; 
             }; 
             CLASS = XMNoCallModule; 
             LANGUAGE = ObjC; 
@@ -64,9 +41,9 @@
                 callButton = NSButton; 
                 contentView = NSView; 
                 locationsPopUpButton = NSPopUpButton; 
-                recentCallsPopUpButton = NSPopUpButton; 
+                selfView = XMLocalVideoView; 
                 semaphoreView = NSImageView; 
-                statusFieldOne = NSTextField; 
+                statusField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 
         }

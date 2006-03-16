@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.h,v 1.3 2006/03/14 23:05:50 hfriederich Exp $
+ * $Id: XMApplicationFunctions.h,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,31 +13,35 @@
 #import "XMeeting.h"
 
 /**
+ * Provides useful functions for the application
+ **/
+
+/**
  * Converts the bytes value into the correct
  * kByte / MByte / GByte string for display
  **/
-NSString *byteString(unsigned bytes);
+NSString *XMByteString(unsigned bytes);
 
 /**
  * Converts seconds into a string with format
  * (Hours:)Minutes:Seconds whereas hours is only shown
  * when the time amount is more than one hour
  **/
-NSString *timeString(unsigned seconds);
+NSString *XMTimeString(unsigned seconds);
 
 /**
  * Returns the format string for representing a date
  **/
-NSString *dateFormatString();
+NSString *XMDateFormatString();
 
 /**
  * Returns an textual representation of the callEndReason
  **/
-NSString *callEndReasonString(XMCallEndReason callEndReason);
+NSString *XMCallEndReasonString(XMCallEndReason callEndReason);
 
 /**
  * Returns a textual representation fo the gatekeeperRegistrationFailReason
  **/
-NSString *gatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailReason failReason);
+NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailReason failReason);
 
 #endif // __XM_APPLICATION_FUNCTIONS_H__
