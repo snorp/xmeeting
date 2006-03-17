@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.23 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.24 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,9 +44,7 @@
 @implementation XMNoCallModule
 
 - (id)init
-{
-	[[XMMainWindowController sharedInstance] addModule:self];
-	
+{	
 	uncompletedStringLength = 0;
 	matchedAddresses = nil;
 	completions = [[NSMutableArray alloc] initWithCapacity:10];
@@ -112,9 +110,6 @@
 	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
 							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper
 							 object:nil];
-	/*[notificationCenter addObserver:self selector:@selector(_callHistoryDataDidChange:)
-							   name:XMNotification_CallHistoryCallAddressProviderDataDidChange
-							 object:nil];*/
 	[notificationCenter addObserver:self selector:@selector(_H323NotEnabled:)
 							   name:XMNotification_CallManagerDidNotEnableH323
 							 object:nil];
@@ -132,6 +127,7 @@
 	[self _preferencesDidChange:nil];
 }
 
+#pragma mark -
 #pragma mark XMMainWindowModule methods
 
 - (NSString *)name
@@ -260,16 +256,19 @@
 	}
 }
 
-- (IBAction)showInspector:(id)sender{
-	[[NSApp delegate] showInspector:self];
+- (IBAction)showInspector:(id)sender
+{
+	[(XMApplicationController *)[NSApp delegate] showInspector:self];
 }
 
-- (IBAction)showTools:(id)sender{
-	[[NSApp delegate] showTools:self];
+- (IBAction)showTools:(id)sender
+{
+	[(XMApplicationController *)[NSApp delegate] showTools:self];
 }
 
-- (IBAction)showAddressBookModuleSheet:(id)sender{
-	//[[XMMainWindowController sharedInstance] showAdditionModule:[[NSApp delegate] addressBookModule]];
+- (IBAction)showContacts:(id)sender
+{
+	[(XMApplicationController *)[NSApp delegate] showContacts:self];
 }
 
 - (IBAction)call:(id)sender
@@ -299,6 +298,7 @@
 	[[XMPreferencesManager sharedInstance] activateLocationAtIndex:selectedIndex];
 }
 
+#pragma mark -
 #pragma mark Call Address XMDatabaseComboBox Data Source Methods
 
 - (NSArray *)databaseField:(XMDatabaseField *)databaseField
@@ -431,14 +431,25 @@
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
+	[semaphoreView setHidden:YES];
+	
+	[busyIndicator startAnimation:self];
+	[busyIndicator setHidden:NO];
+	
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
 }
 
 - (void)_didEndSubsystemSetup:(NSNotification *)notif
 {
+	[semaphoreView setHidden:NO];
+	
+	[busyIndicator stopAnimation:self];
+	[busyIndicator setHidden:YES];
+	
 	[locationsPopUpButton setEnabled:YES];
 	[callButton setEnabled:YES];
+	
 	[self _displayListeningStatusFieldInformation];
 }
 

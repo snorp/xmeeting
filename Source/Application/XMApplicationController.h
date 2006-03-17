@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.12 2006/03/17 13:20:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,10 +11,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class XMNoCallModule, XMInCallModule, XMBusyModule, XMLocalAudioVideoModule;
-@class XMAddressBookModule, XMZeroConfModule, XMDialPadModule;
-@class XMTextChatModule, XMStatisticsModule, XMCallHistoryModule;
-@class XMInfoModule;
+@class XMNoCallModule, XMInCallModule;
+@class XMInfoModule, XMStatisticsModule, XMCallHistoryModule;
+@class XMLocalAudioVideoModule;
+@class XMAddressBookModule;
 
 /**
  * XMApplicationController is responsible for the main menu and
@@ -27,20 +27,19 @@
 	
 	XMNoCallModule *noCallModule;
 	XMInCallModule *inCallModule;
-	XMBusyModule *busyModule;
+	
+	XMInfoModule *infoModule;
+	XMStatisticsModule *statisticsModule;
+	XMCallHistoryModule *callHistoryModule;
 	
 	XMLocalAudioVideoModule *localAudioVideoModule;
 	
 	XMAddressBookModule *addressBookModule;
-	XMZeroConfModule *zeroConfModule;
-	XMDialPadModule *dialPadModule;
-	XMTextChatModule *textChatModule;
-	XMStatisticsModule *statisticsModule;
-	XMCallHistoryModule *callHistoryModule;
-	XMInfoModule *infoModule;
+	//XMZeroConfModule *zeroConfModule;
+	//XMDialPadModule *dialPadModule;
+	//XMTextChatModule *textChatModule;
 	
 	NSAlert *incomingCallAlert;
-	
 }
 
 /**
@@ -49,15 +48,14 @@
 - (IBAction)showPreferences:(id)sender;
 
 - (IBAction)updateDeviceLists:(id)sender;
-
+- (IBAction)retryEnableH323:(id)sender;
 - (IBAction)retryGatekeeperRegistration:(id)sender;
+- (IBAction)retryEnableSIP:(id)sender;
+- (IBAction)retrySIPRegistration:(id)sender;
 
 - (IBAction)showInspector:(id)sender;
-
 - (IBAction)showTools:(id)sender;
-
-//Get&Set
-- (XMAddressBookModule*)addressBookModule;
+- (IBAction)showContacts:(id)sender;
 
 @end
 

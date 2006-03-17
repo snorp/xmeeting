@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.h,v 1.5 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMStatisticsModule.h,v 1.6 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,11 +10,12 @@
 #define __XM_STATISTICS_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowAdditionModule.h"
+
+#import "XMInspectorModule.h"
 
 @class XMCallInfo;
 
-@interface XMStatisticsModule : NSObject <XMMainWindowAdditionModule> {
+@interface XMStatisticsModule : XMInspectorModule {
 	
 	IBOutlet NSView *contentView;
 	NSSize collapsedContentViewSize;

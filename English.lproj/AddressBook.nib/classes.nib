@@ -48,8 +48,9 @@
                 organizationField = NSTextField; 
                 recordNameField = NSTextField; 
             }; 
-            SUPERCLASS = NSObject; 
-        }
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
     ); 
     IBVersion = 1; 
 }

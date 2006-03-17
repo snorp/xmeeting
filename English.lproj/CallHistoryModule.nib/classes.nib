@@ -5,13 +5,15 @@
             CLASS = XMCallHistoryModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                callAddress = id; 
                 contentView = NSView; 
                 logTextView = NSTextView; 
                 recentCallsScrollView = NSScrollView; 
                 recentCallsView = XMRecentCallsView; 
             }; 
-            SUPERCLASS = NSObject; 
+            SUPERCLASS = XMInspectorModule; 
         }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             CLASS = XMRecentCallsView; 
             LANGUAGE = ObjC; 

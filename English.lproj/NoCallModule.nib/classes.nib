@@ -1,6 +1,11 @@
 {
     IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
         {
             CLASS = IGPopupView; 
             LANGUAGE = ObjC; 
@@ -29,7 +34,7 @@
             ACTIONS = {
                 call = id; 
                 changeActiveLocation = id; 
-                showAddressBook = id; 
+                showContacts = id; 
                 showInspector = id; 
                 showTools = id; 
                 toggleShowSelfView = id; 
@@ -37,6 +42,7 @@
             CLASS = XMNoCallModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                busyIndicator = NSProgressIndicator; 
                 callAddressField = XMDatabaseField; 
                 callButton = NSButton; 
                 contentView = NSView; 

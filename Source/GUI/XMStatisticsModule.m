@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.10 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.11 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,7 @@
 
 - (id)init
 {
+	self = [super init];
 	//[[XMMainWindowController sharedInstance] addAdditionModule:self];
 	
 	nibLoader = nil;
@@ -126,7 +127,7 @@
 - (IBAction)toggleShowExtraInformation:(id)sender
 {
 	isExpanded = !isExpanded;
-	[[XMInspectorController instanceWithName:@"Inspector"] currentModuleSizeChanged:self];
+	[self resizeContentView];
 }
 
 #pragma mark TableView DataSource Methods

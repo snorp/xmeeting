@@ -1,6 +1,7 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {toggleShowExtraInformation = id; }; 
             CLASS = XMStatisticsModule; 
@@ -19,7 +20,7 @@
                 remotePartyNameField = NSTextField; 
                 roundTripDelayField = NSTextField; 
             }; 
-            SUPERCLASS = NSObject; 
+            SUPERCLASS = XMInspectorModule; 
         }
     ); 
     IBVersion = 1; 

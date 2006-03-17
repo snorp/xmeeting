@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.h,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMInfoModule.h,v 1.2 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,10 @@
 #define __XM_INFO_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowAdditionModule.h"
 
-@interface XMInfoModule : NSObject <XMMainWindowAdditionModule> {
+#import "XMInspectorModule.h"
+
+@interface XMInfoModule : XMInspectorModule {
 	
 	IBOutlet NSView *contentView;
 	IBOutlet NSTextField *ipFld, *gdsFld, *gkFld, *statusFld;

@@ -3,15 +3,10 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
-            ACTIONS = {changePage = id; currentModuleSizeChanged = id; }; 
+            ACTIONS = {changePage = id; }; 
             CLASS = XMInspectorController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentBox = NSBox; 
-                currentModule = id; 
-                pageController = NSSegmentedControl; 
-                panel = NSPanel; 
-            }; 
+            OUTLETS = {contentBox = NSBox; pageController = NSSegmentedControl; panel = NSPanel; }; 
             SUPERCLASS = NSObject; 
         }, 
         {

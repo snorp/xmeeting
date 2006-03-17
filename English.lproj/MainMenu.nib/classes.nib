@@ -4,6 +4,7 @@
         {
             ACTIONS = {
                 retryGatekeeperRegistration = id; 
+                showContacts = id; 
                 showInspector = id; 
                 showPreferences = id; 
                 showTools = id; 

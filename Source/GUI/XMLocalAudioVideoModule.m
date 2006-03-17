@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.12 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,14 +17,13 @@
 
 @interface XMLocalAudioVideoModule (PrivateMethods)
 
-- (void)_validateControls;
+- (void)_validateAudioControls;
 - (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif;
 - (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
 - (void)_activeLocationDidChange:(NSNotification *)notif;
 
-- (void)_preferencesDidChange:(NSNotification *)notif;
 @end
 
 @implementation XMLocalAudioVideoModule
@@ -33,9 +32,7 @@
 
 - (id)init
 {
-	//[[XMMainWindowController sharedInstance] addSupportModule:self];
-	
-	nibLoader = nil;
+	self = [super init];
 	
 	return self;
 }
@@ -44,37 +41,43 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	[nibLoader release];
-	
 	[super dealloc];
 }
 
 - (void)awakeFromNib
-{	
+{
+	contentViewSize = [contentView bounds].size;
 	
 	// configuring the video content
 	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
 	NSArray *devices = [videoManager inputDevices];
-	if(devices == nil)
+	
+	[videoDevicesPopUp setEnabled:NO];
+	[videoDeviceSettingsButton setEnabled:NO];
+	
+	if(devices != nil)
+	{
+		[self _didUpdateVideoInputDeviceList:nil];
+	}
+
+	// done here to prevent flashing of controls after window is on screen
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == NO)
 	{
 		[videoDevicesPopUp setEnabled:NO];
 		[videoDeviceSettingsButton setEnabled:NO];
+		[videoDisabledFld setStringValue:@"Video is disabled"];
 	}
 	else
 	{
+		[videoDevicesPopUp setEnabled:YES];
+		
 		NSString *device = [videoManager selectedInputDevice];
-		
-		[videoDevicesPopUp removeAllItems];
-		[videoDevicesPopUp addItemsWithTitles:devices];
-		[videoDevicesPopUp selectItemWithTitle:device];
-		
-		BOOL settingsButtonIsEnabled = NO;
-		if([videoManager deviceHasSettings:device])
+		if([videoManager deviceHasSettings:device] == YES)
 		{
-			settingsButtonIsEnabled = YES;
+			[videoDeviceSettingsButton setEnabled:YES];
 		}
 		
-		[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
+		[videoDisabledFld setStringValue:@""];
 	}
 	
 	// configuring the audio content
@@ -87,16 +90,9 @@
 	[audioOutputDevicesPopUp addItemsWithTitles:[audioManager outputDevices]];
 	[audioOutputDevicesPopUp selectItemWithTitle:[audioManager selectedOutputDevice]];
 	
-	[audioInputVolumeSlider setIntValue:[audioManager inputVolume]];
-	[audioOutputVolumeSlider setIntValue:[audioManager outputVolume]];
-	
-	int state = ([audioManager mutesInputVolume] == YES) ? NSOnState : NSOffState;
-	[muteAudioInputSwitch setState:state];
-	
-	state = ([audioManager mutesOutputVolume] == YES) ? NSOnState : NSOffState;
-	[muteAudioOutputSwitch setState:state];
-	
-	[self _validateControls];
+	[self _audioInputVolumeDidChange:nil];
+	[self _audioOutputVolumeDidChange:nil];
+	[self _validateAudioControls];
 	
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -113,29 +109,20 @@
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	
-	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
-							   name:XMNotification_PreferencesManagerDidChangePreferences
-							 object:nil];
-	
-	
-	//[localVideoView setShouldDisplayOSD:NO]; //No OSD for local video view
-	[self _preferencesDidChange:nil];
-	
 }
 
 #pragma mark Protocol Methods
 
 - (NSString *)name
 {
-	return @"Local Audio/Video control";
+	return @"Local Audio/Video Control";
 }
 
 - (NSView *)contentView
 {
-	if(nibLoader == nil)
+	if(contentView == nil)
 	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"LocalAudioVideoModule" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+		[NSBundle loadNibNamed:@"LocalAudioVideoModule" owner:self];
 	}
 	
 	return contentView;
@@ -146,32 +133,28 @@
 	// if not already done, this triggers the loading of the nib file
 	[self contentView];
 	
-	return [contentView requiredSize];
+	return contentViewSize;
 }
 
 - (void)becomeActiveModule
 {
-	NSLog(@"becomeActive");
-	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
-	{
-		[localVideoView startDisplayingLocalVideo];
-	}
-	else
-	{
-		[localVideoView stopDisplayingLocalVideo];
-	}
+	[self _activeLocationDidChange:nil];
 }
 
 - (void)becomeInactiveModule
 {
+	// simply deactivate both instead of querying which
+	// one is active
+	[localVideoView stopDisplayingLocalVideo];
+	[localVideoView stopDisplayingNoVideo];
 }
 
 #pragma mark Action Methods
 
-- (IBAction)updateDeviceLists:(id)sender{
+- (IBAction)updateDeviceLists:(id)sender
+{
 	[[NSApp delegate] updateDeviceLists:self];
 }
-
 
 - (IBAction)changeVideoDevice:(id)sender
 {
@@ -231,7 +214,7 @@
 	int state = ([audioManager mutesInputVolume] == YES) ? NSOnState : NSOffState;
 	[muteAudioInputSwitch setState:state];
 	
-	[self _validateControls];
+	[self _validateAudioControls];
 }
 
 - (IBAction)changeAudioOutputDevice:(id)sender
@@ -250,7 +233,7 @@
 	int state = ([audioManager mutesOutputVolume] == YES) ? NSOnState : NSOffState;
 	[muteAudioOutputSwitch setState:state];
 	
-	[self _validateControls];
+	[self _validateAudioControls];
 }
 
 - (IBAction)changeAudioInputVolume:(id)sender
@@ -263,7 +246,7 @@
 	{
 		[audioInputVolumeSlider setIntValue:[audioManager inputVolume]];
 	}
-	[self _validateControls];
+	[self _validateAudioControls];
 }
 
 - (IBAction)changeAudioOutputVolume:(id)sender
@@ -276,7 +259,7 @@
 	{
 		[audioOutputVolumeSlider setIntValue:[audioManager outputVolume]];
 	}
-	[self _validateControls];
+	[self _validateAudioControls];
 }
 
 - (IBAction)toggleMuteAudioInput:(id)sender
@@ -326,22 +309,7 @@
 
 #pragma mark Private Methods
 
-- (void)_preferencesDidChange:(NSNotification *)notif{
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];	
-	BOOL isVideoEnabled = [[[preferencesManager locations] objectAtIndex:[preferencesManager indexOfActiveLocation]] enableVideo]; 
-	
-	if (!isVideoEnabled){
-		[videoDisabledFld setStringValue:@"Video is disabled"];
-	}
-	else
-	{
-		[videoDisabledFld setStringValue:@""];
-	}
-	[videoDisabledFld setNeedsDisplay:YES];
-}
-
-
-- (void)_validateControls
+- (void)_validateAudioControls
 {
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
@@ -357,6 +325,7 @@
 - (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif
 {
 	[videoDevicesPopUp setEnabled:NO];
+	[videoDeviceSettingsButton setEnabled:NO];
 }
 
 - (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif
@@ -365,18 +334,22 @@
 	
 	NSString *device = [videoManager selectedInputDevice];
 	
-	[videoDevicesPopUp setEnabled:YES];
 	[videoDevicesPopUp removeAllItems];
 	[videoDevicesPopUp addItemsWithTitles:[videoManager inputDevices]];
 	[videoDevicesPopUp selectItemWithTitle:device];
-	
-	BOOL settingsButtonIsEnabled = NO;
-	if([videoManager deviceHasSettings:device])
+		
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
 	{
-		settingsButtonIsEnabled = YES;
-	}
+		[videoDevicesPopUp setEnabled:YES];
 	
-	[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
+		BOOL settingsButtonIsEnabled = NO;
+		if([videoManager deviceHasSettings:device])
+		{
+			settingsButtonIsEnabled = YES;
+		}
+	
+		[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
+	}
 }
 
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif
@@ -408,14 +381,29 @@
 	
 	if(showVideoContent == YES)
 	{
+		XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+		
 		[localVideoView startDisplayingLocalVideo];
+		
+		[videoDevicesPopUp setEnabled:YES];
+			
+		NSString *device = [videoManager selectedInputDevice];
+		if([videoManager deviceHasSettings:device] == YES)
+		{
+			[videoDeviceSettingsButton setEnabled:YES];
+		}
+		
+		[videoDisabledFld setStringValue:@""];
 	}
 	else
 	{
-		[localVideoView stopDisplayingLocalVideo];
+		[localVideoView setNoVideoImage:[NSImage imageNamed:@"no_video_screen.tif"]];
+		[localVideoView startDisplayingNoVideo];
+		
+		[videoDevicesPopUp setEnabled:NO];
+		[videoDeviceSettingsButton setEnabled:NO];
+		[videoDisabledFld setStringValue:@"Video is disabled"];
 	}
-	
-	//[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfSupportModule:self];
 }
 
 @end

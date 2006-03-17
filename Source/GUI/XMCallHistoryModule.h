@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.6 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.7 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,11 +12,11 @@
 #import <Cocoa/Cocoa.h>
 
 #import "XMCallAddressManager.h"
-#import "XMMainWindowAdditionModule.h"
+#import "XMInspectorModule.h"
 
 @class XMRecentCallsView;
 
-@interface XMCallHistoryModule : NSObject <XMMainWindowAdditionModule> {
+@interface XMCallHistoryModule : XMInspectorModule {
 	
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.22 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.23 2006/03/17 13:20:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,25 +14,29 @@
 #import "XMCallHistoryCallAddressProvider.h"
 
 #import "XMMainWindowController.h"
-#import "XMPreferencesWindowController.h"
 #import "XMNoCallModule.h"
 #import "XMInCallModule.h"
-#import "XMBusyModule.h"
-#import "XMLocalAudioVideoModule.h"
-#import "XMAddressBookModule.h"
-#import "XMZeroConfModule.h"
-#import "XMDialPadModule.h"
-#import "XMTextChatModule.h"
+
+#import "XMInspectorController.h"
+
+#import "XMInfoModule.h"
 #import "XMStatisticsModule.h"
 #import "XMCallHistoryModule.h"
-#import "XMInspectorController.h"
+
+#import "XMLocalAudioVideoModule.h"
+
+#import "XMAddressBookModule.h"
+
+//#import "XMZeroConfModule.h"
+//#import "XMDialPadModule.h"
+//#import "XMTextChatModule.h"
+
+#import "XMPreferencesWindowController.h"
 
 #import "XMSetupAssistantManager.h"
 
 @interface XMApplicationController (PrivateMethods)
 
-- (void)_didStartSubsystemSetup:(NSNotification *)notif;
-- (void)_didEndSubsystemSetup:(NSNotification *)notif;
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didEstablishCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
@@ -41,6 +45,8 @@
 - (void)_didNotStartCalling:(NSNotification *)notif;
 - (void)_didNotEnableH323:(NSNotification *)notif;
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
+- (void)_didNotEnableSIP:(NSNotification *)notif;
+- (void)_didNotRegisterAtRegistrar:(NSNotification *)notif;
 
 // terminating the application
 - (void)_frameworkClosed:(NSNotification *)notif;
@@ -50,6 +56,8 @@
 - (void)_displayCallStartFailed;
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
+- (void)_displayEnableingSIPFailedAlert;
+- (void)_displayRegistrarRegistrationFailedAlert;
 
 // validating menu items
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
@@ -67,6 +75,10 @@
 {
 	self = [super init];
 	
+	// all setup is done in -applicationDidFinishLaunching
+	// in order to avoid problems with the XMeeting framework's runtime
+	// engine
+	
 	return self;
 }
 
@@ -78,10 +90,6 @@
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
-	[notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
-							   name:XMNotification_CallManagerDidStartSubsystemSetup object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
-							   name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
 							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
@@ -96,7 +104,8 @@
 							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
 	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
 							   name:XMNotification_FrameworkDidClose object:nil];
-		
+	
+	// depending on wheter preferences are in the system, the setup assistant is shown or not.
 	if([XMPreferencesManager doesHavePreferences] == YES)
 	{
 		[self performSelector:@selector(_setupApplication:) withObject:nil afterDelay:0.0];
@@ -111,15 +120,18 @@
 {
 	[noCallModule release];
 	[inCallModule release];
-	[busyModule release];
-	[localAudioVideoModule release];
-	[addressBookModule release];
-	//[zeroConfModule release];
-	//[dialPadModule release];
-	//[textChatModule release];
+	
 	[infoModule release];
 	[statisticsModule release];
 	[callHistoryModule release];
+	
+	[localAudioVideoModule release];
+	
+	[addressBookModule release];
+	
+	//[zeroConfModule release];
+	//[dialPadModule release];
+	//[textChatModule release];
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
@@ -127,32 +139,6 @@
 }
 
 #pragma mark Action Methods
-
-
-- (IBAction)showInspector:(id)sender{
-	static XMInspectorController *instance;
-	if (!instance){
-		instance = [XMInspectorController instanceWithModules:[NSArray arrayWithObjects:infoModule, statisticsModule, callHistoryModule, nil] andName:@"Inspector"];
-		[NSBundle loadNibNamed:@"XMInspector" owner:[instance retain]];
-	}
-	else
-	{
-		[instance show];
-	}
-}
-
-- (IBAction)showTools:(id)sender{
-	static XMInspectorController *instance;
-	if (!instance){
-		instance = [XMInspectorController instanceWithModules:[NSArray arrayWithObjects:localAudioVideoModule, dialPadModule, nil] andName:@"Tools"];
-		[NSBundle loadNibNamed:@"XMInspector" owner:[instance retain]];
-	}
-	else
-	{
-		[instance show];
-	}
-}
-
 
 - (IBAction)showPreferences:(id)sender
 {
@@ -169,10 +155,19 @@
 	[[XMCallManager sharedInstance] retryGatekeeperRegistration];
 }
 
-#pragma mark -
-#pragma mark Get&Set
-- (XMAddressBookModule*)addressBookModule{
-	return addressBookModule;
+- (IBAction)showInspector:(id)sender
+{
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Inspector] show];
+}
+
+- (IBAction)showTools:(id)sender
+{
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Tools] show];
+}
+
+- (IBAction)showContacts:(id)sender
+{
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Contacts] show];
 }
 
 
@@ -184,21 +179,12 @@
 	XMCloseFramework();
 	
 	[[XMPreferencesManager sharedInstance] synchronize];
+	
 	// wait for the FrameworkDidClose notification before terminating.
 	return NSTerminateLater;
 }
 
 #pragma mark Notification Methods
-
-- (void)_didStartSubsystemSetup:(NSNotification *)notif
-{
-	[[XMMainWindowController sharedInstance] showModule:busyModule];
-}
-
-- (void)_didEndSubsystemSetup:(NSNotification *)notif
-{
-	[[XMMainWindowController sharedInstance] showModule:noCallModule];
-}
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
@@ -389,11 +375,12 @@
 	[alert release];
 }
 
-#pragma mark Private Methods
+#pragma mark -
+#pragma mark Menu Validation
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	if([menuItem tag] == 101)
+	if([menuItem tag] == 311)
 	{
 		XMCallManager *callManager = [XMCallManager sharedInstance];
 		
@@ -406,6 +393,9 @@
 	
 	return YES;
 }
+
+#pragma mark -
+#pragma mark Private Methods
 
 - (void)_showSetupAssistant
 {
@@ -421,20 +411,31 @@
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];
-	busyModule = [[XMBusyModule alloc] init];
-	
-	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
+	NSArray *mainWindowModules = [[NSArray alloc] initWithObjects:noCallModule, inCallModule, nil];
+	[[XMMainWindowController sharedInstance] setModules:mainWindowModules];
+	[mainWindowModules release];
 	
 	infoModule = [[XMInfoModule alloc] init];
-	addressBookModule = [[XMAddressBookModule alloc] init];
-	//zeroConfModule = [[XMZeroConfModule alloc] init];
-	//dialPadModule = [[XMDialPadModule alloc] init];
-	//textChatModule = [[XMTextChatModule alloc] init];
+	[infoModule setTag:XMInspectorControllerTag_Inspector];
 	statisticsModule = [[XMStatisticsModule alloc] init];
+	[statisticsModule setTag:XMInspectorControllerTag_Inspector];
 	callHistoryModule = [[XMCallHistoryModule alloc] init];
+	[callHistoryModule setTag:XMInspectorControllerTag_Inspector];
+	NSArray *inspectorModules = [[NSArray alloc] initWithObjects:infoModule, statisticsModule, callHistoryModule, nil];
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Inspector] setModules:inspectorModules];
+	[inspectorModules release];
 	
-	// show the main window
-	[[XMMainWindowController sharedInstance] showMainWindow];
+	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
+	[localAudioVideoModule setTag:XMInspectorControllerTag_Tools];
+	NSArray *toolsModules = [[NSArray alloc] initWithObjects:localAudioVideoModule, nil];
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Tools] setModules:toolsModules];
+	[toolsModules release];
+	
+	addressBookModule = [[XMAddressBookModule alloc] init];
+	[addressBookModule setTag:XMInspectorControllerTag_Contacts];
+	NSArray *contactsModules = [[NSArray alloc] initWithObjects:addressBookModule, nil];
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Contacts] setModules:contactsModules];
+	[contactsModules release];
 	
 	// start fetching the external address
 	XMUtils *utils = [XMUtils sharedInstance];
@@ -448,6 +449,9 @@
 	{
 		[preferencesManager synchronizeAndNotify];
 	}
+	
+	// show the main window
+	[[XMMainWindowController sharedInstance] showMainWindow];
 	
 	// start grabbing from the video sources
 	[[XMVideoManager sharedInstance] startGrabbing];

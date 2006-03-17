@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.14 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.15 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -60,7 +60,7 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 {
 	self = [super initWithWindowNibName:@"MainWindow"];
 	
-	modules = [[NSMutableArray alloc] initWithCapacity:2];
+	modules = nil;
 	
 	activeModuleIndex = UINT_MAX;
 	
@@ -112,9 +112,9 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 
 #pragma mark Module Methods
 
-- (void)addModule:(id<XMMainWindowModule>)module
+- (void)setModules:(NSArray *)theModules
 {
-	[modules addObject:module];
+	modules = [theModules copy];
 }
 
 - (void)showModule:(id<XMMainWindowModule>)module

@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.12 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,7 @@
 	// GUI Outlets
 	IBOutlet XMLocalVideoView *selfView;
 	IBOutlet NSImageView *semaphoreView;
+	IBOutlet NSProgressIndicator *busyIndicator;
 	IBOutlet NSTextField *statusField;
 	IBOutlet NSPopUpButton *locationsPopUpButton;
 	IBOutlet XMDatabaseField *callAddressField;
@@ -50,9 +51,9 @@
 
 - (IBAction)call:(id)sender;
 - (IBAction)changeActiveLocation:(id)sender;
-- (IBAction)showAddressBook:(id)sender;
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
+- (IBAction)showContacts:(id)sender;
 - (IBAction)toggleShowSelfView:(id)sender;
 
 

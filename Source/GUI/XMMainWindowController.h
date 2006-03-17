@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.8 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.9 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,8 +11,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowModule.h"
-#import "XMMainWindowSupportModule.h"
-#import "XMMainWindowAdditionModule.h"
 
 @class XMMouseOverButton, XMLocalVideoView;
 
@@ -25,7 +23,7 @@
 	
 	XMLocalVideoView *selfView;
 	
-	NSMutableArray *modules;
+	NSArray *modules;
 	unsigned activeModuleIndex;
 	
 	BOOL selfViewShown;
@@ -45,9 +43,9 @@
 #pragma mark Module Methods
 
 /**
- * Adds module to the module list of the receiver
+ * Sets the modules of the receiver
  **/
-- (void)addModule:(id<XMMainWindowModule>)module;
+- (void)setModules:(NSArray *)modules;
 
 /**
  * Displays the desired module on screen.

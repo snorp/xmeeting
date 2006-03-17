@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.15 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.16 2006/03/17 13:20:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,6 @@
 
 - (id)init
 {
-	//[[XMMainWindowController sharedInstance] addMainModule:self];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
