@@ -145,7 +145,6 @@
 		D163381E07A4E739003FD9C0 /* XMPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = D163381C07A4E739003FD9C0 /* XMPreferences.m */; };
 		D163382D07A4E7BC003FD9C0 /* XMTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = D163382C07A4E7BC003FD9C0 /* XMTypes.h */; };
 		D1639417083E17A500F7FD83 /* DialPadModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1639415083E17A500F7FD83 /* DialPadModule.nib */; };
-		D163941C083E17ED00F7FD83 /* XMDialPadModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D163941B083E17ED00F7FD83 /* XMDialPadModule.m */; };
 		D163945F083E19E300F7FD83 /* StatisticsModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D163945D083E19E300F7FD83 /* StatisticsModule.nib */; };
 		D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639464083E1A0F00F7FD83 /* XMStatisticsModule.m */; };
 		D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */; };
@@ -205,8 +204,6 @@
 		D1B4CC2A082F4E6800A444E1 /* XMMainWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B4CC28082F4E6800A444E1 /* XMMainWindowController.h */; };
 		D1B4CC2B082F4E6800A444E1 /* XMMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B4CC29082F4E6800A444E1 /* XMMainWindowController.m */; };
 		D1B4CC9A082F594C00A444E1 /* MainWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1B4CC98082F594C00A444E1 /* MainWindow.nib */; };
-		D1B4CFD60833911600A444E1 /* XMZeroConfModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B4CFD40833911600A444E1 /* XMZeroConfModule.h */; };
-		D1B4CFD70833911600A444E1 /* XMZeroConfModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B4CFD50833911600A444E1 /* XMZeroConfModule.m */; };
 		D1B4D0070833937200A444E1 /* ZeroConfModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1B4D0050833937200A444E1 /* ZeroConfModule.nib */; };
 		D1B606C608F8F8410034B47F /* ptbuildopts.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B6062C08F8F8410034B47F /* ptbuildopts.h */; };
 		D1B606C708F8F8410034B47F /* asnber.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B6062F08F8F8410034B47F /* asnber.h */; };
@@ -786,8 +783,6 @@
 		D1EB18F00843DEC9002CEF53 /* CallHistory.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */; };
 		D1EB19360843E47F002CEF53 /* Window.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB19350843E47F002CEF53 /* Window.tiff */; };
 		D1ECCBF30833DDAD008EBAE3 /* TextChatModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */; };
-		D1ECCBF80833DDD5008EBAE3 /* XMTextChatModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCBF60833DDD5008EBAE3 /* XMTextChatModule.h */; };
-		D1ECCBF90833DDD5008EBAE3 /* XMTextChatModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1ECCBF70833DDD5008EBAE3 /* XMTextChatModule.m */; };
 		D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCD0308348C4E008EBAE3 /* XMMainWindowModule.h */; };
 		D1ECCD180834911C008EBAE3 /* InCallModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD160834911C008EBAE3 /* InCallModule.nib */; };
 		D1ECCD30083491EB008EBAE3 /* NoCallModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD2E083491EB008EBAE3 /* NoCallModule.nib */; };
@@ -3226,13 +3221,11 @@
 				D1B4CC2A082F4E6800A444E1 /* XMMainWindowController.h in Headers */,
 				D1DE52EF07C6474100343A8D /* XMH323EndPoint.h in Headers */,
 				D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Headers */,
-				D1B4CFD60833911600A444E1 /* XMZeroConfModule.h in Headers */,
 				D1A02895081CBED00018BD11 /* XMLocation.h in Headers */,
 				D1A02923081CD0700018BD11 /* XMeeting.h in Headers */,
 				D1A02A77081E40580018BD11 /* XMPreferencesWindowController.h in Headers */,
 				D1A02AB8081E4B8C0018BD11 /* XMPreferencesModule.h in Headers */,
 				D1A02ADD081E56DB0018BD11 /* XMGeneralPreferencesModule.h in Headers */,
-				D1ECCBF80833DDD5008EBAE3 /* XMTextChatModule.h in Headers */,
 				D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Headers */,
 				D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Headers */,
 				D1ECCD350834923D008EBAE3 /* XMNoCallModule.h in Headers */,
@@ -3940,12 +3933,9 @@
 				D1A02AEE081E57040018BD11 /* XMLocationPreferencesModule.m in Sources */,
 				D189805408241F11007CD286 /* XMBooleanCell.m in Sources */,
 				D1B4CC2B082F4E6800A444E1 /* XMMainWindowController.m in Sources */,
-				D1B4CFD70833911600A444E1 /* XMZeroConfModule.m in Sources */,
-				D1ECCBF90833DDD5008EBAE3 /* XMTextChatModule.m in Sources */,
 				D1ECCD360834923D008EBAE3 /* XMNoCallModule.m in Sources */,
 				D1ECCD3C08349255008EBAE3 /* XMInCallModule.m in Sources */,
 				D1CE4B62083CDED900B66B5D /* XMAddressBookModule.m in Sources */,
-				D163941C083E17ED00F7FD83 /* XMDialPadModule.m in Sources */,
 				D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */,
 				D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */,
 				D16395280840C57A00F7FD83 /* XMAddressResource.m in Sources */,

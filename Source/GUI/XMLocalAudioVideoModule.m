@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.12 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.13 2006/03/17 13:47:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,6 @@
 
 #import "XMPreferencesManager.h"
 #import "XMMainWindowController.h"
-#import "XMLocalAudioVideoView.h"
 #import "XMLocalVideoView.h"
 
 @interface XMLocalAudioVideoModule (PrivateMethods)
