@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.12 2006/02/27 18:50:26 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.13 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,57 +113,67 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		unsigned height = size.height;
 		unsigned usedBytes = 4*width*height;
 		
+		NSLog(@"width: %d, height: %d", width, height);
+		
 		// creating a buffer for the pixels
 		void *pixels = malloc(usedBytes);
 		
-		// filling the buffer with a color (currently black)
-		UInt8 *bytes = (UInt8 *)pixels;
-		unsigned i;
-		unsigned count = height;
-		for(i = 0; i < height; i++)
+		NSString *path = [[NSBundle mainBundle] pathForResource:@"DummyImage" ofType:@"gif"];
+		NSData *data = [[NSData alloc] initWithContentsOfFile:path];
+		NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
+		
+		if(bitmapImageRep == nil)
 		{
-			unsigned j;
-			for(j = 0; j < width; j++)
+			[inputManager handleErrorWithCode:1 hintCode:0];
+		}
+		else
+		{
+			UInt8 *bytes = (UInt8 *)pixels;
+			UInt8 *bitmapData = (UInt8 *)[bitmapImageRep bitmapData];
+			
+			unsigned bitmapWidth = [bitmapImageRep pixelsWide];
+			unsigned bitmapHeight = [bitmapImageRep pixelsHigh];
+			
+			unsigned heightSpacing = (height - bitmapHeight) / 2;
+			unsigned widthSpacing = (width - bitmapWidth) / 2;
+			
+			unsigned i;
+			for(i = 0; i < height; i++)
 			{
-				// alpha value
-				*bytes = 255;
-				bytes++;
-				
-				//red value
-				if(j < width/2)
+				unsigned j;
+				for(j = 0; j < width; j++)
 				{
-					*bytes = 255;
+					if(i < heightSpacing || i >= heightSpacing+bitmapHeight ||
+					   j < widthSpacing || j >= widthSpacing+bitmapWidth)
+					{
+						// set black with full alpha
+						*bytes = 255;
+						bytes++;
+						*bytes = 0;
+						bytes++;
+						*bytes = 0;
+						bytes++;
+						*bytes = 0;
+						bytes++;
+					}
+					else
+					{
+						// full alpha
+						*bytes = 255;
+						bytes++;
+						*bytes = *bitmapData;
+						bytes++;
+						bitmapData++;
+						*bytes = *bitmapData;
+						bytes++;
+						bitmapData++;
+						*bytes = *bitmapData;
+						bytes++;
+						bitmapData++;
+					}
 				}
-				else
-				{
-					*bytes = 0;
-				}
-				bytes++;
-				
-				// green value
-				if(((j >= width/6) && (j < width/3)) ||
-				   ((j >= width/2) && (j < 5*width/6)))
-				{
-					*bytes = 255;
-				}
-				else
-				{
-					*bytes = 0;
-				}
-				bytes++;
-				
-				// blue value
-				if(((j >= width/3) && (j < width/2)) ||
-				   (j >= 2*width/3))
-				{
-					*bytes = 255;
-				}
-				else
-				{
-					*bytes = 0;
-				}
-				bytes++;
 			}
+			
 		}
 		
 		// creating the CVPixelBufferRef
@@ -173,6 +183,8 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		
 		if(result != kCVReturnSuccess)
 		{
+			[inputManager handleErrorWithCode:2 hintCode:0];
+			NSLog(@"FAILED2");
 			return NO;
 		}
 	}

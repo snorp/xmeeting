@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.27 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.28 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -309,7 +309,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	isTransmitting = NO;
 	transmitFrameGrabRate = UINT_MAX;
-	videoSize = XMVideoSize_QCIF;
+	videoSize = XMVideoSize_CIF;
 	codecType = 0;
 	codecSpecificCallFlags = 0;
 	bitrateToUse = 0;

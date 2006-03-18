@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.23 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.24 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,7 +96,7 @@ void _XMCheckCloseStatus();
 // called every time enabling the H.323 stack failed
 - (void)_handleH323EnablingFailure;
 
-// Called when the Frameworks starts the gatekeeper registration
+// Called when the Framework starts the gatekeeper registration
 // process. This might be a lengthy task
 - (void)_handleGatekeeperRegistrationProcessStart;
 
@@ -112,6 +112,28 @@ void _XMCheckCloseStatus();
 
 // Called every time an attempt to register at a gatekeeper failed
 - (void)_handleGatekeeperRegistrationFailure:(NSNumber *)gatekeeperRegistrationFailReason;
+
+#pragma mark SIP callbacks
+
+// Called every time enabling the SIP stack failed
+- (void)_handleSIPEnablingFailure;
+
+// called every time when the framework starts a SIP registration
+// process, trying to register at possibly multiple registrars.
+// This might be a lengthy task
+- (void)_handleSIPRegistrationProcessStart;
+
+// Called when the framework ends the SIP registration process
+- (void)_handleSIPRegistrationProcessEnd;
+
+// Called every time the Framework register at a SIP registrar
+- (void)_handleSIPRegistration:(NSString *)registrarName;
+
+// Called every time the Framework unregisters from a SIP registrar
+- (void)_handleSIPUnregistration:(NSString *)registrarName;
+
+// Called every time an attempt to register at a SIP registrar failed
+- (void)_handleSIPRegistrationFailure:(NSArray *)info;
 
 @end
 

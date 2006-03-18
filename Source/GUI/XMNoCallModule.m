@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.24 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.25 2006/03/18 18:26:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,7 @@
 @interface XMNoCallModule (PrivateMethods)
 
 - (void)_preferencesDidChange:(NSNotification *)notif;
+- (void)_didChangeActiveLocation:(NSNotification *)notif;
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
 - (void)_didEndSubsystemSetup:(NSNotification *)notif;
 - (void)_didStartCallInitiation:(NSNotification *)notif;
@@ -31,12 +32,11 @@
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
 - (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif;
-- (void)_callHistoryDataDidChange:(NSNotification *)notif;
+- (void)_h323NotEnabled:(NSNotification*)notif;
 
 - (void)_displayListeningStatusFieldInformation;
-- (void)_recentCallsPopUpButtonAction:(NSMenuItem *)sender;
+- (void)_setupVideoDisplay;
 
-- (void)_H323NotEnabled:(NSNotification*)notif;
 - (void)_appendNetworkInterfacesString:(NSMutableString *)string;
 
 @end
@@ -77,6 +77,9 @@
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangePreferences
 							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didChangeActiveLocation:)
+							   name:XMNotification_PreferencesManagerDidChangeActiveLocation
+							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidEndFetchingExternalAddress
 							 object:nil];
@@ -110,7 +113,7 @@
 	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
 							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper
 							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_H323NotEnabled:)
+	[notificationCenter addObserver:self selector:@selector(_h323NotEnabled:)
 							   name:XMNotification_CallManagerDidNotEnableH323
 							 object:nil];
 		
@@ -243,11 +246,13 @@
 	{
 		doesShowSelfView = YES;
 		[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
-		[selfView startDisplayingLocalVideo];
+		
+		[self _setupVideoDisplay];
 	}
 	else
 	{
 		[selfView stopDisplayingLocalVideo];
+		[selfView stopDisplayingNoVideo];
 		
 		currentContentViewSizeWithSelfViewShown = [contentView bounds].size;
 
@@ -410,6 +415,7 @@
 	return [callAddressManager allAddresses];
 }
 
+#pragma mark -
 #pragma mark Notification Methods
 
 - (void)_preferencesDidChange:(NSNotification *)notif
@@ -421,6 +427,14 @@
 	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
 	
 	[self _gatekeeperRegistrationDidChange:nil];
+}
+
+- (void)_didChangeActiveLocation:(NSNotification *)notif
+{
+	if(doesShowSelfView == YES)
+	{
+		[self _setupVideoDisplay];
+	}
 }
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
@@ -535,14 +549,15 @@
 	[semaphoreView setToolTip:toolTipString];
 }
 
-#pragma mark Private Methods
-
-- (void)_H323NotEnabled:(NSNotification*)notif{
+- (void)_h323NotEnabled:(NSNotification*)notif{
 	// at the moment, treat as a fatal error if H.323 is not enabled.
 	[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
 	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
 	[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 not enabled)",@"")];
 }
+
+#pragma mark -
+#pragma mark Private Methods
 
 - (void)_displayListeningStatusFieldInformation
 {
@@ -570,6 +585,19 @@
 		
 	[statusField setStringValue:NSLocalizedString(@"Idle", @"")];
 	[self _gatekeeperRegistrationDidChange:nil];
+}
+
+- (void)_setupVideoDisplay
+{
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		[selfView startDisplayingLocalVideo];
+	}
+	else
+	{
+		[selfView setNoVideoImage:[NSImage imageNamed:@"no_video_screen.tif"]];
+		[selfView startDisplayingNoVideo];
+	}
 }
 
 - (void)_appendNetworkInterfacesString:(NSMutableString *)addressString

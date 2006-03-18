@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.h,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMApplicationFunctions.h,v 1.5 2006/03/18 18:26:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,5 +43,10 @@ NSString *XMCallEndReasonString(XMCallEndReason callEndReason);
  * Returns a textual representation fo the gatekeeperRegistrationFailReason
  **/
 NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailReason failReason);
+
+/**
+ * Returns a textual representation for the SIP status code
+ **/
+NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode);
 
 #endif // __XM_APPLICATION_FUNCTIONS_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.17 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.18 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -147,29 +147,29 @@ extern NSString *XMNotification_CallManagerDidNotEnableSIP;
  * Posted when the Framwork did start registering at SIP registrars.
  * This can be a lengthy task
  **/
-extern NSString *XMNotification_CallManagerDidStartRegistrarRegistrationProcess;
+extern NSString *XMNotification_CallManagerDidStartSIPRegistrationProcess;
 
 /**
  * Posted when the Framework finished registereing at SIP registrars
  **/
-extern NSString *XMNotification_CallManagerDidEndRegistrarRegistrationProcess;
+extern NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess;
 
 /**
  * Posted when the Framwork succesfully registered at a SIP registrar.
  * This notification is only posted when the Framework has a new registration
  * made.
  **/
-extern NSString *XMNotification_CallManagerDidRegisterAtRegistrar;
+extern NSString *XMNotification_CallManagerDidRegisterAtSIPRegistrar;
 
 /**
  * Posted when the Framework unregistered from a SIP registrar
  **/
-extern NSString *XMNotification_CallManagerDidUnregisterFromRegistrar;
+extern NSString *XMNotification_CallManagerDidUnregisterFromSIPRegistrar;
 
 /**
  * Posted when the Framework failed to register at the registrar
  **/
-extern NSString *XMNotification_CallManagerDidNotRegisterAtRegistrar;
+extern NSString *XMNotification_CallManagerDidNotRegisterAtSIPRegistrar;
 
 /**
  * Posted when the appropriate media stream is opened

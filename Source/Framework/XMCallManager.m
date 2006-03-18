@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.12 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.13 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,6 +65,7 @@
 	return _XMCallManagerSharedInstance;
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -95,7 +96,7 @@
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	
 	registrarNames = [[NSMutableArray alloc] initWithCapacity:1];
-	registrarRegistrationFailReasons = [[NSMutableArray alloc] initWithCapacity:1];
+	sipRegistrationFailReasons = [[NSMutableArray alloc] initWithCapacity:1];
 	
 	callStatisticsUpdateInterval = 1.0;
 	
@@ -130,10 +131,10 @@
 		registrarNames = nil;
 	}
 	
-	if(registrarRegistrationFailReasons != nil)
+	if(sipRegistrationFailReasons != nil)
 	{
-		[registrarRegistrationFailReasons release];
-		registrarRegistrationFailReasons = nil;
+		[sipRegistrationFailReasons release];
+		sipRegistrationFailReasons = nil;
 	}
 	
 	if(recentCalls != nil)
@@ -152,6 +153,7 @@
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark General Configuration
 
 - (BOOL)doesAllowModifications
@@ -194,6 +196,7 @@
 	[self _doSubsystemSetupWithPreferences:activePreferences];
 }
 
+#pragma mark -
 #pragma mark Call management methods
 
 - (BOOL)isInCall
@@ -317,6 +320,7 @@
 	return [recentCallsCopy autorelease];
 }
 
+#pragma mark -
 #pragma mark H.323-specific Methods
 
 - (BOOL)isGatekeeperRegistered
@@ -412,11 +416,12 @@
 	}
 }
 
+#pragma mark -
 #pragma mark SIP specific Methods
 
 - (BOOL)isRegisteredAtAllRegistrars
 {
-	unsigned count = [registrarRegistrationFailReasons count];
+	unsigned count = [sipRegistrationFailReasons count];
 	if(count == 0)
 	{
 		return NO;
@@ -427,9 +432,9 @@
 	unsigned i;
 	for(i = 0; i < count; i++)
 	{
-		NSNumber *number = (NSNumber *)[registrarRegistrationFailReasons objectAtIndex:i];
-		XMRegistrarRegistrationFailReason failReason = (XMRegistrarRegistrationFailReason)[number unsignedIntValue];
-		if(failReason != XMRegistrarRegistrationFailReason_NoFailure)
+		NSNumber *number = (NSNumber *)[sipRegistrationFailReasons objectAtIndex:i];
+		XMSIPStatusCode failReason = (XMSIPStatusCode)[number unsignedIntValue];
+		if(failReason != XMSIPStatusCode_NoFailure)
 		{
 			didRegisterAll = NO;
 			break;
@@ -449,27 +454,27 @@
 	return (NSString *)[registrarNames objectAtIndex:index];
 }
 
-- (unsigned)registrarRegistrationFailReasonCount
-{
-	return [registrarRegistrationFailReasons count];
-}
-
-- (XMRegistrarRegistrationFailReason)registrarRegistrationFailReasonAtIndex:(unsigned)index
-{
-	NSNumber *number = (NSNumber *)[registrarRegistrationFailReasons objectAtIndex:index];
-	
-	return (XMRegistrarRegistrationFailReason)[number unsignedIntValue];
-}
-
 - (NSArray *)registrarNames
 {
 	NSArray *registrarNamesCopy = [registrarNames copy];
 	return [registrarNamesCopy autorelease];
 }
 
-- (NSArray *)registrarRegistrationFailReasons
+- (unsigned)sipRegistrationFailReasonCount
 {
-	NSArray *copy = [registrarRegistrationFailReasons copy];
+	return [sipRegistrationFailReasons count];
+}
+
+- (XMSIPStatusCode)sipRegistrationFailReasonAtIndex:(unsigned)index
+{
+	NSNumber *number = (NSNumber *)[sipRegistrationFailReasons objectAtIndex:index];
+	
+	return (XMSIPStatusCode)[number unsignedIntValue];
+}
+
+- (NSArray *)sipRegistrationFailReasons
+{
+	NSArray *copy = [sipRegistrationFailReasons copy];
 	return [copy autorelease];
 }
 
@@ -513,7 +518,7 @@
 	}
 }
 
-- (void)retryRegistrarRegistrations
+- (void)retrySIPRegistrations
 {
 	if(callManagerStatus == XM_CALL_MANAGER_READY &&
 	   [self isRegisteredAtAllRegistrars] == NO && 
@@ -523,7 +528,7 @@
 		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
 															object:self];
-		[XMOpalDispatcher _retryRegistrarRegistrations:activePreferences];
+		[XMOpalDispatcher _retrySIPRegistrations:activePreferences];
 	}
 	else
 	{
@@ -550,79 +555,11 @@
 	}
 }
 
+#pragma mark -
 #pragma mark InCall Methods
 
-#pragma mark Private & Framework Methods
-
-- (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferences
-{
-	if(callManagerStatus == XM_CALL_MANAGER_READY)
-	{
-		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
-															object:self];
-	}
-	
-	automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
-	
-	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
-	
-	[registrarRegistrationFailReasons removeAllObjects];
-	
-	unsigned count = [[preferences registrarHosts] count];
-	unsigned i;
-	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMRegistrarRegistrationFailReason_NoFailure];
-	for(i = 0; i < count; i++)
-	{
-		[registrarRegistrationFailReasons addObject:number];
-	}
-	[number release];
-	
-	NSString *externalAddress = nil;
-	if([preferences useAddressTranslation])
-	{
-		if([preferences externalAddress] == nil)
-		{
-			externalAddress = [_XMUtilsSharedInstance externalAddress];
-			if(externalAddress == nil)
-			{
-				if([_XMUtilsSharedInstance didSucceedFetchingExternalAddress] == YES)
-				{
-					// not yet fetched
-					[_XMUtilsSharedInstance startFetchingExternalAddress];
-					[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-																 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
-				
-					// we continue this job when the external address fetch task is finished
-					return;
-				}
-			}
-		}
-	}
-	
-	// resetting the H323 listening status if an error previously
-	if(h323ListeningStatus == XM_H323_ERROR)
-	{
-		h323ListeningStatus = XM_H323_NOT_LISTENING;
-	}
-	
-	if(sipListeningStatus == XM_SIP_ERROR)
-	{
-		sipListeningStatus = XM_SIP_NOT_LISTENING;
-	}
-	
-	// preparations complete
-	[XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
-}
-
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
-{
-	// removing the listener
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
-	
-	// do the subsystem setup again
-	[self _doSubsystemSetupWithPreferences:activePreferences];
-}
+#pragma mark -
+#pragma mark Framework Methods
 
 - (void)_handleSubsystemSetupEnd
 {	
@@ -903,6 +840,157 @@
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper
 														object:self];
+}
+
+- (void)_handleSIPEnablingFailure
+{
+	sipListeningStatus = XM_SIP_ERROR;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableSIP
+														object:self];
+}
+
+- (void)_handleSIPRegistrationProcessStart
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSIPRegistrationProcess
+														object:self];
+}
+
+- (void)_handleSIPRegistrationProcessEnd
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSIPRegistrationProcess
+														object:self];
+}
+
+- (void)_handleSIPRegistration:(NSString *)registrar
+{	
+	NSLog(@"registered at %@", registrar);
+	NSArray *hosts = [activePreferences registrarHosts];
+	unsigned index = [hosts indexOfObject:registrar];
+	
+	if(index == NSNotFound)
+	{
+		NSLog(@"REGISTRAR NOT FOUND IN REGISTRAR_HOSTS");
+	}
+	
+	[registrarNames addObject:registrar];
+	
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_NoFailure];
+	[sipRegistrationFailReasons replaceObjectAtIndex:index withObject:number];
+	[number release];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtSIPRegistrar
+														object:self];
+}
+
+- (void)_handleSIPUnregistration:(NSString *)registrar
+{
+	NSLog(@"unregistered from: %@", registrar);
+	unsigned index = [registrarNames indexOfObject:registrar];
+	
+	if(index == NSNotFound)
+	{
+		return;
+	}
+	[registrarNames removeObjectAtIndex:index];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUnregisterFromSIPRegistrar
+														object:self];
+}
+
+- (void)_handleSIPRegistrationFailure:(NSArray *)info
+{
+	NSLog(@"registrationFailed: %@", [info description]);
+	
+	// extracting information from the array
+	NSString *registrar = (NSString *)[info objectAtIndex:0];
+	NSNumber *failReason = (NSNumber *)[info objectAtIndex:1];
+	
+	NSArray *hosts = [activePreferences registrarHosts];
+	unsigned index = [hosts indexOfObject:registrar];
+	
+	if(index == NSNotFound)
+	{
+		NSLog(@"OBJECT NOT FOUND ON SIP REGISTRATION FAILURE");
+	}
+	
+	[sipRegistrationFailReasons replaceObjectAtIndex:index withObject:failReason];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtSIPRegistrar
+														object:self];
+}
+
+#pragma mark -
+#pragma mark Private Methods
+
+- (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferences
+{
+	if(callManagerStatus == XM_CALL_MANAGER_READY)
+	{
+		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
+															object:self];
+	}
+	
+	automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
+	
+	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+	
+	[sipRegistrationFailReasons removeAllObjects];
+	
+	unsigned count = [[preferences registrarHosts] count];
+	unsigned i;
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMSIPStatusCode_NoFailure];
+	for(i = 0; i < count; i++)
+	{
+		[sipRegistrationFailReasons addObject:number];
+	}
+	[number release];
+	
+	NSString *externalAddress = nil;
+	if([preferences useAddressTranslation])
+	{
+		if([preferences externalAddress] == nil)
+		{
+			externalAddress = [_XMUtilsSharedInstance externalAddress];
+			if(externalAddress == nil)
+			{
+				if([_XMUtilsSharedInstance didSucceedFetchingExternalAddress] == YES)
+				{
+					// not yet fetched
+					[_XMUtilsSharedInstance startFetchingExternalAddress];
+					[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+																 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+					
+					// we continue this job when the external address fetch task is finished
+					return;
+				}
+			}
+		}
+	}
+	
+	// resetting the H323 listening status if an error previously
+	if(h323ListeningStatus == XM_H323_ERROR)
+	{
+		h323ListeningStatus = XM_H323_NOT_LISTENING;
+	}
+	
+	if(sipListeningStatus == XM_SIP_ERROR)
+	{
+		sipListeningStatus = XM_SIP_NOT_LISTENING;
+	}
+	
+	// preparations complete
+	[XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
+}
+
+- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
+{
+	// removing the listener
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+	
+	// do the subsystem setup again
+	[self _doSubsystemSetupWithPreferences:activePreferences];
 }
 
 - (void)_initiateCall:(XMAddressResource *)addressResource

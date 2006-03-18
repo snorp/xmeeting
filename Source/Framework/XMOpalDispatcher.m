@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.14 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.15 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,7 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_RetryEnableH323,
 	_XMOpalDispatcherMessage_RetryGatekeeperRegistration,
 	_XMOpalDispatcherMessage_RetryEnableSIP,
-	_XMOpalDispatcherMessage_RetryRegistrarRegistrations,
+	_XMOpalDispatcherMessage_RetrySIPRegistrations,
 	
 	// Call Management messages
 	_XMOpalDispatcherMessage_InitiateCall = 0x0200,
@@ -59,7 +59,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleRetryEnableH323Message:(NSArray *)messageComponents;
 - (void)_handleRetryGatekeeperRegistrationMessage:(NSArray *)messageComponents;
 - (void)_handleRetryEnableSIPMessage:(NSArray *)messageComponents;
-- (void)_handleRetryRegistrarRegistrationsMessage:(NSArray *)messageComponents;
+- (void)_handleRetrySIPRegistrationsMessage:(NSArray *)messageComponents;
 
 - (void)_handleInitiateCallMessage:(NSArray *)messageComponents;
 - (void)_handleInitiateSpecificCallMessage:(NSArray *)messageComponents;
@@ -92,7 +92,7 @@ typedef enum _XMOpalDispatcherMessage
 				passwords:(NSArray *)passwords
 				  verbose:(BOOL)verbose;
 
-- (void)_waitForSubsystemSetupCompletion;
+- (void)_waitForSubsystemSetupCompletion:(BOOL)verbose;
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
@@ -174,7 +174,7 @@ typedef enum _XMOpalDispatcherMessage
 	[components release];
 }
 
-+ (void)_retryRegistrarRegistrations:(XMPreferences *)preferences
++ (void)_retrySIPRegistrations:(XMPreferences *)preferences
 {
 	NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
 	
@@ -184,7 +184,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, registrarPasswordsData, nil];
 	
-	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetryRegistrarRegistrations withComponents:components];
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetrySIPRegistrations withComponents:components];
 	
 	[components release];
 }
@@ -442,6 +442,7 @@ typedef enum _XMOpalDispatcherMessage
 	[portMessage release];
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -463,7 +464,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	callStatisticsUpdateIntervalTimer = nil;
 	
-	registrarRegistrationWaitLock = [[NSLock alloc] init];
+	sipRegistrationWaitLock = [[NSLock alloc] init];
 	
 	return self;
 }
@@ -477,11 +478,12 @@ typedef enum _XMOpalDispatcherMessage
 {
 	[receivePort release];
 
-	[registrarRegistrationWaitLock release];
+	[sipRegistrationWaitLock release];
 
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark MainThread Methods
 
 - (NSPort *)_receivePort
@@ -494,6 +496,7 @@ typedef enum _XMOpalDispatcherMessage
 	_XMThreadExit();
 }
 
+#pragma mark -
 #pragma mark OpalDispatcherThread Methods
 
 - (void)_runOpalDispatcherThread
@@ -536,8 +539,8 @@ typedef enum _XMOpalDispatcherMessage
 		case _XMOpalDispatcherMessage_RetryEnableSIP:
 			[self _handleRetryEnableSIPMessage:[portMessage components]];
 			break;
-		case _XMOpalDispatcherMessage_RetryRegistrarRegistrations:
-			[self _handleRetryRegistrarRegistrationsMessage:[portMessage components]];
+		case _XMOpalDispatcherMessage_RetrySIPRegistrations:
+			[self _handleRetrySIPRegistrationsMessage:[portMessage components]];
 			break;
 		case _XMOpalDispatcherMessage_InitiateCall:
 			[self _handleInitiateCallMessage:[portMessage components]];
@@ -634,7 +637,7 @@ typedef enum _XMOpalDispatcherMessage
 	[self _doPreferencesSetup:preferences withAddress:externalAddress gatekeeperPassword:gatekeeperPassword 
 		   registrarPasswords:registrarPasswords verbose:YES];
 	
-	[self _waitForSubsystemSetupCompletion];
+	[self _waitForSubsystemSetupCompletion:YES];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
@@ -649,7 +652,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	[self _doH323Setup:preferences gatekeeperPassword:gatekeeperPassword verbose:YES];
 	
-	[self _waitForSubsystemSetupCompletion];
+	[self _waitForSubsystemSetupCompletion:NO];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
@@ -664,7 +667,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	[self _doGatekeeperSetup:preferences password:gatekeeperPassword verbose:YES];
 	
-	[self _waitForSubsystemSetupCompletion];
+	[self _waitForSubsystemSetupCompletion:NO];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
 												   withObject:nil
@@ -681,14 +684,14 @@ typedef enum _XMOpalDispatcherMessage
 	
 	[self _doSIPSetup:preferences registrarPasswords:registrarPasswords verbose:YES];
 	
-	[self _waitForSubsystemSetupCompletion];
+	[self _waitForSubsystemSetupCompletion:YES];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
 												   withObject:nil
 												waitUntilDone:NO];
 }
 
-- (void)_handleRetryRegistrarRegistrationsMessage:(NSArray *)components
+- (void)_handleRetrySIPRegistrationsMessage:(NSArray *)components
 {
 	NSData *preferencesData = (NSData *)[components objectAtIndex:0];
 	XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
@@ -697,6 +700,8 @@ typedef enum _XMOpalDispatcherMessage
 	NSArray *registrarPasswords = (NSArray *)[NSKeyedUnarchiver unarchiveObjectWithData:registrarPasswordsData];
 	
 	[self _doRegistrarSetup:preferences passwords:registrarPasswords verbose:YES];
+	
+	[self _waitForSubsystemSetupCompletion:YES];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
 												   withObject:nil
@@ -1190,6 +1195,9 @@ typedef enum _XMOpalDispatcherMessage
 	}
 }
 
+#pragma mark -
+#pragma mark Setup Methods
+
 - (void)_doPreferencesSetup:(XMPreferences *)preferences withAddress:(NSString *)suppliedExternalAddress
 		 gatekeeperPassword:(NSString *)gatekeeperPassword
 		 registrarPasswords:(NSArray *)registrarPasswords
@@ -1425,15 +1433,16 @@ typedef enum _XMOpalDispatcherMessage
 		{
 			if(verbose == YES)
 			{
-				//NSLog(@"ENABLING SIP FAILED");
-				//report an error here
+				[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPEnablingFailure)
+															   withObject:nil
+															waitUntilDone:NO];
 			}
 		}
 	}
 	else // SIP disabled
 	{
 		// unregistering from any registrars if needed
-		[registrarRegistrationWaitLock lock]; // will be unlocked from within _XMFinishRegistrarSetup()
+		[sipRegistrationWaitLock lock]; // will be unlocked from within _XMFinishRegistrarSetup()
 		_XMPrepareRegistrarSetup();
 		_XMFinishRegistrarSetup();
 		
@@ -1452,7 +1461,14 @@ typedef enum _XMOpalDispatcherMessage
 	unsigned i;
 	unsigned count = [hosts count];
 	
-	[registrarRegistrationWaitLock lock];
+	[sipRegistrationWaitLock lock];
+	
+	if(verbose == YES)
+	{
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationProcessStart)
+													   withObject:nil
+													waitUntilDone:NO];
+	}
 	
 	_XMPrepareRegistrarSetup();
 	
@@ -1484,13 +1500,23 @@ typedef enum _XMOpalDispatcherMessage
 	_XMFinishRegistrarSetup();
 }
 
-- (void)_waitForSubsystemSetupCompletion
+- (void)_waitForSubsystemSetupCompletion:(BOOL)verbose
 {
 	// Since the SIP Registrars are registered asynchronously,
 	// we wait here until this task has completed
-	[registrarRegistrationWaitLock lock];
-	[registrarRegistrationWaitLock unlock];
+	[sipRegistrationWaitLock lock];
+	[sipRegistrationWaitLock unlock];
+	
+	if(verbose == YES)
+	{
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationProcessEnd)
+													   withObject:nil
+													waitUntilDone:NO];
+	}
 }
+
+#pragma mark -
+#pragma mark Subsystem Feedback
 
 - (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName
 {
@@ -1522,10 +1548,41 @@ typedef enum _XMOpalDispatcherMessage
 	}
 }
 
+- (void)_handleSIPRegistration:(NSString *)registrar
+{
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistration:)
+												   withObject:registrar
+												waitUntilDone:NO];
+}
+
+- (void)_handleSIPUnregistration:(NSString *)registrar
+{
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPUnregistration:)
+												   withObject:registrar
+												waitUntilDone:NO];
+}
+
+- (void)_handleSIPRegistrationFailure:(NSString *)host failReason:(XMSIPStatusCode)failReason
+{
+	NSNumber *errorNumber = [[NSNumber alloc] initWithUnsignedInt:failReason];
+	NSArray *array = [[NSArray alloc] initWithObjects:host, errorNumber, nil];
+	
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationFailure:)
+												   withObject:array
+												waitUntilDone:NO];
+	
+	
+	[array release];
+	[errorNumber release];
+}
+
 - (void)_handleRegistrarSetupCompleted
 {
-	[registrarRegistrationWaitLock unlock];
+	[sipRegistrationWaitLock unlock];
 }
+
+#pragma mark -
+#pragma mark Methods fired by Timers
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer
 {

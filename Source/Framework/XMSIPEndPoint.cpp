@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.2 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.3 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -143,6 +143,9 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_UNREGISTER)
 		{
 			Unregister(record.GetHost(), record.GetUsername());
+			
+			_XMHandleSIPUnregistration(record.GetHost());
+			
 			activeRegistrars.RemoveAt(i-1);
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REMOVE)
@@ -245,6 +248,8 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 				return;
 			}
 			record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
+			
+			_XMHandleSIPRegistrationFailure(host, (XMSIPStatusCode)reason);
 		}
 		
 		unsigned status = record.GetStatus();
@@ -266,6 +271,7 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 								 const PString & username,
 								 BOOL wasRegistering)
 {
+	cout << "ON REGISTERED" << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)
@@ -286,6 +292,11 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 		   record.GetUsername() == username)
 		{
 			unsigned status = record.GetStatus();
+			
+			if(status == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+			{
+				_XMHandleSIPRegistration(record.GetHost());
+			}
 			
 			record.SetStatus(XM_SIP_REGISTRAR_STATUS_REGISTERED);
 			

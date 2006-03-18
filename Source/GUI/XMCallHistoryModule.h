@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.7 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.8 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,8 @@
 	BOOL didLogIncomingCall;
 	
 	NSString *gatekeeperName;
+	NSString *sipRegistrarName;
+	
 	id<XMCallAddress> callAddress;
 	
 }

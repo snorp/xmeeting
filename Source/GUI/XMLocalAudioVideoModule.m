@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.13 2006/03/17 13:47:09 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.14 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -396,6 +396,10 @@
 	}
 	else
 	{
+		if([videoDeviceSettingsPanel isVisible] == YES)
+		{
+			[self closeVideoDeviceSettingsPanel:self];
+		}
 		[localVideoView setNoVideoImage:[NSImage imageNamed:@"no_video_screen.tif"]];
 		[localVideoView startDisplayingNoVideo];
 		

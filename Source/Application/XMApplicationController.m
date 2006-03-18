@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.23 2006/03/17 13:20:49 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.24 2006/03/18 18:26:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,7 +57,7 @@
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
 - (void)_displayEnableingSIPFailedAlert;
-- (void)_displayRegistrarRegistrationFailedAlert;
+- (void)_displaySIPRegistrationFailedAlert;
 
 // validating menu items
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem;

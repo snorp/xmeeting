@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.19 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.20 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,7 +43,7 @@
 	
 	// SIP variables
 	NSMutableArray *registrarNames;
-	NSMutableArray *registrarRegistrationFailReasons;
+	NSMutableArray *sipRegistrationFailReasons;
 	
 	// InCall variables
 	NSTimeInterval callStatisticsUpdateInterval;
@@ -210,30 +210,29 @@
 - (NSString *)registrarNameAtIndex:(unsigned)index;
 
 /**
+ * Returns the complete array of registrars the client is currently
+ * registered at.
+ **/
+- (NSArray *)registrarNames;
+
+/**
  * Returns the number of registration fail reason records the manager
  * currently has. This is the same number as the number of registrars
  * specified in the active XMPreferences instance.
  **/
-- (unsigned)registrarRegistrationFailReasonCount;
+- (unsigned)sipRegistrationFailReasonCount;
 
 /**
  * Returns the registration fail reason for the particular registrar at index.
  **/
-- (XMRegistrarRegistrationFailReason)registrarRegistrationFailReasonAtIndex:(unsigned)index;
-
-/**
- * Returns the complete array of registrar names for the active XMPreferences instance.
- * If a registration attempt failed or is not yet completed, the appropriate slot
- * is filled with NSNull.
- **/
-- (NSArray *)registrarNames;
+- (XMSIPStatusCode)sipRegistrationFailReasonAtIndex:(unsigned)index;
 
 /**
  * Returns the status of the registration at the registrars provided.
  * If there client has no registrars in the current preferences set,
  * an empty array is returned.
  **/
-- (NSArray *)registrarRegistrationFailReasons;
+- (NSArray *)sipRegistrationFailReasons;
 
 /**
  * Call this method if the enabling of the SIP subsystem failed somehow
@@ -252,7 +251,7 @@
  * succesful or if the current active preferences does not use registrars
  * at all
  **/
-- (void)retryRegistrarRegistrations;
+- (void)retrySIPRegistrations;
 
 #pragma mark InCall functionality
 

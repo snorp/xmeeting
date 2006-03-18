@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.5 2006/03/18 18:26:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -133,9 +133,6 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
 	
 	switch(failReason)
 	{
-		/*case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
-			failReasonString = @"No gatekeeper specified";
-			break;*/
 		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
 			failReasonString = @"Gatekeeper not found";
 			break;
@@ -148,4 +145,188 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
 	}
 	
 	return failReasonString;
+}
+
+NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
+{
+	NSString *statusCodeString;
+	
+	switch(statusCode)
+	{
+		case XMSIPStatusCode_NoFailure:
+			statusCodeString = @"No Failure";
+			break;
+		case XMSIPStatusCode_Information_Trying:
+			statusCodeString = @"100 Trying";
+			break;
+		case XMSIPStatusCode_Information_Ringing:
+			statusCodeString = @"180 Ringing";
+			break;
+		case XMSIPStatusCode_Information_CallForwarded:
+			statusCodeString = @"181 Call Forwarded";
+			break;
+		case XMSIPStatusCode_Information_Queued:
+			statusCodeString = @"182 Queued";
+			break;
+		case XMSIPStatusCode_Information_Session_Progress:
+			statusCodeString = @"183 Session Progress";
+			break;
+			
+		case XMSIPStatusCode_Succesful_OK:
+			statusCodeString = @"200 OK";
+			break;
+		case XMSIPStatusCode_Succesful_Accepted:
+			statusCodeString = @"202 Accepted";
+			break;
+			
+		case XMSIPStatusCode_Redirection_MultipleChoices:
+			statusCodeString = @"300 Multiple Choices";
+			break;
+		case XMSIPStatusCode_Redirection_MovedPermamently:
+			statusCodeString = @"301 Moved Permamently";
+			break;
+		case XMSIPStatusCode_Redirection_MovedTemporarily:
+			statusCodeString = @"302 Moved Temporarily";
+			break;
+		case XMSIPStatusCode_Redirection_UseProxy:
+			statusCodeString = @"305 Use Proxy";
+			break;
+		case XMSIPStatusCode_Redirection_AlternativeService:
+			statusCodeString = @"380 Alternative Service";
+			break;
+			
+		case XMSIPStatusCode_Failure_BadRequest:
+			statusCodeString = @"400 Bad Request";
+			break;
+		case XMSIPStatusCode_Failure_UnAuthorized:
+			statusCodeString = @"401 Unauthorized";
+			break;
+		case XMSIPStatusCode_Failure_PaymentRequired:
+			statusCodeString = @"402 Payment Required";
+			break;
+		case XMSIPStatusCode_Failure_Forbidden:
+			statusCodeString = @"403 Forbidden";
+			break;
+		case XMSIPStatusCode_Failure_NotFound:
+			statusCodeString = @"404 Not Found";
+			break;
+		case XMSIPStatusCode_Failure_MethodNotAllowed:
+			statusCodeString = @"405 Method Not Allowed";
+			break;
+		case XMSIPStatusCode_Failure_NotAcceptable:
+			statusCodeString = @"406 Not Acceptable";
+			break;
+		case XMSIPStatusCode_Failure_ProxyAuthenticationRequired:
+			statusCodeString = @"407 Proxy Authentication Required";
+			break;
+		case XMSIPStatusCode_Failure_RequestTimeout:
+			statusCodeString = @"408 Request Timeout";
+			break;
+		case XMSIPStatusCode_Failure_Conflict:
+			statusCodeString = @"409 Conflict";
+			break;
+		case XMSIPStatusCode_Failure_Gone:
+			statusCodeString = @"410 Gone";
+			break;
+		case XMSIPStatusCode_Failure_LengthRequired:
+			statusCodeString = @"411 LengthRequired";
+			break;
+		case XMSIPStatusCode_Failure_RequestEntityTooLarge:
+			statusCodeString = @"413 Request Entity Too Large";
+			break;
+		case XMSIPStatusCode_Failure_RequestURITooLong:
+			statusCodeString = @"414 Request URI Too Long";
+			break;
+		case XMSIPStatusCode_Failure_UnsupportedMediaScheme:
+			statusCodeString = @"415 Unsupported Media Scheme";
+			break;
+		case XMSIPStatusCode_Failure_UnsupportedURIScheme:
+			statusCodeString = @"416 Unsupported URI Scheme";
+			break;
+		case XMSIPStatusCode_Failure_BadExtension:
+			statusCodeString = @"420 Bad Extension";
+			break;
+		case XMSIPStatusCode_Failure_ExtensionRequired:
+			statusCodeString = @"421 Extension Required";
+			break;
+		case XMSIPStatusCode_Failure_IntervalTooBrief:
+			statusCodeString = @"423 Interval Too Brief";
+			break;
+		case XMSIPStatusCode_Failure_TemporarilyUnavailable:
+			statusCodeString = @"480 Temporarily Unavailable";
+			break;
+		case XMSIPStatusCode_Failure_TransactionDoesNotExist:
+			statusCodeString = @"481 Transaction Does Not Exist";
+			break;
+		case XMSIPStatusCode_Failure_LoopDetected:
+			statusCodeString = @"482 Loop Detected";
+			break;
+		case XMSIPStatusCode_Failure_TooManyHops:
+			statusCodeString = @"483 Too Many Hops";
+			break;
+		case XMSIPStatusCode_Failure_AddressIncomplete:
+			statusCodeString = @"484 Address Incomplete";
+			break;
+		case XMSIPStatusCode_Failure_Ambiguous:
+			statusCodeString = @"485 Ambiguous";
+			break;
+		case XMSIPStatusCode_Failure_BusyHere:
+			statusCodeString = @"486 Busy Here";
+			break;
+		case XMSIPStatusCode_Failure_RequestTerminated:
+			statusCodeString = @"487 Request Terminated";
+			break;
+		case XMSIPStatusCode_Failure_NotAcceptableHere:
+			statusCodeString = @"488 Not Acceptable Here";
+			break;
+		case XMSIPStatusCode_Failure_BadEvent:
+			statusCodeString = @"489 Bad Event";
+			break;
+		case XMSIPStatusCode_Failure_RequestPending:
+			statusCodeString = @"491 Request Pending";
+			break;
+		case XMSIPStatusCode_Failure_Undecipherable:
+			statusCodeString = @"492 Undecipherable";
+			break;
+			
+		case XMSIPStatusCode_Failure_InternalServerError:
+			statusCodeString = @"500 Internal Server Error";
+			break;
+		case XMSIPStatusCode_Failure_NotImplemented:
+			statusCodeString = @"501 Not Implemented";
+			break;
+		case XMSIPStatusCode_Failure_BadGateway:
+			statusCodeString = @"502 Bad Gateway";
+			break;
+		case XMSIPStatusCode_Failure_ServiceUnavailable:
+			statusCodeString = @"503 Service Unavailable";
+			break;
+		case XMSIPStatusCode_Failure_ServerTimeout:
+			statusCodeString = @"504 Server Timeout";
+			break;
+		case XMSIPStatusCode_Failure_SIPVersionNotSupported:
+			statusCodeString = @"505 SIP Version Not Supported";
+			break;
+		case XMSIPStatusCode_Failure_MessageTooLarge:
+			statusCodeString = @"513 Message Too Large";
+			break;
+			
+		case XMSIPStatusCode_GlobalFailure_BusyEverywhere:
+			statusCodeString = @"600 Busy Everywhere";
+			break;
+		case XMSIPStatusCode_GlobalFailure_Decline:
+			statusCodeString = @"603 Decline";
+			break;
+		case XMSIPStatusCode_GlobalFailure_DoesNotExistAnywhere:
+			statusCodeString = @"604 Does Not Exist Anywhere";
+			break;
+		case XMSIPStatusCode_GlobalFailure_NotAcceptable:
+			statusCodeString = @"606 Not Acceptable";
+			break;
+			
+		default:
+			statusCodeString = @"Unknown Failure";
+	}
+	
+	return statusCodeString;
 }

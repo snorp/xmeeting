@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.16 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.17 2006/03/18 18:26:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,11 +37,11 @@ NSString *XMNotification_CallManagerDidRegisterAtGatekeeper = @"XMeetingCallMana
 NSString *XMNotification_CallManagerDidUnregisterFromGatekeeper = @"XMeetingCallManagerDidUnregisterFromGatekeeperNotification";
 NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper = @"XMeetingCallManagerDidNotRegisterAtGatekeeperNotification";
 NSString *XMNotification_CallManagerDidNotEnableSIP = @"XMeetingCallManagerDidNotEnableSIPNotification";
-NSString *XMNotification_CallManagerDidStartRegistrarRegistrationProcess = @"XMeetingCallManagerDidStartRegistrarRegistrationProcessNotification";
-NSString *XMNotification_CallManagerDidEndRegistrarRegistrationProcess = @"XMeetingCallManagerDidEndRegistrarRegistrationProcessNotification";
-NSString *XMNotification_CallManagerDidRegisterAtRegistrar = @"XMeetingCallManagerDidRegisterAtRegistrarNotification";
-NSString *XMNotification_CallManagerDidUnregisterFromRegistrar = @"XMeetingCallManagerDidUnregisterFromRegistrar";
-NSString *XMNotification_CallManagerDidNotRegisterAtRegistrar = @"XMeetingCallManagerDidNotRegisterAtRegistrar";
+NSString *XMNotification_CallManagerDidStartSIPRegistrationProcess = @"XMeetingCallManagerDidStartSIPRegistrationProcessNotification";
+NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess = @"XMeetingCallManagerDidEndSIPRegistrationProcessNotification";
+NSString *XMNotification_CallManagerDidRegisterAtSIPRegistrar = @"XMeetingCallManagerDidRegisterAtSIPRegistrarNotification";
+NSString *XMNotification_CallManagerDidUnregisterFromSIPRegistrar = @"XMeetingCallManagerDidUnregisterFromSIPRegistrar";
+NSString *XMNotification_CallManagerDidNotRegisterAtSIPRegistrar = @"XMeetingCallManagerDidNotRegisterAtSIPRegistrar";
 
 NSString *XMNotification_CallManagerDidOpenOutgoingAudioStream = @"XMeetingCallManagerDidOpenOutgoingAudioStreamNotification";
 NSString *XMNotification_CallManagerDidOpenIncomingAudioStream = @"XMeetingCallManagerDidOpenIncomingAudioStreamNotification";
