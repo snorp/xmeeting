@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.11 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.12 2006/03/18 20:46:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,6 @@
 - (id)init
 {
 	self = [super init];
-	//[[XMMainWindowController sharedInstance] addAdditionModule:self];
 	
 	nibLoader = nil;
 	activeCall = nil;

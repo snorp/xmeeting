@@ -6,10 +6,13 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 contentView = NSView; 
-                gdsFld = NSTextField; 
-                gkFld = NSTextField; 
-                ipFld = NSTextField; 
-                statusFld = NSTextField; 
+                gatekeeperField = NSTextField; 
+                h323StatusField = NSTextField; 
+                ipAddressesField = NSTextField; 
+                phoneNumberField = NSTextField; 
+                registrarField = NSTextField; 
+                sipStatusField = NSTextField; 
+                sipUsernameField = NSTextField; 
             }; 
             SUPERCLASS = XMInspectorModule; 
         }, 

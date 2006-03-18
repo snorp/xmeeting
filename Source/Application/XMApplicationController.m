@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.24 2006/03/18 18:26:10 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.25 2006/03/18 20:46:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -150,9 +150,24 @@
 	[[XMVideoManager sharedInstance] updateInputDeviceList];
 }
 
+- (IBAction)retryEnableH323:(id)sender
+{
+	[[XMCallManager sharedInstance] retryEnableH323];
+}
+
 - (IBAction)retryGatekeeperRegistration:(id)sender
 {
 	[[XMCallManager sharedInstance] retryGatekeeperRegistration];
+}
+
+- (IBAction)retryEnableSIP:(id)sender
+{
+	[[XMCallManager sharedInstance] retryEnableSIP];
+}
+
+- (IBAction)retrySIPRegistration:(id)sender
+{
+	[[XMCallManager sharedInstance] retrySIPRegistrations];
 }
 
 - (IBAction)showInspector:(id)sender
@@ -380,11 +395,44 @@
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	if([menuItem tag] == 311)
+	int tag = [menuItem tag];
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	BOOL doesAllowModifications = [callManager doesAllowModifications];
+	
+	if(tag == 310) // retry enable H.323
 	{
-		XMCallManager *callManager = [XMCallManager sharedInstance];
-		
-		if([callManager gatekeeperRegistrationFailReason] != XMGatekeeperRegistrationFailReason_NoFailure)
+		if(doesAllowModifications == YES &&
+		   [callManager isH323Listening] == NO &&
+		   [[[XMPreferencesManager sharedInstance] activeLocation] enableH323] == YES)
+		{
+			return YES;
+		}
+		return NO;
+	}
+	else if(tag == 311) // retry GK Registration
+	{
+		if(doesAllowModifications == YES &&
+		   [callManager gatekeeperRegistrationFailReason] != XMGatekeeperRegistrationFailReason_NoFailure)
+		{
+			return YES;
+		}
+		return NO;
+	}
+	else if(tag == 320) // retry Enable SIP
+	{
+		if(doesAllowModifications == YES &&
+		   [callManager isSIPListening] == NO &&
+		   [[[XMPreferencesManager sharedInstance] activeLocation] enableSIP] == NO)
+		{
+			return YES;
+		}
+		return NO;
+	}
+	else if(tag == 321) // retry SIP registration
+	{
+		if(doesAllowModifications == YES &&
+		   [callManager sipRegistrationFailReasonCount] > 0 &&
+		   [callManager isRegisteredAtAllRegistrars] == NO)
 		{
 			return YES;
 		}
