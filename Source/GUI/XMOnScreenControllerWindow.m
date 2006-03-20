@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.4 2006/03/20 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -97,7 +97,7 @@
 	NSRect outRect;
 	
 	switch(_effect) {
-		case RollInFromBottomBorderEffect:
+		case RollOutToBottomBorderEffect:
 			outRect = NSMakeRect(NSMinX(screenRect),NSMinY(screenRect)-screenRect.size.height,screenRect.size.width,screenRect.size.height);
 			
 			[self setFrame:screenRect display:YES];

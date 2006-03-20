@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerView.m,v 1.4 2006/03/20 23:25:24 hfriederich Exp $
+ * $Id: XMOnScreenControllerView.m,v 1.5 2006/03/20 23:46:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,6 +39,9 @@ NSString *XM_OSD_Separator = @"separator";
 - (void)_drawControls:(NSRect)aRect;
 - (void)_drawSeparatorInRect:(NSRect)aRect;
 - (void)_drawButton:(NSMutableDictionary*)button;
+
+// Buttons
+- (void)_updateIsPressedInformation:(NSEvent *)theEvent;
 
 @end
 
@@ -350,30 +353,8 @@ NSString *XM_OSD_Separator = @"separator";
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	NSPoint mloc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	int i = 0;
-	NSMutableDictionary *currentButton = nil;
 	currentPressedButtonIndex = -1;
-	
-	while (i < [buttons count])
-	{
-		currentButton = [buttons objectAtIndex:i];
-		if ([currentButton isEqualTo:XM_OSD_Separator])
-		{
-			i++;
-			continue;
-		}
-		NSRect currentRect = [self _rectFromString:[currentButton objectForKey:@"Rect"]];
-		
-		if (NSMouseInRect(mloc, currentRect, NO))
-		{
-			[currentButton setObject:[NSNumber numberWithBool:YES] forKey:@"IsPressed"];
-			currentPressedButtonIndex = i;
-			break;
-		}
-		i++;
-	}
-	[self setNeedsDisplay:YES];
+	[self _updateIsPressedInformation:theEvent];
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
@@ -381,7 +362,15 @@ NSString *XM_OSD_Separator = @"separator";
 	if (currentPressedButtonIndex != -1)
 	{
 		NSMutableDictionary *pressedButton = [buttons objectAtIndex:currentPressedButtonIndex];
+		
+		if([[pressedButton objectForKey:@"IsPressed"] boolValue] == NO)
+		{
+			// if the mouse moved outside the button while pressed, the button isn't considered pressed
+			return;
+		}
+		
 		[pressedButton setObject:[NSNumber numberWithBool:NO] forKey:@"IsPressed"];
+		
 		if ([self _actionIsValidForButton:pressedButton])
 		{
 			[self _performSelectorForButton:pressedButton];
@@ -392,7 +381,6 @@ NSString *XM_OSD_Separator = @"separator";
 			int currentState = [[pressedButton objectForKey:@"CurrentStateIndex"] intValue];
 			[pressedButton setObject:[NSNumber numberWithInt: ((currentState + 1) % numberOfStates)] forKey:@"CurrentStateIndex"];
 		}
-		
 	}
 	
 	[self setNeedsDisplay:YES];
@@ -400,6 +388,52 @@ NSString *XM_OSD_Separator = @"separator";
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
+	[self _updateIsPressedInformation:(NSEvent *)theEvent];
+}
+
+- (void)_updateIsPressedInformation:(NSEvent *)theEvent
+{
+	NSPoint mloc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	unsigned i = 0;
+	unsigned count = [buttons count];
+	
+	NSMutableDictionary *currentButton = nil;
+	BOOL needsDisplay = NO;
+	
+	while (i < count)
+	{
+		currentButton = [buttons objectAtIndex:i];
+		if ([currentButton isEqualTo:XM_OSD_Separator])
+		{
+			i++;
+			continue;
+		}
+		
+		NSRect currentRect = [self _rectFromString:[currentButton objectForKey:@"Rect"]];
+		
+		if (NSMouseInRect(mloc, currentRect, NO) &&
+			(currentPressedButtonIndex == -1 || currentPressedButtonIndex == i))
+		{
+			NSNumber *isPressedNumber = [[NSNumber alloc] initWithBool:YES];
+			[currentButton setObject:isPressedNumber forKey:@"IsPressed"];
+			[isPressedNumber release];
+			currentPressedButtonIndex = i;
+			needsDisplay = YES;
+		}
+		else if(currentPressedButtonIndex == i)
+		{
+			NSNumber *isPressedNumber = [[NSNumber alloc] initWithBool:NO];
+			[currentButton setObject:isPressedNumber forKey:@"IsPressed"];
+			[isPressedNumber release];
+			needsDisplay = YES;
+		}
+		i++;
+	}
+	
+	if(needsDisplay == YES)
+	{
+		[self setNeedsDisplay:YES];
+	}
 }
 
 #pragma mark -
