@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.16 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.17 2006/03/20 19:22:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #import "XMPreferencesManager.h"
 #import "XMInCallView.h"
 #import "XMOSDVideoView.h"
+
+#define VIDEO_INSET 5
 
 @interface XMInCallModule (PrivateMethods)
 
@@ -28,6 +30,7 @@
 
 - (id)init
 {
+	self = [super init];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
@@ -45,14 +48,15 @@
 }
 
 - (void)dealloc
-{
-	[nibLoader release];
-	
+{	
 	[super dealloc];
 }
 
 - (void)awakeFromNib
 {
+	contentViewMinSize = [contentView bounds].size;
+	contentViewSize = contentViewMinSize;
+	
 	[self _activeLocationDidChange:nil];
 }
 
@@ -63,10 +67,9 @@
 
 - (NSView *)contentView
 {
-	if(nibLoader == nil)
+	if(contentView == nil)
 	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"InCallModule" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+		[NSBundle loadNibNamed:@"InCallModule" owner:self];
 	}
 	
 	return contentView;
@@ -74,34 +77,62 @@
 
 - (NSSize)contentViewSize
 {
-	if(contentView == nil)
-	{
-		[self contentView];
-	}
-	return [contentView preferredSize];
+	[self contentView];
+
+	return contentViewSize;
 }
 
 - (NSSize)contentViewMinSize
 {
-	if(contentView == nil)
-	{
-		[self contentView];
-	}
-	return [contentView minimumSize];
+	[self contentView];
+	
+	return contentViewMinSize;
 }
 
 - (NSSize)contentViewMaxSize
 {
-	if(contentView == nil)
-	{
-		[self contentView];
-	}
-	return [contentView maximumSize];
+	return NSMakeSize(5000, 5000);
 }
 
 - (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight
 {
-	return [contentView adjustResizeDifference:resizeDifference minimumHeight:minimumHeight];
+	NSSize size = [contentView bounds].size;
+	
+	// minimum height is height minus height of minimum picture
+	unsigned usedHeight = contentViewMinSize.height - 288.0;
+	
+	int minimumVideoHeight = contentViewMinSize.height - usedHeight;
+	int currentVideoHeight = (int)size.height - usedHeight;
+	
+	int availableWidth = (int)size.width + (int)resizeDifference.width - 2*VIDEO_INSET;
+	int newHeight = currentVideoHeight + (int)resizeDifference.height;
+	
+	// BOGUS: Adjust for different aspect ratios
+	int calculatedWidthFromHeight = (int)XMGetVideoWidthForHeight(newHeight, XMVideoSize_CIF);
+	int calculatedHeightFromWidth = (int)XMGetVideoHeightForWidth(availableWidth, XMVideoSize_CIF);
+	
+	if(calculatedHeightFromWidth <= minimumVideoHeight)
+	{
+		// set the height to the minimum height
+		resizeDifference.height = minimumVideoHeight - currentVideoHeight;
+	}
+	else
+	{
+		if(calculatedWidthFromHeight < availableWidth)
+		{
+			// the height value takes precedence
+			int widthDifference = availableWidth - calculatedWidthFromHeight;
+			resizeDifference.width -= widthDifference;
+		}
+		else
+		{
+			// the width value takes precedence
+			int heightDifference = newHeight - calculatedHeightFromWidth;
+			resizeDifference.height -= heightDifference;
+		}
+	}
+	
+	return resizeDifference;
 }
 
 - (void)becomeActiveModule
@@ -126,6 +157,7 @@
 
 - (void)clearCall:(id)sender
 {
+	NSLog(@"didClearCall");
 	if(didClearCall == YES)
 	{
 		return;
@@ -158,14 +190,14 @@
 {
 	[remotePartyField setStringValue:@""];
 	
-	[contentView setVideoSize:XMVideoSize_QCIF];
+	//[contentView setVideoSize:XMVideoSize_QCIF];
 }
 
 - (void)_didStartReceivingVideo:(NSNotification *)notif
 {
 	XMVideoSize videoSize = [[XMVideoManager sharedInstance] remoteVideoSize];
 	
-	[contentView setVideoSize:videoSize];
+	//[contentView setVideoSize:videoSize];
 	
 	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
 
@@ -177,7 +209,7 @@
 {
 	BOOL enableVideo = [[[XMPreferencesManager sharedInstance] activeLocation] enableVideo];
 
-	[contentView setShowVideoContent:enableVideo];
+	//[contentView setShowVideoContent:enableVideo];
 }
 
 @end

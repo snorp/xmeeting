@@ -6,8 +6,7 @@
             CLASS = XMInCallModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                contentView = XMInCallView; 
-                hangupButton = NSButton; 
+                contentView = NSView; 
                 remotePartyField = NSTextField; 
                 videoView = XMOSDVideoView; 
             }; 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.28 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.29 2006/03/20 19:22:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1440,7 +1440,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_compressSequenceCompressFrame:(CVPixelBufferRef)frame timeStamp:(TimeValue)timeStamp
 {
-	NSLog(@"CompressSequenceCOMPRESS");
 	if(compressSequenceIsActive == YES)
 	{
 		ComponentResult err = noErr;
@@ -1721,8 +1720,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			compressSequenceNonKeyFrameCounter++;
 		}
 		
-		NSLog(@"Compressing");
-		
 		long dataLength;
 		err = CompressSequenceFrame(compressSequence,
 									pixMapHandle,
@@ -1732,7 +1729,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 									&dataLength,
 									NULL,
 									NULL);
-		NSLog(@"Compressing done");
 		if(err != noErr)
 		{
 			NSLog(@"CompressSequenceFrame failed: %d", err);
@@ -1752,8 +1748,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		CVPixelBufferUnlockBaseAddress(frame, 0);
 	}
-	
-	NSLog(@"CompressSequence COMPRESS DONE");
 }
 
 - (OSStatus)_packetizeCompressedFrame:(UInt8 *)data 

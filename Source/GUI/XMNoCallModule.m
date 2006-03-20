@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.26 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.27 2006/03/20 19:22:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -201,13 +201,13 @@
 	
 	unsigned usedHeight = contentViewSizeWithSelfViewHidden.height + VIDEO_INSET;
 	
-	int minimumVideoHeight = contentViewSizeWithSelfViewShown.height - usedHeight;
+	int minimumVideoHeight = contentViewMinSizeWithSelfViewShown.height - usedHeight;
 	int currentVideoHeight = (int)size.height - usedHeight;
 	
 	int availableWidth = (int)size.width + (int)resizeDifference.width - 2*VIDEO_INSET;
 	int newHeight = currentVideoHeight + (int)resizeDifference.height;
 	
-	int calculatedWidth = (int)XMGetVideoWidthForHeight(newHeight, XMVideoSize_CIF);
+	int calculatedWidthFromHeight = (int)XMGetVideoWidthForHeight(newHeight, XMVideoSize_CIF);
 	int calculatedHeightFromWidth = (int)XMGetVideoHeightForWidth(availableWidth, XMVideoSize_CIF);
 	
 	if(calculatedHeightFromWidth <= minimumVideoHeight)
@@ -217,10 +217,10 @@
 	}
 	else
 	{
-		if(calculatedWidth < availableWidth)
+		if(calculatedWidthFromHeight < availableWidth)
 		{
 			// the height value takes precedence
-			int widthDifference = availableWidth - calculatedWidth;
+			int widthDifference = availableWidth - calculatedWidthFromHeight;
 			resizeDifference.width -= widthDifference;
 		}
 		else
@@ -241,7 +241,10 @@
 
 - (void)becomeInactiveModule
 {
-	contentViewSizeWithSelfViewShown = [contentView bounds].size;
+	if(doesShowSelfView == YES)
+	{
+		contentViewSizeWithSelfViewShown = [contentView bounds].size;
+	}
 }
 
 #pragma mark -

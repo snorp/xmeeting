@@ -115,7 +115,6 @@
 		D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */; };
 		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
-		D13233A3090687FA00F4D5A7 /* XMInCallView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13233A2090687FA00F4D5A7 /* XMInCallView.m */; };
 		D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35408F90263007E4ABE /* transports.cxx */; };
 		D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13274F008C6F2BB00298F25 /* XMCallInfoView.m */; };
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
@@ -995,8 +994,6 @@
 		D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMVideoPreferencesModule.m; path = Source/GUI/XMVideoPreferencesModule.m; sourceTree = "<group>"; };
 		D132319E090526B700F4D5A7 /* HeadsetCam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HeadsetCam.tiff; path = Resources/Images/HeadsetCam.tiff; sourceTree = "<group>"; };
 		D13231CF09052FC500F4D5A7 /* Cam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Cam.tiff; path = Resources/Images/Cam.tiff; sourceTree = "<group>"; };
-		D13233A1090687FA00F4D5A7 /* XMInCallView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMInCallView.h; path = Source/GUI/XMInCallView.h; sourceTree = "<group>"; };
-		D13233A2090687FA00F4D5A7 /* XMInCallView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInCallView.m; path = Source/GUI/XMInCallView.m; sourceTree = "<group>"; };
 		D13274EF08C6F2BB00298F25 /* XMCallInfoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = XMCallInfoView.h; sourceTree = "<group>"; };
 		D13274F008C6F2BB00298F25 /* XMCallInfoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = XMCallInfoView.m; sourceTree = "<group>"; };
 		D132750608C6F38000298F25 /* XMRecentCallsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMRecentCallsView.h; sourceTree = "<group>"; };
@@ -2138,8 +2135,6 @@
 				D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */,
 				D1ECCD3908349255008EBAE3 /* XMInCallModule.h */,
 				D1ECCD3A08349255008EBAE3 /* XMInCallModule.m */,
-				D13233A1090687FA00F4D5A7 /* XMInCallView.h */,
-				D13233A2090687FA00F4D5A7 /* XMInCallView.m */,
 				1A348F9B0984E4210033FA95 /* XMInspectorController.h */,
 				1A348F9C0984E4210033FA95 /* XMInspectorController.m */,
 				D1F6056908BA0E600005E9A0 /* XMInspectorModule.h */,
@@ -3972,7 +3967,6 @@
 				D19729B308FBF8A000295E05 /* XMTransmitterMediaPatch.cpp in Sources */,
 				D1972B0308FC529C00295E05 /* XMPacketBuilder.c in Sources */,
 				D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */,
-				D13233A3090687FA00F4D5A7 /* XMInCallView.m in Sources */,
 				D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */,
 				D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */,
 				D1EF0691091756FA008A8974 /* XMAddressBookRecordSearchMatch.m in Sources */,
