@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.12 2006/03/17 13:20:49 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.13 2006/03/20 18:22:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,10 @@
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
 - (IBAction)showContacts:(id)sender;
+
+- (void)showInfoInspector;
+- (void)showStatisticsInspector;
+- (void)showCallHistoryInspector;
 
 @end
 

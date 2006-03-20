@@ -35,7 +35,7 @@
                 call = id; 
                 changeActiveLocation = id; 
                 showContacts = id; 
-                showInspector = id; 
+                showInfoInspector = id; 
                 showTools = id; 
                 toggleShowSelfView = id; 
             }; 
@@ -48,7 +48,7 @@
                 contentView = NSView; 
                 locationsPopUpButton = NSPopUpButton; 
                 selfView = XMLocalVideoView; 
-                semaphoreView = NSImageView; 
+                semaphoreButton = NSButton; 
                 statusField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 

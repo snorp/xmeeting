@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.10 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.11 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -235,7 +235,6 @@
 		representedObject = nil;
 		[[self cell] _setImage:defaultImage];
 		[self _setNeedsDisplay];
-		shouldFetchCompletions = YES;
 	}
 	
 	if(dataSource != nil && shouldFetchCompletions == YES)
@@ -490,12 +489,15 @@
 		}
 		else if(dataSource != nil)
 		{
-			NSArray *imageOptions = [dataSource imageOptionsForDatabaseField:self];
+			unsigned selectedIndex = 0;
+			NSArray *imageOptions = [dataSource imageOptionsForDatabaseField:self selectedIndex:&selectedIndex];
 			if([imageOptions count] != 0)
 			{
 				[tableData release];
 				tableData = [imageOptions retain];
 			
+				pulldownMode = IMAGE_OPTIONS_WINDOW;
+				[self _displayObjectAtIndex:selectedIndex];
 				[self _displayWindow:IMAGE_OPTIONS_WINDOW];
 			}
 		}
@@ -796,6 +798,7 @@
 	[self setBezeled:[textFieldCell isBezeled]];
 	[self setBezelStyle:[textFieldCell bezelStyle]];
 	[self setScrollable:[textFieldCell isScrollable]];
+	[self setFont:[textFieldCell font]];
 	[self setShowsFirstResponder:NO];
 	
 	// optimizing drawing behaviour
@@ -809,7 +812,7 @@
 	image = nil;
 	imageCell = [[NSImageCell alloc] initImageCell:nil];
 	[imageCell setImageFrameStyle:NSImageFrameNone];
-	[imageCell setImageScaling:NSScaleNone];
+	[imageCell setImageScaling:NSScaleProportionally];
 	[imageCell setImageAlignment:NSImageAlignCenter];
 	
 	return self;
@@ -861,12 +864,18 @@
 	// we only adjust the bounds if we have an image to draw
 	if(image != nil)
 	{
-		// height is bounds height + 2
-		float height = bounds.size.height + 2;
+		// width is bounds height
+		float width = bounds.size.height;
 		
-		bounds.origin.x += height;
-		bounds.size.width -= height;
+		bounds.origin.x += width;
+		bounds.size.width -= width;
 	}
+	
+	// we implicitely assume an height of 24 pixels using 13pt font
+	// Normal height for NSTextFields in this case is 22px.
+	// BOUGS: Make this routine more general
+	bounds.origin.y += 2;
+	bounds.size.height -= 4;
 	
 	// subtracting the space for the disclosure triange
 	bounds.size.width -= DISCLOSURE_WIDTH;
@@ -946,8 +955,8 @@
 	if(needsDrawing == YES && image != nil)
 	{
 		// drawing the image
-		float dimension = frame.size.height;
-		[imageCell drawWithFrame:NSMakeRect(frame.origin.x, frame.origin.y, dimension, dimension) inView:view];
+		float dimension = frame.size.height - 6;
+		[imageCell drawWithFrame:NSMakeRect(frame.origin.x + 3, frame.origin.y + 3, dimension, dimension) inView:view];
 	}
 	
 	// drawing the focus ring if needed

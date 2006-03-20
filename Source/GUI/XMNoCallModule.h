@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.12 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.13 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,32 +26,34 @@
 	IBOutlet NSView *contentView;
 	
 	NSSize contentViewSizeWithSelfViewHidden;
+	NSSize contentViewMinSizeWithSelfViewShown;
 	NSSize contentViewSizeWithSelfViewShown;
-	NSSize currentContentViewSizeWithSelfViewShown;
 	
 	// GUI Outlets
 	IBOutlet XMLocalVideoView *selfView;
-	IBOutlet NSImageView *semaphoreView;
+	IBOutlet NSButton *semaphoreButton;
 	IBOutlet NSProgressIndicator *busyIndicator;
 	IBOutlet NSTextField *statusField;
 	IBOutlet NSPopUpButton *locationsPopUpButton;
 	IBOutlet XMDatabaseField *callAddressField;
 	IBOutlet NSButton *callButton;
 	
+	// timer to clear the call end reason
+	NSTimer *callEndReasonTimer;
+	
 	// Optimizations for XMDatabaseField completions
 	unsigned uncompletedStringLength;
 	NSMutableArray *matchedAddresses;
 	NSMutableArray *completions;
 	
-	NSNib *nibLoader;
-	
+	XMCallProtocol currentCallProtocol;
 	BOOL doesShowSelfView;
 	BOOL isCalling;
 }
 
 - (IBAction)call:(id)sender;
 - (IBAction)changeActiveLocation:(id)sender;
-- (IBAction)showInspector:(id)sender;
+- (IBAction)showInfoInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
 - (IBAction)showContacts:(id)sender;
 - (IBAction)toggleShowSelfView:(id)sender;

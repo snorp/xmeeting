@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.h,v 1.6 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMDatabaseField.h,v 1.7 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -117,9 +117,10 @@
  * Asks the data source to return an array of NSString instances. These instances will be displayed
  * in a pull down menu when the user clicks on the image in the view. If the array contains no elements,
  * no pull down menu appears.
+ * By setting selectedIndex to a valid number, the source can determine which option is initially selected
  * This method is required to implement
  **/
-- (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField;
+- (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField selectedIndex:(unsigned *)selectedIndex;
 
 /**
  * Informs the data source that the user selected one of the text options.

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.h,v 1.9 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMAddressBookModule.h,v 1.10 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,7 @@
 @interface XMAddressBookModule : XMInspectorModule {
 
 	IBOutlet NSView *contentView;
+	NSSize contentViewMinSize;
 	NSSize contentViewSize;
 	
 	// outlets in the "main" content view

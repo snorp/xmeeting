@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.25 2006/03/18 20:46:22 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.26 2006/03/20 18:22:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,6 +185,23 @@
 	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Contacts] show];
 }
 
+#pragma mark -
+#pragma mark Public Methods
+
+- (void)showInfoInspector
+{
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Inspector] showModule:infoModule];
+}
+
+- (void)showStatisticsInspector
+{
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Inspector] showModule:statisticsModule];
+}
+
+- (void)showCallHistoryInspector
+{
+	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Inspector] showModule:callHistoryModule];
+}
 
 #pragma mark -
 #pragma mark NSApplication delegate methods
@@ -422,7 +439,7 @@
 	{
 		if(doesAllowModifications == YES &&
 		   [callManager isSIPListening] == NO &&
-		   [[[XMPreferencesManager sharedInstance] activeLocation] enableSIP] == NO)
+		   [[[XMPreferencesManager sharedInstance] activeLocation] enableSIP] == YES)
 		{
 			return YES;
 		}

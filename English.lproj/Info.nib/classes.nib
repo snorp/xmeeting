@@ -7,11 +7,16 @@
             OUTLETS = {
                 contentView = NSView; 
                 gatekeeperField = NSTextField; 
+                gatekeeperSemaphoreView = NSImageView; 
                 h323StatusField = NSTextField; 
+                h323StatusSemaphoreView = NSImageView; 
+                ipAddressSemaphoreView = NSImageView; 
                 ipAddressesField = NSTextField; 
                 phoneNumberField = NSTextField; 
                 registrarField = NSTextField; 
+                registrarSemaphoreView = NSImageView; 
                 sipStatusField = NSTextField; 
+                sipStatusSemaphoreView = NSImageView; 
                 sipUsernameField = NSTextField; 
             }; 
             SUPERCLASS = XMInspectorModule; 

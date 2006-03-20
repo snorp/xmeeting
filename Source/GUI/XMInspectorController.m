@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.3 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.4 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,6 +175,20 @@ static XMInspectorController *contactsInstance;
 	{
 		[panel orderFront:self];
 	}
+}
+
+- (void)showModule:(XMInspectorModule *)module
+{
+	unsigned index = [modules indexOfObject:module];
+	
+	if(index == NSNotFound)
+	{
+		return;
+	}
+	
+	[self show];
+	[pageController setSelectedSegment:index];
+	[self _showModule:module];
 }
 
 - (void)close

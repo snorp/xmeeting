@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.6 2006/03/18 20:46:22 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.7 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,111 +104,6 @@
 #pragma mark -
 #pragma mark Private Methods
 
-- (void)_displayListeningStatusFieldInformation
-{
-	/*
-	XMCallManager *callManager = [XMCallManager sharedInstance];
-	XMUtils *utils = [XMUtils sharedInstance];
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	
-	BOOL isH323Listening = [callManager isH323Listening];
-	
-	if(!isH323Listening)
-	{
-		[statusFld setStringValue:NSLocalizedString(@"Offline", @"")];
-		[ipFld setStringValue:@""];
-		[ipFld setStringValue:@""];
-		return;
-	}
-
-	NSString *externalAddress = [utils externalAddress];
-	NSArray *localAddresses = [utils localAddresses];
-	unsigned localAddressCount = [localAddresses count];
-	
-	if(localAddressCount == 0)
-	{
-		[statusFld setStringValue:NSLocalizedString(@"Offline (No Network Address)", @"")];
-		[ipFld setStringValue:@""];
-		[ipFld setToolTip:@""];
-		return;
-	}
-	
-	[statusFld setStringValue:NSLocalizedString(@"Idle", @"")];
-	
-	NSMutableString *ipAddressString = [[NSMutableString alloc] initWithCapacity:30];
-	unsigned i;
-	
-	for(i = 0; i < (localAddressCount-1); i++)
-	{
-		[ipAddressString appendString:[localAddresses objectAtIndex:i]];
-		[ipAddressString appendString:@", "];
-	}
-	[ipAddressString appendString:[localAddresses objectAtIndex:(localAddressCount-1)]];
-	
-	BOOL useAddressTranslation = [[preferencesManager activeLocation] useAddressTranslation];
-	
-	if(useAddressTranslation == YES && externalAddress != nil && ![localAddresses containsObject:externalAddress])
-	{
-		[ipAddressString appendString:@", "];
-		[ipAddressString appendString:externalAddress];
-		[ipAddressString appendString: @" (External)"];
-	}
-	
-	[ipFld setStringValue:ipAddressString];
-	[ipFld setToolTip:ipAddressString];
-	[ipAddressString release];
-	 */
-}
-
-- (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif
-{
-	/*
-	NSString *gatekeeperName = [[XMCallManager sharedInstance] gatekeeperName];
-	
-	if(gatekeeperName != nil)
-	{
-		NSString *gatekeeperFormat = NSLocalizedString(@"%@", @"");
-		NSString *gatekeeperString = [[NSString alloc] initWithFormat:gatekeeperFormat, gatekeeperName];
-		[gkFld setStringValue:gatekeeperString];
-		[gatekeeperString release];
-		
-		[gdsFld setTextColor:[NSColor controlTextColor]];
-	}
-	else
-	{
-		[gkFld setStringValue:@""];
-		[gdsFld setTextColor:[NSColor disabledControlTextColor]];
-	}
-	 */
-}
-
-/*
-- (void)_preferencesDidChange:(NSNotification *)notif
-{
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	XMLocation *activeLocation = [preferencesManager activeLocation];
-	
-	if([activeLocation usesGatekeeper] == YES)
-	{
-		NSString* phone = [activeLocation gatekeeperPhoneNumber]; 
-		[gdsFld setStringValue:phone];
-	}
-	else
-	{
-		[gdsFld setStringValue:@""];
-	}
-}
-
-- (void)_didReceiveIncomingCall:(NSNotification *)notif
-{
-	[statusFld setStringValue:NSLocalizedString(@"Incoming Call", @"")];
-}
-
-- (void)_didStartCalling:(NSNotification *)notif
-{
-	[statusFld setStringValue:NSLocalizedString(@"In call", @"")];
-}*/
-
 - (void)_updateNetworkStatus:(NSNotification *)notif
 {
 	XMUtils *utils = [XMUtils sharedInstance];
@@ -221,6 +116,7 @@
 	if(localAddressCount == 0)
 	{
 		[ipAddressesField setStringValue:@""];
+		[ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 		return;
 	}
 	
@@ -247,6 +143,7 @@
 	[ipAddressesField setStringValue:ipAddressString];
 	[ipAddressesField setToolTip:ipAddressString];
 	[ipAddressString release];
+	[ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
 }
 
 - (void)_updateProtocolStatus:(NSNotification *)notif
@@ -261,6 +158,7 @@
 		if([callManager isH323Listening] == YES)
 		{
 			[h323StatusField setStringValue:@"Online"];
+			[h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
 			
 			unsigned h323AccountTag = [activeLocation h323AccountTag];
 			if(h323AccountTag != 0)
@@ -274,31 +172,38 @@
 				if(gatekeeper != nil)
 				{
 					[gatekeeperField setStringValue:gatekeeper];
+					[gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
 					[phoneNumberField setTextColor:[NSColor controlTextColor]];
 				}
 				else
 				{
 					[gatekeeperField setStringValue:@"Failed to register"];
+					[gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 					[phoneNumberField setTextColor:[NSColor disabledControlTextColor]];
 				}
 			}
 			else
 			{
 				[gatekeeperField setStringValue:@"Not Used"];
+				[gatekeeperSemaphoreView setImage:nil];
 				[phoneNumberField setStringValue:@""];
 			}
 		}
 		else
 		{
 			[h323StatusField setStringValue:@"Failed to enable"];
+			[h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 			[gatekeeperField setStringValue:@""];
+			[gatekeeperSemaphoreView setImage:nil];
 			[phoneNumberField setStringValue:@""];
 		}
 	}
 	else
 	{
 		[h323StatusField setStringValue:@"Not Enabled"];
+		[h323StatusSemaphoreView setImage:nil];
 		[gatekeeperField setStringValue:@""];
+		[gatekeeperSemaphoreView setImage:nil];
 		[phoneNumberField setStringValue:@""];
 	}
 	
@@ -308,6 +213,7 @@
 		if([callManager isSIPListening] == YES)
 		{
 			[sipStatusField setStringValue:@"Online"];
+			[sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
 			
 			unsigned sipAccountTag = [activeLocation sipAccountTag];
 			if(sipAccountTag != 0)
@@ -325,31 +231,38 @@
 					NSString *username = [sipAccount username];
 					
 					[registrarField setStringValue:registrar];
+					[registrarSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
 					[sipUsernameField setStringValue:username];
 				}
 				else
 				{
 					[registrarField setStringValue:@"Failed to register"];
+					[registrarSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 					[sipUsernameField setStringValue:@""];
 				}
 			}
 			else
 			{
 				[registrarField setStringValue:@"Not Used"];
+				[registrarSemaphoreView setImage:nil];
 				[sipUsernameField setStringValue:@""];
 			}
 		}
 		else
 		{
 			[sipStatusField setStringValue:@"Failed to enable"];
+			[sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 			[registrarField setStringValue:@""];
+			[registrarSemaphoreView setImage:nil];
 			[sipUsernameField setStringValue:@""];
 		}
 	}
 	else
 	{
 		[sipStatusField setStringValue:@"Not Enabled"];
+		[sipStatusSemaphoreView setImage:nil];
 		[registrarField setStringValue:@""];
+		[registrarSemaphoreView setImage:nil];
 		[sipUsernameField setStringValue:@""];
 	}
 }

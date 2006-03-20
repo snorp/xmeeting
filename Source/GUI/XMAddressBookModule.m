@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.13 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.14 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,7 +56,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (void)awakeFromNib
 {
-	contentViewSize = [contentView frame].size;
+	contentViewMinSize = [contentView frame].size;
+	contentViewSize = contentViewMinSize;
 	
 	[addressBookView setAutosaveName:XMAddressBookPeoplePickerViewAutosaveName];
 	[addressBookView setTarget:self];
@@ -119,6 +120,13 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	return contentViewSize;
 }
 
+- (NSSize)contentViewMinSize
+{
+	[self contentView];
+	
+	return contentViewMinSize;
+}
+
 - (NSSize)contentViewMaxSize
 {
 	return NSMakeSize(5000, 5000);
@@ -130,6 +138,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (void)becomeInactiveModule
 {
+	contentViewSize = [contentView frame].size;
 }
 
 #pragma mark Action Methods

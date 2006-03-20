@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.25 2006/03/18 18:26:14 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.26 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,9 @@
 #import "XMCallAddressManager.h"
 #import "XMSimpleAddressResource.h"
 #import "XMPreferencesManager.h"
+#import "XMH323Account.h"
+#import "XMSIPAccount.h"
+#import "XMLocation.h"
 #import "XMMainWindowController.h"
 #import "XMLocalVideoView.h"
 
@@ -25,19 +28,20 @@
 - (void)_didChangeActiveLocation:(NSNotification *)notif;
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
 - (void)_didEndSubsystemSetup:(NSNotification *)notif;
+- (void)_didUpdateNetworkAddresses:(NSNotification *)notif;
 - (void)_didStartCallInitiation:(NSNotification *)notif;
 - (void)_didStartCalling:(NSNotification *)notif;
 - (void)_didNotStartCalling:(NSNotification *)notif;
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif;
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
-- (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif;
-- (void)_h323NotEnabled:(NSNotification*)notif;
+- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif;
 
-- (void)_displayListeningStatusFieldInformation;
+- (void)_clearCallEndReason:(NSTimer *)timer;
+- (void)_invalidateCallEndReasonTimer;
+
+- (void)_updateStatusInformation:(NSString *)statusFieldString;
 - (void)_setupVideoDisplay;
-
-- (void)_appendNetworkInterfacesString:(NSMutableString *)string;
 
 @end
 
@@ -49,8 +53,6 @@
 	matchedAddresses = nil;
 	completions = [[NSMutableArray alloc] initWithCapacity:10];
 	
-	nibLoader = nil;
-	
 	doesShowSelfView = NO;
 	isCalling = NO;
 	
@@ -61,8 +63,6 @@
 {
 	[matchedAddresses release];
 	[completions release];
-	
-	[nibLoader release];
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
@@ -80,14 +80,17 @@
 	[notificationCenter addObserver:self selector:@selector(_didChangeActiveLocation:)
 							   name:XMNotification_PreferencesManagerDidChangeActiveLocation
 							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-							   name:XMNotification_UtilsDidEndFetchingExternalAddress
-							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
 							   name:XMNotification_CallManagerDidStartSubsystemSetup
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
 							   name:XMNotification_CallManagerDidEndSubsystemSetup
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
+							   name:XMNotification_UtilsDidEndFetchingExternalAddress
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
+							   name:XMNotification_UtilsDidUpdateLocalAddresses
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
 							   name:XMNotification_CallManagerDidStartCallInitiation
@@ -107,19 +110,13 @@
 	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
 							   name:XMNotification_CallManagerDidClearCall
 							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
-							   name:XMNotification_CallManagerDidRegisterAtGatekeeper
-							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_gatekeeperRegistrationDidChange:)
+	[notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:)
 							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper
-							 object:nil];
-	[notificationCenter addObserver:self selector:@selector(_h323NotEnabled:)
-							   name:XMNotification_CallManagerDidNotEnableH323
 							 object:nil];
 		
 	contentViewSizeWithSelfViewHidden = [contentView frame].size;
-	contentViewSizeWithSelfViewShown = contentViewSizeWithSelfViewHidden;
-	currentContentViewSizeWithSelfViewShown = contentViewSizeWithSelfViewShown;
+	contentViewMinSizeWithSelfViewShown = contentViewSizeWithSelfViewHidden;
+	contentViewSizeWithSelfViewShown = contentViewMinSizeWithSelfViewShown;
 	
 	// substracting the space used by the self view
 	contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
@@ -128,6 +125,16 @@
 	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
 
 	[self _preferencesDidChange:nil];
+	
+	// determining in which state we currently are
+	if([[XMCallManager sharedInstance] doesAllowModifications])
+	{
+		[self _didEndSubsystemSetup:nil];
+	}
+	else
+	{
+		[self _didStartSubsystemSetup:nil];
+	}
 }
 
 #pragma mark -
@@ -140,10 +147,9 @@
 
 - (NSView *)contentView
 {
-	if(nibLoader == nil)
+	if(contentView == nil)
 	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"NoCallModule" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+		[NSBundle loadNibNamed:@"NoCallModule" owner:self];
 	}
 	return contentView;
 }
@@ -155,7 +161,7 @@
 	
 	if(doesShowSelfView == YES)
 	{
-		return currentContentViewSizeWithSelfViewShown;
+		return contentViewSizeWithSelfViewShown;
 	}
 	return contentViewSizeWithSelfViewHidden;
 }
@@ -167,7 +173,7 @@
 	
 	if(doesShowSelfView == YES)
 	{
-		return contentViewSizeWithSelfViewShown;
+		return contentViewMinSizeWithSelfViewShown;
 	}
 	return contentViewSizeWithSelfViewHidden;
 }
@@ -235,6 +241,7 @@
 
 - (void)becomeInactiveModule
 {
+	contentViewSizeWithSelfViewShown = [contentView bounds].size;
 }
 
 #pragma mark -
@@ -254,16 +261,16 @@
 		[selfView stopDisplayingLocalVideo];
 		[selfView stopDisplayingNoVideo];
 		
-		currentContentViewSizeWithSelfViewShown = [contentView bounds].size;
+		contentViewSizeWithSelfViewShown = [contentView bounds].size;
 
 		doesShowSelfView = NO;
 		[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
 	}
 }
 
-- (IBAction)showInspector:(id)sender
+- (IBAction)showInfoInspector:(id)sender
 {
-	[(XMApplicationController *)[NSApp delegate] showInspector:self];
+	[(XMApplicationController *)[NSApp delegate] showInfoInspector];
 }
 
 - (IBAction)showTools:(id)sender
@@ -385,13 +392,16 @@
 	return image;
 }
 
-- (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField
+- (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField selectedIndex:(unsigned *)selectedIndex;
 {
+	static int counter = 0;
 	id representedObject = [databaseField representedObject];
 	
 	if(representedObject == nil ||
 	   [(id<XMCallAddress>)representedObject displayImage] == nil)
 	{
+		*selectedIndex = counter % 2;
+		counter++;
 		return [NSArray arrayWithObjects:@"H.323", @"SIP", nil];
 	}
 	return [NSArray array];
@@ -425,8 +435,6 @@
 	[locationsPopUpButton removeAllItems];
 	[locationsPopUpButton addItemsWithTitles:[preferencesManager locationNames]];
 	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
-	
-	[self _gatekeeperRegistrationDidChange:nil];
 }
 
 - (void)_didChangeActiveLocation:(NSNotification *)notif
@@ -437,18 +445,14 @@
 	}
 }
 
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
-{
-	[self _displayListeningStatusFieldInformation];
-
-}
-
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
-	[semaphoreView setHidden:YES];
+	[semaphoreButton setHidden:YES];
 	
 	[busyIndicator startAnimation:self];
 	[busyIndicator setHidden:NO];
+	
+	[statusField setStringValue:@"Setup. Please wait..."];
 	
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
@@ -456,7 +460,7 @@
 
 - (void)_didEndSubsystemSetup:(NSNotification *)notif
 {
-	[semaphoreView setHidden:NO];
+	[semaphoreButton setHidden:NO];
 	
 	[busyIndicator stopAnimation:self];
 	[busyIndicator setHidden:YES];
@@ -464,7 +468,20 @@
 	[locationsPopUpButton setEnabled:YES];
 	[callButton setEnabled:YES];
 	
-	[self _displayListeningStatusFieldInformation];
+	[self _updateStatusInformation:nil];
+	[self _invalidateCallEndReasonTimer];
+}
+
+- (void)_didUpdateNetworkAddresses:(NSNotification *)notif
+{
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	
+	if([callManager doesAllowModifications] == NO)
+	{
+		return;	// will be handled automatically if subsystem setup or call is finished
+	}
+	
+	[self _updateStatusInformation:nil];
 }
 
 - (void)_didStartCallInitiation:(NSNotification *)notif
@@ -479,6 +496,8 @@
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
 	[statusField setStringValue:NSLocalizedString(@"Preparing to call...", @"")];
+	
+	[self _invalidateCallEndReasonTimer];
 }
 
 - (void)_didStartCalling:(NSNotification *)notif
@@ -495,7 +514,7 @@
 {
 	[locationsPopUpButton setEnabled:YES];
 	[callButton setEnabled:YES];
-	[self _displayListeningStatusFieldInformation];
+	[self _updateStatusInformation:nil]; // information about this is handled within XMApplicationController
 }
 
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif
@@ -508,6 +527,8 @@
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
 	[statusField setStringValue:NSLocalizedString(@"Incoming Call", @"")];
+	
+	[self _invalidateCallEndReasonTimer];
 }
 
 - (void)_didClearCall:(NSNotification *)notif
@@ -516,75 +537,232 @@
 	[callButton setEnabled:YES];
 	[callButton setImage:[NSImage imageNamed:@"Call_24.tif"]];
 	[callButton setAlternateImage:[NSImage imageNamed:@"Call_24_down.tif"]];
-	[self _displayListeningStatusFieldInformation];
+	
+	// display the cause for the cleared call for some seconds
+	XMCallInfo *callInfo = [[XMCallManager sharedInstance] recentCallAtIndex:0];
+	XMCallEndReason callEndReason = [callInfo callEndReason];
+	NSString *idleString = nil;
+	if(callEndReason != XMCallEndReason_EndedByLocalUser)
+	{
+		idleString = [[NSString alloc] initWithFormat:@"Idle (%@)", XMCallEndReasonString(callEndReason)];
+	}
+	[self _updateStatusInformation:idleString];
+	[idleString release];
+	
+	// causing the call clear reason to disappear after 10 seconds
+	callEndReasonTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(_clearCallEndReason:)
+														 userInfo:nil repeats:NO] retain];
+	
 	isCalling = NO;
 }
 
-- (void)_gatekeeperRegistrationDidChange:(NSNotification *)notif
+- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif
 {
-	NSString *gatekeeperName = [[XMCallManager sharedInstance] gatekeeperName];
-	NSMutableString *toolTipString = [[NSMutableString alloc] initWithCapacity:50];
-	
-	if(gatekeeperName != nil)
+	// we're only interested in the situation when the client gets
+	// unregistered from the gatekeeper immediately without being part
+	// of a subsystem setup.
+	if([[XMCallManager sharedInstance] doesAllowModifications] == YES)
 	{
-		// gatekeeperName is only non-nil if using a gatekeeper
-		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];	
-		[toolTipString appendString:NSLocalizedString(@"Registered with gatekeeper\n\n",@"")];
+		[self _updateStatusInformation:nil];
 	}
-	else
-	{
-		if (![[[XMPreferencesManager sharedInstance] activeLocation] usesGatekeeper]){
-			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_green.tif"]];
-			[toolTipString appendString:NSLocalizedString(@"Ready. Not using a gatekeeper\n\n",@"")];
-		}
-		else
-		{
-			[semaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow.tif"]];
-			[toolTipString appendString:NSLocalizedString(@"Gatekeeper registration failed\n\n",@"")];
-		}
-	}
-	
-	[self _appendNetworkInterfacesString:toolTipString];
-	
-	[semaphoreView setToolTip:toolTipString];
-}
-
-- (void)_h323NotEnabled:(NSNotification*)notif{
-	// at the moment, treat as a fatal error if H.323 is not enabled.
-	[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
-	[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
-	[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 not enabled)",@"")];
 }
 
 #pragma mark -
 #pragma mark Private Methods
 
-- (void)_displayListeningStatusFieldInformation
+- (void)_clearCallEndReason:(NSTimer *)timer
 {
-	XMCallManager *callManager = [XMCallManager sharedInstance];
-	BOOL isH323Listening = [callManager isH323Listening];
+	if(timer != callEndReasonTimer)
+	{
+		// should never happen
+		return;
+	}
+	if([[XMCallManager sharedInstance] doesAllowModifications] == YES)
+	{
+		[self _updateStatusInformation:nil];
+	}
+	
+	[self _invalidateCallEndReasonTimer];
+}
 
-	if(!isH323Listening)
+- (void)_invalidateCallEndReasonTimer
+{
+	if(callEndReasonTimer != nil)
 	{
-		[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
-		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
-		[semaphoreView setToolTip:NSLocalizedString(@"Offline (H.323 is not enabled)",@"")];
-		return;
+		[callEndReasonTimer invalidate];
+		[callEndReasonTimer release];
+		callEndReasonTimer = nil;
 	}
-		
+}
+
+- (void)_updateStatusInformation:(NSString *)statusFieldString;
+{
 	XMUtils *utils = [XMUtils sharedInstance];
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	XMLocation *activeLocation = [preferencesManager activeLocation];
+	
 	NSArray *localAddresses = [utils localAddresses];
-		
-	if([localAddresses count] == 0)
+	unsigned localAddressCount = [localAddresses count];
+	
+	if(localAddressCount == 0)
 	{
-		[statusField setStringValue:NSLocalizedString(@"Offline", @"")];
-		[semaphoreView setImage:[NSImage imageNamed:@"semaphore_red.tif"]];
-		[semaphoreView setToolTip:NSLocalizedString(@"Offline (could not fetch external address)",@"")];
+		NSString *statusString = @"Offline (No network address)";
+		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
+		[semaphoreButton setToolTip:statusString];
+		[statusField setStringValue:statusString];
+		return;
+	}
+	
+	BOOL isH323Listening = [callManager isH323Listening];
+	BOOL isSIPListening = [callManager isSIPListening];
+	BOOL enableH323 = [activeLocation enableH323];
+	BOOL enableSIP = [activeLocation enableSIP];
+	
+	if(!isH323Listening && !isSIPListening)
+	{
+		NSString *statusString = nil;
+		
+		if(!enableH323 && !enableSIP)
+		{
+			statusString = @"Offline (No protocol enabled)";
+		}
+		else if(enableH323 && enableSIP)
+		{
+			statusString = @"Offline (Failed to enable H.323 and SIP)";
+		}
+		else if(enableH323)
+		{
+			statusString = @"Offline (Failed to enable H.323)";
+		}
+		else
+		{
+			statusString = @"Offline (Failed to enable SIP)";
+		}
+		
+		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
+		[semaphoreButton setToolTip:statusString];
+		[statusField setStringValue:statusString];
 		return;
 	}
 		
-	[statusField setStringValue:NSLocalizedString(@"Idle", @"")];
-	[self _gatekeeperRegistrationDidChange:nil];
+	if(statusFieldString == nil)
+	{
+		statusFieldString = NSLocalizedString(@"Idle", @"");
+	}
+	[statusField setStringValue:statusFieldString];
+	
+	NSMutableString *toolTipText = [[NSMutableString alloc] initWithCapacity:100];
+	
+	BOOL isYellowSemaphore = NO;
+	if(enableH323 == YES)
+	{
+		if(isH323Listening == NO)
+		{
+			isYellowSemaphore = YES;
+			[toolTipText appendString:@"H.323: Offline. Failed to enable H.323 system\n"];
+		}
+		else if([activeLocation h323AccountTag] != 0)
+		{
+			NSString *gatekeeperName = [callManager gatekeeperName];
+			if(gatekeeperName == nil) // using a gatekeeper but failed to register
+			{
+				isYellowSemaphore = YES;
+				[toolTipText appendString:@"H.323: Gatekeeper registration failed\n"];
+			}
+			else
+			{
+				[toolTipText appendString:@"H.323: Registered with Gatekeeper\n"];
+			}
+		}
+		else
+		{
+			[toolTipText appendString:@"H.323: Ready. Not using a gatekeeper\n"];
+		}
+	}
+	
+	if(enableSIP == YES)
+	{
+		if(isSIPListening == NO)
+		{
+			isYellowSemaphore = YES;
+			[toolTipText appendString:@"SIP: Offline. Failed to enable SIP system\n"];
+		}
+		else if([activeLocation sipAccountTag] != 0)
+		{
+			unsigned registrarCount = [callManager registrarCount];
+			if(registrarCount == 0)
+			{
+				isYellowSemaphore = YES;
+				[toolTipText appendString:@"SIP: Registration failed\n"];
+			}
+			else
+			{
+				[toolTipText appendString:@"SIP: Registered\n"];
+			}
+		}
+		else
+		{
+			[toolTipText appendString:@"SIP: Ready. Not using a registrar\n"];
+		}
+	}
+	
+	if(isYellowSemaphore == YES)
+	{
+		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_yellow"]];
+	}
+	else
+	{
+		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_green"]];
+	}
+	
+	// appending the network addresses to the tool tip
+	BOOL useAddressTranslation = [activeLocation useAddressTranslation];
+	NSString *externalAddress = nil;
+	unsigned externalAddressIndex = NSNotFound;
+	
+	if(useAddressTranslation == YES)
+	{
+		externalAddress = [utils externalAddress];
+		
+		if(externalAddress != nil)
+		{
+			externalAddressIndex = [localAddresses indexOfObject:externalAddress];
+		}
+	}
+	
+	[toolTipText appendString:@"\nNetwork Addresses:"];
+	
+	unsigned i;
+	for(i = 0; i < localAddressCount; i++)
+	{
+		NSString *address = (NSString *)[localAddresses objectAtIndex:i];
+		[toolTipText appendString:@"\n"];
+		[toolTipText appendString:address];
+		
+		if(i == externalAddressIndex)
+		{
+			[toolTipText appendString:@" (External)"];
+		}
+	}
+	
+	if(useAddressTranslation == YES && externalAddressIndex == NSNotFound)
+	{
+		if(externalAddress == nil)
+		{
+			[toolTipText appendString:@"\nCould not fetch external address."];
+		}
+		else
+		{
+			[toolTipText appendString:@"\n"];
+			[toolTipText appendString:externalAddress];
+			[toolTipText appendString:@" (External)"];
+		}
+	}
+	
+	// updating the remaining UI
+	[semaphoreButton setToolTip:toolTipText];
+	[toolTipText release];
 }
 
 - (void)_setupVideoDisplay
@@ -595,46 +773,8 @@
 	}
 	else
 	{
-		[selfView setNoVideoImage:[NSImage imageNamed:@"no_video_screen.tif"]];
+		[selfView setNoVideoImage:[NSImage imageNamed:@"no_video_screen"]];
 		[selfView startDisplayingNoVideo];
-	}
-}
-
-- (void)_appendNetworkInterfacesString:(NSMutableString *)addressString
-{
-	XMUtils *utils = [XMUtils sharedInstance];
-	
-	NSArray *localAddresses = [utils localAddresses];
-	NSString *externalAddress = [utils externalAddress];
-	BOOL useAddressTranslation = [[[XMPreferencesManager sharedInstance] activeLocation] useAddressTranslation];
-	
-	unsigned count = [localAddresses count];
-	if(count == 0)
-	{
-		[addressString appendString:@"No network addresses"];
-		return;
-	}
-	
-	[addressString appendString:@"Network Addresses:"];
-	
-	unsigned i;
-	for(i = 0; i < count; i++)
-	{
-		NSString *address = (NSString *)[localAddresses objectAtIndex:i];
-		[addressString appendString:@"\n"];
-		[addressString appendString:address];
-		
-		if(useAddressTranslation == YES && externalAddress != nil && [externalAddress isEqualToString:address])
-		{
-			[addressString appendString:@" (External)"];
-		}
-	}
-	
-	if(useAddressTranslation == YES && externalAddress != nil && ![localAddresses containsObject:externalAddress])
-	{
-		[addressString appendString:@"\n"];
-		[addressString appendString:externalAddress];
-		[addressString appendString:@" (External)"];
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.h,v 1.2 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMInspectorController.h,v 1.3 2006/03/20 18:22:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,11 @@ typedef enum XMInspectorControllerTag
  * Causes the inspector to show the window on screen
  **/
 - (void)show;
+
+/**
+ * Causes the inspector to show the desired module
+ **/
+- (void)showModule:(XMInspectorModule *)module;
 
 /**
  * Closes the inspector window
