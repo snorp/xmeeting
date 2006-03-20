@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.17 2006/03/20 19:22:13 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.18 2006/03/20 21:47:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,6 @@
 #import "XMeeting.h"
 #import "XMMainWindowController.h"
 #import "XMPreferencesManager.h"
-#import "XMInCallView.h"
 #import "XMOSDVideoView.h"
 
 #define VIDEO_INSET 5
