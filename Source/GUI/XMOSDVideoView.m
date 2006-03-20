@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.7 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.8 2006/03/20 23:25:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -808,7 +808,7 @@
 			hitCount= 0;
 			if (isMouseInView || fullscreen){
 				if (!isOSDDisplayed) {
-					[self _displayOSDWithSize:(fullscreen ? OSD_LARGE : OSD_SMALL)];
+					[self _displayOSDWithSize:(fullscreen ? XMOSDSize_Large : XMOSDSize_Small)];
 				}
 			}
 		}
@@ -1014,10 +1014,10 @@
 	if (isOSDDisplayed && osdControllerWindow){
 		//[osdControllerWindow closeWithEffect:NoEffect];
 		[self mouseExited:[NSApp currentEvent]];
-		[osd setOSDSize:OSD_LARGE];
+		[osd setOSDSize:XMOSDSize_Large];
 	}
 	else
-		[osd setOSDSize:OSD_LARGE];
+		[osd setOSDSize:XMOSDSize_Large];
 
 	[fullscreenWindow setContentView:self];
 	[fullscreenWindow makeKeyAndOrderFront:nil];
@@ -1294,7 +1294,7 @@
 }
 - (void)mouseEntered:(NSEvent *)theEvent{
 	if (isOSDDisplayed || !shouldDisplayOSD) return;	
-	[self _displayOSDWithSize:(fullscreen ? OSD_LARGE : OSD_SMALL)]; 
+	[self _displayOSDWithSize:(fullscreen ? XMOSDSize_Large : XMOSDSize_Small)]; 
 
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerView.h,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMOnScreenControllerView.h,v 1.3 2006/03/20 23:25:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,30 +8,28 @@
 
 #import <Cocoa/Cocoa.h>
 
+extern NSString *XM_OSD_Separator;
 
-#define SmallButtonWidth 30.0
-#define SmallButtonHeight 24.0
-#define LargeButtonWidth 60.0
-#define LargeButtonHeight 48.0
-#define SmallSeparatorWidth 10.0
-#define LargeSeparatorWidth 20.0
+typedef enum XMOSDSize
+{
+	XMOSDSize_Small = 0,
+	XMOSDSize_Large = 1
+	
+} XMOSDSize;
 
-#define XM_OSD_Separator @"separator"
-
-enum { OSD_SMALL = 0, OSD_LARGE = 1};
-
-@interface XMOnScreenControllerView : NSView {	
+@interface XMOnScreenControllerView : NSView {
+	
 	NSColor *backgroundColor;
 	
 	NSRect bkgrRect;
 	
-	int OSDSize;
+	XMOSDSize osdSize;
 	float buttonWidth, buttonHeight, separatorWidth, separatorHeight;
 	
 	/*Array containing the buttons to be displayed
 	*Each button is stored as a dictionary with the following keys:
 	*
-	*Icons - NSArray
+	*Icons - NSArray of NSImage
 	*PressedIcons - NSArray of NSImage
 	*Selectors - NSArray of selector
 	*Targets - NSArray of NSObject
@@ -53,7 +51,7 @@ enum { OSD_SMALL = 0, OSD_LARGE = 1};
 
 }
 
-- (id)initWithFrame:(NSRect)frameRect andSize:(int)size;
+- (id)initWithFrame:(NSRect)frameRect andSize:(XMOSDSize)size;
 
 //Managing buttons
 - (void)addButton:(NSMutableDictionary*)newBtn;
@@ -67,5 +65,6 @@ enum { OSD_SMALL = 0, OSD_LARGE = 1};
 
 //Get&Set
 - (NSRect)osdRect;
-- (void)setOSDSize:(int)s;
+- (void)setOSDSize:(XMOSDSize)s;
+
 @end

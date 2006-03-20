@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerView.m,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMOnScreenControllerView.m,v 1.4 2006/03/20 23:25:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,29 +8,45 @@
 
 #import "XMOnScreenControllerView.h"
 
+NSString *XM_OSD_Separator = @"separator";
+
+#define SmallButtonWidth 30.0
+#define SmallButtonHeight 24.0
+#define LargeButtonWidth 60.0
+#define LargeButtonHeight 48.0
+#define SmallSeparatorWidth 10.0
+#define LargeSeparatorWidth 20.0
+
+#define OSDWidthSpacing 5.0
+#define OSDHeightSpacing 3.0
+#define OSDBottomMargin 16.0
+#define OSDRadius 10.0
+
 @interface XMOnScreenControllerView (PrivateMethods)
+
+// Action
 - (SEL)_selectorForButton:(NSMutableDictionary*)button;
 - (id)_targetForButton:(NSMutableDictionary*)button;
-- (BOOL)_actionIsValidForButton:(NSMutableDictionary*)button;
+- (BOOL)_actionIsValidForButton:(NSMutableDictionary*)button; // YES if target and selector are non-nil
 - (void)_performSelectorForButton:(NSMutableDictionary*)button;
 
-//Utilities
+// Utilities
 - (NSString*)_stringFromRect:(NSRect)rect;
 - (NSRect)_rectFromString:(NSString*)string;
 
-//Draw
-- (void)_strokeRoundedRect:(NSRect)aRect withRadius:(float)radius;
-- (void)_fillRoundedRect:(NSRect)aRect withRadius:(float)radius;
+// Draw
+- (void)_constructBezierPath:(NSBezierPath *)bezierPath forRoundedRect:(NSRect)aRect withRadius:(float)radius;
+- (void)_drawControls:(NSRect)aRect;
 - (void)_drawSeparatorInRect:(NSRect)aRect;
 - (void)_drawButton:(NSMutableDictionary*)button;
-- (void)_drawBackground:(NSRect)aRect;
-- (void)_drawControls:(NSRect)aRect;
 
 @end
 
 @implementation XMOnScreenControllerView
 
-- (id) initWithFrame:(NSRect)frameRect andSize:(int)size
+#pragma mark Init & Deallocation Methods
+
+- (id) initWithFrame:(NSRect)frameRect andSize:(XMOSDSize)size
 {
 	if ([super initWithFrame:frameRect] == nil) {
 		[self release];
@@ -52,23 +68,28 @@
 
 - (void) dealloc
 {
-	[buttons release];
 	[backgroundColor release];
+	[buttons release];
+	
 	[super dealloc];
 }
 
-
 #pragma mark -
 #pragma mark Button Management
-- (void)addButtons:(NSArray*)newButtons{
+
+- (void)addButtons:(NSArray*)newButtons
+{
 	[buttons addObjectsFromArray:newButtons];
 	numberOfSeparators = -1;
 	numberOfButtons = -1;
 }
 
-- (void)addButton:(NSMutableDictionary*)newBtn{
+- (void)addButton:(NSMutableDictionary*)newBtn
+{
 	[buttons addObject:newBtn];
-	if ([newBtn isEqualTo:XM_OSD_Separator]){
+	
+	if ([newBtn isEqualTo:XM_OSD_Separator])
+	{
 		numberOfSeparators++;
 	}
 	else
@@ -77,9 +98,12 @@
 	}
 }
 
-- (void)insertButton:(NSMutableDictionary*)btn atIndex:(int)idx{
+- (void)insertButton:(NSMutableDictionary*)btn atIndex:(int)idx
+{
 	[buttons insertObject:btn atIndex:idx];
-	if ([btn isEqualTo:XM_OSD_Separator]){
+	
+	if ([btn isEqualTo:XM_OSD_Separator])
+	{
 		numberOfSeparators++;
 	}
 	else
@@ -88,153 +112,111 @@
 	}
 }	
 
-- (void)removeButton:(NSMutableDictionary*)btn{
-	if ([btn isEqualTo:XM_OSD_Separator]){
+- (void)removeButton:(NSMutableDictionary*)btn
+{
+	if ([btn isEqualTo:XM_OSD_Separator])
+	{
 		numberOfSeparators--;
 	}
 	else
 	{
 		numberOfButtons--;
 	}
+	
+	// This is actually bogus in case of XM_OSD_Separator
+	// since always the first separator is removed
 	[buttons removeObject:btn];
-
 }
 
-- (void)removeButtonAtIndex:(int)idx{
+- (void)removeButtonAtIndex:(int)idx
+{
 	NSMutableDictionary* victim = [buttons objectAtIndex:idx];
-	if ([victim isEqualTo:XM_OSD_Separator]){
+	
+	if ([victim isEqualTo:XM_OSD_Separator])
+	{
 		numberOfSeparators--;
 	}
 	else
 	{
 		numberOfButtons--;
 	}
+	
 	[buttons removeObjectAtIndex:idx];
-
 }
 
-- (NSMutableDictionary*)createButtonNamed:(NSString*)name tooltips:(NSArray*)tooltips icons:(NSArray*)icons pressedIcons:(NSArray*)pressedIcons selectors:(NSArray*)selectors targets:(NSArray*)targets currentStateIndex:(int)currentIdx{
-	return [NSMutableDictionary dictionaryWithObjectsAndKeys:name, @"Name",
-														tooltips, @"Tooltips",
-														icons, @"Icons",
-														pressedIcons, @"PressedIcons",
-														selectors, @"Selectors",
-														targets, @"Targets",
-														[NSNumber numberWithInt:currentIdx], @"CurrentStateIndex",
-														[self _stringFromRect:NSZeroRect], @"Rect",
-														[NSNumber numberWithBool:NO], @"IsPressed",
-														nil];
-														
+- (NSMutableDictionary*)createButtonNamed:(NSString*)name tooltips:(NSArray*)tooltips 
+									icons:(NSArray*)icons pressedIcons:(NSArray*)pressedIcons 
+								selectors:(NSArray*)selectors targets:(NSArray*)targets 
+						currentStateIndex:(int)currentIdx
+{
+	NSNumber *currentStateIndex = [[NSNumber alloc] initWithInt:currentIdx];
+	NSString *rectString = [self _stringFromRect:NSZeroRect];
+	NSNumber *isPressed = [[NSNumber alloc] initWithBool:NO];
+	
+	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObjectsAndKeys:name,	@"Name",
+																				  tooltips,	@"Tooltips",
+																			      icons, @"Icons",
+																				  pressedIcons, @"PressedIcons",
+																				  selectors, @"Selectors",
+																				  targets, @"Targets",
+																				  currentStateIndex, @"CurrentStateIndex",
+																				  rectString, @"Rect",
+																				  isPressed, @"IsPressed",
+																				  nil];
+	[currentStateIndex release];
+	[isPressed release];
+	
+	return dict;
+}
+
+#pragma mark -
+#pragma mark Get&Set
+
+- (NSRect)osdRect
+{
+	return bkgrRect;
+}
+
+- (void)setOSDSize:(XMOSDSize)s
+{
+	osdSize = s;
+	
+	if (osdSize == XMOSDSize_Small)
+	{
+		buttonWidth = SmallButtonWidth;
+		buttonHeight = SmallButtonHeight;
+		separatorWidth = SmallSeparatorWidth;
+		separatorHeight = SmallButtonHeight;
+	}
+	else if (osdSize == XMOSDSize_Large)
+	{
+		buttonWidth = LargeButtonWidth;
+		buttonHeight = LargeButtonHeight;
+		separatorWidth = LargeSeparatorWidth;
+		separatorHeight = LargeButtonHeight;
+	}
+	
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -
 #pragma mark Draw
 
-- (void)_fillRoundedRect:(NSRect)aRect withRadius:(float)radius
-{
-	NSBezierPath* path = [NSBezierPath bezierPath];
-	[path moveToPoint:NSMakePoint(NSMidX(aRect),NSMaxY(aRect))];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(aRect),NSMaxY(aRect)) toPoint:NSMakePoint(NSMaxX(aRect),NSMidY(aRect)) radius:radius];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(aRect),NSMinY(aRect)) toPoint:NSMakePoint(NSMidX(aRect),NSMinY(aRect)) radius:radius];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(aRect),NSMinY(aRect)) toPoint:NSMakePoint(NSMinX(aRect),NSMidY(aRect)) radius:radius];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(aRect),NSMaxY(aRect)) toPoint:NSMakePoint(NSMidX(aRect),NSMaxY(aRect)) radius:radius];
+- (void)drawRect:(NSRect)aRect
+{	
+	[NSBezierPath setDefaultLineWidth:2];
 	
-	[path closePath];
-	[path fill];
-}
-
-- (void)_strokeRoundedRect:(NSRect)aRect withRadius:(float)radius
-{
-	NSBezierPath* path = [NSBezierPath bezierPath];
-	[path moveToPoint:NSMakePoint(NSMidX(aRect),NSMaxY(aRect))];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(aRect),NSMaxY(aRect)) toPoint:NSMakePoint(NSMaxX(aRect),NSMidY(aRect)) radius:radius];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(aRect),NSMinY(aRect)) toPoint:NSMakePoint(NSMidX(aRect),NSMinY(aRect)) radius:radius];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(aRect),NSMinY(aRect)) toPoint:NSMakePoint(NSMinX(aRect),NSMidY(aRect)) radius:radius];
-	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(aRect),NSMaxY(aRect)) toPoint:NSMakePoint(NSMidX(aRect),NSMaxY(aRect)) radius:radius];
-	
-	[path closePath];
-	[path stroke];
-}
-
-
-- (void)_drawSeparatorInRect:(NSRect)aRect{	
-	[[NSColor lightGrayColor] set];
-	NSBezierPath* path = [NSBezierPath bezierPath];
-	[path moveToPoint:NSMakePoint(NSMidX(aRect), NSMaxY(aRect) - 2)];
-	[path lineToPoint:NSMakePoint(NSMidX(aRect), NSMinY(aRect) + 2)];
-	[path setLineWidth:0.5];
-	[path stroke];
-}
-
-- (void)_drawButton:(NSMutableDictionary*)button{
-	int currentStateIdx = [[button objectForKey:@"CurrentStateIndex"] intValue];
-	BOOL isPressed = [[button objectForKey:@"IsPressed"] boolValue];
-	NSRect targetRect = [self _rectFromString:[button objectForKey:@"Rect"]];
-	NSImage *icon;
-	
-	if (isPressed){
-		icon = [[button objectForKey:@"PressedIcons"] objectAtIndex:currentStateIdx];
-	}
-	else
-	{
-		icon = [[button objectForKey:@"Icons"] objectAtIndex:currentStateIdx];
-	}
-	
-	[icon drawInRect:targetRect fromRect:NSMakeRect(0,0,60,48) operation:NSCompositeSourceAtop fraction:1.0];
-	
-}
-
-- (void)_drawControls:(NSRect)aRect
-{
-	float left_border = NSMinX(aRect) + 5.0;
-	float bottom_border;
-	if (OSDSize == OSD_SMALL){
-		bottom_border = NSMaxY(aRect) - 7.0 - 20.0;
-	}
-	else if (OSDSize == OSD_LARGE){
-		bottom_border = NSMaxY(aRect) - 11.0 - 20.0 * (OSDSize + 1);
-	}	
-	
-	int i;
-	for (i = 0; i < [buttons count]; i++){
-		NSMutableDictionary* button = [buttons objectAtIndex:i];
-		
-		if ([button isEqualTo:XM_OSD_Separator]){
-			NSRect separatorRect = NSMakeRect(left_border, bottom_border, separatorWidth, separatorHeight);
-			[self _drawSeparatorInRect:separatorRect];
-			left_border += separatorWidth;
-			
-		}
-		else
-		{
-			NSRect buttonRect = NSMakeRect(left_border, bottom_border, buttonWidth, buttonHeight);
-			[button setObject:[self _stringFromRect:buttonRect] forKey:@"Rect"];
-			if([[button objectForKey:@"Name"] isEqualToString:@"Hangup"])
-			{
-				[self removeAllToolTips];
-				[self addToolTipRect:buttonRect owner:self userData:nil];
-			}
-			[self _drawButton:button];
-			left_border += buttonWidth;
-		}
-	}
-
-}
-
-- (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
-{
-	return @"Hangup";
-}
-
-- (void)_drawBackground:(NSRect)aRect
-{
 	[backgroundColor set];
 	
-	if (numberOfButtons == -1 || numberOfSeparators == -1){ //if cached values are not valid
+	if (numberOfButtons == -1 || numberOfSeparators == -1) //if cached values are not valid
+	{
 		int i;
 		numberOfButtons = numberOfSeparators = 0;
-		for (i = 0;  i < [buttons count]; i++){
-			if ([[buttons objectAtIndex:i] isEqualTo:XM_OSD_Separator]){
+		
+		for (i = 0;  i < [buttons count]; i++)
+		{
+			if ([[buttons objectAtIndex:i] isEqualTo:XM_OSD_Separator])
+			{
 				numberOfSeparators++;
 			}
 			else
@@ -243,29 +225,125 @@
 			}
 		}
 	}
-
-	float osdWidth = numberOfButtons * buttonWidth + numberOfSeparators * separatorWidth + 10;
+	
+	float osdWidth = numberOfButtons * buttonWidth + numberOfSeparators * separatorWidth + 2*OSDWidthSpacing;
 	float osdHeight = buttonHeight;
 	
 	float left = NSMidX(aRect) - (osdWidth / 2.0);
-	float bottom = NSMinY(aRect) + 16.0;
-	bkgrRect = NSMakeRect(left, bottom, osdWidth, osdHeight + 6.0);
+	float bottom = NSMinY(aRect) + OSDBottomMargin;
+	bkgrRect = NSMakeRect(left, bottom, osdWidth, osdHeight + 2*OSDHeightSpacing);
 	
-	[self _fillRoundedRect:bkgrRect withRadius:10.0];
+	NSBezierPath *bezierPath = [[NSBezierPath alloc] init];
+	
+	[self _constructBezierPath:bezierPath forRoundedRect:bkgrRect withRadius:OSDRadius];
+	
+	[bezierPath fill];
 	
 	[[NSColor whiteColor] set];
-	[self _strokeRoundedRect:bkgrRect withRadius:10.0];
 	
+	[bezierPath stroke];
+	
+	[bezierPath release];
 	
 	[self _drawControls:bkgrRect];
 }
 
-- (void)drawRect:(NSRect)aRect
-{	
-	[NSBezierPath setDefaultLineWidth:2];
-	[self _drawBackground:aRect];
+- (void)_constructBezierPath:(NSBezierPath *)path forRoundedRect:(NSRect)aRect withRadius:(float)radius
+{
+	[path moveToPoint:NSMakePoint(NSMidX(aRect),NSMaxY(aRect))];
+	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(aRect),NSMaxY(aRect)) toPoint:NSMakePoint(NSMaxX(aRect),NSMidY(aRect)) radius:radius];
+	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(aRect),NSMinY(aRect)) toPoint:NSMakePoint(NSMidX(aRect),NSMinY(aRect)) radius:radius];
+	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(aRect),NSMinY(aRect)) toPoint:NSMakePoint(NSMinX(aRect),NSMidY(aRect)) radius:radius];
+	[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(aRect),NSMaxY(aRect)) toPoint:NSMakePoint(NSMidX(aRect),NSMaxY(aRect)) radius:radius];
+	[path closePath];
 }
 
+- (void)_drawControls:(NSRect)aRect
+{
+	float left_border = NSMinX(aRect) + OSDWidthSpacing;
+	float bottom_border;
+	if (osdSize == XMOSDSize_Small)
+	{
+		bottom_border = NSMaxY(aRect) - SmallButtonHeight - OSDHeightSpacing;
+	}
+	else if (osdSize == XMOSDSize_Large)
+	{
+		bottom_border = NSMaxY(aRect) - LargeButtonHeight - OSDHeightSpacing;
+	}
+	
+	[self removeAllToolTips];
+	
+	int i;
+	for (i = 0; i < [buttons count]; i++)
+	{
+		NSMutableDictionary* button = [buttons objectAtIndex:i];
+		
+		if ([button isEqualTo:XM_OSD_Separator])
+		{
+			NSRect separatorRect = NSMakeRect(left_border, bottom_border, separatorWidth, separatorHeight);
+			[self _drawSeparatorInRect:separatorRect];
+			left_border += separatorWidth;
+		}
+		else
+		{
+			NSRect buttonRect = NSMakeRect(left_border, bottom_border, buttonWidth, buttonHeight);
+			[button setObject:[self _stringFromRect:buttonRect] forKey:@"Rect"];
+			
+			// implicitely assuming that button don't gets released while tool tips are shown!
+			[self addToolTipRect:buttonRect owner:self userData:button];
+
+			[self _drawButton:button];
+			
+			left_border += buttonWidth;
+		}
+	}
+}
+
+- (void)_drawSeparatorInRect:(NSRect)aRect
+{	
+	[[NSColor lightGrayColor] set];
+	
+	NSBezierPath* path = [[NSBezierPath alloc] init];
+	
+	[path moveToPoint:NSMakePoint(NSMidX(aRect), NSMaxY(aRect) - 2)];
+	[path lineToPoint:NSMakePoint(NSMidX(aRect), NSMinY(aRect) + 2)];
+	[path setLineWidth:0.5];
+	[path stroke];
+	
+	[path release];
+}
+
+- (void)_drawButton:(NSMutableDictionary*)button
+{
+	int currentStateIdx = [[button objectForKey:@"CurrentStateIndex"] intValue];
+	BOOL isPressed = [[button objectForKey:@"IsPressed"] boolValue];
+	NSRect targetRect = [self _rectFromString:[button objectForKey:@"Rect"]];
+	NSImage *icon;
+	
+	if (isPressed)
+	{
+		icon = [[button objectForKey:@"PressedIcons"] objectAtIndex:currentStateIdx];
+	}
+	else
+	{
+		icon = [[button objectForKey:@"Icons"] objectAtIndex:currentStateIdx];
+	}
+	
+	NSSize imageSize = [icon size];
+	[icon drawInRect:targetRect fromRect:NSMakeRect(0,0,imageSize.width,imageSize.height) operation:NSCompositeSourceAtop fraction:1.0];
+	
+}
+
+- (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
+{
+	NSMutableDictionary *button = (NSMutableDictionary *)userData;
+	
+	int currentStateIdx = [[button objectForKey:@"CurrentStateIndex"] intValue];
+	
+	NSString *tooltip = [[button objectForKey:@"Tooltips"] objectAtIndex:currentStateIdx];
+	
+	return tooltip;
+}
 
 #pragma mark -
 #pragma mark Event Handling
@@ -277,15 +355,18 @@
 	NSMutableDictionary *currentButton = nil;
 	currentPressedButtonIndex = -1;
 	
-	while (i < [buttons count]){
+	while (i < [buttons count])
+	{
 		currentButton = [buttons objectAtIndex:i];
-		if ([currentButton isEqualTo:XM_OSD_Separator]) {
+		if ([currentButton isEqualTo:XM_OSD_Separator])
+		{
 			i++;
 			continue;
 		}
 		NSRect currentRect = [self _rectFromString:[currentButton objectForKey:@"Rect"]];
 		
-		if (NSMouseInRect(mloc, currentRect, NO)){
+		if (NSMouseInRect(mloc, currentRect, NO))
+		{
 			[currentButton setObject:[NSNumber numberWithBool:YES] forKey:@"IsPressed"];
 			currentPressedButtonIndex = i;
 			break;
@@ -297,14 +378,17 @@
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	if (currentPressedButtonIndex != -1){
+	if (currentPressedButtonIndex != -1)
+	{
 		NSMutableDictionary *pressedButton = [buttons objectAtIndex:currentPressedButtonIndex];
 		[pressedButton setObject:[NSNumber numberWithBool:NO] forKey:@"IsPressed"];
-		if ([self _actionIsValidForButton:pressedButton]){
+		if ([self _actionIsValidForButton:pressedButton])
+		{
 			[self _performSelectorForButton:pressedButton];
 		}
 		int numberOfStates = [[pressedButton objectForKey:@"Icons"] count];
-		if (numberOfStates > 1){ //multi-state button
+		if (numberOfStates > 1) //multi-state button
+		{
 			int currentState = [[pressedButton objectForKey:@"CurrentStateIndex"] intValue];
 			[pressedButton setObject:[NSNumber numberWithInt: ((currentState + 1) % numberOfStates)] forKey:@"CurrentStateIndex"];
 		}
@@ -318,37 +402,16 @@
 {
 }
 
-
-
-#pragma mark -
-- (void)_windowDidMove:(NSNotification *)notif{
-}
-
 #pragma mark -
 #pragma mark Private Methods
-- (NSString*)_stringFromRect:(NSRect)rect{
-	NSString *res = [NSString stringWithFormat:@"%f,%f,%f,%f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height];
-	
-	return res;
-}
-
-- (NSRect)_rectFromString:(NSString*)string{
-	NSRect res;
-	NSArray* parts = [string componentsSeparatedByString:@","];
-	res.origin.x = [[parts objectAtIndex:0] floatValue];
-	res.origin.y = [[parts objectAtIndex:1] floatValue];
-	res.size.width = [[parts objectAtIndex:2] floatValue];
-	res.size.height = [[parts objectAtIndex:3] floatValue];
-	
-	return res;
-}
 
 - (SEL)_selectorForButton:(NSMutableDictionary*)button
 {
 	NSArray *selectors = [button objectForKey:@"Selectors"];
 	NSString *selector = nil;
 	
-	if (selectors != nil){
+	if (selectors != nil)
+	{
 		selector = [selectors objectAtIndex:[[button objectForKey:@"CurrentStateIndex"] intValue]];
 	}
 	
@@ -359,49 +422,46 @@
 {
 	NSArray *targets = [button objectForKey:@"Targets"];
 	id target = nil;
-	if (targets != nil){
+	if (targets != nil)
+	{
 		target = [targets objectAtIndex:[[button objectForKey:@"CurrentStateIndex"] intValue]];
 	}
 	
 	return target;
 }
 
+- (BOOL)_actionIsValidForButton:(NSMutableDictionary*)button
+{	
+	if ([self _targetForButton:button] != nil && [self _selectorForButton:button] != nil)
+	{
+		return YES;
+	}
+	
+	return NO;
+}
 
 - (void)_performSelectorForButton:(NSMutableDictionary*)button
 {
 	[[self _targetForButton:button] performSelector:[self _selectorForButton:button]];
 }
 
-- (BOOL)_actionIsValidForButton:(NSMutableDictionary*)button
-{	
-	if ([self _targetForButton:button] != nil && [self _selectorForButton:button] != nil)
-		return YES;
+- (NSString*)_stringFromRect:(NSRect)rect
+{
+	NSString *res = [NSString stringWithFormat:@"%f,%f,%f,%f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height];
 	
-	return NO;
+	return res;
 }
 
-
-#pragma mark -
-#pragma mark Get&Set
-- (NSRect)osdRect{
-	return bkgrRect;
-}
-
-- (void)setOSDSize:(int)s{
-	OSDSize = s;
-	if (OSDSize == OSD_SMALL){
-		buttonWidth = SmallButtonWidth;
-		buttonHeight = SmallButtonHeight;
-		separatorWidth = SmallSeparatorWidth;
-		separatorHeight = SmallButtonHeight;
-	}
-	else if (OSDSize == OSD_LARGE){
-		buttonWidth = LargeButtonWidth;
-		buttonHeight = LargeButtonHeight;
-		separatorWidth = LargeSeparatorWidth;
-		separatorHeight = LargeButtonHeight;
-	}
-	[self setNeedsDisplay:YES];
+- (NSRect)_rectFromString:(NSString*)string
+{
+	NSRect res;
+	NSArray* parts = [string componentsSeparatedByString:@","];
+	res.origin.x = [[parts objectAtIndex:0] floatValue];
+	res.origin.y = [[parts objectAtIndex:1] floatValue];
+	res.size.width = [[parts objectAtIndex:2] floatValue];
+	res.size.height = [[parts objectAtIndex:3] floatValue];
+	
+	return res;
 }
 
 @end
