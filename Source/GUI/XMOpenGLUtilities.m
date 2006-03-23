@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpenGLUtilities.m,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMOpenGLUtilities.m,v 1.2 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,15 +8,17 @@
 
 #include "XMOpenGLUtilities.h"
 
-struct Vector3 XMMakeVector3(GLfloat x, GLfloat y, GLfloat z){
-	struct Vector3 res;
+Vector3 XMMakeVector3(GLfloat x, GLfloat y, GLfloat z)
+{
+	Vector3 res;
 	res.x = x;
 	res.y = y;
 	res.z = z;
 	return res;
 }
 
-Placement XMMakePlacement(struct Vector3 pos, struct Vector3 scale, struct Vector3 rot, GLfloat rotAngle){
+Placement XMMakePlacement(Vector3 pos, Vector3 scale, Vector3 rot, GLfloat rotAngle)
+{
 	Placement res;
 	res.position = pos;	
 	res.rotationAxis = rot;	
@@ -26,7 +28,8 @@ Placement XMMakePlacement(struct Vector3 pos, struct Vector3 scale, struct Vecto
 	return res;
 }
 
-Camera XMMakeCamera(struct Vector3 eye, struct Vector3 sceneCenter, struct Vector3 up){
+Camera XMMakeCamera(Vector3 eye, Vector3 sceneCenter, Vector3 up)
+{
 	Camera res;
 	res.eye = eye;
 	res.sceneCenter = sceneCenter;

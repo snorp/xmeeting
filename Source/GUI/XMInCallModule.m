@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.18 2006/03/20 21:47:29 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.19 2006/03/23 10:04:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,10 @@
 #import "XMPreferencesManager.h"
 #import "XMOSDVideoView.h"
 
-#define VIDEO_INSET 5
+#define VIDEO_INSET_TOP 27.0
+#define VIDEO_INSET_LEFT 5.0
+#define VIDEO_INSET_RIGHT 5.0
+#define VIDEO_INSET_BOTTOM 25.0
 
 @interface XMInCallModule (PrivateMethods)
 
@@ -30,6 +33,8 @@
 - (id)init
 {
 	self = [super init];
+	
+	isFullScreen = NO;
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
@@ -56,6 +61,9 @@
 	contentViewMinSize = [contentView bounds].size;
 	contentViewSize = contentViewMinSize;
 	
+	[videoView setOSDOpeningEffect:XMOpeningEffect_FadeIn];
+	[videoView setOSDClosingEffect:XMClosingEffect_FadeOut];
+	
 	[self _activeLocationDidChange:nil];
 }
 
@@ -69,6 +77,11 @@
 	if(contentView == nil)
 	{
 		[NSBundle loadNibNamed:@"InCallModule" owner:self];
+	}
+	
+	if(isFullScreen == YES)
+	{
+		return videoView;
 	}
 	
 	return contentView;
@@ -103,7 +116,7 @@
 	int minimumVideoHeight = contentViewMinSize.height - usedHeight;
 	int currentVideoHeight = (int)size.height - usedHeight;
 	
-	int availableWidth = (int)size.width + (int)resizeDifference.width - 2*VIDEO_INSET;
+	int availableWidth = (int)size.width + (int)resizeDifference.width - VIDEO_INSET_LEFT - VIDEO_INSET_RIGHT;
 	int newHeight = currentVideoHeight + (int)resizeDifference.height;
 	
 	// BOGUS: Adjust for different aspect ratios
@@ -138,25 +151,55 @@
 {
 	[self contentView];
 	
-	[videoView startDisplayingRemoteVideo];
+	[videoView startDisplayingVideo];
 	
-	[videoView setShouldDisplayOSD:YES];
+	[videoView setOSDDisplayMode:XMOSDDisplayMode_AutomaticallyHiding];
 	
-	didClearCall = NO;
+	if(isFullScreen == YES)
+	{
+		[[videoView window] makeFirstResponder:videoView];
+	}
 }
 
 - (void)becomeInactiveModule
 {
+	[videoView setOSDDisplayMode:XMOSDDisplayMode_NoOSD];
 	[videoView stopDisplayingVideo];
-	[videoView setShouldDisplayOSD:NO];
-	[videoView moduleWasDeactivated:self];
+}
+
+- (void)beginFullScreen
+{
+	isFullScreen = YES;
+	
+	[self contentView];
+	
+	[videoView removeFromSuperviewWithoutNeedingDisplay];
+	[videoView setFullScreen:YES];
+}
+
+- (void)endFullScreen
+{
+	isFullScreen = NO;
+	
+	[self contentView];
+	
+	NSRect frame = [contentView bounds];
+	
+	frame.origin.x += VIDEO_INSET_LEFT;
+	frame.origin.y += VIDEO_INSET_BOTTOM;
+	frame.size.width -= (VIDEO_INSET_LEFT + VIDEO_INSET_RIGHT);
+	frame.size.height -= (VIDEO_INSET_TOP + VIDEO_INSET_BOTTOM);
+	
+	[contentView addSubview:videoView];
+	[videoView setFrame:frame];
+	
+	[videoView setFullScreen:NO];
 }
 
 #pragma mark User Interface Methods
 
 - (void)clearCall:(id)sender
 {
-	NSLog(@"didClearCall");
 	if(didClearCall == YES)
 	{
 		return;

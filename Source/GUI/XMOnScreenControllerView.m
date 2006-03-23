@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerView.m,v 1.5 2006/03/20 23:46:26 hfriederich Exp $
+ * $Id: XMOnScreenControllerView.m,v 1.6 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,6 @@ NSString *XM_OSD_Separator = @"separator";
 - (SEL)_selectorForButton:(NSMutableDictionary*)button;
 - (id)_targetForButton:(NSMutableDictionary*)button;
 - (BOOL)_actionIsValidForButton:(NSMutableDictionary*)button; // YES if target and selector are non-nil
-- (void)_performSelectorForButton:(NSMutableDictionary*)button;
 
 // Utilities
 - (NSString*)_stringFromRect:(NSRect)rect;
@@ -47,6 +46,25 @@ NSString *XM_OSD_Separator = @"separator";
 
 @implementation XMOnScreenControllerView
 
+#pragma mark Class Methods
+
++ (float)osdHeightForSize:(XMOSDSize)size
+{
+	float buttonHeight;
+	
+	if(size == XMOSDSize_Large)
+	{
+		buttonHeight = LargeButtonHeight;
+	}
+	else
+	{
+		buttonHeight = SmallButtonHeight;
+	}
+	
+	return buttonHeight + 2*OSDHeightSpacing + OSDBottomMargin;
+}
+
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id) initWithFrame:(NSRect)frameRect andSize:(XMOSDSize)size
@@ -60,11 +78,14 @@ NSString *XM_OSD_Separator = @"separator";
 
 	buttons = [[NSMutableArray alloc] initWithCapacity:4];
 	
+	[self setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[self setOSDSize:size];
+	
 	currentPressedButtonIndex = -1;
 	numberOfButtons = -1;
 	numberOfSeparators = -1;
-
+	
+	osdHeightOffset = 0;
 
 	return self;
 }
@@ -180,6 +201,11 @@ NSString *XM_OSD_Separator = @"separator";
 	return bkgrRect;
 }
 
+- (XMOSDSize)osdSize
+{
+	return osdSize;
+}
+
 - (void)setOSDSize:(XMOSDSize)s
 {
 	osdSize = s;
@@ -202,11 +228,21 @@ NSString *XM_OSD_Separator = @"separator";
 	[self setNeedsDisplay:YES];
 }
 
+- (int)osdHeightOffset
+{
+	return osdHeightOffset;
+}
+
+- (void)setOSDHeightOffset:(int)offset
+{
+	osdHeightOffset = offset;
+}
+
 #pragma mark -
 #pragma mark Draw
 
 - (void)drawRect:(NSRect)aRect
-{	
+{
 	[NSBezierPath setDefaultLineWidth:2];
 	
 	[backgroundColor set];
@@ -230,11 +266,12 @@ NSString *XM_OSD_Separator = @"separator";
 	}
 	
 	float osdWidth = numberOfButtons * buttonWidth + numberOfSeparators * separatorWidth + 2*OSDWidthSpacing;
-	float osdHeight = buttonHeight;
+	float osdHeight = buttonHeight + 2*OSDHeightSpacing;;
 	
 	float left = NSMidX(aRect) - (osdWidth / 2.0);
-	float bottom = NSMinY(aRect) + OSDBottomMargin;
-	bkgrRect = NSMakeRect(left, bottom, osdWidth, osdHeight + 2*OSDHeightSpacing);
+	float bottom = NSMinY(aRect) + OSDBottomMargin + osdHeightOffset;
+	
+	bkgrRect = NSMakeRect(left, bottom, osdWidth, osdHeight);
 	
 	NSBezierPath *bezierPath = [[NSBezierPath alloc] init];
 	
@@ -339,6 +376,7 @@ NSString *XM_OSD_Separator = @"separator";
 
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
 {
+	// BOGUS: Does not work in fullscreen mode!
 	NSMutableDictionary *button = (NSMutableDictionary *)userData;
 	
 	int currentStateIdx = [[button objectForKey:@"CurrentStateIndex"] intValue];
@@ -371,16 +409,22 @@ NSString *XM_OSD_Separator = @"separator";
 		
 		[pressedButton setObject:[NSNumber numberWithBool:NO] forKey:@"IsPressed"];
 		
+		id target = nil;
+		SEL selector = nil;
 		if ([self _actionIsValidForButton:pressedButton])
 		{
-			[self _performSelectorForButton:pressedButton];
+			target = [self _targetForButton:pressedButton];
+			selector = [self _selectorForButton:pressedButton];
 		}
+		
 		int numberOfStates = [[pressedButton objectForKey:@"Icons"] count];
 		if (numberOfStates > 1) //multi-state button
 		{
 			int currentState = [[pressedButton objectForKey:@"CurrentStateIndex"] intValue];
 			[pressedButton setObject:[NSNumber numberWithInt: ((currentState + 1) % numberOfStates)] forKey:@"CurrentStateIndex"];
 		}
+		
+		[target performSelector:selector];
 	}
 	
 	[self setNeedsDisplay:YES];
@@ -472,11 +516,6 @@ NSString *XM_OSD_Separator = @"separator";
 	}
 	
 	return NO;
-}
-
-- (void)_performSelectorForButton:(NSMutableDictionary*)button
-{
-	[[self _targetForButton:button] performSelector:[self _selectorForButton:button]];
 }
 
 - (NSString*)_stringFromRect:(NSRect)rect

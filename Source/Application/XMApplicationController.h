@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.13 2006/03/20 18:22:37 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.14 2006/03/23 10:04:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,6 +39,8 @@
 	//XMDialPadModule *dialPadModule;
 	//XMTextChatModule *textChatModule;
 	
+	BOOL isFullScreen;
+	
 	NSAlert *incomingCallAlert;
 }
 
@@ -56,6 +58,10 @@
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
 - (IBAction)showContacts:(id)sender;
+
+- (IBAction)enterFullScreen:(id)sender;
+- (void)exitFullScreen;
+- (BOOL)isFullScreen;
 
 - (void)showInfoInspector;
 - (void)showStatisticsInspector;

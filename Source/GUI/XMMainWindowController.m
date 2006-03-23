@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.15 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.16 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,11 +9,8 @@
 
 #import "XMMainWindowController.h"
 
-#import "XMPreferencesManager.h"
-#import "XMMouseOverButton.h"
-#import "XMCallManager.h"
-#import "XMVideoManager.h"
-#import "XMOSDVideoView.h"
+#import "XMWindow.h"
+
 #import "XMLocalVideoView.h"
 
 NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
@@ -24,9 +21,11 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 
 - (void)windowWillClose:(NSNotification *)notif;
 
-- (void)_showModuleAtIndex:(unsigned)index;
+- (void)_showModuleAtIndex:(unsigned)index fullScreen:(BOOL)fullscreen;
 - (void)_setMinAndMaxWindowSizes;
 - (void)_applicationWillTerminate:(NSNotification *)notif;
+
+- (void)_setupIsFullScreen:(BOOL)flag;
 
 @end
 
@@ -66,6 +65,9 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	
 	selfViewShown = NO;
 	
+	fullScreenWindow = nil;
+	isFullScreen = NO;
+	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_applicationWillTerminate:)
 												 name:NSApplicationWillTerminateNotification object:nil];
 	
@@ -76,17 +78,15 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 {
 	[modules release];
 	
-	if (selfView) [selfView release];
 	[super dealloc];
 }
 
 - (void)awakeFromNib
 {
-	
 	/* making sure that the gui looks properly when displayed the first time */
 	if([modules count] != 0)
 	{
-		[self _showModuleAtIndex:0];
+		[self _showModuleAtIndex:0 fullScreen:NO];
 	}
 	
 	NSWindow *window = [self window];
@@ -99,8 +99,6 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 		windowFrame.origin.y -= windowFrame.size.height;
 		[window setFrame:windowFrame display:NO];
 	}
-
-	selfView = nil;
 }
 
 #pragma mark General Public Methods
@@ -110,6 +108,23 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	[self showWindow:self];
 }
 
+- (BOOL)beginFullScreen
+{
+	[self _showModuleAtIndex:activeModuleIndex fullScreen:YES];
+	
+	return isFullScreen;
+}
+
+- (void)endFullScreen
+{
+	[self _showModuleAtIndex:activeModuleIndex fullScreen:NO];
+}
+
+- (BOOL)isFullScreen
+{
+	return isFullScreen;
+}
+
 #pragma mark Module Methods
 
 - (void)setModules:(NSArray *)theModules
@@ -117,7 +132,7 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	modules = [theModules copy];
 }
 
-- (void)showModule:(id<XMMainWindowModule>)module
+- (void)showModule:(id<XMMainWindowModule>)module fullScreen:(BOOL)fullScreen
 {
 	unsigned index = [modules indexOfObject:module];
 	
@@ -125,7 +140,7 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	{
 		return;
 	}
-	[self _showModuleAtIndex:index];
+	[self _showModuleAtIndex:index fullScreen:fullScreen];
 }
 
 - (id<XMMainWindowModule>)activeModule
@@ -247,18 +262,12 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 
 #pragma mark Private Methods
 
-- (void)_showModuleAtIndex:(unsigned)index
+- (void)_showModuleAtIndex:(unsigned)index fullScreen:(BOOL)fullScreenFlag
 {
-	if(index == activeModuleIndex)
+	if(index == activeModuleIndex && isFullScreen == fullScreenFlag)
 	{
 		return;
 	}
-	
-	/*if (selfViewShown){
-		[selfView removeFromSuperviewWithoutNeedingDisplay];
-		[selfView stopDisplayingLocalVideo];
-		selfViewShown = NO;
-	}*/
 	
 	// deactivating the old module
 	if(activeModuleIndex != UINT_MAX)
@@ -269,32 +278,52 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	
 	activeModuleIndex = index;
 	
-	NSWindow *window = [self window];
+	if(isFullScreen != fullScreenFlag)
+	{
+		[self _setupIsFullScreen:fullScreenFlag];
+	}
 	
-	// fetching the relevant data
 	id<XMMainWindowModule> module = [modules objectAtIndex:index];
-	NSSize currentContentSize = [[window contentView] frame].size;
-	NSSize newContentSize = [module contentViewSize];
-	NSRect windowFrame = [window frame];
-
-	// setting the new height of the window
-	int newHeight = newContentSize.height;
-	int heightDifference = newHeight - (int)currentContentSize.height;
+	
+	if(isFullScreen == NO)
+	{
+		NSWindow *window = [self window];
 		
-	windowFrame.origin.y -= heightDifference;
-	windowFrame.size.height += heightDifference;
+		// fetching the relevant data
+		NSSize currentContentSize = [[window contentView] frame].size;
+		NSSize newContentSize = [module contentViewSize];
+		NSRect windowFrame = [window frame];
 
-	// setting the new width of the window
-	int widthDifference = (int)newContentSize.width - (int)currentContentSize.width;
-	windowFrame.size.width += widthDifference;
+		// setting the new height of the window
+		int newHeight = newContentSize.height;
+		int heightDifference = newHeight - (int)currentContentSize.height;
+		
+		windowFrame.origin.y -= heightDifference;
+		windowFrame.size.height += heightDifference;
 
-	// resizing the window
-	[window setContentView:nil];
-	[window setFrame:windowFrame display:YES animate:YES];
-	[window setContentView:[module contentView]];
+		// setting the new width of the window
+		int widthDifference = (int)newContentSize.width - (int)currentContentSize.width;
+		windowFrame.size.width += widthDifference;
+		
+		// resizing the window
+		[window setContentView:nil];
+		[window setFrame:windowFrame display:YES animate:YES];
+		[window setContentView:[module contentView]];
+	}
+	else
+	{
+		NSView *contentView = [module contentView];
+		
+		[fullScreenWindow setContentView:contentView];
+		[fullScreenWindow makeKeyAndOrderFront:self];
+	}
+	
 	[module becomeActiveModule];
 	
-	[self _setMinAndMaxWindowSizes];
+	if(isFullScreen == NO)
+	{
+		[self _setMinAndMaxWindowSizes];
+	}
 }
 
 - (void)_setMinAndMaxWindowSizes
@@ -336,6 +365,54 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	NSString *topLeftWindowCornerString = NSStringFromPoint(topLeftWindowCorner);
 	[[NSUserDefaults standardUserDefaults] setObject:topLeftWindowCornerString
 											  forKey:XMKey_MainWindowTopLeftCorner];
+}
+
+- (void)_setupIsFullScreen:(BOOL)flag
+{
+	if(flag == YES)
+	{
+		if(CGDisplayCapture(kCGDirectMainDisplay) != kCGErrorSuccess) 
+		{
+			NSLog(@"Could not capture main display");
+			return;
+		}
+		
+		unsigned i;
+		unsigned count = [modules count];
+	
+		for(i = 0; i < count; i++)
+		{
+			id<XMMainWindowModule> module = (id<XMMainWindowModule>)[modules objectAtIndex:i];
+			[module beginFullScreen];
+		}
+	
+		if(fullScreenWindow == nil)
+		{
+			fullScreenWindow = [[XMFullScreenWindow alloc] init];
+		}
+		
+		isFullScreen = YES;
+	}
+	else
+	{
+		[fullScreenWindow orderOut:self];
+		
+		if(CGDisplayRelease(kCGDirectMainDisplay) != kCGErrorSuccess)
+		{
+			NSLog(@"Could not release main display!");
+		}
+		
+		unsigned i;
+		unsigned count = [modules count];
+		
+		for(i = 0; i < count; i++)
+		{
+			id<XMMainWindowModule> module = (id<XMMainWindowModule>)[modules objectAtIndex:i];
+			[module endFullScreen];
+		}
+		
+		isFullScreen = NO;
+	}
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.m,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMWindow.m,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,5 +40,51 @@ NSString *XMNotification_WindowWillMinimize = @"XMeetingWindowWillMinimizeNotifi
 {
 	return YES;
 }
+
+@end
+
+@implementation XMFullScreenWindow
+
+- (id)init
+{
+	NSScreen *mainScreen = [NSScreen mainScreen];
+	NSRect mainScreenRect = [mainScreen frame];
+	
+	self = [super initWithContentRect:mainScreenRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:mainScreen];
+	
+	[self setLevel:CGShieldingWindowLevel()];
+	
+	return self;
+}
+
+- (BOOL)canBecomeKeyWindow
+{
+	return YES;
+}
+
+/*- (void)applicationSwitched:(NSNotification *)notif
+{
+	//if the camera is activated when in fullscreen, it may happen that ichat
+	//will become the active application. To avoid this, we re-activate ourselves.
+	[NSApp activateIgnoringOtherApps:YES];
+	[self makeKeyAndOrderFront:nil];
+	[self setLevel:NSScreenSaverWindowLevel];
+}*/
+
+// blocking this behaviour
+/*- (void)resignKeyWindow
+{
+}
+
+- (void)resignMainWindow
+{
+}*/
+
+/*- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	[super dealloc];
+}*/
 
 @end

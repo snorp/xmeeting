@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.4 2006/03/20 23:46:26 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.5 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,152 +9,217 @@
 #import "XMOnScreenControllerWindow.h"
 #import "XMOnScreenControllerView.h"
 
+#define XM_STEP 0.1
+#define XM_MAX_ALPHA 0.90
+
 @interface XMOnScreenControllerWindow (privateMethods)
+
+- (void)_changeOSDPosition:(NSTimer *)timer;
 - (void)_changeAlpha:(NSTimer*)timer;
-- (void)_displayTimeout:(NSTimer*)timer;
-- (void)_windowWillMove:(NSNotification*)notif;
 
 @end
 
 @implementation XMOnScreenControllerWindow
-+ (id) controllerWindowWithContollerView:(NSView*)_view parentRect:(NSRect)pRect fullscreen:(BOOL)fullscreen
-{
-	XMOnScreenControllerWindow* superWindow;
-	if ((superWindow = [[super alloc] initWithContentRect:pRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES]) == nil) {
-		[self release];
-		return nil;
-	}
-	[superWindow setParentRect:pRect];
-	[superWindow setHidesOnDeactivate:YES];
-	[superWindow setOpaque:NO];
-	[superWindow setAlphaValue:0.0];
-	[superWindow setBackgroundColor:[NSColor clearColor]];
-	[superWindow setContentView:_view];
-	[superWindow setFrame:pRect display:YES animate:NO];
-	
-	
-	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter addObserver:superWindow selector:@selector(_windowWillMove:) name:NSWindowWillMoveNotification object:nil];
 
-	if (fullscreen){
-		[superWindow setLevel:NSScreenSaverWindowLevel+1];
-	}
+#pragma mark Init & Deallocation Methods
 
-	return [superWindow autorelease];
+- (id) initWithControllerView:(XMOnScreenControllerView *)view contentRect:(NSRect)contentRect
+{	
+	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+	
+	[self setHidesOnDeactivate:YES];
+	[self setOpaque:NO];
+	[self setAlphaValue:0.0];
+	[self setBackgroundColor:[NSColor clearColor]];
+	[self setContentView:nil];
+	
+	controllerView = [view retain];
+	
+	return self;
 }
 
-
-- (void)dealloc{
-
+- (void)dealloc
+{
+	[controllerView release];
+	
 	[super dealloc];
 }
 
-
-- (void)setParentRect:(NSRect)rect{
-	parentRect = rect;
-}
-
 #pragma mark -
+#pragma mark Animations
 
-- (void) openWithEffect:(int)_effect
+- (void) openWithEffect:(XMOpeningEffect)effect parentWindow:(NSWindow *)window
 {
-	NSRect screenRect = parentRect;
-	//NSLog(@"[openWithEffect]Parent view frame at %f, %f; size %f x %f", parentRect.origin.x, parentRect.origin.y, parentRect.size.width, parentRect.size.height);
-
-	NSRect inRect;
-	
-	switch(_effect) {
-		case RollInFromBottomBorderEffect:
-			[self setAlphaValue:MAX_ALPHA];
-			inRect = NSMakeRect(NSMinX(screenRect),NSMinY(screenRect)-screenRect.size.height,screenRect.size.width,screenRect.size.height);
-			[self setFrame:inRect display:YES];
-			[self makeKeyAndOrderFront:self];
-			[self setFrame:screenRect display:YES animate:YES];
-
-			break;
-		case FadeInEffect:
-			
-			if (fading){
-				[timer invalidate];
-				[timer release];
-			}
-			
-			fading = YES;
-			[self makeKeyAndOrderFront:self];
-			[self setFrame:screenRect display:YES animate:NO];
-			timer = [[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)0.04 target:self selector:@selector(_changeAlpha:) userInfo:[NSNumber numberWithFloat:0.1] repeats:YES] retain];
-			break;
-		default:
-			break;
+	// do nothing if already visible
+	if([self parentWindow] != nil)
+	{
+		//[self orderFront:self];
+		[self makeKeyWindow];
+		return;
 	}
 	
+	[self setContentView:controllerView];
+	
+	if(effect == XMOpeningEffect_RollInFromBottomBorder)
+	{
+		if(timer != nil)
+		{
+			[timer invalidate];
+			[timer release];
+		}
+		else
+		{
+			[self setAlphaValue:XM_MAX_ALPHA];
+
+			float osdHeight = [XMOnScreenControllerView osdHeightForSize:[controllerView osdSize]];
+			int heightOffset = -osdHeight;
+			[controllerView setOSDHeightOffset:heightOffset];
+			
+			[window addChildWindow:self ordered:NSWindowAbove];
+		}
+		
+		timer = [[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)0.02 target:self
+												selector:@selector(_changeOSDPosition:)
+												userInfo:[NSNumber numberWithInt:6] repeats:YES] retain];
+
+	}
+	else if(effect == XMOpeningEffect_FadeIn)
+	{
+		if(timer != nil)
+		{
+			[timer invalidate];
+			[timer release];
+		}
+		else
+		{
+			[window addChildWindow:self ordered:NSWindowAbove];
+			[self setAlphaValue:0.0];
+		}
+		
+		timer = [[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)0.04 target:self 
+												selector:@selector(_changeAlpha:) 
+												userInfo:[NSNumber numberWithFloat:0.1] repeats:YES] retain];
+	}
+	else
+	{
+		// no effect
+		[self setAlphaValue:XM_MAX_ALPHA];
+		[window addChildWindow:self ordered:NSWindowAbove];
+	}
 }
 
-
-- (void) closeWithEffect:(int)_effect
+- (void) closeWithEffect:(XMClosingEffect)effect
 {
-	NSRect screenRect = parentRect;
-	NSRect outRect;
+	NSWindow *parentWindow = [self parentWindow];
 	
-	switch(_effect) {
-		case RollOutToBottomBorderEffect:
-			outRect = NSMakeRect(NSMinX(screenRect),NSMinY(screenRect)-screenRect.size.height,screenRect.size.width,screenRect.size.height);
-			
-			[self setFrame:screenRect display:YES];
-			[self setFrame:outRect display:YES animate:YES];
-			[self orderOut:self];
-			break;
-		case FadeOutEffect:
-			outRect = NSMakeRect(NSMinX(screenRect),NSMinY(screenRect)-screenRect.size.height,screenRect.size.width,screenRect.size.height);
-			
-			if (fading){
-				[timer invalidate];
-				[timer release];
-			}
-			
-			fading = YES;
-			timer = [[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)0.04 target:self selector:@selector(_changeAlpha:) userInfo:[NSNumber numberWithFloat:-0.1] repeats:YES] retain];
-			[self orderOut:self];
-			break;
-		case NoEffect:
-			[self setAlphaValue:0.0];
-			[self orderOut:self];
-			break;
-		default:
-			break;
+	if(parentWindow == nil)
+	{
+		return;
+	}
+	
+	if(effect == XMClosingEffect_RollOutToBottomBorder)
+	{
+		if(timer != nil)
+		{
+			[timer invalidate];
+			[timer release];
+		}
+		
+		timer = [[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)0.02 target:self
+												selector:@selector(_changeOSDPosition:)
+												userInfo:[NSNumber numberWithInt:-6] repeats:YES] retain];
+	}
+	else if(effect == XMClosingEffect_FadeOut)
+	{
+		if(timer != nil)
+		{
+			[timer invalidate];
+			[timer release];
+		}
+		
+		timer = [[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)0.04 target:self
+												selector:@selector(_changeAlpha:) 
+												userInfo:[NSNumber numberWithFloat:-0.1] repeats:YES] retain];
+	}
+	else
+	{
+		[self setAlphaValue:0.0];
+		[parentWindow removeChildWindow:self];
+		[self orderOut:self];
+		
+		[self setContentView:nil];
 	}
 }
 
 - (NSTimeInterval)animationResizeTime:(NSRect)newFrame
 {
-	return 1.5;
+	return 0.5;
 }
-
 
 #pragma mark -
 #pragma mark Private Methods
-- (void)_windowWillMove:(NSNotification*)notif{
-	[self closeWithEffect:NoEffect];
-}
 
-
-- (void)_changeAlpha:(NSTimer*)t{
-	if ([self alphaValue] > MAX_ALPHA){
-		[self setAlphaValue:MAX_ALPHA];
-		[t invalidate];
-		[t release];
-		fading = NO;
+- (void)_changeOSDPosition:(NSTimer *)t
+{
+	int heightOffset = [controllerView osdHeightOffset];
+	heightOffset += [[timer userInfo] intValue];
+	
+	float height = -[XMOnScreenControllerView osdHeightForSize:[controllerView osdSize]];
+	
+	if(heightOffset >= 0)
+	{
+		heightOffset = 0;
+		[timer invalidate];
+		[timer release];
+		timer = nil;
 	}
-	else if ([self alphaValue] < 0.0){
-		[self setAlphaValue:0.0];
-		[t invalidate];
-		[t release];
-		fading = NO;
-	}
-	else{
-		[self setAlphaValue:[self alphaValue] + [[t userInfo] floatValue]];
+	else if(heightOffset <= height)
+	{
+		heightOffset = height;
+		[timer invalidate];
+		[timer release];
+		timer = nil;
 	}
 	
+	[controllerView setOSDHeightOffset:heightOffset];
+	[controllerView setNeedsDisplay:YES];
+	
+	if(heightOffset == height)
+	{
+		[[self parentWindow] removeChildWindow:self];
+		[self orderOut:self];
+		[self setContentView:nil];
+		[controllerView setOSDHeightOffset:0];
+	}
+}
+
+- (void)_changeAlpha:(NSTimer*)t
+{
+	float alphaValue = [self alphaValue] + [[timer userInfo] floatValue];
+	
+	if (alphaValue > XM_MAX_ALPHA)
+	{
+		alphaValue = XM_MAX_ALPHA;
+		[timer invalidate];
+		[timer release];
+		timer = nil;
+	}
+	else if (alphaValue < 0.0)
+	{
+		alphaValue = 0.0;
+		[timer invalidate];
+		[timer release];
+		timer = nil;
+	}
+
+	[self setAlphaValue:alphaValue];
+	
+	if(alphaValue == 0.0)
+	{
+		[[self parentWindow] removeChildWindow:self];
+		[self orderOut:self];
+		[self setContentView:nil];
+	}
 }
 
 @end

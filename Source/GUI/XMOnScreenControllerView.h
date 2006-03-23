@@ -1,10 +1,13 @@
 /*
- * $Id: XMOnScreenControllerView.h,v 1.3 2006/03/20 23:25:24 hfriederich Exp $
+ * $Id: XMOnScreenControllerView.h,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2006 Ivan Guajana. All rights reserved.
  */
+
+#ifndef __XM_ON_SCREEN_CONTROLLER_VIEW_H__
+#define __XM_ON_SCREEN_CONTROLLER_VIEW_H__
 
 #import <Cocoa/Cocoa.h>
 
@@ -25,6 +28,8 @@ typedef enum XMOSDSize
 	
 	XMOSDSize osdSize;
 	float buttonWidth, buttonHeight, separatorWidth, separatorHeight;
+	
+	int osdHeightOffset;
 	
 	/*Array containing the buttons to be displayed
 	*Each button is stored as a dictionary with the following keys:
@@ -51,6 +56,8 @@ typedef enum XMOSDSize
 
 }
 
++ (float)osdHeightForSize:(XMOSDSize)size;
+
 - (id)initWithFrame:(NSRect)frameRect andSize:(XMOSDSize)size;
 
 //Managing buttons
@@ -65,6 +72,13 @@ typedef enum XMOSDSize
 
 //Get&Set
 - (NSRect)osdRect;
+
+- (XMOSDSize)osdSize;
 - (void)setOSDSize:(XMOSDSize)s;
 
+- (int)osdHeightOffset;
+- (void)setOSDHeightOffset:(int)offset;
+
 @end
+
+#endif // __XM_ON_SCREEN_CONTROLLER_VIEW_H__

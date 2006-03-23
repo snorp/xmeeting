@@ -3,6 +3,7 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
+                enterFullScreen = id; 
                 retryEnableH323 = id; 
                 retryEnableSIP = id; 
                 retryGatekeeperRegistration = id; 

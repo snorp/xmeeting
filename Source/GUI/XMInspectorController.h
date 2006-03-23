@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.h,v 1.3 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMInspectorController.h,v 1.4 2006/03/23 10:04:48 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,11 +33,13 @@ typedef enum XMInspectorControllerTag
 	IBOutlet NSPanel *panel;
 			
 	XMInspectorModule *activeModule;
+	BOOL isFullScreen;
 
 }
 
 + (XMInspectorController *)inspectorWithTag:(XMInspectorControllerTag)tag;
 + (void)closeAllInspectors;
++ (void)setFullScreen:(BOOL)flag;
 
 /**
  * Sets the modules for this inspector

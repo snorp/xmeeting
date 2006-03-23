@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.4 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.5 2006/03/23 10:04:48 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,9 @@
 - (void)_setupInterface;
 - (void)_resizeView;
 - (void)_setMaxAndMinSizes;
+
+- (void)_setFullScreen:(BOOL)flag;
+- (void)_adjustWindowLevel;
 
 @end
 
@@ -66,6 +69,15 @@ static XMInspectorController *contactsInstance;
 	[inspectorInstance close];
 	[toolsInstance close];
 	[contactsInstance close];
+}
+
++ (void)setFullScreen:(BOOL)flag
+{
+	[XMInspectorController closeAllInspectors];
+	
+	[inspectorInstance _setFullScreen:flag];
+	[toolsInstance _setFullScreen:flag];
+	[contactsInstance _setFullScreen:flag];
 }
 
 #pragma mark -
@@ -173,6 +185,7 @@ static XMInspectorController *contactsInstance;
 	}
 	else
 	{
+		[self _adjustWindowLevel];
 		[panel orderFront:self];
 	}
 }
@@ -215,6 +228,7 @@ static XMInspectorController *contactsInstance;
 	
 	[contentBox setContentView:[activeModule contentView]];
 	
+	[self _adjustWindowLevel];
 	[panel orderFront:self];
 	
 	[activeModule becomeActiveModule];
@@ -286,6 +300,23 @@ static XMInspectorController *contactsInstance;
 							  (minSize.height != maxSize.height));
 	
 	[panel setShowsResizeIndicator:windowIsResizable];
+}
+
+- (void)_setFullScreen:(BOOL)flag
+{
+	isFullScreen = flag;
+}
+
+- (void)_adjustWindowLevel
+{
+	if(isFullScreen)
+	{
+		[panel setLevel:CGShieldingWindowLevel()];
+	}
+	else
+	{
+		[panel setLevel:NSFloatingWindowLevel];
+	}
 }
 
 @end

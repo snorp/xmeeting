@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.m,v 1.1 2006/03/22 08:54:52 hfriederich Exp $
+ * $Id: XMLocalVideoView.m,v 1.2 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,6 +71,8 @@
 	busyIndicator = nil;
 	
 	noVideoImage = nil;
+	
+	isLocalVideoMirrored = NO;
 }
 
 - (void)dealloc
@@ -161,6 +163,16 @@
 - (BOOL)doesDisplayLocalVideo
 {
 	return (displayStatus == XM_DISPLAY_LOCAL_VIDEO);
+}
+
+- (BOOL)isLocalVideoMirrored
+{
+	return isLocalVideoMirrored;
+}
+
+- (void)setLocalVideoMirrored:(BOOL)flag
+{
+	isLocalVideoMirrored = flag;
 }
 
 - (void)startDisplayingNoVideo
@@ -281,10 +293,20 @@
 	glBindTexture(target, name);
 	
 	glBegin(GL_QUADS);
-	glTexCoord2fv(bottomLeft); glVertex2f(-1, -1);
-	glTexCoord2fv(topLeft); glVertex2f(-1, 1);
-	glTexCoord2fv(topRight); glVertex2f(1, 1);
-	glTexCoord2fv(bottomRight); glVertex2f(1, -1);
+	if(isLocalVideoMirrored == NO)
+	{
+		glTexCoord2fv(bottomLeft); glVertex2f(-1, -1);
+		glTexCoord2fv(topLeft); glVertex2f(-1, 1);
+		glTexCoord2fv(topRight); glVertex2f(1, 1);
+		glTexCoord2fv(bottomRight); glVertex2f(1, -1);
+	}
+	else
+	{
+		glTexCoord2fv(bottomLeft); glVertex2f(1, -1);
+		glTexCoord2fv(topLeft); glVertex2f(1, 1);
+		glTexCoord2fv(topRight); glVertex2f(-1, 1);
+		glTexCoord2fv(bottomRight); glVertex2f(-1, -1);
+	}
 	glEnd();
 	
 	glDisable(target);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.12 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.13 2006/03/23 10:04:43 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,7 @@
 	NSArray *inputDevices;
 	NSString *selectedInputDevice;
 	
+	BOOL isGrabbing;
 	XMVideoSize localVideoSize;
 	XMVideoSize remoteVideoSize;
 	
@@ -129,6 +130,21 @@
  * is ongoing
  **/
 - (void)stopGrabbing;
+
+/**
+ * Returns whether the grabbing process is running or not
+ **/
+- (BOOL)isGrabbing;
+
+/**
+ * Returns whether the manager is sending video or not
+ **/
+- (BOOL)isSendingVideo;
+
+/**
+ * Returns whether the manager is receiving video or not
+ **/
+- (BOOL)isReceivingVideo;
 
 /**
  * Returns the size of the video currently transmitted.

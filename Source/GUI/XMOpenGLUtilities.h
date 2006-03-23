@@ -1,13 +1,13 @@
 /*
- * $Id: XMOpenGLUtilities.h,v 1.1 2006/02/22 16:12:33 zmit Exp $
+ * $Id: XMOpenGLUtilities.h,v 1.2 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2006 Ivan Guajana. All rights reserved.
  */
  
-#ifndef __XM_OGL_UTILITIES_H__
-#define __XM_OGL_UTILITIES_H__
+#ifndef __XM_OPEN_GL_UTILITIES_H__
+#define __XM_OPEN_GL_UTILITIES_H__
 
 #define ROTATION_AXIS_X XMMakeVector3(1.0, 0.0, 0.0)
 #define ROTATION_AXIS_Y XMMakeVector3(0.0, 1.0, 0.0)
@@ -23,36 +23,44 @@
 
 //Datastructure to store spatial positioning and rotation of a polygon
 //Used for storing PinP modes and video displacement in the 3D space
-struct Vector3{
+typedef struct _Vector3
+{
 	GLfloat x, y, z;
-};
+	
+} Vector3;
 
-typedef struct{
-	struct Vector3 eye;
-	struct Vector3 sceneCenter;
-	struct Vector3 upVector;
+typedef struct _Camera 
+{
+	Vector3 eye;
+	Vector3 sceneCenter;
+	Vector3 upVector;
+	
 } Camera;
 
-typedef struct _Placement{
-	struct Vector3 position;
-	struct Vector3 rotationAxis;
-	struct Vector3 scaling;
+typedef struct _Placement
+{
+	Vector3 position;
+	Vector3 rotationAxis;
+	Vector3 scaling;
 	GLfloat rotationAngle;
 	BOOL isReflected;
+	
 } Placement;
 
-typedef struct _Scene{
+typedef struct _Scene
+{
 	Camera camera;
 	Placement localVideoPlacement;
 	Placement remoteVideoPlacement;
+	
 } Scene;
 
 //Convenience functions to work with the above datastructures
-struct Vector3 XMMakeVector3(GLfloat x, GLfloat y, GLfloat z);
+Vector3 XMMakeVector3(GLfloat x, GLfloat y, GLfloat z);
 
-Placement XMMakePlacement(struct Vector3 pos, struct Vector3 scale, struct Vector3 rot, GLfloat rotAngle);
+Placement XMMakePlacement(Vector3 pos, Vector3 scale, Vector3 rot, GLfloat rotAngle);
 
-Camera XMMakeCamera(struct Vector3 eye, struct Vector3 sceneCenter, struct Vector3 up);
+Camera XMMakeCamera(Vector3 eye, Vector3 sceneCenter, Vector3 up);
 
 NSString* XMStringFromScene(Scene* scene);
 
@@ -60,4 +68,4 @@ void outputCharacter(float x, float y, float z, char *string);
 
 void drawAxisAt(GLfloat x, GLfloat y, GLfloat z);
 
-#endif
+#endif // __XM_OPEN_GL_UTILITIES_H__

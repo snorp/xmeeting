@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.12 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.13 2006/03/23 10:04:43 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -220,6 +220,8 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 		CVDisplayLinkSetOutputCallback(displayLink, &_XMDisplayLinkCallback, NULL);
 		CVDisplayLinkStart(displayLink);
 	}
+	
+	isGrabbing = YES;
 }
 
 - (void)stopGrabbing
@@ -232,6 +234,23 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 		CVDisplayLinkRelease(displayLink);
 		displayLink = NULL;
 	}
+	
+	isGrabbing = NO;
+}
+
+- (BOOL)isGrabbing
+{
+	return isGrabbing;
+}
+
+- (BOOL)isSendingVideo
+{
+	return (localVideoSize != XMVideoSize_NoVideo);
+}
+
+- (BOOL)isReceivingVideo
+{
+	return (remoteVideoSize != XMVideoSize_NoVideo);
 }
 
 - (XMVideoSize)localVideoSize

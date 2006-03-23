@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowModule.h,v 1.5 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMMainWindowModule.h,v 1.6 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,6 +68,17 @@
  * the module can be considered inactive.
  **/
 - (void)becomeInactiveModule;
+
+/**
+ * Informs the receiver that the content view is shown in a full screen window
+ * This method is guaranteed to be called while the module is inactive
+ **/
+- (void)beginFullScreen;
+
+/**
+ * Informs the receiver that full screen mode has ended
+ **/
+- (void)endFullScreen;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.27 2006/03/20 19:22:13 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.28 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -245,6 +245,14 @@
 	{
 		contentViewSizeWithSelfViewShown = [contentView bounds].size;
 	}
+}
+
+- (void)beginFullScreen
+{
+}
+
+- (void)endFullScreen
+{
 }
 
 #pragma mark -

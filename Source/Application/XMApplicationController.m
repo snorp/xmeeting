@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.26 2006/03/20 18:22:37 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.27 2006/03/23 10:04:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,8 +185,38 @@
 	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Contacts] show];
 }
 
+- (IBAction)enterFullScreen:(id)sender
+{
+	XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+	
+	if([mainWindowController isFullScreen])
+	{
+		return;
+	}
+	[XMInspectorController setFullScreen:YES];
+	[mainWindowController beginFullScreen];
+}
+
 #pragma mark -
 #pragma mark Public Methods
+
+- (void)exitFullScreen
+{
+	XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+	
+	if([mainWindowController isFullScreen] == NO)
+	{
+		return;
+	}
+	
+	[XMInspectorController setFullScreen:NO];
+	[mainWindowController endFullScreen];
+}
+
+- (BOOL)isFullScreen
+{
+	return [[XMMainWindowController sharedInstance] isFullScreen];
+}
 
 - (void)showInfoInspector
 {
@@ -226,7 +256,7 @@
 
 - (void)_didEstablishCall:(NSNotification *)notif
 {
-	[[XMMainWindowController sharedInstance] showModule:inCallModule];
+	[[XMMainWindowController sharedInstance] showModule:inCallModule fullScreen:NO];
 }
 
 - (void)_didClearCall:(NSNotification *)notif
@@ -235,7 +265,7 @@
 	{
 		[NSApp abortModal];
 	}
-	[[XMMainWindowController sharedInstance] showModule:noCallModule];
+	[[XMMainWindowController sharedInstance] showModule:noCallModule fullScreen:NO];
 }
 
 - (void)_didNotStartCalling:(NSNotification *)notif
@@ -454,6 +484,17 @@
 			return YES;
 		}
 		return NO;
+	}
+	else if(tag == 430)
+	{
+		/*XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+		
+		if([videoManager isSendingVideo] || [videoManager isReceivingVideo])
+		{
+			return YES;
+		}
+		return NO;*/
+		return YES;
 	}
 	
 	return YES;

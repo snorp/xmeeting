@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMWindow.h,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,6 +31,16 @@ extern NSString *XMNotification_WindowWillMinimize;
  **/
 @interface XMChildWindow : NSWindow {
 	
+}
+
+@end
+
+/**
+ * This class implements a window that will be displayed covering the
+ * whole screen (Full screen)
+ **/
+@interface XMFullScreenWindow : NSWindow {
+
 }
 
 @end

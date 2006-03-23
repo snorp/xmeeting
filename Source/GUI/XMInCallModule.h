@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.h,v 1.9 2006/03/20 19:22:13 hfriederich Exp $
+ * $Id: XMInCallModule.h,v 1.10 2006/03/23 10:04:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@
 	IBOutlet XMOSDVideoView *videoView;
 
 	IBOutlet NSTextField *remotePartyField;
+	
+	BOOL isFullScreen;
 	
 	BOOL didClearCall;
 }

@@ -1,38 +1,33 @@
 /*
- * $Id: XMOnScreenControllerWindow.h,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.h,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2006 Ivan Guajana. All rights reserved.
  */
 
+#ifndef __XM_ON_SCREEN_CONTROLLER_WINDOW_H__
+#define __XM_ON_SCREEN_CONTROLLER_WINDOW_H__
+
 #import <Cocoa/Cocoa.h>
 
-#define STEP 0.1
-#define MAX_ALPHA 0.90
+#import "XMOSDVideoView.h"
 
-enum OpeningEffects {
-	RollInFromBottomBorderEffect,
-	FadeInEffect,
-	NoEffect
-};
-
-enum ClosingEffects {
-	RollOutToBottomBorderEffect,
-	FadeOutEffect
-};
+@class XMOnScreenControllerView;
 
 @interface XMOnScreenControllerWindow : NSWindow {
 	@private
-	NSRect parentRect;
 	NSTimer* timer;
-	BOOL fading;
+	
+	XMOnScreenControllerView *controllerView;
 
 }
-+ (id) controllerWindowWithContollerView:(NSView*)_view parentRect:(NSRect)pRect fullscreen:(BOOL)fullscreen;
-- (void) openWithEffect:(int)_effect;
-- (void) closeWithEffect:(int)_effect;
-- (void) setParentRect:(NSRect)p;
 
+- (id)initWithControllerView:(XMOnScreenControllerView *)view contentRect:(NSRect)contentRect;
+
+- (void) openWithEffect:(XMOpeningEffect)effect parentWindow:(NSWindow *)window;
+- (void) closeWithEffect:(XMClosingEffect)effect;
 
 @end
+
+#endif // __XM_ON_SCREEN_CONTROLLER_WINDOW_H__

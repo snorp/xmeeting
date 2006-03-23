@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.h,v 1.1 2006/03/22 08:54:51 hfriederich Exp $
+ * $Id: XMLocalVideoView.h,v 1.2 2006/03/23 10:04:48 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,9 @@
 	
 	// displayed when -startDisplayingNoVideo is called
 	NSImage *noVideoImage;
+	
+	// mirror local video
+	BOOL isLocalVideoMirrored;
 }
 
 /**
@@ -45,6 +48,8 @@
 - (void)startDisplayingLocalVideo;
 - (void)stopDisplayingLocalVideo;
 - (BOOL)doesDisplayLocalVideo;
+- (BOOL)isLocalVideoMirrored;
+- (void)setLocalVideoMirrored:(BOOL)flag;
 
 - (void)startDisplayingNoVideo;
 - (void)stopDisplayingNoVideo;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.9 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.10 2006/03/23 10:04:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,7 @@
 #import <Cocoa/Cocoa.h>
 #import "XMMainWindowModule.h"
 
-@class XMMouseOverButton, XMLocalVideoView;
+@class XMFullScreenWindow;
 
 /**
  * XMMainWindowController manages the content of the main
@@ -21,12 +21,14 @@
  **/
 @interface XMMainWindowController : NSWindowController {
 	
-	XMLocalVideoView *selfView;
-	
 	NSArray *modules;
 	unsigned activeModuleIndex;
 	
 	BOOL selfViewShown;
+	
+	XMFullScreenWindow *fullScreenWindow;
+	IBOutlet id test;
+	BOOL isFullScreen;
 }
 
 /**
@@ -40,7 +42,21 @@
  **/
 - (void)showMainWindow;
 
-#pragma mark Module Methods
+/**
+ * Shows the current active module in a full screen window
+ * Returns the success of this operation
+ **/
+- (BOOL)beginFullScreen;
+
+/**
+ * Ends the full screen mode
+ **/
+- (void)endFullScreen;
+
+/**
+ * Returns whether we're showing full screen or not
+ **/
+- (BOOL)isFullScreen;
 
 /**
  * Sets the modules of the receiver
@@ -52,7 +68,7 @@
  * Does nothing if module is not contained in the
  * module list of the receiver
  **/
-- (void)showModule:(id<XMMainWindowModule>)module;
+- (void)showModule:(id<XMMainWindowModule>)module fullScreen:(BOOL)showFullscreen;
 
 /**
  * Returns the module which is currently active

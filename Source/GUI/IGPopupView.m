@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.6 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.7 2006/03/23 10:04:47 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -178,9 +178,10 @@
 
 - (void)_resetTrackingRect
 {
-	if ( trackingRect )
+	if (trackingRect != 0)
     {
         [self removeTrackingRect:trackingRect];
+		trackingRect = 0;
     }
 	
 	NSTrackingRectTag theTrackingRect=[self addTrackingRect:[self bounds] owner:self userData:@"rectData" assumeInside:NO];
@@ -196,7 +197,8 @@
 	[self _resetTrackingRect];
 }
 
-- (void) viewDidMoveToWindow {
+- (void) viewDidMoveToWindow 
+{
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	

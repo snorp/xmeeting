@@ -7,10 +7,13 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = XMChildWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
+        {CLASS = XMFullScreenWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
             ACTIONS = {showSelfView = id; }; 
             CLASS = XMMainWindowController; 
             LANGUAGE = ObjC; 
+            OUTLETS = {test = id; }; 
             SUPERCLASS = NSWindowController; 
         }, 
         {CLASS = XMMouseOverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
