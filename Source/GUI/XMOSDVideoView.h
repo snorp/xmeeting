@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.h,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOSDVideoView.h,v 1.5 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,7 +63,7 @@ typedef enum XMClosingEffect
 	// only used to draw into the window draw buffer when
 	// the window does miniaturize or there is no local video
 	// (e.g. when the device is changed)
-	NSCIImageRep *videoImageRep;
+	//NSCIImageRep *videoImageRep;
 	BOOL isMiniaturized;
 	
 	// displayed when -startDisplayingNoVideo is called
@@ -91,6 +91,7 @@ typedef enum XMClosingEffect
 	BOOL switchedPinPMode;
 	
 	// mirroring local video
+	BOOL doMirror;
 	BOOL isLocalVideoMirrored;
 }
 
@@ -115,6 +116,7 @@ typedef enum XMClosingEffect
 - (void)setOSDOpeningEffect:(XMOpeningEffect)effect;
 - (XMClosingEffect)osdClosingEffect;
 - (void)setOSDClosingEffect:(XMClosingEffect)effect;
+- (void)releaseOSD;	// causes the osd to be released
 
 // sets whether we have full screen or not
 // affects the OSD

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.13 2006/03/23 10:04:43 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.14 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,6 +41,7 @@
 	
 	NSArray *inputDevices;
 	NSString *selectedInputDevice;
+	id<XMVideoModule> selectedVideoModule;
 	
 	BOOL isGrabbing;
 	XMVideoSize localVideoSize;
@@ -87,6 +88,12 @@
  * device.
  **/
 - (void)setSelectedInputDevice:(NSString *)inputDevice;
+
+/**
+ * Returns the video module providing the currently selected
+ * input device
+ **/
+- (id<XMVideoModule>)videoModuleProvidingSelectedInputDevice;
 
 /**
  * Returns whether the device specified has any settings or not

@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPurposeAddressResource.m,v 1.2 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.m,v 1.3 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -97,8 +97,23 @@
 
 - (XMCallProtocol)callProtocol
 {
-	// Replace that when SIP is enabled
-	return XMCallProtocol_H323;
+	NSNumber *number = [dictionary objectForKey:XMKey_AddressResourceCallProtocol];
+	if(number == nil)
+	{
+		return XMCallProtocol_H323; // backwards compatibility
+	}
+	
+	XMCallProtocol callProtocol = (XMCallProtocol)[number unsignedIntValue];
+	return callProtocol;
+}
+
+- (void)setCallProtocol:(XMCallProtocol)callProtocol
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callProtocol];
+	
+	[dictionary setObject:number forKey:XMKey_AddressResourceCallProtocol];
+	
+	[number release];
 }
 
 - (NSString *)address

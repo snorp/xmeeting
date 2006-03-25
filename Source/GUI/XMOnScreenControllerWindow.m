@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.5 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.6 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,7 +53,6 @@
 	// do nothing if already visible
 	if([self parentWindow] != nil)
 	{
-		//[self orderFront:self];
 		[self makeKeyWindow];
 		return;
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.3 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.4 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -155,10 +155,29 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
 			BOOL result = Register(record.GetHost(), record.GetUsername(), record.GetUsername(), record.GetPassword());
+			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
+			{
+				record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
+				
+				_XMHandleSIPRegistrationFailure(record.GetHost(), XMSIPStatusCode_UnknownFailure);
+			}
 		}
 	}
 	
-	if(activeRegistrars.GetSize() == 0)
+	BOOL completed = TRUE;
+	count = activeRegistrars.GetSize();
+	for(i = 0; i < count; i++)
+	{
+		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		
+		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+		{
+			completed = FALSE;
+			break;
+		}
+	}
+	
+	if(completed == TRUE)
 	{
 		_XMHandleRegistrarSetupCompleted();
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.m,v 1.2 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMLocalVideoView.m,v 1.3 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,7 @@
 - (void)_windowDidDeminiaturize:(NSNotification *)notif;
 - (void)_didStartSelectedInputDeviceChange:(NSNotification *)notif;
 - (void)_didChangeSelectedInputDevice:(NSNotification *)notif;
+- (void)_checkNeedsMirroring;
 
 @end
 
@@ -56,9 +57,9 @@
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter addObserver:self selector:@selector(_windowWillMiniaturize:)
-							   name:XMNotification_WindowWillMinimize object:[self window]];
+							   name:XMNotification_WindowWillMiniaturize object:nil];
 	[notificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:)
-							   name:NSWindowDidDeminiaturizeNotification object:[self window]];
+							   name:NSWindowDidDeminiaturizeNotification object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartSelectedInputDeviceChange:)
 							   name:XMNotification_VideoManagerDidStartSelectedInputDeviceChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didChangeSelectedInputDevice:)
@@ -72,6 +73,7 @@
 	
 	noVideoImage = nil;
 	
+	doMirror = NO;
 	isLocalVideoMirrored = NO;
 }
 
@@ -135,6 +137,8 @@
 	
 	[openGLContext setView:self];
 	
+	[self _checkNeedsMirroring];
+	
 	displayStatus = XM_DISPLAY_LOCAL_VIDEO;
 	[videoManager addVideoView:self];
 }
@@ -173,6 +177,8 @@
 - (void)setLocalVideoMirrored:(BOOL)flag
 {
 	isLocalVideoMirrored = flag;
+	
+	[self _checkNeedsMirroring];
 }
 
 - (void)startDisplayingNoVideo
@@ -293,7 +299,7 @@
 	glBindTexture(target, name);
 	
 	glBegin(GL_QUADS);
-	if(isLocalVideoMirrored == NO)
+	if(doMirror == NO)
 	{
 		glTexCoord2fv(bottomLeft); glVertex2f(-1, -1);
 		glTexCoord2fv(topLeft); glVertex2f(-1, 1);
@@ -323,7 +329,7 @@
 	if([notif object] == [self window])
 	{
 		isMiniaturized = YES;
-	
+		
 		[self display];
 	}
 }
@@ -385,6 +391,29 @@
 		[busyIndicator stopAnimation:self];
 		[[self window] removeChildWindow:busyWindow];
 		[busyWindow orderOut:self];
+	}
+	
+	[self _checkNeedsMirroring];
+}
+
+- (void)_checkNeedsMirroring
+{
+	if(isLocalVideoMirrored == NO)
+	{
+		doMirror = NO;
+	}
+	else
+	{
+		XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+		id<XMVideoModule> videoModule = [videoManager videoModuleProvidingSelectedInputDevice];
+		if([[videoModule identifier] isEqualToString:@"XMSequenceGrabberVideoInputModule"])
+		{
+			doMirror = YES;
+		}
+		else
+		{
+			doMirror = NO;
+		}
 	}
 }
 

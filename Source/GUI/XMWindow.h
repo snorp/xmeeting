@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.h,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMWindow.h,v 1.5 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString *XMNotification_WindowWillMinimize;
+extern NSString *XMNotification_WindowWillMiniaturize;
 
 /**
  * This class implements a couple of modifications to the normal

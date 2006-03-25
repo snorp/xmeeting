@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.5 2006/03/18 18:26:10 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.6 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,7 +140,7 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
 			failReasonString = @"Gatekeeper rejected registration";
 			break;
 		default:
-			failReasonString = @"Unknown reason";
+			failReasonString = @"Unknown failure";
 			break;
 	}
 	

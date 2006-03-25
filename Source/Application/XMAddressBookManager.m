@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.3 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.4 2006/03/25 10:41:55 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,17 +10,23 @@
 
 #import <AddressBook/AddressBook.h>
 
+extern CFStringRef const kABPersonRecordType;
+
 #import "XMAddressBookRecordSearchMatch.h"
 
 NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddressBookManagerDidChangeDatabaseNotification";
 
-NSString *XMAddressBookProperty_CallAddress = @"XMeeting_CallAddress";
-NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReadableCallAddress";
+NSString *XMAddressBookProperty_CallAddress = @"XMeeting_CallAddress2";
+NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReadableCallAddress2";
+NSString *XMAddressBookProperty_CallAddress_0_1 = @"XMeeting_CallAddress";
+NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanReadableCallAddress";
 
 @interface XMAddressBookManager (PrivateMethods)
 
 - (id)_init;
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
+
+- (void)_transformRecordsFrom_0_1;
 
 @end
 
@@ -79,17 +85,20 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReada
 	
 	// adding XMAddressBookProperty_CallAddress and XMAddressBookProperty_HumanReadableCallAddress
 	// to the list of Properties in ABPerson
-	NSNumber *number = [[NSNumber alloc] initWithInt:kABDataProperty];
+	NSNumber *number = [[NSNumber alloc] initWithInt:kABMultiDataProperty];
 	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMAddressBookProperty_CallAddress, nil];
 	[ABPerson addPropertiesAndTypes:dict];
 	[dict release];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithInt:kABStringProperty];
+	number = [[NSNumber alloc] initWithInt:kABMultiStringProperty];
 	dict = [[NSDictionary alloc] initWithObjectsAndKeys:number, XMAddressBookProperty_HumanReadableCallAddress, nil];
 	[ABPerson addPropertiesAndTypes:dict];
 	[dict release];
 	[number release];
+	
+	// ensure backwards compatibility
+	[self _transformRecordsFrom_0_1];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
 												 name:kABDatabaseChangedNotification object:nil];
@@ -166,7 +175,7 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReada
 		[newRecord setValue:number forProperty:kABPersonFlags];
 		[number release];
 	}
-	
+
 	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[address dictionaryRepresentation]];
 	[newRecord setValue:data forProperty:XMAddressBookProperty_CallAddress];
 	
@@ -280,6 +289,42 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReada
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AddressBookManagerDidChangeDatabase object:self];
 }
 
+- (void)_transformRecordsFrom_0_1
+{
+	NSArray *people = [addressBook people];
+	
+	unsigned i;
+	unsigned count = [people count];
+	
+	for(i = 0; i < count; i++)
+	{
+		ABPerson *person = (ABPerson *)[people objectAtIndex:i];
+		
+		NSData *oldCallAddress = [person valueForProperty:XMAddressBookProperty_CallAddress_0_1];
+		
+		if(oldCallAddress != nil)
+		{
+			NSString *oldHumanReadableCallAddress = [person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress_0_1];
+			
+			ABMutableMultiValue *callAddress = [[ABMutableMultiValue alloc] init];
+			[callAddress addValue:oldCallAddress withLabel:@"H.323"];
+			
+			ABMutableMultiValue *humanReadableCallAddress = [[ABMutableMultiValue alloc] init];
+			[humanReadableCallAddress addValue:oldHumanReadableCallAddress withLabel:@"H.323"];
+			
+			[person setValue:callAddress forProperty:XMAddressBookProperty_CallAddress];
+			[person setValue:humanReadableCallAddress forProperty:XMAddressBookProperty_HumanReadableCallAddress];
+			
+			[callAddress release];
+			[humanReadableCallAddress release];
+			
+			// delete the old record
+			BOOL a = [person removeValueForProperty:XMAddressBookProperty_CallAddress_0_1];
+			BOOL b = [person removeValueForProperty:XMAddressBookProperty_HumanReadableCallAddress_0_1];
+		}
+	}
+}
+
 @end
 
 @implementation ABPerson (XMeetingFrameworkCategoryMethods)
@@ -346,7 +391,13 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress = @"XMeeting_HumanReada
 	{
 		NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[callAddress dictionaryRepresentation]];
 		[self setValue:data forProperty:XMAddressBookProperty_CallAddress];
+		
+		/*ABMutableMultiValue *multiValue = [[ABMutableMultiValue alloc] init];
+		NSString *addr = [callAddress humanReadableAddress];
+		[multiValue addValue:addr withLabel:@"1"];
+		[multiValue addValue:addr withLabel:@"2"];*/
 		[self setValue:[callAddress humanReadableAddress] forProperty:XMAddressBookProperty_HumanReadableCallAddress];
+		//[multiValue release];
 	}
 	else
 	{

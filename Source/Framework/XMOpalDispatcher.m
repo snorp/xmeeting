@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.15 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.16 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,6 +96,8 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
+
+- (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address;
 
 @end
 
@@ -710,34 +712,35 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleInitiateCallMessage:(NSArray *)components
 {
-	if(callID != 0)
-	{
-		// This probably indicates that an incoming call arrived at exactly the same time than
-		// the user tried to initiate this call. Since the incoming call arrived first,
-		// we cannot call anyone at the moment
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_AlreadyInCall];
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:) 
-													   withObject:number
-													waitUntilDone:NO];
-		[number release];
-		
-		return;
-	}
-	
 	NSData *addressData = (NSData *)[components objectAtIndex:0];
 	NSString *address = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:addressData];
 	NSData *protocolData = (NSData *)[components objectAtIndex:1];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
 	XMCallProtocol protocol = (XMCallProtocol)[number unsignedIntValue];
 	
+	if(callID != 0)
+	{
+		// This probably indicates that an incoming call arrived at exactly the same time than
+		// the user tried to initiate this call. Since the incoming call arrived first,
+		// we cannot call anyone at the moment
+		[self _sendCallStartFailReason:XMCallStartFailReason_AlreadyInCall address:address];
+		return;
+	}
+	
 	if((protocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
 	{
 		// Trying to make a H.323 call but H.323 isn't enabled
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_ProtocolNotEnabled];
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:)
-													   withObject:number
-													waitUntilDone:NO];
-		[number release];
+		[self _sendCallStartFailReason:XMCallStartFailReason_H323NotEnabled address:address];
+		return;
+	}
+	if((protocol == XMCallProtocol_H323) && XMIsPhoneNumber(address) && (_XMIsRegisteredAtGatekeeper() == NO))
+	{
+		[self _sendCallStartFailReason:XMCallStartFailReason_GatekeeperRequired address:address];
+		return;
+	}
+	if((protocol == XMCallProtocol_SIP) && (_XMIsSIPEnabled() == NO))
+	{
+		[self _sendCallStartFailReason:XMCallStartFailReason_SIPNotEnabled address:address];
 		return;
 	}
 	
@@ -747,11 +750,7 @@ typedef enum _XMOpalDispatcherMessage
 	if(callID == 0)
 	{
 		// Initiating the call failed
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_UnknownFailure];
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:)
-													   withObject:number
-													waitUntilDone:NO];
-		[number release];
+		[self _sendCallStartFailReason:XMCallStartFailReason_UnknownFailure address:address];
 	}
 	else
 	{
@@ -805,7 +804,7 @@ typedef enum _XMOpalDispatcherMessage
 	
 	if((callProtocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
 	{
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_ProtocolNotEnabled];
+		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_H323NotEnabled];
 		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:)
 													   withObject:number
 													waitUntilDone:NO];
@@ -1602,6 +1601,21 @@ typedef enum _XMOpalDispatcherMessage
 												waitUntilDone:NO];
 	
 	[callStatistics release];
+}
+
+#pragma mark -
+#pragma mark Private Helper Methods
+
+- (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)reason];
+	NSArray *info = [[NSArray alloc] initWithObjects:number, address, nil];
+	[number release];
+	
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:)
+												   withObject:info
+												waitUntilDone:NO];
+	[info release];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.24 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.25 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,7 +62,7 @@ void _XMCheckCloseStatus();
 - (void)_handleCallInitiated:(XMCallInfo *)call;
 
 // Called every time initiating a call failed
-- (void)_handleCallInitiationFailed:(NSNumber *)failReason;
+- (void)_handleCallInitiationFailed:(NSArray *)info;
 
 // Called when the phone is ringing at the remote party
 - (void)_handleCallIsAlerting;
@@ -216,7 +216,7 @@ void _XMCheckCloseStatus();
 - (void)_close;
 
 - (void)_handleDeviceList:(NSArray *)deviceList;
-- (void)_handleInputDeviceChangeComplete:(NSString *)selectedDevice;
+- (void)_handleInputDeviceChangeComplete:(NSArray *)info;
 - (void)_handleVideoReceivingStart:(NSNumber *)videoSize;
 - (void)_handleVideoReceivingEnd;
 
@@ -225,15 +225,6 @@ void _XMCheckCloseStatus();
 - (void)_handleRemoteVideoFrame:(CVPixelBufferRef)frame;
 
 @end
-
-/*@interface XMVideoView (FrameworkMethods)
-
-- (void)_startBusyIndicator;
-- (void)_stopBusyIndicator;
-
-- (void)_renderLocalVideo:(CVOpenGLTextureRef)localVideo remoteVideo:(CVOpenGLTextureRef)remoteVideo;
-
-@end*/
 
 @interface XMGeneralPurposeAddressResource (FrameworkMethods)
 

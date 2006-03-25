@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.19 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.20 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -187,6 +187,11 @@ XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address,
 	return h323EndPoint->SetGatekeeper(address, gkUsername, phoneNumber, password);
 }
 
+bool _XMIsRegisteredAtGatekeeper()
+{
+	return h323EndPoint->IsRegisteredWithGatekeeper();
+}
+
 void _XMCheckGatekeeperRegistration()
 {
 	h323EndPoint->CheckGatekeeperRegistration();
@@ -197,6 +202,11 @@ void _XMCheckGatekeeperRegistration()
 bool _XMEnableSIPListeners(bool flag)
 {
 	return sipEndPoint->EnableListeners(flag);
+}
+
+bool _XMIsSIPEnabled()
+{
+	return sipEndPoint->IsListening();
 }
 
 void _XMPrepareRegistrarSetup()

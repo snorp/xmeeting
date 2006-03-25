@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.29 2006/03/20 19:22:09 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.30 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -716,8 +716,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			}
 		}
 		
+		NSArray *info = [[NSArray alloc] initWithObjects:selectedDevice, moduleWrapper, nil];
 		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
-														withObject:selectedDevice waitUntilDone:NO];
+														withObject:info waitUntilDone:NO];
+		[info release];
 	}
 	else
 	{
@@ -1154,8 +1156,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	selectedDevice = (NSString *)[[[activeModule inputDevices] objectAtIndex:0] retain];
 	
+	NSArray *info = [[NSArray alloc] initWithObjects:selectedDevice, dummyModuleWrapper, nil];
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
-													withObject:selectedDevice waitUntilDone:NO];
+													withObject:info waitUntilDone:NO];
+	[info release];
 	
 	// updating the device list
 	[self _handleGetDeviceListMessage];

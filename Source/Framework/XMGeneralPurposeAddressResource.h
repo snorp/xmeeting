@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPurposeAddressResource.h,v 1.2 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.h,v 1.3 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,7 +19,8 @@
  * besides just the usual protocol/address/port stuff. So, it is
  * possible to force gatekeeper usage or use a different gatekeeper
  * than the one specified. This class does not provide the -stringRepresentation
- * or -initWithStringRepresentation: methods.
+ * or -initWithStringRepresentation: methods, as they do not make sense
+ * for this subclass
  **/
 @interface XMGeneralPurposeAddressResource : XMAddressResource {
 	
@@ -37,6 +38,7 @@
 - (NSDictionary *)dictionaryRepresentation;
 
 - (XMCallProtocol)callProtocol;
+- (void)setCallProtocol:(XMCallProtocol)callProtocol;
 
 - (NSString *)address;
 - (void)setAddress:(NSString *)address;

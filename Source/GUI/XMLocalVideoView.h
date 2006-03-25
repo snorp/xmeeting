@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.h,v 1.2 2006/03/23 10:04:48 hfriederich Exp $
+ * $Id: XMLocalVideoView.h,v 1.3 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,7 @@
 	NSImage *noVideoImage;
 	
 	// mirror local video
+	BOOL doMirror;
 	BOOL isLocalVideoMirrored;
 }
 

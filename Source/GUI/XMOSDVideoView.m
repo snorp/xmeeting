@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.9 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.10 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,7 +27,7 @@
 
 #define XM_ANIMATION_STEPS 60.0
 
-#define __ANTIALIASED_POLY__ 1
+#define __ANTIALIASED_POLY__ 0
 
 
 @interface XMOSDVideoView (PrivateMethods)
@@ -42,6 +42,7 @@
 // Notifications
 - (void)_windowWillMiniaturize:(NSNotification *)notif;
 - (void)_windowDidDeminiaturize:(NSNotification *)notif;
+- (void)_didChangeSelectedInputDevice:(NSNotification *)notif;
 - (void)_frameDidChange:(NSNotification *)notif;
 
 //Drawing
@@ -52,6 +53,7 @@
 - (void)_displayOSD:(XMOpeningEffect)openingEffect;
 - (void)_hideOSD:(XMClosingEffect)closingEffect;
 - (void)_resetOSDTrackingRect;
+- (void)_checkNeedsMirroring;
 
 @end
 
@@ -81,7 +83,7 @@
 	long swapInterval = 1;
 	[openGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
 	
-	videoImageRep = nil;
+	//videoImageRep = nil;
 	isMiniaturized = NO;
 	
 	noVideoImage = nil;
@@ -118,7 +120,17 @@
 	initialPinPMode = currentPinPMode;
 	switchedPinPMode = NO;
 	
+	doMirror = NO;
 	isLocalVideoMirrored = NO;
+	
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	
+	[notificationCenter addObserver:self selector:@selector(_windowWillMiniaturize:)
+							   name:XMNotification_WindowWillMiniaturize object:nil];
+	[notificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:)
+							   name:NSWindowDidDeminiaturizeNotification object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didChangeSelectedInputDevice:)
+							   name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
 }
 
 - (void)dealloc
@@ -128,6 +140,11 @@
 	[openGLContext release];
 	
 	[noVideoImage release];
+	
+	[osd release];
+	[osdControllerWindow release];
+	
+	[sceneAnimation release];
 	
 	[super dealloc];
 }
@@ -408,6 +425,18 @@
 	osdClosingEffect = effect;
 }
 
+- (void)releaseOSD
+{
+	if(osd != nil)
+	{
+		[osd release];
+		osd = nil;
+		
+		[osdControllerWindow release];
+		osdControllerWindow = nil;
+	}
+}
+
 - (BOOL)isFullScreen
 {
 	return isFullScreen;
@@ -436,6 +465,8 @@
 - (void)setLocalVideoMirrored:(BOOL)flag
 {
 	isLocalVideoMirrored = flag;
+	
+	[self _checkNeedsMirroring];
 }
 
 #pragma mark -
@@ -454,7 +485,7 @@
 	{
 		if(isMiniaturized == YES)
 		{
-			if(videoImageRep == nil)
+			/*if(videoImageRep == nil)
 			{
 				CIImage *image = [[CIImage alloc] initWithCVImageBuffer:remoteVideo];
 				videoImageRep = [[NSCIImageRep alloc] initWithCIImage:image];
@@ -464,15 +495,18 @@
 			if(videoImageRep != nil)
 			{
 				[videoImageRep drawInRect:[self bounds]];
-			}
+			}*/
+			
+			[[NSColor blackColor] set];
+			NSRectFill([self bounds]);
 			
 			return;
 		}
-		else if(videoImageRep != nil)
+		/*else if(videoImageRep != nil)
 		{
 			[videoImageRep release];
 			videoImageRep = nil;
-		}
+		}*/
 	}
 	
 	// activating this context
@@ -504,7 +538,7 @@
 	float videoHeight = displaySize.height;
 	float videoWidth = displaySize.width;
 	
-	// ensure correct aspect ration when in full screen
+	// ensure correct aspect ratio when in full screen
 	XMVideoSize remoteVideoSize = [[XMVideoManager sharedInstance] remoteVideoSize];
 	
 	float aspectRatio = 0;
@@ -651,7 +685,7 @@
 		#endif
 		
 		glScaled(videoWidth/videoHeight, 1.0, 1.0); 
-		[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:isLocalVideoMirrored];
+		[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
 		
 		#ifdef __ANTIALIASED_POLY__
 		if (currentPinPMode != &classicPinP){
@@ -660,7 +694,7 @@
 			glEnable( GL_LINE_SMOOTH );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:isLocalVideoMirrored];
+			[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			glDisable( GL_LINE_SMOOTH );
 			glDisable( GL_BLEND );
@@ -703,7 +737,7 @@
 					glPolygonOffset( 1.0, 1.0 );
 				#endif
 			glScaled(videoWidth/videoHeight, 1.0, 1.0);
-			[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:isLocalVideoMirrored];
+			[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
 
 				
 			glClear (GL_DEPTH_BUFFER_BIT);
@@ -733,7 +767,7 @@
 					glEnable( GL_LINE_SMOOTH );
 					glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 					glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-					[self _drawPolygon:0.0 bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:isLocalVideoMirrored];
+					[self _drawPolygon:0.0 bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
 
 					glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 					glDisable( GL_LINE_SMOOTH );
@@ -934,6 +968,29 @@
 #pragma mark -
 #pragma mark Notifications
 
+- (void)_windowWillMiniaturize:(NSNotification *)notif
+{
+	if([notif object] == [self window])
+	{
+		isMiniaturized = YES;
+		
+		[self display];
+	}
+}
+
+- (void)_windowDidDeminiaturize:(NSNotification *)notif
+{
+	if([notif object] == [self window])
+	{
+		isMiniaturized = NO;
+	}
+}
+
+- (void)_didChangeSelectedInputDevice:(NSNotification *)notif
+{
+	[self _checkNeedsMirroring];
+}
+
 - (void)_frameDidChange:(NSNotification *)notif
 {
 	if(osd != nil)
@@ -955,28 +1012,33 @@
 
 - (void)_displayOSD:(XMOpeningEffect)openingEffect
 {
+	if(displayStatus == XM_DISPLAY_NOTHING)
+	{
+		return;
+	}
+	
 	XMOSDSize osdSize = XMOSDSize_Small;
 	if(isFullScreen)
 	{
 		osdSize = XMOSDSize_Large;
 	}
 	
+	NSRect viewRect = [self bounds];
+	NSPoint viewOrigin = viewRect.origin;
+	viewOrigin = [self convertPoint:viewOrigin toView:nil];
+	viewOrigin = [[self window] convertBaseToScreen:viewOrigin];
+	
+	viewRect.origin = viewOrigin;
+	
 	if(osd == nil)
-	{		
-		NSRect viewRect = [self bounds];
-		NSPoint viewOrigin = viewRect.origin;
-		viewOrigin = [self convertPoint:viewOrigin toView:nil];
-		viewOrigin = [[self window] convertBaseToScreen:viewOrigin];
-		
-		viewRect.origin = viewOrigin;
-		
+	{	
 		// Choose the right OSD type
 		if(displayStatus == XM_DISPLAY_VIDEO)
 		{
 			osd = [[XMInCallOSD alloc] initWithFrame:[self frame] videoView:self andSize:osdSize];
 			[(XMInCallOSD *)osd setIsFullScreen:isFullScreen];
 		}
-		else
+		else if(displayStatus == XM_DISPLAY_NO_VIDEO)
 		{
 			osd = [[XMAudioOnlyOSD alloc] initWithFrame:[self frame] videoView:self andSize:osdSize];
 		}
@@ -986,6 +1048,7 @@
 	else
 	{
 		[osd setOSDSize:osdSize];
+		[osdControllerWindow setFrame:viewRect display:NO];
 	}
 	
 	[osdControllerWindow openWithEffect:openingEffect parentWindow:[self window]];
@@ -1039,6 +1102,27 @@
 	{
 		osdTrackingRect = theTrackingRect;
 	}
+}
+
+- (void)_checkNeedsMirroring
+{
+	if(isLocalVideoMirrored == NO)
+	{
+		doMirror = NO;
+	}
+	else
+	{
+		XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+		id<XMVideoModule> videoModule = [videoManager videoModuleProvidingSelectedInputDevice];
+		if([[videoModule identifier] isEqualToString:@"XMSequenceGrabberVideoInputModule"])
+		{
+			doMirror = YES;
+		}
+		else
+		{
+			doMirror = NO;
+		}
+	}	
 }
 
 @end

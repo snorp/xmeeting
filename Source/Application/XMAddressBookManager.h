@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.3 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.4 2006/03/25 10:41:55 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,19 @@ extern NSString *XMNotification_AddressBookManagerDidChangeDatabase;
  **/
 extern NSString *XMAddressBookProperty_CallAddress;
 extern NSString *XMAddressBookProperty_HumanReadableCallAddress;
+
+/**
+ * Needed for backwards compatibility. Unfortunately, the AddressBook
+ * API doesn't allow to change the type of a property once the property
+ * has been added to the AddressBook. This means that it is not possible
+ * to change the properties defined for v0.1 into multivalue properties.
+ * Removing properties from the addres book isn't implemented yet, and
+ * there is no way to run a script that does this.
+ * That means that the AddressBook gets filled up with lots of unused
+ * properties related to XMeeting
+ **/
+extern NSString *XMAddressBookProperty_CallAddress_0_1;
+extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
 
 @class ABAddressBook;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.13 2006/03/23 10:04:43 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.14 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,6 +180,11 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	}
 }
 
+- (id<XMVideoModule>)videoModuleProvidingSelectedInputDevice
+{
+	return selectedVideoModule;
+}
+
 - (BOOL)deviceHasSettings:(NSString *)device
 {
 	return [_XMMediaTransmitterSharedInstance _deviceHasSettings:device];
@@ -341,13 +346,19 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	}
 }
 
-- (void)_handleInputDeviceChangeComplete:(NSString *)device
+- (void)_handleInputDeviceChangeComplete:(NSArray *)info
 {
+	NSString *device = (NSString *)[info objectAtIndex:0];
+	id<XMVideoModule> videoModule = (id<XMVideoModule>)[info objectAtIndex:1];
+	
 	if([device isEqualToString:selectedInputDevice] == NO)
 	{
 		[selectedInputDevice release];
 		selectedInputDevice = [device retain];
 	}
+	
+	[selectedVideoModule release];
+	selectedVideoModule = [videoModule retain];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidChangeSelectedInputDevice object:self];
 }

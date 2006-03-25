@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.27 2006/03/23 10:04:42 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.28 2006/03/25 10:41:55 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,9 +9,14 @@
 #import "XMApplicationController.h"
 
 #import "XMeeting.h"
-#import "XMPreferencesManager.h"
+
 #import "XMAddressBookCallAddressProvider.h"
 #import "XMCallHistoryCallAddressProvider.h"
+#import "XMPreferencesManager.h"
+#import "XMH323Account.h"
+#import "XMSIPAccount.h"
+#import "XMLocation.h"
+#import "XMApplicationFunctions.h"
 
 #import "XMMainWindowController.h"
 #import "XMNoCallModule.h"
@@ -46,17 +51,17 @@
 - (void)_didNotEnableH323:(NSNotification *)notif;
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
 - (void)_didNotEnableSIP:(NSNotification *)notif;
-- (void)_didNotRegisterAtRegistrar:(NSNotification *)notif;
+- (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif;
 
 // terminating the application
 - (void)_frameworkClosed:(NSNotification *)notif;
 
 // displaying dialogs
-- (void)_displayIncomingCall;
-- (void)_displayCallStartFailed;
+- (void)_displayIncomingCallAlert;
+- (void)_displayCallStartFailedAlert:(NSString *)address;
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
-- (void)_displayEnableingSIPFailedAlert;
+- (void)_displayEnablingSIPFailedAlert;
 - (void)_displaySIPRegistrationFailedAlert;
 
 // validating menu items
@@ -102,6 +107,10 @@
 							   name:XMNotification_CallManagerDidNotEnableH323 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:)
 							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotEnableSIP:)
+							   name:XMNotification_CallManagerDidNotEnableSIP object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotRegisterAtSIPRegistrar:)
+							   name:XMNotification_CallManagerDidNotRegisterAtSIPRegistrar object:nil];
 	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
 							   name:XMNotification_FrameworkDidClose object:nil];
 	
@@ -251,7 +260,7 @@
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	
-	[self performSelector:@selector(_displayIncomingCall) withObject:nil afterDelay:0.0];
+	[self performSelector:@selector(_displayIncomingCallAlert) withObject:nil afterDelay:0.0];
 }
 
 - (void)_didEstablishCall:(NSNotification *)notif
@@ -270,19 +279,36 @@
 
 - (void)_didNotStartCalling:(NSNotification *)notif
 {
+	NSDictionary *dict = [notif userInfo];
+	NSString *address = [dict objectForKey:@"Address"];
+	
 	// by delaying the display of the callStartFailed message on screen, we allow
 	// that all observers of this notification have received the notification
-	[self performSelector:@selector(_displayCallStartFailed) withObject:nil afterDelay:0.0];
+	[self performSelector:@selector(_displayCallStartFailedAlert:) withObject:address afterDelay:0.0];
 }
 
 - (void)_didNotEnableH323:(NSNotification *)notif
 {
+	// same as _didNotStartCalling
 	[self performSelector:@selector(_displayEnableH323FailedAlert) withObject:nil afterDelay:0.0];
 }
 
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif
 {
+	// same as _didNotStartCalling
 	[self performSelector:@selector(_displayGatekeeperRegistrationFailedAlert) withObject:nil afterDelay:0.0];
+}
+
+- (void)_didNotEnableSIP:(NSNotification *)notif
+{
+	// same as _didNotStartCalling
+	[self performSelector:@selector(_displayEnableSIPFailedAlert) withObject:nil afterDelay:0.0];
+}
+
+- (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif
+{
+	// same as _didNotStartCalling
+	[self performSelector:@selector(_displaySIPRegistrationFailedAlert) withObject:nil afterDelay:0.0];
 }
 
 - (void)_frameworkDidClose:(NSNotification *)notif
@@ -293,7 +319,7 @@
 
 #pragma mark Displaying Alerts
 
-- (void)_displayIncomingCall
+- (void)_displayIncomingCallAlert
 {
 	incomingCallAlert = [[NSAlert alloc] init];
 	
@@ -324,35 +350,39 @@
 	
 	[incomingCallAlert release];
 	incomingCallAlert = nil;
-	
-
 }
 
-- (void)_displayCallStartFailed
+- (void)_displayCallStartFailedAlert:(NSString *)address
 {
 	NSAlert *alert = [[NSAlert alloc] init];
 	
 	[alert setMessageText:NSLocalizedString(@"Call failed", @"")];
 	
-	NSString *informativeTextFormat = NSLocalizedString(@"Unable to call ADDRESS. (%@)", @"");
+	NSString *informativeTextFormat = NSLocalizedString(@"Unable to call \"%@\". (%@)", @"");
 	NSString *failReasonText;
 	
 	XMCallStartFailReason failReason = [[XMCallManager sharedInstance] callStartFailReason];
 	
 	switch(failReason)
 	{
-		case XMCallStartFailReason_ProtocolNotEnabled:
-			failReasonText = NSLocalizedString(@"Protocol not enabled", @"");
+		case XMCallStartFailReason_H323NotEnabled:
+			failReasonText = NSLocalizedString(@"H.323 is not enabled", @"");
 			break;
-		case XMCallStartFailReason_GatekeeperUsedButNotSpecified:
-			failReasonText = NSLocalizedString(@"Address uses a gatekeeper but no gatekeeper is specified in the active location", @"");
+		case XMCallStartFailReason_GatekeeperRequired:
+			failReasonText = NSLocalizedString(@"Address requires a gatekeeper", @"");
+			break;
+		case XMCallStartFailReason_SIPNotEnabled:
+			failReasonText = NSLocalizedString(@"SIP is not enabled", @"");
+			break;
+		case XMCallStartFailReason_AlreadyInCall:
+			failReasonText = NSLocalizedString(@"Already in call. Please report this problem!", @"");
 			break;
 		default:
 			failReasonText = NSLocalizedString(@"Unknown reason", @"");
 			break;
 	}
 	
-	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, failReasonText];
+	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, address, failReasonText];
 	[alert setInformativeText:informativeText];
 	[informativeText release];
 	
@@ -390,36 +420,33 @@
 	NSAlert *alert = [[NSAlert alloc] init];
 	
 	XMCallManager *callManager = [XMCallManager sharedInstance];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	XMLocation *activeLocation = [preferencesManager activeLocation];
+	unsigned h323AccountTag = [activeLocation h323AccountTag];
+	XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
+	NSString *host = [h323Account gatekeeper];
+	
 	XMGatekeeperRegistrationFailReason failReason = [callManager gatekeeperRegistrationFailReason];
-	NSString *reasonText;
+	NSString *reasonText = XMGatekeeperRegistrationFailReasonString(failReason);
 	NSString *suggestionText;
 	
 	switch(failReason)
 	{
-		/*case XMGatekeeperRegistrationFailReason_NoGatekeeperSpecified:
-			reasonText = NSLocalizedString(@"no gatekeeper specified", @"");
-			suggestionText = NSLocalizedString(@"Please specify a gatekeeper in preferences.", @"");
-			break;*/
 		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
-			reasonText = NSLocalizedString(@"gatekeeper not found", @"");
 			suggestionText = NSLocalizedString(@"Please check your internet connection.", @"");
 			break;
 		case XMGatekeeperRegistrationFailReason_RegistrationReject:
-			reasonText = NSLocalizedString(@"gatekeeper rejected registration", @"");
 			suggestionText = NSLocalizedString(@"Please check your gatekeeper settings.", @"");
 			break;
 		default:
-			reasonText = NSLocalizedString(@"unknown failure", @"");
 			suggestionText = @"";
 			break;
 	}
 	
 	[alert setMessageText:NSLocalizedString(@"Gatekeeper Registration Failed", @"")];
-	NSString *informativeTextFormat = NSLocalizedString(@"Unable to register at gatekeeper. (%@) You will not be able \
-	to use phone numbers when making a call. %@", @"");
-	
+	NSString *informativeTextFormat = NSLocalizedString(@"Unable to register at gatekeeper \"%@\" (%@). You will not be able to use phone numbers when making a call. %@", @"");
 
-	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, reasonText, suggestionText];
+	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
 	[alert setInformativeText:informativeText];
 	[informativeText release];
 	
@@ -432,6 +459,80 @@
 	if(result == NSAlertSecondButtonReturn)
 	{
 		[[XMCallManager sharedInstance] retryGatekeeperRegistration];
+	}
+	
+	[alert release];
+}
+
+- (void)_displayEnableSIPFailedAlert
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	
+	[alert setMessageText:NSLocalizedString(@"Enabling SIP Failed", @"")];
+	[alert setInformativeText:NSLocalizedString(@"Unable to enable the SIP subsystem.", @"")];
+	
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
+	
+	int result = [alert runModal];
+	
+	if(result == NSAlertSecondButtonReturn)
+	{
+		[[XMCallManager sharedInstance] retryEnableSIP];
+	}
+	
+	[alert release];	
+}
+
+- (void)_displaySIPRegistrationFailedAlert
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	XMLocation *activeLocation = [preferencesManager activeLocation];
+	unsigned sipAccountTag = [activeLocation sipAccountTag];
+	XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
+	NSString *host = [sipAccount registrar];
+	XMSIPStatusCode failReason = [callManager sipRegistrationFailReasonAtIndex:0];
+	
+	NSString *reasonText = XMSIPStatusCodeString(failReason);
+	
+	NSString *suggestionText;
+	
+	switch(failReason)
+	{
+		case XMSIPStatusCode_Failure_UnAuthorized:
+			suggestionText = NSLocalizedString(@"Please check your username and password settings.", @"");
+			break;
+		case XMSIPStatusCode_Failure_NotAcceptable:
+			suggestionText = NSLocalizedString(@"Please check your network settings.", @"");
+			break;
+		case XMSIPStatusCode_Failure_BadGateway:
+			suggestionText = NSLocalizedString(@"Please check your settings.", @"");
+			break;
+		default:
+			suggestionText = @"";
+			break;
+	}
+	
+	[alert setMessageText:NSLocalizedString(@"SIP Registration Failed", @"")];
+	NSString *informativeTextFormat = NSLocalizedString(@"Unable to register at SIP registrar \"%@\" (%@). %@", @"");
+	
+	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
+	[alert setInformativeText:informativeText];
+	[informativeText release];
+	
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
+	
+	int result = [alert runModal];
+	
+	if(result == NSAlertSecondButtonReturn)
+	{
+		[[XMCallManager sharedInstance] retrySIPRegistrations];
 	}
 	
 	[alert release];
@@ -487,14 +588,13 @@
 	}
 	else if(tag == 430)
 	{
-		/*XMVideoManager *videoManager = [XMVideoManager sharedInstance];
-		
-		if([videoManager isSendingVideo] || [videoManager isReceivingVideo])
+		if([callManager isInCall] &&
+		   [[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
 		{
 			return YES;
 		}
-		return NO;*/
-		return YES;
+		
+		return NO;
 	}
 	
 	return YES;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.19 2006/03/23 10:04:48 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.20 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,8 +24,6 @@
 - (void)_didClearCall:(NSNotification *)notif;
 - (void)_didStartReceivingVideo:(NSNotification *)notif;
 
-- (void)_activeLocationDidChange:(NSNotification *)notif;
-
 @end
 
 @implementation XMInCallModule
@@ -42,11 +40,6 @@
 							   name:XMNotification_CallManagerDidEstablishCall object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
 							   name:XMNotification_CallManagerDidClearCall object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didStartReceivingVideo:)
-							   name:XMNotification_VideoManagerDidStartReceivingVideo object:nil];
-	
-	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
-							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	
 	return self;
 }
@@ -63,8 +56,6 @@
 	
 	[videoView setOSDOpeningEffect:XMOpeningEffect_FadeIn];
 	[videoView setOSDClosingEffect:XMClosingEffect_FadeOut];
-	
-	[self _activeLocationDidChange:nil];
 }
 
 - (NSString *)name
@@ -151,7 +142,15 @@
 {
 	[self contentView];
 	
-	[videoView startDisplayingVideo];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	if([[preferencesManager activeLocation] enableVideo] == YES)
+	{
+		[videoView startDisplayingVideo];
+	}
+	else
+	{
+		[videoView startDisplayingNoVideo];
+	}
 	
 	[videoView setOSDDisplayMode:XMOSDDisplayMode_AutomaticallyHiding];
 	
@@ -165,6 +164,8 @@
 {
 	[videoView setOSDDisplayMode:XMOSDDisplayMode_NoOSD];
 	[videoView stopDisplayingVideo];
+	
+	contentViewSize = [contentView bounds].size;
 }
 
 - (void)beginFullScreen
@@ -215,14 +216,6 @@
 	//loading the nib file if not already done
 	[self contentView];
 	
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];	
-	BOOL isVideoEnabled = [[[preferencesManager locations] objectAtIndex:[preferencesManager indexOfActiveLocation]] enableVideo]; 
-
-	if (!isVideoEnabled){
-		[videoView stopDisplayingVideo]; //display 'NO VIDEO' picture
-		[self _didStartReceivingVideo:nil];
-	}
-	
 	NSString *remoteName = [[[XMCallManager sharedInstance] activeCall] remoteName];
 	[remotePartyField setStringValue:remoteName];
 	
@@ -232,26 +225,7 @@
 {
 	[remotePartyField setStringValue:@""];
 	
-	//[contentView setVideoSize:XMVideoSize_QCIF];
-}
-
-- (void)_didStartReceivingVideo:(NSNotification *)notif
-{
-	XMVideoSize videoSize = [[XMVideoManager sharedInstance] remoteVideoSize];
-	
-	//[contentView setVideoSize:videoSize];
-	
-	[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
-
-	[videoView mouseEntered:[NSApp currentEvent]];
-
-}
-
-- (void)_activeLocationDidChange:(NSNotification *)notif
-{
-	BOOL enableVideo = [[[XMPreferencesManager sharedInstance] activeLocation] enableVideo];
-
-	//[contentView setShowVideoContent:enableVideo];
+	[videoView releaseOSD];
 }
 
 @end

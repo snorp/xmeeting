@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.m,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMWindow.m,v 1.5 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,7 +8,7 @@
 
 #import "XMWindow.h"
 
-NSString *XMNotification_WindowWillMinimize = @"XMeetingWindowWillMinimizeNotification";
+NSString *XMNotification_WindowWillMiniaturize = @"XMeetingWindowWillMiniaturizeNotification";
 
 @implementation XMWindow
 
@@ -20,7 +20,7 @@ NSString *XMNotification_WindowWillMinimize = @"XMeetingWindowWillMinimizeNotifi
 	// Unfortunately, anything drawn after -miniaturize: has been called does not appear on screen.
 	// Since this notification is posted before the window is "frozen", the changes appear on the
 	// screen
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_WindowWillMinimize
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_WindowWillMiniaturize
 														object:self];
 	[super miniaturize:sender];
 }

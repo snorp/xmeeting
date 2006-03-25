@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.18 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.19 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -145,6 +145,11 @@ XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address,
 													const char *password);
 
 /**
+ * reports whether we are registered at a gk or not
+ **/
+bool _XMIsRegisteredAtGatekeeper();
+
+/**
  * Checks whether we still are registered at the gatekeeper or not.
  **/
 void _XMCheckGatekeeperRegistration();
@@ -152,6 +157,8 @@ void _XMCheckGatekeeperRegistration();
 #pragma mark SIP Setup Functions
 
 bool _XMEnableSIPListeners(bool enable);
+
+bool _XMIsSIPEnabled();
 
 void _XMPrepareRegistrarSetup();
 void _XMUseRegistrar(const char *host,

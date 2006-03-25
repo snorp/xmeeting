@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.14 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.15 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,6 +70,9 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	// the complete call address used for the XMeeting framework
 	[addressBookView addProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	[addressBookView setColumnTitle:@"Call Address" forProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	
+	NSLog([[addressBookView properties] description]);
+	
 	
 	// registering some notification
 	[[NSNotificationCenter defaultCenter] addObserver:self 
@@ -306,6 +309,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (void)_recordSelectionDidChange:(NSNotification *)notif
 {
+	NSLog(@"change");
 	[self _validateButtons];
 }
 

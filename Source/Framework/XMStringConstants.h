@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.18 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.19 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,6 +76,8 @@ extern NSString *XMNotification_CallManagerDidStartCalling;
  * Posted when the attempt to start a call failed. This normally
  * indicates a serious problem such as no address specified or
  * that in the same time an incoming call appeared etc
+ * the userInfo dictionary has the following keys set:
+ * @"Address" : address one tried to call to
  **/
 extern NSString *XMNotification_CallManagerDidNotStartCalling;
 

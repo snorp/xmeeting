@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.13 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.14 2006/03/25 10:41:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -620,15 +620,22 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCalling object:self];
 }
 
-- (void)_handleCallInitiationFailed:(NSNumber *)failReason
+- (void)_handleCallInitiationFailed:(NSArray *)info
 {
-	callStartFailReason = (XMCallStartFailReason)[failReason unsignedIntValue];
+	NSNumber *number = (NSNumber *)[info objectAtIndex:0];
+	NSString *address = (NSString *)[info objectAtIndex:1];
+	
+	callStartFailReason = (XMCallStartFailReason)[number unsignedIntValue];
 	
 	callManagerStatus = XM_CALL_MANAGER_READY;
 	
 	needsSubsystemSetupAfterCallEnd = NO;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotStartCalling object:self];
+	NSDictionary *infoDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:address, @"Address", nil];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotStartCalling object:self userInfo:infoDictionary];
+	
+	[infoDictionary release];
 }
 
 - (void)_handleCallIsAlerting
@@ -997,25 +1004,19 @@
 {
 	XMCallProtocol callProtocol = [addressResource callProtocol];
 	NSString *address = [addressResource address];
+	NSMutableString *processedAddress = [[NSMutableString alloc] initWithCapacity:[address length]];
+	[processedAddress setString:address];
+	[processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
 	
-	// checking if the protocol is enabled. It may also be that the enabling failed for some reason!
-	if((callProtocol == XMCallProtocol_H323) && (h323ListeningStatus != XM_H323_LISTENING))
-	{
-		callStartFailReason = XMCallStartFailReason_ProtocolNotEnabled;
-		
-		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidNotStartCalling
-																	 object:self];
-		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
-		
-		return;
-	}
+	// validity check is done within XMOpalDispatcher
 	
-	/* Checks completed, start calling */
 	callManagerStatus = XM_CALL_MANAGER_PREPARING_CALL;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation
 														object:self];
 	
-	[XMOpalDispatcher _initiateCallToAddress:address protocol:callProtocol];
+	[XMOpalDispatcher _initiateCallToAddress:processedAddress protocol:callProtocol];
+	
+	[processedAddress release];
 }
 
 - (void)_initiateSpecificCall:(XMGeneralPurposeAddressResource *)addressResource
@@ -1029,36 +1030,8 @@
 	XMCallProtocol callProtocol = [addressResource callProtocol];
 	NSString *address = [addressResource address];
 	
-	//Detection of call start failure conditions
-	if(callProtocol == XMCallProtocol_H323 && [modifiedPreferences enableH323] == NO)
-	{
-		callStartFailReason = XMCallStartFailReason_ProtocolNotEnabled;
-		
-		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidNotStartCalling
-																	 object:self];
-		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
-			
-		[modifiedPreferences release];
-			
-		return;
-	}
-	else if(callProtocol == XMCallProtocol_H323 && 
-			[activePreferences usesGatekeeper] == NO && 
-			[modifiedPreferences usesGatekeeper] == YES &&
-			[addressResource valueForKey:XMKey_PreferencesGatekeeperAddress] == nil)
-	{
-		callStartFailReason = XMCallStartFailReason_GatekeeperUsedButNotSpecified;
-		
-		NSNotification *notification = [NSNotification notificationWithName:XMNotification_CallManagerDidNotStartCalling
-																	 object:self];
-		[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
-		
-		[modifiedPreferences release];
-		
-		return;
-	}
+	// call start validity check is done within XMOpalDispatcher
 	
-	//Detection of direct call start failure conditions completed.
 	callManagerStatus = XM_CALL_MANAGER_PREPARING_CALL;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation object:self];
 	
@@ -1067,6 +1040,8 @@
 											protocol:callProtocol 
 										 preferences:modifiedPreferences 
 									 externalAddress:[_XMUtilsSharedInstance externalAddress]];
+	
+	[modifiedPreferences release];
 }
 
 - (void)_storeCall:(XMCallInfo *)call

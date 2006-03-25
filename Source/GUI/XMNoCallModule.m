@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.28 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.29 2006/03/25 10:41:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,6 +41,7 @@
 - (void)_invalidateCallEndReasonTimer;
 
 - (void)_updateStatusInformation:(NSString *)statusFieldString;
+- (void)_setCallProtocol:(XMCallProtocol)callProtocol;
 - (void)_setupVideoDisplay;
 
 @end
@@ -120,10 +121,9 @@
 	
 	// substracting the space used by the self view
 	contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
-	
-	
-	[callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL"]];
 
+	// initial call protocol is H.323 unless restricted from preferences
+	[self _setCallProtocol:XMCallProtocol_H323];
 	[self _preferencesDidChange:nil];
 	
 	// determining in which state we currently are
@@ -328,6 +328,21 @@
 	  completionsForString:(NSString *)uncompletedString
 	   indexOfSelectedItem:(unsigned *)indexOfSelectedItem
 {	
+	// if the user either enters h323: or sip:, we set the
+	// call protocol accordingly and remove the prefix from
+	// the address
+	if([uncompletedString hasPrefix:@"h323:"])
+	{
+		[self _setCallProtocol:XMCallProtocol_H323];
+		[databaseField setStringValue:[uncompletedString substringFromIndex:5]];
+		return [NSArray array];
+	}
+	else if([uncompletedString hasPrefix:@"sip:"])
+	{
+		[self _setCallProtocol:XMCallProtocol_SIP];
+		[databaseField setStringValue:[uncompletedString substringFromIndex:4]];
+		return [NSArray array];
+	}
 	XMCallAddressManager *callAddressManager = [XMCallAddressManager sharedInstance];
 	NSArray *originalMatchedAddresses;
 	unsigned newUncompletedStringLength = [uncompletedString length];
@@ -385,7 +400,7 @@
 	
 	if(index == NSNotFound)
 	{
-		XMSimpleAddressResource *simpleAddressResource = [[[XMSimpleAddressResource alloc] initWithAddress:completedString callProtocol:XMCallProtocol_H323] autorelease];
+		XMSimpleAddressResource *simpleAddressResource = [[[XMSimpleAddressResource alloc] initWithAddress:completedString callProtocol:currentCallProtocol] autorelease];
 		return simpleAddressResource;
 	}
 	return [matchedAddresses objectAtIndex:index];
@@ -405,15 +420,38 @@
 
 - (NSArray *)imageOptionsForDatabaseField:(XMDatabaseField *)databaseField selectedIndex:(unsigned *)selectedIndex;
 {
-	static int counter = 0;
 	id representedObject = [databaseField representedObject];
 	
 	if(representedObject == nil ||
 	   [(id<XMCallAddress>)representedObject displayImage] == nil)
 	{
-		*selectedIndex = counter % 2;
-		counter++;
-		return [NSArray arrayWithObjects:@"H.323", @"SIP", nil];
+		XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+		XMLocation *activeLocation = [preferencesManager activeLocation];
+		BOOL enableH323 = [activeLocation enableH323];
+		BOOL enableSIP = [activeLocation enableSIP];
+		
+		if(enableH323 && enableSIP)
+		{
+			if(currentCallProtocol == XMCallProtocol_H323)
+			{
+				*selectedIndex = 0;
+			}
+			else
+			{
+				*selectedIndex = 1;
+			}
+			return [NSArray arrayWithObjects:@"H.323", @"SIP", nil];
+		}
+		else if(enableH323)
+		{
+			*selectedIndex = 0;
+			return [NSArray arrayWithObjects:@"H.323", nil];
+		}
+		else if(enableSIP)
+		{
+			*selectedIndex = 0;
+			return [NSArray arrayWithObjects:@"SIP", nil];
+		}
 	}
 	return [NSArray array];
 }
@@ -422,11 +460,11 @@
 {
 	if([imageOption isEqualToString:@"H.323"])
 	{
-		[callAddressField setDefaultImage:[NSImage imageNamed:@"H323URL_Disclosure"]];
+		[self _setCallProtocol:XMCallProtocol_H323];
 	}
 	else
 	{
-		[callAddressField setDefaultImage:[NSImage imageNamed:@"SIPURL_Disclosure"]];
+		[self _setCallProtocol:XMCallProtocol_SIP];
 	}
 }
 
@@ -446,6 +484,19 @@
 	[locationsPopUpButton removeAllItems];
 	[locationsPopUpButton addItemsWithTitles:[preferencesManager locationNames]];
 	[locationsPopUpButton selectItemAtIndex:[preferencesManager indexOfActiveLocation]];
+	
+	XMLocation *activeLocation = [preferencesManager activeLocation];
+	BOOL enableH323 = [activeLocation enableH323];
+	BOOL enableSIP = [activeLocation enableSIP];
+	
+	if(enableH323 && !enableSIP)
+	{
+		[self _setCallProtocol:XMCallProtocol_H323];
+	}
+	else if(!enableH323 && enableSIP)
+	{
+		[self _setCallProtocol:XMCallProtocol_SIP];
+	}
 }
 
 - (void)_didChangeActiveLocation:(NSNotification *)notif
@@ -786,6 +837,20 @@
 	{
 		[selfView setNoVideoImage:[NSImage imageNamed:@"no_video_screen"]];
 		[selfView startDisplayingNoVideo];
+	}
+}
+
+- (void)_setCallProtocol:(XMCallProtocol)callProtocol
+{
+	currentCallProtocol = callProtocol;
+	
+	if(callProtocol == XMCallProtocol_H323)
+	{
+		[callAddressField setDefaultImage:[NSImage imageNamed:@"H323URL_Disclosure"]];
+	}
+	else if(callProtocol == XMCallProtocol_SIP)
+	{
+		[callAddressField setDefaultImage:[NSImage imageNamed:@"SIPURL_Disclosure"]];
 	}
 }
 
