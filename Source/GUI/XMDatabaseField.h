@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.h,v 1.7 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMDatabaseField.h,v 1.8 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,8 +125,9 @@
 /**
  * Informs the data source that the user selected one of the text options.
  * This method is required to implement
+ * Both imageOption and index are passed to allow efficient implementations
  **/
-- (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption;
+- (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption index:(unsigned)index;
 
 /**
  * Asks the data source to return an array of objects that the user can choose from. This array

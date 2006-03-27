@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.h,v 1.4 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.h,v 1.5 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,8 @@ typedef enum XMCallHistoryRecordType
 	XMCallHistoryRecordTypeCount
 } XMCallHistoryRecordType;
 
+@class XMAddressBookRecord;
+
 /**
  * This object encapsulates all information required
  * to store information about recent calls made.
@@ -40,7 +42,7 @@ typedef enum XMCallHistoryRecordType
 @interface XMCallHistoryRecord : XMSimpleAddressResource {
 	
 	NSString *displayString;
-	id addressBookRecord;
+	XMAddressBookRecord *addressBookRecord;
 	XMCallHistoryRecordType type;
 
 }

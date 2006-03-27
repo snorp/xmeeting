@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.7 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.8 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,7 @@
 
 #import "XMeeting.h"
 #import "XMAddressBookManager.h"
-#import "XMAddressBookRecordSearchMatch.h"
+#import "XMAddressBookRecord.h"
 
 @interface XMAddressBookCallAddressProvider (PrivateMethods)
 
@@ -88,26 +88,33 @@
 - (NSArray *)addressesMatchingString:(NSString *)searchString
 {
 	XMAddressBookManager *addressBookManager = [XMAddressBookManager sharedInstance];
-	NSArray *matchedRecords = [addressBookManager recordsMatchingString:searchString
-													mustBeValid:YES
-										 returnExtraInformation:YES];
+	NSArray *matchedRecords = [addressBookManager recordsMatchingString:searchString];
 	return matchedRecords;
 }
 
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString
 {
-	XMAddressBookRecordSearchMatch *searchMatch = (XMAddressBookRecordSearchMatch *)address;
-	id record = [searchMatch record];
-	XMAddressBookRecordPropertyMatch propertyMatch = [searchMatch propertyMatch];
+	XMAddressBookRecord *record = (XMAddressBookRecord *)address;
+	XMAddressBookRecordPropertyMatch propertyMatch = [record propertyMatch];
+	NSRange searchRange = NSMakeRange(0, [uncompletedString length]);
 	
 	if(propertyMatch == XMAddressBookRecordPropertyMatch_CallAddressMatch)
 	{
+		//NSLog(@"TRYING TO ADD, %@", uncompletedString);
 		// we have a match for the Address. In this case, we allow only the call address
 		// to be entered. (not e.g. "callAddress" (displayName)". This eases the check
 		// since we only have to check wether uncompletedString is a Prefix to the
 		// call address.
 		NSString *callAddress = [record humanReadableCallAddress];
-		if(![callAddress hasPrefix:uncompletedString])
+		if(searchRange.length > [callAddress length])
+		{
+			return nil;
+		}
+		
+		NSRange prefixRange = [callAddress rangeOfString:uncompletedString
+												 options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
+												   range:searchRange];
+		if(prefixRange.location == NSNotFound)
 		{
 			// since uncompletedString is not a prefix to the callAddress, this record is
 			// not a valid record for completion
@@ -117,16 +124,25 @@
 		
 		// producing the display string
 		return [NSString stringWithFormat:@"%@ (%@)", callAddress, displayName];
-		}
+	}
 	else if(propertyMatch == XMAddressBookRecordPropertyMatch_CompanyMatch)
 	{
 		// a company match has a similar behavior as a call address match.
 		// only if uncompletedString is a prefix to company name, we have a match.
 		NSString *companyName = [record companyName];
-		if(![companyName hasPrefix:uncompletedString])
+		if(searchRange.length > [companyName length])
 		{
 			return nil;
 		}
+		
+		NSRange prefixRange = [companyName rangeOfString:uncompletedString
+												 options:(NSCaseInsensitiveSearch | NSAnchoredSearch)
+												   range:searchRange];
+		if(prefixRange.location == NSNotFound)
+		{
+			return nil;
+		}
+	
 		NSString *callAddress = [record humanReadableCallAddress];
 		return [NSString stringWithFormat:@"%@ <%@>", companyName, callAddress];
 	}
@@ -142,16 +158,33 @@
 		{
 			// only the last name can be shown, if the last name has not the uncompletedString as its prefix
 			// this record is discarded as well.
-			if(![lastName hasPrefix:uncompletedString])
+			if(searchRange.length > [lastName length])
 			{
 				return nil;
 			}
+			
+			NSRange prefixRange = [lastName rangeOfString:uncompletedString
+												  options:(NSCaseInsensitiveSearch | NSAnchoredSearch)
+													range:searchRange];
+			if(prefixRange.location == NSNotFound)
+			{
+				return nil;
+			}
+			
 			return lastName;
 		}
 		else if(!lastName)
 		{
 			// the same as in the case of !firstName
-			if(![firstName hasPrefix:uncompletedString])
+			if(searchRange.length > [firstName length])
+			{
+				return nil;
+			}
+			
+			NSRange prefixRange = [firstName rangeOfString:uncompletedString
+												   options:(NSCaseInsensitiveSearch | NSAnchoredSearch)
+													 range:searchRange];
+			if(prefixRange.location == NSNotFound)
 			{
 				return nil;
 			}
@@ -176,10 +209,23 @@
 			}
 			
 			NSString *displayName = [NSString stringWithFormat:@"%@ %@", firstPart, lastPart];
-			if(![displayName hasPrefix:uncompletedString])
+			
+			if(searchRange.length > [displayName length])
+			{
+				return nil;
+			}
+			
+			NSRange prefixRange = [displayName rangeOfString:uncompletedString
+													 options:(NSCaseInsensitiveSearch | NSAnchoredSearch)
+													   range:searchRange];
+			if(prefixRange.location == NSNotFound)
 			{
 				displayName = [NSString stringWithFormat:@"%@ %@", lastPart, firstPart];
-				if(![displayName hasPrefix:uncompletedString])
+				
+				prefixRange = [displayName rangeOfString:uncompletedString
+												 options:(NSCaseInsensitiveSearch | NSAnchoredSearch)
+												   range:searchRange];
+				if(prefixRange.location == NSNotFound)
 				{
 					return nil;
 				}
@@ -189,13 +235,42 @@
 			return [NSString stringWithFormat:@"%@ <%@>", displayName, callAddress];
 		}
 	}
-	return nil;
+}
+
+- (NSArray *)alternativesForAddress:(id<XMCallAddress>)address selectedIndex:(unsigned *)selectedIndex
+{
+	XMAddressBookRecord *record = (XMAddressBookRecord *)address;
+	
+	NSArray *records = [[XMAddressBookManager sharedInstance] recordsForPersonWithRecord:record indexOfRecord:selectedIndex];
+	
+	unsigned i;
+	unsigned count = [records count];
+	NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMAddressBookRecord *theRecord = (XMAddressBookRecord *)[records objectAtIndex:i];
+		NSString *callAddress = [theRecord humanReadableCallAddress];
+		[array addObject:callAddress];
+	}
+	
+	return array;
+}
+
+- (id<XMCallAddress>)alternativeForAddress:(id<XMCallAddress>)address atIndex:(unsigned)index
+{
+	XMAddressBookRecord *record = (XMAddressBookRecord *)address;
+	
+	unsigned indexOfRecord;
+	NSArray *records = [[XMAddressBookManager sharedInstance] recordsForPersonWithRecord:record indexOfRecord:&indexOfRecord];
+	
+	return (id<XMCallAddress>)[records objectAtIndex:index];
 }
 
 - (NSArray *)allAddresses
 {
 	XMAddressBookManager *addressBookManager = [XMAddressBookManager sharedInstance];
-	return [addressBookManager validRecords];
+	return [addressBookManager records];
 }
 
 @end

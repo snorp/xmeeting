@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.29 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.30 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,7 @@
 #import "XMApplicationController.h"
 #import "XMCallAddressManager.h"
 #import "XMSimpleAddressResource.h"
+#import "XMAddressBookManager.h"
 #import "XMPreferencesManager.h"
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
@@ -36,6 +37,7 @@
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
 - (void)_didUnregisterFromGatekeeper:(NSNotification *)notif;
+- (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
 
 - (void)_clearCallEndReason:(NSTimer *)timer;
 - (void)_invalidateCallEndReasonTimer;
@@ -113,6 +115,9 @@
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:)
 							   name:XMNotification_CallManagerDidUnregisterFromGatekeeper
+							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
+							   name:XMNotification_AddressBookManagerDidChangeDatabase
 							 object:nil];
 		
 	contentViewSizeWithSelfViewHidden = [contentView frame].size;
@@ -422,8 +427,14 @@
 {
 	id representedObject = [databaseField representedObject];
 	
-	if(representedObject == nil ||
-	   [(id<XMCallAddress>)representedObject displayImage] == nil)
+	if(representedObject != nil && [representedObject displayImage] != nil)
+	{
+		NSArray *records = [[XMCallAddressManager sharedInstance] alternativesForAddress:(id<XMCallAddress>)representedObject 
+																		 selectedIndex:selectedIndex];
+		
+		return records;
+	}
+	else
 	{
 		XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 		XMLocation *activeLocation = [preferencesManager activeLocation];
@@ -453,12 +464,21 @@
 			return [NSArray arrayWithObjects:@"SIP", nil];
 		}
 	}
+	
 	return [NSArray array];
 }
 
-- (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption
+- (void)databaseField:(XMDatabaseField *)databaseField userSelectedImageOption:(NSString *)imageOption index:(unsigned)index
 {
-	if([imageOption isEqualToString:@"H.323"])
+	id representedObject = [databaseField representedObject];
+	
+	if(representedObject != nil && [representedObject displayImage] != nil)
+	{
+		id<XMCallAddress> alternative = [[XMCallAddressManager sharedInstance] alternativeForAddress:(id<XMCallAddress>)representedObject 
+																							 atIndex:index];
+		[databaseField setRepresentedObject:alternative];
+	}
+	else if([imageOption isEqualToString:@"H.323"])
 	{
 		[self _setCallProtocol:XMCallProtocol_H323];
 	}
@@ -627,6 +647,11 @@
 	{
 		[self _updateStatusInformation:nil];
 	}
+}
+
+- (void)_addressBookDatabaseDidChange:(NSNotification *)notif
+{
+	[callAddressField setRepresentedObject:nil];
 }
 
 #pragma mark -

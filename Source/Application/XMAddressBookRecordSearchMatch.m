@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecordSearchMatch.m,v 1.3 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMAddressBookRecordSearchMatch.m,v 1.4 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,13 +21,13 @@
 	return nil;
 }
 
-- (id)_initWithRecord:(ABPerson *)theRecord propertyMatch:(XMAddressBookRecordPropertyMatch)thePropertyMatch
+/*- (id)_initWithRecord:(ABPerson *)theRecord propertyMatch:(XMAddressBookRecordPropertyMatch)thePropertyMatch
 {
 	record = [theRecord retain];
 	propertyMatch = thePropertyMatch;
 	
 	return self;
-}
+}*/
 
 - (void)dealloc
 {
@@ -41,10 +41,10 @@
 	return record;
 }
 
-- (XMAddressBookRecordPropertyMatch)propertyMatch
+/*- (XMAddressBookRecordPropertyMatch)propertyMatch
 {
 	return propertyMatch;
-}
+}*/
 
 - (id<XMCallAddressProvider>)provider
 {

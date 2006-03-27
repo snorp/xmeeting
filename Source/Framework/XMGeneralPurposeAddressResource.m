@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPurposeAddressResource.m,v 1.3 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.m,v 1.4 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -227,7 +227,8 @@
 		NSString *key = [keys objectAtIndex:i];
 		
 		if([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
-		   [key isEqualToString:XMKey_AddressResourceAddress])
+		   [key isEqualToString:XMKey_AddressResourceAddress] ||
+		   [key isEqualToString:XMKey_AddressResourceCallProtocol])
 		{
 			continue;
 		}
@@ -256,7 +257,8 @@
 		NSString *key = [keys objectAtIndex:i];
 		
 		if([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
-		   [key isEqualToString:XMKey_AddressResourceAddress])
+		   [key isEqualToString:XMKey_AddressResourceAddress] ||
+		   [key isEqualToString:XMKey_AddressResourceCallProtocol])
 		{
 			continue;
 		}

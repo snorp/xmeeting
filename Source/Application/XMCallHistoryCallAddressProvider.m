@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.5 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.6 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -128,6 +128,8 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 
 - (NSArray *)addressesMatchingString:(NSString *)searchString
 {
+	NSRange searchRange = NSMakeRange(0, [searchString length]);
+	
 	[searchMatches removeAllObjects];
 	
 	unsigned i;
@@ -139,7 +141,18 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 		
 		if([record type] == XMCallHistoryRecordType_GeneralRecord)
 		{
-			if([[record address] hasPrefix:searchString])
+			NSString *address = [record address];
+			
+			if(searchRange.length > [address length])
+			{
+				continue;
+			}
+			
+			NSRange prefixRange = [address rangeOfString:searchString
+												 options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
+												   range:searchRange];
+			
+			if(prefixRange.location != NSNotFound)
 			{
 				[searchMatches addObject:record];
 			}
@@ -153,10 +166,33 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 {
 	XMCallHistoryRecord *record = (XMCallHistoryRecord *)callAddress;
 	
-	if([[record address] hasPrefix:uncompletedString])
+	NSRange searchRange = NSMakeRange(0, [uncompletedString length]);
+	NSString *address = [record address];
+	
+	if(searchRange.length > [address length])
 	{
-		return [record displayString];
+		return nil;
 	}
+	
+	NSRange prefixRange = [address rangeOfString:uncompletedString
+										 options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
+										   range:searchRange];
+	
+	if(prefixRange.location == NSNotFound)
+	{
+		return nil;
+	}
+	
+	return [record displayString];
+}
+
+- (NSArray *)alternativesForAddress:(id<XMCallAddress>)callAddress selectedIndex:(unsigned *)selectedIndex
+{
+	return [NSArray array];
+}
+
+- (id<XMCallAddress>)alternativeForAddress:(id<XMCallAddress>)callAddress atIndex:(unsigned)index
+{
 	return nil;
 }
 

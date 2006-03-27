@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.4 2006/03/25 10:41:55 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.5 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,7 @@ extern NSString *XMAddressBookProperty_HumanReadableCallAddress;
 extern NSString *XMAddressBookProperty_CallAddress_0_1;
 extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
 
-@class ABAddressBook;
+@class ABAddressBook, ABPerson, XMAddressBookRecord;
 
 @protocol XMAddressBookRecord;
 
@@ -64,92 +64,70 @@ extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
 + (XMAddressBookManager *)sharedInstance;
 
 /**
- * Returns all records in the AddressBook database, even if they
- * are not valid, e.g do not have any call address set.
- */
+ * Returns all records in the AddressBook database which have a
+ * call address set and are therefore valid in the context of the
+ * XMeeting framework. If a person has multiple address records stored,
+ * each record is contained once in the array
+ **/
 - (NSArray *)records;
 
 /**
- * Returns all records in the AddressBook database which have a
- * call address set and are therefore valid in the context of the
- * XMeeting framework
- **/
-- (NSArray *)validRecords;
-
-/**
- * Creates a new record initialized with the parameters as specified and returns it
+ * Creates a new person record initialized with the parameters as specified and returns it
  * This does NOT add the record to the database, use -addRecord: to do so. All string
  * values may be nil, but at least one value should not be nil.
  **/
-- (id)createRecordWithFirstName:(NSString *)firstName lastName:(NSString *)lastName
-					companyName:(NSString *)companyName isCompany:(BOOL)isCompany
-					callAddress:(XMAddressResource *)addressResource;
+- (ABPerson *)createPersonWithFirstName:(NSString *)firstName lastName:(NSString *)lastName
+					companyName:(NSString *)companyName isCompany:(BOOL)isCompany;
 
 /**
- * Adds the record to the AddressBook database. Returns whether this action
- * is succesful or not
+ * Adds the person record created by -createPersonWithFirstName... 
+ * to the AddressBook database. Returns whether this action is succesful or not.
+ * Does nothing if the person is already contained in the database
  **/
-- (BOOL)addRecord:(id)record;
+- (BOOL)addPerson:(ABPerson *)person;
+
+/**
+ * Adds the record to the AddressBook database. Returns whether this action is 
+ * succesful or not.
+ * Does nothing if the record is already contained in the database.
+ **/
+- (BOOL)addRecord:(XMAddressBookRecord *)record;
+
+/**
+ * Returns the address book record belonging to the person specified and having the
+ * identifier specified. The identifier is of type like the ones used by ABMultiValue
+ * instances to identify the data records. the identifier is only checked with the identifiers
+ * contained by the multi value stored with the XMAddressBookProperty_HumanReadableCallAddress
+ * property.
+ * if identifier is nil, a new record is created which is marked as needing to be added
+ * to the person as soon as a call adress was set.
+ **/
+- (XMAddressBookRecord *)recordForPerson:(ABPerson *)person identifier:(NSString *)identifier;
+
+/**
+ * Sets the primary identifier for the person specified
+ **/
+- (void)setPrimaryAddressForPerson:(ABPerson *)person withIdentifier:(NSString *)identifier;
 
 /**
  * Searches the AddressBook database and returns all records matching
- * the searchString. if mustBeValid is YES, this method does check whether
- * this record is "valid" and can be used in the context of the XMeeting framework.
- * If returnExtraInformation is YES, the objects contained in the array
- * are instances of XMAddressBookRecordSearchMatch.
+ * the searchString.
  **/
-- (NSArray *)recordsMatchingString:(NSString *)searchString mustBeValid:(BOOL)mustBeValid
-			  returnExtraInformation:(BOOL)returnExtraInformation;
+- (NSArray *)recordsMatchingString:(NSString *)searchString;
 
 /**
- * Returns the record that matches callAddress, or nil if
- * no record matches callAddress. If multiple records have
- * a match on callAddress, it isn't defined which record
+ * Returns the record that matches callAddress, or nil if no record matches callAddress.
+ * If multiple records have a match on callAddress, it isn't defined which record
  * is returned.
  **/
-- (id<XMAddressBookRecord>)recordWithCallAddress:(NSString *)callAddress;
-
-@end
+- (XMAddressBookRecord *)recordWithCallAddress:(NSString *)callAddress;
 
 /**
- * This protocol declares which methods the address book record instances
- * do respond to.
+ * Returns an array containing all records that belong to the same person as the
+ * record given.
+ * On return, indexOfRecord contains the index of the record specified
  **/
-@protocol XMAddressBookRecord <NSObject>
-
-/**
- * Returns whether the record is valid in the context of the
- * XMeeting framework or not
- **/
-- (BOOL)isValid;
-
-/**
- * Returns some properties of the record
- **/
-- (NSString *)firstName;
-- (NSString *)lastName;
-- (NSString *)companyName;
-- (BOOL)isCompany;
-- (XMAddressResource *)callAddress;
-
-/**
- * This is the only property that can be changed
- * by the XMeeting framework.
- **/
-- (void)setCallAddress:(XMAddressResource *)callAddress;
-
-/**
- * Returns a more human readable representation of the record's
- * call address
- **/
-- (NSString *)humanReadableCallAddress;
-
-/**
- * Returns a string useful for Display. This string takes
- * into account whether the record is a person or a company
- * and what the name ordering mask is.
- **/
-- (NSString *)displayName;
+- (NSArray *)recordsForPersonWithRecord:(XMAddressBookRecord *)record indexOfRecord:(unsigned *)indexOfRecord;
 
 @end
 

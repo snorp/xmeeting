@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecordSearchMatch.h,v 1.2 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMAddressBookRecordSearchMatch.h,v 1.3 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,15 +13,7 @@
 
 #import "XMCallAddressManager.h"
 
-typedef enum XMAddressBookRecordPropertyMatch
-{
-	XMAddressBookRecordPropertyMatch_NoMatch = 0,
-	XMAddressBookRecordPropertyMatch_FirstNameMatch,
-	XMAddressBookRecordPropertyMatch_LastNameMatch,
-	XMAddressBookRecordPropertyMatch_CompanyMatch,
-	XMAddressBookRecordPropertyMatch_CallAddressMatch,
-	XMAddressBookRecordPropertyMatchCount
-} XMAddressBookRecordPropertyMatch;
+
 
 /**
  * Instances of this object encapsulate information about a
@@ -32,7 +24,7 @@ typedef enum XMAddressBookRecordPropertyMatch
 @interface XMAddressBookRecordSearchMatch : NSObject <XMCallAddress> {
 	
 	id record;
-	XMAddressBookRecordPropertyMatch propertyMatch;
+//	XMAddressBookRecordPropertyMatch propertyMatch;
 	
 }
 
@@ -44,7 +36,7 @@ typedef enum XMAddressBookRecordPropertyMatch
 /**
  * Returns which part of the record matched the search string
  **/
-- (XMAddressBookRecordPropertyMatch)propertyMatch;
+//- (XMAddressBookRecordPropertyMatch)propertyMatch;
 
 @end
 

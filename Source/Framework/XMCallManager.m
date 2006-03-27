@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.14 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.15 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1024,8 +1024,10 @@
 	// In this case, we have to modify the subsystem before continuing
 	// to make the call. This is "specific calling" since the call
 	// is initated with a specific set of preferences
+	NSLog(@"CALLING %@", [addressResource address]);
 	XMPreferences *modifiedPreferences = [activePreferences copy];
 	[addressResource _modifyPreferences:modifiedPreferences];
+	NSLog(@"BBB");
 
 	XMCallProtocol callProtocol = [addressResource callProtocol];
 	NSString *address = [addressResource address];

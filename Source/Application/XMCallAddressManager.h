@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.7 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.8 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,6 +50,16 @@
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
 
 /**
+ * Returns an array of options for the given address. The array contains NSString instances
+ **/
+- (NSArray *)alternativesForAddress:(id<XMCallAddress>)address selectedIndex:(unsigned *)selectedIndex;
+
+/**
+ * Returns the alternative address for the given index
+ **/
+- (id<XMCallAddress>)alternativeForAddress:(id<XMCallAddress>)address atIndex:(unsigned)index;
+
+/**
  * Returns all available addresses
  **/
 - (NSArray *)allAddresses;
@@ -84,6 +94,17 @@
  * If uncompletedString does not match the resource, this method should return nil.
  */
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
+
+/**
+ * This method should return an array with alternatives for the given address. The options
+ * must be NSString instances
+ **/
+- (NSArray *)alternativesForAddress:(id<XMCallAddress>)address selectedIndex:(unsigned *)selectedIndex;
+
+/**
+ * This method should return the alternative address at index for the given address
+ **/
+- (id<XMCallAddress>)alternativeForAddress:(id<XMCallAddress>)address atIndex:(unsigned)index;
 
 /**
  * This method should return all id<XMCallResource> instances that this instance can

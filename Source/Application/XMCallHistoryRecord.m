@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.9 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.10 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #import "XMCallHistoryRecord.h"
 
 #import "XMAddressBookManager.h"
+#import "XMAddressBookRecord.h"
 #import "XMCallHistoryCallAddressProvider.h"
 #import "XMSimpleAddressResource.h"
 
@@ -123,18 +124,32 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (NSString *)displayString
 {
+	NSString *theDisplayString = nil;
+	NSString *theAddress = [self address];
+	
 	if(type == XMCallHistoryRecordType_AddressBookRecord)
 	{
-		if(addressBookRecord != nil)
+		if(addressBookRecord == nil)
 		{
-			return [addressBookRecord displayName];
+			return nil;
 		}
-		return nil;
+		
+		theDisplayString = [addressBookRecord displayName];
 	}
 	else
 	{
-		return displayString;
+		if(![theAddress isEqualToString:displayString])
+		{
+			theDisplayString = displayString;
+		}
 	}
+	
+	if(theDisplayString == nil)
+	{
+		return theAddress;
+	}
+	
+	return [NSString stringWithFormat:@"%@ (%@)", theAddress, theDisplayString];
 }
 
 - (XMCallHistoryRecordType)type

@@ -1,5 +1,5 @@
 /*
- * $Id: XMDatabaseField.m,v 1.11 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.12 2006/03/27 15:31:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -246,6 +246,7 @@
 		
 		//release the old completions
 		[tableData release];
+		tableData = nil;
 		
 		// asking the data source for new completions
 		unsigned indexOfSelectedItem = 0;
@@ -409,9 +410,7 @@
 				[representedObject release];
 				representedObject = nil;
 			}
-			NSLog(@"asking for represented object");
 			representedObject = [[dataSource databaseField:self representedObjectForCompletedString:string] retain];
-			NSLog(@"GOT %@", [representedObject description]);
 			[self _displayRepresentedObject];
 		}
 		else if(pulldownMode == PULLDOWN_OBJECTS_WINDOW)
@@ -432,7 +431,8 @@
 		}
 		else
 		{
-			[dataSource databaseField:self userSelectedImageOption:string];
+			unsigned selectedIndex = [pulldownTableView selectedRow];
+			[dataSource databaseField:self userSelectedImageOption:string index:selectedIndex];
 		}
 	}
 	[self _hideWindow];
@@ -491,10 +491,12 @@
 		{
 			unsigned selectedIndex = 0;
 			NSArray *imageOptions = [dataSource imageOptionsForDatabaseField:self selectedIndex:&selectedIndex];
+
 			if([imageOptions count] != 0)
 			{
 				[tableData release];
 				tableData = [imageOptions retain];
+				
 			
 				pulldownMode = IMAGE_OPTIONS_WINDOW;
 				[self _displayObjectAtIndex:selectedIndex];
@@ -649,6 +651,7 @@
 - (void)_displayObjectAtIndex:(unsigned)indexOfObject
 {
 	// selecting the appropriate index in tableView
+	[pulldownTableView reloadData];
 	NSIndexSet *indexSet = [[NSIndexSet alloc] initWithIndex:indexOfObject];
 	[pulldownTableView selectRowIndexes:indexSet byExtendingSelection:NO];
 	[pulldownTableView scrollRowToVisible:indexOfObject];
@@ -700,13 +703,10 @@
 		float height = (float)([pulldownTableView rowHeight] * numberOfItems);
 		float width;
 	
-		if(pulldownMode == COMPLETIONS_WINDOW)
+		if(pulldownMode == COMPLETIONS_WINDOW ||
+		   pulldownMode == IMAGE_OPTIONS_WINDOW)
 		{
 			width = frame.size.width - DISCLOSURE_WIDTH;
-		}
-		else if(pulldownMode == IMAGE_OPTIONS_WINDOW)
-		{
-			width = 50.0;
 		}
 		else
 		{
