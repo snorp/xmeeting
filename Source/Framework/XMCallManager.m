@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.15 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
+#import "XMPreferencesRegistrarRecord.h"
 #import "XMAddressResource.h"
 #import "XMBridge.h"
 
@@ -95,7 +96,7 @@
 	gatekeeperName = nil;
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
 	
-	registrarNames = [[NSMutableArray alloc] initWithCapacity:1];
+	registrarHosts = [[NSMutableArray alloc] initWithCapacity:1];
 	sipRegistrationFailReasons = [[NSMutableArray alloc] initWithCapacity:1];
 	
 	callStatisticsUpdateInterval = 1.0;
@@ -125,10 +126,10 @@
 		gatekeeperName = nil;
 	}
 	
-	if(registrarNames != nil)
+	if(registrarHosts != nil)
 	{
-		[registrarNames release];
-		registrarNames = nil;
+		[registrarHosts release];
+		registrarHosts = nil;
 	}
 	
 	if(sipRegistrationFailReasons != nil)
@@ -446,18 +447,18 @@
 
 - (unsigned)registrarCount
 {
-	return [registrarNames count];
+	return [registrarHosts count];
 }
 
-- (NSString *)registrarNameAtIndex:(unsigned)index
+- (NSString *)registrarHostAtIndex:(unsigned)index
 {
-	return (NSString *)[registrarNames objectAtIndex:index];
+	return (NSString *)[registrarHosts objectAtIndex:index];
 }
 
-- (NSArray *)registrarNames
+- (NSArray *)registrarHosts
 {
-	NSArray *registrarNamesCopy = [registrarNames copy];
-	return [registrarNamesCopy autorelease];
+	NSArray *registrarHostsCopy = [registrarHosts copy];
+	return [registrarHostsCopy autorelease];
 }
 
 - (unsigned)sipRegistrationFailReasonCount
@@ -523,7 +524,7 @@
 	if(callManagerStatus == XM_CALL_MANAGER_READY &&
 	   [self isRegisteredAtAllRegistrars] == NO && 
 	   activePreferences != nil &&
-	   [[activePreferences registrarHosts] count] != 0)
+	   [[activePreferences registrarRecords] count] != 0)
 	{
 		callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
@@ -869,37 +870,59 @@
 														object:self];
 }
 
-- (void)_handleSIPRegistration:(NSString *)registrar
+- (void)_handleSIPRegistration:(NSArray *)array
 {	
-	NSLog(@"registered at %@", registrar);
-	NSArray *hosts = [activePreferences registrarHosts];
-	unsigned index = [hosts indexOfObject:registrar];
+	NSString *host = (NSString *)[array objectAtIndex:0];
+	NSString *username = (NSString *)[array objectAtIndex:1];
 	
-	if(index == NSNotFound)
+	NSArray *registrarRecords = [activePreferences registrarRecords];
+	
+	unsigned searchIndex = NSNotFound;
+	unsigned count = [registrarRecords count];
+	unsigned i;
+	for(i = 0; i < count; i++)
 	{
-		NSLog(@"REGISTRAR NOT FOUND IN REGISTRAR_HOSTS");
+		XMPreferencesRegistrarRecord *record = (XMPreferencesRegistrarRecord *)[registrarRecords objectAtIndex:i];
+		if(![record isKindOfClass:[XMPreferencesRegistrarRecord class]])
+		{
+			continue;
+		}
+		
+		if([[record host] isEqualToString:host] &&
+		   [[record username] isEqualToString:username])
+		{
+			searchIndex = i;
+			break;
+		}
 	}
 	
-	[registrarNames addObject:registrar];
+	if(searchIndex == NSNotFound)
+	{
+		NSLog(@"REGISTRAR NOT FOUND IN REGISTRAR_HOSTS");
+		return;
+	}
+	
+	[registrarHosts addObject:host];
 	
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_NoFailure];
-	[sipRegistrationFailReasons replaceObjectAtIndex:index withObject:number];
+	[sipRegistrationFailReasons replaceObjectAtIndex:searchIndex withObject:number];
 	[number release];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtSIPRegistrar
 														object:self];
 }
 
-- (void)_handleSIPUnregistration:(NSString *)registrar
+- (void)_handleSIPUnregistration:(NSArray *)array
 {
-	NSLog(@"unregistered from: %@", registrar);
-	unsigned index = [registrarNames indexOfObject:registrar];
+	NSString *host = (NSString *)[array objectAtIndex:0];
+	
+	unsigned index = [registrarHosts indexOfObject:host];
 	
 	if(index == NSNotFound)
 	{
 		return;
 	}
-	[registrarNames removeObjectAtIndex:index];
+	[registrarHosts removeObjectAtIndex:index];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUnregisterFromSIPRegistrar
 														object:self];
@@ -910,18 +933,37 @@
 	NSLog(@"registrationFailed: %@", [info description]);
 	
 	// extracting information from the array
-	NSString *registrar = (NSString *)[info objectAtIndex:0];
-	NSNumber *failReason = (NSNumber *)[info objectAtIndex:1];
+	NSString *host = (NSString *)[info objectAtIndex:0];
+	NSString *username = (NSString *)[info objectAtIndex:1];
+	NSNumber *failReason = (NSNumber *)[info objectAtIndex:2];
 	
-	NSArray *hosts = [activePreferences registrarHosts];
-	unsigned index = [hosts indexOfObject:registrar];
+	NSArray *records = [activePreferences registrarRecords];
+	unsigned searchIndex = NSNotFound;
+	unsigned count = [records count];
+	unsigned i;
 	
-	if(index == NSNotFound)
+	for(i = 0; i < count; i++)
+	{
+		XMPreferencesRegistrarRecord *record = (XMPreferencesRegistrarRecord *)[records objectAtIndex:i];
+		if(![record isKindOfClass:[XMPreferencesRegistrarRecord class]])
+		{
+			continue;
+		}
+		
+		if([[record host] isEqualToString:host] &&
+		   [[record username] isEqualToString:username])
+		{
+			searchIndex = i;
+			break;
+		}
+	}
+	
+	if(searchIndex == NSNotFound)
 	{
 		NSLog(@"OBJECT NOT FOUND ON SIP REGISTRATION FAILURE");
 	}
 	
-	[sipRegistrationFailReasons replaceObjectAtIndex:index withObject:failReason];
+	[sipRegistrationFailReasons replaceObjectAtIndex:searchIndex withObject:failReason];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtSIPRegistrar
 														object:self];
@@ -945,7 +987,7 @@
 	
 	[sipRegistrationFailReasons removeAllObjects];
 	
-	unsigned count = [[preferences registrarHosts] count];
+	unsigned count = [[preferences registrarRecords] count];
 	unsigned i;
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMSIPStatusCode_NoFailure];
 	for(i = 0; i < count; i++)
@@ -1024,10 +1066,8 @@
 	// In this case, we have to modify the subsystem before continuing
 	// to make the call. This is "specific calling" since the call
 	// is initated with a specific set of preferences
-	NSLog(@"CALLING %@", [addressResource address]);
 	XMPreferences *modifiedPreferences = [activePreferences copy];
 	[addressResource _modifyPreferences:modifiedPreferences];
-	NSLog(@"BBB");
 
 	XMCallProtocol callProtocol = [addressResource callProtocol];
 	NSString *address = [addressResource address];

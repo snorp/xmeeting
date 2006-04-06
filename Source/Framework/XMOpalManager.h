@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.12 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.13 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,7 +24,7 @@ class XMOpalManager : public OpalManager
 	PCLASSINFO(XMOpalManager, OpalManager);
 	
 public:
-	static void InitOpal();
+	static void InitOpal(const PString & pTracePath);
 	
 	XMOpalManager();
 	~XMOpalManager();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.20 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.21 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,9 +53,6 @@
 {
 	contentViewMinSize = [contentView bounds].size;
 	contentViewSize = contentViewMinSize;
-	
-	[videoView setOSDOpeningEffect:XMOpeningEffect_FadeIn];
-	[videoView setOSDClosingEffect:XMClosingEffect_FadeOut];
 }
 
 - (NSString *)name
@@ -152,7 +149,18 @@
 		[videoView startDisplayingNoVideo];
 	}
 	
-	[videoView setOSDDisplayMode:XMOSDDisplayMode_AutomaticallyHiding];
+	if([preferencesManager automaticallyHideInCallControls])
+	{
+		[videoView setOSDDisplayMode:XMOSDDisplayMode_AutomaticallyHiding];
+	}
+	else
+	{
+		[videoView setOSDDisplayMode:XMOSDDisplayMode_AlwaysVisible];
+	}
+	
+	XMInCallControlHideAndShowEffect effect = [preferencesManager inCallControlHideAndShowEffect];
+	[videoView setOSDOpeningEffect:(XMOpeningEffect)effect];
+	[videoView setOSDClosingEffect:(XMClosingEffect)effect];
 	
 	if(isFullScreen == YES)
 	{

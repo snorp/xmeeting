@@ -1,5 +1,5 @@
 /*
- * $Id: XMZeroConfModule.h,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMZeroConfModule.h,v 1.4 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,7 @@
 #define __XM_ZERO_CONF_MOUDLE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowAdditionModule.h"
+//#import "XMMainWindowAdditionModule.h"
 
 @interface XMZeroConfModule : NSObject <XMMainWindowAdditionModule> {
 

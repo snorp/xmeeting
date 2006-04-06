@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.7 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.8 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -222,7 +222,7 @@
 				unsigned registrarCount = [callManager registrarCount];
 				if(registrarCount != 0)
 				{
-					registrar = [callManager registrarNameAtIndex:0];
+					registrar = [callManager registrarHostAtIndex:0];
 				}
 				
 				if(registrar != nil)

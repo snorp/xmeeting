@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.30 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.31 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -305,6 +305,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	frameGrabTimer = nil;
 	
 	isGrabbing = NO;
+	previewFrameGrabRate = 30;
 	frameGrabRate = 30;
 	
 	isTransmitting = NO;
@@ -738,7 +739,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 {
 	NSData *data = [messageComponents objectAtIndex:0];
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	frameGrabRate = [number unsignedIntValue];
+	previewFrameGrabRate = [number unsignedIntValue];
+	
+	if(isTransmitting == NO)
+	{
+		frameGrabRate = previewFrameGrabRate;
+	}
 	
 	[activeModule setFrameGrabRate:frameGrabRate];
 }
@@ -872,6 +878,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	// check if the frameGrabRate needs to be adjusted
 	if((transmitFrameGrabRate < frameGrabRate) && (isGrabbing == YES))
 	{
+		frameGrabRate = transmitFrameGrabRate;
 		[activeModule setFrameGrabRate:transmitFrameGrabRate];
 	}
 	
@@ -931,6 +938,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	_XMDidStopTransmitting(2);
 	
 	isTransmitting = NO;
+	
+	frameGrabRate = previewFrameGrabRate;
 }
 
 - (void)_handleUpdatePictureMessage
@@ -1047,7 +1056,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		[XMMediaTransmitter _startTransmittingForSession:2
 											   withCodec:XMCodecIdentifier_H263
 											   videoSize:XMVideoSize_CIF
-									  maxFramesPerSecond:30
+									  maxFramesPerSecond:2
 											  maxBitrate:384000
 												   flags:0];
 	}*/
@@ -1475,6 +1484,13 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 				needsToScaleImage = YES;
 			}
 		}
+		else if(videoSize ==XMVideoSize_4CIF)
+		{
+			if(width > 704 || height > 576)
+			{
+				needsToScaleImage = YES;
+			}
+		}
 		else
 		{
 			NSLog(@"UNKNOWN VIDEO SIZE");
@@ -1713,6 +1729,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		{
 			needsPictureUpdate = YES;
 		}
+		
+		needsPictureUpdate = YES;
 		
 		if(needsPictureUpdate == YES)
 		{

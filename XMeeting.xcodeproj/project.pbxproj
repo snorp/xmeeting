@@ -96,6 +96,8 @@
 		D10157EE09409867000A9BA7 /* XMRTPH263Packetizer.h in Headers */ = {isa = PBXBuildFile; fileRef = D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */; };
 		D10157EF09409867000A9BA7 /* XMRTPH263Packetizer.c in Sources */ = {isa = PBXBuildFile; fileRef = D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */; };
 		D10157F309409882000A9BA7 /* XMRTPH263PacketizerDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */; };
+		D102A36409E5268D0050239C /* XMPreferencesRegistrarRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D102A36209E5268D0050239C /* XMPreferencesRegistrarRecord.h */; };
+		D102A36509E5268D0050239C /* XMPreferencesRegistrarRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */; };
 		D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFE9407B3771F00BBC8EA /* XMCallManager.h */; };
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
 		D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
@@ -174,6 +176,8 @@
 		D198B483097636F300180551 /* XMRTPH264Packetizer.h in Headers */ = {isa = PBXBuildFile; fileRef = D198B481097636F300180551 /* XMRTPH264Packetizer.h */; };
 		D198B484097636F300180551 /* XMRTPH264Packetizer.c in Sources */ = {isa = PBXBuildFile; fileRef = D198B482097636F300180551 /* XMRTPH264Packetizer.c */; };
 		D198B4880976371D00180551 /* XMRTPH264PacketizerDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = D198B4870976371D00180551 /* XMRTPH264PacketizerDispatch.h */; };
+		D19FFB1109D92E46000E88F4 /* XMSIPConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */; };
+		D19FFB1209D92E46000E88F4 /* XMSIPConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */; };
 		D1A02881081CBCC00018BD11 /* XMPreferencesManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */; };
 		D1A02882081CBCC00018BD11 /* XMPreferencesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02880081CBCC00018BD11 /* XMPreferencesManager.m */; };
 		D1A02895081CBED00018BD11 /* XMLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02893081CBED00018BD11 /* XMLocation.h */; };
@@ -404,6 +408,8 @@
 		D1BB8E9709BB9BCD000897D9 /* XMAccountPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */; };
 		D1BB8E9809BB9BCD000897D9 /* XMAccountPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */; };
 		D1BB917409BCDF99000897D9 /* accountPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1BB917309BCDF99000897D9 /* accountPreferences.tif */; };
+		D1BFF0F009E2BB8E00D3665A /* h224handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BFF0EE09E2BB8E00D3665A /* h224handler.h */; };
+		D1BFF0F109E2BB8E00D3665A /* h281handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BFF0EF09E2BB8E00D3665A /* h281handler.h */; };
 		D1C1E316099B8BEA00815263 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */; };
 		D1CE4B62083CDED900B66B5D /* XMAddressBookModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */; };
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
@@ -795,6 +801,14 @@
 		D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068D091756FA008A8974 /* XMAddressBookManager.m */; };
 		D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */; };
 		D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1EF07510918B212008A8974 /* SetupAssistant.nib */; };
+		D1F0B78309DC4835005D0464 /* h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78009DC4834005D0464 /* h224.cxx */; };
+		D1F0B78409DC4835005D0464 /* h281.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78109DC4834005D0464 /* h281.cxx */; };
+		D1F0B78509DC4835005D0464 /* q922.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78209DC4835005D0464 /* q922.cxx */; };
+		D1F0B78A09DC4867005D0464 /* h224.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F0B78709DC4867005D0464 /* h224.h */; };
+		D1F0B78B09DC4867005D0464 /* h281.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F0B78809DC4867005D0464 /* h281.h */; };
+		D1F0B78C09DC4867005D0464 /* q922.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F0B78909DC4867005D0464 /* q922.h */; };
+		D1F0B7C609DC50E5005D0464 /* h323h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B7C509DC50E5005D0464 /* h323h224.cxx */; };
+		D1F0B7C809DC50F6005D0464 /* h323h224.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F0B7C709DC50F6005D0464 /* h323h224.h */; };
 		D1F49D1E097E553F0010A324 /* echocancel.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F49D04097E509E0010A324 /* echocancel.cxx */; };
 		D1F49D1F097E55490010A324 /* echocancel.h in Headers */ = {isa = PBXBuildFile; fileRef = D1F49D02097E50790010A324 /* echocancel.h */; };
 		D1F49D29097E66940010A324 /* mdf.c in Sources */ = {isa = PBXBuildFile; fileRef = D1F49D1A097E55210010A324 /* mdf.c */; };
@@ -978,6 +992,8 @@
 		D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263Packetizer.h; path = Source/Framework/XMRTPH263Packetizer.h; sourceTree = "<group>"; };
 		D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMRTPH263Packetizer.c; path = Source/Framework/XMRTPH263Packetizer.c; sourceTree = "<group>"; };
 		D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PacketizerDispatch.h; path = Source/Framework/XMRTPH263PacketizerDispatch.h; sourceTree = "<group>"; };
+		D102A36209E5268D0050239C /* XMPreferencesRegistrarRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesRegistrarRecord.h; path = Source/Framework/XMPreferencesRegistrarRecord.h; sourceTree = "<group>"; };
+		D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesRegistrarRecord.m; path = Source/Framework/XMPreferencesRegistrarRecord.m; sourceTree = "<group>"; };
 		D10AFE9407B3771F00BBC8EA /* XMCallManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallManager.h; path = Source/Framework/XMCallManager.h; sourceTree = "<group>"; };
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
@@ -1076,6 +1092,8 @@
 		D198B481097636F300180551 /* XMRTPH264Packetizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH264Packetizer.h; path = Source/Framework/XMRTPH264Packetizer.h; sourceTree = "<group>"; };
 		D198B482097636F300180551 /* XMRTPH264Packetizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMRTPH264Packetizer.c; path = Source/Framework/XMRTPH264Packetizer.c; sourceTree = "<group>"; };
 		D198B4870976371D00180551 /* XMRTPH264PacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH264PacketizerDispatch.h; path = Source/Framework/XMRTPH264PacketizerDispatch.h; sourceTree = "<group>"; };
+		D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSIPConnection.h; path = Source/Framework/XMSIPConnection.h; sourceTree = "<group>"; };
+		D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMSIPConnection.cpp; path = Source/Framework/XMSIPConnection.cpp; sourceTree = "<group>"; };
 		D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesManager.h; path = Source/Application/XMPreferencesManager.h; sourceTree = "<group>"; };
 		D1A02880081CBCC00018BD11 /* XMPreferencesManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesManager.m; path = Source/Application/XMPreferencesManager.m; sourceTree = "<group>"; };
 		D1A02893081CBED00018BD11 /* XMLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocation.h; path = Source/Application/XMLocation.h; sourceTree = "<group>"; };
@@ -1319,6 +1337,8 @@
 		D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAccountPreferencesModule.h; path = Source/GUI/XMAccountPreferencesModule.h; sourceTree = "<group>"; };
 		D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAccountPreferencesModule.m; path = Source/GUI/XMAccountPreferencesModule.m; sourceTree = "<group>"; };
 		D1BB917309BCDF99000897D9 /* accountPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = accountPreferences.tif; path = Resources/Images/accountPreferences.tif; sourceTree = "<group>"; };
+		D1BFF0EE09E2BB8E00D3665A /* h224handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h224handler.h; sourceTree = "<group>"; };
+		D1BFF0EF09E2BB8E00D3665A /* h281handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h281handler.h; sourceTree = "<group>"; };
 		D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D1CE4B60083CDED900B66B5D /* XMAddressBookModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookModule.h; path = Source/GUI/XMAddressBookModule.h; sourceTree = "<group>"; };
 		D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookModule.m; path = Source/GUI/XMAddressBookModule.m; sourceTree = "<group>"; };
@@ -1721,6 +1741,14 @@
 		D1EF074A0918B1B3008A8974 /* XMSetupAssistantManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSetupAssistantManager.h; path = Source/SetupAssistant/XMSetupAssistantManager.h; sourceTree = "<group>"; };
 		D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSetupAssistantManager.m; path = Source/SetupAssistant/XMSetupAssistantManager.m; sourceTree = "<group>"; };
 		D1EF07520918B212008A8974 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SetupAssistant.nib; sourceTree = "<group>"; };
+		D1F0B78009DC4834005D0464 /* h224.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h224.cxx; sourceTree = "<group>"; };
+		D1F0B78109DC4834005D0464 /* h281.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h281.cxx; sourceTree = "<group>"; };
+		D1F0B78209DC4835005D0464 /* q922.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = q922.cxx; sourceTree = "<group>"; };
+		D1F0B78709DC4867005D0464 /* h224.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h224.h; sourceTree = "<group>"; };
+		D1F0B78809DC4867005D0464 /* h281.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h281.h; sourceTree = "<group>"; };
+		D1F0B78909DC4867005D0464 /* q922.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = q922.h; sourceTree = "<group>"; };
+		D1F0B7C509DC50E5005D0464 /* h323h224.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h323h224.cxx; sourceTree = "<group>"; };
+		D1F0B7C709DC50F6005D0464 /* h323h224.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h323h224.h; sourceTree = "<group>"; };
 		D1F49D02097E50790010A324 /* echocancel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = echocancel.h; sourceTree = "<group>"; };
 		D1F49D04097E509E0010A324 /* echocancel.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = echocancel.cxx; sourceTree = "<group>"; };
 		D1F49D10097E54C10010A324 /* fftwrap.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = fftwrap.c; path = libspeex/fftwrap.c; sourceTree = "<group>"; };
@@ -1948,6 +1976,8 @@
 				D163381C07A4E739003FD9C0 /* XMPreferences.m */,
 				D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */,
 				D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */,
+				D102A36209E5268D0050239C /* XMPreferencesRegistrarRecord.h */,
+				D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */,
 				D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */,
 				D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */,
 				D1BA776A086CB1E3007E6CEC /* XMCodec.h */,
@@ -2020,6 +2050,8 @@
 				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
 				D1FD475509B650D500EB517B /* XMSIPEndPoint.h */,
 				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
+				D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */,
+				D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */,
 				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
@@ -2655,6 +2687,7 @@
 		D1CEE1FD08F90230007E4ABE /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				D1F0B78609DC4867005D0464 /* h224 */,
 				D1CEE11208F9022B007E4ABE /* asn */,
 				D1CEE12808F9022B007E4ABE /* codec */,
 				D1CEE13B08F9022B007E4ABE /* h323 */,
@@ -2672,6 +2705,7 @@
 		D1CEE20008F90240007E4ABE /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				D1F0B77F09DC4834005D0464 /* h224 */,
 				D1CEE20108F90261007E4ABE /* asn */,
 				D1CEE23008F90262007E4ABE /* codec */,
 				D1CEE34708F90263007E4ABE /* opal */,
@@ -3182,6 +3216,32 @@
 			name = "Setup Assistant";
 			sourceTree = "<group>";
 		};
+		D1F0B77F09DC4834005D0464 /* h224 */ = {
+			isa = PBXGroup;
+			children = (
+				D1F0B78009DC4834005D0464 /* h224.cxx */,
+				D1F0B7C509DC50E5005D0464 /* h323h224.cxx */,
+				D1F0B78109DC4834005D0464 /* h281.cxx */,
+				D1F0B78209DC4835005D0464 /* q922.cxx */,
+			);
+			name = h224;
+			path = ../opal/src/h224;
+			sourceTree = SOURCE_ROOT;
+		};
+		D1F0B78609DC4867005D0464 /* h224 */ = {
+			isa = PBXGroup;
+			children = (
+				D1F0B78709DC4867005D0464 /* h224.h */,
+				D1BFF0EE09E2BB8E00D3665A /* h224handler.h */,
+				D1F0B7C709DC50F6005D0464 /* h323h224.h */,
+				D1F0B78809DC4867005D0464 /* h281.h */,
+				D1BFF0EF09E2BB8E00D3665A /* h281handler.h */,
+				D1F0B78909DC4867005D0464 /* q922.h */,
+			);
+			name = h224;
+			path = ../opal/include/h224;
+			sourceTree = SOURCE_ROOT;
+		};
 		D1FD47CA09B6544B00EB517B /* sip */ = {
 			isa = PBXGroup;
 			children = (
@@ -3257,6 +3317,8 @@
 				D1BB8E9709BB9BCD000897D9 /* XMAccountPreferencesModule.h in Headers */,
 				D1A5E1FC09C8835E0063B926 /* XMLocalVideoView.h in Headers */,
 				D1FB991709D56F9C0078BBA9 /* XMAddressBookRecord.h in Headers */,
+				D19FFB1109D92E46000E88F4 /* XMSIPConnection.h in Headers */,
+				D102A36409E5268D0050239C /* XMPreferencesRegistrarRecord.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3593,6 +3655,12 @@
 				D1CEE45908F90263007E4ABE /* vid_coder.h in Headers */,
 				D1CEE45A08F90263007E4ABE /* videoframe.h in Headers */,
 				D1F49D1F097E55490010A324 /* echocancel.h in Headers */,
+				D1F0B78A09DC4867005D0464 /* h224.h in Headers */,
+				D1F0B78B09DC4867005D0464 /* h281.h in Headers */,
+				D1F0B78C09DC4867005D0464 /* q922.h in Headers */,
+				D1F0B7C809DC50F6005D0464 /* h323h224.h in Headers */,
+				D1BFF0F009E2BB8E00D3665A /* h224handler.h in Headers */,
+				D1BFF0F109E2BB8E00D3665A /* h281handler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3997,6 +4065,8 @@
 				D1A5E1FD09C8835E0063B926 /* XMLocalVideoView.m in Sources */,
 				D1A5E9E409C9C69F0063B926 /* XMInspectorModule.m in Sources */,
 				D1FB991809D56F9C0078BBA9 /* XMAddressBookRecord.m in Sources */,
+				D19FFB1209D92E46000E88F4 /* XMSIPConnection.cpp in Sources */,
+				D102A36509E5268D0050239C /* XMPreferencesRegistrarRecord.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4252,6 +4322,10 @@
 				D1FD47D109B6544B00EB517B /* sipep.cxx in Sources */,
 				D1FD47D209B6544B00EB517B /* sippdu.cxx in Sources */,
 				D13C78E009B8205A006C6C3B /* XMOpalPatches.cpp in Sources */,
+				D1F0B78309DC4835005D0464 /* h224.cxx in Sources */,
+				D1F0B78409DC4835005D0464 /* h281.cxx in Sources */,
+				D1F0B78509DC4835005D0464 /* q922.cxx in Sources */,
+				D1F0B7C609DC50E5005D0464 /* h323h224.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4587,7 +4661,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
 				GCC_USE_GCC3_PFE_SUPPORT = YES;
 				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = NO;
 				GCC_WARN_SHADOW = NO;
@@ -4663,10 +4737,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
+				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
 				GCC_USE_GCC3_PFE_SUPPORT = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;

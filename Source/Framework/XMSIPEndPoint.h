@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.2 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.3 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,11 +23,13 @@ public:
 	
 	XMSIPRegistrarRecord(const PString & host,
 						 const PString & username,
+						 const PString & authorizationUsername,
 						 const PString & password);
 	~XMSIPRegistrarRecord();
 	
 	const PString & GetHost() const;
 	const PString & GetUsername() const;
+	const PString & GetAuthorizationUsername() const;
 	const PString & GetPassword() const;
 	void SetPassword(const PString & password);
 	unsigned GetStatus() const;
@@ -37,6 +39,7 @@ private:
 		
 	PString host;
 	PString username;
+	PString authorizationUsername;
 	PString password;
 	unsigned status;
 };
@@ -55,6 +58,7 @@ public:
 	void PrepareRegistrarSetup();
 	void UseRegistrar(const PString & host,
 					  const PString & username,
+					  const PString & authorizationUsername,
 					  const PString & password);
 	void FinishRegistrarSetup();
 	
@@ -70,6 +74,13 @@ public:
 	
 	virtual void OnEstablished(OpalConnection & connection);
 	virtual void OnReleased(OpalConnection & connection);
+	
+	virtual SIPConnection * CreateConnection(OpalCall & call,
+											 const PString & token,
+											 void * userData,
+											 const SIPURL & destination,
+											 OpalTransport * transport,
+											 SIP_PDU * invite);
 	
 private:
 	BOOL isListening;

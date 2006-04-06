@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.25 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.26 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
+#import "XMPreferencesRegistrarRecord.h"
 #import "XMCodecManager.h"
 #import "XMCodec.h"
 #import "XMAudioManager.h"
@@ -127,10 +128,10 @@ void _XMCheckCloseStatus();
 - (void)_handleSIPRegistrationProcessEnd;
 
 // Called every time the Framework register at a SIP registrar
-- (void)_handleSIPRegistration:(NSString *)registrarName;
+- (void)_handleSIPRegistration:(NSArray *)info;
 
 // Called every time the Framework unregisters from a SIP registrar
-- (void)_handleSIPUnregistration:(NSString *)registrarName;
+- (void)_handleSIPUnregistration:(NSArray *)info;
 
 // Called every time an attempt to register at a SIP registrar failed
 - (void)_handleSIPRegistrationFailure:(NSArray *)info;
@@ -180,6 +181,12 @@ void _XMCheckCloseStatus();
 @interface XMPreferencesCodecListRecord (FrameworkMethods)
 
 - (id)_initWithIdentifier:(XMCodecIdentifier)identifier enabled:(BOOL)enabled;
+- (id)_initWithDictionary:(NSDictionary *)dict;
+
+@end
+
+@interface XMPreferencesRegistrarRecord (FrameworkMethods)
+
 - (id)_initWithDictionary:(NSDictionary *)dict;
 
 @end

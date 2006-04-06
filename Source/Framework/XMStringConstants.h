@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.19 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.20 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -296,16 +296,26 @@ extern NSString *XMKey_PreferencesEnableFastStart;
 extern NSString *XMKey_PreferencesGatekeeperAddress;
 extern NSString *XMKey_PreferencesGatekeeperUsername;
 extern NSString *XMKey_PreferencesGatekeeperPhoneNumber;
+extern NSString *XMKey_PreferencesGatekeeperPassword;
 
 // SIP-specific keys
 extern NSString *XMKey_PreferencesEnableSIP;
-extern NSString *XMKey_PreferencesRegistrarHosts;
-extern NSString *XMKey_PreferencesRegistrarUsernames;
+extern NSString *XMKey_PreferencesRegistrarRecords;
+extern NSString *XMKey_PreferencesSIPProxyHost;
+extern NSString *XMKey_PreferencesSIPProxyUsername;
+extern NSString *XMKey_PreferencesSIPProxyPassword;
 
 #pragma mark XMPreferencesCodecListRecord Keys
 
 extern NSString *XMKey_PreferencesCodecListRecordIdentifier;
 extern NSString *XMKey_PreferencesCodecListRecordIsEnabled;
+
+#pragma mark XMPreferencesRegistarRecord Keys
+
+extern NSString *XMKey_PreferencesRegistrarRecordHost;
+extern NSString *XMKey_PreferencesRegistrarRecordUsername;
+extern NSString *XMKey_PreferencesRegistrarRecordAuthorizationUsername;
+extern NSString *XMKey_PreferencesRegistrarRecordPassword;
 
 #pragma mark XMCodecManager Keys
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.h,v 1.2 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMSIPAccount.h,v 1.3 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 extern NSString *XMKey_SIPAccountName;
 extern NSString *XMKey_SIPAccountRegistrar;
 extern NSString *XMKey_SIPAccountUsername;
+extern NSString *XMKey_SIPAccountAuthorizationUsername;
 
 /**
  * An SIP account instance encapsulates all information required so that the client
@@ -28,6 +29,7 @@ extern NSString *XMKey_SIPAccountUsername;
 	NSString *name;
 	NSString *registrar;
 	NSString *username;
+	NSString *authorizationUsername;
 	BOOL didLoadPassword;
 	NSString *password;
 }
@@ -47,6 +49,9 @@ extern NSString *XMKey_SIPAccountUsername;
 
 - (NSString *)username;
 - (void)setUsername:(NSString *)username;
+
+- (NSString *)authorizationUsername;
+- (void)setAuthorizationUsername:(NSString *)authorizationUsername;
 
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;

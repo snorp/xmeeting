@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.14 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.15 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,6 +21,7 @@
 - (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
+- (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_activeLocationDidChange:(NSNotification *)notif;
 
 @end
@@ -105,6 +106,8 @@
 	[notificationCenter addObserver:self selector:@selector(_audioOutputVolumeDidChange:)
 							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
 	
+	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
+							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	
@@ -195,6 +198,9 @@
 	[NSApp beginSheet:videoDeviceSettingsPanel modalForWindow:[contentView window] modalDelegate:self didEndSelector:nil contextInfo:NULL];
 	
 	[videoDeviceSettingsView startDisplayingLocalVideo];
+	
+	BOOL mirrorSelfView = [[XMPreferencesManager sharedInstance] showSelfViewMirrored];
+	[videoDeviceSettingsView setLocalVideoMirrored:mirrorSelfView];
 }
 
 - (IBAction)changeAudioInputDevice:(id)sender
@@ -372,6 +378,22 @@
 	[muteAudioOutputSwitch setState:state];
 }
 
+- (void)_preferencesDidChange:(NSNotification *)notif
+{
+	// this takes into account that
+	// - video may get disabled
+	// - video may become mirrored
+	// - video devices may become inactive
+	// The easiest solution is to close the sheet in this case
+	if([videoDeviceSettingsPanel isVisible] == YES)
+	{
+		[self closeVideoDeviceSettingsPanel:self];
+	}
+	
+	BOOL mirrorLocalVideo = [[XMPreferencesManager sharedInstance] showSelfViewMirrored];
+	[localVideoView setLocalVideoMirrored:mirrorLocalVideo];
+}
+
 - (void)_activeLocationDidChange:(NSNotification *)notif
 {
 	XMLocation *location = [[XMPreferencesManager sharedInstance] activeLocation];
@@ -396,10 +418,6 @@
 	}
 	else
 	{
-		if([videoDeviceSettingsPanel isVisible] == YES)
-		{
-			[self closeVideoDeviceSettingsPanel:self];
-		}
 		[localVideoView setNoVideoImage:[NSImage imageNamed:@"no_video_screen.tif"]];
 		[localVideoView startDisplayingNoVideo];
 		

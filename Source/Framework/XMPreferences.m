@@ -1,15 +1,17 @@
 /*
- * $Id: XMPreferences.m,v 1.14 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.15 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
  */
 
+#import "XMPreferences.h"
+
 #import "XMStringConstants.h"
 #import "XMPrivate.h"
-#import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
+#import "XMPreferencesRegistrarRecord.h"
 #import "XMCodecManager.h"
 
 @interface XMPreferences (PrivateMethods)
@@ -229,6 +231,17 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperPassword])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
 	else if([key isEqualToString:XMKey_PreferencesEnableSIP])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -240,9 +253,9 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarHosts])
+	else if([key isEqualToString:XMKey_PreferencesRegistrarRecords])
 	{
-		if(value == nil || [value isKindOfClass:[NSArray class]])
+		if([value isKindOfClass:[NSArray class]])
 		{
 			result = XM_VALID_VALUE;
 		}
@@ -251,9 +264,31 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarUsernames])
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyHost])
 	{
-		if(value == nil || [value isKindOfClass:[NSArray class]])
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyUsername])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
 		{
 			result = XM_VALID_VALUE;
 		}
@@ -335,10 +370,13 @@
 	gatekeeperAddress = nil;
 	gatekeeperUsername = nil;
 	gatekeeperPhoneNumber = nil;
+	gatekeeperPassword = nil;
 	
 	enableSIP = NO;
-	registrarHosts = [[NSArray alloc] init];
-	registrarUsernames = [[NSArray alloc] init];
+	registrarRecords = [[NSArray alloc] init];
+	sipProxyHost = nil;
+	sipProxyUsername = nil;
+	sipProxyPassword = nil;
 
 	return self;
 }
@@ -350,67 +388,67 @@
 	self = [self init];
 	
 	obj = [dict objectForKey:XMKey_PreferencesUserName];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
 		[self setUserName:(NSString *)obj];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setAutomaticallyAcceptIncomingCalls:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesBandwidthLimit];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setBandwidthLimit:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesUseAddressTranslation];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setUseAddressTranslation:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesExternalAddress];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
 		[self setExternalAddress:(NSString *)obj];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesTCPPortBase];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setTCPPortBase:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesTCPPortMax];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setTCPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesUDPPortBase];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setUDPPortBase:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesUDPPortMax];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setUDPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesAudioBufferSize];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setAudioBufferSize:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesAudioCodecList];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSArray class]])
 	{
 		NSArray *arr = (NSArray *)obj;
 		unsigned count = [arr count];
@@ -440,19 +478,19 @@
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableVideo];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setEnableVideo:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesVideoFramesPerSecond];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setVideoFramesPerSecond:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesVideoCodecList];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSArray class]])
 	{
 		NSArray *arr = (NSArray *)obj;
 		unsigned count = [arr count];
@@ -482,71 +520,84 @@
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableH264LimitedMode];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setEnableH264LimitedMode:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableH323];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setEnableH323:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableH245Tunnel];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setEnableH245Tunnel:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableFastStart];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setEnableFastStart:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesGatekeeperAddress];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
 		[self setGatekeeperAddress:(NSString *)obj];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesGatekeeperUsername];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
 		[self setGatekeeperUsername:(NSString *)obj];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesGatekeeperPhoneNumber];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
 		[self setGatekeeperPhoneNumber:(NSString *)obj];
 	}
+	obj = [dict objectForKey:XMKey_PreferencesGatekeeperPassword];
+	if(obj && [obj isKindOfClass:[NSString class]])
+	{
+		[self setGatekeeperPassword:(NSString *)obj];
+	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableSIP];
-	if(obj)
+	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setEnableSIP:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesRegistrarHosts];
-	if(obj)
+	obj = [dict objectForKey:XMKey_PreferencesRegistrarRecords];
+	if(obj && [obj isKindOfClass:[NSArray class]])
 	{
-		[self setRegistrarHosts:(NSArray *)obj];
+		[self setRegistrarRecords:(NSArray *)obj];
 	}
 	else
 	{
-		[self setRegistrarHosts:[NSArray array]];
+		[self setRegistrarRecords:[NSArray array]];
+	}
+		
+	obj = [dict objectForKey:XMKey_PreferencesSIPProxyHost];
+	if(obj && [obj isKindOfClass:[NSString class]])
+	{
+		[self setSIPProxyHost:(NSString *)obj];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesRegistrarUsernames];
-	if(obj)
+	obj = [dict objectForKey:XMKey_PreferencesSIPProxyUsername];
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
-		[self setRegistrarUsernames:(NSArray *)obj];
+		[self setSIPProxyUsername:(NSString *)obj];
 	}
-	else
+	
+	obj = [dict objectForKey:XMKey_PreferencesSIPProxyPassword];
+	if(obj && [obj isKindOfClass:[NSString class]])
 	{
-		[self setRegistrarUsernames:[NSArray array]];
+		[self setSIPProxyPassword:(NSString *)obj];
 	}
 	
 	return self;
@@ -581,10 +632,13 @@
 	[preferences setGatekeeperAddress:[self gatekeeperAddress]];
 	[preferences setGatekeeperUsername:[self gatekeeperUsername]];
 	[preferences setGatekeeperPhoneNumber:[self gatekeeperPhoneNumber]];
+	[preferences setGatekeeperPassword:[self gatekeeperPassword]];
 	
 	[preferences setEnableSIP:[self enableSIP]];
-	[preferences setRegistrarHosts:[self registrarHosts]];
-	[preferences setRegistrarUsernames:[self registrarUsernames]];
+	[preferences setRegistrarRecords:[self registrarRecords]];
+	[preferences setSIPProxyHost:[self sipProxyHost]];
+	[preferences setSIPProxyUsername:[self sipProxyUsername]];
+	[preferences setSIPProxyPassword:[self sipProxyPassword]];
 
 	return preferences;
 }
@@ -665,10 +719,13 @@
 		[self setGatekeeperAddress:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperAddress]];
 		[self setGatekeeperUsername:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperUsername]];
 		[self setGatekeeperPhoneNumber:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber]];
+		[self setGatekeeperPassword:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPassword]];
 		
 		[self setEnableSIP:[coder decodeBoolForKey:XMKey_PreferencesEnableSIP]];
-		[self setRegistrarHosts:[coder decodeObjectForKey:XMKey_PreferencesRegistrarHosts]];
-		[self setRegistrarUsernames:[coder decodeObjectForKey:XMKey_PreferencesRegistrarUsernames]];
+		[self setRegistrarRecords:[coder decodeObjectForKey:XMKey_PreferencesRegistrarRecords]];
+		[self setSIPProxyHost:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyHost]];
+		[self setSIPProxyUsername:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyUsername]];
+		[self setSIPProxyPassword:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyPassword]];
 	}
 	else // raise an exception
 	{
@@ -709,10 +766,13 @@
 		[coder encodeObject:[self gatekeeperAddress] forKey:XMKey_PreferencesGatekeeperAddress];
 		[coder encodeObject:[self gatekeeperUsername] forKey:XMKey_PreferencesGatekeeperUsername];
 		[coder encodeObject:[self gatekeeperPhoneNumber] forKey:XMKey_PreferencesGatekeeperPhoneNumber];
+		[coder encodeObject:[self gatekeeperPassword] forKey:XMKey_PreferencesGatekeeperPassword];
 		
 		[coder encodeBool:[self enableSIP] forKey:XMKey_PreferencesEnableSIP];
-		[coder encodeObject:[self registrarHosts] forKey:XMKey_PreferencesRegistrarHosts];
-		[coder encodeObject:[self registrarUsernames] forKey:XMKey_PreferencesRegistrarUsernames];
+		[coder encodeObject:[self registrarRecords] forKey:XMKey_PreferencesRegistrarRecords];
+		[coder encodeObject:[self sipProxyHost] forKey:XMKey_PreferencesSIPProxyHost];
+		[coder encodeObject:[self sipProxyUsername] forKey:XMKey_PreferencesSIPProxyUsername];
+		[coder encodeObject:[self sipProxyPassword] forKey:XMKey_PreferencesSIPProxyPassword];
 	}
 	else // raise an exception
 	{
@@ -732,9 +792,12 @@
 	[gatekeeperAddress release];
 	[gatekeeperUsername release];
 	[gatekeeperPhoneNumber release];
+	[gatekeeperPassword release];
 	
-	[registrarHosts release];
-	[registrarUsernames release];
+	[registrarRecords release];
+	[sipProxyHost release];
+	[sipProxyUsername release];
+	[sipProxyPassword release];
 	
 	[super dealloc];
 }
@@ -786,10 +849,13 @@
 	   [[otherPreferences gatekeeperAddress] isEqualToString:[self gatekeeperAddress]] &&
 	   [[otherPreferences gatekeeperUsername] isEqualToString:[self gatekeeperUsername]] &&
 	   [[otherPreferences gatekeeperPhoneNumber] isEqualToString:[self gatekeeperPhoneNumber]] &&
+	   [[otherPreferences gatekeeperPassword] isEqualToString:[self gatekeeperPassword]] &&
 	   
 	   [otherPreferences enableSIP] == [self enableSIP] &&
-	   [[otherPreferences registrarHosts] isEqualToArray:[self registrarHosts]] &&
-	   [[otherPreferences registrarUsernames] isEqualToArray:[self registrarUsernames]])
+	   [[otherPreferences registrarRecords] isEqualToArray:[self registrarRecords]] &&
+	   [[otherPreferences sipProxyHost] isEqualToString:[self sipProxyHost]] &&
+	   [[otherPreferences sipProxyUsername] isEqualToString:[self sipProxyUsername]] &&
+	   [[otherPreferences sipProxyPassword] isEqualToString:[self sipProxyPassword]])
 	{
 		return YES;
 	}
@@ -937,20 +1003,38 @@
 		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperPhoneNumber];
 	}
 	
+	obj = [self gatekeeperPassword];
+	if(obj)
+	{
+		[dict setObject:obj forKey:XMKey_PreferencesGatekeeperPassword];
+	}
+	
 	number = [[NSNumber alloc] initWithBool:[self enableSIP]];
 	[dict setObject:number forKey:XMKey_PreferencesEnableSIP];
 	[number release];
 	
-	obj = [self registrarHosts];
+	obj = [self registrarRecords];
 	if([(NSArray *)obj count] != 0)
 	{
-		[dict setObject:obj forKey:XMKey_PreferencesRegistrarHosts];
+		[dict setObject:obj forKey:XMKey_PreferencesRegistrarRecords];
 	}
 	
-	obj = [self registrarUsernames];
-	if([(NSArray *)obj count] != 0)
+	obj = [self sipProxyHost];
+	if(obj)
 	{
-		[dict setObject:obj forKey:XMKey_PreferencesRegistrarUsernames];
+		[dict setObject:obj forKey:XMKey_PreferencesSIPProxyHost];
+	}
+	
+	obj = [self sipProxyUsername];
+	if(obj)
+	{
+		[dict setObject:obj forKey:XMKey_PreferencesSIPProxyUsername];
+	}
+	
+	obj = [self sipProxyPassword];
+	if(obj)
+	{
+		[dict setObject:obj forKey:XMKey_PreferencesSIPProxyPassword];
 	}
 	
 	return dict;
@@ -1045,17 +1129,29 @@
 	{
 		return [self gatekeeperPhoneNumber];
 	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperPassword])
+	{
+		return [self gatekeeperPassword];
+	}
 	else if([key isEqualToString:XMKey_PreferencesEnableSIP])
 	{
 		return [NSNumber numberWithBool:[self enableSIP]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarHosts])
+	else if([key isEqualToString:XMKey_PreferencesRegistrarRecords])
 	{
-		return [self registrarHosts];
+		return [self registrarRecords];
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarUsernames])
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyHost])
 	{
-		return [self registrarUsernames];
+		return [self sipProxyHost];
+	}
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyUsername])
+	{
+		return [self sipProxyUsername];
+	}
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword])
+	{
+		return [self sipProxyPassword];
 	}
 	
 	return nil;
@@ -1274,6 +1370,17 @@
 			correctType = NO;
 		}
 	}
+	else if([key isEqualToString:XMKey_PreferencesGatekeeperPassword])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setGatekeeperPassword:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
 	else if([key isEqualToString:XMKey_PreferencesEnableSIP])
 	{
 		if([value isKindOfClass:[NSNumber class]])
@@ -1285,22 +1392,44 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarHosts])
+	else if([key isEqualToString:XMKey_PreferencesRegistrarRecords])
 	{
 		if([value isKindOfClass:[NSArray class]])
 		{
-			[self setRegistrarHosts:(NSArray *)value];
+			[self setRegistrarRecords:(NSArray *)value];
 		}
 		else
 		{
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarUsernames])
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyHost])
 	{
-		if([value isKindOfClass:[NSArray class]])
+		if(value == nil || [value isKindOfClass:[NSString class]])
 		{
-			[self setRegistrarUsernames:(NSArray *)value];
+			[self setSIPProxyHost:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyUsername])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setSIPProxyUsername:(NSString *)value];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword])
+	{
+		if(value == nil || [value isKindOfClass:[NSString class]])
+		{
+			[self setSIPProxyPassword:(NSString *)value];
 		}
 		else
 		{
@@ -1585,6 +1714,21 @@
 	}
 }
 
+- (NSString *)gatekeeperPassword
+{
+	return gatekeeperPassword;
+}
+
+- (void)setGatekeeperPassword:(NSString *)string
+{
+	if(string != gatekeeperPassword)
+	{
+		NSString *old = gatekeeperPassword;
+		gatekeeperPassword = [string copy];
+		[old release];
+	}
+}
+
 - (BOOL)usesGatekeeper
 {
 	if([self gatekeeperAddress] != nil &&
@@ -1593,11 +1737,6 @@
 		return YES;
 	}
 	return NO;
-}
-
-- (NSString *)gatekeeperPassword
-{
-	return nil;
 }
 
 #pragma mark -
@@ -1613,59 +1752,64 @@
 	enableSIP = flag;
 }
 
-- (NSArray *)registrarHosts
+- (NSArray *)registrarRecords
 {
-	return registrarHosts;
+	return registrarRecords;
 }
 
-- (void)setRegistrarHosts:(NSArray *)hosts
+- (void)setRegistrarRecords:(NSArray *)records
 {
-	if(registrarHosts != hosts)
+	if(registrarRecords != records)
 	{
-		NSArray *old = registrarHosts;
-		registrarHosts = [hosts copy];
-		[old release];
-	}
-}
-
-- (NSArray *)registrarUsernames
-{
-	return registrarUsernames;
-}
-
-- (void)setRegistrarUsernames:(NSArray *)usernames
-{
-	if(registrarUsernames != usernames)
-	{
-		NSArray *old = registrarUsernames;
-		registrarUsernames = [usernames  copy];
+		NSArray *old = registrarRecords;
+		registrarRecords = [records copy];
 		[old release];
 	}
 }
 
 - (BOOL)usesRegistrars
 {
-	if([[self registrarHosts] count] != 0 &&
-	   [[self registrarUsernames] count] != 0)
+	if([[self registrarRecords] count] != 0)
 	{
 		return YES;
 	}
 	return NO;
 }
 
-- (NSArray *)registrarPasswords
+- (NSString *)sipProxyHost
 {
-	unsigned count = [[self registrarHosts] count];
-	unsigned i;
-	
-	NSMutableArray *pwds = [NSMutableArray arrayWithCapacity:count];
-	
-	for(i = 0; i < count; i++)
-	{
-		[pwds addObject:[NSNull null]];
-	}
-	
-	return pwds;
+	return sipProxyHost;
+}
+
+- (void)setSIPProxyHost:(NSString *)host
+{
+	NSString *old = sipProxyHost;
+	sipProxyHost = [host copy];
+	[old release];
+}
+
+- (NSString *)sipProxyUsername
+{
+	return sipProxyUsername;
+}
+
+- (void)setSIPProxyUsername:(NSString *)username
+{
+	NSString *old = sipProxyUsername;
+	sipProxyUsername = [username copy];
+	[old release];
+}
+
+- (NSString *)sipProxyPassword
+{
+	return sipProxyPassword;
+}
+
+- (void)setSIPProxyPassword:(NSString *)password
+{
+	NSString *old = sipProxyPassword;
+	sipProxyPassword = [password copy];
+	[old release];
 }
 
 #pragma mark -

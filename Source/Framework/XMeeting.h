@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.h,v 1.9 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMeeting.h,v 1.10 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,7 @@
  * been posted. Otherwise, one might experience that the application
  * no longer responds to user events or does draw on screen at all.
  **/
-void XMInitFramework();
+void XMInitFramework(NSString *pTracePath);
 
 /**
  * Call this method when you want to shutdown the XMeeting framework.
@@ -40,6 +40,7 @@ void XMCloseFramework();
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
+#import "XMPreferencesRegistrarRecord.h"
 
 #import "XMCodecManager.h"
 #import "XMCodec.h"

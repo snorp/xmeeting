@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.7 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.8 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,6 +70,8 @@
 - (id)_init;
 - (void)_close;
 
+- (void)_runOpalDispatcherThread:(NSString *)pTracePath;
+
 	// called every time the Framework registers at a gatekeeper
 	// called on the OpalDispatcherThread, therefore safe
 - (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName;
@@ -78,11 +80,11 @@
 	// Called on the OpalDispatcherThread, therefore safe
 - (void)_handleGatekeeperUnregistration;
 
-- (void)_handleSIPRegistration:(NSString *)registrar;
+- (void)_handleSIPRegistrationForHost:(NSString *)host username:(NSString *)username;
 
-- (void)_handleSIPUnregistration:(NSString *)registrar;
+- (void)_handleSIPUnregistrationForHost:(NSString *)host username:(NSString *)username;
 
-- (void)_handleSIPRegistrationFailure:(NSString *)registrar failReason:(XMSIPStatusCode)failReason;
+- (void)_handleSIPRegistrationFailureForHost:(NSString *)host username:(NSString *)username failReason:(XMSIPStatusCode)failReason;
 
 	// called every time the Framework completes SIP Registration
     // may be called on any thread

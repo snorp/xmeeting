@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.15 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -367,7 +367,7 @@
 		sipRegistrarName = nil;
 	}
 	
-	sipRegistrarName = [[[XMCallManager sharedInstance] registrarNameAtIndex:0] retain];
+	sipRegistrarName = [[[XMCallManager sharedInstance] registrarHostAtIndex:0] retain];
 	
 	NSString *logText = [[NSString alloc] initWithFormat:@"Registered at SIP registrar \"%@\"", sipRegistrarName];
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.10 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.11 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,11 @@ extern const char *_XMMediaFormatName_H261;
 extern const char *_XMMediaFormatName_H263;
 extern const char *_XMMediaFormatName_H264;
 
+// Format Encodings
+extern const char *_XMMediaFormatEncoding_H261;
+extern const char *_XMMediaFormatEncoding_H263;
+extern const char *_XMMediaFormatEncoding_H264;
+
 #pragma mark XMeeting Video Formats
 
 extern const OpalVideoFormat & XMGetMediaFormat_Video();
@@ -65,6 +70,7 @@ extern const OpalVideoFormat & XMGetMediaFormat_H264();
 #define XM_H264_PACKETIZATION_MODE_SINGLE_NAL 1
 #define XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED 2
 
+#pragma mark -
 #pragma mark managing MediaFormats
 
 BOOL _XMIsVideoMediaFormat(const OpalMediaFormat & mediaFormat);
@@ -72,6 +78,7 @@ XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat);
 XMVideoSize _XMGetMediaFormatSize(const OpalMediaFormat & mediaFormat);
 const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat);
 
+#pragma mark -
 #pragma mark Transcoder classes
 
 class XM_H261_VIDEO : public OpalVideoTranscoder
@@ -138,6 +145,7 @@ public:
 	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
+#pragma mark -
 #pragma mark H.323 Capabilities
 
 class XMH323VideoCapability : public H323VideoCapability
@@ -241,6 +249,28 @@ private:
 	unsigned level;
 };
 
+#pragma mark -
+#pragma mark SDP Functions
+
+unsigned _XMGetMaxH261BitRate();
+PString _XMGetFMTP_H261(unsigned maxBitRate = UINT_MAX, 
+						XMVideoSize videoSize = XMVideoSize_NoVideo,
+						unsigned mpi = 1);
+void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi);
+
+unsigned _XMGetMaxH263BitRate();
+PString _XMGetFMTP_H263(unsigned maxBitRate = UINT_MAX,
+						XMVideoSize videoSize = XMVideoSize_NoVideo,
+						unsigned mpi = 1);
+void _XMParseFMTP_H263(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi);
+
+unsigned _XMGetMaxH264BitRate();
+PString _XMGetFMTP_H264(unsigned maxBitRate = UINT_MAX,
+						XMVideoSize videoSize = XMVideoSize_NoVideo,
+						unsigned mpi = 1);
+void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi);
+
+#pragma mark -
 #pragma mark Macros
 
 #define XM_REGISTER_H323_CAPABILITIES \

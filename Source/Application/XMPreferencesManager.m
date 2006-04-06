@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.16 2006/03/14 23:05:50 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.17 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,8 +20,14 @@ NSString *XMKey_PreferencesManagerH323Accounts = @"XMeeting_H323Accounts";
 NSString *XMKey_PreferencesManagerSIPAccounts = @"XMeeting_SIPAccounts";
 NSString *XMKey_PreferencesManagerLocations = @"XMeeting_Locations";
 NSString *XMKey_PreferencesManagerActiveLocation = @"XMeeting_ActiveLocation";
-NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 NSString *XMKey_PreferencesManagerUserName = @"XMeeting_UserName";
+NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
+NSString *XMKey_PreferencesManagerEnablePTrace = @"XMeeting_EnablePTrace";
+NSString *XMKey_PreferencesManagerPTraceFilePath = @"XMeeting_PTraceFilePath";
+NSString *XMKey_PreferencesManagerAutomaticallyEnterFullScreen = @"XMeeting_AutomaticallyEnterFullScreen";
+NSString *XMKey_PreferencesManagerShowSelfViewMirrored = @"XMeeting_ShowSelfViewMirrored";
+NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls = @"XMeeting_AutomaticallyHideInCallControls";
+NSString *XMKey_PreferencesManagerInCallControlHideAndShowEffect = @"XMeeting_InCallControlHideAndShowEffect";
 NSString *XMKey_PreferencesManagerDisabledVideoModules = @"XMeeting_DisabledVideoModules";
 NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
 
@@ -69,6 +75,26 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	return doesHavePreferences;
 }
 
++ (BOOL)enablePTrace
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerEnablePTrace];
+}
+
++ (void)setEnablePTrace:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerEnablePTrace];
+}
+
++ (NSString *)pTraceFilePath
+{
+	return [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_PreferencesManagerPTraceFilePath];
+}
+
++ (void)setPTraceFilePath:(NSString *)path
+{
+	[[NSUserDefaults standardUserDefaults] setObject:path forKey:XMKey_PreferencesManagerPTraceFilePath];
+}
+
 #pragma mark -
 #pragma mark Init & Deallocation Methods
 
@@ -109,6 +135,19 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	
 	NSNumber *number = [[NSNumber alloc] initWithBool:NO];
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls];
+	
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerEnablePTrace];
+	
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerShowSelfViewMirrored];
+	
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:YES];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerAutomaticallyHideInCallControls];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMInCallControlHideAndShowEffect_Fade];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerInCallControlHideAndShowEffect];
 	[number release];
 	
 	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMScreenVideoInputModule", nil];
@@ -585,6 +624,46 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	automaticallyAcceptIncomingCalls = flag;
 }
 
+- (BOOL)automaticallyEnterFullScreen
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerAutomaticallyEnterFullScreen];
+}
+
+- (void)setAutomaticallyEnterFullScreen:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerAutomaticallyEnterFullScreen];
+}
+
+- (BOOL)showSelfViewMirrored
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerShowSelfViewMirrored];
+}
+
+- (void)setShowSelfViewMirrored:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerShowSelfViewMirrored];
+}
+
+- (BOOL)automaticallyHideInCallControls
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerAutomaticallyHideInCallControls];
+}
+
+- (void)setAutomaticallyHideInCallControls:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerAutomaticallyHideInCallControls];
+}
+
+- (XMInCallControlHideAndShowEffect)inCallControlHideAndShowEffect
+{
+	return (XMInCallControlHideAndShowEffect)[[NSUserDefaults standardUserDefaults] integerForKey:XMKey_PreferencesManagerInCallControlHideAndShowEffect];
+}
+
+- (void)setInCallControlHideAndShowEffect:(XMInCallControlHideAndShowEffect)effect
+{
+	[[NSUserDefaults standardUserDefaults] setInteger:(int)effect forKey:XMKey_PreferencesManagerInCallControlHideAndShowEffect];
+}
+
 - (NSString *)passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
 {
 	OSStatus err = noErr;
@@ -617,7 +696,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 		return nil;
 	}
 	
-	NSString *password = [NSString stringWithCString:passwordString encoding:NSUTF8StringEncoding];
+	NSString *pwd = [[[NSString alloc] initWithBytes:passwordString length:passwordLength encoding:NSUTF8StringEncoding] autorelease];
 	
 	err = SecKeychainItemFreeContent(NULL, (void *)passwordString);
 	
@@ -626,7 +705,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 		NSLog(@"SecKeychainItemFreeContent failed: %d", (int)err);
 	}
 	
-	return password;
+	return pwd;
 }
 
 - (void)setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName

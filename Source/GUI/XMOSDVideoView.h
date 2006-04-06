@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.h,v 1.5 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMOSDVideoView.h,v 1.6 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,15 +34,15 @@ typedef enum XMOSDDisplayMode
 typedef enum XMOpeningEffect 
 {
 	XMOpeningEffect_NoEffect,
-	XMOpeningEffect_RollInFromBottomBorder,
 	XMOpeningEffect_FadeIn,
+	XMOpeningEffect_RollInFromBottomBorder
 } XMOpeningEffect;
 
 typedef enum XMClosingEffect
 {
 	XMClosingEffect_NoEffect,
+	XMClosingEffect_FadeOut,
 	XMClosingEffect_RollOutToBottomBorder,
-	XMClosingEffect_FadeOut
 	
 } XMClosingEffect;
 

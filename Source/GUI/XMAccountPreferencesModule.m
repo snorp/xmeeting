@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.1 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.2 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,7 @@ NSString *XMKey_AccountPreferencesNameIdentifier = @"name";
 NSString *XMKey_AccountPreferencesHostIdentifier = @"host";
 NSString *XMKey_AccountPreferencesUsernameIdentifier = @"username";
 NSString *XMKey_AccountPreferencesPhoneNumberIdentifier = @"phonenumber";
+NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizationUsername";
 
 @interface XMAccountPreferencesModule (PrivateMethods)
 
@@ -105,7 +106,6 @@ NSString *XMKey_AccountPreferencesPhoneNumberIdentifier = @"phonenumber";
 
 - (void)loadPreferences
 {
-	NSLog(@"LOAD");
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
 	[h323Accounts removeAllObjects];
@@ -257,6 +257,13 @@ NSString *XMKey_AccountPreferencesPhoneNumberIdentifier = @"phonenumber";
 	}
 	[sipUsernameField setStringValue:string];
 	
+	string = [sipAccountToEdit authorizationUsername];
+	if(string == nil)
+	{
+		string = @"";
+	}
+	[sipAuthorizationUsernameField setStringValue:string];
+	
 	string = [sipAccountToEdit password];
 	if(string == nil)
 	{
@@ -374,6 +381,10 @@ NSString *XMKey_AccountPreferencesPhoneNumberIdentifier = @"phonenumber";
 		else if([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier])
 		{
 			return [sipAccount username];
+		}
+		else if([identifier isEqualToString:XMKey_AccountPreferencesAuthorizationUsernameIdentifier])
+		{
+			return [sipAccount authorizationUsername];
 		}
 	}
 	
@@ -510,6 +521,13 @@ NSString *XMKey_AccountPreferencesPhoneNumberIdentifier = @"phonenumber";
 			string = nil;
 		}
 		[sipAccountToEdit setUsername:string];
+		
+		string = [sipAuthorizationUsernameField stringValue];
+		if([string isEqualToString:@""])
+		{
+			string = nil;
+		}
+		[sipAccountToEdit setAuthorizationUsername:string];
 		
 		string = [sipPasswordField stringValue];
 		if([string isEqualToString:@""])

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.19 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.20 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,7 @@ extern "C" {
  * and makes it ready to be used.
  * It is safe to call initOPAL() multiple times.
  **/
-void _XMInitSubsystem();
+void _XMInitSubsystem(const char *pTracePath);
 
 #pragma mark General Setup Functions
 
@@ -163,6 +163,7 @@ bool _XMIsSIPEnabled();
 void _XMPrepareRegistrarSetup();
 void _XMUseRegistrar(const char *host,
 					 const char *username,
+					 const char *authorizationUsername,
 					 const char *password);
 void _XMFinishRegistrarSetup();
 

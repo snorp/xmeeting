@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.5 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.6 2006/04/06 23:15:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,8 +94,6 @@ NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
 	[location setH323AccountTag:[self h323AccountTag]];
 	[location setSIPAccountTag:[self sipAccountTag]];
 	
-	[location _setGatekeeperPassword:[self gatekeeperPassword] registrarPasswords:[self registrarPasswords]];
-	
 	return location;
 }
 
@@ -140,8 +138,9 @@ NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
 	[dict removeObjectForKey:XMKey_PreferencesGatekeeperAddress];
 	[dict removeObjectForKey:XMKey_PreferencesGatekeeperUsername];
 	[dict removeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber];
-	[dict removeObjectForKey:XMKey_PreferencesRegistrarHosts];
-	[dict removeObjectForKey:XMKey_PreferencesRegistrarUsernames];
+	[dict removeObjectForKey:XMKey_PreferencesGatekeeperPassword];
+	[dict removeObjectForKey:XMKey_PreferencesRegistrarRecords];
+	[dict removeObjectForKey:XMKey_PreferencesSIPProxyPassword];
 	
 	NSString *theName = [self name];
 	
@@ -244,6 +243,8 @@ NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
 {
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
+	[self setUserName:[preferencesManager userName]];
+	
 	// cleaning up from previous launch if needed
 	[gatekeeperPassword release];
 	gatekeeperPassword = nil;
@@ -285,20 +286,19 @@ NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
 			
 			if(registrar != nil && username != nil)
 			{
-				NSArray *hosts = [[NSArray alloc] initWithObjects:registrar, nil];
-				[self setRegistrarHosts:hosts];
-				[hosts release];
-			
-				NSArray *usernames = [[NSArray alloc] initWithObjects:username, nil];
-				[self setRegistrarUsernames:usernames];
-				[usernames release];
+				XMPreferencesRegistrarRecord *record = [[XMPreferencesRegistrarRecord alloc] init];
 				
+				NSString *authorizationUsername = [sipAccount authorizationUsername];
 				NSString *password = [sipAccount password];
-				if(password == nil)
-				{
-					password = (NSString *)[NSNull null];
-				}
-				registrarPasswords = [[NSArray alloc] initWithObjects:password, nil];
+				
+				[record setHost:registrar];
+				[record setUsername:username];
+				[record setAuthorizationUsername:authorizationUsername];
+				[record setPassword:password];
+				
+				NSArray *records = [[NSArray alloc] initWithObjects:record, nil];
+				[self setRegistrarRecords:records];
+				[records release];
 			
 				didFillAccount = YES;
 			}
@@ -307,23 +307,11 @@ NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
 	
 	if(didFillAccount == NO)
 	{
-		[self setRegistrarHosts:[NSArray array]];
-		[self setRegistrarUsernames:[NSArray array]];
-		
-		registrarPasswords = [[NSArray alloc] init];
+		[self setRegistrarRecords:[NSArray array]];
 	}
 }
 
 #pragma mark overriding methods from XMPreferences
-
-- (NSString *)userName
-{
-	return [[XMPreferencesManager sharedInstance] userName];
-}
-
-- (void)setUserName:(NSString *)name
-{
-}
 
 - (BOOL)automaticallyAcceptIncomingCalls
 {

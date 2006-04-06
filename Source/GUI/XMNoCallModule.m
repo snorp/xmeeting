@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.30 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.31 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -517,6 +517,9 @@
 	{
 		[self _setCallProtocol:XMCallProtocol_SIP];
 	}
+	
+	BOOL mirrorSelfView = [preferencesManager showSelfViewMirrored];
+	[selfView setLocalVideoMirrored:mirrorSelfView];
 }
 
 - (void)_didChangeActiveLocation:(NSNotification *)notif
@@ -624,7 +627,7 @@
 	XMCallInfo *callInfo = [[XMCallManager sharedInstance] recentCallAtIndex:0];
 	XMCallEndReason callEndReason = [callInfo callEndReason];
 	NSString *idleString = nil;
-	if(callEndReason != XMCallEndReason_EndedByLocalUser)
+	if([callInfo isOutgoingCall] && callEndReason != XMCallEndReason_EndedByLocalUser)
 	{
 		idleString = [[NSString alloc] initWithFormat:@"Idle (%@)", XMCallEndReasonString(callEndReason)];
 	}

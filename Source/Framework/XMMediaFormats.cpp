@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.13 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.14 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,10 +19,6 @@
 #define XM_QCIF_HEIGHT PVideoDevice::QCIFHeight
 #define XM_SQCIF_WIDTH 128
 #define XM_SQCIF_HEIGHT PVideoDevice::SQCIFHeight
-
-#define XM_H261_ENCODING_NAME "H261"
-#define XM_H263_ENCODING_NAME "H263"
-#define XM_H264_ENCODING_NAME "H264"
 
 #define XM_MAX_FRAME_WIDTH XM_CIF_WIDTH
 #define XM_MAX_FRAME_HEIGHT XM_CIF_HEIGHT
@@ -62,6 +58,10 @@ const char *_XMMediaFormatName_H261 = "H.261";
 const char *_XMMediaFormatName_H263 = "H.263";
 const char *_XMMediaFormatName_H264 = "H.264";
 
+const char *_XMMediaFormatEncoding_H261 = "H261";
+const char *_XMMediaFormatEncoding_H263 = "H263";
+const char *_XMMediaFormatEncoding_H264 = "H264";
+
 #pragma mark MediaFormat Definitions
 
 const OpalVideoFormat & XMGetMediaFormat_Video()
@@ -80,7 +80,7 @@ const OpalVideoFormat & XMGetMediaFormat_H261()
 {
 	static const OpalVideoFormat XMMediaFormat_H261(_XMMediaFormat_H261,
 													RTP_DataFrame::H261,
-													XM_H261_ENCODING_NAME,
+													_XMMediaFormatEncoding_H261,
 													XM_MAX_FRAME_WIDTH,
 													XM_MAX_FRAME_HEIGHT,
 													XM_MAX_FRAME_RATE,
@@ -92,7 +92,7 @@ const OpalVideoFormat & XMGetMediaFormat_H263()
 {
 	static const OpalVideoFormat XMMediaFormat_H263(_XMMediaFormat_H263,
 													RTP_DataFrame::H263,
-													XM_H263_ENCODING_NAME,
+													_XMMediaFormatEncoding_H263,
 													XM_MAX_FRAME_WIDTH,
 													XM_MAX_FRAME_HEIGHT,
 													XM_MAX_FRAME_RATE,
@@ -104,7 +104,7 @@ const OpalVideoFormat & XMGetMediaFormat_H264()
 {
 	static const OpalVideoFormat XMMediaFormat_H264(_XMMediaFormat_H264,
 													RTP_DataFrame::DynamicBase,
-													XM_H264_ENCODING_NAME,
+													_XMMediaFormatEncoding_H264,
 													XM_MAX_FRAME_WIDTH,
 													XM_MAX_FRAME_HEIGHT,
 													XM_MAX_FRAME_RATE,
@@ -608,13 +608,13 @@ BOOL XM_H323_H263_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 	}
 	if(cif4MPI > 0)
 	{
-		h263.IncludeOptionalField(H245_H263VideoCapability::e_cif4MPI);
-		h263.m_cif4MPI = cif4MPI;
+		//h263.IncludeOptionalField(H245_H263VideoCapability::e_cif4MPI);
+		//h263.m_cif4MPI = cif4MPI;
 	}
 	if(cif16MPI > 0)
 	{
-		h263.IncludeOptionalField(H245_H263VideoCapability::e_cif16MPI);
-		h263.m_cif16MPI = cif16MPI;
+		//h263.IncludeOptionalField(H245_H263VideoCapability::e_cif16MPI);
+		//h263.m_cif16MPI = cif16MPI;
 	}
 	
 	h263.m_maxBitRate = maxBitRate;
@@ -647,13 +647,18 @@ BOOL XM_H323_H263_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 	}
 	if(slowCif4MPI > 0 && cif4MPI == 0)
 	{
-		h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCif4MPI);
-		h263.m_slowCif4MPI = slowCif4MPI;
+		//h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCif4MPI);
+		//h263.m_slowCif4MPI = slowCif4MPI;
 	}
 	if(slowCif16MPI > 0 && cif16MPI == 0)
 	{
-		h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCif16MPI);
-		h263.m_slowCif16MPI = slowCif16MPI;
+		//h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCif16MPI);
+		//h263.m_slowCif16MPI = slowCif16MPI;
+	}
+	
+	if(isH263PlusCapability == TRUE)
+	{
+		h263.IncludeOptionalField(H245_H263VideoCapability::e_h263Options);
 	}
 	
 	return TRUE;
@@ -1247,4 +1252,226 @@ unsigned XM_H323_H264_Capability::GetLevel() const
 	}
 	
 	return XM_H264_LEVEL_2;
+}
+
+#pragma mark -
+#pragma mark SDP Functions
+
+unsigned _XMGetMaxH261BitRate()
+{
+	unsigned maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	if(maxBitRate > XM_MAX_H261_BITRATE)
+	{
+		maxBitRate = XM_MAX_H261_BITRATE;
+	}
+	
+	return maxBitRate;
+}
+
+PString _XMGetFMTP_H261(unsigned maxBitRate,
+						XMVideoSize videoSize,
+						unsigned mpi)
+{
+	if(maxBitRate == UINT_MAX)
+	{
+		maxBitRate = _XMGetVideoBandwidthLimit() / 100; // SDP uses bitrate units of 100bits/s
+	}
+	if(maxBitRate > XM_MAX_H261_BITRATE)
+	{
+		maxBitRate = XM_MAX_H261_BITRATE;
+	}
+	
+	if(videoSize == XMVideoSize_NoVideo)
+	{
+		return psprintf("CIF=%d QCIF=%d MaxBR=%d", mpi, mpi, maxBitRate);
+	}
+	else if(videoSize == XMVideoSize_CIF)
+	{
+		return psprintf("CIF=%d MaxBR=%d", mpi, maxBitRate);
+	}
+	else
+	{
+		return psprintf("QCIF=%d MaxBR=%d", mpi, maxBitRate);
+	}
+}
+
+void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi)
+{
+	maxBitRate = _XMGetMaxH261BitRate();
+	videoSize = XMVideoSize_NoVideo;
+	mpi = 1;
+	
+	const PStringArray tokens = fmtp.Tokenise(" ;");
+	
+	unsigned i;
+	unsigned count = tokens.GetSize();
+	
+	for(i = 0; i < count; i++)
+	{
+		const PString & str = tokens[i];
+		
+		if(str.Left(4) == "CIF=")
+		{
+			PString mpiStr = str(4, 1000);
+			mpi = mpiStr.AsUnsigned();
+			videoSize = XMVideoSize_CIF;
+			
+			cout << "got CIF with mpi" << mpi << endl;
+		}
+		else if(str.Left(5) == "QCIF=")
+		{
+			if(videoSize != XMVideoSize_CIF)
+			{
+				PString mpiStr = str(5, 1000);
+				mpi = mpiStr.AsUnsigned();
+				videoSize = XMVideoSize_QCIF;
+				cout << "got QCIF with mpi" << mpi << endl;
+			}
+		}
+		else if(str.Left(6) == "MaxBR=")
+		{
+			PString brStr = str(6, 1000);
+			unsigned bitRate = brStr.AsUnsigned();
+			if(bitRate < maxBitRate)
+			{
+				maxBitRate = bitRate;
+			}
+		}
+	}
+	
+	if(videoSize == XMVideoSize_NoVideo)
+	{
+		videoSize = XMVideoSize_CIF;
+	}
+	
+	if(mpi == 0)
+	{
+		mpi = 1;
+	}
+}
+
+unsigned _XMGetMaxH263BitRate()
+{
+	unsigned maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	if(maxBitRate > XM_MAX_H263_BITRATE)
+	{
+		maxBitRate = XM_MAX_H263_BITRATE;
+	}
+	
+	return maxBitRate;
+}
+
+PString _XMGetFMTP_H263(unsigned maxBitRate,
+						XMVideoSize videoSize,
+						unsigned mpi)
+{
+	if(maxBitRate == UINT_MAX)
+	{
+		maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	}
+	if(maxBitRate > XM_MAX_H263_BITRATE)
+	{
+		maxBitRate = XM_MAX_H263_BITRATE;
+	}
+	
+	if(videoSize == XMVideoSize_NoVideo)
+	{
+		return psprintf("CIF=%d QCIF=%d SQCIF=%d MaxBR=%d", mpi, mpi, mpi, maxBitRate);
+	}
+	else if(videoSize == XMVideoSize_CIF)
+	{
+		return psprintf("CIF=%d MaxBR=%d", mpi, maxBitRate);
+	}
+	else if(videoSize == XMVideoSize_QCIF)
+	{
+		return psprintf("QCIF=%d MaxBR=%d", mpi, maxBitRate);
+	}
+	else
+	{
+		return psprintf("SQCIF=%d MaxBR=%d", mpi, maxBitRate);
+	}
+}
+
+void _XMParseFMTP_H263(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi)
+{
+	maxBitRate = _XMGetMaxH263BitRate();
+	videoSize = XMVideoSize_NoVideo;
+	mpi = 1;
+	
+	const PStringArray tokens = fmtp.Tokenise(" ;");
+	
+	unsigned i;
+	unsigned count = tokens.GetSize();
+	
+	for(i = 0; i < count; i++)
+	{
+		const PString & str = tokens[i];
+		
+		if(str.Left(4) == "CIF=")
+		{
+			PString mpiStr = str(4, 1000);
+			mpi = mpiStr.AsUnsigned();
+			videoSize = XMVideoSize_CIF;
+		}
+		else if(str.Left(5) == "QCIF=")
+		{
+			if(videoSize != XMVideoSize_CIF)
+			{
+				PString mpiStr = str(5, 1000);
+				mpi = mpiStr.AsUnsigned();
+				videoSize = XMVideoSize_QCIF;
+			}
+		}
+		else if(str.Left(6) == "SQCIF=")
+		{
+			if(videoSize != XMVideoSize_CIF &&
+			   videoSize != XMVideoSize_QCIF)
+			{
+				PString mpiStr = str(6, 1000);
+				mpi = mpiStr.AsUnsigned();
+				videoSize = XMVideoSize_SQCIF;
+			}
+		}
+		else if(str.Left(6) == "MaxBR=")
+		{
+			PString brStr = str(6, 1000);
+			unsigned bitRate = brStr.AsUnsigned();
+			if(bitRate < maxBitRate)
+			{
+				maxBitRate = bitRate;
+			}
+		}
+	}
+	
+	if(videoSize == XMVideoSize_NoVideo)
+	{
+		videoSize = XMVideoSize_CIF;
+	}
+	
+	if(mpi == 0)
+	{
+		mpi = 1;
+	}
+}
+
+unsigned _XMGetMaxH264BitRate()
+{
+	unsigned maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	if(maxBitRate > XM_MAX_H264_BITRATE)
+	{
+		maxBitRate = XM_MAX_H264_BITRATE;
+	}
+	
+	return maxBitRate;
+}
+
+PString _XMGetFMTP_H264(unsigned maxBitRate,
+						XMVideoSize videoSize,
+						unsigned mpi)
+{
+	return "";
+}
+
+void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi)
+{
 }

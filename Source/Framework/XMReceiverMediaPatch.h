@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.h,v 1.6 2006/02/20 17:27:48 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.h,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,7 @@ public:
 									BOOL fromSink);
 	
 	static void SetIsRFC2429(BOOL flag);
+	static BOOL IsRFC2429(RTP_DataFrame::PayloadTypes payloadType, const BYTE *data, unsigned dataLength);
 	
 private:
 		

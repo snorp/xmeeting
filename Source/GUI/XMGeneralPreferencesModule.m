@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.6 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,15 @@
 
 NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferencesModule";
 
+@interface XMGeneralPreferencesModule (PrivateMethods)
+
+-(void)_chooseDebugFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+
+@end
+
 @implementation XMGeneralPreferencesModule
+
+#pragma mark Init & Deallocation Methods
 
 - (id)init
 {
@@ -33,6 +41,9 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 
 	[super dealloc];
 }
+
+#pragma mark -
+#pragma mark XMPreferencesModule methods
 
 - (unsigned)position
 {
@@ -77,6 +88,32 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	
 	int state = ([prefManager defaultAutomaticallyAcceptIncomingCalls] == YES) ? NSOnState : NSOffState;
 	[automaticallyAcceptIncomingCallsSwitch setState:state];
+	
+	state = ([XMPreferencesManager enablePTrace] == YES) ? NSOnState : NSOffState;
+	[generateDebugLogSwitch setState:state];
+	
+	NSString *debugLogFilePath = [XMPreferencesManager pTraceFilePath];
+	if(debugLogFilePath == nil)
+	{
+		debugLogFilePath = @"";
+	}
+	[debugLogFilePathField setStringValue:debugLogFilePath];
+	
+	state = ([prefManager automaticallyEnterFullScreen] == YES) ? NSOnState : NSOffState;
+	[automaticallyEnterFullScreenSwitch setState:state];
+	
+	state = ([prefManager showSelfViewMirrored] == YES) ? NSOnState : NSOffState;
+	[showSelfViewMirroredSwitch setState:state];
+	
+	state = ([prefManager automaticallyHideInCallControls] == YES) ? NSOnState : NSOffState;
+	[automaticallyHideInCallControlsSwitch setState:state];
+	
+	XMInCallControlHideAndShowEffect effect = [prefManager inCallControlHideAndShowEffect];
+	[inCallControlsHideAndShowEffectPopUp selectItemAtIndex:(unsigned)effect];
+	
+	// validating the user interface
+	[self toggleGenerateDebugLogFile:self];
+	[self toggleAutomaticallyHideInCallControls:self];
 }
 
 - (void)savePreferences
@@ -87,8 +124,27 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	
 	BOOL flag = ([automaticallyAcceptIncomingCallsSwitch state] == NSOnState) ? YES : NO;
 	[prefManager setDefaultAutomaticallyAcceptIncomingCalls:flag];
+	
+	flag = ([generateDebugLogSwitch state] == NSOnState) ? YES : NO;
+	[XMPreferencesManager setEnablePTrace:flag];
+	
+	NSString *path = [debugLogFilePathField stringValue];
+	[XMPreferencesManager setPTraceFilePath:path];
+	
+	flag = ([automaticallyEnterFullScreenSwitch state] == NSOnState) ? YES : NO;
+	[prefManager setAutomaticallyEnterFullScreen:flag];
+	
+	flag = ([showSelfViewMirroredSwitch state] == NSOnState) ? YES : NO;
+	[prefManager setShowSelfViewMirrored:flag];
+	
+	flag = ([automaticallyHideInCallControlsSwitch state] == NSOnState) ? YES : NO;
+	[prefManager setAutomaticallyHideInCallControls:flag];
+	
+	XMInCallControlHideAndShowEffect effect = (XMInCallControlHideAndShowEffect)[inCallControlsHideAndShowEffectPopUp indexOfSelectedItem];
+	[prefManager setInCallControlHideAndShowEffect:effect];
 }
 
+#pragma mark -
 #pragma mark Action & Delegate Methods
 
 - (IBAction)defaultAction:(id)sender
@@ -96,9 +152,61 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	[prefWindowController notePreferencesDidChange];
 }
 
+- (IBAction)toggleGenerateDebugLogFile:(id)sender
+{
+	int state = [generateDebugLogSwitch state];
+	BOOL enableButton = (state == NSOnState) ? YES : NO;
+	
+	[chooseDebugLogFilePathButton setEnabled:enableButton];
+	
+	[self defaultAction:self];
+}
+
+- (IBAction)chooseDebugFilePath:(id)sender
+{
+	NSSavePanel *savePanel = [NSSavePanel savePanel];
+	NSString *path = [debugLogFilePathField stringValue];
+	
+	NSString *directory = nil;
+	NSString *file = nil;
+	
+	[savePanel setPrompt:@"Choose"];
+	
+	if(![path isEqualToString:@""])
+	{
+		directory = [path stringByDeletingLastPathComponent];
+		file = [path lastPathComponent];
+	}
+	
+	[savePanel beginSheetForDirectory:directory file:file modalForWindow:[contentView window] modalDelegate:self
+					   didEndSelector:@selector(_chooseDebugFilePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
+}
+
+- (IBAction)toggleAutomaticallyHideInCallControls:(id)sender
+{
+	int state = [automaticallyHideInCallControlsSwitch state];
+	BOOL enablePopUp = (state == NSOnState) ? YES : NO;
+	
+	[inCallControlsHideAndShowEffectPopUp setEnabled:enablePopUp];
+	
+	[self defaultAction:self];
+}
+
 - (void)controlTextDidChange:(NSNotification *)notif
 {
 	[self defaultAction:self];
+}
+
+#pragma mark -
+#pragma mark Private Methods
+
+-(void)_chooseDebugFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	if(returnCode == NSOKButton)
+	{
+		[debugLogFilePathField setStringValue:[sheet filename]];
+		[self defaultAction:self];
+	}
 }
 
 @end

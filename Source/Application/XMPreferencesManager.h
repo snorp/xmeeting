@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.11 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.12 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,10 +21,23 @@ extern NSString *XMKey_PreferencesManagerH323Accounts;
 extern NSString *XMKey_PreferencesManagerSIPAccounts;
 extern NSString *XMKey_PreferencesManagerLocations;
 extern NSString *XMKey_PreferencesManagerActiveLocation;
-extern NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCall;
 extern NSString *XMKey_PreferencesManagerUserName;
+extern NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCall;
+extern NSString *XMKey_PreferencesManagerEnablePTrace;
+extern NSString *XMKey_PreferencesManagerPTraceFilePath;
+extern NSString *XMKey_PreferencesManagerAutomaticallyEnterFullScreen;
+extern NSString *XMKey_PreferencesManagerShowSelfViewMirrored;
+extern NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls;
+extern NSString *XMKey_PreferencesManagerInCallControlHideAndShowEffect;
 extern NSString *XMKey_PreferencesManagerDisabledVideoModules;
 extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
+
+typedef enum XMInCallControlHideAndShowEffect
+{
+	XMInCallControlHideAndShowEffect_NoEffect = 0,
+	XMInCallControlHideAndShowEffect_Fade,
+	XMInCallControlHideAndShowEffect_Roll
+} XMInCallControlHideAndShowEffect;
 
 /**
  * XMPreferencesManager deals with the various task concerning
@@ -63,6 +76,15 @@ extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
  * Returns whether there exists a preferences file or not
  **/
 + (BOOL)doesHavePreferences;
+
+/**
+ * Manages debug information
+ **/
++ (BOOL)enablePTrace;
++ (void)setEnablePTrace:(BOOL)flag;
+
++ (NSString *)pTraceFilePath;
++ (void)setPTraceFilePath:(NSString *)path;
 
 /**
  * Instructs XMPreferencesManager to synchronize the UserDefaults
@@ -210,6 +232,21 @@ extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
 
 - (BOOL)defaultAutomaticallyAcceptIncomingCalls;
 - (void)setDefaultAutomaticallyAcceptIncomingCalls:(BOOL)flag;
+
+/**
+ * GUI settings
+ **/
+- (BOOL)automaticallyEnterFullScreen;
+- (void)setAutomaticallyEnterFullScreen:(BOOL)flag;
+
+- (BOOL)showSelfViewMirrored;
+- (void)setShowSelfViewMirrored:(BOOL)flag;
+
+- (BOOL)automaticallyHideInCallControls;
+- (void)setAutomaticallyHideInCallControls:(BOOL)flag;
+
+- (XMInCallControlHideAndShowEffect)inCallControlHideAndShowEffect;
+- (void)setInCallControlHideAndShowEffect:(XMInCallControlHideAndShowEffect)effect;
 
 /**
  * Returns the password found for the service and account specified

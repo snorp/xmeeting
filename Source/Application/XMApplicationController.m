@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.28 2006/03/25 10:41:55 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.29 2006/04/06 23:15:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -90,7 +90,13 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notif
 {
 	// Initialize the framework
-	XMInitFramework();
+	BOOL enablePTrace = [XMPreferencesManager enablePTrace];
+	NSString *pTracePath = nil;
+	if(enablePTrace == YES)
+	{
+		pTracePath = [XMPreferencesManager pTraceFilePath];
+	}
+	XMInitFramework(pTracePath);
 	
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -265,7 +271,16 @@
 
 - (void)_didEstablishCall:(NSNotification *)notif
 {
-	[[XMMainWindowController sharedInstance] showModule:inCallModule fullScreen:NO];
+	BOOL enterFullScreen = NO;
+	
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	if([[preferencesManager activeLocation] enableVideo] == YES &&
+	   [preferencesManager automaticallyEnterFullScreen] == YES)
+	{
+		enterFullScreen = YES;
+	}
+
+	[[XMMainWindowController sharedInstance] showModule:inCallModule fullScreen:enterFullScreen];
 }
 
 - (void)_didClearCall:(NSNotification *)notif

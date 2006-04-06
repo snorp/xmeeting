@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.13 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.14 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,6 +54,7 @@ BOOL XMTransmitterMediaPatch::IsTerminated() const
 
 void XMTransmitterMediaPatch::Resume()
 {
+	cout << "TRANSMITTER RESUME" << endl;
 	if(PIsDescendant(&source, XMMediaStream))
 	{
 		// If Resume has already been called, don't start the process again
@@ -76,11 +77,14 @@ void XMTransmitterMediaPatch::Resume()
 			unsigned maxBitrate = _XMGetVideoBandwidthLimit();
 			
 			OpalMediaFormat mediaFormat = sinks[0].stream->GetMediaFormat();
+			payloadType = mediaFormat.GetPayloadType();
 			
 			unsigned frameTime = mediaFormat.GetFrameTime();
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
 			unsigned bitrate = mediaFormat.GetBandwidth()*100;
 			unsigned flags = 0;
+			
+			cout << "BITRATE: " << bitrate << endl;
 						
 			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
@@ -99,6 +103,7 @@ void XMTransmitterMediaPatch::Resume()
 				else
 				{
 					cout << "Sending RFC2429" << endl;
+					payloadType = RTP_DataFrame::DynamicBase;
 				}
 			}
 			else if(codecIdentifier == XMCodecIdentifier_H264)
@@ -200,7 +205,10 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 		videoTransmitterPatch->dataFrame = frame;
 		frame->SetPayloadSize(0);
 		
-		XMCodecIdentifier theCodec = videoTransmitterPatch->codecIdentifier;
+		cout << "SETTING PAYLOAD TYPE FOR SENDING: " << videoTransmitterPatch->payloadType << endl;
+		frame->SetPayloadType(videoTransmitterPatch->payloadType);
+		
+		/*XMCodecIdentifier theCodec = videoTransmitterPatch->codecIdentifier;
 		
 		if(theCodec == XMCodecIdentifier_H261)
 		{
@@ -215,7 +223,7 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 		else if(theCodec == XMCodecIdentifier_H264)
 		{
 			frame->SetPayloadType(RTP_DataFrame::DynamicBase);
-		}
+		}*/
 	}
 	
 	frame->SetTimestamp(timeStamp);

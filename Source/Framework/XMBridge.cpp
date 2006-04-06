@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.20 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.21 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,11 +31,11 @@ static XMH323EndPoint *h323EndPoint = NULL;
 // reference to the SIP Endpoint
 static XMSIPEndPoint *sipEndPoint = NULL;
 
-void _XMInitSubsystem()
+void _XMInitSubsystem(const char *pTracePath)
 {
 	if(theManager == NULL)
 	{
-		XMOpalManager::InitOpal();
+		XMOpalManager::InitOpal(pTracePath);
 		
 		theManager = new XMOpalManager;
 		theManager->Initialise();
@@ -216,9 +216,10 @@ void _XMPrepareRegistrarSetup()
 
 void _XMUseRegistrar(const char *host,
 					 const char *username,
+					 const char *authorizationUsername,
 					 const char *password)
 {
-	sipEndPoint->UseRegistrar(host, username, password);
+	sipEndPoint->UseRegistrar(host, username, authorizationUsername, password);
 }
 
 void _XMFinishRegistrarSetup()

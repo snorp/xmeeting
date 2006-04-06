@@ -35,6 +35,7 @@
                 locationModule = XMLocationPreferencesModule; 
                 sipAccountNameField = NSTextField; 
                 sipAccountsTableView = NSTableView; 
+                sipAuthorizationUsernameField = NSTextField; 
                 sipPasswordField = NSTextField; 
                 sipRegistrarHostField = NSTextField; 
                 sipUsernameField = NSTextField; 
@@ -42,12 +43,24 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {defaultAction = id; }; 
+            ACTIONS = {
+                chooseDebugFilePath = id; 
+                defaultAction = id; 
+                toggleAutomaticallyHideInCallControls = id; 
+                toggleGenerateDebugLogFile = id; 
+            }; 
             CLASS = XMGeneralPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 automaticallyAcceptIncomingCallsSwitch = NSButton; 
+                automaticallyEnterFullScreenSwitch = NSButton; 
+                automaticallyHideInCallControlsSwitch = NSButton; 
+                chooseDebugLogFilePathButton = NSButton; 
                 contentView = NSView; 
+                debugLogFilePathField = NSTextField; 
+                generateDebugLogSwitch = NSButton; 
+                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
+                showSelfViewMirroredSwitch = NSButton; 
                 userNameField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 
@@ -111,6 +124,7 @@
                 newLocationNameField = NSTextField; 
                 newLocationOKButton = NSButton; 
                 newLocationSheet = NSPanel; 
+                registrarAuthorizationUsernameField = NSTextField; 
                 registrarHostField = NSTextField; 
                 registrarUsernameField = NSTextField; 
                 sectionsTab = NSTabView; 

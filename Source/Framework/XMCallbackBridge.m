@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.16 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.17 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -189,25 +189,31 @@ void _XMHandleGatekeeperUnregistration()
 
 #pragma mark SIP specific Callbacks
 
-void _XMHandleSIPRegistration(const char *registrar)
+void _XMHandleSIPRegistration(const char *theHost, const char *theUsername)
 {
-	NSString *name = [[NSString alloc] initWithCString:registrar encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistration:name];
-	[name release];
+	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
+	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationForHost:host username:username];
+	[host release];
+	[username release];
 }
 
-void _XMHandleSIPUnregistration(const char *registrar)
+void _XMHandleSIPUnregistration(const char *theHost, const char *theUsername)
 {
-	NSString *name = [[NSString alloc] initWithCString:registrar encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPUnregistration:name];
-	[name release];
+	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
+	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPUnregistrationForHost:host username:username];
+	[host release];
+	[username release];
 }
 
-void _XMHandleSIPRegistrationFailure(const char *registrar, XMSIPStatusCode failReason)
+void _XMHandleSIPRegistrationFailure(const char *theHost, const char *theUsername, XMSIPStatusCode failReason)
 {
-	NSString *name = [[NSString alloc] initWithCString:registrar encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:name failReason:failReason];
-	[name release];
+	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
+	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailureForHost:host username:username failReason:failReason];
+	[host release];
+	[username release];
 }
 
 void _XMHandleRegistrarSetupCompleted()

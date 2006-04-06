@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.15 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,9 +15,13 @@
 #include <ptclib/url.h>
 #include <ptclib/pils.h>
 
+#include <h224/q922.h>
+
 #include "XMCallbackBridge.h"
 #include "XMOpalManager.h"
 #include "XMH323Connection.h"
+
+#include <opal/transcoders.h>
 
 #pragma mark Init & Deallocation
 
@@ -29,6 +33,8 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	connectionToken = "";
 	
 	SetInitialBandwidth(UINT_MAX);
+	
+	SetH224Enabled(TRUE);
 }
 
 XMH323EndPoint::~XMH323EndPoint()

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.15 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,6 +27,7 @@
 	NSTimer *frameGrabTimer;
 	
 	BOOL isGrabbing;
+	unsigned previewFrameGrabRate;
 	unsigned frameGrabRate;
 	
 	BOOL isTransmitting;

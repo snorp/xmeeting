@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.h,v 1.7 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.h,v 1.8 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,6 +58,7 @@ private:
 	BOOL doesRunOwnThread;
 	BOOL isTerminated;
 	RTP_DataFrame *dataFrame;
+	RTP_DataFrame::PayloadTypes payloadType;
 	XMCodecIdentifier codecIdentifier;
 };
 

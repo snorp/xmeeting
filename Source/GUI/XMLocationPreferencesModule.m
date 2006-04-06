@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.17 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.18 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -349,8 +349,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	unsigned index = [h323AccountsPopUp indexOfSelectedItem];
 	
-	NSLog(@"index: %d", index);
-	
 	if(index == 0)
 	{
 		[gatekeeperHostField setStringValue:@""];
@@ -385,6 +383,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	{
 		[registrarHostField setStringValue:@""];
 		[registrarUsernameField setStringValue:@""];
+		[registrarAuthorizationUsernameField setStringValue:@""];
 	}
 	else
 	{
@@ -392,8 +391,24 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		
 		XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:index];
 		
-		[registrarHostField setStringValue:[sipAccount registrar]];
-		[registrarUsernameField setStringValue:[sipAccount username]];
+		NSString *host = [sipAccount registrar];
+		if(host == nil)
+		{
+			host = @"";
+		}
+		NSString *username = [sipAccount username];
+		if(username == nil)
+		{
+			username = @"";
+		}
+		NSString *authorizationUsername = [sipAccount authorizationUsername];
+		if(authorizationUsername == nil)
+		{
+			authorizationUsername = @"";
+		}
+		[registrarHostField setStringValue:host];
+		[registrarUsernameField setStringValue:username];
+		[registrarAuthorizationUsernameField setStringValue:authorizationUsername];
 	}
 	
 	[self defaultAction:self];
@@ -469,7 +484,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (void)noteAccountsDidChange
 {
-	NSLog(@"NOTE ACCOUNTS DID CHANGE");
 	unsigned h323AccountToSelect = 0;
 	unsigned h323AccountTag = 0;
 	unsigned sipAccountToSelect = 0;

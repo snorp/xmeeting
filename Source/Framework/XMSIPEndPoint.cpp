@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.4 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.5 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,8 @@
 
 #include "XMCallbackBridge.h"
 #include "XMOpalManager.h"
+#include "XMSIPConnection.h"
+#include "XMMediaFormats.h"
 
 #define XM_SIP_REGISTRAR_STATUS_TO_REGISTER 0
 #define XM_SIP_REGISTRAR_STATUS_REGISTERED 1
@@ -25,6 +27,8 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	connectionToken = "";
 	
 	SetInitialBandwidth(UINT_MAX);
+	
+	SetUserAgent("XMeeting/0.2");
 }
 
 XMSIPEndPoint::~XMSIPEndPoint()
@@ -67,6 +71,8 @@ void XMSIPEndPoint::PrepareRegistrarSetup()
 {
 	PWaitAndSignal m(registrarListMutex);
 	
+	//SetProxy("sip.ethz.ch", "hannesf", "quartz83");
+	
 	unsigned i;
 	unsigned count = activeRegistrars.GetSize();
 	
@@ -89,6 +95,7 @@ void XMSIPEndPoint::PrepareRegistrarSetup()
 
 void XMSIPEndPoint::UseRegistrar(const PString & host,
 								 const PString & username,
+								 const PString & authorizationUsername,
 								 const PString & password)
 {
 	PWaitAndSignal m(registrarListMutex);
@@ -124,7 +131,7 @@ void XMSIPEndPoint::UseRegistrar(const PString & host,
 		}
 	}
 	
-	XMSIPRegistrarRecord *record = new XMSIPRegistrarRecord(host, username, password);
+	XMSIPRegistrarRecord *record = new XMSIPRegistrarRecord(host, username, authorizationUsername, password);
 	record->SetStatus(XM_SIP_REGISTRAR_STATUS_TO_REGISTER);
 	activeRegistrars.Append(record);
 }
@@ -144,7 +151,7 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		{
 			Unregister(record.GetHost(), record.GetUsername());
 			
-			_XMHandleSIPUnregistration(record.GetHost());
+			_XMHandleSIPUnregistration(record.GetHost(), record.GetUsername());
 			
 			activeRegistrars.RemoveAt(i-1);
 		}
@@ -154,12 +161,13 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
-			BOOL result = Register(record.GetHost(), record.GetUsername(), record.GetUsername(), record.GetPassword());
+			cout << "trying: " << record.GetHost() << " \"" << record.GetUsername() << "\" \"" << record.GetAuthorizationUsername() << "\" \"" << record.GetPassword() << "\"" << endl;
+			BOOL result = Register(record.GetHost(), record.GetUsername(), record.GetAuthorizationUsername(), record.GetPassword());
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
 			{
 				record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
 				
-				_XMHandleSIPRegistrationFailure(record.GetHost(), XMSIPStatusCode_UnknownFailure);
+				_XMHandleSIPRegistrationFailure(record.GetHost(), record.GetUsername(), XMSIPStatusCode_UnknownFailure);
 			}
 		}
 	}
@@ -243,6 +251,7 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 										 SIP_PDU::StatusCodes reason,
 										 BOOL wasRegistering)
 {
+	cout << "ON REGISTRATION FAILED: " << host << " " << username << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)
@@ -268,7 +277,7 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 			}
 			record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
 			
-			_XMHandleSIPRegistrationFailure(host, (XMSIPStatusCode)reason);
+			_XMHandleSIPRegistrationFailure(record.GetHost(), record.GetUsername(), (XMSIPStatusCode)reason);
 		}
 		
 		unsigned status = record.GetStatus();
@@ -314,7 +323,7 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 			
 			if(status == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 			{
-				_XMHandleSIPRegistration(record.GetHost());
+				_XMHandleSIPRegistration(record.GetHost(), record.GetUsername());
 			}
 			
 			record.SetStatus(XM_SIP_REGISTRAR_STATUS_REGISTERED);
@@ -370,15 +379,27 @@ void XMSIPEndPoint::OnReleased(OpalConnection & connection)
 	SIPEndPoint::OnReleased(connection);
 }
 
+SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
+												const PString & token,
+												void * userData,
+												const SIPURL & destination,
+												OpalTransport * transport,
+												SIP_PDU * invite)
+{
+	return new XMSIPConnection(call, *this, token, destination, transport);
+}
+
 #pragma mark -
 #pragma mark XMSIPRegistrarRecord methods
 
 XMSIPRegistrarRecord::XMSIPRegistrarRecord(const PString & theHost,
 										   const PString & theUsername,
+										   const PString & theAuthorizationUsername,
 										   const PString & thePassword)
 {
 	host = theHost;
 	username = theUsername;
+	authorizationUsername = theAuthorizationUsername;
 	password = thePassword;
 }
 
@@ -394,6 +415,11 @@ const PString & XMSIPRegistrarRecord::GetHost() const
 const PString & XMSIPRegistrarRecord::GetUsername() const
 {
 	return username;
+}
+
+const PString & XMSIPRegistrarRecord::GetAuthorizationUsername() const
+{
+	return authorizationUsername;
 }
 
 const PString & XMSIPRegistrarRecord::GetPassword() const

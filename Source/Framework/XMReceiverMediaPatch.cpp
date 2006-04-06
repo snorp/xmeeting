@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.15 2006/02/26 14:49:56 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -120,7 +120,7 @@ void XMReceiverMediaPatch::Main()
 				}
 				else
 				{
-					if(isRFC2429 == TRUE)
+					if(IsRFC2429(payloadType, packets[0]->GetPayloadPtr(), packets[0]->GetPayloadSize()) == TRUE)
 					{
 						cout << "Receiving RFC2429" << endl;
 						packetReassembler = new XMH263PlusRTPPacketReassembler();
@@ -388,6 +388,39 @@ void XMReceiverMediaPatch::Main()
 void XMReceiverMediaPatch::SetIsRFC2429(BOOL flag)
 {
 	isRFC2429 = flag;
+}
+
+BOOL XMReceiverMediaPatch::IsRFC2429(RTP_DataFrame::PayloadTypes payloadType, const BYTE *data, unsigned dataLength)
+{
+	if(isRFC2429)
+	{
+		return TRUE;
+	}
+	else
+	{
+		if(payloadType == RTP_DataFrame::H263)
+		{
+			return FALSE;
+		}
+		
+		BYTE firstByte = data[0];
+		
+		if(firstByte & 0xc0 == 0 && dataLength > 6)
+		{
+			// first two bits are zero.
+			// If it is RFC2190, bytes 5 and 6 must be zero
+			if(data[4] == 0 && data[5] == 0)
+			{
+				return FALSE;
+			}
+			else
+			{
+				return TRUE;
+			}
+		}
+	}
+	
+	return TRUE;
 }
 
 void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,

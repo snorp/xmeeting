@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.20 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.21 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,7 +42,7 @@
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
 	// SIP variables
-	NSMutableArray *registrarNames;
+	NSMutableArray *registrarHosts;
 	NSMutableArray *sipRegistrationFailReasons;
 	
 	// InCall variables
@@ -207,13 +207,13 @@
 /**
  * Returns the name of the registrar at index.
  **/
-- (NSString *)registrarNameAtIndex:(unsigned)index;
+- (NSString *)registrarHostAtIndex:(unsigned)index;
 
 /**
  * Returns the complete array of registrars the client is currently
  * registered at.
  **/
-- (NSArray *)registrarNames;
+- (NSArray *)registrarHosts;
 
 /**
  * Returns the number of registration fail reason records the manager

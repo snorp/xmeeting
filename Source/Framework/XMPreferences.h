@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.11 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.12 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "XMTypes.h"
 
-@class XMPreferencesCodecListRecord;
+@class XMPreferencesCodecListRecord, XMPreferencesRegistrarRecord;
 
 /**
  * This class encapsulates all setting options which affect
@@ -62,11 +62,14 @@
 	NSString	*gatekeeperAddress;			// A string with the address of the gatekeeper to use (domain or ip)
 	NSString	*gatekeeperUsername;		// A string containing the username for gatekeeper registration
 	NSString	*gatekeeperPhoneNumber;		// A string containing the E164 number for gatekeeper registration
+	NSString	*gatekeeperPassword;		// A string containing the password for the gatekeeper registration
 	
 	/* SIP-specific settings */
 	BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
-	NSArray		*registrarHosts;			// An array containing host address strings
-	NSArray		*registrarUsernames;		// An array containing username strings
+	NSArray		*registrarRecords;			// An array containing XMPreferencesRegistrarRecord instances
+	NSString	*sipProxyHost;				// A string containing the host address of the SIP proxy to use
+	NSString	*sipProxyUsername;			// A string containing the username for the SIP proxy to use
+	NSString	*sipProxyPassword;			// A string containing the password for the SIP proxy to use
 }
 
 #pragma mark Init & Representation Methods
@@ -189,22 +192,13 @@
 - (NSString *)gatekeeperPhoneNumber;
 - (void)setGatekeeperPhoneNumber:(NSString *)phoneNumber;
 
+- (NSString *)gatekeeperPassword;
+- (void)setGatekeeperPassword:(NSString *)password;
+
 /**
  * Convenience method to determine whether a gatekeeper is used or not
  **/
 - (BOOL)usesGatekeeper;
-
-/**
- * Returns the gatekeeper password associated with this preferences 
- * instance. The default implementation returns nil.
- * It is up the application design to provide storage for the
- * password data.
- * This method should return nil if no password is set.
- * The storage must be consistend when a copy is made. It is not required
- * and not recommended either that the password will be stored through
- * a dictionary representation or encoding into an NSData object.
- **/
-- (NSString *)gatekeeperPassword;
 
 #pragma mark SIP-specific Methods
 
@@ -220,11 +214,8 @@
  * The arrays set by -setRegistrarHosts, -setRegistrarUsername and returned by -registrarPasswords
  * must have the same number of elements. Only complete host/username pairs will be registered.
  **/
-- (NSArray *)registrarHosts;
-- (void)setRegistrarHosts:(NSArray *)hosts;
-
-- (NSArray *)registrarUsernames;
-- (void)setRegistrarUsernames:(NSArray *)usernames;
+- (NSArray *)registrarRecords;
+- (void)setRegistrarRecords:(NSArray *)records;
 
 /**
  * Convenience method to determine whether registrars are used or not
@@ -232,15 +223,22 @@
 - (BOOL)usesRegistrars;
 
 /**
- * Returns the registrar passwords associated with this preferences instance.
- * The array returned must have the same number of elements as the arrays returned by
- * -registrarHosts and -registrarUsernames
- * The default implementation simply returns an array with the same size as the -registrarHosts array,
- * filled with NSNull instances. It is up to the application design to provide storage for the password data.
- * This storage must be consistent when -copy is called. It is not required, and not recommended either,
- * to store the password data inside a dictionary or encode it into an NSData instance.
+ * SIP proxy settings
  **/
-- (NSArray *)registrarPasswords;
+- (NSString *)sipProxyHost;
+- (void)setSIPProxyHost:(NSString *)address;
+
+- (NSString *)sipProxyUsername;
+- (void)setSIPProxyUsername:(NSString *)username;
+
+/**
+ * Returns the password to use for the SIP proxy.
+ * The default implementation returns nil and does not provide
+ * storage for passwords. It is up to the application design to provide
+ * storage for this password data
+ **/
+- (NSString *)sipProxyPassword;
+- (void)setSIPProxyPassword:(NSString *)password;
 
 @end
 

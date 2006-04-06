@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.17 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.18 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -123,13 +123,21 @@ NSString *XMKey_PreferencesEnableFastStart = @"XMeeting_EnableFastStart";
 NSString *XMKey_PreferencesGatekeeperAddress = @"XMeeting_GatekeeperAddress";
 NSString *XMKey_PreferencesGatekeeperUsername = @"XMeeting_GatekeeperUsername";
 NSString *XMKey_PreferencesGatekeeperPhoneNumber = @"XMeeting_GatekeeperPhoneNumber";
+NSString *XMKey_PreferencesGatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 NSString *XMKey_PreferencesEnableSIP = @"XMeeting_EnableSIP";
-NSString *XMKey_PreferencesRegistrarHosts = @"XMeeting_RegistrarHosts";
-NSString *XMKey_PreferencesRegistrarUsernames = @"XMeeting_RegistrarUsernames";
+NSString *XMKey_PreferencesRegistrarRecords = @"XMeeting_RegistrarRecords";
+NSString *XMKey_PreferencesSIPProxyHost = @"XMeeting_SIPProxyHost";
+NSString *XMKey_PreferencesSIPProxyUsername = @"XMeeting_SIPProxyUsername";
+NSString *XMKey_PreferencesSIPProxyPassword = @"XMeeting_SIPProxyPassword";
 
 NSString *XMKey_PreferencesCodecListRecordIdentifier = @"XMeeting_Identifier";
 NSString *XMKey_PreferencesCodecListRecordIsEnabled = @"XMeeting_IsEnabled";
+
+NSString *XMKey_PreferencesRegistrarRecordHost = @"XMeeting_Host";
+NSString *XMKey_PreferencesRegistrarRecordUsername = @"XMeeting_Username";
+NSString *XMKey_PreferencesRegistrarRecordAuthorizationUsername = @"XMeeting_AuthorizationUsername";
+NSString *XMKey_PreferencesRegistrarRecordPassword = @"XMeeting_Password";
 
 NSString *XMKey_CodecManagerCodecDescriptionsFilename = @"XMCodecDescriptions";
 NSString *XMKey_CodecManagerCodecDescriptionsFiletype = @"plist";

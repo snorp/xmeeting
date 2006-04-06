@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.9 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.10 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,7 +30,7 @@ XMOpalDispatcher *_XMOpalDispatcherSharedInstance = nil;
 XMMediaTransmitter *_XMMediaTransmitterSharedInstance = nil;
 XMMediaReceiver *_XMMediaReceiverSharedInstance = nil;
 
-void XMInitFramework()
+void XMInitFramework(NSString *pTracePath)
 {
 	if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZED)
 	{
@@ -51,7 +51,7 @@ void XMInitFramework()
 	_XMMediaReceiverSharedInstance = [[XMMediaReceiver alloc] _init];
 	
 	// starting the OpalDispatcher Thread
-	[NSThread detachNewThreadSelector:@selector(_runOpalDispatcherThread) toTarget:_XMOpalDispatcherSharedInstance withObject:nil];
+	[NSThread detachNewThreadSelector:@selector(_runOpalDispatcherThread:) toTarget:_XMOpalDispatcherSharedInstance withObject:pTracePath];
 	
 	// starting the MediaTransmitter Thread
 	[NSThread detachNewThreadSelector:@selector(_runMediaTransmitterThread) toTarget:_XMMediaTransmitterSharedInstance withObject:nil];

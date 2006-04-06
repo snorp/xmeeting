@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.21 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.22 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,7 +22,7 @@ using namespace std;
 
 #pragma mark Init & Deallocation
 
-void XMOpalManager::InitOpal()
+void XMOpalManager::InitOpal(const PString & pTracePath)
 {
 	static XMProcess *theProcess = NULL;
 	
@@ -31,8 +31,10 @@ void XMOpalManager::InitOpal()
 		PProcess::PreInitialise(0, 0, 0);
 		theProcess = new XMProcess;
 		
-		/* temporarily initialise PTracing */
-		PTrace::Initialise(5, "/tmp/XMeeting.log", PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
+		if(pTracePath != NULL)
+		{
+			PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
+		}
 	}
 }
 

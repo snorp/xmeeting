@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.6 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,9 @@
 
 - (void)dealloc
 {
+	[timer invalidate];
+	[timer release];
+	
 	[controllerView release];
 	
 	[super dealloc];
@@ -142,6 +145,12 @@
 	}
 	else
 	{
+		if(timer != nil)
+		{
+			[timer invalidate];
+			[timer release];
+			timer = nil;
+		}
 		[self setAlphaValue:0.0];
 		[parentWindow removeChildWindow:self];
 		[self orderOut:self];
