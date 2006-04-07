@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.17 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.18 2006/04/07 10:15:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1362,6 +1362,16 @@ typedef enum _XMOpalDispatcherMessage
 	{
 		if(_XMEnableSIPListeners(YES) == YES)
 		{
+			NSString *host = [preferences sipProxyHost];
+			NSString *username = [preferences sipProxyUsername];
+			NSString *password = [preferences sipProxyPassword];
+			
+			const char *proxyHost = [host cStringUsingEncoding:NSASCIIStringEncoding];
+			const char *proxyUsername = [username cStringUsingEncoding:NSASCIIStringEncoding];
+			const char *proxyPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
+			
+			_XMSetSIPProxy(proxyHost, proxyUsername, proxyPassword);
+			
 			[self _doRegistrarSetup:preferences verbose:verbose];
 		}
 		else
@@ -1376,6 +1386,8 @@ typedef enum _XMOpalDispatcherMessage
 	}
 	else // SIP disabled
 	{
+		_XMSetSIPProxy(NULL, NULL, NULL);
+		
 		// unregistering from any registrars if needed
 		[sipRegistrationWaitLock lock]; // will be unlocked from within _XMFinishRegistrarSetup()
 		_XMPrepareRegistrarSetup();

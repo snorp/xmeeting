@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.20 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.21 2006/04/07 10:15:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -159,6 +159,10 @@ void _XMCheckGatekeeperRegistration();
 bool _XMEnableSIPListeners(bool enable);
 
 bool _XMIsSIPEnabled();
+
+void _XMSetSIPProxy(const char *host,
+					const char *username,
+					const char *password);
 
 void _XMPrepareRegistrarSetup();
 void _XMUseRegistrar(const char *host,

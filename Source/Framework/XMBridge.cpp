@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.21 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.22 2006/04/07 10:15:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -207,6 +207,14 @@ bool _XMEnableSIPListeners(bool flag)
 bool _XMIsSIPEnabled()
 {
 	return sipEndPoint->IsListening();
+}
+
+void _XMSetSIPProxy(const char *host,
+					const char *username,
+					const char *password)
+{
+	cout << "Setting PRoxy: " << host << " u: " << username << " p: " << password << endl;
+	sipEndPoint->SetProxy(host, username, password);
 }
 
 void _XMPrepareRegistrarSetup()

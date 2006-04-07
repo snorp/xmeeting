@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.18 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.19 2006/04/07 10:15:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -197,6 +197,22 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[locations removeAllObjects];
 	[locations addObjectsFromArray:[preferencesManager locations]];
 	
+	// adjusting SIP proxy passwords if needed
+	unsigned i;
+	unsigned count = [locations count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+		
+		if([location sipProxyMode] == XMSIPProxyMode_CustomProxy)
+		{
+			NSString *password = [[XMPreferencesManager sharedInstance] passwordForServiceName:[location sipProxyHost] 
+																				   accountName:[location sipProxyUsername]];
+			[location setSIPProxyPassword:password];
+		}
+	}
+	
 	// making sure that there is no wrong data saved
 	currentLocation = nil;
 	
@@ -220,6 +236,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (void)savePreferences
 {
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
 	// in case that the locations table view is editing a location's name,
 	// we have to stor that value as well
 	unsigned index = [locationsTableView editedRow];
@@ -233,8 +251,22 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	// first, save the current location
 	[self _saveCurrentLocation];
 	
+	// store any passwords needed
+	unsigned i;
+	unsigned count = [locations count];
+	for(i = 0; i < count; i++)
+	{
+		XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+		
+		if([location sipProxyMode] == XMSIPProxyMode_CustomProxy)
+		{
+			[preferencesManager setPassword:[location sipProxyPassword]
+							 forServiceName:[location sipProxyHost]
+								accountName:[location sipProxyUsername]];
+		}
+	}
+	
 	// pass the changed locations to the preferences manager
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	[preferencesManager setLocations:locations];
 }
 
@@ -379,6 +411,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	unsigned index = [sipAccountsPopUp indexOfSelectedItem];
 	
+	BOOL enableSIPAccountProxy = NO;
+	
 	if(index == 0)
 	{
 		[registrarHostField setStringValue:@""];
@@ -409,7 +443,37 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		[registrarHostField setStringValue:host];
 		[registrarUsernameField setStringValue:username];
 		[registrarAuthorizationUsernameField setStringValue:authorizationUsername];
+		
+		enableSIPAccountProxy = YES;
 	}
+	
+	NSCell *cell = (NSCell *)[sipProxyModeMatrix cellWithTag:XMSIPProxyMode_UseSIPAccount];
+	if(enableSIPAccountProxy == YES)
+	{
+		[cell setEnabled:YES];
+	}
+	else
+	{
+		[cell setEnabled:NO];
+		[sipProxyModeMatrix selectCellWithTag:XMSIPProxyMode_NoProxy];
+	}
+	[self sipProxyModeSelected:self];
+}
+
+- (IBAction)sipProxyModeSelected:(id)sender
+{
+	XMSIPProxyMode proxyMode = (XMSIPProxyMode)[[sipProxyModeMatrix selectedCell] tag];
+	
+	BOOL enableTextFields = NO;
+	
+	if(proxyMode == XMSIPProxyMode_CustomProxy)
+	{
+		enableTextFields = YES;
+	}
+	
+	[sipProxyHostField setEnabled:enableTextFields];
+	[sipProxyUsernameField setEnabled:enableTextFields];
+	[sipProxyPasswordField setEnabled:enableTextFields];
 	
 	[self defaultAction:self];
 }
@@ -669,7 +733,45 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	if(result == NO)
 	{
 		[sipAccountsPopUp selectItemAtIndex:0];
+		sipAccountTag = 0;
 	}
+	
+	XMSIPProxyMode sipProxyMode = [currentLocation sipProxyMode];
+	if(sipProxyMode == XMSIPProxyMode_UseSIPAccount && sipAccountTag == 0)
+	{
+		sipProxyMode = XMSIPProxyMode_NoProxy;
+	}
+	
+	[sipProxyModeMatrix selectCellWithTag:sipProxyMode];
+	
+	NSString *sipProxyHost = nil;
+	NSString *sipProxyUsername = nil;
+	NSString *sipProxyPassword = nil;
+	
+	if(sipProxyMode == XMSIPProxyMode_CustomProxy)
+	{
+		sipProxyHost = [currentLocation sipProxyHost];
+		sipProxyUsername = [currentLocation sipProxyUsername];
+		sipProxyPassword = [currentLocation sipProxyPassword];
+	}
+	
+	if(sipProxyHost == nil)
+	{
+		sipProxyHost = @"";
+	}
+	if(sipProxyUsername == nil)
+	{
+		sipProxyUsername = @"";
+	}
+	if(sipProxyPassword == nil)
+	{
+		sipProxyPassword = @"";
+	}
+	
+	[sipProxyHostField setStringValue:sipProxyHost];
+	[sipProxyUsernameField setStringValue:sipProxyUsername];
+	[sipProxyPasswordField setStringValue:sipProxyPassword];
+	
 	// causing the account information to be displayed
 	[self sipAccountSelected:self];
 	
@@ -739,6 +841,32 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	unsigned sipAccountTag = [[sipAccountsPopUp selectedItem] tag];
 	[currentLocation setSIPAccountTag:sipAccountTag];
+	
+	XMSIPProxyMode sipProxyMode = (XMSIPProxyMode)[[sipProxyModeMatrix selectedCell] tag];
+	[currentLocation setSIPProxyMode:sipProxyMode];
+	if(sipProxyMode == XMSIPProxyMode_CustomProxy)
+	{
+		NSString *host = [sipProxyHostField stringValue];
+		NSString *username = [sipProxyUsernameField stringValue];
+		NSString *password = [sipProxyPasswordField stringValue];
+		
+		if([host isEqualToString:@""])
+		{
+			host = nil;
+		}
+		if([username isEqualToString:@""])
+		{
+			username = nil;
+		}
+		if([password isEqualToString:@""])
+		{
+			password = nil;
+		}
+		
+		[currentLocation setSIPProxyHost:host];
+		[currentLocation setSIPProxyUsername:username];
+		[currentLocation setSIPProxyPassword:password];
+	}
 	
 	// saving the audio section
 	[currentLocation setAudioBufferSize:[audioBufferSizeSlider intValue]];

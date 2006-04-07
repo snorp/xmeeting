@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.5 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.6 2006/04/07 10:15:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,14 @@
 extern NSString *XMKey_LocationName;
 extern NSString *XMKey_LocationH323AccountID;
 extern NSString *XMKey_LocationSIPAccountID;
+extern NSString *XMKey_LocationSIPProxyMode;
+
+typedef enum XMSIPProxyMode
+{
+	XMSIPProxyMode_NoProxy,
+	XMSIPProxyMode_UseSIPAccount,
+	XMSIPProxyMode_CustomProxy
+} XMSIPProxyMode;
 
 /**
  * Overrides the default XMPreferences instance to provide the following
@@ -31,9 +39,9 @@ extern NSString *XMKey_LocationSIPAccountID;
 	NSString *name;
 	unsigned h323AccountTag;
 	unsigned sipAccountTag;
+	XMSIPProxyMode proxyMode;
 	
-	NSString *gatekeeperPassword;
-	NSArray *registrarPasswords;
+	NSString *temporarySIPProxyPassword;
 	
 }
 
@@ -60,6 +68,9 @@ extern NSString *XMKey_LocationSIPAccountID;
 
 - (unsigned)sipAccountTag;
 - (void)setSIPAccountTag:(unsigned)tag;
+
+- (XMSIPProxyMode)sipProxyMode;
+- (void)setSIPProxyMode:(XMSIPProxyMode)sipProxyMode;
 
 /**
  * Stores the information from the accounts in the data storage

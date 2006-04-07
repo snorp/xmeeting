@@ -80,6 +80,7 @@
                 moveVideoCodec = id; 
                 renameLocation = id; 
                 sipAccountSelected = id; 
+                sipProxyModeSelected = id; 
                 toggleAutoGetExternalAddress = id; 
                 toggleEnableH323 = id; 
                 toggleEnableSIP = id; 
@@ -129,6 +130,10 @@
                 registrarUsernameField = NSTextField; 
                 sectionsTab = NSTabView; 
                 sipAccountsPopUp = NSPopUpButton; 
+                sipProxyHostField = NSTextField; 
+                sipProxyModeMatrix = NSMatrix; 
+                sipProxyPasswordField = NSTextField; 
+                sipProxyUsernameField = NSTextField; 
                 useIPAddressTranslationSwitch = NSButton; 
                 videoCodecPreferenceOrderTableView = NSTableView; 
                 videoFrameRateField = NSTextField; 
