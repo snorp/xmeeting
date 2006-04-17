@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalPatches.cpp,v 1.1 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMOpalPatches.cpp,v 1.2 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,7 +84,7 @@ BOOL H323_H261Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 Opal_H261_YUV420P::Opal_H261_YUV420P()
 : OpalVideoTranscoder(OpalH261_QCIF, OpalYUV420P)
 {
-	cout << "YYY" << endl;
+	//cout << "YYY" << endl;
 }
 
 
@@ -110,7 +110,7 @@ BOOL Opal_H261_YUV420P::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameLi
 Opal_YUV420P_H261::Opal_YUV420P_H261()
 : OpalVideoTranscoder(OpalYUV420P, OpalH261_QCIF)
 {
-	cout << "ZZZ" << endl;
+	//cout << "ZZZ" << endl;
 }
 
 

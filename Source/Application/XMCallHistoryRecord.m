@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.10 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.11 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -172,7 +172,14 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	}
 	else
 	{
-		return [NSImage imageNamed:@"CallHistory"];
+		if([self callProtocol] == XMCallProtocol_H323)
+		{
+			return [NSImage imageNamed:@"CallHistory_H323"];
+		}
+		else
+		{
+			return [NSImage imageNamed:@"CallHistory_SIP"];
+		}
 	}
 }
 

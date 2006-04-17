@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.6 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.7 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -188,12 +188,34 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 
 - (NSArray *)alternativesForAddress:(id<XMCallAddress>)callAddress selectedIndex:(unsigned *)selectedIndex
 {
-	return [NSArray array];
+	XMCallHistoryRecord *record = (XMCallHistoryRecord *)callAddress;
+	
+	if([record callProtocol] == XMCallProtocol_H323)
+	{
+		*selectedIndex = 0;
+	}
+	else
+	{
+		*selectedIndex = 1;
+	}
+	
+	return [NSArray arrayWithObjects:@"H.323", @"SIP", nil];
 }
 
 - (id<XMCallAddress>)alternativeForAddress:(id<XMCallAddress>)callAddress atIndex:(unsigned)index
 {
-	return nil;
+	XMCallHistoryRecord *record = (XMCallHistoryRecord *)callAddress;
+	
+	if(index == 0)
+	{
+		[record setCallProtocol:XMCallProtocol_H323];
+	}
+	else
+	{
+		[record setCallProtocol:XMCallProtocol_SIP];
+	}
+	
+	return record;
 }
 
 - (NSArray *)allAddresses

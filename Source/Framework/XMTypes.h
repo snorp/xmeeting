@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.20 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.21 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -217,6 +217,22 @@ typedef enum XMVideoSize
 	XMVideoSize_320_240,
 	XMVideoSizeCount
 } XMVideoSize;
+
+/**
+ * Defines the various camera events that can be sent
+ **/
+typedef enum XMCameraEvent
+{
+	XMCameraEvent_NoEvent = 0,
+	XMCameraEvent_PanLeft,
+	XMCameraEvent_PanRight,
+	XMCameraEvent_TiltUp,
+	XMCameraEvent_TiltDown,
+	XMCameraEvent_ZoomIn,
+	XMCameraEvent_ZoomOut,
+	XMCameraEvent_FocusIn,
+	XMCameraEvent_FocusOut
+} XMCameraEvent;
 
 /**
  * Defines the various types of URL's that the XMeeting framework understands

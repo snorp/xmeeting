@@ -2,11 +2,32 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {userInputToneButtonPressed = id; }; 
             CLASS = XMDialPadModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }
+            OUTLETS = {
+                button0 = NSButton; 
+                button1 = NSButton; 
+                button10 = NSButton; 
+                button11 = NSButton; 
+                button2 = NSButton; 
+                button3 = NSButton; 
+                button4 = NSButton; 
+                button5 = NSButton; 
+                button6 = NSButton; 
+                button7 = NSButton; 
+                button8 = NSButton; 
+                button9 = NSButton; 
+                contentView = NSView; 
+                downButton = XMInstantActionButton; 
+                leftButton = XMInstantActionButton; 
+                rightButton = XMInstantActionButton; 
+                upButton = XMInstantActionButton; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = XMInstantActionButton; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }

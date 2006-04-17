@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioOnlyOSD.m,v 1.2 2006/03/23 10:04:47 hfriederich Exp $
+ * $Id: XMAudioOnlyOSD.m,v 1.3 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,10 +7,21 @@
  */
 
 #import "XMAudioOnlyOSD.h"
+
+#import "XMApplicationController.h"
 #import "XMOSDVideoView.h"
 
-@implementation XMAudioOnlyOSD
+@interface XMAudioOnlyOSD (PrivateMethods)
 
+- (void)showInspector;
+- (void)showTools;
+- (void)hangup;
+- (void)mute;
+- (void)unmute;
+
+@end
+
+@implementation XMAudioOnlyOSD
 
 - (id)initWithFrame:(NSRect)frameRect videoView:(XMOSDVideoView *)theVideoView andSize:(XMOSDSize)size
 {
@@ -63,5 +74,45 @@
 	
 	[super dealloc];
 }
+
+#pragma mark -
+#pragma mark OSD Action Methods
+
+- (void)showInspector
+{
+	XMApplicationController *applicationController = (XMApplicationController *)[NSApp delegate];
+	[applicationController showInspector:self];
+}
+
+- (void)showTools
+{
+	XMApplicationController *applicationController = (XMApplicationController *)[NSApp delegate];
+	[applicationController showTools:self];
+}
+
+- (void)hangup
+{
+	[[XMCallManager sharedInstance] clearActiveCall];
+}
+
+- (void)mute
+{	
+	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+	
+	//volume = (unsigned)[audioManager inputVolume];
+	
+	/*if([audioManager setInputVolume:0])
+	{
+	}*/
+}
+
+- (void)unmute
+{
+	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+	
+	/*if(![audioManager setInputVolume:volume])
+	{
+	}*/
+}	
 
 @end

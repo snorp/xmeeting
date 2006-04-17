@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.9 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.10 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,12 +23,22 @@ XM_REGISTER_FORMATS();
 XMEndPoint::XMEndPoint(OpalManager & manager)
 : OpalEndPoint(manager, "xm", CanTerminateCall)
 {
+	isIncomingCall = FALSE;
 }
 
 XMEndPoint::~XMEndPoint()
 {
 }
 
+#pragma mark -
+#pragma mark SetupMethods
+
+void XMEndPoint::SetEnableVideo(BOOL flag)
+{
+	enableVideo = flag;
+}
+
+#pragma mark -
 #pragma mark Overriding OpalEndPoint Methods
 
 BOOL XMEndPoint::MakeConnection(OpalCall & call,
@@ -48,6 +58,7 @@ BOOL XMEndPoint::MakeConnection(OpalCall & call,
 		return FALSE;
 	}
 	
+	// only ever one active connection
 	connectionsActive.SetAt(connection->GetToken(), connection);
 	
 	if(call.GetConnection(0) == connection)
@@ -80,6 +91,7 @@ PSafePtr<XMConnection> XMEndPoint::GetXMConnectionWithLock(const PString & token
 
 XMConnection * XMEndPoint::CreateConnection(OpalCall & call, PString & token)
 {
+	//cout << "CreateConnection" << endl;
 	return new XMConnection(call, *this, token);
 }
 
@@ -101,7 +113,8 @@ PSoundChannel * XMEndPoint::CreateSoundChannel(const XMConnection & connection,
 	return NULL;
 }
 
-#pragma mark CallManagement Methods
+#pragma mark -
+#pragma mark Call Management Methods
 
 BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty, PString & token)
 {
@@ -129,13 +142,16 @@ BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty,
 
 void XMEndPoint::OnShowOutgoing(const XMConnection & connection)
 {
+	//cout << "OnShowOutgoing" << endl;
 	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 	
+	//cout << "ALERTING2" << endl;
 	_XMHandleCallIsAlerting(callID);
 }
 
 void XMEndPoint::OnShowIncoming(XMConnection & connection)
 {
+	//cout << "OnShowIncoming" << endl;
 	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 	XMCallProtocol callProtocol = XMCallProtocol_UnknownProtocol;
 		
@@ -152,12 +168,12 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 	
 	if(callProtocol == XMCallProtocol_UnknownProtocol)
 	{
-		cout << "No Valid call protocol" << endl;
+		//cout << "No Valid call protocol" << endl;
 		RejectIncomingCall();
 		return;
 	}
 	
-	incomingConnectionToken = connection.GetToken();
+	isIncomingCall = TRUE;
 	
 	_XMHandleIncomingCall(callID,
 						  callProtocol,
@@ -169,11 +185,11 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 
 void XMEndPoint::AcceptIncomingCall()
 {
-	if(incomingConnectionToken.IsEmpty())
+	if(isIncomingCall == FALSE)
 	{
 		return;
 	}
-	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(incomingConnectionToken, PSafeReadOnly);
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting", PSafeReadOnly);
 	if(connection != NULL)
 	{
 		connection->AcceptIncoming();
@@ -182,7 +198,12 @@ void XMEndPoint::AcceptIncomingCall()
 
 void XMEndPoint::RejectIncomingCall()
 {
-	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(incomingConnectionToken, PSafeReadOnly);
+	if(isIncomingCall == FALSE)
+	{
+		return;
+	}
+	
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting", PSafeReadOnly);
 	if(connection != NULL)
 	{
 		connection->ClearCall(OpalConnection::EndedByRefusal);
@@ -194,31 +215,153 @@ void XMEndPoint::RejectIncomingCall()
 	PSafePtr<OpalCall> call = GetManager().FindCallWithLock(token, PSafeReadOnly);
 	if(call != NULL)
 	{
-		cout << "trying to clear" << endl;
+		//cout << "trying to clear" << endl;
 		call->Clear();
-		cout << "done" << endl;
+		//cout << "done" << endl;
 	}
 	else
 	{
-		cout << "Clearing the Call failed (Call not found)" << endl;
+		//cout << "Clearing the Call failed (Call not found)" << endl;
 	}
 }*/
-
-void XMEndPoint::SetEnableVideo(BOOL flag)
-{
-	enableVideo = flag;
-}
 
 
 void XMEndPoint::OnReleased(OpalConnection & connection)
 {
-	cout << "XMEndPoint::OnReleased: " << connection;
 	OpalEndPoint::OnReleased(connection);
 }
 
 void XMEndPoint::OnEstablished(OpalConnection & connection)
 {
-	cout << "XMEndPoint::OnEstablished: " << connection;
+	isIncomingCall = FALSE;
 	OpalEndPoint::OnEstablished(connection);
-	cout << "XMEndPoint::OnEstablished done" << endl;
+}
+
+#pragma mark -
+#pragma mark InCall Methods
+
+BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
+{
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
+	if(connection == NULL)
+	{
+		return FALSE;
+	}
+	
+	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
+	if(otherConnection == NULL)
+	{
+		return FALSE;
+	}
+	
+	return otherConnection->SendUserInputTone(tone);
+}
+
+BOOL XMEndPoint::SendUserInputString(PString & callID, const PString & string)
+{
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
+	if(connection == NULL)
+	{
+		return FALSE;
+	}
+	
+	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
+	if(otherConnection == NULL)
+	{
+		return FALSE;
+	}
+	
+	return otherConnection->SendUserInputString(string);
+}
+
+BOOL XMEndPoint::StartCameraEvent(PString & callID, XMCameraEvent cameraEvent)
+{	
+	OpalH281Handler *h281Handler = GetH281Handler(callID);
+	
+	if(h281Handler == NULL)
+	{
+		return FALSE;
+	}
+	
+	H281_Frame::PanDirection panDirection = H281_Frame::NoPan;
+	H281_Frame::TiltDirection tiltDirection = H281_Frame::NoTilt;
+	H281_Frame::ZoomDirection zoomDirection = H281_Frame::NoZoom;
+	H281_Frame::FocusDirection focusDirection = H281_Frame::NoFocus;
+	
+	switch(cameraEvent)
+	{
+		case XMCameraEvent_NoEvent:
+			return FALSE;
+		case XMCameraEvent_PanLeft:
+			panDirection = H281_Frame::PanLeft;
+			break;
+		case XMCameraEvent_PanRight:
+			panDirection = H281_Frame::PanRight;
+			break;
+		case XMCameraEvent_TiltUp:
+			tiltDirection = H281_Frame::TiltUp;
+			break;
+		case XMCameraEvent_TiltDown:
+			tiltDirection = H281_Frame::TiltDown;
+			break;
+		case XMCameraEvent_ZoomIn:
+			zoomDirection = H281_Frame::ZoomIn;
+			break;
+		case XMCameraEvent_ZoomOut:
+			zoomDirection = H281_Frame::ZoomOut;
+			break;
+		case XMCameraEvent_FocusIn:
+			focusDirection = H281_Frame::FocusIn;
+			break;
+		case XMCameraEvent_FocusOut:
+			focusDirection = H281_Frame::FocusOut;
+			break;
+	}
+	
+	h281Handler->StartAction(panDirection, tiltDirection, zoomDirection, focusDirection);
+	
+	return TRUE;
+}
+
+void XMEndPoint::StopCameraEvent(PString & callID)
+{	
+	OpalH281Handler *h281Handler = GetH281Handler(callID);
+	
+	if(h281Handler == NULL)
+	{
+		return;
+	}
+	
+	h281Handler->StopAction();
+}
+
+OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
+{
+	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
+	if(connection == NULL)
+	{
+		return NULL;
+	}
+	
+	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
+	if(otherConnection == NULL)
+	{
+		return NULL;
+	}
+	
+	OpalH224Handler * h224Handler = otherConnection->GetH224Handler();
+	
+	if(h224Handler == NULL)
+	{
+		return NULL;
+	}
+	
+	OpalH281Handler *h281Handler = h224Handler->GetH281Handler();
+	
+	if(h281Handler == NULL)
+	{
+		return NULL;
+	}
+	
+	return h281Handler;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.17 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -558,6 +558,58 @@
 
 #pragma mark -
 #pragma mark InCall Methods
+
+- (void)sendUserInputTone:(char)tone
+{
+	if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
+		return;
+	}
+	
+	unsigned callID = [activeCall _callID];
+	
+	[XMOpalDispatcher _sendUserInputToneForCall:callID tone:tone];
+}
+
+- (void)sendUserInputString:(NSString *)string
+{
+	if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
+		return;
+	}
+	
+	unsigned callID = [activeCall _callID];
+	
+	[XMOpalDispatcher _sendUserInputStringForCall:callID string:string];
+}
+
+- (void)startCameraEvent:(XMCameraEvent)cameraEvent
+{
+	if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
+		return;
+	}
+	
+	unsigned callID = [activeCall _callID];
+	
+	[XMOpalDispatcher _startCameraEventForCall:callID event:cameraEvent];
+}
+
+- (void)stopCameraEvent
+{
+	if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
+	{
+		[NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
+		return;
+	}
+	
+	unsigned callID = [activeCall _callID];
+	
+	[XMOpalDispatcher _stopCameraEventForCall:callID];
+}
 
 #pragma mark -
 #pragma mark Framework Methods

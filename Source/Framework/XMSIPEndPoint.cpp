@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.5 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.6 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -161,7 +161,7 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
-			cout << "trying: " << record.GetHost() << " \"" << record.GetUsername() << "\" \"" << record.GetAuthorizationUsername() << "\" \"" << record.GetPassword() << "\"" << endl;
+			//cout << "trying: " << record.GetHost() << " \"" << record.GetUsername() << "\" \"" << record.GetAuthorizationUsername() << "\" \"" << record.GetPassword() << "\"" << endl;
 			BOOL result = Register(record.GetHost(), record.GetUsername(), record.GetAuthorizationUsername(), record.GetPassword());
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
 			{
@@ -251,7 +251,7 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 										 SIP_PDU::StatusCodes reason,
 										 BOOL wasRegistering)
 {
-	cout << "ON REGISTRATION FAILED: " << host << " " << username << endl;
+	//cout << "ON REGISTRATION FAILED: " << host << " " << username << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)
@@ -299,7 +299,7 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 								 const PString & username,
 								 BOOL wasRegistering)
 {
-	cout << "ON REGISTERED" << endl;
+	//cout << "ON REGISTERED" << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)

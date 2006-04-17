@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Channel.h,v 1.2 2006/02/20 17:27:48 hfriederich Exp $
+ * $Id: XMH323Channel.h,v 1.3 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,8 +21,8 @@ class XMH323Channel : public H323_RTPChannel
 				  Directions direction,
 				  RTP_Session & rtp);
 	
-	virtual BOOL OnReceivedPDU(const H245_OpenLogicalChannel & pdu, unsigned & errorCode);
-	virtual BOOL OnSendingPDU(H245_OpenLogicalChannel & openPDU) const;
+	virtual BOOL OnReceivedPDU(const H245_H2250LogicalChannelParameters & param, unsigned & errorCode);
+	virtual BOOL OnSendingPDU(H245_H2250LogicalChannelParameters & param) const;
 };
 
 #endif // __XM_H323_CHANNEL_H__

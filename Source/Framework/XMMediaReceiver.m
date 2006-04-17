@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.17 2006/03/20 19:22:09 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.18 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,7 +20,7 @@
 mask >>= 1; \
 if(mask == 0) { \
 	dataIndex++; \
-		mask = 0x80; \
+	mask = 0x80; \
 }
 
 #define readBit() \
@@ -425,6 +425,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (XMVideoSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length;
 {
+	printf("Determining H.261 size: %x %x %x %x %x\n", frame[0], frame[1], frame[2], frame[3], frame[4]);
 	UInt8 *data = frame;
 	UInt32 dataIndex = 0;
 	UInt8 mask = 0x80;
@@ -450,34 +451,46 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		readBit();
 	}
 	
-	// scanning past the rest of PSC and TR
-	dataIndex++;
-	scanBit();
-	
-	// scanning past splitScreenIndicator
-	scanBit();
-	
-	// scanning past document camera indicator
-	scanBit();
-	
-	// scanning past Freeze picture release
-	scanBit();
-	
-	// reading Source Format
+	// check whether it is PSC
 	readBit();
+	if(bit != 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	readBit();
+	if(bit != 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	readBit();
+	if(bit != 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	readBit();
+	if(bit != 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
 	
+	// scanning past TR, SplitScreenIndicator, DocumentCameraIndicator, FreezePictureRelease
+	dataIndex++;
+
+	readBit();
 	if(bit == 0)
 	{
+		printf("Is QCIF\n");
 		return XMVideoSize_QCIF;
 	}
 	else
 	{
+		printf("Is CIF\n");
 		return XMVideoSize_CIF;
 	}
 }
 
 - (XMVideoSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length
-{
+{	
 	if(length < 5)
 	{
 		return XMVideoSize_NoVideo;
@@ -492,8 +505,41 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		return XMVideoSize_NoVideo;
 	}
 	
-	UInt8 data = frame[4];
-	UInt8 size = (data & 0x1c) >> 2;
+	if(frame[0] != 0 ||
+	   frame[1] != 0)
+	{
+		return XMVideoSize_NoVideo;
+	}
+	
+	UInt8 *data = frame;
+	UInt32 dataIndex = 2;
+	UInt8 mask = 0x80;
+	UInt8 bit;
+	
+	do {
+		readBit();
+	} while(bit == 0);
+	
+	dataIndex += 2;
+	scanBit();
+	scanBit();
+	
+	UInt8 size = 0;
+	readBit();
+	if(bit)
+	{
+		size |= 0x04;
+	}
+	readBit();
+	if(bit)
+	{
+		size |= 0x02;
+	}
+	readBit();
+	if(bit)
+	{
+		size |= 0x01;
+	}
 	
 	if(size == 1)
 	{

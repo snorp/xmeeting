@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.17 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.18 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,6 @@
 void _XMHandleCallIsAlerting(unsigned callID)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	
 	[XMOpalDispatcher _callIsAlerting:callID];
 	
 	[autoreleasePool release];

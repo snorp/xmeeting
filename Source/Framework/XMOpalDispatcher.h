@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.8 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.9 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "XMTypes.h"
 #import "XMPreferences.h"
 
 /**
@@ -66,6 +67,14 @@
 				  incoming:(BOOL)isIncomingStream;
 + (void)_videoStreamClosed:(unsigned)callID 
 				  incoming:(BOOL)isIncomingStream;
+
++ (void)_sendUserInputToneForCall:(unsigned)callID
+							 tone:(char)tone;
++ (void)_sendUserInputStringForCall:(unsigned)callID
+							 string:(NSString *)string;
++ (void)_startCameraEventForCall:(unsigned)callID 
+						   event:(XMCameraEvent)event;
++ (void)_stopCameraEventForCall:(unsigned)callID;
 
 - (id)_init;
 - (void)_close;

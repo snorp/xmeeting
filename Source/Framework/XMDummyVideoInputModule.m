@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.13 2006/03/18 18:26:13 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.14 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,14 +113,13 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		unsigned height = size.height;
 		unsigned usedBytes = 4*width*height;
 		
-		NSLog(@"width: %d, height: %d", width, height);
-		
 		// creating a buffer for the pixels
 		void *pixels = malloc(usedBytes);
 		
 		NSString *path = [[NSBundle mainBundle] pathForResource:@"DummyImage" ofType:@"gif"];
 		NSData *data = [[NSData alloc] initWithContentsOfFile:path];
 		NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
+		[data release];
 		
 		if(bitmapImageRep == nil)
 		{
@@ -187,6 +186,8 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 			NSLog(@"FAILED2");
 			return NO;
 		}
+		
+		[bitmapImageRep release];
 	}
 	
 	[inputManager handleGrabbedFrame:pixelBuffer];

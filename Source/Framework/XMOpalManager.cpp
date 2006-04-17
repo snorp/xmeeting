@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.22 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.23 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -134,7 +134,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 		   remoteAddress == "" &&
 		   remoteApplication == "")
 		{
-			cout << "resetting connection token";
+			////cout << "resetting connection token" << endl;
 			connectionToken = "";
 			callProtocol = XMCallProtocol_UnknownProtocol;
 		}
@@ -162,7 +162,7 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {	
-	cout << "OnEstablishedCall" << endl;
+	////cout << "OnEstablishedCall" << endl;
 	BOOL isIncomingCall = TRUE;
 	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
 	if(PIsDescendant(&endPoint, XMEndPoint))
@@ -176,7 +176,7 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {
-	cout << "OnClearedCall " << *(PThread::Current()) << endl;
+	//cout << "OnClearedCall " << *(PThread::Current()) << endl;
 	XMSoundChannel::StopChannels();
 	unsigned callID = call.GetToken().AsUnsigned();
 	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
@@ -185,7 +185,7 @@ void XMOpalManager::OnClearedCall(OpalCall & call)
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
-	cout << "OnReleased: " << connection << endl;
+	//cout << "OnReleased: " << connection << endl;
 	OpalManager::OnReleased(connection);
 }
 

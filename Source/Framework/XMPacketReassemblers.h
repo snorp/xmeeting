@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.h,v 1.2 2006/01/14 13:25:59 hfriederich Exp $
+ * $Id: XMPacketReassemblers.h,v 1.3 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -67,6 +67,11 @@ class XMH264RTPPacketReassembler : public XMRTPPacketReassembler
 	virtual BOOL IsFirstPacketOfFrame(XMRTPPacket *packet);
 	virtual BOOL CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
 };
+
+// 0: cannot determine
+// 1: RFC2190
+// 2: RFC2429
+int _XMDetermineH263PacketizationScheme(const BYTE *data, PINDEX length);
 
 #endif // __XM_PACKET_REASSEMBLERS_H__
 

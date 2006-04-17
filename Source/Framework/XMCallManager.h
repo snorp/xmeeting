@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.21 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.22 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -254,6 +254,34 @@
 - (void)retrySIPRegistrations;
 
 #pragma mark InCall functionality
+
+/**
+ * Sends character as a DTMF user input tone
+ * character may be one of the following characters:
+ * "0123456789*#ABCD!", ! indicates a hook flash.
+ * Calling this method is only valid when there is an
+ * active call. Otherwise, an exception will be raised
+ **/
+- (void)sendUserInputTone:(char)tone;
+
+/**
+ * Sends string as an UserInput string.
+ * Calling this method is only valid when there is an active
+ * call. Otherwise, an exception will be raised
+ **/
+- (void)sendUserInputString:(NSString *)string;
+
+/**
+ * Sends a camera event to the remote party. Calling this method is only
+ * valid if there is a call. Otherwise, an exception will be raised
+ **/
+- (void)startCameraEvent:(XMCameraEvent)cameraEvent;
+
+/**
+ * stops the camera event initiated by -startCameraEvent:
+ * Raises an exception if this method is called while not in a call
+ **/
+- (void)stopCameraEvent;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.14 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -216,6 +216,11 @@
  * Unlocks the video system again
  **/
 - (void)unlockVideoSystem;
+
+/**
+ * Creates a texture to be used within the video system
+ **/
+- (CVOpenGLTextureRef)createTextureFromImage:(CVPixelBufferRef)pixelBuffer;
 
 @end
 

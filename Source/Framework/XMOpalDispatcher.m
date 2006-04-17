@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.18 2006/04/07 10:15:16 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.19 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,13 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_AudioStreamOpened = 0x0300,
 	_XMOpalDispatcherMessage_VideoStreamOpened,
 	_XMOpalDispatcherMessage_AudioStreamClosed,
-	_XMOpalDispatcherMessage_VideoStreamClosed
+	_XMOpalDispatcherMessage_VideoStreamClosed,
+	
+	// InCall messages
+	_XMOpalDispatcherMessage_SendUserInputTone = 0x400,
+	_XMOpalDispatcherMessage_SendUserInputString,
+	_XMOpalDispatcherMessage_StartCameraEvent,
+	_XMOpalDispatcherMessage_StopCameraEvent
 	
 } _XMOpalDispatcherMessage;
 
@@ -74,6 +80,11 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents;
 - (void)_handleAudioStreamClosedMessage:(NSArray *)messageComponents;
 - (void)_handleVideoStreamClosedMessage:(NSArray *)messageComponents;
+
+- (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents;
+- (void)_handleSendUserInputStringMessage:(NSArray *)messageComponents;
+- (void)_handleStartCameraEventMessage:(NSArray *)messageComponents;
+- (void)_handleStopCameraEventMessage:(NSArray *)messageComponents;
 
 - (void)_doPreferencesSetup:(XMPreferences *)preferences 
 			externalAddress:(NSString *)externalAddress 
@@ -385,6 +396,68 @@ typedef enum _XMOpalDispatcherMessage
 	[components release];
 }
 
++ (void)_sendUserInputToneForCall:(unsigned)callID tone:(char)tone
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithChar:tone];
+	NSData *toneData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, toneData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SendUserInputTone withComponents:components];
+	
+	[components release];
+}
+
++ (void)_sendUserInputStringForCall:(unsigned)callID string:(NSString *)string
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSData *stringData = [NSKeyedArchiver archivedDataWithRootObject:string];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, stringData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SendUserInputString withComponents:components];
+	
+	[components release];
+}
+
++ (void)_startCameraEventForCall:(unsigned)callID event:(XMCameraEvent)event
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:event];
+	NSData *eventData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, eventData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_StartCameraEvent withComponents:components];
+	
+	[components release];
+}
+
++ (void)_stopCameraEventForCall:(unsigned)callID
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_StopCameraEvent withComponents:components];
+	
+	[components release];
+}
+
 + (void)_sendMessage:(_XMOpalDispatcherMessage)message withComponents:(NSArray *)components
 {
 	if(_XMOpalDispatcherSharedInstance == nil)
@@ -542,6 +615,18 @@ typedef enum _XMOpalDispatcherMessage
 			break;
 		case _XMOpalDispatcherMessage_VideoStreamClosed:
 			[self _handleVideoStreamClosedMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_SendUserInputTone:
+			[self _handleSendUserInputToneMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_SendUserInputString:
+			[self _handleSendUserInputStringMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_StartCameraEvent:
+			[self _handleStartCameraEventMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_StopCameraEvent:
+			[self _handleStopCameraEventMessage:[portMessage components]];
 			break;
 		default:
 			break;
@@ -933,7 +1018,7 @@ typedef enum _XMOpalDispatcherMessage
 												   withObject:remotePartyInformations
 												waitUntilDone:NO];
 	
-	callStatisticsUpdateIntervalTimer = [[NSTimer scheduledTimerWithTimeInterval:5.0
+	callStatisticsUpdateIntervalTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0
 																		  target:self
 																		selector:@selector(_updateCallStatistics:)
 																		userInfo:nil
@@ -1131,6 +1216,80 @@ typedef enum _XMOpalDispatcherMessage
 	{
 		[_XMCallManagerSharedInstance _handleOutgoingVideoStreamClosed];
 	}
+}
+
+- (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [number unsignedIntValue];
+	
+	if((theCallID != callID) && (callID != UINT_MAX))
+	{
+		NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
+		return;
+	}
+	
+	NSData *toneData = (NSData *)[messageComponents objectAtIndex:1];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:toneData];
+	char tone = [number charValue];
+	
+	_XMSendUserInputTone(theCallID, tone);
+	
+}
+
+- (void)_handleSendUserInputStringMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [number unsignedIntValue];
+	
+	if((theCallID != callID) && (callID != UINT_MAX))
+	{
+		NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
+		return;
+	}
+	
+	NSData *stringData = (NSData *)[messageComponents objectAtIndex:1];
+	NSString *string = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:stringData];
+	
+	const char *theString = [string cStringUsingEncoding:NSASCIIStringEncoding];
+	
+	_XMSendUserInputString(theCallID, theString);
+}
+
+- (void)_handleStartCameraEventMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [number unsignedIntValue];
+	
+	if((theCallID != callID) && (callID != UINT_MAX))
+	{
+		NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
+		return;
+	}
+	
+	NSData *eventData = (NSData *)[messageComponents objectAtIndex:1];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:eventData];
+	XMCameraEvent cameraEvent = (XMCameraEvent)[number unsignedIntValue];
+	
+	_XMStartCameraEvent(theCallID, cameraEvent);
+}
+
+- (void)_handleStopCameraEventMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [number unsignedIntValue];
+	
+	if((theCallID != callID) && (callID != UINT_MAX))
+	{
+		NSLog(@"CallID mismatch on StopCameraEvent: %d to actual %d", theCallID, callID);
+		return;
+	}
+	
+	_XMStopCameraEvent(theCallID);
 }
 
 #pragma mark -

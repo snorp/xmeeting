@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.h,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.h,v 1.8 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,9 +26,6 @@ public:
 	virtual void Main();
 	virtual void SetCommandNotifier(const PNotifier & notifier,
 									BOOL fromSink);
-	
-	static void SetIsRFC2429(BOOL flag);
-	static BOOL IsRFC2429(RTP_DataFrame::PayloadTypes payloadType, const BYTE *data, unsigned dataLength);
 	
 private:
 		

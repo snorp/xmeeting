@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.m,v 1.2 2006/03/23 10:04:48 hfriederich Exp $
+ * $Id: XMInCallOSD.m,v 1.3 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,17 @@
 #import "XMOSDVideoView.h"
 
 @interface XMInCallOSD (PrivateMethods)
+
+- (void)beginFullScreen;
+- (void)endFullScreen;
+- (void)enablePinP;
+- (void)disablePinP;
+- (void)showNextPinPMode;
+- (void)showInspector;
+- (void)showTools;
+- (void)hangup;
+- (void)mute;
+- (void)unmute;
 
 - (void)_setNextPinPMode;
 

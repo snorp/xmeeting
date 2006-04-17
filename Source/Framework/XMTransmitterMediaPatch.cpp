@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.14 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,11 +17,6 @@
 #include "XMCallbackBridge.h"
 
 static XMTransmitterMediaPatch *videoTransmitterPatch = NULL;
-static RTP_DataFrame::PayloadTypes h263PayloadType;
-static unsigned h264Profile;
-static unsigned h264Level;
-static unsigned h264PacketizationMode;
-static BOOL h264EnableLimitedMode = FALSE;
 
 XMTransmitterMediaPatch::XMTransmitterMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
@@ -54,7 +49,7 @@ BOOL XMTransmitterMediaPatch::IsTerminated() const
 
 void XMTransmitterMediaPatch::Resume()
 {
-	cout << "TRANSMITTER RESUME" << endl;
+	//cout << "TRANSMITTER RESUME" << endl;
 	if(PIsDescendant(&source, XMMediaStream))
 	{
 		// If Resume has already been called, don't start the process again
@@ -84,7 +79,7 @@ void XMTransmitterMediaPatch::Resume()
 			unsigned bitrate = mediaFormat.GetBandwidth()*100;
 			unsigned flags = 0;
 			
-			cout << "BITRATE: " << bitrate << endl;
+			//cout << "BITRATE: " << bitrate << endl;
 						
 			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
@@ -94,21 +89,20 @@ void XMTransmitterMediaPatch::Resume()
 				// If we're  sending H.263, we need to know which
 				// format to send. The payload code is submitted in the
 				// flags parameter
-				flags = h263PayloadType;
+				flags = payloadType;
 				
-				if(h263PayloadType == RTP_DataFrame::H263)
+				if(payloadType == RTP_DataFrame::H263)
 				{
 					cout << "Sending RFC2190" << endl;
 				}
 				else
 				{
 					cout << "Sending RFC2429" << endl;
-					payloadType = RTP_DataFrame::DynamicBase;
 				}
 			}
 			else if(codecIdentifier == XMCodecIdentifier_H264)
 			{
-				if(h264PacketizationMode == XM_H264_PACKETIZATION_MODE_SINGLE_NAL)
+				if(_XMGetH264PacketizationMode() == XM_H264_PACKETIZATION_MODE_SINGLE_NAL)
 				{
 					// We send only at a limited bitrate to avoid too many
 					// NAL units which are TOO big to fit
@@ -118,7 +112,8 @@ void XMTransmitterMediaPatch::Resume()
 					}
 				}
 				
-				flags = (h264PacketizationMode << 8) + (h264Profile << 4) + h264Level;
+				cout << "Sending H.264 with modes: " << _XMGetH264PacketizationMode() << " " << _XMGetH264Profile() << " " << _XMGetH264Level() << endl;
+				flags = (_XMGetH264PacketizationMode() << 8) + (_XMGetH264Profile() << 4) + _XMGetH264Level();
 			}
 			
 			// adjusting the maxFramesPerSecond / maxBitrate parameters
@@ -135,7 +130,7 @@ void XMTransmitterMediaPatch::Resume()
 			if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
 			   videoSize == XMVideoSize_NoVideo)
 			{
-				cout << "Trying to open unknown codec for transmission" << endl;
+				//cout << "Trying to open unknown codec for transmission" << endl;
 				return;
 			}
 			
@@ -193,7 +188,7 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 {
 	if(videoTransmitterPatch == NULL)
 	{
-		cout << "No VideoTransmitterPatch found!" << endl;
+		//cout << "No VideoTransmitterPatch found!" << endl;
 		return;
 	}
 	
@@ -205,7 +200,7 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 		videoTransmitterPatch->dataFrame = frame;
 		frame->SetPayloadSize(0);
 		
-		cout << "SETTING PAYLOAD TYPE FOR SENDING: " << videoTransmitterPatch->payloadType << endl;
+		//cout << "SETTING PAYLOAD TYPE FOR SENDING: " << videoTransmitterPatch->payloadType << endl;
 		frame->SetPayloadType(videoTransmitterPatch->payloadType);
 		
 		/*XMCodecIdentifier theCodec = videoTransmitterPatch->codecIdentifier;
@@ -235,7 +230,7 @@ void XMTransmitterMediaPatch::AppendData(unsigned sessionID,
 {
 	if(videoTransmitterPatch == NULL)
 	{
-		cout << "No VideoTransmitterPatch found (3)" << endl;
+		//cout << "No VideoTransmitterPatch found (3)" << endl;
 		return;
 	}
 	
@@ -243,7 +238,7 @@ void XMTransmitterMediaPatch::AppendData(unsigned sessionID,
 	
 	if(frame == NULL)
 	{
-		cout << "FRAME IS NULL" << endl;
+		//cout << "FRAME IS NULL" << endl;
 		return;
 	}
 	
@@ -262,7 +257,7 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 {	
 	if(videoTransmitterPatch == NULL)
 	{
-		cout << "No VideoTransmitterPatch found (4)" << endl;
+		//cout << "No VideoTransmitterPatch found (4)" << endl;
 		return;
 	}
 		
@@ -280,7 +275,7 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 		BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
 		if(result == FALSE)
 		{
-			cout << "ERROR Writing frame to sink!" << endl;
+			//cout << "ERROR Writing frame to sink!" << endl;
 		}
 	}
 	
@@ -293,46 +288,10 @@ void XMTransmitterMediaPatch::HandleDidStopTransmitting(unsigned sessionID)
 {
 	if(videoTransmitterPatch == NULL)
 	{
-		cout << "ERROR: NO TRANSMITTER PATCH FOUND" << endl;
+		//cout << "ERROR: NO TRANSMITTER PATCH FOUND" << endl;
 		return;
 	}
 	
 	videoTransmitterPatch->isTerminated = TRUE;
 	videoTransmitterPatch = NULL;
-}
-
-void XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::PayloadTypes payloadType)
-{
-	h263PayloadType = payloadType;
-}
-
-RTP_DataFrame::PayloadTypes XMTransmitterMediaPatch::GetH263PayloadType()
-{
-	return h263PayloadType;
-}
-
-void XMTransmitterMediaPatch::SetH264Parameters(unsigned profile, unsigned level)
-{
-	h264Profile = profile;
-	h264Level = level;
-}
-
-void XMTransmitterMediaPatch::SetH264PacketizationMode(unsigned packetizationMode)
-{
-	h264PacketizationMode = packetizationMode;
-}
-
-unsigned XMTransmitterMediaPatch::GetH264PacketizationMode()
-{
-	return h264PacketizationMode;
-}
-
-BOOL XMTransmitterMediaPatch::GetH264EnableLimitedMode()
-{
-	return h264EnableLimitedMode;
-}
-
-void XMTransmitterMediaPatch::SetH264EnableLimitedMode(BOOL flag)
-{
-	h264EnableLimitedMode = flag;
 }

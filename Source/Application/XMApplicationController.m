@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.29 2006/04/06 23:15:31 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.30 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,11 +29,11 @@
 #import "XMCallHistoryModule.h"
 
 #import "XMLocalAudioVideoModule.h"
+#import "XMDialPadModule.h"
 
 #import "XMAddressBookModule.h"
 
 //#import "XMZeroConfModule.h"
-//#import "XMDialPadModule.h"
 //#import "XMTextChatModule.h"
 
 #import "XMPreferencesWindowController.h"
@@ -42,6 +42,10 @@
 
 @interface XMApplicationController (PrivateMethods)
 
+// location / video management
+- (void)_activeLocationDidChange:(NSNotification *)notif;
+
+// Call management
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didEstablishCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
@@ -101,6 +105,8 @@
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
+	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
+							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
 							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
@@ -261,7 +267,23 @@
 	return NSTerminateLater;
 }
 
+#pragma mark -
 #pragma mark Notification Methods
+
+- (void)_activeLocationDidChange:(NSNotification *)notif
+{
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	if([[preferencesManager activeLocation] enableVideo] == YES)
+	{
+		[videoManager startGrabbing];
+	}
+	else
+	{
+		[videoManager stopGrabbing];
+	}
+}
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
@@ -648,7 +670,9 @@
 	
 	localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
 	[localAudioVideoModule setTag:XMInspectorControllerTag_Tools];
-	NSArray *toolsModules = [[NSArray alloc] initWithObjects:localAudioVideoModule, nil];
+	dialPadModule = [[XMDialPadModule alloc] init];
+	[dialPadModule setTag:XMInspectorControllerTag_Tools];
+	NSArray *toolsModules = [[NSArray alloc] initWithObjects:localAudioVideoModule, dialPadModule, nil];
 	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Tools] setModules:toolsModules];
 	[toolsModules release];
 	
@@ -674,8 +698,8 @@
 	// show the main window
 	[[XMMainWindowController sharedInstance] showMainWindow];
 	
-	// start grabbing from the video sources
-	[[XMVideoManager sharedInstance] startGrabbing];
+	// start grabbing from the video sources if needed
+	[self _activeLocationDidChange:nil];
 	
 	incomingCallAlert = nil;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.14 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -321,6 +321,26 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	[videoLock unlock];
 }
 
+- (CVOpenGLTextureRef)createTextureFromImage:(CVPixelBufferRef)pixelBuffer
+{
+	if(textureCache == NULL)
+	{
+		return NULL;
+	}
+	
+	// transform the CVPixelBufferRef into an OpenGL texture
+	CVOpenGLTextureRef openGLTexture;
+	CVReturn result = CVOpenGLTextureCacheCreateTextureFromImage(NULL, textureCache,
+																 pixelBuffer, NULL, &openGLTexture);
+	
+	if(result != kCVReturnSuccess)
+	{
+		return NULL;
+	}
+	
+	return openGLTexture;
+}
+
 #pragma mark Framework Methods
 
 - (void)_handleDeviceList:(NSArray *)deviceList
@@ -386,6 +406,20 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	[videoLock unlock];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidEndReceivingVideo object:self];
+}
+
+- (void)_handleVideoTransmittingStart:(NSNumber *)videoSize
+{
+	localVideoSize = (XMVideoSize)[videoSize unsignedIntValue];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartTransmittingVideo object:self];
+}
+
+- (void)_handleVideoTransmittingEnd
+{
+	localVideoSize = XMVideoSize_NoVideo;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidEndTransmittingVideo object:self];
 }
 
 - (void)_handleLocalVideoFrame:(CVPixelBufferRef)pixelBuffer

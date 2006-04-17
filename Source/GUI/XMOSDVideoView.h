@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.h,v 1.6 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMOSDVideoView.h,v 1.7 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,6 +59,7 @@ typedef enum XMClosingEffect
 	
 	NSOpenGLContext *openGLContext;
 	NSSize displaySize;
+	CVOpenGLTextureRef noVideoTexture;
 	
 	// only used to draw into the window draw buffer when
 	// the window does miniaturize or there is no local video

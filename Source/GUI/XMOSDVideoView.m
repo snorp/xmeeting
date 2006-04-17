@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.10 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.11 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,7 +27,7 @@
 
 #define XM_ANIMATION_STEPS 60.0
 
-#define __ANTIALIASED_POLY__ 0
+#define __ANTIALIASED_POLY__ 1
 
 
 @interface XMOSDVideoView (PrivateMethods)
@@ -49,13 +49,19 @@
 - (void)_drawPolygon:(GLfloat)depth bottomLeft:(GLfloat*)bottomLeft
 		 bottomRight:(GLfloat*)bottomRight topRight:(GLfloat*)topRight
 			 topLeft:(GLfloat*)topLeft mirrored:(BOOL)mirrored;
+- (void)_dimTexture:(GLfloat)depth;
 
 - (void)_displayOSD:(XMOpeningEffect)openingEffect;
 - (void)_hideOSD:(XMClosingEffect)closingEffect;
 - (void)_resetOSDTrackingRect;
 - (void)_checkNeedsMirroring;
 
+- (CVOpenGLTextureRef)_createNoVideoTexture;
+
 @end
+
+void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
+											  const void *baseAddress);
 
 @implementation XMOSDVideoView
 
@@ -79,6 +85,7 @@
 	NSOpenGLPixelFormat *openGLPixelFormat = [videoManager openGLPixelFormat];
 	openGLContext = [[NSOpenGLContext alloc] initWithFormat:openGLPixelFormat shareContext:[videoManager openGLContext]];
 	displaySize = NSMakeSize(0, 0);
+	noVideoTexture = NULL;
 	
 	long swapInterval = 1;
 	[openGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
@@ -244,6 +251,12 @@
 	[self display];
 	
 	[openGLContext clearDrawable];
+	
+	if(noVideoTexture != NULL)
+	{
+		CVOpenGLTextureRelease(noVideoTexture);
+		noVideoTexture = NULL;
+	}
 }
 
 - (BOOL)doesDisplayVideo
@@ -485,28 +498,11 @@
 	{
 		if(isMiniaturized == YES)
 		{
-			/*if(videoImageRep == nil)
-			{
-				CIImage *image = [[CIImage alloc] initWithCVImageBuffer:remoteVideo];
-				videoImageRep = [[NSCIImageRep alloc] initWithCIImage:image];
-				[image release];
-			}
-			
-			if(videoImageRep != nil)
-			{
-				[videoImageRep drawInRect:[self bounds]];
-			}*/
-			
 			[[NSColor blackColor] set];
 			NSRectFill([self bounds]);
 			
 			return;
 		}
-		/*else if(videoImageRep != nil)
-		{
-			[videoImageRep release];
-			videoImageRep = nil;
-		}*/
 	}
 	
 	// activating this context
@@ -560,6 +556,16 @@
 	
 	CVOpenGLTextureRef openGLTextureLocal = localVideo;
 	CVOpenGLTextureRef openGLTextureRemote = remoteVideo;
+	
+	if(openGLTextureRemote == NULL)
+	{
+		if(noVideoTexture == NULL)
+		{
+			noVideoTexture = [self _createNoVideoTexture];
+		}
+		
+		openGLTextureRemote = noVideoTexture;
+	}
 	
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -685,7 +691,13 @@
 		#endif
 		
 		glScaled(videoWidth/videoHeight, 1.0, 1.0); 
+	
 		[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
+		
+		if([[XMVideoManager sharedInstance] isSendingVideo] == NO)
+		{
+			[self _dimTexture:depth];
+		}
 		
 		#ifdef __ANTIALIASED_POLY__
 		if (currentPinPMode != &classicPinP){
@@ -788,21 +800,6 @@
 	glFlush();
 }
 
-/*
-- (void)_windowWillMiniaturize:(NSNotification *)notif
-{
-	[osdControllerWindow closeWithEffect:NoEffect];
-	isOSDDisplayed = NO;
-	isMiniaturized = YES;
-	[self _stopTimer];
-	[self display];
-}*/
-
-/*- (void)_windowWillClose:(NSNotification *)notif{
-	[osdControllerWindow closeWithEffect:NoEffect];
-	[self _stopTimer];
-}*/
-
 #pragma mark -
 #pragma mark Animation
 
@@ -878,6 +875,28 @@
 			glTexCoord2fv(bottomRight); glVertex3f(-1, -1, depth);
 		}
 	glEnd();
+}
+
+- (void)_dimTexture:(GLfloat)depth
+{
+	// Dimming the texture just drawn by blending in a color with reduced
+	// alpha
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glPushAttrib(0xffffffff);
+	glEnable (GL_BLEND);
+	
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glBegin(GL_QUADS);
+	glColor4f(0.5, 0.5, 0.5, 0.5);
+	glVertex3f(-1, -1, depth); 
+	glVertex3f(-1, 1, depth);
+	glVertex3f(1, 1, depth);
+	glVertex3f(1, -1, depth);
+	glEnd();
+	
+	glDisable(GL_BLEND);
+	glPopAttrib();
 }
 
 #pragma mark -
@@ -1125,4 +1144,71 @@
 	}	
 }
 
+- (CVOpenGLTextureRef)_createNoVideoTexture
+{
+	CVReturn result;
+	
+	NSString *path = [[NSBundle mainBundle] pathForResource:@"no_video_screen" ofType:@"tif"];
+	NSData *data = [[NSData alloc] initWithContentsOfFile:path];
+	NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
+	[data release];
+	
+	unsigned width = [bitmapImageRep pixelsWide];
+	unsigned height = [bitmapImageRep pixelsHigh];
+	unsigned usedBytes = 4*width*height;
+	
+	UInt8 *dstData = (UInt8 *)malloc(usedBytes);
+	UInt8 *srcData = (UInt8 *)[bitmapImageRep bitmapData];
+	
+	UInt8 *bytes = dstData;
+		
+	unsigned i;
+	for(i = 0; i < width*height; i++)
+	{
+		//alpha
+		*bytes = 255;
+		bytes++;
+		
+		//red
+		*bytes = *srcData;
+		bytes++;
+		srcData++;
+		
+		// green
+		*bytes = *srcData;
+		bytes++;
+		srcData++;
+		
+		// blue
+		*bytes = *srcData;
+		bytes++;
+		srcData++;
+	}
+	
+	[bitmapImageRep release];
+	
+	// creating the CVPixelBufferRef
+	CVPixelBufferRef pixelBuffer;
+	result = CVPixelBufferCreateWithBytes(NULL, (size_t)width, (size_t)height,
+										  k32ARGBPixelFormat, dstData, 4*width,
+										  XMOSDVideoViewPixelBufferReleaseCallback, NULL, NULL, &pixelBuffer);
+	
+	if(result != kCVReturnSuccess)
+	{
+		return NULL;
+	}
+	
+	CVOpenGLTextureRef openGLTexture = [[XMVideoManager sharedInstance] createTextureFromImage:pixelBuffer];
+	
+	CVPixelBufferRelease(pixelBuffer);
+	
+	return openGLTexture;
+}
+
 @end
+
+void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
+											  const void *baseAddress)
+{
+	free((void *)baseAddress);
+}

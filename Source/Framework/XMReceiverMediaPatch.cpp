@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.17 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,8 +18,6 @@
 #define XM_PACKET_POOL_GRANULARITY 8
 #define XM_FRAME_BUFFER_SIZE 352*288*4
 
-static BOOL isRFC2429 = FALSE;
-
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
 {
@@ -35,6 +33,7 @@ void XMReceiverMediaPatch::Main()
 	// Currently, audio is processed using the default OPAL facilities.
 	// Only video is processed using QuickTime
 	const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
+	cout << "Receiving " << mediaFormat << endl;
 	if(_XMIsVideoMediaFormat(mediaFormat) == FALSE)
 	{
 		OpalMediaPatch::Main();
@@ -113,22 +112,37 @@ void XMReceiverMediaPatch::Main()
 				packetReassembler = new XMH261RTPPacketReassembler();
 				break;
 			case XMCodecIdentifier_H263:
-				if(payloadType == RTP_DataFrame::H263)
+				if(_XMIsReceivingRFC2429() || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
 				{
-					cout << "Receiving RFC2190" << endl;
-					packetReassembler = new XMH263RTPPacketReassembler();
+					cout << "Receiving RFC2429" << endl;
+					packetReassembler = new XMH263PlusRTPPacketReassembler();
 				}
 				else
 				{
-					if(IsRFC2429(payloadType, packets[0]->GetPayloadPtr(), packets[0]->GetPayloadSize()) == TRUE)
+					int result = _XMDetermineH263PacketizationScheme(packets[0]->GetPayloadPtr(), packets[0]->GetPayloadSize());
+					
+					if(result == 0)
 					{
-						cout << "Receiving RFC2429" << endl;
-						packetReassembler = new XMH263PlusRTPPacketReassembler();
+						if(payloadType == RTP_DataFrame::H263)
+						{
+							cout << "Receiving RFC2190" << endl;
+							packetReassembler = new XMH263RTPPacketReassembler();
+						}
+						else
+						{
+							cout << "Receiving RFC2429" << endl;
+							packetReassembler = new XMH263PlusRTPPacketReassembler();
+						}
 					}
-					else
+					else if(result == 1)
 					{
 						cout << "Receiving RFC2190" << endl;
 						packetReassembler = new XMH263RTPPacketReassembler();
+					}
+					else
+					{
+						cout << "Receiving RFC2429" << endl;
+						packetReassembler = new XMH263PlusRTPPacketReassembler();
 					}
 				}
 				break;
@@ -177,7 +191,7 @@ void XMReceiverMediaPatch::Main()
 					if(firstPacketOfPacketGroup != NULL)
 					{
 						// Discarding the old packet group since incomplete
-						cout << "Discarding packet group" << endl;
+						//cout << "Discarding packet group" << endl;
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;
@@ -304,6 +318,8 @@ void XMReceiverMediaPatch::Main()
 				
 				if(result == TRUE)
 				{
+					//printf("RECV FRAME: %x %x %x %x %x %x %x %x\n", frameBuffer[0], frameBuffer[1], frameBuffer[2],
+					//	   frameBuffer[3], frameBuffer[4], frameBuffer[5], frameBuffer[7], frameBuffer[8]);
 					result = _XMProcessFrame(sessionID, frameBuffer, frameBufferSize);
 					if(result == FALSE)
 					{
@@ -383,44 +399,6 @@ void XMReceiverMediaPatch::Main()
 	free(packets);
 	free(frameBuffer);
 	free(packetReassembler);
-}
-
-void XMReceiverMediaPatch::SetIsRFC2429(BOOL flag)
-{
-	isRFC2429 = flag;
-}
-
-BOOL XMReceiverMediaPatch::IsRFC2429(RTP_DataFrame::PayloadTypes payloadType, const BYTE *data, unsigned dataLength)
-{
-	if(isRFC2429)
-	{
-		return TRUE;
-	}
-	else
-	{
-		if(payloadType == RTP_DataFrame::H263)
-		{
-			return FALSE;
-		}
-		
-		BYTE firstByte = data[0];
-		
-		if(firstByte & 0xc0 == 0 && dataLength > 6)
-		{
-			// first two bits are zero.
-			// If it is RFC2190, bytes 5 and 6 must be zero
-			if(data[4] == 0 && data[5] == 0)
-			{
-				return FALSE;
-			}
-			else
-			{
-				return TRUE;
-			}
-		}
-	}
-	
-	return TRUE;
 }
 
 void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,

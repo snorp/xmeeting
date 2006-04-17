@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.5 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.6 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -246,6 +246,7 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 			// it should be possible to transform the PLUSPTYPE header into a
 			// normal PTYPE header. Fortunately, QuickTime fully understands 
 			// bitstreams where PSC isn't byte-aligned.
+			
 			if(sourceFormat == 7)
 			{
 				BYTE tr = (src[0] & 0x03) << 6;
@@ -465,7 +466,7 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		}
 		else
 		{
-			cout << "UNKNOWN NAL TYPE" << endl;
+			//cout << "UNKNOWN NAL TYPE" << endl;
 		}
 		
 		packet = packet->next;
@@ -475,4 +476,29 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	*outFrameLength = frameLength;
 	
 	return TRUE;
+}
+
+int _XMDetermineH263PacketizationScheme(const BYTE *data, PINDEX length)
+{
+	if(length <= 10)
+	{
+		// won't determine short frames
+		return 0;
+	}
+	
+	if((data[0] & 0xf8) != 0)
+	{
+		// RFC2429 has these bits reserved, set to zero
+		// RFC2190 has these bits set to zero if it is the first frame of a packet group.
+		// Thus, if this part isn't zero, it is RFC2190 but not a packet group start
+		return 1;
+	}
+	
+	// if the first two bits are zero AND bytes 5 and 6 are zero, we have RFC2190
+	if((data[0] & 0xc0) == 0 && data[4] == 0 && data[5] == 0)
+	{
+		return 1;
+	}
+	
+	return 2;
 }

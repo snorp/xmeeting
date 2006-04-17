@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.10 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.11 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,33 +35,21 @@ void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 {
 	H323Connection::OnSendCapabilitySet(pdu);
 	
-	H245_MultiplexCapability & multiplexCapability = pdu.m_multiplexCapability;
-	H245_H2250Capability & h2250Capability = (H245_H2250Capability &)multiplexCapability;
-	H245_MediaPacketizationCapability & mediaPacketizationCapability = h2250Capability.m_mediaPacketizationCapability;
-	mediaPacketizationCapability.IncludeOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType);
-	H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
-	arrayOfRTPPayloadType.SetSize(3);
+	const H323Capabilities & localCaps = GetLocalCapabilities();
 	
-	// Signal the ability to handle RFC 2429 packets (H.263).
-	// Using RFC 2429 does work also without that signal, but it's better if this is present
-	H245_RTPPayloadType & h263PayloadType = arrayOfRTPPayloadType[0];
-	H245_RTPPayloadType_payloadDescriptor & h263Descriptor = h263PayloadType.m_payloadDescriptor;
-	h263Descriptor.SetTag(H245_RTPPayloadType_payloadDescriptor::e_rfc_number);
-	PASN_Integer & h263Integer = (PASN_Integer &)h263Descriptor;
-	h263Integer.SetValue(2429);
+	PINDEX i;
+	PINDEX count = localCaps.GetSize();
 	
-	// Signal the H.264 packetization modes understood by this endpoint
-	H245_RTPPayloadType & h264PayloadTypeSingleNAL = arrayOfRTPPayloadType[1];
-	H245_RTPPayloadType_payloadDescriptor & h264DescriptorSingleNAL = h264PayloadTypeSingleNAL.m_payloadDescriptor;
-	h264DescriptorSingleNAL.SetTag(H245_RTPPayloadType_payloadDescriptor::e_oid);
-	PASN_ObjectId & h264ObjectIdSingleNAL = (PASN_ObjectId &)h264DescriptorSingleNAL;
-	h264ObjectIdSingleNAL.SetValue("0.0.8.241.0.0.0.0");
-	
-	H245_RTPPayloadType & h264PayloadTypeNonInterleaved = arrayOfRTPPayloadType[2];
-	H245_RTPPayloadType_payloadDescriptor & h264DescriptorNonInterleaved = h264PayloadTypeNonInterleaved.m_payloadDescriptor;
-	h264DescriptorNonInterleaved.SetTag(H245_RTPPayloadType_payloadDescriptor::e_oid);
-	PASN_ObjectId & h264ObjectIdNonInterleaved = (PASN_ObjectId &)h264DescriptorNonInterleaved;
-	h264ObjectIdNonInterleaved.SetValue("0.0.8.241.0.0.0.1");
+	for(i = 0; i < count; i++)
+	{
+		H323Capability & h323Capability = localCaps[i];
+		
+		if(PIsDescendant(&h323Capability, XMH323VideoCapability))
+		{
+			XMH323VideoCapability & videoCap = (XMH323VideoCapability &)h323Capability;
+			videoCap.OnSendingTerminalCapabilitySet(pdu);
+		}
+	}
 	
 	hasSentLocalCapabilities = TRUE;
 }
@@ -72,45 +60,20 @@ BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCa
 {
 	BOOL result = H323Connection::OnReceivedCapabilitySet(remoteCaps, muxCap, reject);
 	
-	XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::H263);
-	XMTransmitterMediaPatch::SetH264PacketizationMode(XM_H264_PACKETIZATION_MODE_SINGLE_NAL);
-	
-	if(result == TRUE && muxCap != NULL && muxCap->GetTag() == H245_MultiplexCapability::e_h2250Capability)
+	unsigned i;
+	unsigned count = remoteCaps.GetSize();
+	for(i = 0; i < count; i++)
 	{
-		const H245_H2250Capability & h2250Capability = *muxCap;
-		const H245_MediaPacketizationCapability & mediaPacketizationCapability = h2250Capability.m_mediaPacketizationCapability;
+		H323Capability & h323Capability = remoteCaps[i];
 		
-		if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
+		if(PIsDescendant(&h323Capability, XMH323VideoCapability))
 		{
-			const H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
-			PINDEX size = arrayOfRTPPayloadType.GetSize();
-			PINDEX i;
-			
-			for(i = 0; i < size; i++)
-			{
-				const H245_RTPPayloadType & payloadType = arrayOfRTPPayloadType[i];
-				const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = payloadType.m_payloadDescriptor;
-				if(payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_oid)
-				{
-					const PASN_ObjectId & objectId = payloadDescriptor;
-					if(objectId == "0.0.8.241.0.0.0.1")
-					{
-						XMTransmitterMediaPatch::SetH264PacketizationMode(XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED);
-					}
-				}
-				else if(payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_rfc_number)
-				{
-					const PASN_Integer & rfcNumber = payloadDescriptor;
-					
-					if(rfcNumber == 2429)
-					{
-						XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::DynamicBase);
-					}
-				}
-			}
+			XMH323VideoCapability & videoCap = (XMH323VideoCapability &)h323Capability;
+			const H245_H2250Capability & h2250Capability = (const H245_H2250Capability &)*muxCap;
+			videoCap.OnReceivedTerminalCapabilitySet(h2250Capability);
 		}
 	}
-	
+
 	return result;
 }
 
@@ -126,6 +89,8 @@ void XMH323Connection::OnSetLocalCapabilities()
 
 void XMH323Connection::SelectDefaultLogicalChannel(unsigned sessionID)
 {
+	// overridden to achieve better capability select behaviour
+	
 	if(sessionID == OpalMediaFormat::DefaultAudioSessionID)
 	{
 		H323Connection::SelectDefaultLogicalChannel(sessionID);
@@ -178,39 +143,17 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 										  H323Channel::Directions dir)
 {
 	BOOL isValidCapability = TRUE;
-	if(PIsDescendant(&capability, XM_H323_H261_Capability))
+	if(PIsDescendant(&capability, XMH323VideoCapability))
 	{
-		XM_H323_H261_Capability & h261Capability = (XM_H323_H261_Capability &)capability;
-		isValidCapability = h261Capability.IsValidCapabilityForSending();
-	}
-	else if(PIsDescendant(&capability, XM_H323_H263_Capability))
-	{
-		XM_H323_H263_Capability & h263Capability = (XM_H323_H263_Capability &)capability;
-		isValidCapability = h263Capability.IsValidCapabilityForSending();
-
-		if(isValidCapability == TRUE && h263Capability.IsH263PlusCapability())
-		{
-			XMTransmitterMediaPatch::SetH263PayloadType(RTP_DataFrame::DynamicBase);
-		}
-	}
-	else if(PIsDescendant(&capability, XM_H323_H264_Capability))
-	{
-		XM_H323_H264_Capability & h264Capability = (XM_H323_H264_Capability &)capability;
-		isValidCapability = h264Capability.IsValidCapabilityForSending();
-		if(isValidCapability == TRUE )
-		{
-			XMTransmitterMediaPatch::SetH264Parameters(h264Capability.GetProfile(), h264Capability.GetLevel());
-		}
-		else
-		{
-			isValidCapability = FALSE;
-		}
+		XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
+		isValidCapability = videoCapability.IsValidCapabilityForSending();
 	}
 	
 	if(isValidCapability == FALSE)
 	{
 		return FALSE;
 	}
+	
 	return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
 }
 
@@ -253,10 +196,15 @@ H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability
 		
 		if(PIsDescendant(&capability, XM_H323_H263_Capability))
 		{
-			if(XMTransmitterMediaPatch::GetH263PayloadType() == RTP_DataFrame::DynamicBase)
+			XM_H323_H263_Capability & h323Cap = (XM_H323_H263_Capability &)capability;
+			if(h323Cap.IsH263PlusCapability())
 			{
-				theChannel->SetDynamicRTPPayloadType(RTP_DataFrame::DynamicBase);
+				theChannel->SetDynamicRTPPayloadType(96);
 			}
+		}
+		else if(PIsDescendant(&capability, XM_H323_H264_Capability))
+		{
+			theChannel->SetDynamicRTPPayloadType(97);
 		}
 		
 		return theChannel;
@@ -267,12 +215,6 @@ H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability
 																		sessionID,
 																		param,
 																		rtpqos);
-	if(PIsDescendant(&capability, XM_H323_H264_Capability))
-	{
-		H323_RealTimeChannel *realTimeChannel = (H323_RealTimeChannel *)channel;
-		realTimeChannel->SetDynamicRTPPayloadType(RTP_DataFrame::DynamicBase);
-	}
-	
 	return channel;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.31 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.32 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -679,6 +679,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	data = [messageComponents objectAtIndex:1];
 	NSString *device = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	
+	NSLog(@"Setting device: %@", device);
+	
 	XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:moduleIndex];
 	id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 	
@@ -704,6 +706,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		}
 		
 		didSucceed = [module openInputDevice:device];
+	}
+	else
+	{
+		activeModule = module;
 	}
 	
 	if(didSucceed == YES)
@@ -820,8 +826,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	codecIdentifier = [number unsignedIntValue];
 	
 	data = (NSData *)[components objectAtIndex:2];
-	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	requiredVideoSize = (XMVideoSize)[number unsignedIntValue];
+	NSNumber *videoSizeNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	requiredVideoSize = (XMVideoSize)[videoSizeNumber unsignedIntValue];
 	
 	data = (NSData *)[components objectAtIndex:3];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -834,6 +840,15 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	data = (NSData *)[components objectAtIndex:5];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	codecSpecificCallFlags = [number unsignedIntValue];
+	
+	// taking into account packetization overhead
+	bitrateToUse = (bitrateToUse * 0.95);
+	
+	// protection against codec hangups
+	if(bitrateToUse < 64000)
+	{
+		bitrateToUse = 64000;
+	}
 	
 	switch(codecIdentifier)
 	{
@@ -897,6 +912,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	previousTimeStamp = 0;
 	
 	isTransmitting = YES;
+	
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoTransmittingStart:)
+													withObject:videoSizeNumber waitUntilDone:NO];
 }
 
 - (void)_handleStopTransmittingMessage:(NSArray *)components
@@ -940,6 +958,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	isTransmitting = NO;
 	
 	frameGrabRate = previewFrameGrabRate;
+	
+	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoTransmittingEnd)
+													withObject:nil waitUntilDone:NO];
 }
 
 - (void)_handleUpdatePictureMessage
@@ -949,7 +970,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)components
 {
-	/*if(compressSequence != 0)
+	if(compressSequence != 0)
 	{
 		NSData *data = (NSData *)[components objectAtIndex:0];
 		NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -982,7 +1003,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		compressSequenceFrameCounter = 0;
 		compressSequenceLastVideoBytesSent = videoBytesSent;
-	}*/
+	}
 }
 
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents
@@ -1153,6 +1174,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 - (void)_updateDeviceListAndSelectDummy
 {
+	NSLog(@"select dummy");
 	if(activeModule != nil)
 	{
 		[activeModule closeInputDevice];
@@ -1687,7 +1709,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			
 			compressSequencePreviousTimeStamp = 0;
 			
-			bitrateToUse = 384000;
 			NSLog(@"limiting bitrate to %d", bitrateToUse);
 			DataRateParams dataRateParams;
 			dataRateParams.dataRate = (bitrateToUse / 8);
@@ -1793,10 +1814,12 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			case kH263CodecType:
 				if(codecSpecificCallFlags >= kRTPPayload_FirstDynamic)
 				{
+					NSLog(@"Using PLUS Packetizer");
 					packetizerToUse = kRTP263PlusMediaPacketizerType;
 				}
 				else
 				{
+					NSLog(@"USING OLD PACKETIZER");
 					packetizerToUse = kXMRTPH263PacketizerType;
 				}
 				break;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.h,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMDialPadModule.h,v 1.4 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,15 +10,35 @@
 #define __XM_DIAL_PAD_MODULE_H__
 
 #import <Cocoa/Cocoa.h>
-#import "XMMainWindowAdditionModule.h"
+#import "XMInspectorModule.h"
 
-@interface XMDialPadModule : NSObject <XMMainWindowAdditionModule> {
+@class XMInstantActionButton;
+
+@interface XMDialPadModule : XMInspectorModule {
 
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;
 	
-	NSNib *nibLoader;
+	IBOutlet NSButton *button0;
+	IBOutlet NSButton *button1;
+	IBOutlet NSButton *button2;
+	IBOutlet NSButton *button3;
+	IBOutlet NSButton *button4;
+	IBOutlet NSButton *button5;
+	IBOutlet NSButton *button6;
+	IBOutlet NSButton *button7;
+	IBOutlet NSButton *button8;
+	IBOutlet NSButton *button9;
+	IBOutlet NSButton *button10;
+	IBOutlet NSButton *button11;
+	
+	IBOutlet XMInstantActionButton *upButton;
+	IBOutlet XMInstantActionButton *leftButton;
+	IBOutlet XMInstantActionButton *rightButton;
+	IBOutlet XMInstantActionButton *downButton;
 }
+
+- (IBAction)userInputToneButtonPressed:(id)sender;
 
 @end
 

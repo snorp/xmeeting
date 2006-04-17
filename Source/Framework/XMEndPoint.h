@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.7 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.8 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,7 +26,10 @@ public:
 	XMEndPoint(OpalManager & manager);
 	~XMEndPoint();
 	
-	// Overriding EndPoint methods
+	// Setup Methods
+	void SetEnableVideo(BOOL enableVideo);
+	
+	// Overriding OpalEndPoint methods
 	virtual BOOL MakeConnection(OpalCall & call,
 								const PString & party,
 								void *userData = NULL);
@@ -45,14 +48,18 @@ public:
 	
 	virtual void OnReleased(OpalConnection & connection);
 	virtual void OnEstablished(OpalConnection & connection);
-
-	void SetEnableVideo(BOOL enableVideo);
+	
+	// InCall Methods
+	BOOL SendUserInputTone(PString & callID, const char tone);
+	BOOL SendUserInputString(PString & callID, const PString & string);
+	BOOL StartCameraEvent(PString & callID, XMCameraEvent cameraEvent);	
+	void StopCameraEvent(PString & callID);
 
 private:
-	BOOL BeginAcceptIncomingCall();
-	BOOL CompleteAcceptIncomingCall();
-	PString incomingConnectionToken;
+		
+	OpalH281Handler * GetH281Handler(PString & callID);
 	
+	BOOL isIncomingCall;
 	BOOL enableVideo;
 };
 

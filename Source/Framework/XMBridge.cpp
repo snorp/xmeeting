@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.22 2006/04/07 10:15:16 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.23 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #include "XMH323EndPoint.h"
 #include "XMSIPEndPoint.h"
 #include "XMSoundChannel.h"
+#include "XMMediaFormats.h"
 #include "XMTransmitterMediaPatch.h"
 
 using namespace std;
@@ -48,6 +49,7 @@ void _XMInitSubsystem(const char *pTracePath)
 	}
 }
 
+#pragma mark -
 #pragma mark General Setup functions
 
 void _XMSetUserName(const char *string)
@@ -60,6 +62,7 @@ const char *_XMGetUserName()
 	return theManager->GetDefaultUserName();
 }
 
+#pragma mark -
 #pragma mark Network Setup functions
 
 void _XMSetBandwidthLimit(unsigned limit)
@@ -90,6 +93,7 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 	theManager->SetRtpIpPorts(rtpPortMin, rtpPortMax);
 }
 
+#pragma mark -
 #pragma mark Audio Functions
 
 void setSelectedAudioInputDevice(unsigned int deviceID)
@@ -118,6 +122,7 @@ void _XMSetAudioBufferSize(unsigned size)
 	//callEndPoint->SetSoundChannelBufferDepth(size);
 }
 
+#pragma mark -
 #pragma mark Video functions
 
 void _XMSetEnableVideo(bool enableVideo)
@@ -127,9 +132,10 @@ void _XMSetEnableVideo(bool enableVideo)
 
 void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode)
 {
-	XMTransmitterMediaPatch::SetH264EnableLimitedMode(enableH264LimitedMode);
+	_XMSetH264EnableLimitedMode(enableH264LimitedMode);
 }
 
+#pragma mark -
 #pragma mark codec functions
 
 void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount,
@@ -161,6 +167,7 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	theManager->SetMediaFormatOrder(orderedCodecsArray);
 }
 
+#pragma mark -
 #pragma mark H.323 Functions
 
 bool _XMEnableH323Listeners(bool flag)
@@ -197,6 +204,7 @@ void _XMCheckGatekeeperRegistration()
 	h323EndPoint->CheckGatekeeperRegistration();
 }
 
+#pragma mark -
 #pragma mark SIP Setup Functions
 
 bool _XMEnableSIPListeners(bool flag)
@@ -213,7 +221,6 @@ void _XMSetSIPProxy(const char *host,
 					const char *username,
 					const char *password)
 {
-	cout << "Setting PRoxy: " << host << " u: " << username << " p: " << password << endl;
 	sipEndPoint->SetProxy(host, username, password);
 }
 
@@ -235,6 +242,7 @@ void _XMFinishRegistrarSetup()
 	sipEndPoint->FinishRegistrarSetup();
 }
 
+#pragma mark -
 #pragma mark Call Management functions
 
 unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty)
@@ -296,6 +304,34 @@ void _XMGetCallStatistics(unsigned callID,
 	theManager->GetCallStatistics(callStatistics);
 }
 
+#pragma mark -
+#pragma mark InCall Functions
+
+bool _XMSendUserInputTone(unsigned callID, const char tone)
+{
+	PString callIDString = PString(callID);
+	return callEndPoint->SendUserInputTone(callIDString, tone);
+}
+
+bool _XMSendUserInputString(unsigned callID, const char *string)
+{
+	PString callIDString = PString(callID);
+	return callEndPoint->SendUserInputString(callIDString, string);
+}
+
+bool _XMStartCameraEvent(unsigned callID, XMCameraEvent cameraEvent)
+{
+	PString callIDString = PString(callID);
+	return callEndPoint->StartCameraEvent(callIDString, cameraEvent);
+}
+
+void _XMStopCameraEvent(unsigned callID)
+{
+	PString callIDString = PString(callID);
+	return callEndPoint->StopCameraEvent(callIDString);
+}
+
+#pragma mark -
 #pragma mark MediaTransmitter Functions
 
 void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp)

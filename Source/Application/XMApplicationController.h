@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.15 2006/03/25 10:41:55 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.16 2006/04/17 17:51:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,7 @@
 
 @class XMNoCallModule, XMInCallModule;
 @class XMInfoModule, XMStatisticsModule, XMCallHistoryModule;
-@class XMLocalAudioVideoModule;
+@class XMLocalAudioVideoModule, XMDialPadModule;
 @class XMAddressBookModule;
 
 /**
@@ -33,10 +33,10 @@
 	XMCallHistoryModule *callHistoryModule;
 	
 	XMLocalAudioVideoModule *localAudioVideoModule;
+	XMDialPadModule *dialPadModule;
 	
 	XMAddressBookModule *addressBookModule;
 	//XMZeroConfModule *zeroConfModule;
-	//XMDialPadModule *dialPadModule;
 	//XMTextChatModule *textChatModule;
 	
 	BOOL isFullScreen;
