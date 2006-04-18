@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.6 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.7 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -103,6 +103,21 @@ void XMSIPEndPoint::UseRegistrar(const PString & host,
 	unsigned i;
 	unsigned count = activeRegistrars.GetSize();
 	
+	PString adjustedHost;
+	PString adjustedUsername;
+	
+	PINDEX atLocation = username.Find('@');
+	if(atLocation != P_MAX_INDEX)
+	{
+		adjustedUsername = username.Left(atLocation);
+		adjustedHost = username.Mid(atLocation+1);
+	}
+	else
+	{
+		adjustedUsername = username;
+		adjustedHost = host;
+	}
+	
 	// searching for a record with the same information
 	// if found, marking this record as registered/needs to register.
 	// if not, create a new record and add it to the list
@@ -110,8 +125,8 @@ void XMSIPEndPoint::UseRegistrar(const PString & host,
 	{
 		XMSIPRegistrarRecord & record = activeRegistrars[i];
 		
-		if(record.GetHost() == host &&
-		   record.GetUsername() == username)
+		if(record.GetHost() == adjustedHost &&
+		   record.GetUsername() == adjustedUsername)
 		{
 			if(record.GetPassword() != password)
 			{
@@ -251,7 +266,7 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 										 SIP_PDU::StatusCodes reason,
 										 BOOL wasRegistering)
 {
-	//cout << "ON REGISTRATION FAILED: " << host << " " << username << endl;
+	cout << "ON REGISTRATION FAILED: " << host << " " << username << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)
@@ -268,8 +283,18 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 	{
 		XMSIPRegistrarRecord & record = activeRegistrars[i];
 		
-		if(record.GetHost() == host &&
-		   record.GetUsername() == username)
+		PString theHost = record.GetHost();
+		PString theUsername = record.GetUsername();
+		
+		PINDEX atLocation = theUsername.Find('@');
+		if(atLocation != P_MAX_INDEX)
+		{
+			theHost = theUsername.Mid(atLocation+1);
+			theUsername = theUsername.Left(atLocation);
+		}
+		
+		if(theHost == host &&
+		  theUsername == username)
 		{
 			if(record.GetStatus() != XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 			{
@@ -316,8 +341,21 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 	{
 		XMSIPRegistrarRecord & record = activeRegistrars[i];
 		
-		if(record.GetHost() == host &&
-		   record.GetUsername() == username)
+		// if the user entered username in the form username@registrar.net
+		// both username and registrar.net will be used as username / host
+		// respectively. This circumstance is taken into account here
+		PString theHost = record.GetHost();
+		PString theUsername = record.GetUsername();
+		
+		PINDEX atLocation = theUsername.Find('@');
+		if(atLocation != P_MAX_INDEX)
+		{
+			theHost = theUsername.Mid(atLocation+1);
+			theUsername = theUsername.Left(atLocation);
+		}
+		
+		if(theHost == host &&
+		   theUsername == username)
 		{
 			unsigned status = record.GetStatus();
 			

@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.31 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.32 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,7 @@
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
 #import "XMLocation.h"
+#import "XMApplicationFunctions.h"
 #import "XMMainWindowController.h"
 #import "XMLocalVideoView.h"
 
@@ -336,13 +337,13 @@
 	// if the user either enters h323: or sip:, we set the
 	// call protocol accordingly and remove the prefix from
 	// the address
-	if([uncompletedString hasPrefix:@"h323:"])
+	if([uncompletedString hasPrefixCaseInsensitive:@"h323:"])
 	{
 		[self _setCallProtocol:XMCallProtocol_H323];
 		[databaseField setStringValue:[uncompletedString substringFromIndex:5]];
 		return [NSArray array];
 	}
-	else if([uncompletedString hasPrefix:@"sip:"])
+	else if([uncompletedString hasPrefixCaseInsensitive:@"sip:"])
 	{
 		[self _setCallProtocol:XMCallProtocol_SIP];
 		[databaseField setStringValue:[uncompletedString substringFromIndex:4]];

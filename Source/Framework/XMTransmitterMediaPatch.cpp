@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.16 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -79,7 +79,7 @@ void XMTransmitterMediaPatch::Resume()
 			unsigned bitrate = mediaFormat.GetBandwidth()*100;
 			unsigned flags = 0;
 			
-			//cout << "BITRATE: " << bitrate << endl;
+			cout << "BITRATE: " << bitrate << endl;
 						
 			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);

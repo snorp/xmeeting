@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.17 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.18 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,8 @@
 
 - (void)_initiateCall:(XMAddressResource *)addressResource;
 - (void)_initiateSpecificCall:(XMGeneralPurposeAddressResource *)addressResource;
+
+- (NSString *)_adjustedSIPAddress:(XMAddressResource *)addressResource;
 
 - (void)_storeCall:(XMCallInfo *)callInfo;
 
@@ -1097,7 +1099,18 @@
 - (void)_initiateCall:(XMAddressResource *)addressResource
 {
 	XMCallProtocol callProtocol = [addressResource callProtocol];
-	NSString *address = [addressResource address];
+	
+	NSString *address;
+	if(callProtocol == XMCallProtocol_SIP)
+	{
+		address = [self _adjustedSIPAddress:addressResource];
+	}
+	else
+	{
+		address = [addressResource address];
+	}
+	
+	// remove any white spaces in the address
 	NSMutableString *processedAddress = [[NSMutableString alloc] initWithCapacity:[address length]];
 	[processedAddress setString:address];
 	[processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
@@ -1122,7 +1135,21 @@
 	[addressResource _modifyPreferences:modifiedPreferences];
 
 	XMCallProtocol callProtocol = [addressResource callProtocol];
-	NSString *address = [addressResource address];
+	NSString *address;
+	
+	if(callProtocol == XMCallProtocol_SIP)
+	{
+		address = [self _adjustedSIPAddress:addressResource];
+	}
+	else
+	{
+		address = [addressResource address];
+	}
+	
+	// remove any white spaces in the address
+	NSMutableString *processedAddress = [[NSMutableString alloc] initWithCapacity:[address length]];
+	[processedAddress setString:address];
+	[processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
 	
 	// call start validity check is done within XMOpalDispatcher
 	
@@ -1130,12 +1157,36 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation object:self];
 	
 	// change the subsystem and start calling afterwards
-	[XMOpalDispatcher _initiateSpecificCallToAddress:address 
+	[XMOpalDispatcher _initiateSpecificCallToAddress:processedAddress
 											protocol:callProtocol 
 										 preferences:modifiedPreferences 
 									 externalAddress:[_XMUtilsSharedInstance externalAddress]];
 	
 	[modifiedPreferences release];
+	[processedAddress release];
+}
+
+- (NSString *)_adjustedSIPAddress:(XMAddressResource *)addressResource
+{
+	// if using SIP and the address is not an IP address,
+	// the address must have the form xxx@registrar.net
+	// In case the suffix @registrar.net is missing, 
+	// the suffix is added from the information from the
+	// registrar host
+	NSString *address = [addressResource address];
+	if(!XMIsIPAddress(address) && [registrarHosts count] != 0)
+	{
+		NSRange atRange = [address rangeOfString:@"@"];
+	
+		if(atRange.location == NSNotFound)
+		{
+			NSString *host = (NSString *)[registrarHosts objectAtIndex:0];
+			
+			return [NSString stringWithFormat:@"%@@%@", address, host];
+		}
+	}
+	
+	return address;
 }
 
 - (void)_storeCall:(XMCallInfo *)call

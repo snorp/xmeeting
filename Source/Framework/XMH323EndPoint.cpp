@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.17 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.18 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,7 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	
 	SetInitialBandwidth(UINT_MAX);
 	
-	//SetIsH224Enabled(TRUE);
+	SetIsH224Enabled(TRUE);
 }
 
 XMH323EndPoint::~XMH323EndPoint()

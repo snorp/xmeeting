@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263Packetizer.c,v 1.4 2006/02/06 19:38:07 hfriederich Exp $
+ * $Id: XMRTPH263Packetizer.c,v 1.5 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -619,9 +619,9 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 	while(remainingLength > maxPacketLength)
 	{
 		UInt8 gobNumber = (data[dataStartIndex+2] >> 2) & 0x1f;
+		
 		if(gobNumber == lastGOBNumber)
 		{
-			//printf("Is Last GOB Number, packing LONG GOB from %d (%d)\n", dataStartIndex, remainingLength);
 			_XMRTPH263Packetizer_PacketizeLongGOB(globals->packetBuilder,
 												  globals->maxPacketSize,
 												  sampleData,
@@ -637,7 +637,7 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 		else
 		{
 			UInt32 scanIndex = dataStartIndex + maxPacketLength;
-			UInt32 firstPossibleGOBStartIndex = dataStartIndex + 4;
+			UInt32 firstPossibleGOBStartIndex = dataStartIndex + 2;
 			UInt32 gobStartIndex = 0;
 			
 			// find gob header
@@ -709,8 +709,18 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 				
 				if(gobStartIndex == 0)
 				{
+					// it may be that QuickTime does omit some GOBS if they are completely zero
+					// thus, it we consider this case here as having the last GOB
+					_XMRTPH263Packetizer_PacketizeLongGOB(globals->packetBuilder,
+														  globals->maxPacketSize,
+														  sampleData,
+														  packetGroupRef,
+														  sourceFormat,
+														  pictureCodingType,
+														  dataStartIndex,
+														  remainingLength,
+														  true);
 					*outFlags = 0;
-					printf("ERROR: NO GOB start FOUND!\n");
 					return noErr;
 				}
 				else
@@ -983,7 +993,6 @@ void _XMRTPH263Packetizer_PacketizeLongGOB(ComponentInstance packetBuilder,
 										   UInt32 gobLength,
 										   Boolean isLastGOB)
 {
-	printf("LONG GOB\n");
 	// subtracting 8 bytes for Mode B header
 	maxPacketSize -= 8;
 	
@@ -1232,7 +1241,6 @@ void _XMRTPH263Packetizer_PacketizeLongGOB(ComponentInstance packetBuilder,
 		
 		if(newLengthToPacketize > maxPacketSize)
 		{
-			printf("çççççççççççççpacking data part from %d with length %d\n", packetStartIndex, lengthToPacketize);
 			if(packetStartIndex == gobStartIndex)
 			{
 				_XMRTPH263Packetizer_PacketizeGOBStart(packetBuilder,

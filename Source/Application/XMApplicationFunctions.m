@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.6 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.7 2006/04/18 21:58:45 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -330,3 +330,29 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
 	
 	return statusCodeString;
 }
+
+@implementation NSString (XMExtensions)
+
+- (BOOL)hasPrefixCaseInsensitive:(NSString *)prefix
+{
+	unsigned length = [prefix length];
+	
+	if(length > [self length])
+	{
+		return NO;
+	}
+	
+	NSRange searchRange = NSMakeRange(0, length);
+	
+	NSRange prefixRange = [self rangeOfString:prefix
+									  options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
+										range:searchRange];
+	if(prefixRange.location != NSNotFound)
+	{
+		return YES;
+	}
+	
+	return NO;
+}
+
+@end

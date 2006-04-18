@@ -830,6 +830,10 @@
 		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */; };
 		D1FB991709D56F9C0078BBA9 /* XMAddressBookRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */; };
 		D1FB991809D56F9C0078BBA9 /* XMAddressBookRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */; };
+		D1FC2F1609F52A83009C69EE /* h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78009DC4834005D0464 /* h224.cxx */; };
+		D1FC2F1709F52A83009C69EE /* h281.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78109DC4834005D0464 /* h281.cxx */; };
+		D1FC2F1809F52A83009C69EE /* h323h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B7C509DC50E5005D0464 /* h323h224.cxx */; };
+		D1FC2F1909F52A84009C69EE /* q922.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78209DC4835005D0464 /* q922.cxx */; };
 		D1FD475709B650D500EB517B /* XMSIPEndPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FD475509B650D500EB517B /* XMSIPEndPoint.h */; };
 		D1FD475809B650D500EB517B /* XMSIPEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */; };
 		D1FD47CF09B6544B00EB517B /* sdp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FD47CB09B6544B00EB517B /* sdp.cxx */; };
@@ -4338,6 +4342,10 @@
 				D1FD47D109B6544B00EB517B /* sipep.cxx in Sources */,
 				D1FD47D209B6544B00EB517B /* sippdu.cxx in Sources */,
 				D13C78E009B8205A006C6C3B /* XMOpalPatches.cpp in Sources */,
+				D1FC2F1609F52A83009C69EE /* h224.cxx in Sources */,
+				D1FC2F1709F52A83009C69EE /* h281.cxx in Sources */,
+				D1FC2F1809F52A83009C69EE /* h323h224.cxx in Sources */,
+				D1FC2F1909F52A84009C69EE /* q922.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

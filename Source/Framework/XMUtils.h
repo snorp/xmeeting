@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.15 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.16 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -87,10 +87,16 @@
 @end
 
 /**
- * checks whether str is a phone number and consists of only
+ * checks whether phoneNumber is a phone number and consists of only
  * digits, white space and '(' ')' '+' or '-'
  **/
 BOOL XMIsPhoneNumber(NSString *phoneNumber);
+
+/**
+ * checks whether address is an ip address in the form
+ * xxx.xxx.xxx.xxx (IPv4)
+ **/
+BOOL XMIsIPAddress(NSString *address);
 
 /**
  * Returns an NSSize containing the width and height

@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.10 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.11 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -233,6 +233,7 @@ void XMEndPoint::OnReleased(OpalConnection & connection)
 
 void XMEndPoint::OnEstablished(OpalConnection & connection)
 {
+	cout << "ON ESTABLISHED" << endl;
 	isIncomingCall = FALSE;
 	OpalEndPoint::OnEstablished(connection);
 }

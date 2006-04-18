@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.11 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.12 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -425,6 +425,9 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 @end
 
+#pragma mark -
+#pragma mark Functions
+
 BOOL XMIsPhoneNumber(NSString *string)
 {
 	NSCharacterSet *charSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789 ()+-"];
@@ -439,6 +442,27 @@ BOOL XMIsPhoneNumber(NSString *string)
 	[scanner release];
 	
 	return result;
+}
+
+BOOL XMIsIPAddress(NSString *address)
+{
+	NSScanner *scanner = [[NSScanner alloc] initWithString:address];
+	
+	int byte;
+	
+	BOOL isIPAddress = NO;
+	
+	if([scanner scanInt:&byte] && [scanner scanString:@"." intoString:nil] &&
+	   [scanner scanInt:&byte] && [scanner scanString:@"." intoString:nil] &&
+	   [scanner scanInt:&byte] && [scanner scanString:@"." intoString:nil] &&
+	   [scanner scanInt:&byte])
+	{
+		isIPAddress = YES;
+	}
+	
+	[scanner release];
+	
+	return isIPAddress;
 }
 
 NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.23 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.24 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -162,7 +162,7 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {	
-	////cout << "OnEstablishedCall" << endl;
+	cout << "OnEstablishedCall" << endl;
 	BOOL isIncomingCall = TRUE;
 	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
 	if(PIsDescendant(&endPoint, XMEndPoint))

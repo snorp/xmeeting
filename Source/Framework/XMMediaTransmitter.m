@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.32 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.33 2006/04/18 21:58:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -849,6 +849,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	{
 		bitrateToUse = 64000;
 	}
+	
+	NSLog(@"using bitrate %d %d", bitrateToUse, bitrateToUse/8);
 	
 	switch(codecIdentifier)
 	{
