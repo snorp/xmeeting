@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.18 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.19 2006/04/19 11:37:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,6 +63,8 @@ expGolombSymbol -= 1;
 - (XMVideoSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length;
 - (XMVideoSize)_getH264VideoSize;
 - (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer;
+
+- (void)_releaseDecompressionSession;
 
 @end
 
@@ -132,11 +134,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (void)_stopMediaReceivingForSession:(unsigned)sessionID
 {	
-	if(videoDecompressionSession != NULL)
-	{
-		ICMDecompressionSessionRelease(videoDecompressionSession);
-		videoDecompressionSession = NULL;
-	}
+	[self _releaseDecompressionSession];
 	
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingEnd)
 													withObject:nil waitUntilDone:NO];
@@ -302,7 +300,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 											 (void *)self);
 	if(err != noErr)
 	{
+		
 		NSLog(@"Decompression of the frame failed %d", (int)err);
+		if(err == qErr)
+		{
+			[self _releaseDecompressionSession];
+		}
 		return NO;
 	}
 	return YES;
@@ -737,6 +740,15 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	printf("********\n");
 	
 	NSLog(@"Created AVCC Atom. There are %d SPS and %d PPS atoms to choose", numberOfH264SPSAtoms, numberOfH264PPSAtoms);
+}
+
+- (void)_releaseDecompressionSession
+{
+	if(videoDecompressionSession != NULL)
+	{
+		ICMDecompressionSessionRelease(videoDecompressionSession);
+		videoDecompressionSession = NULL;
+	}
 }
 
 @end
