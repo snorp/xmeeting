@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.33 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.34 2006/04/19 09:07:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -841,6 +841,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	codecSpecificCallFlags = [number unsignedIntValue];
 	
+	NSLog(@"USING BITRATE: %d", bitrateToUse);
+	
 	// taking into account packetization overhead
 	bitrateToUse = (bitrateToUse * 0.95);
 	
@@ -849,8 +851,6 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	{
 		bitrateToUse = 64000;
 	}
-	
-	NSLog(@"using bitrate %d %d", bitrateToUse, bitrateToUse/8);
 	
 	switch(codecIdentifier)
 	{
@@ -914,6 +914,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	previousTimeStamp = 0;
 	
 	isTransmitting = YES;
+	transmitFrameCounter = 0;
 	
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoTransmittingStart:)
 													withObject:videoSizeNumber waitUntilDone:NO];
@@ -993,8 +994,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		dataRateParams.dataOverrun = overrun;
 		dataRateParams.frameDuration = 1000/compressSequenceFrameCounter;
 		dataRateParams.keyFrameRate = 0;
-		dataRateParams.minSpatialQuality = codecLowQuality;
-		dataRateParams.minTemporalQuality = codecLowQuality;
+		dataRateParams.minSpatialQuality = codecNormalQuality;
+		dataRateParams.minTemporalQuality = codecNormalQuality;
 		
 		OSStatus err = noErr;
 		err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
@@ -1064,6 +1065,17 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		}
 		
 		previousTimeStamp = timeStamp;
+
+		// Sending a couple of I-Frames at the beginning of a stream
+		// to allow proper picture build-up.
+		if(transmitFrameCounter < 5 ||
+		   (transmitFrameCounter < 30 && (transmitFrameCounter % 2) == 0) ||
+		   (transmitFrameCounter < 120 && (transmitFrameCounter % 10) == 0))
+		{
+			needsPictureUpdate = YES;
+		}
+			
+		transmitFrameCounter++;
 	
 		if(useCompressionSessionAPI == YES)
 		{
@@ -1224,7 +1236,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}	
 	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 120);
+	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 80);
 	if(err != noErr)
 	{
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
@@ -1670,8 +1682,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 										32,
 										codecType,
 										(CompressorComponent)compressor,
-										codecNormalQuality,
-										codecNormalQuality,
+										codecHighQuality,
+										codecHighQuality,
 										0,
 										NULL,
 										codecFlagUpdatePreviousComp,
@@ -1717,8 +1729,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 			dataRateParams.dataOverrun = 0;
 			dataRateParams.frameDuration = 34;
 			dataRateParams.keyFrameRate = 0;
-			dataRateParams.minSpatialQuality = codecLowQuality;
-			dataRateParams.minTemporalQuality = codecLowQuality;
+			dataRateParams.minSpatialQuality = codecNormalQuality;
+			dataRateParams.minTemporalQuality = codecNormalQuality;
 			err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
 			if(err != noErr)
 			{
@@ -1748,12 +1760,10 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
 		
-		if(compressSequenceNonKeyFrameCounter == 120)
+		if(compressSequenceNonKeyFrameCounter == 80)
 		{
 			needsPictureUpdate = YES;
 		}
-		
-		needsPictureUpdate = YES;
 		
 		if(needsPictureUpdate == YES)
 		{

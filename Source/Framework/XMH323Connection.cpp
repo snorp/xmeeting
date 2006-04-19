@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.11 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.12 2006/04/19 09:07:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -238,4 +238,20 @@ BOOL XMH323Connection::OnCreateLogicalChannel(const H323Capability & capability,
 	}
 	
 	return H323Connection::OnCreateLogicalChannel(capability, dir, errorCode);
+}
+
+BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
+{
+	if(!H323Connection::OnOpenMediaStream(mediaStream))
+	{
+		return FALSE;
+	}
+	
+	if(phase == ConnectedPhase)
+	{
+		SetPhase(EstablishedPhase);
+		OnEstablished();
+	}
+	
+	return TRUE;
 }

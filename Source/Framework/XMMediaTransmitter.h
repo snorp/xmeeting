@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.17 2006/04/19 09:07:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,6 +31,7 @@
 	unsigned frameGrabRate;
 	
 	BOOL isTransmitting;
+	unsigned transmitFrameCounter;
 	unsigned transmitFrameGrabRate;
 	XMVideoSize videoSize;
 	CodecType codecType;

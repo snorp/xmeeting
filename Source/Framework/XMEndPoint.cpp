@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.11 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.12 2006/04/19 09:07:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -341,12 +341,14 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
 	if(connection == NULL)
 	{
+		cout << "NoConnection" << endl;
 		return NULL;
 	}
 	
 	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
 	if(otherConnection == NULL)
 	{
+		cout << "NoOtherConnection" << endl;
 		return NULL;
 	}
 	
@@ -354,6 +356,7 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	
 	if(h224Handler == NULL)
 	{
+		cout << "No H224Handler" << endl;
 		return NULL;
 	}
 	
@@ -361,6 +364,7 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	
 	if(h281Handler == NULL)
 	{
+		cout << "No H281Handler" << endl;
 		return NULL;
 	}
 	

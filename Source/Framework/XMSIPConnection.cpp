@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.1 2006/04/19 08:30:41 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.2 2006/04/19 09:07:48 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -89,12 +89,13 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 												unsigned sessionID,
 												SDPSessionDescription & sdpOut)
 {
-	if(sessionID != 2)
+	if(mediaType != SDPMediaDescription::Video)
 	{
 		return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sessionID, sdpOut);
 	}
 	else
 	{
+		// Set default values
 		h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH261BitRate());
 		h261VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 3003);
 		h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
@@ -103,120 +104,183 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 		h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 3003);
 		h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
 		h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+		h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH263BitRate());
+		h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 3003);
+		h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+		h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
 		h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH264BitRate());
 		h264VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 3003);
 		h264VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
 		h264VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
 		
+		// Extract remote media format information
 		const SDPMediaDescriptionList & mediaDescriptionList = sdpIn.GetMediaDescriptions();
-		if(mediaDescriptionList.GetSize() >= 2)
+		for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 		{
-			SDPMediaDescription & videoDescription = mediaDescriptionList[1];
-			const SDPMediaFormatList & videoMediaFormatList = videoDescription.GetSDPMediaFormats();
-			
-			unsigned i;
-			unsigned count = videoMediaFormatList.GetSize();
-			
-			for(i = 0; i < count; i++)
+			SDPMediaDescription & description = mediaDescriptionList[i];
+			if(description.GetMediaType() == SDPMediaDescription::Video)
 			{
-				SDPMediaFormat & mediaFormat = videoMediaFormatList[i];
-				if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
+				const SDPMediaFormatList & videoMediaFormatList = description.GetSDPMediaFormats();
+			
+				unsigned j;
+				unsigned count = videoMediaFormatList.GetSize();
+			
+				for(j = 0; j < count; j++)
 				{
-					unsigned maxBitRate;
-					XMVideoSize videoSize;
-					unsigned mpi;
+					SDPMediaFormat & mediaFormat = videoMediaFormatList[j];
 					
-					_XMParseFMTP_H261(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
-					
-					h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
-					h261VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
-					
-					if(videoSize == XMVideoSize_CIF)
+					if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
 					{
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						unsigned maxBitRate;
+						XMVideoSize videoSize;
+						unsigned mpi;
+					
+						_XMParseFMTP_H261(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+					
+						h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+						h261VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
+					
+						if(videoSize == XMVideoSize_CIF)
+						{
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						}
+						else
+						{
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+						}
 					}
-					else
+					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
 					{
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
-					}
-				}
-				else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
-				{
-					unsigned maxBitRate;
-					XMVideoSize videoSize;
-					unsigned mpi;
+						unsigned maxBitRate;
+						XMVideoSize videoSize;
+						unsigned mpi;
 					
-					_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+						_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+						
+						h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+						h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
 					
-					h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
-					h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
+						if(videoSize == XMVideoSize_CIF)
+						{
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						}
+						else if(videoSize == XMVideoSize_QCIF)
+						{
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+						}
+						else
+						{
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+						}
+					}
+					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
+					{
+						unsigned maxBitRate;
+						XMVideoSize videoSize;
+						unsigned mpi;
 					
-					if(videoSize == XMVideoSize_CIF)
-					{
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
-					}
-					else if(videoSize == XMVideoSize_QCIF)
-					{
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
-					}
-					else
-					{
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+						_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+					
+						h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+						h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
+					
+						if(videoSize == XMVideoSize_CIF)
+						{
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						}
+						else if(videoSize == XMVideoSize_QCIF)
+						{
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+						}
+						else
+						{
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+						}
 					}
 				}
 			}
 		}
 
+		// calling super class implementation
 		BOOL result = SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sessionID, sdpOut);
 		
+		// adjust FMTP information on the SDP list sent
 		SDPMediaDescriptionList outMediaDescriptionList = sdpOut.GetMediaDescriptions();
-		if(outMediaDescriptionList.GetSize() >= 2)
+		
+		for(PINDEX i = 0; i < outMediaDescriptionList.GetSize(); i++)
 		{
-			SDPMediaDescription & videoDescription = outMediaDescriptionList[1];
-			const SDPMediaFormatList & videoMediaFormatList = videoDescription.GetSDPMediaFormats();
-			
-			if(videoMediaFormatList.GetSize() != 0)
+			SDPMediaDescription & description = outMediaDescriptionList[i];
+			if(description.GetMediaType() == SDPMediaDescription::Video)
 			{
-				SDPMediaFormat & mediaFormat = videoMediaFormatList[0];
-				if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
+				const SDPMediaFormatList & videoMediaFormatList = description.GetSDPMediaFormats();
+			
+				for(PINDEX j = 0; j < videoMediaFormatList.GetSize(); j++)
 				{
-					unsigned maxBitRate = h261VideoFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption);
-					unsigned mpi = h261VideoFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption) / 3003;
-					XMVideoSize videoSize;
-					if(h261VideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::CIFWidth)
-					{
-						videoSize = XMVideoSize_CIF;
-					}
-					else
-					{
-						videoSize = XMVideoSize_QCIF;
-					}
-					mediaFormat.SetFMTP(_XMGetFMTP_H261(maxBitRate, videoSize, mpi));
-				}
-				else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
-				{
-					unsigned maxBitRate = h263VideoFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption);
-					unsigned mpi = h263VideoFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption) / 3003;
-					XMVideoSize videoSize;
-					if(h263VideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::CIFWidth)
-					{
-						videoSize = XMVideoSize_CIF;
-					}
-					else if(h263VideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::QCIFWidth)
-					{
-						videoSize = XMVideoSize_QCIF;
-					}
-					else
-					{
-						videoSize = XMVideoSize_SQCIF;
-					}
+					SDPMediaFormat & mediaFormat = videoMediaFormatList[j];
 					
-					mediaFormat.SetFMTP(_XMGetFMTP_H263(maxBitRate, videoSize, mpi));
+					if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
+					{
+						unsigned maxBitRate = h261VideoFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption);
+						unsigned mpi = h261VideoFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption) / 3003;
+						XMVideoSize videoSize;
+						if(h261VideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::CIFWidth)
+						{
+							videoSize = XMVideoSize_CIF;
+						}
+						else
+						{
+							videoSize = XMVideoSize_QCIF;
+						}
+						mediaFormat.SetFMTP(_XMGetFMTP_H261(maxBitRate, videoSize, mpi));
+					}
+					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
+					{
+						unsigned maxBitRate = h263VideoFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption);
+						unsigned mpi = h263VideoFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption) / 3003;
+						XMVideoSize videoSize;
+						if(h263VideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::CIFWidth)
+						{
+							videoSize = XMVideoSize_CIF;
+						}
+						else if(h263VideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::QCIFWidth)
+						{
+							videoSize = XMVideoSize_QCIF;
+						}
+						else
+						{
+							videoSize = XMVideoSize_SQCIF;
+						}
+					
+						mediaFormat.SetFMTP(_XMGetFMTP_H263(maxBitRate, videoSize, mpi));
+					}
+					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
+					{
+						unsigned maxBitRate = h263PlusVideoFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption);
+						unsigned mpi = h263PlusVideoFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption) / 3003;
+						XMVideoSize videoSize;
+						if(h263PlusVideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::CIFWidth)
+						{
+							videoSize = XMVideoSize_CIF;
+						}
+						else if(h263PlusVideoFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption) == PVideoDevice::QCIFWidth)
+						{
+							videoSize = XMVideoSize_QCIF;
+						}
+						else
+						{
+							videoSize = XMVideoSize_SQCIF;
+						}
+						
+						mediaFormat.SetFMTP(_XMGetFMTP_H263(maxBitRate, videoSize, mpi));
+					}
 				}
 			}
 		}
@@ -229,7 +293,7 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 													SDPMediaDescription::MediaType mediaType,
 													unsigned sessionID)
 {
-	if(sessionID == 2)
+	if(mediaType == SDPMediaDescription::Video)
 	{
 		// Resetting media formats to default values
 		h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH261BitRate());
@@ -240,7 +304,7 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 		h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 3003);
 		h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
 		h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
-		h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat:MaxBitRateOption, _XMGetMaxH263BitRate());
+		h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH263BitRate());
 		h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 3003);
 		h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
 		h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
@@ -250,62 +314,92 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 		h264VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
 		
 		const SDPMediaDescriptionList & mediaDescriptionList = sdp.GetMediaDescriptions();
-		if(mediaDescriptionList.GetSize() >= 2)
+		for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 		{
-			SDPMediaDescription & videoDescription = mediaDescriptionList[1];
-			const SDPMediaFormatList & videoMediaFormatList = videoDescription.GetSDPMediaFormats();
-			
-			if(videoMediaFormatList.GetSize() != 0)
+			SDPMediaDescription & description = mediaDescriptionList[i];
+			if(description.GetMediaType() == SDPMediaDescription::Video)
 			{
-				SDPMediaFormat & mediaFormat = videoMediaFormatList[0];
+				const SDPMediaFormatList & videoMediaFormatList = description.GetSDPMediaFormats();
+			
+				for(PINDEX j = 0; j < videoMediaFormatList.GetSize(); j++)
+				{
+					SDPMediaFormat & mediaFormat = videoMediaFormatList[j];
 
-				if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
-				{
-					unsigned maxBitRate;
-					XMVideoSize videoSize;
-					unsigned mpi;
-					
-					_XMParseFMTP_H261(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
-					
-					h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
-					h261VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
-					
-					if(videoSize == XMVideoSize_CIF)
+					if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
 					{
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						unsigned maxBitRate;
+						XMVideoSize videoSize;
+						unsigned mpi;
+					
+						_XMParseFMTP_H261(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+					
+						h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+						h261VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
+					
+						if(videoSize == XMVideoSize_CIF)
+						{
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						}
+						else
+						{
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
+							h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+						}
 					}
-					else
+					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
 					{
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
-						h261VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
-					}
-				}
-				else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
-				{
-					unsigned maxBitRate;
-					XMVideoSize videoSize;
-					unsigned mpi;
+						unsigned maxBitRate;
+						XMVideoSize videoSize;
+						unsigned mpi;
 					
-					_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+						_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
 					
-					h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
-					h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
+						h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+						h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
 					
-					if(videoSize == XMVideoSize_CIF)
-					{
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						if(videoSize == XMVideoSize_CIF)
+						{
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						}
+						else if(videoSize == XMVideoSize_QCIF)
+						{
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+						}
+						else
+						{
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
+							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+						}
 					}
-					else if(videoSize == XMVideoSize_QCIF)
+					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
 					{
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
-					}
-					else
-					{
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
-						h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+						unsigned maxBitRate;
+						XMVideoSize videoSize;
+						unsigned mpi;
+						
+						_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+						
+						h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+						h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
+						
+						if(videoSize == XMVideoSize_CIF)
+						{
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+						}
+						else if(videoSize == XMVideoSize_QCIF)
+						{
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+						}
+						else
+						{
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
+							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+						}
 					}
 				}
 			}
@@ -338,6 +432,10 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		{
 			return SIPConnection::CreateMediaStream(h263VideoFormat, sessionID, isSource);
 		}
+		else if(mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
+		{
+			return SIPConnection::CreateMediaStream(h263PlusVideoFormat, sessionID, isSource);
+		}
 		else if(mediaFormat == XM_MEDIA_FORMAT_H264)
 		{
 			return SIPConnection::CreateMediaStream(h264VideoFormat, sessionID, isSource);
@@ -349,35 +447,42 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 
 void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 {
-	const SDPMediaDescriptionList & mediaDescription = sdp.GetMediaDescriptions();
-	if(mediaDescription.GetSize() < 2)
-	{
-		return;
-	}
+	const SDPMediaDescriptionList & mediaDescriptionList = sdp.GetMediaDescriptions();
 
-	SDPMediaDescription & videoDescription = mediaDescription[1];
-	const SDPMediaFormatList & videoMediaFormats = videoDescription.GetSDPMediaFormats();
-	
-	unsigned i;
-	unsigned count = videoMediaFormats.GetSize();
-	
-	for(i = 0; i < count; i++)
+	for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 	{
-		SDPMediaFormat & videoMediaFormat = videoMediaFormats[i];
-		
-		RTP_DataFrame::PayloadTypes payloadType = videoMediaFormat.GetPayloadType();
-		
-		if(payloadType == RTP_DataFrame::H261)
+
+		SDPMediaDescription & description = mediaDescriptionList[i];
+		if(description.GetMediaType() == SDPMediaDescription::Video)
 		{
-			videoMediaFormat.SetFMTP(_XMGetFMTP_H261());
-		}
-		else if(payloadType == RTP_DataFrame::H263)
-		{
-			videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
-		}
-		else if(payloadType == RTP_DataFrame::DynamicBase)
-		{
-			videoMediaFormat.SetFMTP(_XMGetFMTP_H264());
+			const SDPMediaFormatList & videoMediaFormats = description.GetSDPMediaFormats();
+	
+			unsigned j;
+			unsigned count = videoMediaFormats.GetSize();
+	
+			for(j = 0; j < count; j++)
+			{
+				SDPMediaFormat & videoMediaFormat = videoMediaFormats[j];
+				
+				RTP_DataFrame::PayloadTypes payloadType = videoMediaFormat.GetPayloadType();
+				
+				if(payloadType == RTP_DataFrame::H261)
+				{
+					videoMediaFormat.SetFMTP(_XMGetFMTP_H261());
+				}
+				else if(payloadType == RTP_DataFrame::H263)
+				{
+					videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
+				}
+				else if(payloadType == (RTP_DataFrame::PayloadTypes)96)
+				{
+					videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
+				}
+				else if(payloadType == (RTP_DataFrame::PayloadTypes)97)
+				{
+					videoMediaFormat.SetFMTP(_XMGetFMTP_H264());
+				}
+			}
 		}
 	}
 }

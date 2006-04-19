@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.6 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.7 2006/04/19 09:07:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -155,6 +155,12 @@ BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 	if(!OpalConnection::OnOpenMediaStream(mediaStream))
 	{
 		return FALSE;
+	}
+	
+	if (phase == ConnectedPhase)
+	{
+		SetPhase(EstablishedPhase);
+		OnEstablished();
 	}
 	
 	if(mediaStream.IsSource())
