@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.21 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.22 2006/04/19 11:52:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -146,6 +146,7 @@
 	}
 	else
 	{
+		[videoView setNoVideoImage:[NSImage imageNamed:@"no_video_screen"]];
 		[videoView startDisplayingNoVideo];
 	}
 	
