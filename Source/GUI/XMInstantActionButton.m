@@ -1,16 +1,16 @@
-//
-//  XMInstantActionButton.m
-//  XMeeting
-//
-//  Created by Hannes on 10.4.2006.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
-//
+/*
+ * $Id: XMInstantActionButton.m,v 1.2 2006/04/19 11:55:55 hfriederich Exp $
+ *
+ * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * All rights reserved.
+ * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ */
 
 #import "XMInstantActionButton.h"
 
 @interface XMInstantActionButton (PrivateMethods)
 
-- (void)_updateTrackingRect;
+- (void)_setHighlighted:(BOOL)flag;
 
 @end
 
