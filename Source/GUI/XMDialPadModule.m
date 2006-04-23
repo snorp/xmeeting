@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.8 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.9 2006/04/23 16:18:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,15 +43,19 @@
 	[upButton setTarget:self];
 	[upButton setBecomesPressedAction:@selector(_startUp:)];
 	[upButton setBecomesReleasedAction:@selector(_stop:)];
+	[upButton setKeyCode:NSUpArrowFunctionKey];
 	[leftButton setTarget:self];
 	[leftButton setBecomesPressedAction:@selector(_startLeft:)];
 	[leftButton setBecomesReleasedAction:@selector(_stop:)];
+	[leftButton setKeyCode:NSLeftArrowFunctionKey];
 	[rightButton setTarget:self];
 	[rightButton setBecomesPressedAction:@selector(_startRight:)];
 	[rightButton setBecomesReleasedAction:@selector(_stop:)];
+	[rightButton setKeyCode:NSRightArrowFunctionKey];
 	[downButton setTarget:self];
 	[downButton setBecomesPressedAction:@selector(_startDown:)];
 	[downButton setBecomesReleasedAction:@selector(_stop:)];
+	[downButton setKeyCode:NSDownArrowFunctionKey];
 }
 
 - (NSString *)name

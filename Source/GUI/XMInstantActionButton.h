@@ -1,5 +1,5 @@
 /*
- * $Id: XMInstantActionButton.h,v 1.2 2006/04/19 11:55:55 hfriederich Exp $
+ * $Id: XMInstantActionButton.h,v 1.3 2006/04/23 16:18:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,24 +12,24 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface XMInstantActionButton : NSView {
-
+@interface XMInstantActionButton : NSButton {
+	
 	BOOL isPressed;
 	
-	id target;
 	SEL becomesPressedAction;
-	SEL becomesReleasedAction;
+	SEL becomesReleasedAction;	
 	
+	unichar keyCode;
 }
-
-- (id)target;
-- (void)setTarget:(id)target;
 
 - (SEL)becomesPressedAction;
 - (void)setBecomesPressedAction:(SEL)selector;
 
 - (SEL)becomesReleasedAction;
 - (void)setBecomesReleasedAction:(SEL)selector;
+
+- (unichar)keyCode;
+- (void)setKeyCode:(unichar)keyCode;
 
 @end
 

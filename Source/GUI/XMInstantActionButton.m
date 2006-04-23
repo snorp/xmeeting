@@ -1,5 +1,5 @@
 /*
- * $Id: XMInstantActionButton.m,v 1.2 2006/04/19 11:55:55 hfriederich Exp $
+ * $Id: XMInstantActionButton.m,v 1.3 2006/04/23 16:18:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,30 +16,24 @@
 
 @implementation XMInstantActionButton
 
+#pragma mark Init & Deallocation Methods
+
 - (id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
 	
-	target = nil;
+	isPressed = NO;
+	
 	becomesPressedAction = NULL;
 	becomesReleasedAction = NULL;
+	
+	keyCode = 0x0000;
 	
 	return self;
 }
 
-- (void)awakeFromNib
-{
-}
-
-- (id)target
-{
-	return target;
-}
-
-- (void)setTarget:(id)theTarget
-{
-	target = theTarget;
-}
+#pragma mark -
+#pragma mark Public Methods
 
 - (SEL)becomesPressedAction
 {
@@ -61,18 +55,18 @@
 	becomesReleasedAction = action;
 }
 
-- (void)drawRect:(NSRect)rect
+- (unichar)keyCode
 {
-	if(isPressed)
-	{
-		[[NSColor redColor] set];
-	}
-	else
-	{
-		[[NSColor blueColor] set];
-	}
-	NSRectFill(rect);
+	return keyCode;
 }
+
+- (void)setKeyCode:(unichar)theKeyCode
+{
+	keyCode = theKeyCode;
+}
+
+#pragma mark -
+#pragma mark Overriding NSButton Methods
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
@@ -93,16 +87,44 @@
 	[self _setHighlighted:isInside];
 }
 
-- (BOOL)isOpaque
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	NSString *characters = [theEvent characters];
+	unichar character = [characters characterAtIndex:0];
+	
+	if(character == keyCode)
+	{
+		NSEventType type = [theEvent type];
+		
+		if(type == NSKeyDown)
+		{
+			[self _setHighlighted:YES];
+		}
+		else if(type == NSKeyUp)
+		{
+			[self _setHighlighted:NO];
+		}
+		return YES;
+	}
+	return [super performKeyEquivalent:theEvent];
+}
+
+- (BOOL)acceptsFirstResponder
 {
 	return YES;
 }
 
+#pragma mark -
+#pragma mark Private Methods
+
 - (void)_setHighlighted:(BOOL)flag
-{	
+{
 	if(flag != isPressed)
 	{
 		isPressed = flag;
+		[self highlight:flag];
+		
+		id target = [self target];
 		
 		if(target != nil)
 		{
@@ -115,8 +137,6 @@
 				[target performSelector:becomesReleasedAction withObject:self];
 			}
 		}
-		
-		[self setNeedsDisplay:YES];
 	}
 }
 

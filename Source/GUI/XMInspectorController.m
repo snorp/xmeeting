@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.5 2006/03/23 10:04:48 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.6 2006/04/23 16:18:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -252,6 +252,7 @@ static XMInspectorController *contactsInstance;
 		[pageController setImage:[curModule image] forSegment:i];
 		[pageController setEnabled:[curModule isEnabled] forSegment:i];
 		[pageController setWidth:0 forSegment:i]; //autosize
+		[[pageController cell] setToolTip:[curModule name] forSegment:i];
 	}
 	
 	[pageController setSelectedSegment:0];
