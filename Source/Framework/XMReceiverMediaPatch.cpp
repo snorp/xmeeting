@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.18 2006/04/19 11:37:57 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.19 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -115,7 +115,7 @@ void XMReceiverMediaPatch::Main()
 				if(_XMIsReceivingRFC2429() || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
 				{
 					cout << "Receiving RFC2429" << endl;
-					packetReassembler = new XMH263PlusRTPPacketReassembler();
+					packetReassembler = new XMH263RTPPacketReassembler();
 				}
 				else
 				{
@@ -131,7 +131,7 @@ void XMReceiverMediaPatch::Main()
 						else
 						{
 							cout << "Receiving RFC2429" << endl;
-							packetReassembler = new XMH263PlusRTPPacketReassembler();
+							packetReassembler = new XMH263RTPPacketReassembler();
 						}
 					}
 					else if(result == 1)
@@ -142,7 +142,7 @@ void XMReceiverMediaPatch::Main()
 					else
 					{
 						cout << "Receiving RFC2429" << endl;
-						packetReassembler = new XMH263PlusRTPPacketReassembler();
+						packetReassembler = new XMH263RTPPacketReassembler();
 					}
 				}
 				break;

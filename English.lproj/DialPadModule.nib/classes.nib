@@ -27,7 +27,12 @@
             SUPERCLASS = XMInspectorModule; 
         }, 
         {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = XMInstantActionButton; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+        {
+            CLASS = XMInstantActionButton; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {target = id; }; 
+            SUPERCLASS = NSButton; 
+        }
     ); 
     IBVersion = 1; 
 }

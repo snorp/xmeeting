@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.12 2006/04/19 09:07:48 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.13 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,9 @@
 
 #include <h323/h323ep.h>
 #include <sip/sipep.h>
+#include <h224/h281.h>
+#include <h224/h224handler.h>
+#include <h224/h281handler.h>
 
 #include "XMCallbackBridge.h"
 #include "XMConnection.h"
@@ -206,7 +209,7 @@ void XMEndPoint::RejectIncomingCall()
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting", PSafeReadOnly);
 	if(connection != NULL)
 	{
-		connection->ClearCall(OpalConnection::EndedByRefusal);
+		connection->ClearCall(OpalConnection::EndedByNoAccept);
 	}
 }
 

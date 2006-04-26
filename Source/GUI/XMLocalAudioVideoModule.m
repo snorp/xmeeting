@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.15 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.16 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -117,7 +117,7 @@
 
 - (NSString *)name
 {
-	return @"Local Audio/Video Control";
+	return @"Audio/Video Control";
 }
 
 - (NSView *)contentView

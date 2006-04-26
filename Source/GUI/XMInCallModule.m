@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.22 2006/04/19 11:52:14 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.23 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -78,20 +78,36 @@
 - (NSSize)contentViewSize
 {
 	[self contentView];
-
-	return contentViewSize;
+	
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		return contentViewSize;
+	}
+	else
+	{
+		return contentViewMinSize;
+	}
 }
 
 - (NSSize)contentViewMinSize
 {
 	[self contentView];
-	
+
 	return contentViewMinSize;
 }
 
 - (NSSize)contentViewMaxSize
 {
-	return NSMakeSize(5000, 5000);
+	[self contentView];
+	
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		return NSMakeSize(5000, 5000);
+	}
+	else
+	{
+		return contentViewMinSize;
+	}
 }
 
 - (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight
@@ -140,7 +156,10 @@
 	[self contentView];
 	
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	if([[preferencesManager activeLocation] enableVideo] == YES)
+	XMLocation *activeLocation = [preferencesManager activeLocation];
+	BOOL enableVideo = [activeLocation enableVideo];
+	
+	if(enableVideo == YES)
 	{
 		[videoView startDisplayingVideo];
 	}
@@ -150,7 +169,7 @@
 		[videoView startDisplayingNoVideo];
 	}
 	
-	if([preferencesManager automaticallyHideInCallControls])
+	if([preferencesManager automaticallyHideInCallControls] && enableVideo == YES)
 	{
 		[videoView setOSDDisplayMode:XMOSDDisplayMode_AutomaticallyHiding];
 	}
@@ -163,7 +182,7 @@
 	[videoView setOSDOpeningEffect:(XMOpeningEffect)effect];
 	[videoView setOSDClosingEffect:(XMClosingEffect)effect];
 	
-	if(isFullScreen == YES)
+	if(isFullScreen == YES && enableVideo == YES)
 	{
 		[[videoView window] makeFirstResponder:videoView];
 	}

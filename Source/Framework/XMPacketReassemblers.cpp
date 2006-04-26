@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.6 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.7 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -202,6 +202,7 @@ BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 
 BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
+	cout << "Copy" << endl;
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
 
@@ -238,7 +239,13 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 		// If this is the first packet, we examine the H.323 picture header
 		if(packet == packetListHead)
 		{
-			BYTE *src = &data[offset];
+			PINDEX sourceFormatOffset = 2;
+			if(p == 0)
+			{
+				sourceFormatOffset = 4;
+			}
+			
+			BYTE *src = &data[sourceFormatOffset];
 			BYTE sourceFormat = (src[2] >> 2) & 0x07;
 			
 			// QuickTime H.263 cannot understand the extended PTYPE header
@@ -260,6 +267,8 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 					cout << "Cannot transform frame since UFEP == zero!!!!!!" << endl;
 					return FALSE;
 				}
+				
+				cout << "ufep: " << (int)ufep << endl;
 				
 				sourceFormat = (src[3] >> 4) & 0x07;
 				

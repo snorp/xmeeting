@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.1 2006/04/19 08:30:41 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.2 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,7 @@ public:
 											   SDPMediaDescription::MediaType mediaType,
 											   unsigned sessionID);
 	
+	virtual OpalMediaFormatList GetMediaFormats() const;
 	virtual void AdjustMediaFormats(OpalMediaFormatList & mediaFormats) const;
 	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
@@ -46,16 +47,17 @@ public:
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
 	
+	virtual void OnReceivedACK(SIP_PDU & pdu);
+	
 private:
 	
 	static void AdjustSessionDescription(SDPSessionDescription & sdp);
-	void ExtractFMTPOfMediaFormat(SDPMediaFormat & mediaFormat);
-	void SetFMTPOfMediaFormat(SDPMediaFormat & mediaFormat);
 	
 	OpalVideoFormat h261VideoFormat;
 	OpalVideoFormat h263VideoFormat;
 	OpalVideoFormat h263PlusVideoFormat;
 	OpalVideoFormat h264VideoFormat;
+	unsigned bandwidthUsed;
 };
 
 #endif // __XM_SIP_CONNECTION_H__

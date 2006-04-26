@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.16 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.17 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,6 +73,7 @@ void XMTransmitterMediaPatch::Resume()
 			
 			OpalMediaFormat mediaFormat = sinks[0].stream->GetMediaFormat();
 			payloadType = mediaFormat.GetPayloadType();
+			payloadType = (RTP_DataFrame::PayloadTypes)34;
 			
 			unsigned frameTime = mediaFormat.GetFrameTime();
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
@@ -202,6 +203,8 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 		
 		//cout << "SETTING PAYLOAD TYPE FOR SENDING: " << videoTransmitterPatch->payloadType << endl;
 		frame->SetPayloadType(videoTransmitterPatch->payloadType);
+		cout << "SENDING PTYPE: " << videoTransmitterPatch->payloadType << endl;
+		//frame->SetPayloadType((RTP_DataFrame::PayloadTypes)103);
 		
 		/*XMCodecIdentifier theCodec = videoTransmitterPatch->codecIdentifier;
 		

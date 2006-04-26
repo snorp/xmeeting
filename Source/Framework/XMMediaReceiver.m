@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.19 2006/04/19 11:37:57 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.20 2006/04/26 21:50:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -178,7 +178,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
 				codecName = "H.261";
-				NSLog(@"getting H.261 video size");
 				videoMediaSize = [self _getH261VideoSize:data length:length];
 				break;
 			case XMCodecIdentifier_H263:
