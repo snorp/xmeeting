@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.14 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.15 2006/04/26 21:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,9 +7,6 @@
  */
 
 #import "XMDummyVideoInputModule.h"
-
-void XMDummyPixelBufferReleaseCallback(void *releaseRefCon, 
-									   const void *baseAddress);
 
 @implementation XMDummyVideoInputModule
 
@@ -85,9 +82,14 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 	return YES;
 }
 
-- (BOOL)setInputFrameSize:(NSSize)theSize
+- (BOOL)setInputFrameSize:(XMVideoSize)theVideoSize
 {
-	size = theSize;
+	if(videoSize == theVideoSize)
+	{
+		return YES;
+	}
+	
+	videoSize = theVideoSize;
 	
 	if(pixelBuffer != NULL)
 	{
@@ -107,15 +109,6 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 {
 	if(pixelBuffer == NULL)
 	{
-		CVReturn result;
-		
-		unsigned width = size.width;
-		unsigned height = size.height;
-		unsigned usedBytes = 4*width*height;
-		
-		// creating a buffer for the pixels
-		void *pixels = malloc(usedBytes);
-		
 		NSString *path = [[NSBundle mainBundle] pathForResource:@"DummyImage" ofType:@"gif"];
 		NSData *data = [[NSData alloc] initWithContentsOfFile:path];
 		NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
@@ -124,66 +117,28 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 		if(bitmapImageRep == nil)
 		{
 			[inputManager handleErrorWithCode:1 hintCode:0];
-		}
-		else
-		{
-			UInt8 *bytes = (UInt8 *)pixels;
-			UInt8 *bitmapData = (UInt8 *)[bitmapImageRep bitmapData];
-			
-			unsigned bitmapWidth = [bitmapImageRep pixelsWide];
-			unsigned bitmapHeight = [bitmapImageRep pixelsHigh];
-			
-			unsigned heightSpacing = (height - bitmapHeight) / 2;
-			unsigned widthSpacing = (width - bitmapWidth) / 2;
-			
-			unsigned i;
-			for(i = 0; i < height; i++)
-			{
-				unsigned j;
-				for(j = 0; j < width; j++)
-				{
-					if(i < heightSpacing || i >= heightSpacing+bitmapHeight ||
-					   j < widthSpacing || j >= widthSpacing+bitmapWidth)
-					{
-						// set black with full alpha
-						*bytes = 255;
-						bytes++;
-						*bytes = 0;
-						bytes++;
-						*bytes = 0;
-						bytes++;
-						*bytes = 0;
-						bytes++;
-					}
-					else
-					{
-						// full alpha
-						*bytes = 255;
-						bytes++;
-						*bytes = *bitmapData;
-						bytes++;
-						bitmapData++;
-						*bytes = *bitmapData;
-						bytes++;
-						bitmapData++;
-						*bytes = *bitmapData;
-						bytes++;
-						bitmapData++;
-					}
-				}
-			}
-			
+			return NO;
 		}
 		
-		// creating the CVPixelBufferRef
-		result = CVPixelBufferCreateWithBytes(NULL, (size_t)width, (size_t)height,
-											  k32ARGBPixelFormat, pixels, 4*width,
-											  XMDummyPixelBufferReleaseCallback, NULL, NULL, &pixelBuffer);
 		
-		if(result != kCVReturnSuccess)
+		UInt8 *bitmapData = (UInt8 *)[bitmapImageRep bitmapData];
+			
+		unsigned width = [bitmapImageRep pixelsWide];
+		unsigned height = [bitmapImageRep pixelsHigh];
+		unsigned bytesPerRow = [bitmapImageRep bytesPerRow];
+		
+		pixelBuffer = XMCreatePixelBuffer(videoSize);
+		
+		void *context = XMCreateImageCopyContext(bitmapData, width, height, bytesPerRow, k24RGBPixelFormat,
+												 pixelBuffer, XMImageScaleOperation_NoScaling);
+		
+		BOOL result = XMCopyImageIntoPixelBuffer(bitmapData, pixelBuffer, context);
+		
+		XMDisposeImageCopyContext(context);
+		
+		if(result == NO)
 		{
 			[inputManager handleErrorWithCode:2 hintCode:0];
-			NSLog(@"FAILED2");
 			return NO;
 		}
 		
@@ -236,12 +191,6 @@ void XMDummyPixelBufferReleaseCallback(void *releaseRefCon,
 
 - (void)setDefaultSettingsForDevice:(NSString *)device
 {
-}
-
-void XMDummyPixelBufferReleaseCallback(void *releaseRefCon, 
-									   const void *baseAddress)
-{
-	free((void *)baseAddress);
 }
 
 @end

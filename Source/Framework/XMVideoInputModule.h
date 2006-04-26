@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.11 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.12 2006/04/26 21:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuickTime/QuickTime.h>
+
+#import "XMTypes.h"
 
 @protocol XMVideoInputModule;
 
@@ -152,18 +154,18 @@
 
 /*!
 	@function   setInputFrameSize:(NSSize)frameSize;
-	@discussion	tells the receiver to produce frames optimized for the frameSize dimension.
+	@discussion	tells the receiver to produce frames with dimensions for the given video size
 	
 	This method may be called during a ongoing grab sequence, so the receiver
 	cannot rely on having the same frame size all the time.
 	
 	This method is guaranteed to be called at least once before any call to -openInputDevice is made.
 	 
-	@param      NSSize		frameSize	tells the receiver which size is desired
+	@param      XMVideoSize	videoSize	tells the receiver which size is required
 	 
 	@result		BOOL		return whether the receiver can handle this size or not.
  **/
-- (BOOL)setInputFrameSize:(NSSize)frameSize;
+- (BOOL)setInputFrameSize:(XMVideoSize)videoSize;
 
 /*!
 	@function   setFrameGrabRate:(unsigned)frameGrabRate;
@@ -324,6 +326,87 @@
 - (void)setDefaultSettingsForDevice:(NSString *)device;
 
 @end
+
+/*!
+	@function	XMCreatePixelBuffer(XMVideoSize videoSize);
+	@discussion	Creates a CVPixelBuffer for a given video size that
+				is configured for best performance within the XMeeting
+				video system.
+ 
+	@param		XMVideoSize	videoSize	The desired video size for the buffer.
+	@result		CVPixelBufferRef	The created pixel buffer
+ **/
+CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize);
+
+/*!
+	@function	XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
+										 unsigned bytesPerRow, OSType srcPixelFormat,
+										 CVPixelBufferRef dstPixelBuffer,
+										 XMImageScaleOperation imageScaleOperation);
+	@discussion	Creates a context for copying/scaling a given source into the
+				destination pixel buffer. This context guarantees best speed performance
+				for the desired operation. This context has to be used when calling
+				XMCopyImageIntoPixelBuffer().
+ 
+	@param	void *		src			A pointer to the source buffer containing the image(s).
+	@param	unsigned	srcWidth	The width (in pixels) of the source image
+	@param	unsigned	srcHeight	The height (in pixels) of the source image
+	@param	unsigned	bytesPerRow	The number of bytes per row.
+	@param	OSType		srcPixelFormat	The pixel format of the source. Currently supported
+										pixel formats are:
+										k32ARGBPixelFormat,
+										k24RGBPixelFormat,
+										k16BE555PixelFormat
+										Other pixel formats may be added in future
+	@param	CVPixelBufferRef	dstPixelBuffer	The destionation pixel buffer. Use a buffer
+												obtained from XMCreatePixelBuffer()
+	@param	XMImageScaleOperation	imageScaleOperation	Defines how the image shall be scaled
+									(if needed). 
+ 
+									XMImageScaleOperation_NoScaling does not scale
+									the source image. If it is too small, it is placed in the center
+									of the image. If it is too large, only the upper left portion
+									of the image will be copied.
+ 
+									XMImageScaleOperation_ScaleProportionally will scale the image
+									while keeping the proportions. The image is copied over the
+									destination pixel buffer, thus the previous image is not altered
+									where the source image does not cover. A pixel buffer created
+									with XMCreatePixelBuffer will usually be zeroed (black background).
+ 
+									XMImageScaleOperation_ScaleToFit will scale the image so that
+									the whole destination buffer is covered by the source image.
+ 
+	@result	void*	The freshly created image copy context
+ **/
+void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
+							   unsigned bytesPerRow, OSType srcPixelFormat,
+							   CVPixelBufferRef dstPixelBuffer,
+							   XMImageScaleOperation imageScaleOperation);
+
+/*!
+	@function XMDisposeImageCopyContext(void *imageCopyContext);
+	@discussion	Disposes the context created by XMCreateImageCopyContext().
+ 
+	@param	void*	imageCopyContext	The context to dispose
+ **/
+void XMDisposeImageCopyContext(void *imageCopyContext);
+
+/*!
+	@function	XMCopyImageIntoPixelBuffer(void *src, CVPixelBufferRef dstPixelBuffer,
+										   void *imageCopyContext);
+	@discussion	Copies the source image contained in src to the destionation buffer
+				according to the settings defined in the context. The context
+				is created by calling XMCreateImageCopyContext().
+ 
+	@param	void*				src					The source image buffer
+	@param	CVPixelBufferRef	dstPixelBuffer		The destination pixel buffer.
+	@aram	void*				imageCopyContext	The context to be used for this operation
+ 
+	@result		Returns the success of this operation
+ **/
+BOOL XMCopyImageIntoPixelBuffer(void *src, CVPixelBufferRef dstPixelBuffer,
+								void *imageCopyContext);
 
 #endif // __XM_VIDEO_INPUT_MODULE_H__
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.34 2006/04/19 09:07:48 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.35 2006/04/26 21:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMMediaTransmitter.h"
+
+#import <Accelerate/Accelerate.h>
 
 #import "XMPrivate.h"
 
@@ -119,6 +121,9 @@ OSStatus XMPacketizeCompressedFrameProc(void*						encodedFrameOutputRefCon,
 
 void XMPacketizerDataReleaseProc(UInt8 *inData,
 								 void *inRefCon);
+
+void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon, 
+												  const void *baseAddress);
 
 @implementation XMMediaTransmitter
 
@@ -697,7 +702,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		{
 			activeModule = module;
 			
-			BOOL result = [module setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+			BOOL result = [module setInputFrameSize:videoSize];
 			if(result == NO)
 			{
 				NSLog(@"Error with setInputFrameSize (2)");
@@ -762,7 +767,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		return;
 	}
 	
-	BOOL result = [activeModule setInputFrameSize:XMGetVideoFrameDimensions(videoSize)];
+	BOOL result = [activeModule setInputFrameSize:videoSize];
 	if(result == NO)
 	{
 		activeModule = nil;
@@ -878,13 +883,11 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 	
 	if(videoSize != requiredVideoSize)
 	{
-		NSSize frameDimensions = XMGetVideoFrameDimensions(requiredVideoSize);
-		
 		videoSize = requiredVideoSize;
 		
 		if(isGrabbing == YES)
 		{
-			BOOL result = [activeModule setInputFrameSize:frameDimensions];
+			BOOL result = [activeModule setInputFrameSize:requiredVideoSize];
 			if(result == NO)
 			{
 				NSLog(@"Error with setInputFrameSize (1)");
@@ -1068,9 +1071,9 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 		// Sending a couple of I-Frames at the beginning of a stream
 		// to allow proper picture build-up.
-		if(transmitFrameCounter < 5 ||
-		   (transmitFrameCounter < 30 && (transmitFrameCounter % 2) == 0) ||
-		   (transmitFrameCounter < 120 && (transmitFrameCounter % 10) == 0))
+		if(transmitFrameCounter < 3 ||
+		   (transmitFrameCounter < 30 && (transmitFrameCounter % 4) == 0) ||
+		   (transmitFrameCounter < 120 && (transmitFrameCounter % 30) == 0))
 		{
 			needsPictureUpdate = YES;
 		}
@@ -1236,7 +1239,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}	
 	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 80);
+	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 200);
 	if(err != noErr)
 	{
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
@@ -1760,7 +1763,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 		
 		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
 		
-		if(compressSequenceNonKeyFrameCounter == 80)
+		if(compressSequenceNonKeyFrameCounter == 200)
 		{
 			needsPictureUpdate = YES;
 		}
@@ -2165,6 +2168,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 @end
 
+#pragma mark -
 #pragma mark QT-Procs
 
 OSStatus XMPacketizeCompressedFrameProc(void*						encodedFrameOutputRefCon, 
@@ -2195,4 +2199,363 @@ OSStatus XMPacketizeCompressedFrameProc(void*						encodedFrameOutputRefCon,
 void XMPacketizerDataReleaseProc(UInt8 *inData,
 								 void *inRefCon)
 {
+}
+
+#pragma mark -
+#pragma mark Pixel processing functions
+
+typedef struct XMImageCopyContext
+{
+	size_t srcWidth;
+	size_t srcHeight;
+	size_t srcBytesPerRow;
+	size_t srcBytesPerPixel;
+	size_t dstWidth;
+	size_t dstHeight;
+	size_t dstBytesPerRow;
+	size_t dstOffset;
+	unsigned conversionMode;
+	unsigned scaleMode;
+	void *intermediateBuffer;
+	void *scaleBuffer;
+} XMImageCopyContext;
+
+CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize)
+{
+	NSSize size = XMGetVideoFrameDimensions(videoSize);
+	
+	unsigned width = size.width;
+	unsigned height = size.height;
+	
+	if(width == 0 && height == 0)
+	{
+		return NULL;
+	}
+	
+	void *buffer = malloc(4*width*height);
+	
+	CVPixelBufferRef pixelBuffer;
+	CVReturn result = CVPixelBufferCreateWithBytes(NULL, (size_t)width, (size_t)height,
+												   k32ARGBPixelFormat, buffer, 4*width,
+												   XMMediaTransmitterPixelBufferReleaseCallback,
+												   NULL, NULL, &pixelBuffer);
+	
+	if(result != kCVReturnSuccess)
+	{
+		return NULL;
+	}
+	
+	return pixelBuffer;
+}
+
+void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
+							   unsigned srcBytesPerRow, OSType srcPixelFormat,
+							   CVPixelBufferRef dstPixelBuffer,
+							   XMImageScaleOperation imageScaleOperation)
+{
+	XMImageCopyContext *context = malloc(sizeof(XMImageCopyContext));
+	
+	// initializing default values
+	context->srcWidth = srcWidth;
+	context->srcHeight = srcHeight;
+	context->srcBytesPerRow = srcBytesPerRow;
+	context->srcBytesPerPixel = 4;
+	context->dstWidth = CVPixelBufferGetWidth(dstPixelBuffer);
+	context->dstHeight = CVPixelBufferGetHeight(dstPixelBuffer);
+	context->dstBytesPerRow = CVPixelBufferGetBytesPerRow(dstPixelBuffer);
+	context->dstOffset = 0;
+	context->conversionMode = 0;
+	context->scaleMode = 0;
+	context->intermediateBuffer = NULL;
+	context->scaleBuffer = NULL;
+	
+	// determining whether conversion is needed
+	switch(srcPixelFormat)
+	{
+		case k32ARGBPixelFormat:
+			break;
+		case k24RGBPixelFormat:
+			context->conversionMode = 1;
+			context->srcBytesPerPixel = 3;
+			break;
+		case k16BE555PixelFormat:
+			context->conversionMode = 2;
+			context->srcBytesPerPixel = 2;
+			break;
+		default: // unknown pixel format
+			context->conversionMode = UINT_MAX;
+			break;
+	}
+	
+	// determining whether scale or copy operation is needed
+	if(context->srcWidth != context->dstWidth ||
+	   context->srcHeight != context->srcHeight)
+	{
+		if(imageScaleOperation == XMImageScaleOperation_NoScaling)
+		{
+			context->scaleMode = 1;
+			
+			if(context->srcWidth < context->dstWidth)
+			{
+				size_t difference = (context->dstWidth - context->srcWidth) / 2;
+				context->dstOffset += (difference * 4);
+				context->dstWidth = context->srcWidth;
+			}
+			else
+			{
+				context->srcWidth = context->dstWidth;
+			}
+			
+			if(context->srcHeight < context->dstHeight)
+			{
+				size_t difference = (context->dstHeight - context->srcHeight) / 2;
+				context->dstOffset += (difference * context->dstBytesPerRow);
+				context->dstHeight = context->srcHeight;
+			}
+			else
+			{
+				context->srcHeight = context->dstHeight;
+			}
+				
+		}
+		else if(imageScaleOperation == XMImageScaleOperation_ScaleProportionally)
+		{
+			context->scaleMode = 2;
+			
+			float aspectRatio = (float)context->srcWidth/(float)context->srcHeight;
+			
+			size_t calculatedDstWidth = (size_t)((float)context->dstHeight * aspectRatio);
+			size_t calculatedDstHeight = (size_t)((float)context->dstWidth / aspectRatio);
+			
+			if(calculatedDstWidth < context->dstWidth)
+			{
+				size_t difference = (context->dstWidth - calculatedDstWidth) / 2;
+				context->dstWidth = calculatedDstWidth;
+				context->dstOffset += difference * 4;
+			}
+			else if(calculatedDstHeight < context->dstHeight)
+			{
+				size_t difference = (context->dstHeight - calculatedDstHeight) / 2;
+				context->dstHeight = calculatedDstHeight;
+				context->dstOffset += (difference*context->dstBytesPerRow);
+			}
+		}
+		else if(imageScaleOperation == XMImageScaleOperation_ScaleToFit)
+		{
+			context->scaleMode = 2;
+		}
+	}
+	
+	if(context->conversionMode != 0 && context->scaleMode == 2)
+	{
+		unsigned bufferSize = 4*context->srcWidth*context->srcHeight;
+		context->intermediateBuffer = malloc(bufferSize);
+	}
+	if(context->scaleMode == 1)
+	{
+		if(context->conversionMode != 0)
+		{
+			unsigned bufferSize = context->srcBytesPerPixel*context->srcWidth*context->srcHeight;
+			context->intermediateBuffer = malloc(bufferSize);
+		}
+	}
+	if(context->scaleMode == 2)
+	{
+		vImage_Buffer srcBuffer;
+		vImage_Buffer dstBuffer;
+		
+		srcBuffer.data = NULL;
+		srcBuffer.width = context->srcWidth;
+		srcBuffer.height = context->srcHeight;
+		if(context->conversionMode == 0)
+		{
+			srcBuffer.rowBytes = context->srcBytesPerRow;
+		}
+		else
+		{
+			srcBuffer.rowBytes = 4*context->srcWidth*context->srcHeight;
+		}
+		
+		dstBuffer.data = NULL;
+		dstBuffer.width = context->dstWidth;
+		dstBuffer.height = context->dstHeight;
+		dstBuffer.rowBytes = context->dstBytesPerRow;
+		
+		vImage_Error result;
+		
+		result = vImageScale_ARGB8888(&srcBuffer, &dstBuffer, NULL, 
+									  (kvImageBackgroundColorFill | kvImageGetTempBufferSize));
+		
+		if(result < 0)
+		{
+			context->scaleMode = UINT_MAX;
+		}
+		else
+		{
+			context->scaleBuffer = malloc(result);
+		}
+	}
+	
+	if(context->scaleMode == 0 && context->conversionMode == 0)
+	{
+		context->scaleMode = 1;
+	}
+	
+	return context;
+}
+
+void XMDisposeImageCopyContext(void *imageCopyContext)
+{
+	XMImageCopyContext *context = (XMImageCopyContext *)imageCopyContext;
+	
+	if(context->intermediateBuffer != NULL)
+	{
+		free(context->intermediateBuffer);
+	}
+	if(context->scaleBuffer != NULL)
+	{
+		free(context->scaleBuffer);
+	}
+	
+	free(context);
+}
+
+BOOL XMCopyImageIntoPixelBuffer(void *srcImage, CVPixelBufferRef dstPixelBuffer,
+								void *imageCopyContext)
+{
+	CVPixelBufferLockBaseAddress(dstPixelBuffer, 0);
+	
+	XMImageCopyContext *context = (XMImageCopyContext *)imageCopyContext;
+	void *targetBuffer = CVPixelBufferGetBaseAddress(dstPixelBuffer);
+	
+	void *srcBuffer = srcImage;
+	void *dstBuffer = srcImage;
+	unsigned srcBytesPerRow = context->srcBytesPerRow;
+	unsigned dstBytesPerRow = srcBytesPerRow;
+
+	if(context->scaleMode == 1)
+	{
+		unsigned numberOfLines = context->srcHeight;
+		unsigned numberOfSrcBytes = context->srcWidth * context->srcBytesPerPixel;
+		srcBytesPerRow = context->srcBytesPerRow;
+		
+		if(context->conversionMode == 0)
+		{
+			dstBuffer = targetBuffer;
+			dstBuffer += context->dstOffset;
+			dstBytesPerRow = context->dstBytesPerRow;
+		}
+		else
+		{
+			dstBuffer = context->intermediateBuffer;
+			dstBytesPerRow = numberOfSrcBytes;
+		}
+		
+		void *src = srcBuffer;
+		void *dst = dstBuffer;
+		
+		unsigned i;
+		for(i = 0; i < numberOfLines; i++)
+		{
+			memcpy(dst, src, numberOfSrcBytes);
+			src += srcBytesPerRow;
+			dst += dstBytesPerRow;
+		}
+	}
+	
+	srcBuffer = dstBuffer;
+	srcBytesPerRow = dstBytesPerRow;
+	
+	if(context->conversionMode >= 1)
+	{
+		vImage_Buffer srcImageBuffer;
+		vImage_Buffer dstImageBuffer;
+		
+		srcImageBuffer.data = srcBuffer;
+		srcImageBuffer.width = context->srcWidth;
+		srcImageBuffer.height = context->srcHeight;
+		srcImageBuffer.rowBytes = srcBytesPerRow;
+		
+		if(context->scaleMode == 2)
+		{
+			dstBuffer = context->intermediateBuffer;
+			dstImageBuffer.data = dstBuffer;
+			dstImageBuffer.width = context->srcWidth;
+			dstImageBuffer.height = context->srcHeight;
+			dstImageBuffer.rowBytes = dstImageBuffer.width*4;
+			dstBytesPerRow = dstImageBuffer.rowBytes;
+		}
+		else
+		{
+			dstBuffer = CVPixelBufferGetBaseAddress(dstPixelBuffer);
+			dstImageBuffer.data = (dstBuffer + context->dstOffset);
+			dstImageBuffer.width = context->dstWidth;
+			dstImageBuffer.height = context->dstHeight;
+			dstImageBuffer.rowBytes = context->dstBytesPerRow;
+			dstBytesPerRow = dstImageBuffer.rowBytes;
+		}
+		
+		vImage_Error result = kvImageNoError;
+		
+		if(context->conversionMode == 1)
+		{
+			result = vImageConvert_RGB888toARGB8888(&srcImageBuffer,
+													NULL, 0xff,
+													&dstImageBuffer, false,
+													kvImageNoFlags);
+		}
+		else
+		{
+			result = vImageConvert_ARGB1555toARGB8888(&srcImageBuffer,
+													  &dstImageBuffer,
+													  kvImageNoFlags);
+		}
+		
+		if(result != kvImageNoError)
+		{
+			NSLog(@"vImageConvert failed %d", result);
+			CVPixelBufferUnlockBaseAddress(dstPixelBuffer, 0);
+			return NO;
+		}
+	}
+	
+	srcBuffer = dstBuffer;
+	srcBytesPerRow = dstBytesPerRow;
+	
+	if(context->scaleMode == 2)
+	{
+		vImage_Buffer srcImageBuffer;
+		vImage_Buffer dstImageBuffer;
+		
+		srcImageBuffer.data = srcBuffer;
+		srcImageBuffer.width = context->srcWidth;
+		srcImageBuffer.height = context->srcHeight;
+		srcImageBuffer.rowBytes = srcBytesPerRow;
+		
+		dstImageBuffer.data = (targetBuffer + context->dstOffset);
+		dstImageBuffer.width = context->dstWidth;
+		dstImageBuffer.height = context->dstHeight;
+		dstImageBuffer.rowBytes = context->dstBytesPerRow;
+		
+		vImage_Error result = kvImageNoError;
+		
+		result = vImageScale_ARGB8888(&srcImageBuffer, &dstImageBuffer, context->scaleBuffer,
+									  kvImageBackgroundColorFill);
+		
+		if(result != kvImageNoError)
+		{
+			CVPixelBufferUnlockBaseAddress(dstPixelBuffer, 0);
+			return NO;
+		}
+	}
+
+	CVPixelBufferUnlockBaseAddress(dstPixelBuffer, 0);
+	
+	return YES;
+}
+
+void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon, 
+												  const void *baseAddress)
+{
+	free((void *)baseAddress);
 }

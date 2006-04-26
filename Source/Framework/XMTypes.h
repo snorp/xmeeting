@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.21 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.22 2006/04/26 21:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
  * and NSString keys used within the framework
  **/
 
+#pragma mark -
 #pragma mark Enumerations
 
 /**
@@ -235,6 +236,16 @@ typedef enum XMCameraEvent
 } XMCameraEvent;
 
 /**
+ * Defines various pixel buffer scaling operations
+ **/
+typedef enum XMImageScaleOperation
+{
+	XMImageScaleOperation_NoScaling = 0,
+	XMImageScaleOperation_ScaleProportionally,
+	XMImageScaleOperation_ScaleToFit
+} XMImageScaleOperation;
+
+/**
  * Defines the various types of URL's that the XMeeting framework understands
  **/
 /*typedef enum XMURLType
@@ -258,6 +269,7 @@ typedef enum XMCameraEvent
 	XMCalltoURLTypeCount
 } XMCalltoURLType;*/
 
+#pragma mark -
 #pragma mark Structs
 
 typedef struct XMCallStatisticsRecord

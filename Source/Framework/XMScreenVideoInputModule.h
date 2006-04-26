@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.h,v 1.3 2006/02/27 23:23:58 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.h,v 1.4 2006/04/26 21:49:03 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,23 +28,30 @@
 
 	id<XMVideoInputManager> inputManager;
 
-	NSMutableArray *screenNames;	
+	NSMutableArray *screenNames;	// array containing the names for all screens
+	
 	CGDirectDisplayID displayID;	// selected screen.
-	unsigned rowBytesScreen;		// CGDisplayBytesPerRow(displayID);
-	BOOL	needsUpdate;
+	NSRect screenRect;
+	unsigned rowBytesScreen;		// number of bytes per row for the selected screen
+	BOOL	needsUpdate;			// used to indicate whether the screen did change or not
 	unsigned topLine, bottomLine;	// optimized copy only rows updated (0, height) == full screen.
-	NSLock *updateLock;
+	OSType screenPixelFormat;		// pixel format of the screen
+	
+	NSLock *updateLock;				// assuring correct propagation of screen updates
 	
 	NSRect  frameRect;				// location on the screen (not used yet).
 	
-	NSSize size;					// size of image requested.
-	unsigned frameGrabRate;
-	CVPixelBufferRef pixelBuffer;	// buffer returned on call (can this be a screen frame buffer?).
-									// Note: typedef CVBufferRef = CVImageBufferRef = CVPixelBufferRef;
+	XMVideoSize videoSize;			// required size of output image.
+	
+	CVPixelBufferRef pixelBuffer;	// buffer returned on call to -grabFrame
+	void *imageBuffer;				// copy of screen buffer (for performance reasons)
+	void *imageCopyContext;			// context used to copy the image
+	
+	unsigned droppedFrameCounter;	// counter to ensure that at least every 5th frame is transmitted
 }
 
 - (id)_init;
-- (void) setNeedsUpdate: (BOOL) v;
+
 @end
 
 #endif // __XM_SCREEN_VIDEO_INPUT_MODULE_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.13 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.14 2006/04/26 21:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 
 #import "XMSequenceGrabberVideoInputModule.h"
+
+#import "XMUtils.h"
 
 #define XM_GRAB_WIDTH 352
 #define XM_GRAB_HEIGHT 288
@@ -531,9 +533,9 @@ bail:
 	return result;
 }
 
-- (BOOL)setInputFrameSize:(NSSize)theFrameSize
-{	
-	frameSize = theFrameSize;
+- (BOOL)setInputFrameSize:(XMVideoSize)videoSize
+{
+	frameSize = XMGetVideoFrameDimensions(videoSize);
 	
 	if(isGrabbing == YES)
 	{
