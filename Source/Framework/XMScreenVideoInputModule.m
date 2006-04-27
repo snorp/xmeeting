@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.10 2006/04/26 21:49:03 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.11 2006/04/27 12:25:33 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -281,6 +281,8 @@ Thousands of color:
 		
 		unsigned usedBytes = rowBytesScreen*height;
 		
+		CGDirectPaletteRef palette = NULL;
+		
 		if (rowBytesScreen == 4 * width) 
 		{
 			screenPixelFormat = k32ARGBPixelFormat;		// 32bit color for video
@@ -295,8 +297,8 @@ Thousands of color:
 		} 
 		else
 		{
-			[inputManager handleErrorWithCode:1 hintCode:1]; //256 color video
-			return NO;
+			screenPixelFormat = k8IndexedPixelFormat;
+			palette = CGPaletteCreateWithDisplay(displayID);
 		}
 	
 		// creating the CVPixelBufferRef
@@ -310,7 +312,7 @@ Thousands of color:
 		imageBuffer = malloc(usedBytes);	// creating an buffer for the pixels
 		
 		imageCopyContext = XMCreateImageCopyContext(imageBuffer, width, height, rowBytesScreen,
-													screenPixelFormat, pixelBuffer, 
+													screenPixelFormat, palette, pixelBuffer, 
 													XMImageScaleOperation_ScaleProportionally);
 		
 		[self _setNeedsUpdate:YES];

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.35 2006/04/26 21:49:03 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.36 2006/04/27 12:25:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -2214,8 +2214,9 @@ typedef struct XMImageCopyContext
 	size_t dstHeight;
 	size_t dstBytesPerRow;
 	size_t dstOffset;
-	unsigned conversionMode;
-	unsigned scaleMode;
+	unsigned conversionMode; // 0: no conversion, 1:24to32, 2:16to32 3:8to32
+	unsigned scaleMode;		// 0: no scaling, 1: direct copy, 2: vImage_Scale
+	CGDirectPaletteRef palette;
 	void *intermediateBuffer;
 	void *scaleBuffer;
 } XMImageCopyContext;
@@ -2250,6 +2251,7 @@ CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize)
 
 void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 							   unsigned srcBytesPerRow, OSType srcPixelFormat,
+							   CGDirectPaletteRef colorPalette,
 							   CVPixelBufferRef dstPixelBuffer,
 							   XMImageScaleOperation imageScaleOperation)
 {
@@ -2266,6 +2268,7 @@ void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 	context->dstOffset = 0;
 	context->conversionMode = 0;
 	context->scaleMode = 0;
+	context->palette = NULL;
 	context->intermediateBuffer = NULL;
 	context->scaleBuffer = NULL;
 	
@@ -2281,6 +2284,18 @@ void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 		case k16BE555PixelFormat:
 			context->conversionMode = 2;
 			context->srcBytesPerPixel = 2;
+			break;
+		case k8IndexedPixelFormat:
+			context->conversionMode = 3;
+			context->srcBytesPerPixel = 1;
+			if(colorPalette != NULL)
+			{
+				context->palette = colorPalette;
+			}
+			else
+			{
+				context->palette = CGPaletteCreateDefaultColorPalette();
+			}
 			break;
 		default: // unknown pixel format
 			context->conversionMode = UINT_MAX;
@@ -2408,6 +2423,10 @@ void XMDisposeImageCopyContext(void *imageCopyContext)
 {
 	XMImageCopyContext *context = (XMImageCopyContext *)imageCopyContext;
 	
+	if(context->palette != NULL)
+	{
+		CGPaletteRelease(context->palette);
+	}
 	if(context->intermediateBuffer != NULL)
 	{
 		free(context->intermediateBuffer);
@@ -2466,7 +2485,53 @@ BOOL XMCopyImageIntoPixelBuffer(void *srcImage, CVPixelBufferRef dstPixelBuffer,
 	srcBuffer = dstBuffer;
 	srcBytesPerRow = dstBytesPerRow;
 	
-	if(context->conversionMode >= 1)
+	if(context->conversionMode == 3)
+	{
+		UInt8 *src = srcBuffer;
+		UInt8 *dst;
+		
+		if(context->scaleMode == 2)
+		{
+			dstBuffer = context->intermediateBuffer;
+			dstBytesPerRow = context->srcWidth*4;
+			dst = dstBuffer;
+		}
+		else
+		{
+			dstBuffer = targetBuffer;
+			dstBytesPerRow = context->dstBytesPerRow;
+			dst = (dstBuffer + context->dstOffset);
+		}
+		
+		unsigned i;
+		unsigned j;
+		
+		unsigned width = context->srcWidth;
+		unsigned height = context->srcHeight;
+		
+		CGDirectPaletteRef palette = context->palette;
+		
+		for(i = 0; i < height; i++)
+		{
+			UInt8 *temp = dst;
+			
+			for(j = 0; j < width; j++)
+			{
+				UInt8 byte = src[j];
+				CGDeviceColor color = CGPaletteGetColorAtIndex(palette, byte);
+				
+				temp[0] = 255;
+				temp[1] = (UInt8)(255.0f*color.red);
+				temp[2] = (UInt8)(255.0f*color.green);
+				temp[3] = (UInt8)(255.0f*color.blue);
+				temp += 4;
+			}
+			
+			src += srcBytesPerRow;
+			dst += dstBytesPerRow;
+		}
+	}
+	else if(context->conversionMode >= 1)
 	{
 		vImage_Buffer srcImageBuffer;
 		vImage_Buffer dstImageBuffer;
@@ -2487,7 +2552,7 @@ BOOL XMCopyImageIntoPixelBuffer(void *srcImage, CVPixelBufferRef dstPixelBuffer,
 		}
 		else
 		{
-			dstBuffer = CVPixelBufferGetBaseAddress(dstPixelBuffer);
+			dstBuffer = targetBuffer;
 			dstImageBuffer.data = (dstBuffer + context->dstOffset);
 			dstImageBuffer.width = context->dstWidth;
 			dstImageBuffer.height = context->dstHeight;

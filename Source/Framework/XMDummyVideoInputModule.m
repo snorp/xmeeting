@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.15 2006/04/26 21:49:03 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.16 2006/04/27 12:25:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -130,7 +130,7 @@
 		pixelBuffer = XMCreatePixelBuffer(videoSize);
 		
 		void *context = XMCreateImageCopyContext(bitmapData, width, height, bytesPerRow, k24RGBPixelFormat,
-												 pixelBuffer, XMImageScaleOperation_NoScaling);
+												 NULL, pixelBuffer, XMImageScaleOperation_NoScaling);
 		
 		BOOL result = XMCopyImageIntoPixelBuffer(bitmapData, pixelBuffer, context);
 		
