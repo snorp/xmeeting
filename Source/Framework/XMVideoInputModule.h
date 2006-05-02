@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.13 2006/04/27 12:25:33 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.14 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -363,9 +363,9 @@ CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize);
 												pixel format is k8IndexedPixelFormat.
 												If you pass NULL, the default palette
 												will be used.
-												If you pass a palette here, do not dispose
-												of it. The palette will be automatically
-												released when the context is destroyed.
+												If you pass a palette here, you must
+												release the palette, as the context
+												does make a copy from the palette.
 	@param	CVPixelBufferRef	dstPixelBuffer	The destionation pixel buffer. Use a buffer
 												obtained from XMCreatePixelBuffer()
 	@param	XMImageScaleOperation	imageScaleOperation	Defines how the image shall be scaled

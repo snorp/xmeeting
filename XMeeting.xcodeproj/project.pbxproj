@@ -121,6 +121,9 @@
 		D1205B1109F989AA00179B6C /* up_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205B0F09F989AA00179B6C /* up_arrow.tif */; };
 		D120614409FBDE5100179B6C /* AddressBook_16.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D120614309FBDE5100179B6C /* AddressBook_16.tiff */; };
 		D120649A09FE56C600179B6C /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D120649909FE56C600179B6C /* Accelerate.framework */; };
+		D12077B80A011A0900179B6C /* XMRTPH263PlusPacketizer.c in Sources */ = {isa = PBXBuildFile; fileRef = D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */; };
+		D12077B90A011A0900179B6C /* XMRTPH263PlusPacketizer.h in Headers */ = {isa = PBXBuildFile; fileRef = D12077B60A011A0900179B6C /* XMRTPH263PlusPacketizer.h */; };
+		D12077BA0A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = D12077B70A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h */; };
 		D1296DF509288A7A0077C77F /* psync.h in Headers */ = {isa = PBXBuildFile; fileRef = D1296DF409288A7A0077C77F /* psync.h */; };
 		D12E605B0998AFE9004EF9F8 /* XMVideoModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */; };
 		D12E61D20998FEEB004EF9F8 /* XMVideoInputModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D132789908C7A40800298F25 /* XMVideoInputModule.h */; };
@@ -1029,6 +1032,9 @@
 		D1205B0F09F989AA00179B6C /* up_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = up_arrow.tif; path = Resources/Images/up_arrow.tif; sourceTree = "<group>"; };
 		D120614309FBDE5100179B6C /* AddressBook_16.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AddressBook_16.tiff; path = Resources/Images/AddressBook_16.tiff; sourceTree = "<group>"; };
 		D120649909FE56C600179B6C /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = /System/Library/Frameworks/Accelerate.framework; sourceTree = "<absolute>"; };
+		D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XMRTPH263PlusPacketizer.c; path = Source/Framework/XMRTPH263PlusPacketizer.c; sourceTree = "<group>"; };
+		D12077B60A011A0900179B6C /* XMRTPH263PlusPacketizer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PlusPacketizer.h; path = Source/Framework/XMRTPH263PlusPacketizer.h; sourceTree = "<group>"; };
+		D12077B70A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PlusPacketizerDispatch.h; path = Source/Framework/XMRTPH263PlusPacketizerDispatch.h; sourceTree = "<group>"; };
 		D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMCircularBuffer.cpp; path = Source/Framework/XMCircularBuffer.cpp; sourceTree = "<group>"; };
 		D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMCircularBuffer.h; path = Source/Framework/XMCircularBuffer.h; sourceTree = "<group>"; };
 		D1296DF409288A7A0077C77F /* psync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = psync.h; sourceTree = "<group>"; };
@@ -2049,6 +2055,9 @@
 				D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */,
 				D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */,
 				D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */,
+				D12077B60A011A0900179B6C /* XMRTPH263PlusPacketizer.h */,
+				D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */,
+				D12077B70A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h */,
 				D198B481097636F300180551 /* XMRTPH264Packetizer.h */,
 				D198B482097636F300180551 /* XMRTPH264Packetizer.c */,
 				D198B4870976371D00180551 /* XMRTPH264PacketizerDispatch.h */,
@@ -3366,6 +3375,8 @@
 				D102A36409E5268D0050239C /* XMPreferencesRegistrarRecord.h in Headers */,
 				D102A8FB09E6B4D50050239C /* XMDialPadModule.h in Headers */,
 				D102AFFD09EA770F0050239C /* XMInstantActionButton.h in Headers */,
+				D12077B90A011A0900179B6C /* XMRTPH263PlusPacketizer.h in Headers */,
+				D12077BA0A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4127,6 +4138,7 @@
 				D102A36509E5268D0050239C /* XMPreferencesRegistrarRecord.m in Sources */,
 				D102A8FC09E6B4DA0050239C /* XMDialPadModule.m in Sources */,
 				D102AFFE09EA770F0050239C /* XMInstantActionButton.m in Sources */,
+				D12077B80A011A0900179B6C /* XMRTPH263PlusPacketizer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.7 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.8 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -202,7 +202,6 @@ BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 
 BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
-	cout << "Copy" << endl;
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
 
@@ -267,8 +266,6 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 					cout << "Cannot transform frame since UFEP == zero!!!!!!" << endl;
 					return FALSE;
 				}
-				
-				cout << "ufep: " << (int)ufep << endl;
 				
 				sourceFormat = (src[3] >> 4) & 0x07;
 				

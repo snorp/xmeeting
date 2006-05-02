@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.11 2006/04/27 12:25:33 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.12 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,15 +9,18 @@
 #import "XMScreenVideoInputModule.h"
 
 void XMScreenModuleRefreshCallback(CGRectCount count, const CGRect *rectArray, void *context);
+void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display, 
+										   CGDisplayChangeSummaryFlags flags,
+										   void *context);
 
 @interface XMScreenVideoInputModule (PrivateMethods)
 
 - (void)_setNeedsUpdate:(BOOL)flag;
 - (void)_doScreenCopy;
-- (void)_doScreenCopy_32;
-- (void)_doScreenCopy_24;
-- (void)_doScreenCopy_16;
+- (void)_disposeBuffers;
 - (void)_handleUpdatedScreenRects:(const CGRect *)rectArray count:(CGRectCount)count;
+- (void)_handleScreenReconfigurationForDisplay:(CGDirectDisplayID)display 
+								   changeFlags:(CGDisplayChangeSummaryFlags)flags;
 
 @end
 
@@ -77,6 +80,9 @@ void XMScreenModuleRefreshCallback(CGRectCount count, const CGRect *rectArray, v
 	imageCopyContext = NULL;
 	
 	droppedFrameCounter = 0;
+	
+	locked = NO;
+	needsDisposing = NO;
 	
 	return self;
 }
@@ -236,7 +242,9 @@ Thousands of color:
 
 	}	// end for i
 	
+	locked = NO;
 	CGRegisterScreenRefreshCallback(XMScreenModuleRefreshCallback, self);
+	CGDisplayRegisterReconfigurationCallback(XMScreenModuleReconfigurationCallback, self);
 	
 	return YES;
 }
@@ -244,30 +252,33 @@ Thousands of color:
 - (BOOL)closeInputDevice
 {	
 	CGUnregisterScreenRefreshCallback(XMScreenModuleRefreshCallback, self);
+	CGDisplayRemoveReconfigurationCallback(XMScreenModuleReconfigurationCallback, self);
 	displayID = NULL;
 	
-	if(pixelBuffer != NULL)
-	{
-		CVPixelBufferRelease(pixelBuffer);
-		pixelBuffer = NULL;
-	}
-	if(imageBuffer != NULL)
-	{
-		free(imageBuffer);
-		imageBuffer = NULL;
-	}
-	if(imageCopyContext != NULL)
-	{
-		XMDisposeImageCopyContext(imageCopyContext);
-		imageCopyContext = NULL;
-	}
+	[self _disposeBuffers];
 	
 	return YES;
 }
 
 // called by timer to get updates...
 - (BOOL)grabFrame
-{	
+{
+	if(needsDisposing == YES)
+	{
+		[updateLock lock];
+		
+		[self _disposeBuffers];
+		needsDisposing = NO;
+		
+		[updateLock unlock];
+	}
+	
+	// Don't grab anything while the screen reconfigures itself
+	if(locked == YES)
+	{
+		return YES;
+	}
+	
 	if(pixelBuffer == NULL)
 	{
 		// see:  CoreGraphics/CGDirectDisplay.h
@@ -314,6 +325,11 @@ Thousands of color:
 		imageCopyContext = XMCreateImageCopyContext(imageBuffer, width, height, rowBytesScreen,
 													screenPixelFormat, palette, pixelBuffer, 
 													XMImageScaleOperation_ScaleProportionally);
+		
+		if(palette != NULL)
+		{
+			CGPaletteRelease(palette);
+		}
 		
 		[self _setNeedsUpdate:YES];
 		topLine = 0;
@@ -411,17 +427,20 @@ Thousands of color:
 {	
 	[updateLock lock];
 	
-	UInt8 *bytes = imageBuffer;
-	UInt8 *screenPtr = CGDisplayBaseAddress(displayID);
-	bytes += (topLine * rowBytesScreen);
-	screenPtr += (topLine * rowBytesScreen);
+	if(locked == NO)
+	{
+		UInt8 *bytes = imageBuffer;
+		UInt8 *screenPtr = CGDisplayBaseAddress(displayID);
+		bytes += (topLine * rowBytesScreen);
+		screenPtr += (topLine * rowBytesScreen);
 	
-	unsigned numberOfLines = bottomLine - topLine;
+		unsigned numberOfLines = bottomLine - topLine;
 	
-	memcpy(bytes, screenPtr, numberOfLines*rowBytesScreen);
+		memcpy(bytes, screenPtr, numberOfLines*rowBytesScreen);
 	
-	topLine = screenRect.size.height;
-	bottomLine = 0;
+		topLine = screenRect.size.height;
+		bottomLine = 0;
+	}
 	
 	[updateLock unlock];
 	
@@ -430,6 +449,25 @@ Thousands of color:
 	if(result == NO)
 	{
 		NSLog(@"Couldn't copy to pixel buffer");
+	}
+}
+
+- (void)_disposeBuffers
+{
+	if(pixelBuffer != NULL)
+	{
+		CVPixelBufferRelease(pixelBuffer);
+		pixelBuffer = NULL;
+	}
+	if(imageBuffer != NULL)
+	{
+		free(imageBuffer);
+		imageBuffer = NULL;
+	}
+	if(imageCopyContext != NULL)
+	{
+		XMDisposeImageCopyContext(imageCopyContext);
+		imageCopyContext = NULL;
 	}
 }
 
@@ -467,6 +505,27 @@ Thousands of color:
 	[updateLock unlock];
 }
 
+- (void)_handleScreenReconfigurationForDisplay:(CGDirectDisplayID)display 
+								   changeFlags:(CGDisplayChangeSummaryFlags)flags
+{
+	[updateLock lock];
+	
+	if(display == displayID)
+	{
+		if((flags & kCGDisplayBeginConfigurationFlag) != 0)
+		{
+			locked = YES;
+			needsDisposing = YES;
+		}
+		else
+		{
+			locked = NO;
+		}
+	}
+	
+	[updateLock unlock];
+}
+
 @end
 
 #pragma mark -
@@ -477,4 +536,13 @@ void XMScreenModuleRefreshCallback(CGRectCount count, const CGRect *rectArray, v
 	XMScreenVideoInputModule *module = (XMScreenVideoInputModule *)context;
 
 	[module _handleUpdatedScreenRects:rectArray count:count];
+}
+
+void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display, 
+										   CGDisplayChangeSummaryFlags flags,
+										   void *context)
+{
+	XMScreenVideoInputModule *module = (XMScreenVideoInputModule *)context;
+	
+	[module _handleScreenReconfigurationForDisplay:display changeFlags:flags];
 }

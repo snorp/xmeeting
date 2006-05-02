@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.17 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.18 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,7 +73,6 @@ void XMTransmitterMediaPatch::Resume()
 			
 			OpalMediaFormat mediaFormat = sinks[0].stream->GetMediaFormat();
 			payloadType = mediaFormat.GetPayloadType();
-			payloadType = (RTP_DataFrame::PayloadTypes)34;
 			
 			unsigned frameTime = mediaFormat.GetFrameTime();
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);

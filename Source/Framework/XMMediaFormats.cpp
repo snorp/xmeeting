@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.16 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -805,15 +805,14 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	const H245_H263VideoCapability & h263 = cap;
 	
-	// Due to various interop issues, H.263 sending is limited to RFC2190 at the moment!
-	/*if(h263.HasOptionalField(H245_H263VideoCapability::e_h263Options))
+	if(h263.HasOptionalField(H245_H263VideoCapability::e_h263Options))
 	{
 		isH263PlusCapability = TRUE;
 	}
 	else
 	{
 		isH263PlusCapability = FALSE;
-	}*/
+	}
 	
 	OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.36 2006/04/27 12:25:33 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.37 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 
 #import "XMPacketBuilder.h"
 #import "XMRTPH263Packetizer.h"
+#import "XMRTPH263PlusPacketizer.h"
 #import "XMRTPH264Packetizer.h"
 
 #import "XMSequenceGrabberVideoInputModule.h"
@@ -124,6 +125,7 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 
 void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon, 
 												  const void *baseAddress);
+UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 @implementation XMMediaTransmitter
 
@@ -548,6 +550,7 @@ void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon,
 	EnterMoviesOnThread(kQTEnterMoviesFlagDontSetComponentsThreadMode);
 	XMRegisterPacketBuilder();
 	XMRegisterRTPH263Packetizer();
+	XMRegisterRTPH263PlusPacketizer();
 	XMRegisterRTPH264Packetizer();
 	
 	[receivePort setDelegate:self];
@@ -1094,9 +1097,9 @@ void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon,
 		[XMMediaTransmitter _startTransmittingForSession:2
 											   withCodec:XMCodecIdentifier_H263
 											   videoSize:XMVideoSize_CIF
-									  maxFramesPerSecond:2
+									  maxFramesPerSecond:15
 											  maxBitrate:384000
-												   flags:0];
+												   flags:103];
 	}*/
 	
 	// handling the frame to the video manager to draw the preview image
@@ -1830,7 +1833,7 @@ void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon,
 				if(codecSpecificCallFlags >= kRTPPayload_FirstDynamic)
 				{
 					NSLog(@"Using PLUS Packetizer");
-					packetizerToUse = kRTP263PlusMediaPacketizerType;
+					packetizerToUse = kXMRTPH263PlusPacketizerType;
 				}
 				else
 				{
@@ -2216,7 +2219,7 @@ typedef struct XMImageCopyContext
 	size_t dstOffset;
 	unsigned conversionMode; // 0: no conversion, 1:24to32, 2:16to32 3:8to32
 	unsigned scaleMode;		// 0: no scaling, 1: direct copy, 2: vImage_Scale
-	CGDirectPaletteRef palette;
+	UInt32 *colorLookupTable;
 	void *intermediateBuffer;
 	void *scaleBuffer;
 } XMImageCopyContext;
@@ -2268,7 +2271,7 @@ void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 	context->dstOffset = 0;
 	context->conversionMode = 0;
 	context->scaleMode = 0;
-	context->palette = NULL;
+	context->colorLookupTable = NULL;
 	context->intermediateBuffer = NULL;
 	context->scaleBuffer = NULL;
 	
@@ -2288,14 +2291,7 @@ void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 		case k8IndexedPixelFormat:
 			context->conversionMode = 3;
 			context->srcBytesPerPixel = 1;
-			if(colorPalette != NULL)
-			{
-				context->palette = colorPalette;
-			}
-			else
-			{
-				context->palette = CGPaletteCreateDefaultColorPalette();
-			}
+			context->colorLookupTable = _XMCreateColorLookupTable(colorPalette);
 			break;
 		default: // unknown pixel format
 			context->conversionMode = UINT_MAX;
@@ -2423,9 +2419,9 @@ void XMDisposeImageCopyContext(void *imageCopyContext)
 {
 	XMImageCopyContext *context = (XMImageCopyContext *)imageCopyContext;
 	
-	if(context->palette != NULL)
+	if(context->colorLookupTable != NULL)
 	{
-		CGPaletteRelease(context->palette);
+		free(context->colorLookupTable);
 	}
 	if(context->intermediateBuffer != NULL)
 	{
@@ -2509,22 +2505,17 @@ BOOL XMCopyImageIntoPixelBuffer(void *srcImage, CVPixelBufferRef dstPixelBuffer,
 		unsigned width = context->srcWidth;
 		unsigned height = context->srcHeight;
 		
-		CGDirectPaletteRef palette = context->palette;
+		UInt32 *table = context->colorLookupTable;
 		
 		for(i = 0; i < height; i++)
 		{
-			UInt8 *temp = dst;
+			UInt32 *temp = (UInt32 *)dst;
 			
 			for(j = 0; j < width; j++)
 			{
-				UInt8 byte = src[j];
-				CGDeviceColor color = CGPaletteGetColorAtIndex(palette, byte);
+				UInt8 index = src[j];
 				
-				temp[0] = 255;
-				temp[1] = (UInt8)(255.0f*color.red);
-				temp[2] = (UInt8)(255.0f*color.green);
-				temp[3] = (UInt8)(255.0f*color.blue);
-				temp += 4;
+				temp[j] = table[index];
 			}
 			
 			src += srcBytesPerRow;
@@ -2623,4 +2614,35 @@ void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon,
 												  const void *baseAddress)
 {
 	free((void *)baseAddress);
+}
+
+UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette)
+{
+	UInt32 *table = (UInt32 *)malloc(256*4);
+	
+	CGDirectPaletteRef thePalette = palette;
+	
+	if(thePalette == NULL)
+	{
+		thePalette = CGPaletteCreateDefaultColorPalette();
+	}
+	
+	unsigned i;
+	for(i = 0; i < 256; i++)
+	{
+		CGDeviceColor color = CGPaletteGetColorAtIndex(thePalette, i);
+		
+		UInt8 *ptr = (UInt8 *)(&table[i]);
+		ptr[0] = 255;
+		ptr[1] = (UInt8)(255.0f * color.red);
+		ptr[2] = (UInt8)(255.0f * color.green);
+		ptr[3] = (UInt8)(255.0f * color.blue);
+	}
+	
+	if(palette == NULL)
+	{
+		CGPaletteRelease(thePalette);
+	}
+	
+	return table;
 }

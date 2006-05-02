@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.h,v 1.4 2006/04/26 21:49:03 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.h,v 1.5 2006/05/02 06:58:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,9 @@
 	void *imageCopyContext;			// context used to copy the image
 	
 	unsigned droppedFrameCounter;	// counter to ensure that at least every 5th frame is transmitted
+	
+	BOOL locked;					// used to prevent accessing the screen while a configuration change is ongoing
+	BOOL needsDisposing;			// indicates that the buffers need to be disposed
 }
 
 - (id)_init;
