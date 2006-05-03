@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.3 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.4 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,13 +38,14 @@ BOOL XMSIPConnection::SetUpConnection()
 	
 	PTRACE(2, "SIP\tSetUpConnection: " << remotePartyAddress);
 	// Do a DNS SRV lookup
-/*	
+	
+	/*
     PIPSocketAddressAndPortVector addrs;
     if (PDNS::LookupSRV(targetAddress.GetHostName(), "_sip._udp", targetAddress.GetPort(), addrs)) {
 		transportAddress.SetHostName(addrs[0].address.AsString());
 		transportAddress.SetPort(addrs [0].port);
     }
- */
+	 */
 
 	originating = TRUE;
 	
@@ -91,19 +92,24 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 												unsigned sessionID,
 												SDPSessionDescription & sdpOut)
 {
-	cout << "On Send SDP: " << sdpIn << endl;
-	//sdpOut.SetBandwidthModifier(sdpIn.GetBandwidthModifier());
+	// adjusting bandwidth information,
+	// taking the lower value of remote (if set)
+	// and own bandwidth limit
+	PString bandwidthModifier = sdpIn.GetBandwidthModifier();
+	if(bandwidthModifier.IsEmpty())
+	{
+		bandwidthModifier = SDPSessionDescription::ConferenceTotalBandwidthModifier;
+	}
+	sdpOut.SetBandwidthModifier(sdpIn.GetBandwidthModifier());
 	
 	unsigned bandwidth = sdpIn.GetBandwidthValue();
 	if(bandwidth < bandwidthUsed)
 	{
 		bandwidthUsed = bandwidth;
 	}
-	//sdpOut.SetBandwidthValue(bandwidthUsed);
+	sdpOut.SetBandwidthValue(bandwidthUsed);
 	
-	BOOL result = SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sessionID, sdpOut);
-	
-	/*if(mediaType != SDPMediaDescription::Video)
+	if(mediaType != SDPMediaDescription::Video)
 	{
 		return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sessionID, sdpOut);
 	}
@@ -146,10 +152,16 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 					if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
 					{
 						unsigned maxBitRate;
+						unsigned maxVideoBitRate = (bandwidthUsed-64000)/100;
 						XMVideoSize videoSize;
 						unsigned mpi;
 					
 						_XMParseFMTP_H261(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+						
+						if(maxBitRate > maxVideoBitRate)
+						{
+							maxBitRate = maxVideoBitRate;
+						}
 					
 						h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 						h261VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
@@ -168,10 +180,16 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
 					{
 						unsigned maxBitRate;
+						unsigned maxVideoBitRate = (bandwidthUsed-64000)/100;
 						XMVideoSize videoSize;
 						unsigned mpi;
 					
 						_XMParseFMTP_H263(mediaFormat.GetFMTP(), maxBitRate, videoSize, mpi);
+						
+						if(maxBitRate > maxVideoBitRate)
+						{
+							maxBitRate = maxVideoBitRate;
+						}
 						
 						h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 						h263VideoFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, 90000*mpi*100/2997);
@@ -192,7 +210,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
 						}
 					}
-					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
+					/*else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
 					{
 						unsigned maxBitRate;
 						XMVideoSize videoSize;
@@ -218,7 +236,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
 							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
 						}
-					}
+					}*/
 				}
 			}
 		}
@@ -275,7 +293,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 					
 						mediaFormat.SetFMTP(_XMGetFMTP_H263(maxBitRate, videoSize, mpi));
 					}
-					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
+					/*else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
 					{
 						unsigned maxBitRate = h263PlusVideoFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption);
 						unsigned mpi = h263PlusVideoFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption) / 3003;
@@ -294,21 +312,20 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 						}
 						
 						mediaFormat.SetFMTP(_XMGetFMTP_H263(maxBitRate, videoSize, mpi));
-					}
+					}*/
 				}
 			}
-		}*/
+		}
 	
 		return result;
-	//}
+	}
 }
 
 BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 													SDPMediaDescription::MediaType mediaType,
 													unsigned sessionID)
 {
-	cout << "On RECV SDP: " << sdp << endl;
-	/*if(mediaType == SDPMediaDescription::Video)
+	if(mediaType == SDPMediaDescription::Video)
 	{
 		// Resetting media formats to default values
 		h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH261BitRate());
@@ -389,7 +406,7 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 							h263VideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
 						}
 					}
-					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
+					/*else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263Plus)
 					{
 						unsigned maxBitRate;
 						XMVideoSize videoSize;
@@ -415,11 +432,11 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
 							h263PlusVideoFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
 						}
-					}
+					}*/
 				}
 			}
 		}
-	}*/
+	}
 	return SIPConnection::OnReceivedSDPMediaDescription(sdp, mediaType, sessionID);
 }
 
@@ -427,17 +444,19 @@ OpalMediaFormatList XMSIPConnection::GetMediaFormats() const
 {
 	OpalMediaFormatList mediaFormats = SIPConnection::GetMediaFormats();
 	
-	PINDEX index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H264);
+	// At the moment, neither H.263+ and H.264 are supported for SIP.
+	// H.263+ will probably never come unless QuickTime can actually handle
+	// H.263+ (PLUSPTYPE)
+	PINDEX index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H263PLUS);
 	if(index != P_MAX_INDEX)
 	{
 		mediaFormats.RemoveAt(index);
 	}
-	index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H263PLUS);
+	index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H264);
 	if(index != P_MAX_INDEX)
 	{
 		mediaFormats.RemoveAt(index);
 	}
-	cout << "Returning media formats: " << mediaFormats << endl;
 	return mediaFormats;
 }
 
@@ -462,7 +481,6 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 {
 	if(sessionID == 2)
 	{
-		/*cout << "CreateMediaStream: " << mediaFormat << " " << isSource << endl;
 		if(mediaFormat == XM_MEDIA_FORMAT_H261)
 		{
 			return SIPConnection::CreateMediaStream(h261VideoFormat, sessionID, isSource);
@@ -471,7 +489,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		{
 			return SIPConnection::CreateMediaStream(h263VideoFormat, sessionID, isSource);
 		}
-		else if(mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
+		/*else if(mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
 		{
 			return SIPConnection::CreateMediaStream(h263PlusVideoFormat, sessionID, isSource);
 		}
@@ -486,6 +504,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 
 void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 {
+	cout << "Adjust Session Description" << endl;
 	unsigned bandwidth = (_XMGetMaxH261BitRate() + 640) / 10;
 	sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
 	sdp.SetBandwidthValue(bandwidth);
@@ -496,7 +515,7 @@ void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 	{
 
 		SDPMediaDescription & description = mediaDescriptionList[i];
-		/*if(description.GetMediaType() == SDPMediaDescription::Video)
+		if(description.GetMediaType() == SDPMediaDescription::Video)
 		{
 			const SDPMediaFormatList & videoMediaFormats = description.GetSDPMediaFormats();
 	
@@ -517,16 +536,16 @@ void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 				{
 					videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
 				}
-				else if(payloadType == (RTP_DataFrame::PayloadTypes)96)
+				/*else if(payloadType == (RTP_DataFrame::PayloadTypes)96)
 				{
 					videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
 				}
 				else if(payloadType == (RTP_DataFrame::PayloadTypes)97)
 				{
 					videoMediaFormat.SetFMTP(_XMGetFMTP_H264());
-				}
+				}*/
 			}
-		}*/
+		}
 	}
 }
 
@@ -552,5 +571,95 @@ void XMSIPConnection::OnReceivedACK(SIP_PDU & pdu)
 	if(phase == EstablishedPhase)
 	{
 		releaseMethod = ReleaseWithBYE;
+	}
+}
+
+void XMSIPConnection::OnReceivedAuthenticationRequired(SIPTransaction & transaction,
+													   SIP_PDU & response)
+{
+	BOOL isProxy = response.GetStatusCode() == SIP_PDU::Failure_ProxyAuthenticationRequired;
+	SIPURL proxy;
+	SIPAuthentication auth;
+	PString lastUsername;
+	PString lastNonce;
+	
+	if (transaction.GetMethod() != SIP_PDU::Method_INVITE)
+	{
+		return;
+	}
+	
+	// Received authentication required response, try to find authentication
+	// for the given realm if no proxy
+	if (!auth.Parse(response.GetMIME()(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate"),isProxy)) 
+	{
+		Release(EndedBySecurityDenial);
+		return;
+	}
+	
+	// Save the username, realm and nonce
+	lastUsername = auth.GetUsername();
+	lastNonce = auth.GetNonce();
+	
+	// Try to find authentication parameters for the given realm,
+	// if not, use the proxy authentication parameters (if any)
+	if (!endpoint.GetAuthentication(auth.GetAuthRealm(), authentication))
+	{
+		if (!endpoint.GetProxy().IsEmpty())
+		{
+			authentication.SetUsername(endpoint.GetProxy().GetUserName());
+			authentication.SetPassword(endpoint.GetProxy().GetPassword());
+		}
+		else
+		{
+			Release(EndedBySecurityDenial);
+			return;
+		}
+	}
+	
+	if (!authentication.Parse(response.GetMIME()(isProxy ? "Proxy-Authenticate": "WWW-Authenticate"), isProxy))
+	{
+		Release(EndedBySecurityDenial);
+		return;
+	}
+	
+	if (!authentication.IsValid() || (authentication.IsValid() && lastUsername == authentication.GetUsername () 
+									  && lastNonce    == authentication.GetNonce ())) 
+	{
+		Release(EndedBySecurityDenial);
+		return;
+	}
+	
+	// Restart the transaction with new authentication info
+	// and start with a fresh To tag
+	// Section 8.1.3.5 of RFC3261 tells that the authenticated
+	// request SHOULD have the same value of the Call-ID, To and From.
+	PINDEX j;
+	if ((j = remotePartyAddress.Find (';')) != P_MAX_INDEX)
+	{
+		remotePartyAddress = remotePartyAddress.Left(j);
+	}
+	
+	if (proxy.IsEmpty())
+	{
+		proxy = endpoint.GetProxy();
+	}
+	
+	// Default routeSet if there is a proxy
+	if (!proxy.IsEmpty() && routeSet.GetSize() == 0)
+	{
+		routeSet += "sip:" + proxy.GetHostName() + ':' + PString(proxy.GetPort()) + ";lr";
+	}
+	
+	SIPTransaction * invite = new SIPInvite(*this, *transport);
+	
+	AdjustSessionDescription(invite->GetSDP());
+	
+	if (invite->Start())
+	{
+		invitations.Append(invite);
+	}
+	else 
+	{
+		delete invite;
 	}
 }

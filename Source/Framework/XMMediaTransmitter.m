@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.37 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.38 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1031,6 +1031,19 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame
 {	
+	// checking whether frame has correct dimensions
+	unsigned width = CVPixelBufferGetWidth(frame);
+	unsigned height = CVPixelBufferGetHeight(frame);
+	NSSize desiredSize = XMGetVideoFrameDimensions(videoSize);
+	
+	if((unsigned)desiredSize.width != width ||
+	   (unsigned)desiredSize.height != height)
+	{
+		[self _updateDeviceListAndSelectDummy];
+		return;
+	}
+	
+	// compress and transmit the frame if needed
 	if(isTransmitting == YES)
 	{
 		TimeValue timeStamp;
@@ -1074,9 +1087,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 		// Sending a couple of I-Frames at the beginning of a stream
 		// to allow proper picture build-up.
-		if(transmitFrameCounter < 3 ||
-		   (transmitFrameCounter < 30 && (transmitFrameCounter % 4) == 0) ||
-		   (transmitFrameCounter < 120 && (transmitFrameCounter % 30) == 0))
+		if(transmitFrameCounter < 3 ||	// first three frames are I-frames
+		   (transmitFrameCounter < 120 && (transmitFrameCounter % 30) == 0))	// every 30th is an I-frame
 		{
 			needsPictureUpdate = YES;
 		}
@@ -1092,15 +1104,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			[self _compressSequenceCompressFrame:frame timeStamp:timeStamp];
 		}
 	}
-	/*else
-	{
-		[XMMediaTransmitter _startTransmittingForSession:2
-											   withCodec:XMCodecIdentifier_H263
-											   videoSize:XMVideoSize_CIF
-									  maxFramesPerSecond:15
-											  maxBitrate:384000
-												   flags:103];
-	}*/
 	
 	// handling the frame to the video manager to draw the preview image
 	// on screen
@@ -1503,160 +1506,39 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		UInt32 width = CVPixelBufferGetWidth(frame);
 		UInt32 height = CVPixelBufferGetHeight(frame);
 		
-		BOOL needsToScaleImage = NO;
-		
-		if(videoSize == XMVideoSize_CIF)
-		{
-			if(width <= 176 || height <= 144)
-			{
-				needsToScaleImage = YES;
-			}
-		}
-		else if(videoSize == XMVideoSize_QCIF)
-		{
-			if(width > 176 || height > 144 || width <= 128 || height <= 96)
-			{
-				needsToScaleImage = YES;
-			}
-		}
-		else if(videoSize == XMVideoSize_SQCIF)
-		{
-			if(width > 128 || height > 96)
-			{
-				needsToScaleImage = YES;
-			}
-		}
-		else if(videoSize ==XMVideoSize_4CIF)
-		{
-			if(width > 704 || height > 576)
-			{
-				needsToScaleImage = YES;
-			}
-		}
-		else
-		{
-			NSLog(@"UNKNOWN VIDEO SIZE");
-			return;
-		}
-		
 		PixMap pixMap;
 		PixMapPtr pixMapPtr;
 		PixMapHandle pixMapHandle;
 		Rect dstRect;
 		
-		if(needsToScaleImage == NO)
-		{
-			pixMap.baseAddr = CVPixelBufferGetBaseAddress(frame);
-			pixMap.rowBytes = 0x8000;
-			pixMap.rowBytes |= (CVPixelBufferGetBytesPerRow(frame) & 0x3fff);
-			pixMap.bounds.top = 0;
-			pixMap.bounds.left = 0;
-			pixMap.bounds.bottom = height;
-			pixMap.bounds.right = width;
-			pixMap.pmVersion = 0;
-			pixMap.packType = 0;
-			pixMap.packSize = 0;
-			pixMap.hRes = Long2Fix(72);
-			pixMap.vRes = Long2Fix(72);
-			pixMap.pixelType = 16;
-			pixMap.pixelSize = 32;
-			pixMap.cmpCount = 4;
-			pixMap.cmpSize = 8;
-			pixMap.pixelFormat = CVPixelBufferGetPixelFormatType(frame);
-			pixMap.pmTable = NULL;
-			pixMap.pmExt = NULL;
+		pixMap.baseAddr = CVPixelBufferGetBaseAddress(frame);
+		pixMap.rowBytes = 0x8000;
+		pixMap.rowBytes |= (CVPixelBufferGetBytesPerRow(frame) & 0x3fff);
+		pixMap.bounds.top = 0;
+		pixMap.bounds.left = 0;
+		pixMap.bounds.bottom = height;
+		pixMap.bounds.right = width;
+		pixMap.pmVersion = 0;
+		pixMap.packType = 0;
+		pixMap.packSize = 0;
+		pixMap.hRes = Long2Fix(72);
+		pixMap.vRes = Long2Fix(72);
+		pixMap.pixelType = 16;
+		pixMap.pixelSize = 32;
+		pixMap.cmpCount = 4;
+		pixMap.cmpSize = 8;
+		pixMap.pixelFormat = CVPixelBufferGetPixelFormatType(frame);
+		pixMap.pmTable = NULL;
+		pixMap.pmExt = NULL;
 		
-			pixMapPtr = &pixMap;
-			pixMapHandle = &pixMapPtr;
-			dstRect.top = 0;
-			dstRect.left = 0;
-			dstRect.bottom = height;
-			dstRect.right = width;
-		}
-		else
-		{
-			Rect srcRect;
-			srcRect.top = 0;
-			srcRect.left = 0;
-			srcRect.right = width;
-			srcRect.bottom = height;
-			
-			dstRect.top = 0;
-			dstRect.left = 0;
-			
-			if(videoSize == XMVideoSize_CIF)
-			{
-				dstRect.right = 352;
-				dstRect.bottom = 288;
-			}
-			else if(videoSize == XMVideoSize_QCIF)
-			{
-				dstRect.right = 176;
-				dstRect.bottom = 144;
-			}
-			else
-			{
-				dstRect.right = 128;
-				dstRect.bottom = 96;
-			}
-			
-			if(compressSequenceScaleGWorld == NULL)
-			{
-				void *data = malloc(dstRect.right*dstRect.bottom*4);
-
-				err = QTNewGWorldFromPtr(&compressSequenceScaleGWorld,
-										 CVPixelBufferGetPixelFormatType(frame),
-										 &dstRect,
-										 NULL,
-										 NULL,
-										 0,
-										 data,
-										 dstRect.right*4);
-				if(err != noErr)
-				{
-					NSLog(@"QTNewGWorld failed: %d", err);
-				}
-				
-				compressSequenceScaleImageDescription = (ImageDescriptionHandle)NewHandleClear(sizeof(ImageDescription));
-				
-				(**compressSequenceScaleImageDescription).idSize = sizeof(ImageDescription);
-				(**compressSequenceScaleImageDescription).cType = kRawCodecType;
-				(**compressSequenceScaleImageDescription).resvd1 = 0;
-				(**compressSequenceScaleImageDescription).resvd2 = 0;
-				(**compressSequenceScaleImageDescription).dataRefIndex = 0;
-				(**compressSequenceScaleImageDescription).version = 0;
-				(**compressSequenceScaleImageDescription).revisionLevel = 0;
-				(**compressSequenceScaleImageDescription).vendor = 0;
-				(**compressSequenceScaleImageDescription).temporalQuality = 0;
-				(**compressSequenceScaleImageDescription).spatialQuality = codecNormalQuality;
-				(**compressSequenceScaleImageDescription).width = width;
-				(**compressSequenceScaleImageDescription).height = height;
-				(**compressSequenceScaleImageDescription).hRes = Long2Fix(72);
-				(**compressSequenceScaleImageDescription).vRes = Long2Fix(72);
-				(**compressSequenceScaleImageDescription).dataSize = CVPixelBufferGetBytesPerRow(frame) * CVPixelBufferGetHeight(frame);
-				CopyCStringToPascal("", (**compressSequenceScaleImageDescription).name);
-				(**compressSequenceScaleImageDescription).frameCount = 0;
-				(**compressSequenceScaleImageDescription).depth = 32;
-				(**compressSequenceScaleImageDescription).clutID = -1;
-			}
-			
-			SetGWorld(compressSequenceScaleGWorld, NULL);
-			
-			pixMapHandle = GetGWorldPixMap(compressSequenceScaleGWorld);
-			
-			err = DecompressImage(CVPixelBufferGetBaseAddress(frame),
-								  compressSequenceScaleImageDescription,
-								  pixMapHandle,
-								  &srcRect,
-								  &dstRect,
-								  0,
-								  NULL);
-			if(err != noErr)
-			{
-				NSLog(@"DecImage failed: %d", err);
-			}
-		}
+		pixMapPtr = &pixMap;
+		pixMapHandle = &pixMapPtr;
+		dstRect.top = 0;
+		dstRect.left = 0;
+		dstRect.bottom = height;
+		dstRect.right = width;
 		
+		// creating the compress sequence if needed
 		if(compressSequence == 0)
 		{
 			ComponentDescription componentDescription;
@@ -1729,7 +1611,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			
 			compressSequencePreviousTimeStamp = 0;
 			
-			NSLog(@"limiting bitrate to %d", bitrateToUse);
 			DataRateParams dataRateParams;
 			dataRateParams.dataRate = (bitrateToUse / 8);
 			dataRateParams.dataOverrun = 0;
@@ -1748,13 +1629,36 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			compressSequenceNonKeyFrameCounter = 0;
 		}
 		
-		UInt32 numberOfFramesInBetween = 1;
-		if(compressSequencePreviousTimeStamp != 0)
+		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
+		
+		// send and I-frame every 200 frames
+		if(compressSequenceNonKeyFrameCounter == 200)
 		{
-			numberOfFramesInBetween = (timeStamp - compressSequencePreviousTimeStamp) / 3003;
-			compressSequenceFrameNumber += numberOfFramesInBetween;
+			needsPictureUpdate = YES;
 		}
 		
+		// picture update means to force a key frame
+		// as well as setting the compressSequenceFrameNumber to zero
+		// Only that way will an H.263 frame actually be encoded as an I-frame
+		if(needsPictureUpdate == YES)
+		{
+			compressionFlags |= codecFlagForceKeyFrame;
+			compressSequenceNonKeyFrameCounter = 0;
+			compressSequenceFrameNumber = 0;
+		}
+		else
+		{
+			compressSequenceNonKeyFrameCounter++;
+		
+			// calculate the correct frame number
+			UInt32 numberOfFramesInBetween = 1;
+			if(compressSequencePreviousTimeStamp != 0)
+			{
+				numberOfFramesInBetween = (timeStamp - compressSequencePreviousTimeStamp) / 3003;
+				compressSequenceFrameNumber += numberOfFramesInBetween;
+			}
+		}
+	
 		err = SetCSequenceFrameNumber(compressSequence,
 									  compressSequenceFrameNumber);
 		if(err != noErr)
@@ -1763,23 +1667,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		}
 		
 		compressSequencePreviousTimeStamp = timeStamp;
-		
-		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
-		
-		if(compressSequenceNonKeyFrameCounter == 200)
-		{
-			needsPictureUpdate = YES;
-		}
-		
-		if(needsPictureUpdate == YES)
-		{
-			compressionFlags |= codecFlagForceKeyFrame;
-			compressSequenceNonKeyFrameCounter = 0;
-		}
-		else
-		{
-			compressSequenceNonKeyFrameCounter++;
-		}
 		
 		long dataLength;
 		err = CompressSequenceFrame(compressSequence,
@@ -1832,12 +1719,10 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			case kH263CodecType:
 				if(codecSpecificCallFlags >= kRTPPayload_FirstDynamic)
 				{
-					NSLog(@"Using PLUS Packetizer");
 					packetizerToUse = kXMRTPH263PlusPacketizerType;
 				}
 				else
 				{
-					NSLog(@"USING OLD PACKETIZER");
 					packetizerToUse = kXMRTPH263PacketizerType;
 				}
 				break;
@@ -1954,6 +1839,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	sampleData.sampleDescription = (Handle)imageDesc;
 	sampleData.dataLength = dataLength;
 	
+	// Making H.261 stream standard compliant
 	if(codecType == kH261CodecType)
 	{
 		[self _adjustH261Data:data];
@@ -1972,6 +1858,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		NSLog(@"Still processing data");
 	}
 	
+	// should actually not happen at all!
 	while(kRTPMPStillProcessingData & outFlags)
 	{
 		err = RTPMPIdle(mediaPacketizer, 0, &outFlags);

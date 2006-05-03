@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.2 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.3 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,9 @@ public:
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
 	
 	virtual void OnReceivedACK(SIP_PDU & pdu);
+	
+	virtual void OnReceivedAuthenticationRequired(SIPTransaction & transaction,
+												  SIP_PDU & response);
 	
 private:
 	

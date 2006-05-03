@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.16 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.17 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -238,10 +238,32 @@ const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 }
 
 #pragma mark -
+#pragma mark XMVideoTranscoder methods
+
+XMVideoTranscoder::XMVideoTranscoder(const OpalVideoFormat & src, const OpalVideoFormat & dst)
+: OpalVideoTranscoder(src, dst)
+{
+}
+
+XMVideoTranscoder::~XMVideoTranscoder()
+{
+}
+
+PINDEX XMVideoTranscoder::GetOptimalDataFrameSize(BOOL input) const
+{
+	return RTP_DataFrame::MaxEthernetPayloadSize;
+}
+
+BOOL XMVideoTranscoder::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
+{
+	return TRUE;
+}
+
+#pragma mark -
 #pragma mark XM_H261_VIDEO methods
 
 XM_H261_VIDEO::XM_H261_VIDEO()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_H261, XM_MEDIA_FORMAT_VIDEO)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_H261, XM_MEDIA_FORMAT_VIDEO)
 {
 }
 
@@ -249,21 +271,11 @@ XM_H261_VIDEO::~XM_H261_VIDEO()
 {
 }
 
-PINDEX XM_H261_VIDEO::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_H261_VIDEO::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_H263_VIDEO methods
 
 XM_H263_VIDEO::XM_H263_VIDEO()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_H263, XM_MEDIA_FORMAT_VIDEO)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_H263, XM_MEDIA_FORMAT_VIDEO)
 {
 }
 
@@ -271,21 +283,11 @@ XM_H263_VIDEO::~XM_H263_VIDEO()
 {
 }
 
-PINDEX XM_H263_VIDEO::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_H263_VIDEO::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_H263PLUS_VIDEO methods
 
 XM_H263PLUS_VIDEO::XM_H263PLUS_VIDEO()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_H263PLUS, XM_MEDIA_FORMAT_VIDEO)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_H263PLUS, XM_MEDIA_FORMAT_VIDEO)
 {
 }
 
@@ -293,21 +295,11 @@ XM_H263PLUS_VIDEO::~XM_H263PLUS_VIDEO()
 {
 }
 
-PINDEX XM_H263PLUS_VIDEO::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_H263PLUS_VIDEO::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_H264_VIDEO methods
 
 XM_H264_VIDEO::XM_H264_VIDEO()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_H264, XM_MEDIA_FORMAT_VIDEO)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_H264, XM_MEDIA_FORMAT_VIDEO)
 {
 }
 
@@ -315,21 +307,11 @@ XM_H264_VIDEO::~XM_H264_VIDEO()
 {
 }
 
-PINDEX XM_H264_VIDEO::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_H264_VIDEO::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_VIDEO_H261 methods
 
 XM_VIDEO_H261::XM_VIDEO_H261()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H261)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H261)
 {
 }
 
@@ -337,21 +319,11 @@ XM_VIDEO_H261::~XM_VIDEO_H261()
 {
 }
 
-PINDEX XM_VIDEO_H261::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_VIDEO_H261::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{	
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_VIDEO_H263 methods
 
 XM_VIDEO_H263::XM_VIDEO_H263()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263)
 {
 }
 
@@ -359,21 +331,11 @@ XM_VIDEO_H263::~XM_VIDEO_H263()
 {
 }
 
-PINDEX XM_VIDEO_H263::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_VIDEO_H263::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_VIDEO_H263PLUS methods
 
 XM_VIDEO_H263PLUS::XM_VIDEO_H263PLUS()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263PLUS)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263PLUS)
 {
 }
 
@@ -381,36 +343,16 @@ XM_VIDEO_H263PLUS::~XM_VIDEO_H263PLUS()
 {
 }
 
-PINDEX XM_VIDEO_H263PLUS::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_VIDEO_H263PLUS::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
 #pragma mark -
 #pragma mark XM_VIDEO_H264 methods
 
 XM_VIDEO_H264::XM_VIDEO_H264()
-: OpalVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H264)
+: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H264)
 {
 }
 
 XM_VIDEO_H264::~XM_VIDEO_H264()
 {
-}
-
-PINDEX XM_VIDEO_H264::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XM_VIDEO_H264::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
 }
 
 #pragma mark -

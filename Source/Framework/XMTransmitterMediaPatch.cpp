@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.18 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.19 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -78,8 +78,6 @@ void XMTransmitterMediaPatch::Resume()
 			unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
 			unsigned bitrate = mediaFormat.GetBandwidth()*100;
 			unsigned flags = 0;
-			
-			cout << "BITRATE: " << bitrate << endl;
 						
 			codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
 			XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
@@ -135,6 +133,24 @@ void XMTransmitterMediaPatch::Resume()
 			}
 			
 			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, flags);
+			
+			// adjusting the payload type afterwards, now that the packetization scheme has
+			// been determined
+			OpalTranscoder * transcoder = sinks[0].primaryCodec;
+			if(PIsDescendant(transcoder, XMVideoTranscoder))
+			{
+				XMVideoTranscoder *t = (XMVideoTranscoder *)transcoder;
+				RTP_DataFrame::PayloadMapType map = t->GetPayloadMap();
+				
+				if(map.size() != 0)
+				{
+					RTP_DataFrame::PayloadMapType::iterator r = map.find(mediaFormat.GetPayloadType());
+					if(r != map.end())
+					{
+						payloadType = r->second;
+					}
+				}
+			}
 		}
 	}
 	else

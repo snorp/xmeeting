@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.12 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.13 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -83,90 +83,88 @@ const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat);
 #pragma mark -
 #pragma mark Transcoder classes
 
-class XM_H261_VIDEO : public OpalVideoTranscoder
+class XMVideoTranscoder : public OpalVideoTranscoder
 {
-	PCLASSINFO(XM_H261_VIDEO, OpalVideoTranscoder);
+	PCLASSINFO(XMVideoTranscoder, OpalVideoTranscoder);
+	
+public:
+	
+	XMVideoTranscoder(const OpalVideoFormat & src, const OpalVideoFormat & dst);
+	~XMVideoTranscoder();
+	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
+	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
+	
+	RTP_DataFrame::PayloadMapType GetPayloadMap() const { return payloadTypeMap; }
+};
+
+class XM_H261_VIDEO : public XMVideoTranscoder
+{
+	PCLASSINFO(XM_H261_VIDEO, XMVideoTranscoder);
 	
 public:
 	XM_H261_VIDEO();
 	~XM_H261_VIDEO();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_H263_VIDEO : public OpalVideoTranscoder
+class XM_H263_VIDEO : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_H263_VIDEO, OpalVideoTranscoder);
+	PCLASSINFO(XM_H263_VIDEO, XMVideoTranscoder);
 public:
 	XM_H263_VIDEO();
 	~XM_H263_VIDEO();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_H263PLUS_VIDEO : public OpalVideoTranscoder
+class XM_H263PLUS_VIDEO : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_H263PLUS_VIDEO, OpalVideoTranscoder);
+	PCLASSINFO(XM_H263PLUS_VIDEO, XMVideoTranscoder);
 	
 public:
 	XM_H263PLUS_VIDEO();
 	~XM_H263PLUS_VIDEO();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_H264_VIDEO : public OpalVideoTranscoder
+class XM_H264_VIDEO : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_H264_VIDEO, OpalVideoTranscoder);
+	PCLASSINFO(XM_H264_VIDEO, XMVideoTranscoder);
 public:
 	XM_H264_VIDEO();
 	~XM_H264_VIDEO();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_VIDEO_H261 : public OpalVideoTranscoder
+class XM_VIDEO_H261 : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_VIDEO_H261, OpalVideoTranscoder);
+	PCLASSINFO(XM_VIDEO_H261, XMVideoTranscoder);
 	
 public:
 	XM_VIDEO_H261();
 	~XM_VIDEO_H261();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_VIDEO_H263 : public OpalVideoTranscoder
+class XM_VIDEO_H263 : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_VIDEO_H263, OpalVideoTranscoder);
+	PCLASSINFO(XM_VIDEO_H263, XMVideoTranscoder);
 	
 public:
 	XM_VIDEO_H263();
 	~XM_VIDEO_H263();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_VIDEO_H263PLUS : public OpalVideoTranscoder
+class XM_VIDEO_H263PLUS : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_VIDEO_H263PLUS, OpalVideoTranscoder);
+	PCLASSINFO(XM_VIDEO_H263PLUS, XMVideoTranscoder);
 	
 public:
 	XM_VIDEO_H263PLUS();
 	~XM_VIDEO_H263PLUS();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
-class XM_VIDEO_H264 : public OpalVideoTranscoder
+class XM_VIDEO_H264 : public XMVideoTranscoder
 {
-	PCLASSINFO(XM_VIDEO_H264, OpalVideoTranscoder);
+	PCLASSINFO(XM_VIDEO_H264, XMVideoTranscoder);
 	
 public:
 	XM_VIDEO_H264();
 	~XM_VIDEO_H264();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
 };
 
 #pragma mark -

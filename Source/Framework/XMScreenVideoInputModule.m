@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.12 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.13 2006/05/03 19:54:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -313,7 +313,7 @@ Thousands of color:
 		}
 	
 		// creating the CVPixelBufferRef
-		pixelBuffer = XMCreatePixelBuffer(XMVideoSize_CIF);
+		pixelBuffer = XMCreatePixelBuffer(videoSize);
 		
 		if(pixelBuffer == NULL)
 		{
