@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263Packetizer.c,v 1.6 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMRTPH263Packetizer.c,v 1.7 2006/05/03 20:10:04 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -595,13 +595,6 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 	
 	// determining the picture coding type (INTRA / INTER) for this frame
 	UInt8 pictureCodingType = (data[4] >> 1) & 0x01;
-	
-	if(pictureCodingType == 0)
-	{
-		printf("INTRA\n");
-	}
-	
-	static int counter = 0;
 	
 	UInt32 remainingLength = frameLength;
 	UInt32 dataStartIndex = 0;

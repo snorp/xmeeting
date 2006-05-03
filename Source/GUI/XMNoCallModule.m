@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.32 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.33 2006/05/03 20:10:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -880,6 +880,14 @@
 	else if(callProtocol == XMCallProtocol_SIP)
 	{
 		[callAddressField setDefaultImage:[NSImage imageNamed:@"SIPURL_Disclosure"]];
+	}
+	
+	id representedObject = [callAddressField representedObject];
+	
+	if([representedObject displayImage] == nil)
+	{
+		XMSimpleAddressResource *resource = (XMSimpleAddressResource *)representedObject;
+		[resource setCallProtocol:callProtocol];
 	}
 }
 
