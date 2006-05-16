@@ -6,6 +6,7 @@
                 cancelAssistant = id; 
                 continueAssistant = id; 
                 goBackAssistant = id; 
+                protocolSwitchToggled = id; 
                 updateExternalAddress = id; 
                 validateAddressTranslationInterface = id; 
             }; 
@@ -17,6 +18,9 @@
                 cancelButton = NSButton; 
                 contentBox = NSBox; 
                 continueButton = NSButton; 
+                cornerImage = NSImageView; 
+                enableH323Switch = NSButton; 
+                enableSIPSwitch = NSButton; 
                 enableVideoRadioButtons = NSMatrix; 
                 externalAddressField = NSTextField; 
                 flCompletedView = NSView; 
@@ -24,6 +28,7 @@
                 flIntroductionView = NSView; 
                 flLocationView = NSView; 
                 flNewLocationView = NSView; 
+                flProtocolsView = NSView; 
                 gatekeeperSettingsView = NSView; 
                 gkHostField = NSTextField; 
                 gkPasswordField = NSTextField; 
@@ -36,11 +41,18 @@
                 liInfoView = NSView; 
                 locationNameField = NSTextField; 
                 locationRadioButtons = NSMatrix; 
-                modalDelegate = id; 
                 networkSettingsView = NSView; 
+                registrarAuthUsernameField = NSTextField; 
+                registrarHostField = NSTextField; 
+                registrarPasswordField = NSTextField; 
+                registrarSettingsView = NSView; 
+                registrarUsernameField = NSTextField; 
+                sipSettingsView = NSView; 
+                titleField = NSTextField; 
                 updateExternalAddressButton = NSButton; 
                 useGatekeeperRadioButtons = NSMatrix; 
                 useIPAddressTranslationSwitch = NSButton; 
+                useRegistrarRadioButtons = NSMatrix; 
                 userNameField = NSTextField; 
                 videoSettingsView = NSView; 
             }; 
