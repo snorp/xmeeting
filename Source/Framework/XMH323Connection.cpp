@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.12 2006/04/19 09:07:48 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.13 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,11 @@
 
 #include <asn/h245.h>
 
+#include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 #include "XMTransmitterMediaPatch.h"
 #include "XMH323Channel.h"
+#include "XMBridge.h"
 
 XMH323Connection::XMH323Connection(OpalCall & call,
 								   H323EndPoint & endPoint,
@@ -24,6 +26,9 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 {
 	hasSetLocalCapabilities = FALSE;
 	hasSentLocalCapabilities = FALSE;
+	
+	// setting correct initial bandwidth
+	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
 }
 
 XMH323Connection::~XMH323Connection()
@@ -33,6 +38,7 @@ XMH323Connection::~XMH323Connection()
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 {
+	cout << "ON SEND CAPS" << endl;
 	H323Connection::OnSendCapabilitySet(pdu);
 	
 	const H323Capabilities & localCaps = GetLocalCapabilities();
@@ -79,6 +85,7 @@ BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCa
 
 void XMH323Connection::OnSetLocalCapabilities()
 {	
+	cout << "ON SET LOCAL CAPS" << endl;
 	// Only call OnSetLocalCapabilities if not already done
 	if(hasSetLocalCapabilities == FALSE)
 	{
@@ -253,5 +260,23 @@ BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 		OnEstablished();
 	}
 	
+	return TRUE;
+}
+
+BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
+{
+	cout << "SET AVAILABLE BANDWIDTH: " << newBandwidth;
+	bandwidthAvailable = newBandwidth;
+	XMOpalManager::SetAvailableBandwidth(100*newBandwidth);
+	return TRUE;
+}
+
+unsigned XMH323Connection::GetBandwidthUsed() const
+{
+	return 0;
+}
+
+BOOL XMH323Connection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
+{
 	return TRUE;
 }

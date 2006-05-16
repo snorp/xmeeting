@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Account.h,v 1.1 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMH323Account.h,v 1.2 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@ extern NSString *XMKey_H323AccountName;
 extern NSString *XMKey_H323AccountGatekeeper;
 extern NSString *XMKey_H323AccountUsername;
 extern NSString *XMKey_H323AccountPhoneNumber;
+extern NSString *XMKey_H323AccountPassword;
 
 /**
  * An H323 account instance encapsulates all information required so that the client

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.19 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.20 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1054,6 +1054,9 @@ typedef enum _XMOpalDispatcherMessage
 		NSLog(@"callID mismatch in callCleared: %d to current %d", (int)theCallID, (int)callID);
 		return;
 	}
+	
+	_XMStopAudio();
+	_XMResetAvailableBandwidth();
 	
 	NSData *callEndReasonData = (NSData *)[messageComponents objectAtIndex:1];
 	NSNumber *callEndReason = [NSKeyedUnarchiver unarchiveObjectWithData:callEndReasonData];

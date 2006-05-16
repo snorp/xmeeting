@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Account.m,v 1.1 2006/03/13 23:46:21 hfriederich Exp $
+ * $Id: XMH323Account.m,v 1.2 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@ NSString *XMKey_H323AccountName = @"XMeeting_H323AccountName";
 NSString *XMKey_H323AccountGatekeeper = @"XMeeting_H323AccountGatekeeper";
 NSString *XMKey_H323AccountUsername = @"XMeeting_H323AccountUsername";
 NSString *XMKey_H323AccountPhoneNumber = @"XMeeting_H323AccountPhoneNumber";
+NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 @interface XMH323Account (PrivateMethods)
 

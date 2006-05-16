@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.7 2006/04/19 09:07:48 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.8 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,6 +51,11 @@ public:
 										unsigned & errorCode);
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
+	
+	// improved bandwidth management
+	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
+	virtual unsigned GetBandwidthUsed() const;
+	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
 	
 private:
 	BOOL hasSetLocalCapabilities;

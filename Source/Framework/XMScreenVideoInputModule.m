@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.13 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.14 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -285,6 +285,7 @@ Thousands of color:
 		rowBytesScreen = CGDisplayBytesPerRow(displayID);
 		unsigned height = CGDisplayPixelsHigh(displayID);
 		unsigned width = CGDisplayPixelsWide(displayID);
+		unsigned bitsPerPixel = CGDisplayBitsPerPixel(displayID);
 		
 		NSLog(@"Screen Geometry Changed - (%d,%d) Depth: %d, Samples: %d, rowBytesScreen %d\n", 
 			  width,  height,
@@ -294,15 +295,15 @@ Thousands of color:
 		
 		CGDirectPaletteRef palette = NULL;
 		
-		if (rowBytesScreen == 4 * width) 
+		if (bitsPerPixel == 32) 
 		{
 			screenPixelFormat = k32ARGBPixelFormat;		// 32bit color for video
 		} 
-		else if (rowBytesScreen == 3 * width) 
+		else if (bitsPerPixel == 24) 
 		{
 			screenPixelFormat = k24RGBPixelFormat;		// 24 bit color for video
 		} 
-		else if (rowBytesScreen == 2 * width)
+		else if (bitsPerPixel == 16)
 		{
 			screenPixelFormat = k16BE555PixelFormat;	// Thousands for video
 		} 
@@ -434,9 +435,40 @@ Thousands of color:
 		bytes += (topLine * rowBytesScreen);
 		screenPtr += (topLine * rowBytesScreen);
 	
+#if defined(__BIG_ENDIAN__)
 		unsigned numberOfLines = bottomLine - topLine;
-	
 		memcpy(bytes, screenPtr, numberOfLines*rowBytesScreen);
+#else
+		if(screenPixelFormat == k32ARGBPixelFormat)
+		{
+			// we need to do byte swapping in order to get correct
+			// colors. Reading from the screen buffer seems to be
+			// SLOOOOOOOOOOOOW on intel macs, also true for memcpy
+			// :-(
+			unsigned width = (unsigned)screenRect.size.width;
+			unsigned i;
+			
+			for(i = topLine; i < bottomLine; i++)
+			{
+				UInt32 *src = (UInt32 *)screenPtr;
+				UInt32 *dst = (UInt32 *)bytes;
+				
+				unsigned j;
+				for(j = 0; j < width; j++)
+				{
+					dst[j] = CFSwapInt32(src[j]);
+				}
+				
+				bytes += rowBytesScreen;
+				screenPtr += rowBytesScreen;
+			}
+		}
+		else
+		{
+			unsigned numberOfLines = bottomLine - topLine;
+			memcpy(bytes, screenPtr, numberOfLines*rowBytesScreen);
+		}
+#endif
 	
 		topLine = screenRect.size.height;
 		bottomLine = 0;

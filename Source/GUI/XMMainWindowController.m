@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.16 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.17 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -371,12 +371,6 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 {
 	if(flag == YES)
 	{
-		if(CGDisplayCapture(kCGDirectMainDisplay) != kCGErrorSuccess) 
-		{
-			NSLog(@"Could not capture main display");
-			return;
-		}
-		
 		unsigned i;
 		unsigned count = [modules count];
 	
@@ -396,11 +390,6 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	else
 	{
 		[fullScreenWindow orderOut:self];
-		
-		if(CGDisplayRelease(kCGDirectMainDisplay) != kCGErrorSuccess)
-		{
-			NSLog(@"Could not release main display!");
-		}
 		
 		unsigned i;
 		unsigned count = [modules count];

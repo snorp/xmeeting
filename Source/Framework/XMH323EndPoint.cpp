@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.18 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.19 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,9 @@
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager)
 {
+	//adjusting some time intervals
+	gatekeeperRequestTimeout = PTimeInterval(0, 2);
+	
 	isListening = FALSE;
 	
 	connectionToken = "";
@@ -270,17 +273,20 @@ void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 
 void XMH323EndPoint::OnReleased(OpalConnection & connection)
 {
-	XMOpalManager * manager = (XMOpalManager *)(&GetManager());
-	PString empty = "";
+	if(connection.GetToken() == connectionToken)
+	{
+		XMOpalManager * manager = (XMOpalManager *)(&GetManager());
+		PString empty = "";
 
-	manager->SetCallInformation(connectionToken,
-								empty,
-								empty,
-								empty,
-								empty,
-								XMCallProtocol_H323);
+		manager->SetCallInformation(connectionToken,
+									empty,
+									empty,
+									empty,
+									empty,
+									XMCallProtocol_H323);
 	
-	connectionToken = "";
+		connectionToken = "";
+	}
 	
 	H323EndPoint::OnReleased(connection);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.13 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.14 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -294,6 +294,7 @@ private:
 #pragma mark Packetization Functions
 
 BOOL _XMIsReceivingRFC2429();
+void _XMSetIsReceivingRFC2429(BOOL flag);
 unsigned _XMGetH264Profile();
 unsigned _XMGetH264Level();
 unsigned _XMGetH264PacketizationMode();

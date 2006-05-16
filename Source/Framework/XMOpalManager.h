@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.13 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.14 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,8 +63,12 @@ public:
 	void SetUserName(const PString & name);
 
 	/* Network setup methods */
-	void SetBandwidthLimit(unsigned limit);
-	unsigned GetVideoBandwidthLimit();
+	static void SetBandwidthLimit(unsigned limit);
+	static unsigned GetBandwidthLimit();
+	static unsigned GetVideoBandwidthLimit();
+	static unsigned GetAvailableBandwidth();
+	static void SetAvailableBandwidth(unsigned limit);
+	static void ResetAvailableBandwidth();
 	
 	/* Video setup methods */
 	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);
@@ -73,8 +77,6 @@ private:
 	BOOL IsOutgoingMedia(OpalMediaStream & stream);
 	
 	unsigned callID;
-	
-	unsigned videoBandwidthLimit;
 	
 	BOOL enableVideoTransmit;
 	BOOL enableVideoReceive;

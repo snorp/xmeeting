@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.2 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.3 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -322,6 +322,22 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 - (XMSIPAccount *)sipAccountAtIndex:(unsigned)index
 {
 	return (XMSIPAccount *)[sipAccounts objectAtIndex:index];
+}
+
+- (void)addH323Accounts:(NSArray *)theAccounts
+{
+	[h323Accounts addObjectsFromArray:theAccounts];
+	
+	[self _validateButtons];
+	[h323AccountsTableView reloadData];
+}
+
+- (void)addSIPAccounts:(NSArray *)theAccounts
+{
+	[sipAccounts addObjectsFromArray:theAccounts];
+	
+	[self _validateButtons];
+	[sipAccountsTableView reloadData];
 }
 
 #pragma mark -

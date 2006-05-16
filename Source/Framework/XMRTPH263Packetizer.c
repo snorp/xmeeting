@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263Packetizer.c,v 1.7 2006/05/03 20:10:04 hfriederich Exp $
+ * $Id: XMRTPH263Packetizer.c,v 1.8 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -565,6 +565,7 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 												  const RTPMPSampleDataParams *sampleData,
 												  SInt32 *outFlags)
 {	
+	printf("xxx\n");
 	RTPPacketGroupRef packetGroupRef;
 	const UInt8 *data = sampleData->data;
 	UInt32 maxPacketLength = globals->maxPacketSize - 4;	// substracting 4 bytes for Mode A

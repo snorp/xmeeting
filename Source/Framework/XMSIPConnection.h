@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.3 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.4 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,6 +52,10 @@ public:
 	virtual void OnReceivedAuthenticationRequired(SIPTransaction & transaction,
 												  SIP_PDU & response);
 	
+	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
+	virtual unsigned GetBandwidthUsed() const;
+	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
+	
 private:
 	
 	static void AdjustSessionDescription(SDPSessionDescription & sdp);
@@ -60,7 +64,6 @@ private:
 	OpalVideoFormat h263VideoFormat;
 	OpalVideoFormat h263PlusVideoFormat;
 	OpalVideoFormat h264VideoFormat;
-	unsigned bandwidthUsed;
 };
 
 #endif // __XM_SIP_CONNECTION_H__

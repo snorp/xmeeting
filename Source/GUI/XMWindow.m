@@ -1,5 +1,5 @@
 /*
- * $Id: XMWindow.m,v 1.5 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMWindow.m,v 1.6 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,7 +52,7 @@ NSString *XMNotification_WindowWillMiniaturize = @"XMeetingWindowWillMiniaturize
 	
 	self = [super initWithContentRect:mainScreenRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:mainScreen];
 	
-	[self setLevel:CGShieldingWindowLevel()];
+	[self setLevel:NSScreenSaverWindowLevel];
 	
 	return self;
 }

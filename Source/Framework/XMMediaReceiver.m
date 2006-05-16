@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.20 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.21 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -299,11 +299,9 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 											 (void *)self);
 	if(err != noErr)
 	{
-		
-		NSLog(@"Decompression of the frame failed %d", (int)err);
-		if(err == qErr)
+		if(err == qErr && videoCodecIdentifier == XMCodecIdentifier_H263)
 		{
-			[self _releaseDecompressionSession];
+			//[self _releaseDecompressionSession];
 		}
 		return NO;
 	}

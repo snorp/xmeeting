@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.m,v 1.3 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMInCallOSD.m,v 1.4 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,6 +96,7 @@
 		[super addButtons:[NSArray arrayWithObjects:fullScreenButton, XM_OSD_Separator, pinpButton, pinpModeButton, XM_OSD_Separator, infoButton, toolsButton, XM_OSD_Separator, muteButton, XM_OSD_Separator, hangupButton, nil]];
 		
 		pinpMode = XMPinPMode_SideBySide;
+		enableComplexPinPModes = YES;
 	}
 	
 	return self;
@@ -111,6 +112,16 @@
 #pragma mark -
 #pragma mark Public Methods
 
+- (BOOL)enableComplexPinPModes
+{
+	return enableComplexPinPModes;
+}
+
+- (void)setEnableComplexPinPModes:(BOOL)flag
+{
+	enableComplexPinPModes = flag;
+}
+
 - (void)setPinPMode:(XMPinPMode)mode
 {
 	int theState;
@@ -125,7 +136,14 @@
 	else if(mode == XMPinPMode_Classic)
 	{
 		theState = 1;
-		theMode = 1;
+		if(enableComplexPinPModes == YES)
+		{
+			theMode = 1;
+		}
+		else
+		{
+			theMode = 2;
+		}
 		pinpMode = mode;
 	}
 	else if(mode == XMPinPMode_3D)
@@ -240,7 +258,14 @@
 {
 	if(pinpMode == XMPinPMode_Classic)
 	{
-		pinpMode = XMPinPMode_3D;
+		if(enableComplexPinPModes == YES)
+		{
+			pinpMode = XMPinPMode_3D;
+		}
+		else
+		{
+			pinpMode = XMPinPMode_SideBySide;
+		}
 	}
 	else if(pinpMode == XMPinPMode_3D)
 	{

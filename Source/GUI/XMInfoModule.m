@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.8 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.9 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,7 +65,7 @@
 
 - (NSString *)name
 {
-	return @"Info";
+	return @"Status";
 }
 
 - (NSImage *)image

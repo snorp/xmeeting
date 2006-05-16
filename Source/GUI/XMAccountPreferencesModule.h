@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.h,v 1.2 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.h,v 1.3 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,6 +81,9 @@ extern NSString *XMKey_AccountPreferencesPhoneNumberIdentifier;
 
 - (unsigned)sipAccountCount;
 - (XMSIPAccount *)sipAccountAtIndex:(unsigned)index;
+
+- (void)addH323Accounts:(NSArray *)h323Accounts;
+- (void)addSIPAccounts:(NSArray *)sipAccounts;
 
 @end
 

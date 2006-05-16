@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.30 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.31 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,7 +72,10 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
 
 - (void)_showSetupAssistant;
-- (void)_setupApplication:(NSArray *)locations;
+- (void)_setupApplication;
+- (void)_setupApplicationWithLocations:(NSArray *)locations 
+						  h323Accounts:(NSArray *)h323Accounts
+						   sipAccounts:(NSArray *)sipAccounts;
 
 @end
 
@@ -129,7 +132,7 @@
 	// depending on wheter preferences are in the system, the setup assistant is shown or not.
 	if([XMPreferencesManager doesHavePreferences] == YES)
 	{
-		[self performSelector:@selector(_setupApplication:) withObject:nil afterDelay:0.0];
+		[self performSelector:@selector(_setupApplication) withObject:nil afterDelay:0.0];
 	}
 	else
 	{
@@ -643,10 +646,20 @@
 - (void)_showSetupAssistant
 {
 	[[XMSetupAssistantManager sharedInstance] runFirstApplicationLaunchAssistantWithDelegate:self
-																			  didEndSelector:@selector(_setupApplication:)];
+			didEndSelector:@selector(_setupApplicationWithLocations:h323Accounts:sipAccounts:)];
 }
 
-- (void)_setupApplication:(NSArray *)locations
+- (void)_setupApplication
+{
+	NSArray *array = [NSArray array];
+	[self _setupApplicationWithLocations:array
+							h323Accounts:array
+							 sipAccounts:array];
+}
+
+- (void)_setupApplicationWithLocations:(NSArray *)locations
+						  h323Accounts:(NSArray *)h323Accounts
+						   sipAccounts:(NSArray *)sipAccounts
 {		
 	// registering the call address providers
 	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
@@ -689,7 +702,10 @@
 	// causing the PreferencesManager to activate the active location
 	// by calling XMCallManager -setActivePreferences:
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	[preferencesManager setH323Accounts:h323Accounts];
+	[preferencesManager setSIPAccounts:sipAccounts];
 	[preferencesManager setLocations:locations];
+	
 	if([locations count] != 0)
 	{
 		[preferencesManager synchronizeAndNotify];

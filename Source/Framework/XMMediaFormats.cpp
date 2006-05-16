@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.17 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.18 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include <asn/h245.h>
 #include <codec/h261codec.h>
 
+#include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 #include "XMBridge.h"
 #include "XMTransmitterMediaPatch.h"
@@ -218,8 +219,6 @@ const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat)
 
 const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 {
-	cout << "TEST" << endl;
-	printf("test2\n");
 	switch(codecIdentifier)
 	{
 		case XMCodecIdentifier_G711_uLaw:
@@ -363,11 +362,8 @@ XM_H323_H261_Capability::XM_H323_H261_Capability()
 	qcifMPI = 1;
 	cifMPI = 1;
 	
-	maxBitRate = _XMGetVideoBandwidthLimit() / 100; // H.245 uses bitrate units of 100bits/s
-	if(maxBitRate > XM_MAX_H261_BITRATE)
-	{
-		maxBitRate = XM_MAX_H261_BITRATE;
-	}
+	cout << "CREATE H261CAP" << endl;
+	maxBitRate = _XMGetMaxH261BitRate();
 }
 
 PObject * XM_H323_H261_Capability::Clone() const
@@ -567,11 +563,7 @@ XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
 	cif4MPI = 0;
 	cif16MPI = 0;
 	
-	maxBitRate = _XMGetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H263_BITRATE)
-	{
-		maxBitRate = XM_MAX_H263_BITRATE;
-	}
+	maxBitRate = _XMGetMaxH263BitRate();
 	
 	slowSqcifMPI = 0;
 	slowQcifMPI = 0;
@@ -1101,12 +1093,7 @@ BOOL XM_H323_H263_Capability::IsH263PlusCapability() const
 
 XM_H323_H264_Capability::XM_H323_H264_Capability()
 {
-	maxBitRate = _XMGetVideoBandwidthLimit() / 100;
-	
-	if(maxBitRate > XM_MAX_H264_BITRATE)
-	{
-		maxBitRate = XM_MAX_H264_BITRATE;
-	}
+	maxBitRate = _XMGetMaxH264BitRate();
 	
 	profile = XM_H264_PROFILE_CODE_BASELINE;
 	level = XM_H264_LEVEL_CODE_2;
@@ -1510,6 +1497,11 @@ BOOL _XMIsReceivingRFC2429()
 	return isReceivingRFC2429;
 }
 
+void _XMSetIsReceivingRFC2429(BOOL flag)
+{
+	isReceivingRFC2429 = flag;
+}
+
 unsigned _XMGetH264Profile()
 {
 	return h264Profile;
@@ -1535,7 +1527,7 @@ void _XMSetH264EnableLimitedMode(BOOL flag)
 
 unsigned _XMGetMaxH261BitRate()
 {
-	unsigned maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	unsigned maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
 	if(maxBitRate > XM_MAX_H261_BITRATE)
 	{
 		maxBitRate = XM_MAX_H261_BITRATE;
@@ -1550,7 +1542,7 @@ PString _XMGetFMTP_H261(unsigned maxBitRate,
 {
 	if(maxBitRate == UINT_MAX)
 	{
-		maxBitRate = _XMGetVideoBandwidthLimit() / 100; // SDP uses bitrate units of 100bits/s
+		maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100; // SDP uses bitrate units of 100bits/s
 	}
 	if(maxBitRate > XM_MAX_H261_BITRATE)
 	{
@@ -1628,7 +1620,7 @@ void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 
 unsigned _XMGetMaxH263BitRate()
 {
-	unsigned maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	unsigned maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
 	if(maxBitRate > XM_MAX_H263_BITRATE)
 	{
 		maxBitRate = XM_MAX_H263_BITRATE;
@@ -1643,7 +1635,7 @@ PString _XMGetFMTP_H263(unsigned maxBitRate,
 {
 	if(maxBitRate == UINT_MAX)
 	{
-		maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+		maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
 	}
 	if(maxBitRate > XM_MAX_H263_BITRATE)
 	{
@@ -1732,7 +1724,7 @@ void _XMParseFMTP_H263(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 
 unsigned _XMGetMaxH264BitRate()
 {
-	unsigned maxBitRate = _XMGetVideoBandwidthLimit() / 100;
+	unsigned maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
 	if(maxBitRate > XM_MAX_H264_BITRATE)
 	{
 		maxBitRate = XM_MAX_H264_BITRATE;

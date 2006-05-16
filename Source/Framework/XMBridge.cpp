@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.23 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.24 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -67,12 +67,12 @@ const char *_XMGetUserName()
 
 void _XMSetBandwidthLimit(unsigned limit)
 {
-	theManager->SetBandwidthLimit(limit);
+	XMOpalManager::SetBandwidthLimit(limit);
 }
 
-unsigned _XMGetVideoBandwidthLimit()
+void _XMResetAvailableBandwidth()
 {
-	return theManager->GetVideoBandwidthLimit();
+	XMOpalManager::ResetAvailableBandwidth();
 }
 
 void _XMSetTranslationAddress(const char *a)
@@ -120,6 +120,11 @@ void _XMSetAudioBufferSize(unsigned size)
 {
 	// currently not enabled
 	//callEndPoint->SetSoundChannelBufferDepth(size);
+}
+
+void _XMStopAudio()
+{
+	XMSoundChannel::StopChannels();
 }
 
 #pragma mark -

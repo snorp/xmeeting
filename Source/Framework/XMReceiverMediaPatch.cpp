@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.20 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.21 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -171,6 +171,8 @@ void XMReceiverMediaPatch::Main()
 			DWORD timestamp = packet->GetTimestamp();
 			WORD sequenceNumber = packet->GetSequenceNumber();
 			
+			//cout << "recv: " << (int)sequenceNumber << " " << packet->GetMarker() << " " << timestamp << endl;
+			
 			// take into account that the timestamp might wrap around
 			if(timestamp < currentTimestamp && (currentTimestamp - timestamp) > (0x01 << 31))
 			{
@@ -191,7 +193,7 @@ void XMReceiverMediaPatch::Main()
 					if(firstPacketOfPacketGroup != NULL)
 					{
 						// Discarding the old packet group since incomplete
-						cout << "Discarding packet group" << endl;
+					//	cout << "Discarding packet group: " << packet->GetSequenceNumber() << endl;
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;

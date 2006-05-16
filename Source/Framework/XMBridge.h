@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.22 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.23 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -67,10 +67,10 @@ const char *_XMGetUserName();
 void _XMSetBandwidthLimit(unsigned limit);
 
 /**
- * Returns the maximum allowed video bitrate to satisfy
- * the bandwidth limit
+ * Resets the available bandwidth to the default value
+ * after a call has finished
  **/
-unsigned _XMGetVideoBandwidthLimit();
+void _XMResetAvailableBandwidth();
 
 /**
  * Sets the translation address (usually the NAT address)
@@ -104,6 +104,7 @@ void setSelectedAudioOutputDevice(unsigned int device);
 void setMuteAudioOutputDevice(bool muteFlag);
 
 void _XMSetAudioBufferSize(unsigned value);
+void _XMStopAudio();
 
 #pragma mark Video Setup Functions
 

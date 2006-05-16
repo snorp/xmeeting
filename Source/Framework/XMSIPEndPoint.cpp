@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.7 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.8 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -402,17 +402,20 @@ void XMSIPEndPoint::OnEstablished(OpalConnection & connection)
 
 void XMSIPEndPoint::OnReleased(OpalConnection & connection)
 {
-	XMOpalManager *manager = (XMOpalManager *)(&GetManager());
-	PString empty = "";
+	if(connection.GetToken() == connectionToken)
+	{
+		XMOpalManager *manager = (XMOpalManager *)(&GetManager());
+		PString empty = "";
 	
-	manager->SetCallInformation(connectionToken,
-								empty,
-								empty,
-								empty,
-								empty,
-								XMCallProtocol_SIP);
+		manager->SetCallInformation(connectionToken,
+									empty,
+									empty,
+									empty,
+									empty,
+									XMCallProtocol_SIP);
 	
-	connectionToken = "";
+		connectionToken = "";
+	}
 	
 	SIPEndPoint::OnReleased(connection);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.24 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.25 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@
 #include "XMProcess.h"
 
 #include <ptlib.h>
+
+#define XM_MAX_BANDWIDTH 1100000
 
 using namespace std;
 
@@ -177,7 +179,6 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {
 	//cout << "OnClearedCall " << *(PThread::Current()) << endl;
-	XMSoundChannel::StopChannels();
 	unsigned callID = call.GetToken().AsUnsigned();
 	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
@@ -269,20 +270,46 @@ void XMOpalManager::SetUserName(const PString & username)
 
 #pragma mark Network Setup Methods
 
+static unsigned bandwidthLimit = XM_MAX_BANDWIDTH;
+static unsigned availableBandwidth = XM_MAX_BANDWIDTH;
+
 void XMOpalManager::SetBandwidthLimit(unsigned limit)
 {
-	if(limit == 0)
+	if(limit == 0 || limit > XM_MAX_BANDWIDTH)
 	{
-		limit = UINT_MAX;
+		limit = XM_MAX_BANDWIDTH;
 	}
 	
-	// taking away the approximative amount of audio bandwidth
-	videoBandwidthLimit = limit - 64000;
+	bandwidthLimit = limit;
+}
+
+unsigned XMOpalManager::GetBandwidthLimit()
+{
+	return bandwidthLimit;
 }
 
 unsigned XMOpalManager::GetVideoBandwidthLimit()
 {
-	return videoBandwidthLimit;
+	// taking away 64kbit/s for audio
+	return XMOpalManager::GetAvailableBandwidth() - 64000;
+}
+
+unsigned XMOpalManager::GetAvailableBandwidth()
+{
+	return availableBandwidth;
+}
+
+void XMOpalManager::SetAvailableBandwidth(unsigned bandwidth)
+{
+	if(availableBandwidth > bandwidth)
+	{
+		availableBandwidth = bandwidth;
+	}
+}
+
+void XMOpalManager::ResetAvailableBandwidth()
+{
+	availableBandwidth = XM_MAX_BANDWIDTH;
 }
 
 #pragma mark Video Setup Methods

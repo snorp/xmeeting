@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.38 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.39 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -341,7 +341,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	compressSequenceFrameCounter = 0;
 	compressSequenceLastVideoBytesSent = 0;
 	compressSequenceNonKeyFrameCounter = 0;
-	compressSequenceScaleGWorld = NULL;
 	
 	mediaPacketizer = NULL;
 	
@@ -506,6 +505,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	}
 	
 	NSString *device = [_XMVideoManagerSharedInstance selectedInputDevice];
+	
+	NSLog(@"device: %@", device);
 	
 	[_XMVideoManagerSharedInstance _handleDeviceList:devices];
 	
@@ -1330,22 +1331,38 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		UInt32 *data = (UInt32 *)*h264Settings;
 		for(i = 0; i < settingsSize; i++)
 		{
+			// Forcing Baseline profile
+#if defined(__BIG_ENDIAN__)
 			if(data[i] == FOUR_CHAR_CODE('sprf'))
 			{
-				// Forcing Baseline profile
 				i+=4;
 				data[i] = 1;
 			}
+#else
+			if(data[i] == FOUR_CHAR_CODE('frps'))
+			{
+				i+=4;
+				data[i] = CFSwapInt32(1);
+			}
+#endif
 			
 			// if video sent is CIF size, we set this flag to one to have the picture
 			// encoded in 5 slices instead of two.
 			// If QCIF is sent, this flag remains zero to send two slices instead of
 			// one.
+#if defined(__BIG_ENDIAN__)
 			else if(videoSize == XMVideoSize_CIF && data[i] == FOUR_CHAR_CODE('susg'))
 			{
 				i+=4;
 				data[i] = 1;
 			}
+#else
+			else if(videoSize == XMVideoSize_CIF && data[i] == FOUR_CHAR_CODE('gsus'))
+			{
+				i+=4;
+				data[i] = CFSwapInt32(1);
+			}
+#endif
 		}
 		
 		err = ImageCodecSetSettings(compressor, h264Settings);
@@ -1473,18 +1490,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	{
 		CloseComponent(compressor);
 		compressor = NULL;
-	}
-	
-	if(compressSequenceScaleGWorld != NULL)
-	{
-		DisposeHandle((Handle)compressSequenceScaleImageDescription);
-		PixMapHandle pixMapHandle = GetGWorldPixMap(compressSequenceScaleGWorld);
-		free((**pixMapHandle).baseAddr);
-		(**pixMapHandle).baseAddr = NULL;
-		DisposeGWorld(compressSequenceScaleGWorld);
-		
-		compressSequenceScaleImageDescription = NULL;
-		compressSequenceScaleGWorld = NULL;
 	}
 	
 	compressSequenceIsActive = NO;

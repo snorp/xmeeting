@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.6 2006/04/23 16:18:57 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.7 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -312,7 +312,7 @@ static XMInspectorController *contactsInstance;
 {
 	if(isFullScreen)
 	{
-		[panel setLevel:CGShieldingWindowLevel()];
+		[panel setLevel:NSScreenSaverWindowLevel];
 	}
 	else
 	{

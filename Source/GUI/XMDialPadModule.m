@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.9 2006/04/23 16:18:57 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.10 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,8 @@
 - (void)_startDown:(id)sender;
 - (void)_startLeft:(id)sender;
 - (void)_startRight:(id)sender;
+- (void)_startZoomIn:(id)sender;
+- (void)_startZoomOut:(id)sender;
 - (void)_stop;
 
 @end
@@ -56,6 +58,12 @@
 	[downButton setBecomesPressedAction:@selector(_startDown:)];
 	[downButton setBecomesReleasedAction:@selector(_stop:)];
 	[downButton setKeyCode:NSDownArrowFunctionKey];
+	[zoomInButton setTarget:self];
+	[zoomInButton setBecomesPressedAction:@selector(_startZoomIn:)];
+	[zoomInButton setBecomesReleasedAction:@selector(_stop:)];
+	[zoomOutButton setTarget:self];
+	[zoomOutButton setBecomesPressedAction:@selector(_startZoomOut:)];
+	[zoomOutButton setBecomesReleasedAction:@selector(_stop:)];
 }
 
 - (NSString *)name
@@ -204,6 +212,28 @@
 	if([callManager isInCall])
 	{
 		[callManager startCameraEvent:XMCameraEvent_PanRight];
+	}
+}
+
+- (void)_startZoomIn:(id)sender
+{
+	NSLog(@"StartZoomIn");
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	
+	if([callManager isInCall])
+	{
+		[callManager startCameraEvent:XMCameraEvent_ZoomIn];
+	}
+}
+
+- (void)_startZoomOut:(id)sender
+{
+	NSLog(@"StartZoomOut");
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	
+	if([callManager isInCall])
+	{
+		[callManager startCameraEvent:XMCameraEvent_ZoomOut];
 	}
 }
 

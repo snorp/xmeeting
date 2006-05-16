@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.h,v 1.7 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMOSDVideoView.h,v 1.8 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,7 +64,6 @@ typedef enum XMClosingEffect
 	// only used to draw into the window draw buffer when
 	// the window does miniaturize or there is no local video
 	// (e.g. when the device is changed)
-	//NSCIImageRep *videoImageRep;
 	BOOL isMiniaturized;
 	
 	// displayed when -startDisplayingNoVideo is called
@@ -90,6 +89,7 @@ typedef enum XMClosingEffect
 	Scene *targetPinPMode, *initialPinPMode; //used for animation
 	NSAnimation *sceneAnimation;
 	BOOL switchedPinPMode;
+	BOOL enableComplexPinPModes;
 	
 	// mirroring local video
 	BOOL doMirror;
@@ -100,6 +100,8 @@ typedef enum XMClosingEffect
 - (void)startDisplayingVideo;
 - (void)stopDisplayingVideo;
 - (BOOL)doesDisplayVideo;
+- (BOOL)enableComplexPinPModes;
+- (void)setEnableComplexPinPModes:(BOOL)flag;
 - (XMPinPMode)pinpMode;
 - (void)setPinPMode:(XMPinPMode)mode animate:(BOOL)animate;
 
@@ -127,6 +129,10 @@ typedef enum XMClosingEffect
 // sets whether the local video is drawn mirrored or not
 - (BOOL)isLocalVideoMirrored;
 - (void)setLocalVideoMirrored:(BOOL)flag;
+
+// Sets / Gets display settings
+- (NSString *)settings;
+- (void)setSettings:(NSString *)settings;
 
 @end
 

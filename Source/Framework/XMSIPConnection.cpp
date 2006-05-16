@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.4 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.5 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 
 #include <opal/mediafmt.h>
 #include <sip/sipep.h>
+#include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 
 XMSIPConnection::XMSIPConnection(OpalCall & call,
@@ -23,9 +24,7 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
   h263PlusVideoFormat(_XMMediaFormat_H263Plus, (RTP_DataFrame::PayloadTypes)96, _XMMediaFormatEncoding_H263Plus, 352, 288, 30, _XMGetMaxH263BitRate()),
   h264VideoFormat(_XMMediaFormat_H264, (RTP_DataFrame::PayloadTypes)97, _XMMediaFormatEncoding_H264, 352, 288, 30, _XMGetMaxH264BitRate())
 {
-	bandwidthUsed = (_XMGetMaxH261BitRate() + 640) / 10;
-	  
-	cout << "XMSIPCONNECTION created " << bandwidthUsed << endl;
+	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
 }
 
 XMSIPConnection::~XMSIPConnection()
@@ -100,14 +99,14 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 	{
 		bandwidthModifier = SDPSessionDescription::ConferenceTotalBandwidthModifier;
 	}
-	sdpOut.SetBandwidthModifier(sdpIn.GetBandwidthModifier());
+	sdpOut.SetBandwidthModifier(bandwidthModifier);
 	
-	unsigned bandwidth = sdpIn.GetBandwidthValue();
-	if(bandwidth < bandwidthUsed)
+	unsigned bandwidth = sdpIn.GetBandwidthValue()*10;
+	if(bandwidth < bandwidthAvailable)
 	{
-		bandwidthUsed = bandwidth;
+		SetBandwidthAvailable(bandwidth);
 	}
-	sdpOut.SetBandwidthValue(bandwidthUsed);
+	sdpOut.SetBandwidthValue(bandwidthAvailable/10);
 	
 	if(mediaType != SDPMediaDescription::Video)
 	{
@@ -152,7 +151,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 					if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H261)
 					{
 						unsigned maxBitRate;
-						unsigned maxVideoBitRate = (bandwidthUsed-64000)/100;
+						unsigned maxVideoBitRate = (bandwidthAvailable-640);
 						XMVideoSize videoSize;
 						unsigned mpi;
 					
@@ -180,7 +179,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 					else if(mediaFormat.GetEncodingName() == _XMMediaFormatEncoding_H263)
 					{
 						unsigned maxBitRate;
-						unsigned maxVideoBitRate = (bandwidthUsed-64000)/100;
+						unsigned maxVideoBitRate = (bandwidthAvailable - 640);
 						XMVideoSize videoSize;
 						unsigned mpi;
 					
@@ -487,6 +486,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		}
 		else if(mediaFormat == XM_MEDIA_FORMAT_H263)
 		{
+			_XMSetIsReceivingRFC2429(FALSE); // prevent XMMediaTransmitter from assuming RFC2429
 			return SIPConnection::CreateMediaStream(h263VideoFormat, sessionID, isSource);
 		}
 		/*else if(mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
@@ -505,7 +505,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 {
 	cout << "Adjust Session Description" << endl;
-	unsigned bandwidth = (_XMGetMaxH261BitRate() + 640) / 10;
+	unsigned bandwidth = XMOpalManager::GetAvailableBandwidth() / 10;
 	sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
 	sdp.SetBandwidthValue(bandwidth);
 	
@@ -662,4 +662,21 @@ void XMSIPConnection::OnReceivedAuthenticationRequired(SIPTransaction & transact
 	{
 		delete invite;
 	}
+}
+
+BOOL XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
+{
+	bandwidthAvailable = newBandwidth;
+	XMOpalManager::SetAvailableBandwidth(100*newBandwidth);
+	return TRUE;
+}
+
+unsigned XMSIPConnection::GetBandwidthUsed() const
+{
+	return 0;
+}
+
+BOOL XMSIPConnection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
+{
+	return TRUE;
 }

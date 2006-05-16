@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.7 2006/04/07 10:15:16 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.8 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,10 +51,8 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	return self;
 }
 
-- (id)initWithDictionary:(NSDictionary *)dict
-{
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	
+- (id)initWithDictionary:(NSDictionary *)dict h323Accounts:(NSArray *)h323Accounts sipAccounts:(NSArray *)sipAccounts
+{	
 	self = [super initWithDictionary:dict];
 	
 	NSString *theName = (NSString *)[dict objectForKey:XMKey_LocationName];
@@ -66,7 +64,7 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	if(number != nil)
 	{
 		unsigned index = [number unsignedIntValue];
-		XMH323Account *h323Account = [preferencesManager h323AccountAtIndex:index];
+		XMH323Account *h323Account = [h323Accounts objectAtIndex:index];
 		h323AccountTag = [h323Account tag];
 	}
 	
@@ -74,7 +72,7 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	if(number != nil)
 	{
 		unsigned index = [number unsignedIntValue];
-		XMSIPAccount *sipAccount = [preferencesManager sipAccountAtIndex:index];
+		XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:index];
 		sipAccountTag = [sipAccount tag];
 	}
 	
@@ -132,10 +130,9 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 #pragma mark -
 #pragma mark Getting different representations
 
-- (NSMutableDictionary *)dictionaryRepresentation
-{
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	
+- (NSMutableDictionary *)dictionaryRepresentationWithH323Accounts:(NSArray *)h323Accounts
+													  sipAccounts:(NSArray *)sipAccounts
+{	
 	NSMutableDictionary *dict = [super dictionaryRepresentation];
 	
 	// removing unneded keys
@@ -163,12 +160,12 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	
 	if(h323AccountTag != 0)
 	{
-		unsigned h323AccountCount = [preferencesManager h323AccountCount];
+		unsigned h323AccountCount = [h323Accounts count];
 		unsigned i;
 		
 		for(i = 0; i < h323AccountCount; i++)
 		{
-			XMH323Account *h323Account = [preferencesManager h323AccountAtIndex:i];
+			XMH323Account *h323Account = [h323Accounts objectAtIndex:i];
 			if([h323Account tag] == h323AccountTag)
 			{
 				NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
@@ -181,12 +178,12 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	
 	if(sipAccountTag != 0)
 	{
-		unsigned sipAccountCount = [preferencesManager sipAccountCount];
+		unsigned sipAccountCount = [sipAccounts count];
 		unsigned i;
 		
 		for(i = 0; i < sipAccountCount; i++)
 		{
-			XMSIPAccount *sipAccount = [preferencesManager sipAccountAtIndex:i];
+			XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:i];
 			if([sipAccount tag] == sipAccountTag)
 			{
 				NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];

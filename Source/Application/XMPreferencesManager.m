@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.17 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.18 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,7 +126,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	/* intermediate code to make sure that at least one location is present in UserDefaults */
 	/* later, this will be replaced by some sort of wizard popping up */
 	XMLocation *defaultLocation = [[XMLocation alloc] initWithName:NSLocalizedString(@"<Default Location>", @"")];
-	NSDictionary *dict = [defaultLocation dictionaryRepresentation];
+	NSDictionary *dict = [defaultLocation dictionaryRepresentationWithH323Accounts:nil sipAccounts:nil];
 	NSArray *defaultLocationArray = [NSArray arrayWithObject:dict];
 	[defaultsDict setObject:defaultLocationArray forKey:XMKey_PreferencesManagerLocations];
 	[defaultLocation release];
@@ -203,7 +203,9 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 		for(i = 0; i < count; i++)
 		{
 			NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
-			XMLocation *location = [[XMLocation alloc] initWithDictionary:dict];
+			XMLocation *location = [[XMLocation alloc] initWithDictionary:dict
+															 h323Accounts:h323Accounts
+															  sipAccounts:sipAccounts];
 			[locations addObject:location];
 			[location release];
 		}
@@ -315,7 +317,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	for(i = 0; i < count; i++)
 	{
 		XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
-		[dictArray addObject:[location dictionaryRepresentation]];
+		[dictArray addObject:[location dictionaryRepresentationWithH323Accounts:h323Accounts sipAccounts:sipAccounts]];
 	}
 	[userDefaults setObject:dictArray forKey:XMKey_PreferencesManagerLocations];
 	[dictArray release];

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpenGLUtilities.h,v 1.2 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOpenGLUtilities.h,v 1.3 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,7 +62,9 @@ Placement XMMakePlacement(Vector3 pos, Vector3 scale, Vector3 rot, GLfloat rotAn
 
 Camera XMMakeCamera(Vector3 eye, Vector3 sceneCenter, Vector3 up);
 
-NSString* XMStringFromScene(Scene* scene);
+NSString *XMStringFromScene(Scene* scene);
+
+NSString *XMStringFromPlacement(Placement *placement);
 
 void outputCharacter(float x, float y, float z, char *string);
 

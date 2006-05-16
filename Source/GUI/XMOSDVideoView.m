@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.11 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.12 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,6 +126,7 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	currentPinPMode = &noPinP;
 	initialPinPMode = currentPinPMode;
 	switchedPinPMode = NO;
+	enableComplexPinPModes = YES;
 	
 	doMirror = NO;
 	isLocalVideoMirrored = NO;
@@ -264,6 +265,30 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	return (displayStatus == XM_DISPLAY_VIDEO);
 }
 
+- (BOOL)enableComplexPinPModes
+{
+	if(displayStatus == XM_DISPLAY_VIDEO)
+	{
+		return enableComplexPinPModes;
+	}
+	else
+	{
+		return NO;
+	}
+}
+
+- (void)setEnableComplexPinPModes:(BOOL)flag
+{
+	enableComplexPinPModes = flag;
+	
+	if((displayStatus == XM_DISPLAY_VIDEO) &&
+	   (osd != nil))
+	{
+		XMInCallOSD *inCallOSD = (XMInCallOSD *)osd;
+		[inCallOSD setEnableComplexPinPModes:flag];
+	}
+}
+
 - (XMPinPMode)pinpMode
 {
 	if(currentPinPMode == &noPinP)
@@ -306,7 +331,7 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	{
 		targetPinPMode = &classicPinP;
 	}
-	else if(mode == XMPinPMode_SideBySide)
+	else if(mode == XMPinPMode_SideBySide || enableComplexPinPModes == NO)
 	{
 		targetPinPMode = &sideBySidePinP;
 	}
@@ -482,6 +507,38 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	[self _checkNeedsMirroring];
 }
 
+- (NSString *)settings
+{
+	return [NSString stringWithFormat:@"%d %f %f", 
+		[self pinpMode],
+		classicPinP.localVideoPlacement.position.x,
+		classicPinP.localVideoPlacement.position.y];
+}
+
+- (void)setSettings:(NSString *)settings
+{
+	NSScanner *scanner = [[NSScanner alloc] initWithString:settings];
+	
+	int mode;
+	float x;
+	float y;
+	
+	if([scanner scanInt:&mode] &&
+	   [scanner scanFloat:&x] &&
+	   [scanner scanFloat:&y] &&
+	   [scanner isAtEnd])
+	{
+		[self setPinPMode:(XMPinPMode)mode animate:NO];
+		classicPinP.localVideoPlacement.position.x = x;
+		classicPinP.localVideoPlacement.position.y = y;
+		
+		if(displayStatus == XM_DISPLAY_VIDEO && osd != nil)
+		{
+			[(XMInCallOSD *)osd setPinPMode:(XMPinPMode)mode];
+		}
+	}
+}
+
 #pragma mark -
 #pragma mark XMVideoView protocol methods
 
@@ -530,9 +587,6 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 		
 		switchedPinPMode = NO;
 	}
-
-	float videoHeight = displaySize.height;
-	float videoWidth = displaySize.width;
 	
 	// ensure correct aspect ratio when in full screen
 	XMVideoSize remoteVideoSize = [[XMVideoManager sharedInstance] remoteVideoSize];
@@ -547,11 +601,6 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	else
 	{
 		aspectRatio = 11.0/9.0;
-	}
-	
-	if (videoHeight/videoWidth != aspectRatio)
-	{
-		videoWidth = aspectRatio * videoHeight;
 	}
 	
 	CVOpenGLTextureRef openGLTextureLocal = localVideo;
@@ -597,7 +646,7 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 			glPolygonOffset( 1.0, 1.0 );
 		#endif
 		
-		glScaled(videoWidth/videoHeight, 1.0, 1.0);
+		glScaled(aspectRatio, 1.0, 1.0);
 		
 		[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:NO];
 		
@@ -626,7 +675,7 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 				glEnable( GL_POLYGON_OFFSET_FILL );
 				glPolygonOffset( 1.0, 1.0 );
 #endif
-			glScaled(videoWidth/videoHeight, 1.0, 1.0);
+			glScaled(aspectRatio, 1.0, 1.0);
 			[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:NO];
 				
 			glClear (GL_DEPTH_BUFFER_BIT);
@@ -690,7 +739,7 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 		}
 		#endif
 		
-		glScaled(videoWidth/videoHeight, 1.0, 1.0); 
+		glScaled(aspectRatio, 1.0, 1.0); 
 	
 		[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
 		
@@ -748,7 +797,7 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 					glEnable( GL_POLYGON_OFFSET_FILL );
 					glPolygonOffset( 1.0, 1.0 );
 				#endif
-			glScaled(videoWidth/videoHeight, 1.0, 1.0);
+			glScaled(aspectRatio, 1.0, 1.0);
 			[self _drawPolygon:depth bottomLeft:bottomLeft bottomRight:bottomRight topRight:topRight topLeft:topLeft mirrored:doMirror];
 
 				
@@ -939,6 +988,25 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 			//back to ogl coordinates
 		  float posX = 2.0 * ((transformedPoint.x - downPoint.x) / [self bounds].size.width) - 1.0;
 		  float posY = 2.0 * ((transformedPoint.y - downPoint.y) / [self bounds].size.height) - 1.0 ;
+		  
+		  // making sure local video remains visible
+		  if(posX < -0.9f)
+		  {
+			  posX = -0.9f;
+		  }
+		  else if(posX > 0.9f)
+		  {
+			  posX = 0.9f;
+		  }
+		  
+		  if(posY < -0.73f)
+		  {
+			  posY = -0.73f;
+		  }
+		  else if(posY > 0.73f)
+		  {
+			  posY = 0.73f;
+		  }
 		  		  
 		  currentPinPMode->localVideoPlacement.position.x = posX;
 		  currentPinPMode->localVideoPlacement.position.y = posY;
@@ -1056,6 +1124,8 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 		{
 			osd = [[XMInCallOSD alloc] initWithFrame:[self frame] videoView:self andSize:osdSize];
 			[(XMInCallOSD *)osd setIsFullScreen:isFullScreen];
+			[(XMInCallOSD *)osd setEnableComplexPinPModes:enableComplexPinPModes];
+			[(XMInCallOSD *)osd setPinPMode:[self pinpMode]];
 		}
 		else if(displayStatus == XM_DISPLAY_NO_VIDEO)
 		{

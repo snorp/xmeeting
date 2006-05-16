@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.23 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.24 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,11 +18,12 @@
 #define VIDEO_INSET_RIGHT 5.0
 #define VIDEO_INSET_BOTTOM 25.0
 
+NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
+
 @interface XMInCallModule (PrivateMethods)
 
 - (void)_didEstablishCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
-- (void)_didStartReceivingVideo:(NSNotification *)notif;
 
 @end
 
@@ -123,7 +124,8 @@
 	int availableWidth = (int)size.width + (int)resizeDifference.width - VIDEO_INSET_LEFT - VIDEO_INSET_RIGHT;
 	int newHeight = currentVideoHeight + (int)resizeDifference.height;
 	
-	// BOGUS: Adjust for different aspect ratios
+	// Aspect ratios other than CIF / QCIF are handled within
+	// the OSD video view
 	int calculatedWidthFromHeight = (int)XMGetVideoWidthForHeight(newHeight, XMVideoSize_CIF);
 	int calculatedHeightFromWidth = (int)XMGetVideoHeightForWidth(availableWidth, XMVideoSize_CIF);
 	
@@ -159,8 +161,20 @@
 	XMLocation *activeLocation = [preferencesManager activeLocation];
 	BOOL enableVideo = [activeLocation enableVideo];
 	
+	NSString *settings = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_VideoViewSettings];
+	if(settings != nil)
+	{
+		[videoView setSettings:settings];
+	}
+	
 	if(enableVideo == YES)
 	{
+		// Check whether QuartzExtreme is enabled or not to hide some functions
+		// wich don't work well on non quartz-extreme machines
+		// For simplicity, we consider only the main display
+		BOOL enableComplexModes = CGDisplayUsesOpenGLAcceleration(CGMainDisplayID());
+		[videoView setEnableComplexPinPModes:enableComplexModes];
+		
 		[videoView startDisplayingVideo];
 	}
 	else
@@ -192,6 +206,10 @@
 {
 	[videoView setOSDDisplayMode:XMOSDDisplayMode_NoOSD];
 	[videoView stopDisplayingVideo];
+	
+	// storing some settings of the video view
+	NSString *settings = [videoView settings];
+	[[NSUserDefaults standardUserDefaults] setObject:settings forKey:XMKey_VideoViewSettings];
 	
 	contentViewSize = [contentView bounds].size;
 }

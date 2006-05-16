@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.6 2006/04/07 10:15:16 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.7 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,12 +51,28 @@ typedef enum XMSIPProxyMode
 - (id)initWithName:(NSString *)theName;
 
 /**
+ * initializes the instance with the contents from dictionary,
+ * pointing to the H.323 and SIP accounts provided if needed.
+ **/
+- (id)initWithDictionary:(NSDictionary *)dictionary
+			h323Accounts:(NSArray *)h323Accounts
+			 sipAccounts:(NSArray *)sipAccounts;
+
+/**
  * Returns a duplicate of the location with the
  * new name set. Using this method is preferred instead
  * of -copy and then -setName: since it makes sure that
  * several internal optimizations work
  **/
 - (XMLocation *)duplicateWithName:(NSString *)name;
+
+/**
+ * Returns the contents of the location stored in a dictionary.
+ * The account pointers are stored relative to the index in the arrays
+ * passed as arguments
+ **/
+- (NSMutableDictionary *)dictionaryRepresentationWithH323Accounts:(NSArray *)h323Accounts
+													  sipAccounts:(NSArray *)sipAccounts;
 
 - (unsigned)tag;
 

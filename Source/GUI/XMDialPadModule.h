@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.h,v 1.4 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMDialPadModule.h,v 1.5 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,8 @@
 	IBOutlet XMInstantActionButton *leftButton;
 	IBOutlet XMInstantActionButton *rightButton;
 	IBOutlet XMInstantActionButton *downButton;
+	IBOutlet XMInstantActionButton *zoomInButton;
+	IBOutlet XMInstantActionButton *zoomOutButton;
 }
 
 - (IBAction)userInputToneButtonPressed:(id)sender;

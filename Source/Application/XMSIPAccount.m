@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.m,v 1.2 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMSIPAccount.m,v 1.3 2006/05/16 21:30:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@ NSString *XMKey_SIPAccountName = @"XMeeting_SIPAccountName";
 NSString *XMKey_SIPAccountRegistrar = @"XMeeting_SIPAccountRegistrar";
 NSString *XMKey_SIPAccountUsername = @"XMeeting_SIPAccountUsername";
 NSString *XMKey_SIPAccountAuthorizationUsername = @"XMeeting_SIPAccountAuthorizationUsername";
+NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 @interface XMSIPAccount (PrivateMethods)
 

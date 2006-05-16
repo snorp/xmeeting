@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.19 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.20 2006/05/16 21:32:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #include <math.h>
 #include <opal/mediastrm.h>
 
+#include "XMOpalManager.h"
 #include "XMBridge.h"
 #include "XMMediaFormats.h"
 #include "XMMediaStream.h"
@@ -69,7 +70,7 @@ void XMTransmitterMediaPatch::Resume()
 		if(i > 0)
 		{
 			unsigned maxFramesPerSecond = UINT_MAX;
-			unsigned maxBitrate = _XMGetVideoBandwidthLimit();
+			unsigned maxBitrate = XMOpalManager::GetVideoBandwidthLimit();
 			
 			OpalMediaFormat mediaFormat = sinks[0].stream->GetMediaFormat();
 			payloadType = mediaFormat.GetPayloadType();
@@ -202,6 +203,7 @@ BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
 
 void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStamp)
 {
+	cout << "setTimestamp: " << timeStamp << endl;
 	if(videoTransmitterPatch == NULL)
 	{
 		//cout << "No VideoTransmitterPatch found!" << endl;
@@ -275,7 +277,7 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 {	
 	if(videoTransmitterPatch == NULL)
 	{
-		//cout << "No VideoTransmitterPatch found (4)" << endl;
+		cout << "No VideoTransmitterPatch found (4)" << endl;
 		return;
 	}
 		
@@ -285,15 +287,17 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 	
 	videoTransmitterPatch->inUse.Wait();
 		
-	videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
+	//videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
 	
 	PINDEX i;
-	for(i = 0; i < videoTransmitterPatch->sinks.GetSize(); i++)
+	PINDEX size = videoTransmitterPatch->sinks.GetSize();
+	for(i = 0; i < size; i++)
 	{
+	cout << "sending packet: " << setMarker << " (" << frame->GetSequenceNumber() << ")" << endl;
 		BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
 		if(result == FALSE)
 		{
-			//cout << "ERROR Writing frame to sink!" << endl;
+			cout << "ERROR Writing frame to sink!" << endl;
 		}
 	}
 	

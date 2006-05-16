@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.19 2006/04/07 10:15:16 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.20 2006/05/16 21:33:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,7 +61,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 // notification responding
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
 
-- (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)locations;
+- (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)locations
+										h323Accounts:(NSArray *)h323Accounts
+										 sipAccounts:(NSArray *)sipAccounts;
 
 @end
 
@@ -288,7 +290,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[[XMSetupAssistantManager sharedInstance] 
 			runImportLocationsAssistantModalForWindow:[contentView window]
 										modalDelegate:self
-									   didEndSelector:@selector(_importLocationsAssistantDidEndWithLocations:)];
+									   didEndSelector:@selector(_importLocationsAssistantDidEndWithLocations:
+																h323Accounts:sipAccounts:)];
 }
 
 - (IBAction)duplicateLocation:(id)sender
@@ -393,9 +396,25 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		
 		XMH323Account *h323Account = [accountModule h323AccountAtIndex:index];
 		
-		[gatekeeperHostField setStringValue:[h323Account gatekeeper]];
-		[gatekeeperUserAliasField setStringValue:[h323Account username]];
-		[gatekeeperPhoneNumberField setStringValue:[h323Account phoneNumber]];
+		NSString *gkHost = [h323Account gatekeeper];
+		NSString *gkUsername = [h323Account username];
+		NSString *gkPhoneNumber = [h323Account phoneNumber];
+		
+		if(gkHost == nil)
+		{
+			gkHost = @"";
+		}
+		if(gkUsername == nil)
+		{
+			gkUsername = @"";
+		}
+		if(gkPhoneNumber == nil)
+		{
+			gkPhoneNumber = @"";
+		}
+		[gatekeeperHostField setStringValue:gkHost];
+		[gatekeeperUserAliasField setStringValue:gkUsername];
+		[gatekeeperPhoneNumberField setStringValue:gkPhoneNumber];
 	}
 	
 	[self defaultAction:self];
@@ -1213,7 +1232,13 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 }
 
 - (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)theLocations
+										h323Accounts:(NSArray *)h323Accounts
+										 sipAccounts:(NSArray *)sipAccounts
 {
+	[accountModule addH323Accounts:h323Accounts];
+	[accountModule addSIPAccounts:sipAccounts];
+	[self noteAccountsDidChange];
+	
 	unsigned count = [theLocations count];
 	
 	if(count != 0)
