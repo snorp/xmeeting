@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.5 2006/03/14 23:06:09 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.6 2006/05/16 21:33:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 #import "XMeeting.h"
 #import "XMPreferencesManager.h"
 #import "XMLocation.h"
+#import "XMH323Account.h"
+#import "XMSIPAccount.h"
 
 #define XM_QUIT_APPLICATION UINT_MAX
 
@@ -25,7 +27,8 @@
 #define XM_FL_GENERAL_SETTINGS_VIEW_TAG 2
 #define XM_FL_LOCATION_VIEW_TAG 3
 #define XM_FL_NEW_LOCATION_VIEW_TAG 4
-#define XM_FL_COMPLETED_VIEW_TAG 5
+#define XM_FL_PROTOCOLS_VIEW_TAG 5
+#define XM_FL_COMPLETED_VIEW_TAG 6
 
 #define XM_LI_START_VIEW_TAG 11
 #define XM_LI_INFO_VIEW_TAG 12
@@ -34,16 +37,21 @@
 #define XM_NETWORK_SETTINGS_VIEW_TAG 21
 #define XM_H323_SETTINGS_VIEW_TAG 22
 #define XM_GATEKEEPER_SETTINGS_VIEW_TAG 23
-#define XM_VIDEO_SETTINGS_VIEW_TAG 24
+#define XM_SIP_SETTINGS_VIEW_TAG 24
+#define XM_REGISTRAR_SETTINGS_VIEW_TAG 25
+#define XM_VIDEO_SETTINGS_VIEW_TAG 26
 
 #define XMKey_SetupAssistantNibName @"SetupAssistant"
 
 #define XMKey_KeysToAsk @"XMeeting_KeysToAsk"
 #define XMKey_AppliesTo @"XMeeting_AppliesTo"
 #define XMKey_Description @"XMeeting_Description"
+#define XMKey_Title @"XMeeting_Title"
 #define XMKey_Keys @"XMeeting_Keys"
 #define XMKey_GatekeeperPassword @"XMeeting_GatekeeperPassword"
 #define XMKey_Locations @"XMeeting_Locations"
+#define XMKey_H323Accounts @"XMeeting_H323Accounts"
+#define XMKey_SIPAccounts @"XMeeting_SIPAccounts"
 
 @interface XMSetupAssistantManager (PrivateMethods)
 
@@ -51,9 +59,15 @@
 
 - (void)_setupButtons;
 
+- (void)_setTitle:(NSString *)title;
+- (void)_setShowCornerImage:(BOOL)flag;
+
 - (void)_showNextViewForFirstApplicationLaunchMode;
 - (void)_showPreviousViewForFirstApplicationLaunchMode;
 - (void)_returnFromFirstApplicationLaunchAssistant:(int)returnCode;
+
+- (void)_prepareFLIntroductionSettings;
+- (void)_finishFLIntroductionSettings;
 
 - (NSView *)_prepareFLGeneralSettings;
 - (void)_finishFLGeneralSettings;
@@ -67,19 +81,32 @@
 - (void)_prepareFLNetworkSettings;
 - (void)_finishFLNetworkSettings;
 
+- (void)_prepareFLProtocolSettings;
+- (void)_finishFLProtocolSettings;
+
 - (void)_prepareFLH323Settings;
 - (void)_finishFLH323Settings;
 
 - (NSView *)_prepareFLGatekeeperSettings;
 - (void)_finishFLGatekeeperSettings;
 
+- (void)_prepareFLSIPSettings;
+- (void)_finishFLSIPSettings;
+
+- (NSView *)_prepareFLRegistrarSettings;
+- (void)_finishFLRegistrarSettings;
+
 - (void)_prepareFLVideoSettings;
 - (void)_finishFLVideoSettings;
+
+- (void)_prepareFLCompletedSettings;
+- (void)_finishFLCompletedSettings;
 
 - (void)_beginFLLocationImport;
 - (void)_flLocationImportOpenPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 
 - (NSDictionary *)_parseFile:(NSString *)file errorDescription:(NSString **)errorDescription;
+- (void)_returnFromLocationImportAssistant:(int)returnCode;
 
 - (void)_showNextViewForImportLocationModes;
 - (void)_showPreviousViewForImportLocationModes;
@@ -95,6 +122,12 @@
 - (NSView *)_prepareLIGatekeeperSettings;
 - (void)_finishLIGatekeeperSettings;
 
+- (NSView *)_prepareLIRegistrarSettings;
+- (void)_finishLIRegistrarSettings;
+
+- (void)_prepareLICompletedSettings;
+- (void)_finishLICompletedSettings;
+
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
 
 @end
@@ -103,10 +136,10 @@
 
 #pragma mark Class Methods
 
+static XMSetupAssistantManager *sharedInstance = nil;
+
 + (XMSetupAssistantManager *)sharedInstance
-{
-	static XMSetupAssistantManager *sharedInstance = nil;
-	
+{	
 	if(sharedInstance == nil)
 	{
 		sharedInstance = [[XMSetupAssistantManager alloc] _init];
@@ -132,6 +165,8 @@
 	viewTag = XM_NO_VIEW_TAG;
 	
 	location = nil;
+	h323Account = nil;
+	sipAccount = nil;
 	locationImportData = nil;
 	currentKeysToAskIndex = 0;
 	
@@ -160,9 +195,10 @@
 
 #pragma mark Public Methods
 
-- (void)runFirstApplicationLaunchAssistantWithDelegate:(id)theDelegate
+- (void)runFirstApplicationLaunchAssistantWithDelegate:(NSObject *)theDelegate
 										didEndSelector:(SEL)theDidEndSelector
 {
+	NSLog(@"run1");
 	delegate = theDelegate;
 	didEndSelector = theDidEndSelector;
 	
@@ -174,11 +210,16 @@
 	// preparing the view
 	mode = XM_FIRST_APPLICATION_LAUNCH_MODE;
 	viewTag = XM_FL_INTRODUCTION_VIEW_TAG;
+	[self _prepareFLIntroductionSettings];
 	[contentBox setContentView:flIntroductionView];
 	[self _setupButtons];
 	
 	// creating an empty location
 	location = (XMLocation *)[[[preferencesManager locations] objectAtIndex:0] retain];
+	h323Account = [[XMH323Account alloc] init];
+	[h323Account setName:NSLocalizedString(@"<Default Gatekeeper>", @"")];
+	sipAccount = [[XMSIPAccount alloc] init];
+	[sipAccount setName:NSLocalizedString(@"<Default Registrar>", @"")];
 	
 	if(locationImportData != nil)
 	{
@@ -203,21 +244,26 @@
 	
 	// changing some default settings of location
 	[location setEnableVideo:YES];
-	
-	if(gkPassword != nil)
-	{
-		[gkPassword release];
-	}
-	gkPassword = nil;
+	[location setEnableH323:YES];
+	[location setEnableSIP:YES];
+	[location setSIPAccountTag:[sipAccount tag]];
+	[location setSIPProxyMode:XMSIPProxyMode_UseSIPAccount];
 	
 	[[self window] center];
 	[self showWindow:self];
 }
 
+- (IBAction)showWindow:(id)sender
+{
+	NSLog(@"SHOWWWWWWWWWWW");
+	[super showWindow:sender];
+}
+
 - (void)runImportLocationsAssistantModalForWindow:(NSWindow *)window 
-									modalDelegate:(id)theModalDelegate
+									modalDelegate:(NSObject *)theModalDelegate
 								   didEndSelector:(SEL)theDidEndSelector
 {
+	NSLog(@"run2");
 	modalWindow = window;
 	delegate = theModalDelegate;
 	didEndSelector = theDidEndSelector;
@@ -264,6 +310,7 @@
 
 - (IBAction)continueAssistant:(id)sender
 {
+	NSLog(@"continue");
 	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
 	{
 		[self _showNextViewForFirstApplicationLaunchMode];
@@ -350,6 +397,13 @@
 	[[XMUtils sharedInstance] startFetchingExternalAddress];
 }
 
+- (IBAction)protocolSwitchToggled:(id)sender
+{
+	BOOL enableNextButton = ([enableH323Switch state] == NSOnState ||
+							 [enableSIPSwitch state] == NSOnState);
+	[continueButton setEnabled:enableNextButton];
+}
+
 #pragma mark Delegate Methods
 
 - (void)controlTextDidChange:(NSNotification *)notif
@@ -357,6 +411,18 @@
 	if([notif object] == gkHostField)
 	{
 		NSString *text = [gkHostField stringValue];
+		
+		BOOL enableContinueButton = YES;
+		if([text isEqualToString:@""])
+		{
+			enableContinueButton = NO;
+		}
+		
+		[continueButton setEnabled:enableContinueButton];
+	}
+	else if([notif object] == registrarHostField)
+	{
+		NSString *text = [registrarHostField stringValue];
 		
 		BOOL enableContinueButton = YES;
 		if([text isEqualToString:@""])
@@ -411,6 +477,16 @@
 	[goBackButton setEnabled:enableGoBackButton];
 }
 
+- (void)_setTitle:(NSString *)title
+{
+	[titleField setStringValue:title];
+}
+
+- (void)_setShowCornerImage:(BOOL)flag
+{
+	[cornerImage setHidden:!flag];
+}
+
 - (void)_showNextViewForFirstApplicationLaunchMode
 {
 	NSView *nextView = nil;
@@ -419,6 +495,7 @@
 	switch(viewTag)
 	{
 		case XM_FL_INTRODUCTION_VIEW_TAG:
+			[self _finishFLIntroductionSettings];
 			nextView = flGeneralSettingsView;
 			viewTag = XM_FL_GENERAL_SETTINGS_VIEW_TAG;
 			firstResponder = [self _prepareFLGeneralSettings];
@@ -456,18 +533,40 @@
 			
 		case XM_NETWORK_SETTINGS_VIEW_TAG:
 			[self _finishFLNetworkSettings];
-			nextView = h323SettingsView;
-			viewTag = XM_H323_SETTINGS_VIEW_TAG;
-			[self _prepareFLH323Settings];
+			nextView = flProtocolsView;
+			viewTag = XM_FL_PROTOCOLS_VIEW_TAG;
+			[self _prepareFLProtocolSettings];
+			break;
+			
+		case XM_FL_PROTOCOLS_VIEW_TAG:
+			[self _finishFLProtocolSettings];
+			if([location enableH323])
+			{
+				nextView = h323SettingsView;
+				viewTag = XM_H323_SETTINGS_VIEW_TAG;
+				[self _prepareFLH323Settings];
+			}
+			else if([location enableSIP])
+			{
+				nextView = sipSettingsView;
+				viewTag = XM_SIP_SETTINGS_VIEW_TAG;
+				[self _prepareFLSIPSettings];
+			}
 			break;
 			
 		case XM_H323_SETTINGS_VIEW_TAG:
 			[self _finishFLH323Settings];
-			if([location usesGatekeeper] == YES)
+			if([location h323AccountTag] != 0)
 			{
 				nextView = gatekeeperSettingsView;
 				viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
 				firstResponder = [self _prepareFLGatekeeperSettings];
+			}
+			else if([location enableSIP] == YES)
+			{
+				nextView = sipSettingsView;
+				viewTag = XM_SIP_SETTINGS_VIEW_TAG;
+				[self _prepareFLSIPSettings];
 			}
 			else
 			{
@@ -479,6 +578,38 @@
 			
 		case XM_GATEKEEPER_SETTINGS_VIEW_TAG:
 			[self _finishFLGatekeeperSettings];
+			if([location enableSIP] == YES)
+			{
+				nextView = sipSettingsView;
+				viewTag = XM_SIP_SETTINGS_VIEW_TAG;
+				[self _prepareFLSIPSettings];
+			}
+			else
+			{
+				nextView = videoSettingsView;
+				viewTag = XM_VIDEO_SETTINGS_VIEW_TAG;
+				[self _prepareFLVideoSettings];
+			}
+			break;
+			
+		case XM_SIP_SETTINGS_VIEW_TAG:
+			[self _finishFLSIPSettings];
+			if([location sipAccountTag] != 0)
+			{
+				nextView = registrarSettingsView;
+				viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
+				firstResponder = [self _prepareFLRegistrarSettings];
+			}
+			else
+			{
+				nextView = videoSettingsView;
+				viewTag = XM_VIDEO_SETTINGS_VIEW_TAG;
+				[self _prepareFLVideoSettings];
+			}
+			break;
+			
+		case XM_REGISTRAR_SETTINGS_VIEW_TAG:
+			[self _finishFLRegistrarSettings];
 			nextView = videoSettingsView;
 			viewTag = XM_VIDEO_SETTINGS_VIEW_TAG;
 			[self _prepareFLVideoSettings];
@@ -488,9 +619,11 @@
 			[self _finishFLVideoSettings];
 			nextView = flCompletedView;
 			viewTag = XM_FL_COMPLETED_VIEW_TAG;
+			[self _prepareFLCompletedSettings];
 			break;
 			
 		case XM_FL_COMPLETED_VIEW_TAG:
+			[self _finishFLCompletedSettings];
 			[self _returnFromFirstApplicationLaunchAssistant:NSRunStoppedResponse];
 			
 		default:
@@ -515,6 +648,7 @@
 			[self _finishFLGeneralSettings];
 			nextView = flIntroductionView;
 			viewTag = XM_FL_INTRODUCTION_VIEW_TAG;
+			[self _prepareFLIntroductionSettings];
 			break;
 			
 		case XM_FL_LOCATION_VIEW_TAG:
@@ -538,11 +672,18 @@
 			firstResponder = [self _prepareFLNewLocationSettings];
 			break;
 			
-		case XM_H323_SETTINGS_VIEW_TAG:
-			[self _finishFLH323Settings];
+		case XM_FL_PROTOCOLS_VIEW_TAG:
+			[self _finishFLProtocolSettings];
 			nextView = networkSettingsView;
 			viewTag = XM_NETWORK_SETTINGS_VIEW_TAG;
 			[self _prepareFLNetworkSettings];
+			break;
+			
+		case XM_H323_SETTINGS_VIEW_TAG:
+			[self _finishFLH323Settings];
+			nextView = flProtocolsView;
+			viewTag = XM_FL_PROTOCOLS_VIEW_TAG;
+			[self _prepareFLProtocolSettings];
 			break;
 			
 		case XM_GATEKEEPER_SETTINGS_VIEW_TAG:
@@ -552,23 +693,75 @@
 			[self _prepareFLH323Settings];
 			break;
 			
-		case XM_VIDEO_SETTINGS_VIEW_TAG:
-			[self _finishFLVideoSettings];
-			if([location usesGatekeeper] == YES)
+		case XM_SIP_SETTINGS_VIEW_TAG:
+			[self _finishFLSIPSettings];
+			if([location enableH323] == YES)
 			{
-				nextView = gatekeeperSettingsView;
-				viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
-				firstResponder = [self _prepareFLGatekeeperSettings];
+				if([location h323AccountTag] != 0)
+				{
+					nextView = gatekeeperSettingsView;
+					viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareFLGatekeeperSettings];
+				}
+				else
+				{
+					nextView = h323SettingsView;
+					viewTag = XM_H323_SETTINGS_VIEW_TAG;
+					[self _prepareFLH323Settings];
+				}
 			}
 			else
 			{
-				nextView = h323SettingsView;
-				viewTag = XM_H323_SETTINGS_VIEW_TAG;
-				[self _prepareFLH323Settings];
+				nextView = flProtocolsView;
+				viewTag = XM_FL_PROTOCOLS_VIEW_TAG;
+				[self _prepareFLProtocolSettings];
 			}
 			break;
 			
+		case XM_REGISTRAR_SETTINGS_VIEW_TAG:
+			[self _finishFLRegistrarSettings];
+			nextView = sipSettingsView;
+			viewTag = XM_SIP_SETTINGS_VIEW_TAG;
+			[self _prepareFLSIPSettings];
+			break;
+			
+		case XM_VIDEO_SETTINGS_VIEW_TAG:
+			[self _finishFLVideoSettings];
+			if([location enableSIP] == YES)
+			{
+				if([location sipAccountTag] != 0)
+				{
+					nextView = registrarSettingsView;
+					viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareFLRegistrarSettings];
+				}
+				else
+				{
+					nextView = sipSettingsView;
+					viewTag = XM_SIP_SETTINGS_VIEW_TAG;
+					[self _prepareFLSIPSettings];
+				}
+			}
+			else if([location enableH323] == YES)
+			{
+				if([location h323AccountTag] != 0)
+				{
+					nextView = gatekeeperSettingsView;
+					viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareFLGatekeeperSettings];
+				}
+				else
+				{
+					nextView = h323SettingsView;
+					viewTag = XM_H323_SETTINGS_VIEW_TAG;
+					[self _prepareFLH323Settings];
+				}
+			}
+
+			break;
+			
 		case XM_FL_COMPLETED_VIEW_TAG:
+			[self _finishFLCompletedSettings];
 			nextView = videoSettingsView;
 			viewTag = XM_VIDEO_SETTINGS_VIEW_TAG;
 			[self _prepareFLVideoSettings];
@@ -590,49 +783,93 @@
 	
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
+	NSArray *locations = nil;
+	NSArray *h323Accounts = nil;
+	NSArray *sipAccounts = nil;
+	
 	if(returnCode == NSRunAbortedResponse)
-	{
-		[location release];
-		location = nil;
-		
-		if(locationImportData != nil)
-		{
-			[locationImportData release];
-			locationImportData = nil;
-		}
-		
-		[delegate performSelector:didEndSelector withObject:[NSArray array]];
-		return;
-	}
-	
-	[preferencesManager setUserName:userName];
-	
-	NSArray *locationsArray = nil;
-	
-	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
-	{
-		if(gkPassword != nil && [location usesGatekeeper] == YES)
-		{
-			//[preferencesManager setTemporaryGatekeeperPassword:gkPassword forLocation:location];
-		}
-		
-		[location setEnableH323:YES];
-		
-		locationsArray = [NSArray arrayWithObject:location];
-		
-		[location release];
-		location = nil;
+	{		
+		NSArray *array = [NSArray array];
+		locations = array;
+		h323Accounts = array;
+		sipAccounts = array;
 	}
 	else
 	{
-		locationsArray = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
+		[preferencesManager setUserName:userName];
+	
+		if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
+		{
+			if([location enableH323] == YES && [location h323AccountTag] != 0)
+			{
+				h323Accounts = [NSArray arrayWithObject:h323Account];
+			}
+			else
+			{
+				[location setH323AccountTag:0];
+				h323Accounts = [NSArray array];
+			}
+			
+			if([location enableSIP] == YES && [location sipAccountTag] != 0)
+			{
+				sipAccounts = [NSArray arrayWithObject:sipAccount];
+			}
+			else
+			{
+				[location setSIPAccountTag:0];
+				sipAccounts = [NSArray array];
+			}
+			
+			locations = [NSArray arrayWithObject:location];
+		}
+		else
+		{
+			locations = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
+			h323Accounts = [[[locationImportData objectForKey:XMKey_H323Accounts] retain] autorelease];
+			sipAccounts = [[[locationImportData objectForKey:XMKey_SIPAccounts] retain] autorelease];
+		}
 	}
 	
-	[delegate performSelector:didEndSelector withObject:locationsArray];
+	NSMethodSignature *methodSignature = [delegate methodSignatureForSelector:didEndSelector];
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+	
+	[invocation setTarget:delegate];
+	[invocation setSelector:didEndSelector];
+	[invocation setArgument:&locations atIndex:2];
+	[invocation setArgument:&h323Accounts atIndex:3];
+	[invocation setArgument:&sipAccounts atIndex:4];
+	
+	[invocation invoke];
+	
+	[location release];
+	location = nil;
+	[h323Account release];
+	h323Account = nil;
+	[sipAccount release];
+	sipAccount = nil;
+	[locationImportData release];
+	locationImportData = nil;
+	
+	// workaround to prevent the setup manager window from popping up if there
+	// is an incoming call. Still don't know why such things happen...
+	[self release];
+	sharedInstance = nil;
+}
+
+- (void)_prepareFLIntroductionSettings
+{
+	[self _setTitle:NSLocalizedString(@"Welcome to XMeeting!", @"")];
+	[self _setShowCornerImage:NO];
+}
+
+- (void)_finishFLIntroductionSettings
+{
+	[self _setShowCornerImage:YES];
 }
 
 - (NSView *)_prepareFLGeneralSettings
 {
+	[self _setTitle:@"Personal Information"];
 	[userNameField setStringValue:userName];
 	return userNameField;
 }
@@ -646,6 +883,7 @@
 
 - (void)_prepareFLLocationSettings
 {
+	[self _setTitle:@"Locations"];
 	int tag = (mode == XM_FIRST_APPLICATION_LAUNCH_MODE) ? 0 : 1;
 	[locationRadioButtons selectCellWithTag:tag];
 }
@@ -658,6 +896,7 @@
 
 - (NSView *)_prepareFLNewLocationSettings
 {
+	[self _setTitle:@"New Location"];
 	[locationNameField setStringValue:[location name]];
 	return locationNameField;
 }
@@ -669,6 +908,9 @@
 
 - (void)_prepareFLNetworkSettings
 {
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
 	int state;
 	
 	XMUtils *utils = [XMUtils sharedInstance];
@@ -727,25 +969,60 @@
 	[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
 }
 
+- (void)_prepareFLProtocolSettings
+{
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
+	int state = ([location enableH323] == YES) ? NSOnState : NSOffState;
+	[enableH323Switch setState:state];
+	
+	state = ([location enableSIP] == YES) ? NSOnState : NSOffState;
+	[enableSIPSwitch setState:state];
+	
+	[self protocolSwitchToggled:nil];
+}
+
+- (void)_finishFLProtocolSettings
+{
+	BOOL flag = ([enableH323Switch state] == NSOnState) ? YES : NO;
+	[location setEnableH323:flag];
+	
+	flag = ([enableSIPSwitch state] == NSOnState) ? YES : NO;
+	[location setEnableSIP:flag];
+}
+
 - (void)_prepareFLH323Settings
 {
-	int tag = ([location usesGatekeeper] == YES) ? 0 : 1;
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
+	int tag = ([location h323AccountTag] != 0) ? 0 : 1;
 	[useGatekeeperRadioButtons selectCellWithTag:tag];
 }
 
 - (void)_finishFLH323Settings
 {
 	int tag = [[useGatekeeperRadioButtons selectedCell] tag];
-	BOOL usesGatekeeper = (tag == 0) ? YES : NO;
-	//[location setUseGatekeeper:useGatekeeper];
+	if(tag == 0)
+	{
+		[location setH323AccountTag:[h323Account tag]];
+	}
+	else
+	{
+		[location setH323AccountTag:0];
+	}
 }
 
 - (NSView *)_prepareFLGatekeeperSettings
 {
-	NSString *gatekeeperAddress = [location gatekeeperAddress];
-	NSString *gatekeeperUsername = [location gatekeeperUsername];
-	NSString *gatekeeperPhoneNumber = [location gatekeeperPhoneNumber];
-	NSString *gatekeeperPassword = gkPassword;
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
+	NSString *gatekeeperAddress = [h323Account gatekeeper];
+	NSString *gatekeeperUsername = [h323Account username];
+	NSString *gatekeeperPhoneNumber = [h323Account phoneNumber];
+	NSString *gatekeeperPassword = [h323Account password];
 	
 	BOOL enableContinueButton = YES;
 	
@@ -801,25 +1078,114 @@
 		gatekeeperPassword = nil;
 	}
 	
-	[location setGatekeeperAddress:gatekeeperAddress];
-	[location setGatekeeperUsername:gatekeeperUsername];
-	[location setGatekeeperPhoneNumber:gatekeeperPhoneNumber];
+	[h323Account setGatekeeper:gatekeeperAddress];
+	[h323Account setUsername:gatekeeperUsername];
+	[h323Account setPhoneNumber:gatekeeperPhoneNumber];
+	[h323Account setPassword:gatekeeperPassword];
 	
-	if(gkPassword != nil)
+	[continueButton setEnabled:YES];
+}
+
+- (void)_prepareFLSIPSettings
+{
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
+	int tag = ([location sipAccountTag] != 0) ? 0 : 1;
+	[useRegistrarRadioButtons selectCellWithTag:tag];
+}
+
+- (void)_finishFLSIPSettings
+{
+	int tag = [[useRegistrarRadioButtons selectedCell] tag];
+	if(tag == 0)
 	{
-		[gkPassword release];
+		[location setSIPAccountTag:[sipAccount tag]];
 	}
-	gkPassword = gatekeeperPassword;
-	if(gkPassword != nil)
+	else
 	{
-		[gkPassword retain];
+		[location setSIPAccountTag:0];
 	}
+	
+}
+
+- (NSView *)_prepareFLRegistrarSettings
+{
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
+	NSString *registrarAddress = [sipAccount registrar];
+	NSString *registrarUsername = [sipAccount username];
+	NSString *registrarAuthUsername = [sipAccount authorizationUsername];
+	NSString *registrarPassword = [sipAccount password];
+	
+	BOOL enableContinueButton = YES;
+	
+	if(registrarAddress == nil)
+	{
+		enableContinueButton = NO;
+		registrarAddress = @"";
+	}
+	if(registrarUsername == nil)
+	{
+		registrarUsername = @"";
+	}
+	if(registrarAuthUsername == nil)
+	{
+		registrarAuthUsername = @"";
+	}
+	if(registrarPassword == nil)
+	{
+		registrarPassword = @"";
+	}
+	
+	[registrarHostField setStringValue:registrarAddress];
+	[registrarUsernameField setStringValue:registrarUsername];
+	[registrarAuthUsernameField setStringValue:registrarAuthUsername];
+	[registrarPasswordField setStringValue:registrarPassword];
+	
+	[continueButton setEnabled:enableContinueButton];
+	
+	return registrarHostField;
+}
+
+- (void)_finishFLRegistrarSettings
+{
+	NSString *registrarAddress = [registrarHostField stringValue];
+	NSString *registrarUsername = [registrarUsernameField stringValue];
+	NSString *registrarAuthUsername = [registrarAuthUsernameField stringValue];
+	NSString *registrarPassword = [registrarPasswordField stringValue];
+	
+	if([registrarAddress isEqualToString:@""])
+	{
+		registrarAddress = nil;
+	}
+	if([registrarUsername isEqualToString:@""])
+	{
+		registrarUsername = nil;
+	}
+	if([registrarAuthUsername isEqualToString:@""])
+	{
+		registrarAuthUsername = nil;
+	}
+	if([registrarPassword isEqualToString:@""])
+	{
+		registrarPassword = nil;
+	}
+	
+	[sipAccount setRegistrar:registrarAddress];
+	[sipAccount setUsername:registrarUsername];
+	[sipAccount setAuthorizationUsername:registrarAuthUsername];
+	[sipAccount setPassword:registrarPassword];
 	
 	[continueButton setEnabled:YES];
 }
 
 - (void)_prepareFLVideoSettings
 {
+	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	[self _setTitle:titleString];
+	
 	int tag = ([location enableVideo] == YES) ? 0 : 1;
 	[enableVideoRadioButtons selectCellWithTag:tag];
 }
@@ -829,6 +1195,15 @@
 	int tag = [[enableVideoRadioButtons selectedCell] tag];
 	BOOL enableVideo = (tag == 0) ? YES : NO;
 	[location setEnableVideo:enableVideo];
+}
+
+- (void)_prepareFLCompletedSettings
+{
+	[self _setTitle:@"Completed"];
+}
+
+- (void)_finishFLCompletedSettings
+{
 }
 
 - (void)_beginFLLocationImport
@@ -913,50 +1288,187 @@
 	
 	if(propertyList == nil)
 	{
+		*errorDescription = @"File does not contain valid data";
 		return nil;
 	}
 	
-	if([propertyList isKindOfClass:[NSDictionary class]])
+	if(![propertyList isKindOfClass:[NSDictionary class]])
 	{
-		NSArray *locationDicts = [propertyList objectForKey:XMKey_Locations];
-		
-		if((locationDicts != nil) && ([locationDicts isKindOfClass:[NSArray class]]))
+		*errorDescription = @"File does not contain valid data";
+		return nil;
+	}
+	
+	NSArray *locationDicts = [propertyList objectForKey:XMKey_Locations];
+	
+	if((locationDicts == nil) || (![locationDicts isKindOfClass:[NSArray class]]))
+	{
+		*errorDescription = @"File does not contain valid data";
+		return nil;
+	}
+	
+	NSArray *h323AccountDicts = [propertyList objectForKey:XMKey_H323Accounts];
+	
+	if(h323AccountDicts != nil)
+	{
+		if(![h323AccountDicts isKindOfClass:[NSArray class]])
 		{
-			unsigned count = [locationDicts count];
-			unsigned i;
-			NSMutableArray *parsedLocations = [[NSMutableArray alloc] initWithCapacity:count];
+			*errorDescription = @"File does not contain valid data";
+			return nil;
+		}
+
+		unsigned count = [h323AccountDicts count];
+		unsigned i;
+		NSMutableArray *parsedAccounts = [[NSMutableArray alloc] initWithCapacity:count];
+		
+		for(i = 0; i < count; i++)
+		{
+			NSDictionary *dict = [h323AccountDicts objectAtIndex:i];
 			
-			for(i = 0; i < count; i++)
+			if(![dict isKindOfClass:[NSDictionary class]])
 			{
-				NSDictionary *dict = [locationDicts objectAtIndex:i];
-				
-				if(![dict isKindOfClass:[NSDictionary class]])
-				{
-					continue;
-				}
-				
-				XMLocation *locationInstance = [[XMLocation alloc] initWithDictionary:dict];
-				if(locationInstance != nil)
-				{
-					[parsedLocations addObject:locationInstance];
-					[locationInstance release];
-				}
+				continue;
 			}
 			
-			count = [parsedLocations count];
-			
-			[propertyList setObject:parsedLocations forKey:XMKey_Locations];
-			[parsedLocations release];
-			
-			if(count != 0)
+			XMH323Account *accountInstance = [[XMH323Account alloc] initWithDictionary:dict];
+			if(accountInstance != nil)
 			{
-				return propertyList;
+				[parsedAccounts addObject:accountInstance];
+				[accountInstance release];
 			}
+		}
+		
+		count = [parsedAccounts count];
+		
+		[propertyList setObject:parsedAccounts forKey:XMKey_H323Accounts];
+		[parsedAccounts release];
+		
+		if(count == 0)
+		{
+			*errorDescription = @"File does not contain valid data";
+			return nil;
 		}
 	}
 	
-	*errorDescription = @"File does not contain valid data";
-	return nil;
+	NSArray *sipAccountDicts = [propertyList objectForKey:XMKey_SIPAccounts];
+	
+	if(sipAccountDicts != nil)
+	{
+		if(![sipAccountDicts isKindOfClass:[NSArray class]])
+		{
+			*errorDescription = @"File does not contain valid data";
+			return nil;
+		}
+		
+		unsigned count = [sipAccountDicts count];
+		unsigned i;
+		NSMutableArray *parsedAccounts = [[NSMutableArray alloc] initWithCapacity:count];
+		
+		for(i = 0; i < count; i++)
+		{
+			NSDictionary *dict = [sipAccountDicts objectAtIndex:i];
+			
+			if(![dict isKindOfClass:[NSDictionary class]])
+			{
+				continue;
+			}
+			
+			XMSIPAccount *accountInstance = [[XMSIPAccount alloc] initWithDictionary:dict];
+			if(accountInstance != nil)
+			{
+				[parsedAccounts addObject:accountInstance];
+				[accountInstance release];
+			}
+		}
+		
+		count = [parsedAccounts count];
+		
+		[propertyList setObject:parsedAccounts forKey:XMKey_SIPAccounts];
+		[parsedAccounts release];
+		
+		if(count == 0)
+		{
+			*errorDescription = @"File does not contain valid data";
+			return nil;
+		}
+	}
+		
+	unsigned count = [locationDicts count];
+	unsigned i;
+	NSMutableArray *parsedLocations = [[NSMutableArray alloc] initWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		NSDictionary *dict = [locationDicts objectAtIndex:i];
+			
+		if(![dict isKindOfClass:[NSDictionary class]])
+		{
+			continue;
+		}
+				
+		XMLocation *locationInstance = [[XMLocation alloc] initWithDictionary:dict 
+																 h323Accounts:[propertyList objectForKey:XMKey_H323Accounts]
+																  sipAccounts:[propertyList objectForKey:XMKey_SIPAccounts]];
+		if(locationInstance != nil)
+		{
+			[parsedLocations addObject:locationInstance];
+			[locationInstance release];
+		}
+	}
+			
+	count = [parsedLocations count];
+			
+	[propertyList setObject:parsedLocations forKey:XMKey_Locations];
+	[parsedLocations release];
+			
+	if(count == 0)
+	{
+		*errorDescription = @"File does not contain valid data";
+		return nil;
+	}
+
+	return propertyList;
+}
+
+- (void)_returnFromLocationImportAssistant:(int)returnCode
+{
+	NSArray *locations = nil;
+	NSArray *h323Accounts = nil;
+	NSArray *sipAccounts = nil;
+	
+	if(returnCode == NSRunAbortedResponse)
+	{		
+		NSArray *array = [NSArray array];
+		locations = array;
+		h323Accounts = array;
+		sipAccounts = array;
+	}
+	else
+	{
+		locations = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
+		h323Accounts = [[[locationImportData objectForKey:XMKey_H323Accounts] retain] autorelease];
+		sipAccounts = [[[locationImportData objectForKey:XMKey_SIPAccounts] retain] autorelease];
+	}
+	
+	NSMethodSignature *methodSignature = [delegate methodSignatureForSelector:didEndSelector];
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+	
+	[invocation setTarget:delegate];
+	[invocation setSelector:didEndSelector];
+	[invocation setArgument:&locations atIndex:2];
+	[invocation setArgument:&h323Accounts atIndex:3];
+	[invocation setArgument:&sipAccounts atIndex:4];
+	
+	// calling the callback of the receiver
+	[invocation invoke];
+	
+	[location release];
+	location = nil;
+	[h323Account release];
+	h323Account = nil;
+	[sipAccount release];
+	sipAccount = nil;
+	[locationImportData release];
+	locationImportData = nil;
 }
 
 - (void)_showNextViewForImportLocationModes
@@ -966,7 +1478,8 @@
 	
 	if(viewTag == XM_FL_COMPLETED_VIEW_TAG)
 	{
-		[NSApp stopModal];
+		[self _finishFLCompletedSettings];
+		[self _returnFromFirstApplicationLaunchAssistant:NSRunStoppedResponse];
 		return;
 	}
 	else if(viewTag == XM_LI_COMPLETED_VIEW_TAG)
@@ -974,8 +1487,8 @@
 		[self close];
 		[NSApp endSheet:[self window]];
 		
-		NSArray *importedLocations = [locationImportData objectForKey:XMKey_Locations];
-		[delegate performSelector:didEndSelector withObject:importedLocations];
+		[self _finishLICompletedSettings];
+		[self _returnFromLocationImportAssistant:NSRunStoppedResponse];
 		return;
 	}
 	
@@ -986,11 +1499,13 @@
 	{
 		if(mode == XM_FIRST_APPLICATION_LAUNCH_IMPORT_LOCATIONS_MODE)
 		{
+			[self _prepareFLCompletedSettings];
 			nextView = flCompletedView;
 			viewTag = XM_FL_COMPLETED_VIEW_TAG;
 		}
 		else
 		{
+			[self _prepareLICompletedSettings];
 			nextView = liCompletedView;
 			viewTag = XM_LI_COMPLETED_VIEW_TAG;
 		}
@@ -1017,7 +1532,7 @@
 				didFinishCurrentSettings = YES;
 				
 				NSString *description = [currentKeySet objectForKey:XMKey_Description];
-				if(description != nil)
+				if(description != nil && [description isKindOfClass:[NSString class]])
 				{
 					nextView = liInfoView;
 					viewTag = XM_LI_INFO_VIEW_TAG;
@@ -1049,9 +1564,9 @@
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_PreferencesGatekeeperUsername] ||
-				   [keys containsObject:XMKey_PreferencesGatekeeperPhoneNumber] ||
-				   [keys containsObject:XMKey_GatekeeperPassword])
+				if([keys containsObject:XMKey_H323AccountUsername] ||
+				   [keys containsObject:XMKey_H323AccountPhoneNumber] ||
+				   [keys containsObject:XMKey_H323AccountPassword])
 				{
 					nextView = gatekeeperSettingsView;
 					viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
@@ -1066,15 +1581,34 @@
 					didFinishCurrentSettings = YES;
 				}
 				
+				if([keys containsObject:XMKey_SIPAccountUsername] ||
+				   [keys containsObject:XMKey_SIPAccountAuthorizationUsername] ||
+				   [keys containsObject:XMKey_SIPAccountPassword])
+				{
+					nextView = registrarSettingsView;
+					viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareLIRegistrarSettings];
+					break;
+				}
+				
+			case XM_REGISTRAR_SETTINGS_VIEW_TAG:
+				if(didFinishCurrentSettings == NO)
+				{
+					[self _finishLIRegistrarSettings];
+					didFinishCurrentSettings = YES;
+				}
+				
 				if([keysToAsk count] == (currentKeysToAskIndex + 1))
 				{
 					if(mode == XM_FIRST_APPLICATION_LAUNCH_IMPORT_LOCATIONS_MODE)
 					{
+						[self _prepareFLCompletedSettings];
 						nextView = flCompletedView;
 						viewTag = XM_FL_COMPLETED_VIEW_TAG;
 					}
 					else
 					{
+						[self _prepareLICompletedSettings];
 						nextView = liCompletedView;
 						viewTag = XM_LI_COMPLETED_VIEW_TAG;
 					}
@@ -1110,6 +1644,7 @@
 	{
 		if(mode == XM_FIRST_APPLICATION_LAUNCH_IMPORT_LOCATIONS_MODE)
 		{
+			[self _prepareFLLocationSettings];
 			nextView = flLocationView;
 			viewTag = XM_FL_LOCATION_VIEW_TAG;
 			mode = XM_FIRST_APPLICATION_LAUNCH_MODE;
@@ -1136,9 +1671,26 @@
 			case XM_LI_COMPLETED_VIEW_TAG:
 				didFinishCurrentSettings = YES;
 				
-				if([keys containsObject:XMKey_PreferencesGatekeeperUsername] ||
-				   [keys containsObject:XMKey_PreferencesGatekeeperPhoneNumber] ||
-				   [keys containsObject:XMKey_GatekeeperPassword])
+				if([keys containsObject:XMKey_SIPAccountUsername] ||
+				   [keys containsObject:XMKey_SIPAccountAuthorizationUsername] ||
+				   [keys containsObject:XMKey_SIPAccountPassword])
+				{
+					nextView = registrarSettingsView;
+					viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareLIRegistrarSettings];
+					break;
+				}
+					
+			case XM_REGISTRAR_SETTINGS_VIEW_TAG:
+				if(didFinishCurrentSettings == NO)
+				{
+					[self _finishLIRegistrarSettings];
+					didFinishCurrentSettings = YES;
+				}
+				
+				if([keys containsObject:XMKey_H323AccountUsername] ||
+				   [keys containsObject:XMKey_H323AccountPhoneNumber] ||
+				   [keys containsObject:XMKey_H323AccountPassword])
 				{
 					nextView = gatekeeperSettingsView;
 					viewTag = XM_GATEKEEPER_SETTINGS_VIEW_TAG;
@@ -1167,10 +1719,11 @@
 				if(didFinishCurrentSettings == NO)
 				{
 					[self _finishLINetworkSettings];
+					didFinishCurrentSettings = YES;
 				}
 				
 				NSString *description = [currentKeySet objectForKey:XMKey_Description];
-				if(description != nil)
+				if(description != nil && [description isKindOfClass:[NSString class]])
 				{
 					nextView = liInfoView;
 					viewTag = XM_LI_INFO_VIEW_TAG;
@@ -1192,6 +1745,7 @@
 						nextView = flLocationView;
 						viewTag = XM_FL_LOCATION_VIEW_TAG;
 						mode = XM_FIRST_APPLICATION_LAUNCH_MODE;
+						[self _prepareFLLocationSettings];
 						break;
 					}
 					else
@@ -1228,9 +1782,7 @@
 {
 	if(returnCode == NSCancelButton)
 	{
-		NSArray *array = [[NSArray alloc] init];
-		[delegate performSelector:didEndSelector withObject:array];
-		[array release];
+		[self _returnFromLocationImportAssistant:NSRunAbortedResponse];
 		return;
 	}
 	else
@@ -1270,7 +1822,7 @@
 		}
 		else
 		{
-			[delegate performSelector:didEndSelector withObject:[dict objectForKey:XMKey_Locations]];
+			[self _returnFromLocationImportAssistant:NSRunStoppedResponse];
 		}
 	}
 }
@@ -1284,10 +1836,22 @@
 	[self _showNextViewForImportLocationModes];
 	[NSApp beginSheet:[self window] modalForWindow:modalWindow modalDelegate:self didEndSelector:nil contextInfo:NULL];
 }
+
 - (void)_prepareLIInfoSettings
 {
-	NSString *description = [[[locationImportData objectForKey:XMKey_KeysToAsk] 
-								objectAtIndex:currentKeysToAskIndex] objectForKey:XMKey_Description];
+	NSDictionary *dict = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
+	
+	NSString *title = [dict objectForKey:XMKey_Title];
+	if(title != nil && [title isKindOfClass:[NSString class]])
+	{
+		[self _setTitle:title];
+	}
+	else
+	{
+		[self _setTitle:@"Import"];
+	}
+	
+	NSString *description = [dict objectForKey:XMKey_Description];
 	[infoField setStringValue:description];
 }
 
@@ -1302,6 +1866,16 @@
 	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
 	NSArray *locationIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
 	NSArray *keys = [currentKeys objectForKey:XMKey_Keys];
+	
+	NSString *title = [currentKeys objectForKey:XMKey_Title];
+	if(title != nil && [title isKindOfClass:[NSString class]])
+	{
+		[self _setTitle:title];
+	}
+	else
+	{
+		[self _setTitle:@"Import"];
+	}
 	
 	XMLocation *theLocation = (XMLocation *)[locations objectAtIndex:[[locationIndexes objectAtIndex:0] unsignedIntValue]];
 	
@@ -1418,39 +1992,43 @@
 
 - (NSView *)_prepareLIGatekeeperSettings
 {
-	NSArray *locations = [locationImportData objectForKey:XMKey_Locations];
+	NSArray *h323Accounts = [locationImportData objectForKey:XMKey_H323Accounts];
 	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
-	NSArray *locationIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
+	NSArray *accountIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
 	NSArray *keys = [currentKeys objectForKey:XMKey_Keys];
 	NSView *firstResponder = gkUsernameField;
 	
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	NSString *title = [currentKeys objectForKey:XMKey_Title];
+	if(title != nil && [title isKindOfClass:[NSString class]])
+	{
+		[self _setTitle:title];
+	}
+	else
+	{
+		[self _setTitle:@"Import"];
+	}
 	
-	XMLocation *theLocation = (XMLocation *)[locations objectAtIndex:[[locationIndexes objectAtIndex:0] unsignedIntValue]];
+	XMH323Account *theH323Account = (XMH323Account *)[h323Accounts objectAtIndex:[[accountIndexes objectAtIndex:0] unsignedIntValue]];
 	
-	NSString *gkAddress = [theLocation gatekeeperAddress];
+	NSString *gkAddress = [theH323Account gatekeeper];
 	if(gkAddress == nil)
 	{
 		gkAddress = @"";
 	}
 
-	NSString *gkUsername = [theLocation gatekeeperUsername];
+	NSString *gkUsername = [theH323Account username];
 	if(gkUsername == nil)
 	{
 		gkUsername = @"";
 	}
 	
-	NSString *gkPhoneNumber = [theLocation gatekeeperPhoneNumber];
+	NSString *gkPhoneNumber = [theH323Account phoneNumber];
 	if(gkPhoneNumber == nil)
 	{
 		gkPhoneNumber = @"";
 	}
 	
 	NSString *gkPwd = @"";
-	if(gkPwd == nil)
-	{
-		gkPwd = @"";
-	}
 	
 	[gkHostField setStringValue:gkAddress];
 	[gkUsernameField setStringValue:gkUsername];
@@ -1459,12 +2037,12 @@
 	
 	[gkHostField setEnabled:NO];
 	
-	if(![keys containsObject:XMKey_PreferencesGatekeeperUsername])
+	if(![keys containsObject:XMKey_H323AccountUsername])
 	{
 		[gkUsernameField setEnabled:NO];
 		firstResponder = gkPhoneNumberField;
 	}
-	if(![keys containsObject:XMKey_PreferencesGatekeeperPhoneNumber])
+	if(![keys containsObject:XMKey_H323AccountPhoneNumber])
 	{
 		[gkPhoneNumberField setEnabled:NO];
 		if(firstResponder == gkPhoneNumberField)
@@ -1472,7 +2050,7 @@
 			firstResponder = gkPasswordField;
 		}
 	}
-	if(![keys containsObject:XMKey_GatekeeperPassword])
+	if(![keys containsObject:XMKey_H323AccountPassword])
 	{
 		[gkPasswordField setEnabled:NO];
 	}
@@ -1482,46 +2060,45 @@
 
 - (void)_finishLIGatekeeperSettings
 {
-	NSArray *locations = [locationImportData objectForKey:XMKey_Locations];
+	NSArray *h323Accounts = [locationImportData objectForKey:XMKey_H323Accounts];
 	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
-	NSArray *locationIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
+	NSArray *accountIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
 	NSArray *keys = [currentKeys objectForKey:XMKey_Keys];
 	
-	unsigned count = [locationIndexes count];
+	unsigned count = [accountIndexes count];
 	unsigned i;
 	
 	for(i = 0; i < count; i++)
 	{
-		NSNumber *number = [locationIndexes objectAtIndex:i];
-		XMLocation *locationToChange = (XMLocation *)[locations objectAtIndex:[number unsignedIntValue]];
+		NSNumber *number = [accountIndexes objectAtIndex:i];
+		XMH323Account *accountToChange = (XMH323Account *)[h323Accounts objectAtIndex:[number unsignedIntValue]];
 		
-		if([keys containsObject:XMKey_PreferencesGatekeeperUsername])
+		if([keys containsObject:XMKey_H323AccountUsername])
 		{
 			NSString *gkUsername = [gkUsernameField stringValue];
 			if([gkUsername isEqualToString:@""])
 			{
 				gkUsername = nil;
 			}
-			[locationToChange setGatekeeperUsername:gkUsername];
+			[accountToChange setUsername:gkUsername];
 		}
-		if([keys containsObject:XMKey_PreferencesGatekeeperPhoneNumber])
+		if([keys containsObject:XMKey_H323AccountPhoneNumber])
 		{
 			NSString *gkPhoneNumber = [gkPhoneNumberField stringValue];
 			if([gkPhoneNumber isEqualToString:@""])
 			{
 				gkPhoneNumber = nil;
 			}
-			[locationToChange setGatekeeperPhoneNumber:gkPhoneNumber];
+			[accountToChange setPhoneNumber:gkPhoneNumber];
 		}
-	}
-	
-	if([keys containsObject:XMKey_GatekeeperPassword])
-	{
-		XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-		NSString *gkPwd = [gkPasswordField stringValue];
-		if([gkPwd isEqualToString:@""])
+		if([keys containsObject:XMKey_H323AccountPassword])
 		{
-			gkPwd = nil;
+			NSString *gkPassword = [gkPasswordField stringValue];
+			if([gkPassword isEqualToString:@""])
+			{
+				gkPassword = nil;
+			}
+			[accountToChange setPassword:gkPassword];
 		}
 	}
 	
@@ -1529,6 +2106,133 @@
 	[gkUsernameField setEnabled:YES];
 	[gkPhoneNumberField setEnabled:YES];
 	[gkPasswordField setEnabled:YES];
+}
+
+- (NSView *)_prepareLIRegistrarSettings
+{
+	NSArray *sipAccounts = [locationImportData objectForKey:XMKey_SIPAccounts];
+	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
+	NSArray *accountIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
+	NSArray *keys = [currentKeys objectForKey:XMKey_Keys];
+	NSView *firstResponder = registrarUsernameField;
+	
+	NSString *title = [currentKeys objectForKey:XMKey_Title];
+	if(title != nil && [title isKindOfClass:[NSString class]])
+	{
+		[self _setTitle:title];
+	}
+	else
+	{
+		[self _setTitle:@"Import"];
+	}
+	
+	XMSIPAccount *theSIPAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:[[accountIndexes objectAtIndex:0] unsignedIntValue]];
+	
+	NSString *registrarAddress = [theSIPAccount registrar];
+	if(registrarAddress == nil)
+	{
+		registrarAddress = @"";
+	}
+	
+	NSString *registrarUsername = [theSIPAccount username];
+	if(registrarUsername == nil)
+	{
+		registrarUsername = @"";
+	}
+	
+	NSString *registrarAuthUsername = [theSIPAccount authorizationUsername];
+	if(registrarAuthUsername == nil)
+	{
+		registrarAuthUsername = @"";
+	}
+	
+	NSString *registrarPwd = @"";
+	
+	[registrarHostField setStringValue:registrarAddress];
+	[registrarUsernameField setStringValue:registrarUsername];
+	[registrarAuthUsernameField setStringValue:registrarAuthUsername];
+	[registrarPasswordField setStringValue:registrarPwd];
+	
+	[registrarHostField setEnabled:NO];
+	
+	if(![keys containsObject:XMKey_SIPAccountUsername])
+	{
+		[registrarUsernameField setEnabled:NO];
+		firstResponder = registrarAuthUsernameField;
+	}
+	if(![keys containsObject:XMKey_SIPAccountAuthorizationUsername])
+	{
+		[registrarAuthUsernameField setEnabled:NO];
+		if(firstResponder == registrarAuthUsernameField)
+		{
+			firstResponder = registrarPasswordField;
+		}
+	}
+	if(![keys containsObject:XMKey_SIPAccountPassword])
+	{
+		[registrarPasswordField setEnabled:NO];
+	}
+	
+	return firstResponder;
+}
+
+- (void)_finishLIRegistrarSettings
+{
+	NSArray *sipAccounts = [locationImportData objectForKey:XMKey_SIPAccounts];
+	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
+	NSArray *accountIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
+	NSArray *keys = [currentKeys objectForKey:XMKey_Keys];
+	
+	unsigned count = [accountIndexes count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		NSNumber *number = [accountIndexes objectAtIndex:i];
+		XMSIPAccount *accountToChange = (XMSIPAccount *)[sipAccounts objectAtIndex:[number unsignedIntValue]];
+		
+		if([keys containsObject:XMKey_SIPAccountUsername])
+		{
+			NSString *registrarUsername = [registrarUsernameField stringValue];
+			if([registrarUsername isEqualToString:@""])
+			{
+				registrarUsername = nil;
+			}
+			[accountToChange setUsername:registrarUsername];
+		}
+		if([keys containsObject:XMKey_SIPAccountAuthorizationUsername])
+		{
+			NSString *registrarAuthUsername = [registrarAuthUsernameField stringValue];
+			if([registrarAuthUsername isEqualToString:@""])
+			{
+				registrarAuthUsername = nil;
+			}
+			[accountToChange setAuthorizationUsername:registrarAuthUsername];
+		}
+		if([keys containsObject:XMKey_SIPAccountPassword])
+		{
+			NSString *registrarPassword = [registrarPasswordField stringValue];
+			if([registrarPassword isEqualToString:@""])
+			{
+				registrarPassword = nil;
+			}
+			[accountToChange setPassword:registrarPassword];
+		}
+	}
+	
+	[registrarHostField setEnabled:YES];
+	[registrarUsernameField setEnabled:YES];
+	[registrarAuthUsernameField setEnabled:YES];
+	[registrarPasswordField setEnabled:YES];
+}
+
+- (void)_prepareLICompletedSettings
+{
+	[self _setTitle:@"Completed"];
+}
+
+- (void)_finishLICompletedSettings
+{
 }
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
