@@ -23,6 +23,8 @@
                 leftButton = XMInstantActionButton; 
                 rightButton = XMInstantActionButton; 
                 upButton = XMInstantActionButton; 
+                zoomInButton = XMInstantActionButton; 
+                zoomOutButton = XMInstantActionButton; 
             }; 
             SUPERCLASS = XMInspectorModule; 
         }, 
