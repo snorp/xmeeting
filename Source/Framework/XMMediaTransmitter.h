@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.20 2006/05/17 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,6 +50,7 @@
 	
 	ICMCompressionSessionRef compressionSession;
 	ICMCompressionFrameOptionsRef compressionFrameOptions;
+	TimeValue compressionSessionPreviousTimeStamp;
 	
 	BOOL compressSequenceIsActive;
 	ImageSequence compressSequence;

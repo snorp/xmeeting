@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.40 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.41 2006/05/17 23:49:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -857,9 +857,15 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	bitrateToUse = (bitrateToUse * 0.95);
 	
 	// protection against codec hangups
-	if(bitrateToUse < 64000)
+	if(bitrateToUse < 64000 && codecIdentifier != XMCodecIdentifier_H264)
 	{
 		bitrateToUse = 64000;
+	}
+	else if(bitrateToUse < 192000 && codecIdentifier == XMCodecIdentifier_H264)
+	{
+		// H.264 seems not to use the whole bandwidth allowed, so we're increasing
+		// the minimum bandwidth used
+		bitrateToUse = 192000;
 	}
 	
 	// ensuring correct keyframe interval
@@ -1272,7 +1278,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	}
 	
 	// averageDataRate is in bytes/s
-	SInt32 averageDataRate = bitrateToUse / 8;
+	SInt32 averageDataRate = bitrateToUse/8;
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -1292,6 +1298,17 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	if(err != noErr)
 	{
 		NSLog(@"SetMaxFrameDelayCount failed: %d", (int)err);
+	}
+	
+	CodecQ codecQuality = codecMaxQuality;
+	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+												  kQTPropertyClass_ICMCompressionSessionOptions,
+												  kICMCompressionSessionOptionsPropertyID_Quality,
+												  sizeof(codecQuality),
+												  &codecQuality);
+	if(err != noErr)
+	{
+		NSLog(@"SetCodecQuality failed: %d", (int)err);
 	}
 	
 	ComponentDescription componentDescription;
@@ -1394,7 +1411,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	
 	NSSize frameDimensions = XMGetVideoFrameDimensions(videoSize);
 	err = ICMCompressionSessionCreate(NULL, frameDimensions.width, frameDimensions.height, codecType,
-									  90000, sessionOptions, NULL, &encodedFrameOutputRecord,
+									  (TimeScale)90000, sessionOptions, NULL, &encodedFrameOutputRecord,
 									  &compressionSession);
 	if(err != noErr)
 	{
@@ -1410,6 +1427,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	{
 		NSLog(@"ICMCompressionFrameOptionsCreate failed %d", (int)err);
 	}
+	
+	compressionSessionPreviousTimeStamp = 0;
 }
 
 - (void)_stopCompressionSession
@@ -1446,11 +1465,13 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
 		}
 		
+		TimeValue frameDuration = timeStamp - compressionSessionPreviousTimeStamp;
+		
 		err = ICMCompressionSessionEncodeFrame(compressionSession, 
 											   frame,
 											   timeStamp, 
-											   0, 
-											   kICMValidTime_DisplayTimeStampIsValid,
+											   frameDuration, 
+											   kICMValidTime_DisplayTimeStampIsValid | kICMValidTime_DisplayDurationIsValid,
 											   compressionFrameOptions, 
 											   NULL, 
 											   NULL);
@@ -1458,6 +1479,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		{
 			NSLog(@"ICMCompressionSessionEncodeFrame failed %d", (int)err);
 		}
+		
+		compressionSessionPreviousTimeStamp = timeStamp;
 		
 		needsPictureUpdate = NO;
 	}
