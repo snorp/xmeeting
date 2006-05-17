@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.9 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.10 2006/05/17 22:49:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -167,6 +167,10 @@
 				XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
 				NSString *phoneNumber = [h323Account phoneNumber];
 				
+				if(phoneNumber == nil)
+				{
+					phoneNumber = @"";
+				}
 				[phoneNumberField setStringValue:phoneNumber];
 				
 				if(gatekeeper != nil)
