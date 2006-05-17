@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.15 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.16 2006/05/17 16:28:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -873,7 +873,7 @@ bail:
 	
 	// we need to explicitely call this function or the code will break
 	// although we aren't using any GWorld
-	err = SGSetGWorld(sequenceGrabber, NULL, GetMainDevice());
+	err = SGSetGWorld(sequenceGrabber, NULL, NULL);
 	if(err != noErr)
 	{
 		hintCode = 0x001003;
