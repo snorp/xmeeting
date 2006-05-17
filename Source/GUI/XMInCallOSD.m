@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.m,v 1.4 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMInCallOSD.m,v 1.5 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -127,36 +127,48 @@
 	int theState;
 	int theMode;
 	
-	if(mode == XMPinPMode_NoPinP)
+	if(enableComplexPinPModes == YES)
 	{
-		theState = 0;
-		theMode = 0;
-		pinpMode = XMPinPMode_Classic;
-	}
-	else if(mode == XMPinPMode_Classic)
-	{
-		theState = 1;
-		if(enableComplexPinPModes == YES)
+	
+		if(mode == XMPinPMode_NoPinP)
 		{
+			theState = 0;
+			theMode = 0;
+			pinpMode = XMPinPMode_Classic;
+		}
+		else if(mode == XMPinPMode_Classic)
+		{
+			theState = 1;
 			theMode = 1;
+			pinpMode = mode;
+		}
+		else if(mode == XMPinPMode_3D)
+		{
+			theState = 1;
+			theMode = 2;
+			pinpMode = mode;
 		}
 		else
 		{
-			theMode = 2;
+			theState = 1;
+			theMode = 0;
+			pinpMode = mode;
 		}
-		pinpMode = mode;
-	}
-	else if(mode == XMPinPMode_3D)
-	{
-		theState = 1;
-		theMode = 2;
-		pinpMode = mode;
 	}
 	else
 	{
-		theState = 1;
-		theMode = 0;
-		pinpMode = mode;
+		if(mode == XMPinPMode_NoPinP)
+		{
+			theState = 0;
+			theMode = 2;
+			pinpMode = XMPinPMode_SideBySide;
+		}
+		else
+		{
+			theState = 1;
+			theMode = 2;
+			pinpMode = XMPinPMode_SideBySide;
+		}
 	}
 	
 	NSNumber *number = [[NSNumber alloc] initWithInt:theState];

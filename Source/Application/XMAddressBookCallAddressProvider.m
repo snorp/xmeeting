@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.8 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,7 +100,6 @@
 	
 	if(propertyMatch == XMAddressBookRecordPropertyMatch_CallAddressMatch)
 	{
-		//NSLog(@"TRYING TO ADD, %@", uncompletedString);
 		// we have a match for the Address. In this case, we allow only the call address
 		// to be entered. (not e.g. "callAddress" (displayName)". This eases the check
 		// since we only have to check wether uncompletedString is a Prefix to the

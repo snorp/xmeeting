@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.18 2006/05/16 21:30:06 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -694,7 +694,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	
 	if(err != noErr)
 	{
-		NSLog(@"SecKeychainFindGenericPassword failed: %d", (int)err);
+		//NSLog(@"SecKeychainFindGenericPassword failed: %d", (int)err);
 		return nil;
 	}
 	
@@ -761,7 +761,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 		else if(strcmp(passwordString, newPasswordString) == 0)
 		{
 			// no need to modify pwd
-			NSLog(@"old pwd equal new pwd");
+			//NSLog(@"old pwd equal new pwd");
 		}
 		else
 		{

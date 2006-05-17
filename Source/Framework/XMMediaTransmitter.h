@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.18 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,7 @@
 	OSType codecManufacturer;
 	unsigned codecSpecificCallFlags;
 	unsigned bitrateToUse;
+	unsigned keyframeInterval;
 	
 	BOOL needsPictureUpdate;
 
@@ -77,6 +78,7 @@
 						   videoSize:(XMVideoSize)videoSize 
 				  maxFramesPerSecond:(unsigned)maxFramesPerSecond
 						  maxBitrate:(unsigned)maxBitrate
+					keyframeInterval:(unsigned)keyframeInterval
 							   flags:(unsigned)flags;
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 

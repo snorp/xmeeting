@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.5 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.6 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -128,7 +128,6 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 		}
 		
 		unsigned index = [self _indexOfPrimaryAddressForPerson:person];
-		NSLog(@"adding index: %d", index);
 		
 		XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index
 																	 propertyMatch:XMAddressBookRecordPropertyMatch_NoMatch];

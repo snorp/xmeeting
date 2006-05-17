@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.20 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.21 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,7 +50,6 @@ BOOL XMTransmitterMediaPatch::IsTerminated() const
 
 void XMTransmitterMediaPatch::Resume()
 {
-	//cout << "TRANSMITTER RESUME" << endl;
 	if(PIsDescendant(&source, XMMediaStream))
 	{
 		// If Resume has already been called, don't start the process again
@@ -111,7 +110,6 @@ void XMTransmitterMediaPatch::Resume()
 					}
 				}
 				
-				cout << "Sending H.264 with modes: " << _XMGetH264PacketizationMode() << " " << _XMGetH264Profile() << " " << _XMGetH264Level() << endl;
 				flags = (_XMGetH264PacketizationMode() << 8) + (_XMGetH264Profile() << 4) + _XMGetH264Level();
 			}
 			
@@ -129,11 +127,11 @@ void XMTransmitterMediaPatch::Resume()
 			if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
 			   videoSize == XMVideoSize_NoVideo)
 			{
-				//cout << "Trying to open unknown codec for transmission" << endl;
 				return;
 			}
 			
-			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, flags);
+			unsigned keyframeInterval = XMOpalManager::GetManagerInstance()->GetKeyFrameIntervalForCurrentCall();
+			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, keyframeInterval, flags);
 			
 			// adjusting the payload type afterwards, now that the packetization scheme has
 			// been determined
@@ -203,10 +201,8 @@ BOOL XMTransmitterMediaPatch::ExecuteCommand(const OpalMediaCommand & command,
 
 void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStamp)
 {
-	cout << "setTimestamp: " << timeStamp << endl;
 	if(videoTransmitterPatch == NULL)
 	{
-		//cout << "No VideoTransmitterPatch found!" << endl;
 		return;
 	}
 	
@@ -218,27 +214,7 @@ void XMTransmitterMediaPatch::SetTimeStamp(unsigned sessionID, unsigned timeStam
 		videoTransmitterPatch->dataFrame = frame;
 		frame->SetPayloadSize(0);
 		
-		//cout << "SETTING PAYLOAD TYPE FOR SENDING: " << videoTransmitterPatch->payloadType << endl;
 		frame->SetPayloadType(videoTransmitterPatch->payloadType);
-		cout << "SENDING PTYPE: " << videoTransmitterPatch->payloadType << endl;
-		//frame->SetPayloadType((RTP_DataFrame::PayloadTypes)103);
-		
-		/*XMCodecIdentifier theCodec = videoTransmitterPatch->codecIdentifier;
-		
-		if(theCodec == XMCodecIdentifier_H261)
-		{
-			frame->SetPayloadType(RTP_DataFrame::H261);
-		}
-		else if(theCodec == XMCodecIdentifier_H263)
-		{
-			OpalMediaFormat mediaFormat = videoTransmitterPatch->sinks[0].stream->GetMediaFormat();
-			RTP_DataFrame::PayloadTypes payloadType = h263PayloadType;
-			frame->SetPayloadType(payloadType);
-		}
-		else if(theCodec == XMCodecIdentifier_H264)
-		{
-			frame->SetPayloadType(RTP_DataFrame::DynamicBase);
-		}*/
 	}
 	
 	frame->SetTimestamp(timeStamp);
@@ -250,7 +226,6 @@ void XMTransmitterMediaPatch::AppendData(unsigned sessionID,
 {
 	if(videoTransmitterPatch == NULL)
 	{
-		//cout << "No VideoTransmitterPatch found (3)" << endl;
 		return;
 	}
 	
@@ -258,7 +233,6 @@ void XMTransmitterMediaPatch::AppendData(unsigned sessionID,
 	
 	if(frame == NULL)
 	{
-		//cout << "FRAME IS NULL" << endl;
 		return;
 	}
 	
@@ -277,7 +251,6 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 {	
 	if(videoTransmitterPatch == NULL)
 	{
-		cout << "No VideoTransmitterPatch found (4)" << endl;
 		return;
 	}
 		
@@ -286,18 +259,15 @@ void XMTransmitterMediaPatch::SendPacket(unsigned sessionID, BOOL setMarker)
 	frame->SetMarker(setMarker);
 	
 	videoTransmitterPatch->inUse.Wait();
-		
-	//videoTransmitterPatch->FilterFrame(*frame, videoTransmitterPatch->source.GetMediaFormat());
 	
 	PINDEX i;
 	PINDEX size = videoTransmitterPatch->sinks.GetSize();
 	for(i = 0; i < size; i++)
 	{
-	cout << "sending packet: " << setMarker << " (" << frame->GetSequenceNumber() << ")" << endl;
 		BOOL result = videoTransmitterPatch->sinks[i].stream->WritePacket(*frame);
 		if(result == FALSE)
 		{
-			cout << "ERROR Writing frame to sink!" << endl;
+			cout << "ERROR when writing frame to sink!" << endl;
 		}
 	}
 	
@@ -310,7 +280,6 @@ void XMTransmitterMediaPatch::HandleDidStopTransmitting(unsigned sessionID)
 {
 	if(videoTransmitterPatch == NULL)
 	{
-		//cout << "ERROR: NO TRANSMITTER PATCH FOUND" << endl;
 		return;
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.18 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -984,8 +984,6 @@
 
 - (void)_handleSIPRegistrationFailure:(NSArray *)info
 {
-	NSLog(@"registrationFailed: %@", [info description]);
-	
 	// extracting information from the array
 	NSString *host = (NSString *)[info objectAtIndex:0];
 	NSString *username = (NSString *)[info objectAtIndex:1];

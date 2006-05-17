@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.6 2006/05/16 21:33:49 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.7 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -198,7 +198,6 @@ static XMSetupAssistantManager *sharedInstance = nil;
 - (void)runFirstApplicationLaunchAssistantWithDelegate:(NSObject *)theDelegate
 										didEndSelector:(SEL)theDidEndSelector
 {
-	NSLog(@"run1");
 	delegate = theDelegate;
 	didEndSelector = theDidEndSelector;
 	
@@ -255,7 +254,6 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (IBAction)showWindow:(id)sender
 {
-	NSLog(@"SHOWWWWWWWWWWW");
 	[super showWindow:sender];
 }
 
@@ -263,7 +261,6 @@ static XMSetupAssistantManager *sharedInstance = nil;
 									modalDelegate:(NSObject *)theModalDelegate
 								   didEndSelector:(SEL)theDidEndSelector
 {
-	NSLog(@"run2");
 	modalWindow = window;
 	delegate = theModalDelegate;
 	didEndSelector = theDidEndSelector;
@@ -310,7 +307,6 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (IBAction)continueAssistant:(id)sender
 {
-	NSLog(@"continue");
 	if(mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
 	{
 		[self _showNextViewForFirstApplicationLaunchMode];

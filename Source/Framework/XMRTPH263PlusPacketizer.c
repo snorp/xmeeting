@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263PlusPacketizer.c,v 1.2 2006/05/03 19:54:40 hfriederich Exp $
+ * $Id: XMRTPH263PlusPacketizer.c,v 1.3 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -699,7 +699,6 @@ void _XMRTPH263PlusPacketizer_PacketizeLongGOB(ComponentInstance packetBuilder,
 											   UInt32 dataLength,
 											   Boolean isLastPacket)
 {
-	printf("long\n");
 	UInt8 header[2];
 	
 	header[0] = 0;

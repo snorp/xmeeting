@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.16 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.17 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -359,7 +359,6 @@
 
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif
 {
-	NSLog(@"volume changed");
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
 	[audioInputVolumeSlider setIntValue:[audioManager inputVolume]];

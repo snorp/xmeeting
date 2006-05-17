@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.14 2006/04/26 21:49:03 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.15 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -375,7 +375,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = VDGetBrightness(videoDigitizer, &theBrightness);
 	if(err != noErr)
 	{
-		NSLog(@"VDGetBrightness failed :%d", err);
+		//NSLog(@"VDGetBrightness failed :%d", err);
 		theBrightness = 0;
 	}
 	else
@@ -394,7 +394,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = VDGetHue(videoDigitizer, &theHue);
 	if(err != noErr)
 	{
-		NSLog(@"VDGetHue failed: %d", err);
+		//NSLog(@"VDGetHue failed: %d", err);
 		theHue = 0;
 	}
 	else
@@ -413,7 +413,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = VDGetSaturation(videoDigitizer, &theSaturation);
 	if(err != noErr)
 	{
-		NSLog(@"VDGetSaturation failed: %d", err);
+		//NSLog(@"VDGetSaturation failed: %d", err);
 		theSaturation = 0;
 	}
 	else
@@ -432,7 +432,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = VDGetContrast(videoDigitizer, &theContrast);
 	if(err != noErr)
 	{
-		NSLog(@"VDGetContrast failed: %d", err);
+		//NSLog(@"VDGetContrast failed: %d", err);
 		theContrast = 0;
 	}
 	else
@@ -451,7 +451,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	err = VDGetSharpness(videoDigitizer, &theSharpness);
 	if(err != noErr)
 	{
-		NSLog(@"VDGetSharpness failed: %d", err);
+		//NSLog(@"VDGetSharpness failed: %d", err);
 		theSharpness = 0;
 	}
 	else
@@ -582,7 +582,7 @@ bail:
 		callbackMissCounter++;
 		if(callbackMissCounter == 10)
 		{
-			NSLog(@"Callback not called 10 times, restarting the grabbing process");
+			//NSLog(@"Callback not called 10 times, restarting the grabbing process");
 			NSString *device = [selectedDevice retain];
 			[self closeInputDevice];
 			[self _disposeSeqGrabComponent];
@@ -783,7 +783,7 @@ bail:
 		err = VDSetBrightness(videoDigitizer, &theBrightness);
 		if(err != noErr)
 		{
-			NSLog(@"VDSetBrightness failed: %d", err);
+			//NSLog(@"VDSetBrightness failed: %d", err);
 		}
 	}
 	if(theHue != 0)
@@ -791,7 +791,7 @@ bail:
 		err = VDSetHue(videoDigitizer, &theHue);
 		if(err != noErr)
 		{
-			NSLog(@"VDSetHue failed: %d", err);
+			//NSLog(@"VDSetHue failed: %d", err);
 		}
 	}
 	if(theSaturation != 0)
@@ -799,7 +799,7 @@ bail:
 		err = VDSetSaturation(videoDigitizer, &theSaturation);
 		if(err != noErr)
 		{
-			NSLog(@"VDSetSaturation failed: %d", err);
+			//NSLog(@"VDSetSaturation failed: %d", err);
 		}
 	}
 	if(theContrast != 0)
@@ -807,7 +807,7 @@ bail:
 		err = VDSetContrast(videoDigitizer, &theContrast);
 		if(err != noErr)
 		{
-			NSLog(@"VDSetContrast failed: %d", err);
+			//NSLog(@"VDSetContrast failed: %d", err);
 		}
 	}
 	if(theSharpness != 0)
@@ -815,7 +815,7 @@ bail:
 		err = VDSetSharpness(videoDigitizer, &theSharpness);
 		if(err != noErr)
 		{
-			NSLog(@"VDSetSharpness failed: %d", err);
+			//NSLog(@"VDSetSharpness failed: %d", err);
 		}
 	}
 }

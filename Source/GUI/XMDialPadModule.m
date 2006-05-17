@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.10 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.11 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -173,7 +173,6 @@
 
 - (void)_startUp:(id)sender
 {
-	NSLog(@"startUP");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])
@@ -184,7 +183,6 @@
 
 - (void)_startDown:(id)sender
 {
-	NSLog(@"startDown");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])
@@ -195,7 +193,6 @@
 
 - (void)_startLeft:(id)sender
 {
-	NSLog(@"startLeft");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])
@@ -206,7 +203,6 @@
 
 - (void)_startRight:(id)sender
 {
-	NSLog(@"startRight");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])
@@ -217,7 +213,6 @@
 
 - (void)_startZoomIn:(id)sender
 {
-	NSLog(@"StartZoomIn");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])
@@ -228,7 +223,6 @@
 
 - (void)_startZoomOut:(id)sender
 {
-	NSLog(@"StartZoomOut");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])
@@ -239,7 +233,6 @@
 
 - (void)_stop:(id)sender
 {
-	NSLog(@"STOP");
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	
 	if([callManager isInCall])

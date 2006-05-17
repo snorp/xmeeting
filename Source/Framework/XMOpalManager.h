@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.14 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.15 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,9 @@ public:
 	~XMOpalManager();
 	
 	void Initialise();
+	
+	/* Getting access to the OPAL manager */
+	static XMOpalManager * GetManagerInstance();
 	
 	/* Getting access to the endpoints */
 	XMH323EndPoint * H323EndPoint();
@@ -72,6 +75,10 @@ public:
 	
 	/* Video setup methods */
 	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);
+	
+	/* getting /setting information about current call */
+	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
+	unsigned GetKeyFrameIntervalForCurrentCall();
 	
 private:
 	BOOL IsOutgoingMedia(OpalMediaStream & stream);

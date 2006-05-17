@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.5 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.6 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -504,7 +504,6 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 
 void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 {
-	cout << "Adjust Session Description" << endl;
 	unsigned bandwidth = XMOpalManager::GetAvailableBandwidth() / 10;
 	sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
 	sdp.SetBandwidthValue(bandwidth);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH264Packetizer.c,v 1.5 2006/03/01 12:48:57 hfriederich Exp $
+ * $Id: XMRTPH264Packetizer.c,v 1.6 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -173,7 +173,6 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 												  const RTPMPSampleDataParams *sampleData,
 												  SInt32 *outFlags)
 {	
-	//printf("*******\n");
 	UInt32 maxPacketLength = globals->maxPacketSize;
 	const UInt8 *data = sampleData->data;
 	UInt32 dataLength = sampleData->dataLength;
@@ -235,14 +234,11 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		index += 4;
 		UInt32 nalLength = ntohl(lengthPtr[0]);
 		
-		//printf("NAL %d\n", nalLength);
-		
 		// If the NAL does not fit within one single packet,
 		// we have to use FU-A packets, which are only available
 		// in the non-interleaved mode
 		if(nalLength > maxPacketLength && globals->useNonInterleavedMode == true)
 		{
-			//printf("Sending FU-A\n");
 			// Send some FU-A packets
 			UInt8 nri = (data[index] >> 5) & 0x03;
 			UInt8 type = data[index] & 0x1f;
@@ -320,10 +316,9 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
 		}
 		else if(nalLength > maxPacketLength)
 		{
-			// Generating a packet of zero length indicates to the subsystem
+			// Generating a packet of short length indicates to the subsystem
 			// to drop this packet and increment the RTP Sequence Number by
 			// one
-			//printf("Impossible to send too big NAL unit: %d\n", nalLength);
 			RTPPacketRef packetRef;
 			RTPPBBeginPacket(packetBuilder,
 							 0,

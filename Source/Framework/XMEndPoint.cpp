@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.13 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.14 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,7 +94,6 @@ PSafePtr<XMConnection> XMEndPoint::GetXMConnectionWithLock(const PString & token
 
 XMConnection * XMEndPoint::CreateConnection(OpalCall & call, PString & token)
 {
-	//cout << "CreateConnection" << endl;
 	return new XMConnection(call, *this, token);
 }
 
@@ -140,21 +139,20 @@ BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty,
 	
 	partyB += remoteParty;
 	
+	XMOpalManager::GetManagerInstance()->SetCallProtocol(protocol);
+	
 	return GetManager().SetUpCall(partyA, partyB, token);
 }
 
 void XMEndPoint::OnShowOutgoing(const XMConnection & connection)
 {
-	//cout << "OnShowOutgoing" << endl;
 	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 	
-	//cout << "ALERTING2" << endl;
 	_XMHandleCallIsAlerting(callID);
 }
 
 void XMEndPoint::OnShowIncoming(XMConnection & connection)
 {
-	//cout << "OnShowIncoming" << endl;
 	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 	XMCallProtocol callProtocol = XMCallProtocol_UnknownProtocol;
 		
@@ -171,7 +169,6 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 	
 	if(callProtocol == XMCallProtocol_UnknownProtocol)
 	{
-		//cout << "No Valid call protocol" << endl;
 		RejectIncomingCall();
 		return;
 	}
@@ -213,22 +210,6 @@ void XMEndPoint::RejectIncomingCall()
 	}
 }
 
-/*void XMEndPoint::ClearCall(const PString & token)
-{
-	PSafePtr<OpalCall> call = GetManager().FindCallWithLock(token, PSafeReadOnly);
-	if(call != NULL)
-	{
-		//cout << "trying to clear" << endl;
-		call->Clear();
-		//cout << "done" << endl;
-	}
-	else
-	{
-		//cout << "Clearing the Call failed (Call not found)" << endl;
-	}
-}*/
-
-
 void XMEndPoint::OnReleased(OpalConnection & connection)
 {
 	OpalEndPoint::OnReleased(connection);
@@ -236,7 +217,6 @@ void XMEndPoint::OnReleased(OpalConnection & connection)
 
 void XMEndPoint::OnEstablished(OpalConnection & connection)
 {
-	cout << "ON ESTABLISHED" << endl;
 	isIncomingCall = FALSE;
 	OpalEndPoint::OnEstablished(connection);
 }
@@ -344,14 +324,12 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
 	if(connection == NULL)
 	{
-		cout << "NoConnection" << endl;
 		return NULL;
 	}
 	
 	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
 	if(otherConnection == NULL)
 	{
-		cout << "NoOtherConnection" << endl;
 		return NULL;
 	}
 	
@@ -359,7 +337,6 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	
 	if(h224Handler == NULL)
 	{
-		cout << "No H224Handler" << endl;
 		return NULL;
 	}
 	
@@ -367,7 +344,6 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	
 	if(h281Handler == NULL)
 	{
-		cout << "No H281Handler" << endl;
 		return NULL;
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.7 2006/03/23 10:04:47 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.8 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -106,7 +106,7 @@
 #pragma mark Item Selection
 
 - (void)synchronizeTitleAndSelectedItem{
-	//NSLog(@"synch popup");
+
 	if (showingTitleOfSelectedItem) {
 		[self setTitle:[super titleOfSelectedItem]];
 	}

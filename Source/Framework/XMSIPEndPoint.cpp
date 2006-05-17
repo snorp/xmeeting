@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.8 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -176,7 +176,6 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
-			//cout << "trying: " << record.GetHost() << " \"" << record.GetUsername() << "\" \"" << record.GetAuthorizationUsername() << "\" \"" << record.GetPassword() << "\"" << endl;
 			BOOL result = Register(record.GetHost(), record.GetUsername(), record.GetAuthorizationUsername(), record.GetPassword());
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
 			{
@@ -266,7 +265,6 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 										 SIP_PDU::StatusCodes reason,
 										 BOOL wasRegistering)
 {
-	cout << "ON REGISTRATION FAILED: " << host << " " << username << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)
@@ -324,7 +322,6 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 								 const PString & username,
 								 BOOL wasRegistering)
 {
-	//cout << "ON REGISTERED" << endl;
 	PWaitAndSignal m(registrarListMutex);
 	
 	if(wasRegistering == FALSE)

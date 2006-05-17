@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.39 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.40 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -178,6 +178,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 						   videoSize:(XMVideoSize)videoSize 
 				  maxFramesPerSecond:(unsigned)maxFramesPerSecond
 						  maxBitrate:(unsigned)maxBitrate
+					keyframeInterval:(unsigned)theKeyframeInterval
 							   flags:(unsigned)flags
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:sessionID];
@@ -200,12 +201,16 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	NSData *bitrateData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
+	number = [[NSNumber alloc] initWithUnsignedInt:theKeyframeInterval];
+	NSData *keyframeData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
 	number = [[NSNumber alloc] initWithUnsignedInt:flags];
 	NSData *flagsData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:sessionData, codecData, sizeData, framesData,
-															bitrateData, flagsData, nil];
+															bitrateData, keyframeData, flagsData, nil];
 	
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartTransmitting withComponents:components];
 	
@@ -506,8 +511,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	
 	NSString *device = [_XMVideoManagerSharedInstance selectedInputDevice];
 	
-	NSLog(@"device: %@", device);
-	
 	[_XMVideoManagerSharedInstance _handleDeviceList:devices];
 	
 	if(device != nil && ![devices containsObject:device])
@@ -688,8 +691,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	data = [messageComponents objectAtIndex:1];
 	NSString *device = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	
-	NSLog(@"Setting device: %@", device);
-	
 	XMVideoInputModuleWrapper *moduleWrapper = (XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:moduleIndex];
 	id<XMVideoInputModule> module = [moduleWrapper _videoInputModule];
 	
@@ -820,10 +821,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 - (void)_handleStartTransmittingMessage:(NSArray *)components
 {
-	NSLog(@"HANDLE START TRANSMITTING");
 	if(isTransmitting == YES)
 	{
-		NSLog(@"ALREADY DONE");
 		return;
 	}
 	
@@ -848,9 +847,11 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	
 	data = (NSData *)[components objectAtIndex:5];
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	codecSpecificCallFlags = [number unsignedIntValue];
+	keyframeInterval = [number unsignedIntValue];
 	
-	NSLog(@"USING BITRATE: %d", bitrateToUse);
+	data = (NSData *)[components objectAtIndex:6];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	codecSpecificCallFlags = [number unsignedIntValue];
 	
 	// taking into account packetization overhead
 	bitrateToUse = (bitrateToUse * 0.95);
@@ -859,6 +860,13 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	if(bitrateToUse < 64000)
 	{
 		bitrateToUse = 64000;
+	}
+	
+	// ensuring correct keyframe interval
+	if(keyframeInterval == 0 ||
+	   keyframeInterval > 200)
+	{
+		keyframeInterval = 200;
 	}
 	
 	switch(codecIdentifier)
@@ -1198,7 +1206,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 - (void)_updateDeviceListAndSelectDummy
 {
-	NSLog(@"select dummy");
 	if(activeModule != nil)
 	{
 		[activeModule closeInputDevice];
@@ -1246,7 +1253,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}	
 	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, 200);
+	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, keyframeInterval);
 	if(err != noErr)
 	{
 		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
@@ -1266,7 +1273,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	
 	// averageDataRate is in bytes/s
 	SInt32 averageDataRate = bitrateToUse / 8;
-	//NSLog(@"limiting dataRate to %d", averageDataRate);
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
@@ -1605,10 +1611,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			{
 				NSLog(@"GetMaxCompressionSize failed: %d", err);
 			}
-			else
-			{
-				NSLog(@"maxCompressionSize: %d", maxCompressionSize);
-			}
 			
 			compressSequenceCompressedFrame = QTSNewPtr(maxCompressionSize,
 														kQTSMemAllocHoldMemory,
@@ -1626,7 +1628,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 			err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
 			if(err != noErr)
 			{
-				NSLog(@"Setting data rate contratints failed %d", err);
+				NSLog(@"Setting data rate contraints failed %d", err);
 			}
 			
 			compressSequenceFrameCounter = 0;
@@ -1636,8 +1638,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		
 		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
 		
-		// send and I-frame every 200 frames
-		if(compressSequenceNonKeyFrameCounter == 200)
+		// send and I-frame every keyframeInterval frames
+		if(compressSequenceNonKeyFrameCounter == keyframeInterval)
 		{
 			needsPictureUpdate = YES;
 		}
@@ -1810,7 +1812,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 		
 		// Preventing the packetizer from creating packets
 		// greater than the ethernet packet size
-		err = RTPMPSetMaxPacketSize(mediaPacketizer, 1438);
+		err = RTPMPSetMaxPacketSize(mediaPacketizer, 1400);
 		if(err != noErr)
 		{
 			NSLog(@"SetMaxPacketSize failed: %d", (int)err);

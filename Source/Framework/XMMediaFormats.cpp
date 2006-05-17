@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.18 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -189,7 +189,6 @@ XMVideoSize _XMGetMediaFormatSize(const OpalMediaFormat & mediaFormat)
 	}
 	else
 	{
-		//cout << "XMGetMediaFormatInfo with invalid size " << width << " " << height << endl;
 		return XMVideoSize_NoVideo;
 	}
 }
@@ -362,7 +361,6 @@ XM_H323_H261_Capability::XM_H323_H261_Capability()
 	qcifMPI = 1;
 	cifMPI = 1;
 	
-	cout << "CREATE H261CAP" << endl;
 	maxBitRate = _XMGetMaxH261BitRate();
 }
 
@@ -1169,8 +1167,6 @@ BOOL XM_H323_H264_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 
 BOOL XM_H323_H264_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 {
-	//cout << "On sending H.264 VideoMode" << endl;
-	
 	return TRUE;
 }
 
@@ -1583,8 +1579,6 @@ void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 			PString mpiStr = str(4, 1000);
 			mpi = mpiStr.AsUnsigned();
 			videoSize = XMVideoSize_CIF;
-			
-			//cout << "got CIF with mpi" << mpi << endl;
 		}
 		else if(str.Left(5) == "QCIF=")
 		{
@@ -1593,7 +1587,6 @@ void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 				PString mpiStr = str(5, 1000);
 				mpi = mpiStr.AsUnsigned();
 				videoSize = XMVideoSize_QCIF;
-				//cout << "got QCIF with mpi" << mpi << endl;
 			}
 		}
 		else if(str.Left(6) == "MaxBR=")

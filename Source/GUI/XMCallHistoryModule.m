@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.16 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.17 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -143,7 +143,8 @@
 
 - (void)awakeFromNib
 {
-	contentViewSize = [contentView frame].size;
+	contentViewMinSize = [contentView frame].size;
+	contentViewSize = contentViewMinSize;
 
 	[recentCallsScrollView setBorderType:NSBezelBorder];
 	[recentCallsScrollView setHasHorizontalScroller:NO];
@@ -184,12 +185,25 @@
 	return contentViewSize;
 }
 
+- (NSSize)contentViewMinSize
+{
+	[self contentView];
+	
+	return contentViewMinSize;
+}
+
+- (NSSize)contentViewMaxSize
+{
+	return NSMakeSize(5000, 5000);
+}
+
 - (void)becomeActiveModule
 {
 }
 
 - (void)becomeInactiveModule
 {
+	contentViewSize = [contentView frame].size;
 }
 
 - (BOOL)isResizableWhenInSeparateWindow

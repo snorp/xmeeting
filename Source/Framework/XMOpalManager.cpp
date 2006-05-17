@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.25 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.26 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,8 @@ using namespace std;
 
 #pragma mark Init & Deallocation
 
+static XMOpalManager * managerInstance = NULL;
+
 void XMOpalManager::InitOpal(const PString & pTracePath)
 {
 	static XMProcess *theProcess = NULL;
@@ -42,6 +44,8 @@ void XMOpalManager::InitOpal(const PString & pTracePath)
 
 XMOpalManager::XMOpalManager()
 {
+	managerInstance = this;
+	
 	callEndPoint = NULL;
 	h323EndPoint = NULL;
 	sipEndPoint = NULL;
@@ -72,6 +76,14 @@ void XMOpalManager::Initialise()
 	
 	SetAutoStartTransmitVideo(TRUE);
 	SetAutoStartReceiveVideo(TRUE);
+}
+
+#pragma mark -
+#pragma mark Accessing the manager
+
+XMOpalManager * XMOpalManager::GetManagerInstance()
+{
+	return managerInstance;
 }
 
 #pragma mark Access to Endpoints
@@ -136,7 +148,6 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 		   remoteAddress == "" &&
 		   remoteApplication == "")
 		{
-			////cout << "resetting connection token" << endl;
 			connectionToken = "";
 			callProtocol = XMCallProtocol_UnknownProtocol;
 		}
@@ -164,7 +175,6 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {	
-	cout << "OnEstablishedCall" << endl;
 	BOOL isIncomingCall = TRUE;
 	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
 	if(PIsDescendant(&endPoint, XMEndPoint))
@@ -178,7 +188,6 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {
-	//cout << "OnClearedCall " << *(PThread::Current()) << endl;
 	unsigned callID = call.GetToken().AsUnsigned();
 	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
@@ -186,7 +195,6 @@ void XMOpalManager::OnClearedCall(OpalCall & call)
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
-	//cout << "OnReleased: " << connection << endl;
 	OpalManager::OnReleased(connection);
 }
 
@@ -318,6 +326,22 @@ void XMOpalManager::SetVideoFunctionality(BOOL newEnableVideoTransmit, BOOL newE
 {
 	enableVideoTransmit = newEnableVideoTransmit;
 	enableVideoReceive = newEnableVideoReceive;
+}
+
+#pragma mark -
+#pragma mark Information about current Calls
+
+unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall()
+{
+	switch (callProtocol)
+	{
+		case XMCallProtocol_H323:
+			return 200;
+		case XMCallProtocol_SIP:
+			return 60;
+		default:
+			return 0;
+	}
 }
 
 #pragma mark Private Methods

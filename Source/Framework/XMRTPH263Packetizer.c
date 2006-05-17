@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263Packetizer.c,v 1.8 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMRTPH263Packetizer.c,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -565,7 +565,6 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 												  const RTPMPSampleDataParams *sampleData,
 												  SInt32 *outFlags)
 {	
-	printf("xxx\n");
 	RTPPacketGroupRef packetGroupRef;
 	const UInt8 *data = sampleData->data;
 	UInt32 maxPacketLength = globals->maxPacketSize - 4;	// substracting 4 bytes for Mode A
@@ -668,8 +667,6 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 			{
 				UInt32 dataLength = gobStartIndex - dataStartIndex;
 				
-				//printf("Packetizing Mode A from %d to %d (%d)\n", dataStartIndex, dataStartIndex+dataLength, dataLength);
-					
 				_XMRTPH263Packetizer_PacketizeCompleteGOBs(globals->packetBuilder,
 														   sampleData,
 														   packetGroupRef,
@@ -727,7 +724,6 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 				else
 				{
 					UInt32 dataLength = gobStartIndex - dataStartIndex;
-					//printf("Packetizing Mode A/B packets from %d to %d (%d)\n", dataStartIndex, gobStartIndex, dataLength);
 					_XMRTPH263Packetizer_PacketizeLongGOB(globals->packetBuilder,
 														  globals->maxPacketSize,
 														  sampleData,
@@ -746,7 +742,6 @@ ComponentResult XMRTPH263Packetizer_SetSampleData(XMRTPH263PacketizerGlobals glo
 		
 	if(remainingLength != 0)
 	{
-		//printf("Packing Rest as Mode A packet from %d to %d (%d)\n", dataStartIndex, dataStartIndex+remainingLength, remainingLength);
 		_XMRTPH263Packetizer_PacketizeCompleteGOBs(globals->packetBuilder,
 												   sampleData,
 												   packetGroupRef,

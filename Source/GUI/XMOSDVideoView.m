@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.12 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.13 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -323,21 +323,35 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 		sceneAnimation = nil;
 	}
 	
-	if(mode == XMPinPMode_NoPinP)
+	if(enableComplexPinPModes == YES)
 	{
-		targetPinPMode = &noPinP;
-	}
-	else if(mode == XMPinPMode_Classic)
-	{
-		targetPinPMode = &classicPinP;
-	}
-	else if(mode == XMPinPMode_SideBySide || enableComplexPinPModes == NO)
-	{
-		targetPinPMode = &sideBySidePinP;
+		if(mode == XMPinPMode_NoPinP)
+		{
+			targetPinPMode = &noPinP;
+		}
+		else if(mode == XMPinPMode_Classic)
+		{
+			targetPinPMode = &classicPinP;
+		}
+		else if(mode == XMPinPMode_SideBySide)
+		{
+			targetPinPMode = &sideBySidePinP;
+		}
+		else
+		{
+			targetPinPMode = &roomPinP;
+		}
 	}
 	else
 	{
-		targetPinPMode = &roomPinP;
+		if(mode == XMPinPMode_NoPinP)
+		{
+			targetPinPMode = &noPinP;
+		}
+		else
+		{
+			targetPinPMode = &sideBySidePinP;
+		}
 	}
 	
 	// simply return if there is nothing to change, we're not showing video

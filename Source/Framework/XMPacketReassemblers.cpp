@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.8 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -263,7 +263,6 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 				
 				if(ufep == 0)
 				{
-					cout << "Cannot transform frame since UFEP == zero!!!!!!" << endl;
 					return FALSE;
 				}
 				
@@ -274,22 +273,20 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 				   ((src[5] & 0xe3) != 0) ||
 				   ((src[6] & 0x70) != 0x10))
 				{
-					cout << "cannot transform frame since UFEP/MPPTYPE fields not zero" << endl;
-					printf("%x %x %x %x\n", src[3], src[4], src[5], src[6]);
 					return FALSE;
 				}
 				
 				BYTE pictureTypeCode = (src[5] >> 2) & 0x07;
 				if(pictureTypeCode > 1)
 				{
-					cout << "cannot transform frame since PictureTypeCode not valid" << endl;
 					return FALSE;
 				}
 				
 				BYTE cpm = (src[6] >> 3) & 0x01;
 				if(cpm == 1)
 				{
-					cout << "cannot transform frame since CPM is one" << endl;
+					//cout << "cannot transform frame since CPM is one" << endl;
+					return FALSE;
 				}
 				
 				BYTE pquant = (src[6] & 0x07) << 2;

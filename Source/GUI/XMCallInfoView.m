@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.4 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -683,7 +683,6 @@
 	
 	if(callStartString == nil)
 	{
-		NSLog(@"2");
 		return height;
 	}
 
@@ -754,7 +753,6 @@
 		height += 2*SMALL_LINE_HEIGHT + VERTICAL_SPACING;
 	}
 	
-	NSLog(@"3");
 	return height;
 }
 

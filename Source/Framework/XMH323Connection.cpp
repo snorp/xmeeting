@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.13 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.14 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,12 +33,10 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 
 XMH323Connection::~XMH323Connection()
 {
-	cout << "XMH323Connection destroyed " << (int)this << endl;
 }
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 {
-	cout << "ON SEND CAPS" << endl;
 	H323Connection::OnSendCapabilitySet(pdu);
 	
 	const H323Capabilities & localCaps = GetLocalCapabilities();
@@ -85,7 +83,6 @@ BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCa
 
 void XMH323Connection::OnSetLocalCapabilities()
 {	
-	cout << "ON SET LOCAL CAPS" << endl;
 	// Only call OnSetLocalCapabilities if not already done
 	if(hasSetLocalCapabilities == FALSE)
 	{
@@ -265,7 +262,6 @@ BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 
 BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
 {
-	cout << "SET AVAILABLE BANDWIDTH: " << newBandwidth;
 	bandwidthAvailable = newBandwidth;
 	XMOpalManager::SetAvailableBandwidth(100*newBandwidth);
 	return TRUE;

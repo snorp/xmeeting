@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.8 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -90,7 +90,6 @@ ComponentResult XMPacketBuilder_BeginPacketGroup(XMPacketBuilderGlobals globals,
 												 UInt32 inTimeStamp,
 												 RTPPacketGroupRef *outPacketGroup)
 {
-	//printf("begin packet group\n");
 	ComponentResult err = noErr;
 	
 	if(outPacketGroup != NULL)
@@ -119,7 +118,6 @@ ComponentResult XMPacketBuilder_BeginPacket(XMPacketBuilderGlobals globals,
 											UInt32 inPacketMediaDataLength,
 											RTPPacketRef *outPacket)
 {
-	//printf("*\n");
 	ComponentResult err = noErr;
 	
 	if(outPacket != NULL)

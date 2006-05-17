@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.21 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.22 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -199,13 +199,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 				}
 				break;
 			default:
-				NSLog(@"illegal codecType");
 				return NO;
 		}
 		
 		if(videoMediaSize == XMVideoSize_NoVideo)
 		{
-			NSLog(@"No valid data");
+			NSLog(@"No valid data video size");
 			return NO;
 		}
 		
@@ -301,7 +300,10 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	{
 		if(err == qErr && videoCodecIdentifier == XMCodecIdentifier_H263)
 		{
-			//[self _releaseDecompressionSession];
+			// H.263 will display a green picture in this case.
+			// Workaround: release and recreate the decompression session.
+			// Hopefully, the remote pary will send an I-frame soon
+			[self _releaseDecompressionSession];
 		}
 		return NO;
 	}
@@ -425,7 +427,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (XMVideoSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length;
 {
-	printf("Determining H.261 size: %x %x %x %x %x\n", frame[0], frame[1], frame[2], frame[3], frame[4]);
 	UInt8 *data = frame;
 	UInt32 dataIndex = 0;
 	UInt8 mask = 0x80;
@@ -479,12 +480,10 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	readBit();
 	if(bit == 0)
 	{
-		printf("Is QCIF\n");
 		return XMVideoSize_QCIF;
 	}
 	else
 	{
-		printf("Is CIF\n");
 		return XMVideoSize_CIF;
 	}
 }
@@ -555,7 +554,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	}
 	else
 	{
-		NSLog(@"UNKNOWN H.263 size");
 		return XMVideoSize_NoVideo;
 	}
 }
@@ -595,7 +593,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	}
 	else if(expGolombSymbol == 1)
 	{
-		printf("pic_order_cnt_type is one\n");
 		// scanning past delta_pic_order_always_zero_flag
 		scanBit();
 		
@@ -643,7 +640,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		return XMVideoSize_320_240;
 	}
 	
-	printf("UNKNOWN H.264 Size\n");
 	// Return CIF to have at least a valid dimension
 	return XMVideoSize_CIF;
 }

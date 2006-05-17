@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.14 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.15 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,7 +58,6 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 		
 		NSScreen *aScreen = [[NSScreen screens] objectAtIndex:i];
 		NSDictionary *deviceDescription = [aScreen deviceDescription];
-		NSLog(@"screen %d, %@", i, deviceDescription);		// DEBUG
 	}
 	
 	displayID = NULL;
@@ -185,13 +184,11 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 		
 			aScreen = [[NSScreen screens] objectAtIndex:i];
 			screenRect = [aScreen frame];
-			NSLog(@"screenRect: %d %d %d %d", (int)screenRect.origin.x, (int)screenRect.origin.y, (int)screenRect.size.width, (int)screenRect.size.height);
 			//[self setFrameRect: &aRect];	
 			deviceDescription = [aScreen deviceDescription];
 			//  	@"NSScreenNumber"	An NSNumber that contains the CGDirectDisplayID for the screen device. This key is only valid for the device description dictionary for an NSScreen.
 			aNum = [deviceDescription objectForKey: @"NSScreenNumber"];
 			displayID = (CGDirectDisplayID)[aNum intValue];
-			NSLog(@"screen %@", deviceDescription);
 			
 /* 
 	2006-02-08 17:29:39.566 XMeeting[3348] screen {
@@ -286,10 +283,6 @@ Thousands of color:
 		unsigned height = CGDisplayPixelsHigh(displayID);
 		unsigned width = CGDisplayPixelsWide(displayID);
 		unsigned bitsPerPixel = CGDisplayBitsPerPixel(displayID);
-		
-		NSLog(@"Screen Geometry Changed - (%d,%d) Depth: %d, Samples: %d, rowBytesScreen %d\n", 
-			  width,  height,
-			  CGDisplayBitsPerPixel(displayID), CGDisplaySamplesPerPixel(displayID), rowBytesScreen);
 		
 		unsigned usedBytes = rowBytesScreen*height;
 		

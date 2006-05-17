@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.21 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.22 2006/05/17 11:48:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,7 +33,6 @@ void XMReceiverMediaPatch::Main()
 	// Currently, audio is processed using the default OPAL facilities.
 	// Only video is processed using QuickTime
 	const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
-	cout << "Receiving " << mediaFormat << endl;
 	if(_XMIsVideoMediaFormat(mediaFormat) == FALSE)
 	{
 		OpalMediaPatch::Main();
@@ -171,8 +170,6 @@ void XMReceiverMediaPatch::Main()
 			DWORD timestamp = packet->GetTimestamp();
 			WORD sequenceNumber = packet->GetSequenceNumber();
 			
-			//cout << "recv: " << (int)sequenceNumber << " " << packet->GetMarker() << " " << timestamp << endl;
-			
 			// take into account that the timestamp might wrap around
 			if(timestamp < currentTimestamp && (currentTimestamp - timestamp) > (0x01 << 31))
 			{
@@ -193,7 +190,6 @@ void XMReceiverMediaPatch::Main()
 					if(firstPacketOfPacketGroup != NULL)
 					{
 						// Discarding the old packet group since incomplete
-					//	cout << "Discarding packet group: " << packet->GetSequenceNumber() << endl;
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;
@@ -320,8 +316,6 @@ void XMReceiverMediaPatch::Main()
 				
 				if(result == TRUE)
 				{
-					//printf("RECV FRAME: %x %x %x %x %x %x %x %x\n", frameBuffer[0], frameBuffer[1], frameBuffer[2],
-					//	   frameBuffer[3], frameBuffer[4], frameBuffer[5], frameBuffer[7], frameBuffer[8]);
 					result = _XMProcessFrame(sessionID, frameBuffer, frameBufferSize);
 					if(result == FALSE)
 					{
