@@ -23,8 +23,6 @@
 		1A348FB20984E4210033FA95 /* XMOSDVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A348FA40984E4210033FA95 /* XMOSDVideoView.m */; };
 		1A348FB70984E4520033FA95 /* Info.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FB30984E4520033FA95 /* Info.nib */; };
 		1A348FB80984E4520033FA95 /* XMInspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FB50984E4520033FA95 /* XMInspector.nib */; };
-		1A348FD20984E4680033FA95 /* camera_settings_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBA0984E4680033FA95 /* camera_settings_large_down.tif */; };
-		1A348FD30984E4680033FA95 /* camera_settings_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBB0984E4680033FA95 /* camera_settings_large.tif */; };
 		1A348FD40984E4680033FA95 /* fullscreen_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBC0984E4680033FA95 /* fullscreen_large_down.tif */; };
 		1A348FD50984E4680033FA95 /* fullscreen_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBD0984E4680033FA95 /* fullscreen_large.tif */; };
 		1A348FD60984E4680033FA95 /* hangup_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A348FBE0984E4680033FA95 /* hangup_large_down.tif */; };
@@ -73,8 +71,6 @@
 		1AD42C3A0993BF1100F92546 /* pinp_off_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C360993BF1100F92546 /* pinp_off_large.tif */; };
 		1AD42C3B0993BF1100F92546 /* pinp_on_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C370993BF1100F92546 /* pinp_on_large_down.tif */; };
 		1AD42C3C0993BF1100F92546 /* pinp_on_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C380993BF1100F92546 /* pinp_on_large.tif */; };
-		1ADAFBC70990E8B500F6C5FF /* Call_32_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBC50990E8B500F6C5FF /* Call_32_down.tif */; };
-		1ADAFBC80990E8B500F6C5FF /* Call_32.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBC60990E8B500F6C5FF /* Call_32.tif */; };
 		1ADAFBD90990EBA700F6C5FF /* contacts_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD50990EBA700F6C5FF /* contacts_24_down.tif */; };
 		1ADAFBDA0990EBA700F6C5FF /* contacts_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD60990EBA700F6C5FF /* contacts_24.tif */; };
 		1ADAFBDB0990EBA700F6C5FF /* Call_24_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */; };
@@ -102,6 +98,36 @@
 		D102A8FC09E6B4DA0050239C /* XMDialPadModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D163941B083E17ED00F7FD83 /* XMDialPadModule.m */; };
 		D102AFFD09EA770F0050239C /* XMInstantActionButton.h in Headers */ = {isa = PBXBuildFile; fileRef = D102AFFB09EA770F0050239C /* XMInstantActionButton.h */; };
 		D102AFFE09EA770F0050239C /* XMInstantActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = D102AFFC09EA770F0050239C /* XMInstantActionButton.m */; };
+		D104D9660A0E5973000898F2 /* dial_pad_0_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D94E0A0E5973000898F2 /* dial_pad_0_down.tif */; };
+		D104D9670A0E5973000898F2 /* dial_pad_0.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D94F0A0E5973000898F2 /* dial_pad_0.tif */; };
+		D104D9680A0E5973000898F2 /* dial_pad_1_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9500A0E5973000898F2 /* dial_pad_1_down.tif */; };
+		D104D9690A0E5973000898F2 /* dial_pad_1.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9510A0E5973000898F2 /* dial_pad_1.tif */; };
+		D104D96A0A0E5973000898F2 /* dial_pad_2_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9520A0E5973000898F2 /* dial_pad_2_down.tif */; };
+		D104D96B0A0E5973000898F2 /* dial_pad_2.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9530A0E5973000898F2 /* dial_pad_2.tif */; };
+		D104D96C0A0E5973000898F2 /* dial_pad_3_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9540A0E5973000898F2 /* dial_pad_3_down.tif */; };
+		D104D96D0A0E5973000898F2 /* dial_pad_3.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9550A0E5973000898F2 /* dial_pad_3.tif */; };
+		D104D96E0A0E5973000898F2 /* dial_pad_4_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9560A0E5973000898F2 /* dial_pad_4_down.tif */; };
+		D104D96F0A0E5973000898F2 /* dial_pad_4.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9570A0E5973000898F2 /* dial_pad_4.tif */; };
+		D104D9700A0E5973000898F2 /* dial_pad_5_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9580A0E5973000898F2 /* dial_pad_5_down.tif */; };
+		D104D9710A0E5973000898F2 /* dial_pad_5.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9590A0E5973000898F2 /* dial_pad_5.tif */; };
+		D104D9720A0E5973000898F2 /* dial_pad_6_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D95A0A0E5973000898F2 /* dial_pad_6_down.tif */; };
+		D104D9730A0E5973000898F2 /* dial_pad_6.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D95B0A0E5973000898F2 /* dial_pad_6.tif */; };
+		D104D9740A0E5973000898F2 /* dial_pad_7_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D95C0A0E5973000898F2 /* dial_pad_7_down.tif */; };
+		D104D9750A0E5973000898F2 /* dial_pad_7.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D95D0A0E5973000898F2 /* dial_pad_7.tif */; };
+		D104D9760A0E5973000898F2 /* dial_pad_8_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D95E0A0E5973000898F2 /* dial_pad_8_down.tif */; };
+		D104D9770A0E5973000898F2 /* dial_pad_8.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D95F0A0E5973000898F2 /* dial_pad_8.tif */; };
+		D104D9780A0E5973000898F2 /* dial_pad_9_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9600A0E5973000898F2 /* dial_pad_9_down.tif */; };
+		D104D9790A0E5973000898F2 /* dial_pad_9.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9610A0E5973000898F2 /* dial_pad_9.tif */; };
+		D104D97A0A0E5973000898F2 /* dial_pad_10_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9620A0E5973000898F2 /* dial_pad_10_down.tif */; };
+		D104D97B0A0E5973000898F2 /* dial_pad_10.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9630A0E5973000898F2 /* dial_pad_10.tif */; };
+		D104D97C0A0E5973000898F2 /* dial_pad_11_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9640A0E5973000898F2 /* dial_pad_11_down.tif */; };
+		D104D97D0A0E5973000898F2 /* dial_pad_11.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9650A0E5973000898F2 /* dial_pad_11.tif */; };
+		D104D99F0A0E60D6000898F2 /* zoom_in_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D99B0A0E60D6000898F2 /* zoom_in_down.tif */; };
+		D104D9A00A0E60D6000898F2 /* zoom_in.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D99C0A0E60D6000898F2 /* zoom_in.tif */; };
+		D104D9A10A0E60D6000898F2 /* zoom_out_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D99D0A0E60D6000898F2 /* zoom_out_down.tif */; };
+		D104D9A20A0E60D6000898F2 /* zoom_out.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D99E0A0E60D6000898F2 /* zoom_out.tif */; };
+		D104D9C10A0E9947000898F2 /* DefaultURL_H323.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9BF0A0E9947000898F2 /* DefaultURL_H323.tif */; };
+		D104D9C20A0E9947000898F2 /* DefaultURL_SIP.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9C00A0E9947000898F2 /* DefaultURL_SIP.tif */; };
 		D10AFE9607B3771F00BBC8EA /* XMCallManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFE9407B3771F00BBC8EA /* XMCallManager.h */; };
 		D10AFE9707B3771F00BBC8EA /* XMCallManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFE9507B3771F00BBC8EA /* XMCallManager.m */; };
 		D10AFEB407B3781700BBC8EA /* XMUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D10AFEB207B3781700BBC8EA /* XMUtils.h */; };
@@ -110,7 +136,6 @@
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
-		D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1152F73084C61730057CA9D /* DefaultURL.tiff */; };
 		D1205AF909F986A000179B6C /* down_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF709F986A000179B6C /* down_arrow_down.tif */; };
 		D1205AFA09F986A000179B6C /* down_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF809F986A000179B6C /* down_arrow.tif */; };
 		D1205B0A09F9899600179B6C /* left_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205B0609F9899600179B6C /* left_arrow_down.tif */; };
@@ -132,7 +157,6 @@
 		D12E627C0999168E004EF9F8 /* XMScreenVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */; };
 		D12E63A90999503F004EF9F8 /* XMVideoPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */; };
 		D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */; };
-		D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D132319E090526B700F4D5A7 /* HeadsetCam.tiff */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D1323EAA090936F600F4D5A7 /* transports.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35408F90263007E4ABE /* transports.cxx */; };
 		D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13274F008C6F2BB00298F25 /* XMCallInfoView.m */; };
@@ -210,10 +234,6 @@
 		D1A02AED081E57040018BD11 /* XMLocationPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */; };
 		D1A02AEE081E57040018BD11 /* XMLocationPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */; };
 		D1A02B26081E96D30018BD11 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1A02B24081E96D30018BD11 /* Preferences.nib */; };
-		D1A5E0B409C82BF70063B926 /* H323URL_Disclosure.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1A5E0B209C82BF70063B926 /* H323URL_Disclosure.tiff */; };
-		D1A5E0B509C82BF70063B926 /* H323URL_NoDisclosure.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1A5E0B309C82BF70063B926 /* H323URL_NoDisclosure.tiff */; };
-		D1A5E0B809C82C120063B926 /* SIPURL_Disclosure.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1A5E0B609C82C120063B926 /* SIPURL_Disclosure.tiff */; };
-		D1A5E0B909C82C120063B926 /* SIPURL_NoDisclosure.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1A5E0B709C82C120063B926 /* SIPURL_NoDisclosure.tiff */; };
 		D1A5E1FC09C8835E0063B926 /* XMLocalVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D1A5E1FA09C8835E0063B926 /* XMLocalVideoView.h */; };
 		D1A5E1FD09C8835E0063B926 /* XMLocalVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */; };
 		D1A5E9E409C9C69F0063B926 /* XMInspectorModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */; };
@@ -806,7 +826,6 @@
 		D1EB18E40843DB92002CEF53 /* TextChat.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18E30843DB92002CEF53 /* TextChat.tiff */; };
 		D1EB18EA0843DCC2002CEF53 /* Statistics.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18E90843DCC2002CEF53 /* Statistics.tiff */; };
 		D1EB18F00843DEC9002CEF53 /* CallHistory.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */; };
-		D1EB19360843E47F002CEF53 /* Window.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB19350843E47F002CEF53 /* Window.tiff */; };
 		D1ECCBF30833DDAD008EBAE3 /* TextChatModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */; };
 		D1ECCD0408348C4E008EBAE3 /* XMMainWindowModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1ECCD0308348C4E008EBAE3 /* XMMainWindowModule.h */; };
 		D1ECCD180834911C008EBAE3 /* InCallModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1ECCD160834911C008EBAE3 /* InCallModule.nib */; };
@@ -934,8 +953,6 @@
 		1A348FA40984E4210033FA95 /* XMOSDVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMOSDVideoView.m; path = Source/GUI/XMOSDVideoView.m; sourceTree = "<group>"; };
 		1A348FB40984E4520033FA95 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Info.nib; sourceTree = "<group>"; };
 		1A348FB60984E4520033FA95 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/XMInspector.nib; sourceTree = "<group>"; };
-		1A348FBA0984E4680033FA95 /* camera_settings_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = camera_settings_large_down.tif; path = Resources/Images/camera_settings_large_down.tif; sourceTree = "<group>"; };
-		1A348FBB0984E4680033FA95 /* camera_settings_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = camera_settings_large.tif; path = Resources/Images/camera_settings_large.tif; sourceTree = "<group>"; };
 		1A348FBC0984E4680033FA95 /* fullscreen_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = fullscreen_large_down.tif; path = Resources/Images/fullscreen_large_down.tif; sourceTree = "<group>"; };
 		1A348FBD0984E4680033FA95 /* fullscreen_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = fullscreen_large.tif; path = Resources/Images/fullscreen_large.tif; sourceTree = "<group>"; };
 		1A348FBE0984E4680033FA95 /* hangup_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hangup_large_down.tif; path = Resources/Images/hangup_large_down.tif; sourceTree = "<group>"; };
@@ -984,8 +1001,6 @@
 		1AD42C360993BF1100F92546 /* pinp_off_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_off_large.tif; path = Resources/Images/pinp_off_large.tif; sourceTree = "<group>"; };
 		1AD42C370993BF1100F92546 /* pinp_on_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_on_large_down.tif; path = Resources/Images/pinp_on_large_down.tif; sourceTree = "<group>"; };
 		1AD42C380993BF1100F92546 /* pinp_on_large.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_on_large.tif; path = Resources/Images/pinp_on_large.tif; sourceTree = "<group>"; };
-		1ADAFBC50990E8B500F6C5FF /* Call_32_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_32_down.tif; path = Resources/Images/Call_32_down.tif; sourceTree = "<group>"; };
-		1ADAFBC60990E8B500F6C5FF /* Call_32.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_32.tif; path = Resources/Images/Call_32.tif; sourceTree = "<group>"; };
 		1ADAFBD50990EBA700F6C5FF /* contacts_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = contacts_24_down.tif; path = Resources/Images/contacts_24_down.tif; sourceTree = "<group>"; };
 		1ADAFBD60990EBA700F6C5FF /* contacts_24.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = contacts_24.tif; path = Resources/Images/contacts_24.tif; sourceTree = "<group>"; };
 		1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Call_24_down.tif; path = Resources/Images/Call_24_down.tif; sourceTree = "<group>"; };
@@ -1015,13 +1030,42 @@
 		D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesRegistrarRecord.m; path = Source/Framework/XMPreferencesRegistrarRecord.m; sourceTree = "<group>"; };
 		D102AFFB09EA770F0050239C /* XMInstantActionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMInstantActionButton.h; sourceTree = "<group>"; };
 		D102AFFC09EA770F0050239C /* XMInstantActionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMInstantActionButton.m; sourceTree = "<group>"; };
+		D104D94E0A0E5973000898F2 /* dial_pad_0_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_0_down.tif; path = Resources/Images/dial_pad_0_down.tif; sourceTree = "<group>"; };
+		D104D94F0A0E5973000898F2 /* dial_pad_0.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_0.tif; path = Resources/Images/dial_pad_0.tif; sourceTree = "<group>"; };
+		D104D9500A0E5973000898F2 /* dial_pad_1_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_1_down.tif; path = Resources/Images/dial_pad_1_down.tif; sourceTree = "<group>"; };
+		D104D9510A0E5973000898F2 /* dial_pad_1.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_1.tif; path = Resources/Images/dial_pad_1.tif; sourceTree = "<group>"; };
+		D104D9520A0E5973000898F2 /* dial_pad_2_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_2_down.tif; path = Resources/Images/dial_pad_2_down.tif; sourceTree = "<group>"; };
+		D104D9530A0E5973000898F2 /* dial_pad_2.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_2.tif; path = Resources/Images/dial_pad_2.tif; sourceTree = "<group>"; };
+		D104D9540A0E5973000898F2 /* dial_pad_3_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_3_down.tif; path = Resources/Images/dial_pad_3_down.tif; sourceTree = "<group>"; };
+		D104D9550A0E5973000898F2 /* dial_pad_3.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_3.tif; path = Resources/Images/dial_pad_3.tif; sourceTree = "<group>"; };
+		D104D9560A0E5973000898F2 /* dial_pad_4_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_4_down.tif; path = Resources/Images/dial_pad_4_down.tif; sourceTree = "<group>"; };
+		D104D9570A0E5973000898F2 /* dial_pad_4.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_4.tif; path = Resources/Images/dial_pad_4.tif; sourceTree = "<group>"; };
+		D104D9580A0E5973000898F2 /* dial_pad_5_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_5_down.tif; path = Resources/Images/dial_pad_5_down.tif; sourceTree = "<group>"; };
+		D104D9590A0E5973000898F2 /* dial_pad_5.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_5.tif; path = Resources/Images/dial_pad_5.tif; sourceTree = "<group>"; };
+		D104D95A0A0E5973000898F2 /* dial_pad_6_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_6_down.tif; path = Resources/Images/dial_pad_6_down.tif; sourceTree = "<group>"; };
+		D104D95B0A0E5973000898F2 /* dial_pad_6.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_6.tif; path = Resources/Images/dial_pad_6.tif; sourceTree = "<group>"; };
+		D104D95C0A0E5973000898F2 /* dial_pad_7_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_7_down.tif; path = Resources/Images/dial_pad_7_down.tif; sourceTree = "<group>"; };
+		D104D95D0A0E5973000898F2 /* dial_pad_7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_7.tif; path = Resources/Images/dial_pad_7.tif; sourceTree = "<group>"; };
+		D104D95E0A0E5973000898F2 /* dial_pad_8_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_8_down.tif; path = Resources/Images/dial_pad_8_down.tif; sourceTree = "<group>"; };
+		D104D95F0A0E5973000898F2 /* dial_pad_8.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_8.tif; path = Resources/Images/dial_pad_8.tif; sourceTree = "<group>"; };
+		D104D9600A0E5973000898F2 /* dial_pad_9_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_9_down.tif; path = Resources/Images/dial_pad_9_down.tif; sourceTree = "<group>"; };
+		D104D9610A0E5973000898F2 /* dial_pad_9.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_9.tif; path = Resources/Images/dial_pad_9.tif; sourceTree = "<group>"; };
+		D104D9620A0E5973000898F2 /* dial_pad_10_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_10_down.tif; path = Resources/Images/dial_pad_10_down.tif; sourceTree = "<group>"; };
+		D104D9630A0E5973000898F2 /* dial_pad_10.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_10.tif; path = Resources/Images/dial_pad_10.tif; sourceTree = "<group>"; };
+		D104D9640A0E5973000898F2 /* dial_pad_11_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_11_down.tif; path = Resources/Images/dial_pad_11_down.tif; sourceTree = "<group>"; };
+		D104D9650A0E5973000898F2 /* dial_pad_11.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_11.tif; path = Resources/Images/dial_pad_11.tif; sourceTree = "<group>"; };
+		D104D99B0A0E60D6000898F2 /* zoom_in_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = zoom_in_down.tif; path = Resources/Images/zoom_in_down.tif; sourceTree = "<group>"; };
+		D104D99C0A0E60D6000898F2 /* zoom_in.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = zoom_in.tif; path = Resources/Images/zoom_in.tif; sourceTree = "<group>"; };
+		D104D99D0A0E60D6000898F2 /* zoom_out_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = zoom_out_down.tif; path = Resources/Images/zoom_out_down.tif; sourceTree = "<group>"; };
+		D104D99E0A0E60D6000898F2 /* zoom_out.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = zoom_out.tif; path = Resources/Images/zoom_out.tif; sourceTree = "<group>"; };
+		D104D9BF0A0E9947000898F2 /* DefaultURL_H323.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL_H323.tif; path = Resources/Images/DefaultURL_H323.tif; sourceTree = "<group>"; };
+		D104D9C00A0E9947000898F2 /* DefaultURL_SIP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL_SIP.tif; path = Resources/Images/DefaultURL_SIP.tif; sourceTree = "<group>"; };
 		D10AFE9407B3771F00BBC8EA /* XMCallManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallManager.h; path = Source/Framework/XMCallManager.h; sourceTree = "<group>"; };
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
 		D10AFEB307B3781700BBC8EA /* XMUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMUtils.m; path = Source/Framework/XMUtils.m; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
-		D1152F73084C61730057CA9D /* DefaultURL.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL.tiff; path = Resources/Images/DefaultURL.tiff; sourceTree = "<group>"; };
 		D1205AF709F986A000179B6C /* down_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow_down.tif; path = Resources/Images/down_arrow_down.tif; sourceTree = "<group>"; };
 		D1205AF809F986A000179B6C /* down_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow.tif; path = Resources/Images/down_arrow.tif; sourceTree = "<group>"; };
 		D1205B0609F9899600179B6C /* left_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = left_arrow_down.tif; path = Resources/Images/left_arrow_down.tif; sourceTree = "<group>"; };
@@ -1043,7 +1087,6 @@
 		D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMScreenVideoInputModule.m; path = Source/Framework/XMScreenVideoInputModule.m; sourceTree = "<group>"; };
 		D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoPreferencesModule.h; path = Source/GUI/XMVideoPreferencesModule.h; sourceTree = "<group>"; };
 		D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMVideoPreferencesModule.m; path = Source/GUI/XMVideoPreferencesModule.m; sourceTree = "<group>"; };
-		D132319E090526B700F4D5A7 /* HeadsetCam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HeadsetCam.tiff; path = Resources/Images/HeadsetCam.tiff; sourceTree = "<group>"; };
 		D13231CF09052FC500F4D5A7 /* Cam.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Cam.tiff; path = Resources/Images/Cam.tiff; sourceTree = "<group>"; };
 		D13274EF08C6F2BB00298F25 /* XMCallInfoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = XMCallInfoView.h; sourceTree = "<group>"; };
 		D13274F008C6F2BB00298F25 /* XMCallInfoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = XMCallInfoView.m; sourceTree = "<group>"; };
@@ -1143,10 +1186,6 @@
 		D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocationPreferencesModule.h; path = Source/GUI/XMLocationPreferencesModule.h; sourceTree = "<group>"; };
 		D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLocationPreferencesModule.m; path = Source/GUI/XMLocationPreferencesModule.m; sourceTree = "<group>"; };
 		D1A02B25081E96D30018BD11 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
-		D1A5E0B209C82BF70063B926 /* H323URL_Disclosure.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = H323URL_Disclosure.tiff; path = Resources/Images/H323URL_Disclosure.tiff; sourceTree = "<group>"; };
-		D1A5E0B309C82BF70063B926 /* H323URL_NoDisclosure.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = H323URL_NoDisclosure.tiff; path = Resources/Images/H323URL_NoDisclosure.tiff; sourceTree = "<group>"; };
-		D1A5E0B609C82C120063B926 /* SIPURL_Disclosure.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = SIPURL_Disclosure.tiff; path = Resources/Images/SIPURL_Disclosure.tiff; sourceTree = "<group>"; };
-		D1A5E0B709C82C120063B926 /* SIPURL_NoDisclosure.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = SIPURL_NoDisclosure.tiff; path = Resources/Images/SIPURL_NoDisclosure.tiff; sourceTree = "<group>"; };
 		D1A5E1FA09C8835E0063B926 /* XMLocalVideoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMLocalVideoView.h; path = Source/GUI/XMLocalVideoView.h; sourceTree = "<group>"; };
 		D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMLocalVideoView.m; path = Source/GUI/XMLocalVideoView.m; sourceTree = "<group>"; };
 		D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInspectorModule.m; path = Source/GUI/XMInspectorModule.m; sourceTree = "<group>"; };
@@ -1759,7 +1798,6 @@
 		D1EB18E30843DB92002CEF53 /* TextChat.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TextChat.tiff; path = Resources/Images/TextChat.tiff; sourceTree = "<group>"; };
 		D1EB18E90843DCC2002CEF53 /* Statistics.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Statistics.tiff; path = Resources/Images/Statistics.tiff; sourceTree = "<group>"; };
 		D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory.tiff; path = Resources/Images/CallHistory.tiff; sourceTree = "<group>"; };
-		D1EB19350843E47F002CEF53 /* Window.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Window.tiff; path = Resources/Images/Window.tiff; sourceTree = "<group>"; };
 		D1ECCBF20833DDAD008EBAE3 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/TextChatModule.nib; sourceTree = "<group>"; };
 		D1ECCBF60833DDD5008EBAE3 /* XMTextChatModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMTextChatModule.h; path = Source/GUI/XMTextChatModule.h; sourceTree = "<group>"; };
 		D1ECCBF70833DDD5008EBAE3 /* XMTextChatModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMTextChatModule.m; path = Source/GUI/XMTextChatModule.m; sourceTree = "<group>"; };
@@ -3168,19 +3206,40 @@
 				D120614309FBDE5100179B6C /* AddressBook_16.tiff */,
 				1ADAFBD80990EBA700F6C5FF /* Call_24.tif */,
 				1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */,
-				1ADAFBC60990E8B500F6C5FF /* Call_32.tif */,
-				1ADAFBC50990E8B500F6C5FF /* Call_32_down.tif */,
 				D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */,
 				D162158209F0F91600647E48 /* CallHistory_H323.tiff */,
 				D162158309F0F91600647E48 /* CallHistory_SIP.tiff */,
 				D13231CF09052FC500F4D5A7 /* Cam.tiff */,
 				1ADAFBE90990F74700F6C5FF /* camera_24.tif */,
 				1ADAFBE80990F74700F6C5FF /* camera_24_down.tif */,
-				1A348FBB0984E4680033FA95 /* camera_settings_large.tif */,
-				1A348FBA0984E4680033FA95 /* camera_settings_large_down.tif */,
 				1ADAFBD60990EBA700F6C5FF /* contacts_24.tif */,
 				1ADAFBD50990EBA700F6C5FF /* contacts_24_down.tif */,
-				D1152F73084C61730057CA9D /* DefaultURL.tiff */,
+				D104D9BF0A0E9947000898F2 /* DefaultURL_H323.tif */,
+				D104D9C00A0E9947000898F2 /* DefaultURL_SIP.tif */,
+				D104D94F0A0E5973000898F2 /* dial_pad_0.tif */,
+				D104D94E0A0E5973000898F2 /* dial_pad_0_down.tif */,
+				D104D9510A0E5973000898F2 /* dial_pad_1.tif */,
+				D104D9630A0E5973000898F2 /* dial_pad_10.tif */,
+				D104D9620A0E5973000898F2 /* dial_pad_10_down.tif */,
+				D104D9650A0E5973000898F2 /* dial_pad_11.tif */,
+				D104D9640A0E5973000898F2 /* dial_pad_11_down.tif */,
+				D104D9500A0E5973000898F2 /* dial_pad_1_down.tif */,
+				D104D9530A0E5973000898F2 /* dial_pad_2.tif */,
+				D104D9520A0E5973000898F2 /* dial_pad_2_down.tif */,
+				D104D9550A0E5973000898F2 /* dial_pad_3.tif */,
+				D104D9540A0E5973000898F2 /* dial_pad_3_down.tif */,
+				D104D9570A0E5973000898F2 /* dial_pad_4.tif */,
+				D104D9560A0E5973000898F2 /* dial_pad_4_down.tif */,
+				D104D9590A0E5973000898F2 /* dial_pad_5.tif */,
+				D104D9580A0E5973000898F2 /* dial_pad_5_down.tif */,
+				D104D95B0A0E5973000898F2 /* dial_pad_6.tif */,
+				D104D95A0A0E5973000898F2 /* dial_pad_6_down.tif */,
+				D104D95D0A0E5973000898F2 /* dial_pad_7.tif */,
+				D104D95C0A0E5973000898F2 /* dial_pad_7_down.tif */,
+				D104D95F0A0E5973000898F2 /* dial_pad_8.tif */,
+				D104D95E0A0E5973000898F2 /* dial_pad_8_down.tif */,
+				D104D9610A0E5973000898F2 /* dial_pad_9.tif */,
+				D104D9600A0E5973000898F2 /* dial_pad_9_down.tif */,
 				D1EB18DF0843D90D002CEF53 /* DialPad.tiff */,
 				D1205AF809F986A000179B6C /* down_arrow.tif */,
 				D1205AF709F986A000179B6C /* down_arrow_down.tif */,
@@ -3188,13 +3247,10 @@
 				1A348FBD0984E4680033FA95 /* fullscreen_large.tif */,
 				1A348FBC0984E4680033FA95 /* fullscreen_large_down.tif */,
 				1A3A07D2099C876A00F5DBAD /* generalPreferences.tif */,
-				D1A5E0B209C82BF70063B926 /* H323URL_Disclosure.tiff */,
-				D1A5E0B309C82BF70063B926 /* H323URL_NoDisclosure.tiff */,
 				1ADAFC000990FABD00F6C5FF /* hangup_24.tif */,
 				1ADAFBFF0990FABD00F6C5FF /* hangup_24_down.tif */,
 				1A348FBF0984E4680033FA95 /* hangup_large.tif */,
 				1A348FBE0984E4680033FA95 /* hangup_large_down.tif */,
-				D132319E090526B700F4D5A7 /* HeadsetCam.tiff */,
 				1ADAFBE30990EFB800F6C5FF /* info_24.tif */,
 				1ADAFBE20990EFB800F6C5FF /* info_24_down.tif */,
 				1A348FC10984E4680033FA95 /* Inspect.tiff */,
@@ -3230,8 +3286,6 @@
 				1A348FCC0984E4680033FA95 /* semaphore_green.tif */,
 				1A348FCD0984E4680033FA95 /* semaphore_red.tif */,
 				1A348FCE0984E4680033FA95 /* semaphore_yellow.tif */,
-				D1A5E0B609C82C120063B926 /* SIPURL_Disclosure.tiff */,
-				D1A5E0B709C82C120063B926 /* SIPURL_NoDisclosure.tiff */,
 				1A3A07D3099C876A00F5DBAD /* sourcesPreferences.tif */,
 				D1EB18E90843DCC2002CEF53 /* Statistics.tiff */,
 				D1EB18E30843DB92002CEF53 /* TextChat.tiff */,
@@ -3243,10 +3297,13 @@
 				1A490F810998EB850096261F /* unmute_large_down.tif */,
 				D1205B0F09F989AA00179B6C /* up_arrow.tif */,
 				D1205B0E09F989AA00179B6C /* up_arrow_down.tif */,
-				D1EB19350843E47F002CEF53 /* Window.tiff */,
 				1A348FD00984E4680033FA95 /* windowed_large.tif */,
 				1A348FCF0984E4680033FA95 /* windowed_large_down.tif */,
 				D1EB18B90843D6B6002CEF53 /* ZeroConf.tiff */,
+				D104D99C0A0E60D6000898F2 /* zoom_in.tif */,
+				D104D99B0A0E60D6000898F2 /* zoom_in_down.tif */,
+				D104D99E0A0E60D6000898F2 /* zoom_out.tif */,
+				D104D99D0A0E60D6000898F2 /* zoom_out_down.tif */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -3910,18 +3967,13 @@
 				D1EB18E40843DB92002CEF53 /* TextChat.tiff in Resources */,
 				D1EB18EA0843DCC2002CEF53 /* Statistics.tiff in Resources */,
 				D1EB18F00843DEC9002CEF53 /* CallHistory.tiff in Resources */,
-				D1EB19360843E47F002CEF53 /* Window.tiff in Resources */,
-				D1152F74084C61730057CA9D /* DefaultURL.tiff in Resources */,
 				D1B06A5C086A9C5E00563EDB /* Loudspeaker.tiff in Resources */,
 				D1B06A5D086A9C5E00563EDB /* Microphone.tiff in Resources */,
 				D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */,
-				D132319F090526B700F4D5A7 /* HeadsetCam.tiff in Resources */,
 				D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */,
 				D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */,
 				1A348FB70984E4520033FA95 /* Info.nib in Resources */,
 				1A348FB80984E4520033FA95 /* XMInspector.nib in Resources */,
-				1A348FD20984E4680033FA95 /* camera_settings_large_down.tif in Resources */,
-				1A348FD30984E4680033FA95 /* camera_settings_large.tif in Resources */,
 				1A348FD40984E4680033FA95 /* fullscreen_large_down.tif in Resources */,
 				1A348FD50984E4680033FA95 /* fullscreen_large.tif in Resources */,
 				1A348FD60984E4680033FA95 /* hangup_large_down.tif in Resources */,
@@ -3944,8 +3996,6 @@
 				1A348FE70984E4680033FA95 /* windowed_large_down.tif in Resources */,
 				1A348FE80984E4680033FA95 /* windowed_large.tif in Resources */,
 				1AC7C1EF098665E2008521B4 /* no_video_screen.tif in Resources */,
-				1ADAFBC70990E8B500F6C5FF /* Call_32_down.tif in Resources */,
-				1ADAFBC80990E8B500F6C5FF /* Call_32.tif in Resources */,
 				1ADAFBD90990EBA700F6C5FF /* contacts_24_down.tif in Resources */,
 				1ADAFBDA0990EBA700F6C5FF /* contacts_24.tif in Resources */,
 				1ADAFBDB0990EBA700F6C5FF /* Call_24_down.tif in Resources */,
@@ -3983,10 +4033,6 @@
 				1A9E27BE09A5BF3600E9A7CE /* Ringer.aiff in Resources */,
 				1A42B4D109A9DEAF007773DA /* XMeeting.icns in Resources */,
 				D1BB917409BCDF99000897D9 /* accountPreferences.tif in Resources */,
-				D1A5E0B409C82BF70063B926 /* H323URL_Disclosure.tiff in Resources */,
-				D1A5E0B509C82BF70063B926 /* H323URL_NoDisclosure.tiff in Resources */,
-				D1A5E0B809C82C120063B926 /* SIPURL_Disclosure.tiff in Resources */,
-				D1A5E0B909C82C120063B926 /* SIPURL_NoDisclosure.tiff in Resources */,
 				D1A5EE1609CB08E30063B926 /* DummyImage.gif in Resources */,
 				D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */,
 				D162158509F0F91600647E48 /* CallHistory_SIP.tiff in Resources */,
@@ -3999,6 +4045,36 @@
 				D1205B1009F989AA00179B6C /* up_arrow_down.tif in Resources */,
 				D1205B1109F989AA00179B6C /* up_arrow.tif in Resources */,
 				D120614409FBDE5100179B6C /* AddressBook_16.tiff in Resources */,
+				D104D9660A0E5973000898F2 /* dial_pad_0_down.tif in Resources */,
+				D104D9670A0E5973000898F2 /* dial_pad_0.tif in Resources */,
+				D104D9680A0E5973000898F2 /* dial_pad_1_down.tif in Resources */,
+				D104D9690A0E5973000898F2 /* dial_pad_1.tif in Resources */,
+				D104D96A0A0E5973000898F2 /* dial_pad_2_down.tif in Resources */,
+				D104D96B0A0E5973000898F2 /* dial_pad_2.tif in Resources */,
+				D104D96C0A0E5973000898F2 /* dial_pad_3_down.tif in Resources */,
+				D104D96D0A0E5973000898F2 /* dial_pad_3.tif in Resources */,
+				D104D96E0A0E5973000898F2 /* dial_pad_4_down.tif in Resources */,
+				D104D96F0A0E5973000898F2 /* dial_pad_4.tif in Resources */,
+				D104D9700A0E5973000898F2 /* dial_pad_5_down.tif in Resources */,
+				D104D9710A0E5973000898F2 /* dial_pad_5.tif in Resources */,
+				D104D9720A0E5973000898F2 /* dial_pad_6_down.tif in Resources */,
+				D104D9730A0E5973000898F2 /* dial_pad_6.tif in Resources */,
+				D104D9740A0E5973000898F2 /* dial_pad_7_down.tif in Resources */,
+				D104D9750A0E5973000898F2 /* dial_pad_7.tif in Resources */,
+				D104D9760A0E5973000898F2 /* dial_pad_8_down.tif in Resources */,
+				D104D9770A0E5973000898F2 /* dial_pad_8.tif in Resources */,
+				D104D9780A0E5973000898F2 /* dial_pad_9_down.tif in Resources */,
+				D104D9790A0E5973000898F2 /* dial_pad_9.tif in Resources */,
+				D104D97A0A0E5973000898F2 /* dial_pad_10_down.tif in Resources */,
+				D104D97B0A0E5973000898F2 /* dial_pad_10.tif in Resources */,
+				D104D97C0A0E5973000898F2 /* dial_pad_11_down.tif in Resources */,
+				D104D97D0A0E5973000898F2 /* dial_pad_11.tif in Resources */,
+				D104D99F0A0E60D6000898F2 /* zoom_in_down.tif in Resources */,
+				D104D9A00A0E60D6000898F2 /* zoom_in.tif in Resources */,
+				D104D9A10A0E60D6000898F2 /* zoom_out_down.tif in Resources */,
+				D104D9A20A0E60D6000898F2 /* zoom_out.tif in Resources */,
+				D104D9C10A0E9947000898F2 /* DefaultURL_H323.tif in Resources */,
+				D104D9C20A0E9947000898F2 /* DefaultURL_SIP.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4567,6 +4643,10 @@
 		D11E93F208589A9200154C02 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_DYNAMIC_NO_PIC = YES;
@@ -4615,7 +4695,10 @@
 		D11E93F308589A9200154C02 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_POSTPROCESSING = NO;
@@ -4685,6 +4768,10 @@
 		D1B6057808F8F7A20034B47F /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4725,7 +4812,10 @@
 		D1B6057908F8F7A20034B47F /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4766,6 +4856,10 @@
 		D1CEE1F808F9022C007E4ABE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4793,7 +4887,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = opal;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SECTORDER_FLAGS = "";
 				SKIP_INSTALL = YES;
 				ZERO_LINK = YES;
@@ -4803,7 +4897,10 @@
 		D1CEE1F908F9022C007E4ABE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4831,7 +4928,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = opal;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SECTORDER_FLAGS = "";
 				SKIP_INSTALL = YES;
 				ZERO_LINK = NO;
