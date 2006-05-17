@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.6 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.7 2006/05/17 16:44:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -101,10 +101,11 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 	}
 	sdpOut.SetBandwidthModifier(bandwidthModifier);
 	
-	unsigned bandwidth = sdpIn.GetBandwidthValue()*10;
-	if(bandwidth < bandwidthAvailable)
+	unsigned remoteBandwidth = sdpIn.GetBandwidthValue();
+	unsigned localBandwidth = bandwidthAvailable/10;
+	if(remoteBandwidth != 0 && remoteBandwidth < localBandwidth)
 	{
-		SetBandwidthAvailable(bandwidth);
+		SetBandwidthAvailable(10*remoteBandwidth);
 	}
 	sdpOut.SetBandwidthValue(bandwidthAvailable/10);
 	
@@ -504,7 +505,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 
 void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 {
-	unsigned bandwidth = XMOpalManager::GetAvailableBandwidth() / 10;
+	unsigned bandwidth = XMOpalManager::GetAvailableBandwidth() / 1000;
 	sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
 	sdp.SetBandwidthValue(bandwidth);
 	
