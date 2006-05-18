@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.10 2006/05/17 22:49:06 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.11 2006/05/18 20:41:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -233,6 +233,11 @@
 				{
 					XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
 					NSString *username = [sipAccount username];
+					
+					if(username == nil)
+					{
+						username = @"";
+					}
 					
 					[registrarField setStringValue:registrar];
 					[registrarSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
