@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.34 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.35 2006/05/18 08:49:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -307,6 +307,9 @@
 		// we are calling someone but the call has not yet been established
 		// therefore, we simply hang up the call again
 		[[XMCallManager sharedInstance] clearActiveCall];
+		[callButton setEnabled:NO];
+		[statusField setStringValue:NSLocalizedString(@"Hangup...", @"")];
+		
 		return;
 	}
 	
