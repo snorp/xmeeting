@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.41 2006/05/17 23:49:46 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.42 2006/05/18 08:37:59 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -857,7 +857,11 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	bitrateToUse = (bitrateToUse * 0.95);
 	
 	// protection against codec hangups
-	if(bitrateToUse < 64000 && codecIdentifier != XMCodecIdentifier_H264)
+	if(bitrateToUse < 80000 && codecIdentifier == XMCodecIdentifier_H261)
+	{
+		bitrateToUse = 80000;
+	}
+	else if(bitrateToUse < 64000 && codecIdentifier == XMCodecIdentifier_H263)
 	{
 		bitrateToUse = 64000;
 	}
