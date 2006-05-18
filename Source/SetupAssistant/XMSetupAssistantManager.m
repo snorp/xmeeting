@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.7 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.8 2006/05/18 20:46:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -243,6 +243,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	// changing some default settings of location
 	[location setEnableVideo:YES];
+	[location setBandwidthLimit:512000];
 	[location setEnableH323:YES];
 	[location setEnableSIP:YES];
 	[location setSIPAccountTag:[sipAccount tag]];
