@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.8 2006/05/24 12:01:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,8 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 @implementation XMPreferencesWindowController
 
-#pragma mark General Methods
+#pragma mark -
+#pragma mark Init & Deallocation Methods
 
 + (XMPreferencesWindowController *)sharedInstance
 {
@@ -123,6 +124,9 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 	[applyButton setEnabled:NO];
 }
 
+#pragma mark -
+#pragma mark Public Methods
+
 - (void)showPreferencesWindow
 {
 	NSWindow *window = [self window];
@@ -165,10 +169,34 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 			[window center];
 		}
 	}
-	//[[self window] setLevel:NSScreenSaverWindowLevel+2]; //OSD is NSScreenSaverWindowLevel+1. This ensures it doesn't get over
 	[self showWindow:self];
 }
 
+- (void)closePreferencesWindow
+{
+	if([[self window] isVisible] && preferencesHaveChanged)
+	{
+		/* We first ask the user whether he wants to save the changes made */
+		NSAlert *alert = [[NSAlert alloc] init];
+		
+		[alert setMessageText:NSLocalizedString(@"Do you want to save the changed preferences before closing?",
+												@"PreferencesWindowCloseAlert_Urgent")];
+		
+		[alert addButtonWithTitle:NSLocalizedString(@"Save", @"Save")];
+		[alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"Don't Save")];
+		
+		int result = [alert runModal];
+		
+		if(result == NSAlertFirstButtonReturn)
+		{
+			[self applyPreferences:self];
+		}
+	}
+	
+	[[self window] orderOut:self];
+}
+
+#pragma mark -
 #pragma mark Methods for XMPreferencesModules
 
 - (void)notePreferencesDidChange
@@ -213,6 +241,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 	[toolbarItem release];
 }
 
+#pragma mark -
 #pragma mark Toolbar Delegate Methods
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar 
@@ -249,6 +278,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 	return identifiers;
 }
 
+#pragma mark -
 #pragma mark Interface Action Methods
 
 - (IBAction)toolbarItemAction:(NSToolbarItem *)item
@@ -304,6 +334,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 	[[XMPreferencesManager sharedInstance] synchronizeAndNotify];
 }
 
+#pragma mark -
 #pragma mark Window Delegate Methods
 
 - (BOOL)windowShouldClose:(id)sender
@@ -341,6 +372,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 											  forKey:XMKey_PreferencesWindowTopLeftCorner];
 }
 
+#pragma mark -
 #pragma mark ModalDelegate Methods
 
 - (void)savePreferencesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo

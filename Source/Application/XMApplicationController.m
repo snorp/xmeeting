@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.31 2006/05/16 21:30:06 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.32 2006/05/24 12:01:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -262,6 +262,9 @@
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+	// Close the preferences window in a proper fashion
+	[[XMPreferencesWindowController sharedInstance] closePreferencesWindow];
+	
 	XMCloseFramework();
 	
 	[[XMPreferencesManager sharedInstance] synchronize];

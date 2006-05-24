@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.5 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.6 2006/05/24 12:01:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,6 +44,11 @@
  * Presents the preferences window on screen
  **/
 - (void)showPreferencesWindow;
+
+/**
+ * Closes the preferences window, asking the user whether to save the data or not
+ **/
+- (void)closePreferencesWindow;
 
 @end
 
