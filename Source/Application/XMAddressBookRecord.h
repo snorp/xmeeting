@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecord.h,v 1.1 2006/04/06 23:15:31 hfriederich Exp $
+ * $Id: XMAddressBookRecord.h,v 1.2 2006/05/24 10:11:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,7 @@ typedef enum XMAddressBookRecordPropertyMatch
 	XMAddressBookRecordPropertyMatch_LastNameMatch,
 	XMAddressBookRecordPropertyMatch_CompanyMatch,
 	XMAddressBookRecordPropertyMatch_CallAddressMatch,
+	XMAddressBookRecordPropertyMatch_PhoneNumberMatch,
 	XMAddressBookRecordPropertyMatchCount
 } XMAddressBookRecordPropertyMatch;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.17 2006/04/26 21:50:09 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.18 2006/05/24 10:11:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -74,7 +74,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	// both a more human readable representation to display in the PeoplePickerView and
 	// the complete call address used for the XMeeting framework
 	[addressBookView addProperty:XMAddressBookProperty_HumanReadableCallAddress];
-	[addressBookView setColumnTitle:@"Call Address" forProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	[addressBookView setColumnTitle:@"XMeeting Call Address" forProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	
+	// also display phone numbers
+	[addressBookView addProperty:kABPhoneProperty];
+	[addressBookView setColumnTitle:@"Phone Number" forProperty:kABPhoneProperty];
 	
 	// registering some notification
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

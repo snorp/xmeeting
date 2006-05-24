@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.6 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.7 2006/05/24 10:11:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,9 +10,14 @@
 
 #import <AddressBook/AddressBook.h>
 
+#import "XMSimpleAddressResource.h"
 #import "XMAddressBookRecord.h"
+#import "XMApplicationFunctions.h"
 
 #define XM_UNKNOWN_INDEX NSNotFound-1
+
+#define XM_PHONE_NUMBER_MASK 0x80000000
+#define XM_PHONE_NUMBER_CLEAR_MASK 0x7fffffff
 
 NSString *XMNotification_AddressBookManagerDidChangeDatabase = @"XMeetingAddressBookManagerDidChangeDatabaseNotification";
 
@@ -28,7 +33,8 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
 - (void)_transformRecordsFrom_0_1;
 
-- (unsigned)_indexOfPrimaryAddressForPerson:(ABPerson *)person;
+- (unsigned)_indexOfPrimaryCallAddressForPerson:(ABPerson *)person;
+- (unsigned)_indexOfPrimaryPhoneNumberForPerson:(ABPerson *)person;
 
 @end
 
@@ -127,7 +133,7 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 			continue;
 		}
 		
-		unsigned index = [self _indexOfPrimaryAddressForPerson:person];
+		unsigned index = [self _indexOfPrimaryCallAddressForPerson:person];
 		
 		XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index
 																	 propertyMatch:XMAddressBookRecordPropertyMatch_NoMatch];
@@ -238,22 +244,31 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 	
 	ABSearchElement *finalSearchElement;	// the searchElement with which we actually query the database
 	
+	// Names are searched only by the first token to allow entering firstName lastName or similar constructs
+	NSArray *stringTokens = [searchString componentsSeparatedByString:@" "];
+	NSString *firstToken = [stringTokens objectAtIndex:0];
+	
 	// we search the firstName, lastName, companyName and HumanReadableCallAddress properties
 	// for a match (in this order) and keep the information which part matched if needed
 	ABSearchElement *firstNameSearchElement = [ABPerson searchElementForProperty:kABFirstNameProperty label:nil key:nil
-																		   value:searchString
+																		   value:firstToken
 																	  comparison:kABPrefixMatchCaseInsensitive];
 	ABSearchElement *lastNameSearchElement = [ABPerson searchElementForProperty:kABLastNameProperty label:nil key:nil
-																		  value:searchString
+																		  value:firstToken
 																	 comparison:kABPrefixMatchCaseInsensitive];
 	ABSearchElement *companyNameSearchElement = [ABPerson searchElementForProperty:kABOrganizationProperty label:nil key:nil
-																			 value:searchString
+																			 value:firstToken
 																		comparison:kABPrefixMatchCaseInsensitive];
 	ABSearchElement *callAddressSearchElement = [ABPerson searchElementForProperty:XMAddressBookProperty_HumanReadableCallAddress
 																			 label:nil key:nil value:searchString
 																		comparison:kABPrefixMatchCaseInsensitive];
+	
+	ABSearchElement *phoneNumberSearchElement = [ABPerson searchElementForProperty:kABPhoneProperty label:nil key:nil
+																			 value:searchString
+																		comparison:kABPrefixMatchCaseInsensitive];
+	
 	NSArray *stringSearchElements = [[NSArray alloc] initWithObjects:firstNameSearchElement, lastNameSearchElement, companyNameSearchElement,
-		callAddressSearchElement, nil];
+		callAddressSearchElement, phoneNumberSearchElement, nil];
 	finalSearchElement = [ABSearchElement searchElementForConjunction:kABSearchOr children:stringSearchElements];
 	[stringSearchElements release];
 	
@@ -267,100 +282,200 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 	{
 		ABPerson *record = (ABPerson *)[matchedRecords objectAtIndex:i];
 		
-		ABMultiValue *multiValue = [record valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
-		unsigned multiValueCount = [multiValue count];
-		if(multiValue == nil || multiValueCount == 0)
-		{
-			continue;
-		}
+		ABMultiValue *callAddressMultiValue = [record valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+		unsigned callAddressCount = [callAddressMultiValue count];
+		ABMultiValue *phoneNumberMultiValue = [record valueForProperty:kABPhoneProperty];
+		unsigned phoneNumberCount = [phoneNumberMultiValue count];
 		
-		if([firstNameSearchElement matchesRecord:record])
+		if(callAddressCount != 0 || phoneNumberCount != 0)
 		{
-			unsigned primaryIndex = [self _indexOfPrimaryAddressForPerson:record];
-			
-			XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:primaryIndex
-																			propertyMatch:XMAddressBookRecordPropertyMatch_FirstNameMatch];
-			[searchMatches addObject:theRecord];
-			[theRecord release];
-			
-			unsigned j;
-			for(j = 0; j < multiValueCount; j++)
+			if([firstNameSearchElement matchesRecord:record])
 			{
-				if(j == primaryIndex)
-				{
-					continue;
-				}
-				XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
-																						propertyMatch:XMAddressBookRecordPropertyMatch_FirstNameMatch];
-				[searchMatches addObject:addressBookRecord];
-				[addressBookRecord release];
-			}
-		}
-		if([lastNameSearchElement matchesRecord:record])
-		{
-			unsigned primaryIndex = [self _indexOfPrimaryAddressForPerson:record];
-			
-			XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:primaryIndex
-																			propertyMatch:XMAddressBookRecordPropertyMatch_LastNameMatch];
-			[searchMatches addObject:theRecord];
-			[theRecord release];
-			
-			unsigned j;
-			for(j = 0; j < multiValueCount; j++)
-			{
-				if(j == primaryIndex)
-				{
-					continue;
-				}
-				XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
-																						propertyMatch:XMAddressBookRecordPropertyMatch_LastNameMatch];
-				[searchMatches addObject:addressBookRecord];
-				[addressBookRecord release];
-			}
-		}
-		if([companyNameSearchElement matchesRecord:record])
-		{
-			unsigned primaryIndex = [self _indexOfPrimaryAddressForPerson:record];
-			
-			XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:primaryIndex
-																			propertyMatch:XMAddressBookRecordPropertyMatch_CompanyMatch];
-			[searchMatches addObject:theRecord];
-			[theRecord release];
-			
-			unsigned j;
-			for(j = 0; j < multiValueCount; j++)
-			{
-				if(j == primaryIndex)
-				{
-					continue;
-				}
-				XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
-																						propertyMatch:XMAddressBookRecordPropertyMatch_CompanyMatch];
-				[searchMatches addObject:addressBookRecord];
-				[addressBookRecord release];
-			}
-		}
-		if([callAddressSearchElement matchesRecord:record])
-		{
-			unsigned j;
-			for(j = 0; j < multiValueCount; j++)
-			{
-				NSString *address = (NSString *)[multiValue valueAtIndex:j];
+				unsigned primaryIndex = 0;
 				
-				if(searchStringRange.length > [address length])
+				if(callAddressCount != 0)
 				{
-					continue;
+					primaryIndex = [self _indexOfPrimaryCallAddressForPerson:record];
+			
+					XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:primaryIndex
+																					propertyMatch:XMAddressBookRecordPropertyMatch_FirstNameMatch];
+					[searchMatches addObject:theRecord];
+					[theRecord release];
 				}
-				
-				NSRange range = [address rangeOfString:searchString 
-											   options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
-												 range:searchStringRange];
-				if(range.location != NSNotFound)
+			
+				unsigned j;
+				for(j = 0; j < callAddressCount; j++)
 				{
+					if(j == primaryIndex)
+					{
+						continue;
+					}
 					XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
-																							propertyMatch:XMAddressBookRecordPropertyMatch_CallAddressMatch];
+																							propertyMatch:XMAddressBookRecordPropertyMatch_FirstNameMatch];
 					[searchMatches addObject:addressBookRecord];
 					[addressBookRecord release];
+				}
+				
+				if(phoneNumberCount != 0)
+				{
+					primaryIndex = [self _indexOfPrimaryPhoneNumberForPerson:record];
+					
+					XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(primaryIndex | XM_PHONE_NUMBER_MASK)
+																					propertyMatch:XMAddressBookRecordPropertyMatch_FirstNameMatch];
+					[searchMatches addObject:theRecord];
+					[theRecord release];
+				}
+				
+				for(j = 0; j < phoneNumberCount; j++)
+				{
+					if(j == primaryIndex)
+					{
+						continue;
+					}
+					
+					XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(j | XM_PHONE_NUMBER_MASK)
+																							propertyMatch:XMAddressBookRecordPropertyMatch_FirstNameMatch];
+					[searchMatches addObject:addressBookRecord];
+					[addressBookRecord release];
+				}
+			}
+			if([lastNameSearchElement matchesRecord:record])
+			{
+				unsigned primaryIndex = 0;
+				
+				if(callAddressCount > 0)
+				{
+					primaryIndex = [self _indexOfPrimaryCallAddressForPerson:record];
+			
+					XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:primaryIndex
+																					propertyMatch:XMAddressBookRecordPropertyMatch_LastNameMatch];
+					[searchMatches addObject:theRecord];
+					[theRecord release];
+				}
+			
+				unsigned j;
+				for(j = 0; j < callAddressCount; j++)
+				{
+					if(j == primaryIndex)
+					{
+						continue;
+					}
+					XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
+																							propertyMatch:XMAddressBookRecordPropertyMatch_LastNameMatch];
+					[searchMatches addObject:addressBookRecord];
+					[addressBookRecord release];
+				}
+				
+				if(phoneNumberCount > 0)
+				{
+					primaryIndex = [self _indexOfPrimaryCallAddressForPerson:record];
+					
+					XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(primaryIndex | XM_PHONE_NUMBER_MASK)
+																					propertyMatch:XMAddressBookRecordPropertyMatch_LastNameMatch];
+					[searchMatches addObject:theRecord];
+					[theRecord release];
+				}
+				
+				for(j = 0; j < phoneNumberCount; j++)
+				{
+					if(j == primaryIndex)
+					{
+						continue;
+					}
+					XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(j | XM_PHONE_NUMBER_MASK)
+																							propertyMatch:XMAddressBookRecordPropertyMatch_LastNameMatch];
+					[searchMatches addObject:addressBookRecord];
+					[addressBookRecord release];
+				}
+			}
+			if([companyNameSearchElement matchesRecord:record])
+			{
+				unsigned primaryIndex = 0;
+				
+				if(callAddressCount > 0)
+				{
+					primaryIndex = [self _indexOfPrimaryCallAddressForPerson:record];
+			
+					XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:primaryIndex
+																					propertyMatch:XMAddressBookRecordPropertyMatch_CompanyMatch];
+					[searchMatches addObject:theRecord];
+					[theRecord release];
+				}
+			
+				unsigned j;
+				for(j = 0; j < callAddressCount; j++)
+				{
+					if(j == primaryIndex)
+					{
+						continue;
+					}
+					XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
+																							propertyMatch:XMAddressBookRecordPropertyMatch_CompanyMatch];
+					[searchMatches addObject:addressBookRecord];
+					[addressBookRecord release];
+				}
+				
+				if(phoneNumberCount > 0)
+				{
+					primaryIndex = [self _indexOfPrimaryCallAddressForPerson:record];
+					
+					XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(primaryIndex | XM_PHONE_NUMBER_MASK)
+																					propertyMatch:XMAddressBookRecordPropertyMatch_CompanyMatch];
+					[searchMatches addObject:theRecord];
+					[theRecord release];
+				}
+				
+				for(j = 0; j < phoneNumberCount; j++)
+				{
+					if(j == primaryIndex)
+					{
+						continue;
+					}
+					XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(j | XM_PHONE_NUMBER_MASK)
+																							propertyMatch:XMAddressBookRecordPropertyMatch_CompanyMatch];
+					[searchMatches addObject:addressBookRecord];
+					[addressBookRecord release];
+				}
+			}
+			if([callAddressSearchElement matchesRecord:record])
+			{
+				unsigned j;
+				for(j = 0; j < callAddressCount; j++)
+				{
+					NSString *address = (NSString *)[callAddressMultiValue valueAtIndex:j];
+				
+					if(searchStringRange.length > [address length])
+					{
+						continue;
+					}
+				
+					NSRange range = [address rangeOfString:searchString 
+												   options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
+													 range:searchStringRange];
+					if(range.location != NSNotFound)
+					{
+						XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:j 
+																								propertyMatch:XMAddressBookRecordPropertyMatch_CallAddressMatch];
+						[searchMatches addObject:addressBookRecord];
+						[addressBookRecord release];
+					}
+				}
+			}
+			if([phoneNumberSearchElement matchesRecord:record])
+			{
+				unsigned j;
+				
+				for(j = 0; j < phoneNumberCount; j++)
+				{
+					NSString *value = [phoneNumberMultiValue valueAtIndex:i];
+					
+					if([value hasPrefixCaseInsensitive:searchString])
+					{
+						XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(i | XM_PHONE_NUMBER_MASK)
+																								propertyMatch:XMAddressBookRecordPropertyMatch_PhoneNumberMatch];
+						[searchMatches addObject:addressBookRecord];
+						[addressBookRecord release];
+					}
 				}
 			}
 		}
@@ -377,29 +492,56 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 	
 	NSArray *matchedRecords = [addressBook recordsMatchingSearchElement:callAddressSearchElement];
 	
-	if([matchedRecords count] == 0)
+	if([matchedRecords count] != 0)
 	{
-		return nil;
-	}
-	ABPerson *person = (ABPerson *)[matchedRecords objectAtIndex:0];
-	ABMultiValue *multiValue = (ABMultiValue *)[person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+		ABPerson *person = (ABPerson *)[matchedRecords objectAtIndex:0];
+		ABMultiValue *multiValue = (ABMultiValue *)[person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	
-	unsigned i;
-	unsigned count = [multiValue count];
+		unsigned i;
+		unsigned count = [multiValue count];
 	
-	for(i = 0; i < count; i++)
-	{
-		NSString *address = (NSString *)[multiValue valueAtIndex:i];
-		
-		NSComparisonResult result = [address compare:callAddress options:(NSCaseInsensitiveSearch | NSLiteralSearch)
-											   range:NSMakeRange(0, [address length]) locale:nil];
-		
-		if(result == NSOrderedSame)
+		for(i = 0; i < count; i++)
 		{
+			NSString *address = (NSString *)[multiValue valueAtIndex:i];
+		
+			NSComparisonResult result = [address compare:callAddress options:(NSCaseInsensitiveSearch | NSLiteralSearch)
+												   range:NSMakeRange(0, [address length]) locale:nil];
+		
+			if(result == NSOrderedSame)
+			{
+				XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:i
+																			 propertyMatch:XMAddressBookRecordPropertyMatch_CallAddressMatch];
+				return [record autorelease];
+			}
+		}
+	}
+	
+	ABSearchElement *phoneNumberSearchElement = [ABPerson searchElementForProperty:kABPhoneProperty
+																			 label:nil key:nil value:callAddress comparison:kABEqualCaseInsensitive];
+	matchedRecords = [addressBook recordsMatchingSearchElement:phoneNumberSearchElement];
+	
+	if([matchedRecords count] != 0)
+	{
+		ABPerson *person = (ABPerson *)[matchedRecords objectAtIndex:0];
+		ABMultiValue *multiValue = (ABMultiValue *)[person valueForProperty:kABPhoneProperty];
+		
+		unsigned i;
+		unsigned count = [multiValue count];
+		
+		for(i = 0; i < count; i++)
+		{
+			NSString *phoneNumber = (NSString *)[multiValue valueAtIndex:i];
 			
-			XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:i
-																		 propertyMatch:XMAddressBookRecordPropertyMatch_CallAddressMatch];
-			return [record autorelease];
+			NSComparisonResult result = [phoneNumber compare:callAddress options:(NSCaseInsensitiveSearch | NSLiteralSearch)
+													   range:NSMakeRange(0, [phoneNumber length]) locale:nil];
+			
+			if(result == NSOrderedSame)
+			{
+				XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:(i | XM_PHONE_NUMBER_MASK)
+																			 propertyMatch:XMAddressBookRecordPropertyMatch_PhoneNumberMatch];
+				
+				return [record autorelease];
+			}
 		}
 	}
 	
@@ -410,20 +552,40 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 {
 	ABPerson *person = [record _person];
 	
-	*indexOfRecord = [record _index];
+	unsigned index = [record _index];
 	
-	ABMultiValue *multiValue = [person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	ABMultiValue *callAddressMultiValue = [person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	unsigned callAddressCount = [callAddressMultiValue count];
+	ABMultiValue *phoneNumberMultiValue = [person valueForProperty:kABPhoneProperty];
+	unsigned phoneNumberCount = [phoneNumberMultiValue count];
 	
 	unsigned i;
-	unsigned count = [multiValue count];
-	NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
+	NSMutableArray *array = [NSMutableArray arrayWithCapacity:(callAddressCount + phoneNumberCount)];
 	
-	for(i = 0; i < count; i++)
+	for(i = 0; i < callAddressCount; i++)
 	{
 		XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:person index:i
 																		propertyMatch:XMAddressBookRecordPropertyMatch_NoMatch];
 		[array addObject:theRecord];
 		[theRecord release];
+	}
+	
+	for(i = 0; i < phoneNumberCount; i++)
+	{
+		XMAddressBookRecord *theRecord = [[XMAddressBookRecord alloc] _initWithPerson:person index:(i | XM_PHONE_NUMBER_MASK)
+																		propertyMatch:XMAddressBookRecordPropertyMatch_NoMatch];
+		[array addObject:theRecord];
+		[theRecord release];
+	}
+	
+	if((index & XM_PHONE_NUMBER_MASK) != 0)
+	{
+		index &= XM_PHONE_NUMBER_CLEAR_MASK;
+		*indexOfRecord = (callAddressCount + index);
+	}
+	else
+	{
+		*indexOfRecord = index;
 	}
 	
 	return array;
@@ -472,9 +634,18 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 	}
 }
 
-- (unsigned)_indexOfPrimaryAddressForPerson:(ABPerson *)person
+- (unsigned)_indexOfPrimaryCallAddressForPerson:(ABPerson *)person
 {
 	ABMultiValue *multiValue = (ABMultiValue *)[person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+	
+	unsigned index = [multiValue indexForIdentifier:[multiValue primaryIdentifier]];
+	
+	return index;
+}
+
+- (unsigned)_indexOfPrimaryPhoneNumberForPerson:(ABPerson *)person
+{
+	ABMultiValue *multiValue = (ABMultiValue *)[person valueForProperty:kABPhoneProperty];
 	
 	unsigned index = [multiValue indexForIdentifier:[multiValue primaryIdentifier]];
 	

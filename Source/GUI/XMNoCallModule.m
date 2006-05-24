@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.35 2006/05/18 08:49:14 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.36 2006/05/24 10:11:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -369,11 +369,8 @@
 	
 	if(matchedAddresses == nil)
 	{
-		// Tokenizing the currentTokenField string, obtaining matches for the first
-		// token from XMCallAddressManager
-		NSArray *stringTokens = [uncompletedString componentsSeparatedByString:@" "];
-		NSString *firstToken = [stringTokens objectAtIndex:0];
-		originalMatchedAddresses = [[callAddressManager addressesMatchingString:firstToken] retain];
+		// do a fresh search on the database
+		originalMatchedAddresses = [[callAddressManager addressesMatchingString:uncompletedString] retain];
 	}
 	else
 	{

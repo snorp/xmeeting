@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecord.m,v 1.1 2006/04/06 23:15:31 hfriederich Exp $
+ * $Id: XMAddressBookRecord.m,v 1.2 2006/05/24 10:11:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,11 +11,15 @@
 #import <AddressBook/AddressBook.h>
 #import "XMeeting.h"
 
+#import "XMSimpleAddressResource.h"
 #import "XMAddressBookManager.h"
 #import "XMAddressBookCallAddressProvider.h"
 
 #define XM_ILLEGAL_INDEX NSNotFound
 #define XM_UNKNOWN_INDEX NSNotFound-1
+
+#define XM_PHONE_NUMBER_MASK 0x80000000
+#define XM_PHONE_NUMBER_CLEAR_MASK 0x7fffffff
 
 @implementation XMAddressBookRecord
 
@@ -87,19 +91,37 @@
 		return nil;
 	}
 	
-	ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_CallAddress];
-	
-	if(multiValue == nil)
+	if((index & XM_PHONE_NUMBER_MASK) != 0)
 	{
-		return nil;
+		ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:kABPhoneProperty];
+		
+		if(multiValue == nil)
+		{
+			return nil;
+		}
+		
+		NSString *phoneNumber = [multiValue valueAtIndex:(index & XM_PHONE_NUMBER_CLEAR_MASK)];
+		
+		XMSimpleAddressResource *addressResource = [[XMSimpleAddressResource alloc] initWithAddress:phoneNumber callProtocol:XMCallProtocol_SIP];
+		
+		return [addressResource autorelease];
 	}
+	else
+	{
+		ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_CallAddress];
 	
-	NSData *data = (NSData *)[multiValue valueAtIndex:index];
+		if(multiValue == nil)
+		{
+			return nil;
+		}
 	
-	NSDictionary *dictionary = (NSDictionary *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
-	XMAddressResource *addressResource = [XMAddressResource addressResourceWithDictionaryRepresentation:dictionary];
+		NSData *data = (NSData *)[multiValue valueAtIndex:index];
 	
-	return addressResource;
+		NSDictionary *dictionary = (NSDictionary *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+		XMAddressResource *addressResource = [XMAddressResource addressResourceWithDictionaryRepresentation:dictionary];
+	
+		return addressResource;
+	}
 }
 
 - (NSString *)label
@@ -109,20 +131,41 @@
 		return nil;
 	}
 	
-	ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_CallAddress];
-	
-	if(multiValue == nil)
+	if((index & XM_PHONE_NUMBER_MASK) != 0)
 	{
-		return nil;
+		ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:kABPhoneProperty];
+		
+		if(multiValue == nil)
+		{
+			return nil;
+		}
+		
+		NSString *label = (NSString *)[multiValue labelAtIndex:(index & XM_PHONE_NUMBER_CLEAR_MASK)];
+		
+		return label;
 	}
+	else
+	{
+		ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_CallAddress];
 	
-	NSString *label =  (NSString *)[multiValue labelAtIndex:index];
+		if(multiValue == nil)
+		{
+			return nil;
+		}
 	
-	return label;
+		NSString *label = (NSString *)[multiValue labelAtIndex:index];
+	
+		return label;
+	}
 }
 
 - (void)setCallAddress:(XMAddressResource *)callAddress label:(NSString *)label
 {
+	if((index & XM_PHONE_NUMBER_MASK) != 0)
+	{
+		return;
+	}
+	
 	ABMultiValue *addressMultiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_CallAddress];
 	ABMultiValue *humanReadableAddressMultiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	NSData *data = nil;
@@ -180,19 +223,33 @@
 
 - (NSString *)humanReadableCallAddress
 {
-	if(index == XM_UNKNOWN_INDEX)
+	if((index & XM_PHONE_NUMBER_MASK) != 0)
 	{
-		return nil;
+		ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:kABPhoneProperty];
+		
+		if(multiValue == nil)
+		{
+			return nil;
+		}
+		
+		return [multiValue valueAtIndex:(index & XM_PHONE_NUMBER_CLEAR_MASK)];
 	}
-	
-	ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
-	
-	if(multiValue == nil)
+	else
 	{
-		return nil;
-	}
+		if(index == XM_UNKNOWN_INDEX)
+		{
+			return nil;
+		}
+		
+		ABMultiValue *multiValue = (ABMultiValue *)[addressBookPerson valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	
-	return (NSString *)[multiValue valueAtIndex:index];
+		if(multiValue == nil)
+		{
+			return nil;
+		}
+	
+		return (NSString *)[multiValue valueAtIndex:index];
+	}
 }
 
 - (NSString *)displayName

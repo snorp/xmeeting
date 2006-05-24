@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.10 2006/05/24 10:11:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -145,6 +145,25 @@
 		NSString *callAddress = [record humanReadableCallAddress];
 		return [NSString stringWithFormat:@"%@ <%@>", companyName, callAddress];
 	}
+	else if(propertyMatch == XMAddressBookRecordPropertyMatch_PhoneNumberMatch)
+	{
+		NSString *callAddress = [record humanReadableCallAddress];
+		if(searchRange.length > [callAddress length])
+		{
+			return nil;
+		}
+		
+		NSRange prefixRange = [callAddress rangeOfString:uncompletedString
+												 options:(NSCaseInsensitiveSearch | NSAnchoredSearch)
+												   range:searchRange];
+		if(prefixRange.location == NSNotFound)
+		{
+			return nil;
+		}
+		
+		NSString *displayName = [record displayName];
+		return [NSString stringWithFormat:@"%@ (%@)", callAddress, displayName];
+	}
 	else
 	{
 		// this is the most complicated case. the record matched either a first name or a last name,
@@ -209,6 +228,8 @@
 			
 			NSString *displayName = [NSString stringWithFormat:@"%@ %@", firstPart, lastPart];
 			
+			// a match for "firstPart lastPart <Address>" isn't searched. If the text entered is too long,
+			// simply abort
 			if(searchRange.length > [displayName length])
 			{
 				return nil;
@@ -219,6 +240,8 @@
 													   range:searchRange];
 			if(prefixRange.location == NSNotFound)
 			{
+				// it might now be that the combination "lastPart firstPart" matches
+				// if so, check this
 				displayName = [NSString stringWithFormat:@"%@ %@", lastPart, firstPart];
 				
 				prefixRange = [displayName rangeOfString:uncompletedString
