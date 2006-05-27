@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.4 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.5 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -86,8 +86,8 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	selectedOutputDeviceID = kAudioDeviceUnknown;
 	selectedOutputDeviceIsMuted = NO;
 	
-	noDeviceName = NSLocalizedString(@"<No Device>", @"");
-	unknownDeviceName = NSLocalizedString(@"Unknown Audio Device", @"");
+	noDeviceName = NSLocalizedString(@"XM_FRAMEWORK_NO_DEVICE", @"");
+	unknownDeviceName = NSLocalizedString(@"XM_FRAMEWORK_UNKNOWN_DEVICE", @"");
 	
 	// obtaining the currently selected devices
 	selectedInputDeviceID = [self _defaultDeviceForDirection:XM_INPUT_DIRECTION];

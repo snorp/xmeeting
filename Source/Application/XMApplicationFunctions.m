@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.8 2006/05/03 20:10:04 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,7 +51,7 @@ NSString *XMTimeString(unsigned time)
 
 NSString *XMDateFormatString()
 {
-	return @"%Y-%m-%d %H:%M:%S";
+	return NSLocalizedString(@"XM_DATE_FORMAT_STRING", @"");
 }
 
 NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
@@ -61,65 +61,65 @@ NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
 	switch(callEndReason)
 	{
 		case XMCallEndReason_EndedByLocalUser:
-			reasonString = @"User cleared call";
+			reasonString = NSLocalizedString(@"XM_CALL_END_USER_CLEARED", @"");
 			break;
 		case XMCallEndReason_EndedByNoAccept:
 		case XMCallEndReason_EndedByRefusal:
-			reasonString = @"Remote party refused call";
+			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_REFUSED", @"");
 			break;
 		case XMCallEndReason_EndedByRemoteUser:
-			reasonString = @"Remote party cleared call";
+			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_CLEARED", @"");
 			break;
 		case XMCallEndReason_EndedByAnswerDenied:
 		case XMCallEndReason_EndedByNoAnswer:
-			reasonString = @"Remote party did not answer call";
+			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_NO_ANSWER", @"");;
 			break;
 		case XMCallEndReason_EndedByCallerAbort:
-			reasonString = @"Remote party stopped calling";
+			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_ABORT", @"");
 			break;
 		case XMCallEndReason_EndedByTransportFail:
 		case XMCallEndReason_EndedByConnectFail:
-			reasonString = @"Internal transport/connect failure";
+			reasonString = NSLocalizedString(@"XM_CALL_END_INTERNAL_FAILURE", @"");
 			break;
 		case XMCallEndReason_EndedByGatekeeper:
-			reasonString = @"Gatekeeper cleared call";
+			reasonString = NSLocalizedString(@"XM_CALL_END_GK_CLEARED", @"");
 			break;
 		case XMCallEndReason_EndedByNoUser:
-			reasonString = @"No such user found";
+			reasonString = NSLocalizedString(@"XM_CALL_END_NO_USER", @"");
 			break;
 		case XMCallEndReason_EndedByNoBandwidth:
-			reasonString = @"Insufficient bandwidth";
+			reasonString = NSLocalizedString(@"XM_CALL_END_NO_BANDWIDTH", @"");
 			break;
 		case XMCallEndReason_EndedByCapabilityExchange:
-			reasonString = @"No common media capabilities";
+			reasonString = NSLocalizedString(@"XM_CALL_END_CAP_EXCHANGE", @"");
 			break;
 		case XMCallEndReason_EndedByCallForwarded:
-			reasonString = @"Call forwarded";
+			reasonString = NSLocalizedString(@"XM_CALL_END_FORWARDED", @"");
 			break;
 		case XMCallEndReason_EndedBySecurityDenial:
-			reasonString = @"Call failed security check";
+			reasonString = NSLocalizedString(@"XM_CALL_END_SECURITY_DENIAL", @"");
 			break;
 		case XMCallEndReason_EndedByRemoteBusy:
 		case XMCallEndReason_EndedByRemoteCongestion:
-			reasonString = @"Remote party is busy";
+			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_BUSY", @"");
 			break;
 		case XMCallEndReason_EndedByUnreachable:
-			reasonString = @"Remote party unreachable";
+			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_UNREACHABLE", @"");
 			break;
 		case XMCallEndReason_EndedByNoEndPoint:
-			reasonString = @"No endpoint running at remote party";
+			reasonString = NSLocalizedString(@"XM_CALL_END_NO_ENDPOINT", @"");
 			break;
 		case XMCallEndReason_EndedByHostOffline:
-			reasonString = @"Remote party host is offline";
+			reasonString = NSLocalizedString(@"XM_CALL_END_HOST_OFFLINE", @"");
 			break;
 		case XMCallEndReason_EndedByDurationLimit:
-			reasonString = @"Call duration limit reached";
+			reasonString = NSLocalizedString(@"XM_CALL_END_DURATION_LIMIT", @"");
 			break;
 		case XMCallEndReason_EndedByInvalidConferenceID:
-			reasonString = @"Invalid conference ID";
+			reasonString = NSLocalizedString(@"XM_CALL_END_CONFERENCE_ID", @"");
 			break;
 		default:
-			reasonString = [NSString stringWithFormat:@"Unspecified reason (%d)", callEndReason];
+			reasonString = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), callEndReason];
 			break;
 	}
 	
@@ -134,13 +134,13 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
 	switch(failReason)
 	{
 		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
-			failReasonString = @"Gatekeeper not found";
+			failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_NOT_FOUND", @"");
 			break;
 		case XMGatekeeperRegistrationFailReason_RegistrationReject:
-			failReasonString = @"Gatekeeper rejected registration";
+			failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_REJECTED", @"");
 			break;
 		default:
-			failReasonString = @"Unknown failure";
+			failReasonString = NSLocalizedString(@"XM_UNKNOWN_REASON", @"");
 			break;
 	}
 	
@@ -325,7 +325,7 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
 			break;
 			
 		default:
-			statusCodeString = @"Unknown Failure";
+			statusCodeString = NSLocalizedString(@"XM_UNKNOWN_REASON", @"");
 	}
 	
 	return statusCodeString;

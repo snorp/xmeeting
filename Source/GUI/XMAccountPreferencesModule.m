@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.3 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.4 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,7 +81,7 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (NSString *)toolbarLabel
 {
-	return @"Accounts";
+	return NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
@@ -91,7 +91,7 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (NSString *)toolTipText
 {
-	return @"Account Preferences";
+	return NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView

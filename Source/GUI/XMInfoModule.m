@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.11 2006/05/18 20:41:58 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.12 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,7 +65,7 @@
 
 - (NSString *)name
 {
-	return @"Status";
+	return NSLocalizedString(@"XM_INFO_MODULE_NAME", @"");
 }
 
 - (NSImage *)image
@@ -137,7 +137,7 @@
 	{
 		[ipAddressString appendString:@", "];
 		[ipAddressString appendString:externalAddress];
-		[ipAddressString appendString: @" (External)"];
+		[ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
 	}
 	
 	[ipAddressesField setStringValue:ipAddressString];
@@ -157,7 +157,7 @@
 	{
 		if([callManager isH323Listening] == YES)
 		{
-			[h323StatusField setStringValue:@"Online"];
+			[h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
 			[h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
 			
 			unsigned h323AccountTag = [activeLocation h323AccountTag];
@@ -181,21 +181,21 @@
 				}
 				else
 				{
-					[gatekeeperField setStringValue:@"Failed to register"];
+					[gatekeeperField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_REG_FAILURE", @"")];
 					[gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 					[phoneNumberField setTextColor:[NSColor disabledControlTextColor]];
 				}
 			}
 			else
 			{
-				[gatekeeperField setStringValue:@"Not Used"];
+				[gatekeeperField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
 				[gatekeeperSemaphoreView setImage:nil];
 				[phoneNumberField setStringValue:@""];
 			}
 		}
 		else
 		{
-			[h323StatusField setStringValue:@"Failed to enable"];
+			[h323StatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_PROTOCOL_FAILURE", @"")];
 			[h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 			[gatekeeperField setStringValue:@""];
 			[gatekeeperSemaphoreView setImage:nil];
@@ -204,7 +204,7 @@
 	}
 	else
 	{
-		[h323StatusField setStringValue:@"Not Enabled"];
+		[h323StatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_PROTOCOL", @"")];
 		[h323StatusSemaphoreView setImage:nil];
 		[gatekeeperField setStringValue:@""];
 		[gatekeeperSemaphoreView setImage:nil];
@@ -245,21 +245,21 @@
 				}
 				else
 				{
-					[registrarField setStringValue:@"Failed to register"];
+					[registrarField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_REG_FAILURE", @"")];
 					[registrarSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 					[sipUsernameField setStringValue:@""];
 				}
 			}
 			else
 			{
-				[registrarField setStringValue:@"Not Used"];
+				[registrarField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
 				[registrarSemaphoreView setImage:nil];
 				[sipUsernameField setStringValue:@""];
 			}
 		}
 		else
 		{
-			[sipStatusField setStringValue:@"Failed to enable"];
+			[sipStatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_PROTOCOL_FAILURE", @"")];
 			[sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 			[registrarField setStringValue:@""];
 			[registrarSemaphoreView setImage:nil];
@@ -268,7 +268,7 @@
 	}
 	else
 	{
-		[sipStatusField setStringValue:@"Not Enabled"];
+		[sipStatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_PROTOCOL", @"")];
 		[sipStatusSemaphoreView setImage:nil];
 		[registrarField setStringValue:@""];
 		[registrarSemaphoreView setImage:nil];

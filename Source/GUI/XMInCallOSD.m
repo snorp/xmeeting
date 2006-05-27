@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.m,v 1.5 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMInCallOSD.m,v 1.6 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,7 +38,7 @@
 		videoView = [theVideoView retain];
 		
 		NSMutableDictionary* fullScreenButton = [super createButtonNamed:@"Fullscreen" 
-																tooltips:[NSArray arrayWithObjects:@"Enter fullscreen mode", @"Exit fullscreen mode", nil]
+																tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_ENTER_FS", @""), NSLocalizedString(@"XM_OSD_TOOLTIP_EXIT_FS", @""), nil]
 																   icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"fullscreen_large.tif"], [NSImage imageNamed:@"windowed_large.tif"], nil] 
 															pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"fullscreen_large_down.tif"], [NSImage imageNamed:@"windowed_large_down.tif"], nil] 
 															   selectors:[NSArray arrayWithObjects:@"beginFullScreen", @"endFullScreen", nil] 
@@ -46,7 +46,7 @@
 													   currentStateIndex:0];
 		
 		NSMutableDictionary* pinpButton = [super createButtonNamed:@"Picture-in-Picture" 
-																tooltips:[NSArray arrayWithObjects:@"Enable Picture-in-Picture", @"Disable Picture-in-Picture", nil]
+																tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_ENABLE_PIP", @""), NSLocalizedString(@"XM_OSD_TOOLTIP_DISABLE_PIP", @""), nil]
 																   icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"pinp_on_large.tif"], [NSImage imageNamed:@"no_pinp_large.tif"], nil] 
 															pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"pinp_on_large_down.tif"], [NSImage imageNamed:@"no_pinp_large_down.tif"], nil] 
 															   selectors:[NSArray arrayWithObjects:@"enablePinP", @"disablePinP", nil] 
@@ -54,7 +54,7 @@
 													   currentStateIndex:0];
 		
 		NSMutableDictionary* pinpModeButton = [super createButtonNamed:@"Picture-in-Picture Mode" 
-																tooltips:[NSArray arrayWithObjects:@"Show classic Picture-in-Picture", @"Show 3D Picture-in-Picture", @"Show side by side Picture-in-Picture", nil]
+																tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_CLASSIC_PIP", @""), NSLocalizedString(@"XM_OSD_TOOLTIP_3D_PIP", @""), NSLocalizedString(@"XM_OSD_TOOLTIP_SBS_PIP", @""), nil]
 																   icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"pinpmode_classic_large.tif"], [NSImage imageNamed:@"pinpmode_ichat_large.tif"], [NSImage imageNamed:@"pinpmode_sidebyside_large.tif"], nil] 
 															pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"pinpmode_classic_large_down.tif"], [NSImage imageNamed:@"pinpmode_ichat_large_down.tif"], [NSImage imageNamed:@"pinpmode_sidebyside_large_down.tif"],nil] 
 															   selectors:[NSArray arrayWithObjects:@"showNextPinPMode", @"showNextPinPMode", @"showNextPinPMode", nil] 
@@ -62,7 +62,7 @@
 													   currentStateIndex:0];
 		
 		NSMutableDictionary* infoButton = [super createButtonNamed:@"Info Inspector" 
-																tooltips:[NSArray arrayWithObjects:@"Show Info Inspector", nil]
+																tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_INFO", @""), nil]
 																   icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"inspector_bw_large.tif"], nil] 
 															pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"inspector_bw_large_down.tif"], nil] 
 															   selectors:[NSArray arrayWithObjects:@"showInspector", nil] 
@@ -70,7 +70,7 @@
 													   currentStateIndex:0];
 		
 		NSMutableDictionary* toolsButton = [super createButtonNamed:@"Tools" 
-														   tooltips:[NSArray arrayWithObjects:@"Show Tools", nil]
+														   tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_TOOLS", @""), nil]
 															  icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"tools_large.tif"], nil] 
 													   pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"tools_large_down.tif"], nil] 
 														  selectors:[NSArray arrayWithObjects:@"showTools", nil] 
@@ -78,7 +78,7 @@
 												  currentStateIndex:0];
 
 		NSMutableDictionary* hangupButton = [super createButtonNamed:@"Hangup" 
-														  tooltips:[NSArray arrayWithObjects:@"Terminate call", nil]
+														  tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_HANGUP", @""), nil]
 															 icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"hangup_large.tif"], nil] 
 													  pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"hangup_large_down.tif"], nil] 
 														 selectors:[NSArray arrayWithObjects:@"hangup", nil] 
@@ -86,7 +86,7 @@
 												 currentStateIndex:0];
 		
 		NSMutableDictionary* muteButton = [super createButtonNamed:@"Mute/Unmute" 
-																tooltips:[NSArray arrayWithObjects:@"Mute Microphone", @"Unmute Microphone", nil]
+																tooltips:[NSArray arrayWithObjects:NSLocalizedString(@"XM_OSD_TOOLTIP_MUTE", @""), NSLocalizedString(@"XM_OSD_TOOLTIP_UNMUTE", @""), nil]
 																   icons:[NSArray arrayWithObjects:[NSImage imageNamed:@"mute_large.tif"], [NSImage imageNamed:@"unmute_large.tif"], nil] 
 															pressedIcons:[NSArray arrayWithObjects:[NSImage imageNamed:@"mute_large_down.tif"], [NSImage imageNamed:@"unmute_large_down.tif"], nil] 
 															   selectors:[NSArray arrayWithObjects:@"mute", @"unmute", nil] 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.11 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.12 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,7 +68,7 @@
 
 - (NSString *)name
 {
-	return @"Remote Control";
+	return NSLocalizedString(@"XM_DIAL_PAD_MODULE_NAME", @"");
 }
 
 - (NSImage *)image

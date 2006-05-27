@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.32 2006/05/24 12:01:15 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.33 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -399,9 +399,9 @@
 {
 	NSAlert *alert = [[NSAlert alloc] init];
 	
-	[alert setMessageText:NSLocalizedString(@"Call failed", @"")];
+	[alert setMessageText:NSLocalizedString(@"XM_CALL_FAILED_MESSAGE", @"")];
 	
-	NSString *informativeTextFormat = NSLocalizedString(@"Unable to call \"%@\". (%@)", @"");
+	NSString *informativeTextFormat = NSLocalizedString(@"XM_CALL_FAILED_INFO_TEXT", @"");
 	NSString *failReasonText;
 	
 	XMCallStartFailReason failReason = [[XMCallManager sharedInstance] callStartFailReason];
@@ -409,19 +409,19 @@
 	switch(failReason)
 	{
 		case XMCallStartFailReason_H323NotEnabled:
-			failReasonText = NSLocalizedString(@"H.323 is not enabled", @"");
+			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_H323_NOT_ENABLED", @"");
 			break;
 		case XMCallStartFailReason_GatekeeperRequired:
-			failReasonText = NSLocalizedString(@"Address requires a gatekeeper", @"");
+			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_GK_REQUIRED", @"");
 			break;
 		case XMCallStartFailReason_SIPNotEnabled:
-			failReasonText = NSLocalizedString(@"SIP is not enabled", @"");
+			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_SIP_NOT_ENABLED", @"");
 			break;
 		case XMCallStartFailReason_AlreadyInCall:
-			failReasonText = NSLocalizedString(@"Already in call. Please report this problem!", @"");
+			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_ALREADY_IN_CALL", @"");
 			break;
 		default:
-			failReasonText = NSLocalizedString(@"Unknown reason", @"");
+			failReasonText = NSLocalizedString(@"XM_UNKNOWN_REASON", @"");
 			break;
 	}
 	
@@ -441,8 +441,8 @@
 {
 	NSAlert *alert = [[NSAlert alloc] init];
 	
-	[alert setMessageText:NSLocalizedString(@"Enabling H.323 Failed", @"")];
-	[alert setInformativeText:NSLocalizedString(@"Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls", @"")];
+	[alert setMessageText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_MESSAGE", @"")];
+	[alert setInformativeText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_INFO_TEXT", @"")];
 	
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
@@ -476,18 +476,18 @@
 	switch(failReason)
 	{
 		case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
-			suggestionText = NSLocalizedString(@"Please check your internet connection.", @"");
+			suggestionText = NSLocalizedString(@"XM_GK_NOT_FOUND_SUGGESTION", @"");
 			break;
 		case XMGatekeeperRegistrationFailReason_RegistrationReject:
-			suggestionText = NSLocalizedString(@"Please check your gatekeeper settings.", @"");
+			suggestionText = NSLocalizedString(@"XM_GK_REG_REJECT_SUGGESTION", @"");
 			break;
 		default:
 			suggestionText = @"";
 			break;
 	}
 	
-	[alert setMessageText:NSLocalizedString(@"Gatekeeper Registration Failed", @"")];
-	NSString *informativeTextFormat = NSLocalizedString(@"Unable to register at gatekeeper \"%@\" (%@). You will not be able to use phone numbers when making a call. %@", @"");
+	[alert setMessageText:NSLocalizedString(@"XM_GK_REG_FAILED_MESSAGE", @"")];
+	NSString *informativeTextFormat = NSLocalizedString(@"XM_GK_REG_FAILED_INFO_TEXT", @"");
 
 	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
 	[alert setInformativeText:informativeText];
@@ -511,8 +511,8 @@
 {
 	NSAlert *alert = [[NSAlert alloc] init];
 	
-	[alert setMessageText:NSLocalizedString(@"Enabling SIP Failed", @"")];
-	[alert setInformativeText:NSLocalizedString(@"Unable to enable the SIP subsystem.", @"")];
+	[alert setMessageText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_MESSAGE", @"")];
+	[alert setInformativeText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_INFO_TEXT", @"")];
 	
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
@@ -547,21 +547,21 @@
 	switch(failReason)
 	{
 		case XMSIPStatusCode_Failure_UnAuthorized:
-			suggestionText = NSLocalizedString(@"Please check your username and password settings.", @"");
+			suggestionText = NSLocalizedString(@"XM_SIP_UN_AUTHORIZED_SUGGESTION", @"");
 			break;
 		case XMSIPStatusCode_Failure_NotAcceptable:
-			suggestionText = NSLocalizedString(@"Please check your network settings.", @"");
+			suggestionText = NSLocalizedString(@"XM_SIP_NOT_ACCEPTABLE_SUGGESTION", @"");
 			break;
 		case XMSIPStatusCode_Failure_BadGateway:
-			suggestionText = NSLocalizedString(@"Please check your settings.", @"");
+			suggestionText = NSLocalizedString(@"XM_SIP_BAD_GATEWAY_SUGGESTION", @"");
 			break;
 		default:
 			suggestionText = @"";
 			break;
 	}
 	
-	[alert setMessageText:NSLocalizedString(@"SIP Registration Failed", @"")];
-	NSString *informativeTextFormat = NSLocalizedString(@"Unable to register at SIP registrar \"%@\" (%@). %@", @"");
+	[alert setMessageText:NSLocalizedString(@"XM_SIP_REG_FAILED_MESSAGE", @"")];
+	NSString *informativeTextFormat = NSLocalizedString(@"XM_SIP_REG_FAILED_INFO_TEXT", @"");
 	
 	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
 	[alert setInformativeText:informativeText];

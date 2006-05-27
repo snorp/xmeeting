@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.8 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,7 +57,7 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 
 - (NSString *)toolbarLabel
 {
-	return NSLocalizedString(@"General", @"GeneralPreferencesModuleLabel");
+	return NSLocalizedString(@"XM_GENERAL_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
@@ -67,7 +67,7 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 
 - (NSString *)toolTipText
 {
-	return NSLocalizedString(@"General Purpose Preferences", @"GeneralPreferencesModuleToolTip");
+	return NSLocalizedString(@"XM_GENERAL_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView
@@ -170,7 +170,7 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	NSString *directory = nil;
 	NSString *file = nil;
 	
-	[savePanel setPrompt:@"Choose"];
+	[savePanel setPrompt:NSLocalizedString(@"XM_GENERAL_PREFERENCES_CHOOSE", @"")];
 	
 	if(![path isEqualToString:@""])
 	{

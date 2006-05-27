@@ -1,5 +1,5 @@
 /*
- * $Id: XMBooleanCell.m,v 1.3 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMBooleanCell.m,v 1.4 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,8 +27,8 @@
 	[self setIntercellSpacing:NSMakeSize(0.0, 0.0)];
 	
 	[self setNumberOfVisibleItems:2];
-	[self addItemWithObjectValue:NSLocalizedString(@"Yes", @"YES")];
-	[self addItemWithObjectValue:NSLocalizedString(@"No", @"NO")];
+	[self addItemWithObjectValue:NSLocalizedString(@"Yes", @"")];
+	[self addItemWithObjectValue:NSLocalizedString(@"No", @"")];
 	
 	return self;
 }
@@ -38,7 +38,7 @@
 	NSString *string = (NSString *)[super objectValue];
 	BOOL value = YES;
 	
-	if([string isEqualToString:NSLocalizedString(@"No", @"NO")])
+	if([string isEqualToString:NSLocalizedString(@"No", @"")])
 	{
 		value = NO;
 	}
@@ -56,11 +56,11 @@
 		
 		if(flag)
 		{
-			object = NSLocalizedString(@"Yes", @"YES");
+			object = NSLocalizedString(@"Yes", @"");
 		}
 		else
 		{
-			object = NSLocalizedString(@"No", @"NO");
+			object = NSLocalizedString(@"No", @"");
 		}
 	}
 	[super setObjectValue:object];

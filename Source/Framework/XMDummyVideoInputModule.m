@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.16 2006/04/27 12:25:33 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.17 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,7 +21,7 @@
 {
 	self = [super init];
 	
-	NSString *deviceName = NSLocalizedString(@"<No Device>", @"");
+	NSString *deviceName = NSLocalizedString(@"XM_FRAMEWORK_NO_DEVICE", @"");
 	
 	device = [[NSArray alloc] initWithObjects:deviceName, nil];
 	

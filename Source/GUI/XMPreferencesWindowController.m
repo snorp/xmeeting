@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.8 2006/05/24 12:01:15 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -179,11 +179,10 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 		/* We first ask the user whether he wants to save the changes made */
 		NSAlert *alert = [[NSAlert alloc] init];
 		
-		[alert setMessageText:NSLocalizedString(@"Do you want to save the changed preferences before closing?",
-												@"PreferencesWindowCloseAlert_Urgent")];
+		[alert setMessageText:NSLocalizedString(@"XM_PREFERENCES_WINDOW_CLOSE", @"")];
 		
-		[alert addButtonWithTitle:NSLocalizedString(@"Save", @"Save")];
-		[alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"Don't Save")];
+		[alert addButtonWithTitle:NSLocalizedString(@"Save", @"")];
+		[alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"")];
 		
 		int result = [alert runModal];
 		
@@ -344,12 +343,11 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 		/* We first ask the user whether he wants to save the changes made */
 		NSAlert *alert = [[NSAlert alloc] init];
 		
-		[alert setMessageText:NSLocalizedString(@"Do you want to save the changes before closing?",
-												@"PreferencesWindowCloseAlert")];
+		[alert setMessageText:NSLocalizedString(@"XM_PREFERENCES_WINDOW_CLOSE", @"")];
 		
-		[alert addButtonWithTitle:NSLocalizedString(@"Save", @"Save")];
-		[alert addButtonWithTitle:NSLocalizedString(@"Abort", @"Abort")];
-		[alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"Don't Save")];
+		[alert addButtonWithTitle:NSLocalizedString(@"Save", @"")];
+		[alert addButtonWithTitle:NSLocalizedString(@"Abort", @"")];
+		[alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"")];
 		
 		[alert beginSheetModalForWindow:[self window] 
 						  modalDelegate:self 

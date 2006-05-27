@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.4 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.5 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -328,11 +328,11 @@
 	NSString *detailsString;
 	if(disclosureState == DISCLOSURE_CLOSED)
 	{
-		detailsString = @"Show Details";
+		detailsString = NSLocalizedString(@"XM_CALL_INFO_VIEW_SHOW_DETAILS", @"");
 	}
 	else
 	{
-		detailsString = @"Hide Details";
+		detailsString = NSLocalizedString(@"XM_CALL_INFO_VIEW_HIDE_DETAILS", @"");
 	}
 	[textDrawCell setStringValue:detailsString];
 
@@ -522,7 +522,7 @@
 	
 	if(audioOutString != nil || audioInString != nil)
 	{
-		[textDrawCell setStringValue:@"Audio:"];
+		[textDrawCell setStringValue:NSLocalizedString(@"XM_CALL_INFO_VIEW_AUDIO", @"")];
 		drawRect = NSMakeRect(x, y, availableWidth, SMALL_LINE_HEIGHT);
 		[textDrawCell drawWithFrame:drawRect inView:self];
 		
@@ -550,7 +550,7 @@
 	
 	if(videoOutString != nil || videoInString != nil)
 	{
-		[textDrawCell setStringValue:@"Video:"];
+		[textDrawCell setStringValue:NSLocalizedString(@"XM_CALL_INFO_VIEW_VIDEO", @"")];
 		drawRect = NSMakeRect(x, y, availableWidth, SMALL_LINE_HEIGHT);
 		[textDrawCell drawWithFrame:drawRect inView:self];
 		
@@ -770,15 +770,15 @@
 	
 	if([callInfo isOutgoingCall] == YES)
 	{
-		callDirectionString = @"Direction: Out";
+		callDirectionString = NSLocalizedString(@"XM_CALL_INFO_VIEW_DIRECTION_OUT", @"");
 	}
 	else
 	{
-		callDirectionString = @"Direction: In";
+		callDirectionString = NSLocalizedString(@"XM_CALL_INFO_VIEW_DIRECTION_IN", @"");
 	}
 	
 	NSString *endReason = XMCallEndReasonString([callInfo callEndReason]);
-	endReasonString = [[NSString alloc] initWithFormat:@"Call End Reason: %@", endReason];
+	endReasonString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_END_REASON", @""), endReason];
 	
 	NSDate *startDate = [callInfo callInitiationDate];
 	if(startDate != nil)
@@ -786,56 +786,56 @@
 		NSString *startDateString = [startDate descriptionWithCalendarFormat:XMDateFormatString()
 																	timeZone:nil
 																	  locale:nil];
-		callStartString = [[NSString alloc] initWithFormat:@"Start: %@", startDateString];
-		callEndString = [[NSString alloc] initWithFormat:@"End: %@", endDateString];
+		callStartString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_START", @""), startDateString];
+		callEndString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_END", @""), endDateString];
 		
 		NSString *callDuration = XMTimeString((unsigned)[callInfo callDuration]);
-		callDurationString = [[NSString alloc] initWithFormat:@"Duration: %@", callDuration];
+		callDurationString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_DURATION", @""), callDuration];
 		
 		NSString *remoteNumber = [callInfo remoteNumber];
 		if(remoteNumber != nil)
 		{
-			remoteNumberString = [[NSString alloc] initWithFormat:@"Remote Number: %@", remoteNumber];
+			remoteNumberString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_NUMBER", @""), remoteNumber];
 		}
 		
 		NSString *remoteAddress = [callInfo remoteAddress];
 		if(remoteAddress != nil)
 		{
-			remoteAddressString = [[NSString alloc] initWithFormat:@"Remote Address: %@", remoteAddress];
+			remoteAddressString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_ADDRESS", @""), remoteAddress];
 		}
 		
 		NSString *remoteApplication = [callInfo remoteApplication];
 		if(remoteApplication != nil)
 		{
-			remoteApplicationString = [[NSString alloc] initWithFormat:@"Remote Application: %@", remoteApplication];
+			remoteApplicationString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_APPLICATION", @""), remoteApplication];
 		}
 		
 		NSString *audioCodecOut = [callInfo outgoingAudioCodec];
 		if(audioCodecOut != nil)
 		{
 			NSString *bytesSentString = XMByteString([callInfo audioBytesSent]);
-			audioOutString = [[NSString alloc] initWithFormat:@"%@ sent using <%@>", bytesSentString, audioCodecOut];
+			audioOutString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_SENT", @""), bytesSentString, audioCodecOut];
 		}
 		
 		NSString *audioCodecIn = [callInfo incomingAudioCodec];
 		if(audioCodecIn != nil)
 		{
 			NSString *bytesReceivedString = XMByteString([callInfo audioBytesReceived]);
-			audioInString = [[NSString alloc] initWithFormat:@"%@ received using <%@>", bytesReceivedString, audioCodecIn];
+			audioInString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_RECV", @""), bytesReceivedString, audioCodecIn];
 		}
 		
 		NSString *videoCodecOut = [callInfo outgoingVideoCodec];
 		if(videoCodecOut != nil)
 		{
 			NSString *bytesSentString = XMByteString([callInfo videoBytesSent]);
-			videoOutString = [[NSString alloc] initWithFormat:@"%@ sent using <%@>", bytesSentString, videoCodecOut];
+			videoOutString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_SENT", @""), bytesSentString, videoCodecOut];
 		}
 		
 		NSString *videoCodecIn = [callInfo incomingVideoCodec];
 		if(videoCodecIn != nil)
 		{
 			NSString *bytesReceivedString = XMByteString([callInfo videoBytesReceived]);
-			videoInString = [[NSString alloc] initWithFormat:@"%@ received using <%@>", bytesReceivedString, videoCodecIn];
+			videoInString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_RECV", @""), bytesReceivedString, videoCodecIn];
 		}
 	}
 }

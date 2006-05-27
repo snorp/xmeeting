@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.7 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.8 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,7 +37,7 @@ static XMInspectorController *contactsInstance;
 	{
 		if(inspectorInstance == nil)
 		{
-			inspectorInstance = [[XMInspectorController alloc] _initWithName:@"Inspector"];
+			inspectorInstance = [[XMInspectorController alloc] _initWithName:NSLocalizedString(@"XM_INSPECTOR_INFO", @"")];
 		}
 		
 		return inspectorInstance;
@@ -46,7 +46,7 @@ static XMInspectorController *contactsInstance;
 	{
 		if(toolsInstance == nil)
 		{
-			toolsInstance = [[XMInspectorController alloc] _initWithName:@"Tools"];
+			toolsInstance = [[XMInspectorController alloc] _initWithName:NSLocalizedString(@"XM_INSPECTOR_TOOLS", @"")];
 		}
 		
 		return toolsInstance;
@@ -55,7 +55,7 @@ static XMInspectorController *contactsInstance;
 	{
 		if(contactsInstance == nil)
 		{
-			contactsInstance = [[XMInspectorController alloc] _initWithName:@"Contacts"];
+			contactsInstance = [[XMInspectorController alloc] _initWithName:NSLocalizedString(@"XM_INSPECTOR_CONTACTS", @"")];
 		}
 		
 		return contactsInstance;

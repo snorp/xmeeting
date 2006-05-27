@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.12 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.13 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -275,7 +275,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 		else
 		{
 			didSucceedFetchingExternalAddress = NO;
-			externalAddressFetchFailReason = @"Invalid Data";
+			externalAddressFetchFailReason = NSLocalizedString(@"XM_FRAMEWORK_INVALID_DATA", @"");
 		}
 		
 		[scanner release];
@@ -284,7 +284,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	else
 	{
 		didSucceedFetchingExternalAddress = NO;
-		externalAddressFetchFailReason = @"No Data";
+		externalAddressFetchFailReason = NSLocalizedString(@"XM_FRAMEWORK_NO_DATA", @"");
 	}
 	
 	if(externalAddressURLConnection != nil)
@@ -372,7 +372,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	{
 		[externalAddressFetchFailReason release];
 	}
-	externalAddressFetchFailReason = [NSLocalizedString(@"connection timeout", @"") retain];
+	externalAddressFetchFailReason = [NSLocalizedString(@"XM_FRAMEWORK_CONNECTION_TIMEOUT", @"") retain];
 	
 	didSucceedFetchingExternalAddress = NO;
 	isFetchingExternalAddress = NO;

@@ -172,6 +172,9 @@
 		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
+		D15F84440A24874400FB2EDB /* h4601.h in Headers */ = {isa = PBXBuildFile; fileRef = D15F84430A24874400FB2EDB /* h4601.h */; };
+		D15F84480A24878400FB2EDB /* h4601.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F84470A24878400FB2EDB /* h4601.cxx */; };
+		D15F844C0A24880000FB2EDB /* h235auth1.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F844B0A24880000FB2EDB /* h235auth1.cxx */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
 		D162158509F0F91600647E48 /* CallHistory_SIP.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158309F0F91600647E48 /* CallHistory_SIP.tiff */; };
 		D163336507A01BD5003FD9C0 /* XMApplicationController.h in Headers */ = {isa = PBXBuildFile; fileRef = D163336307A01BD5003FD9C0 /* XMApplicationController.h */; };
@@ -198,6 +201,18 @@
 		D177D7A107B62C9500BD0172 /* XMCallInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = D177D79F07B62C9500BD0172 /* XMCallInfo.h */; };
 		D177D7A207B62C9500BD0172 /* XMCallInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D177D7A007B62C9500BD0172 /* XMCallInfo.m */; };
 		D178D51608F58780006E9786 /* XMDummyVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */; };
+		D1887CC50A2713E200C938BB /* h460.h in Headers */ = {isa = PBXBuildFile; fileRef = D1887CC40A2713E200C938BB /* h460.h */; };
+		D1887D630A27A85500C938BB /* pssl.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1887D620A27A85500C938BB /* pssl.cxx */; };
+		D1887DCE0A27AEF300C938BB /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DCD0A27AEF300C938BB /* libssl.dylib */; };
+		D1887DDD0A27B1E200C938BB /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DDC0A27B1E200C938BB /* libcrypto.dylib */; };
+		D1887DE60A27B5E400C938BB /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DCD0A27AEF300C938BB /* libssl.dylib */; };
+		D1887DE70A27B5EA00C938BB /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DDC0A27B1E200C938BB /* libcrypto.dylib */; };
+		D1887DEC0A27B67B00C938BB /* psasl.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1887DEB0A27B67B00C938BB /* psasl.cxx */; };
+		D1887E130A27BA2F00C938BB /* prop.h in Headers */ = {isa = PBXBuildFile; fileRef = D1887E110A27BA2F00C938BB /* prop.h */; };
+		D1887E140A27BA2F00C938BB /* sasl.h in Headers */ = {isa = PBXBuildFile; fileRef = D1887E120A27BA2F00C938BB /* sasl.h */; };
+		D1887E1A0A27BAF300C938BB /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887E190A27BAF300C938BB /* libsasl2.dylib */; };
+		D1887E1C0A27BB1600C938BB /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887E1B0A27BB1600C938BB /* libresolv.dylib */; };
+		D1887E770A283DEA00C938BB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1887E750A283DEA00C938BB /* Localizable.strings */; };
 		D189803E082411AC007CD286 /* XMCodecDescriptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = D189803D082411AC007CD286 /* XMCodecDescriptions.plist */; };
 		D189805308241F11007CD286 /* XMBooleanCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D189805108241F11007CD286 /* XMBooleanCell.h */; };
 		D189805408241F11007CD286 /* XMBooleanCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D189805208241F11007CD286 /* XMBooleanCell.m */; };
@@ -454,7 +469,6 @@
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
 		D1CE4B76083CE0FC00B66B5D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
 		D1CEE0EA08F90111007E4ABE /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
-		D1CEE0EC08F9013C007E4ABE /* libresolv.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0EB08F9013C007E4ABE /* libresolv.9.dylib */; };
 		D1CEE18D08F9022B007E4ABE /* gcc.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE11408F9022B007E4ABE /* gcc.h */; };
 		D1CEE18E08F9022B007E4ABE /* h225.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE11508F9022B007E4ABE /* h225.h */; };
 		D1CEE18F08F9022B007E4ABE /* h235.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE11608F9022B007E4ABE /* h235.h */; };
@@ -888,36 +902,6 @@
 		};
 /* End PBXBuildRule section */
 
-/* Begin PBXBuildStyle section */
-		4A9504CCFFE6A4B311CA0CBA /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_PASCAL_STRINGS = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_UNUSED_VALUE = NO;
-				PREBINDING = NO;
-				ZERO_LINK = NO;
-			};
-			name = Development;
-		};
-		4A9504CDFFE6A4B311CA0CBA /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
-
 /* Begin PBXContainerItemProxy section */
 		D1CEE10C08F901F8007E4ABE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1109,6 +1093,9 @@
 		D15B409209AD262800A49EE7 /* tinyjpeg.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = tinyjpeg.cxx; sourceTree = "<group>"; };
 		D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationFunctions.h; path = Source/Application/XMApplicationFunctions.h; sourceTree = "<group>"; };
 		D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationFunctions.m; path = Source/Application/XMApplicationFunctions.m; sourceTree = "<group>"; };
+		D15F84430A24874400FB2EDB /* h4601.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h4601.h; sourceTree = "<group>"; };
+		D15F84470A24878400FB2EDB /* h4601.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h4601.cxx; sourceTree = "<group>"; };
+		D15F844B0A24880000FB2EDB /* h235auth1.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h235auth1.cxx; sourceTree = "<group>"; };
 		D162158209F0F91600647E48 /* CallHistory_H323.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory_H323.tiff; path = Resources/Images/CallHistory_H323.tiff; sourceTree = "<group>"; };
 		D162158309F0F91600647E48 /* CallHistory_SIP.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory_SIP.tiff; path = Resources/Images/CallHistory_SIP.tiff; sourceTree = "<group>"; };
 		D163336307A01BD5003FD9C0 /* XMApplicationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationController.h; path = Source/Application/XMApplicationController.h; sourceTree = "<group>"; };
@@ -1143,6 +1130,16 @@
 		D177D7A007B62C9500BD0172 /* XMCallInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallInfo.m; path = Source/Framework/XMCallInfo.m; sourceTree = "<group>"; };
 		D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMDummyVideoInputModule.h; path = Source/Framework/XMDummyVideoInputModule.h; sourceTree = "<group>"; };
 		D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMDummyVideoInputModule.m; path = Source/Framework/XMDummyVideoInputModule.m; sourceTree = "<group>"; };
+		D1887CC40A2713E200C938BB /* h460.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h460.h; sourceTree = "<group>"; };
+		D1887D620A27A85500C938BB /* pssl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pssl.cxx; sourceTree = "<group>"; };
+		D1887DCD0A27AEF300C938BB /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
+		D1887DDC0A27B1E200C938BB /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		D1887DEB0A27B67B00C938BB /* psasl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = psasl.cxx; sourceTree = "<group>"; };
+		D1887E110A27BA2F00C938BB /* prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = prop.h; path = Source/Framework/prop.h; sourceTree = "<group>"; };
+		D1887E120A27BA2F00C938BB /* sasl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sasl.h; path = Source/Framework/sasl.h; sourceTree = "<group>"; };
+		D1887E190A27BAF300C938BB /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = /usr/lib/libsasl2.dylib; sourceTree = "<absolute>"; };
+		D1887E1B0A27BB1600C938BB /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
+		D1887E760A283DEA00C938BB /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D1897F7C0823EEF2007CD286 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = English; path = English.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
 		D189805108241F11007CD286 /* XMBooleanCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMBooleanCell.h; sourceTree = "<group>"; };
 		D189805208241F11007CD286 /* XMBooleanCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMBooleanCell.m; sourceTree = "<group>"; };
@@ -1336,7 +1333,6 @@
 		D1B606B108F8F8410034B47F /* semaphor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = semaphor.h; sourceTree = "<group>"; };
 		D1B606B208F8F8410034B47F /* serchan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = serchan.h; sourceTree = "<group>"; };
 		D1B606B308F8F8410034B47F /* sfile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sfile.h; sourceTree = "<group>"; };
-		D1B606B408F8F8410034B47F /* shmvideo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = shmvideo.h; sourceTree = "<group>"; };
 		D1B606B508F8F8410034B47F /* socket.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
 		D1B606B608F8F8410034B47F /* sound.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
 		D1B606B708F8F8410034B47F /* svcproc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = svcproc.h; sourceTree = "<group>"; };
@@ -1420,7 +1416,6 @@
 		D1CE4B68083CDF3900B66B5D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/AddressBook.nib; sourceTree = "<group>"; };
 		D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = /System/Library/Frameworks/AddressBook.framework; sourceTree = "<absolute>"; };
 		D1CEE0E908F90111007E4ABE /* LDAP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDAP.framework; path = /System/Library/Frameworks/LDAP.framework; sourceTree = "<absolute>"; };
-		D1CEE0EB08F9013C007E4ABE /* libresolv.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.9.dylib; path = /usr/lib/libresolv.9.dylib; sourceTree = "<absolute>"; };
 		D1CEE10B08F901F0007E4ABE /* opal.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = opal.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1CEE11308F9022B007E4ABE /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		D1CEE11408F9022B007E4ABE /* gcc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = gcc.h; sourceTree = "<group>"; };
@@ -1887,7 +1882,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1CEE0EA08F90111007E4ABE /* LDAP.framework in Frameworks */,
-				D1CEE0EC08F9013C007E4ABE /* libresolv.9.dylib in Frameworks */,
+				D1887DCE0A27AEF300C938BB /* libssl.dylib in Frameworks */,
+				D1887DDD0A27B1E200C938BB /* libcrypto.dylib in Frameworks */,
+				D1887E1A0A27BAF300C938BB /* libsasl2.dylib in Frameworks */,
+				D1887E1C0A27BB1600C938BB /* libresolv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1896,6 +1894,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D19714F108F9186100295E05 /* pwlib.dylib in Frameworks */,
+				D1887DE60A27B5E400C938BB /* libssl.dylib in Frameworks */,
+				D1887DE70A27B5EA00C938BB /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2167,6 +2167,15 @@
 			name = Framework;
 			sourceTree = "<group>";
 		};
+		D1887E0B0A27B96900C938BB /* Patches */ = {
+			isa = PBXGroup;
+			children = (
+				D1887E110A27BA2F00C938BB /* prop.h */,
+				D1887E120A27BA2F00C938BB /* sasl.h */,
+			);
+			name = Patches;
+			sourceTree = "<group>";
+		};
 		D1A02A6C081E40360018BD11 /* Preferences Window */ = {
 			isa = PBXGroup;
 			children = (
@@ -2295,10 +2304,11 @@
 		D1B6062B08F8F8200034B47F /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				D1B606C508F8F8410034B47F /* ptlib.h */,
 				D1B6062C08F8F8410034B47F /* ptbuildopts.h */,
 				D1B6062E08F8F8410034B47F /* ptclib */,
 				D1B6065D08F8F8410034B47F /* ptlib */,
-				D1B606C508F8F8410034B47F /* ptlib.h */,
+				D1887E0B0A27B96900C938BB /* Patches */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -2464,7 +2474,6 @@
 				D1B606B108F8F8410034B47F /* semaphor.h */,
 				D1B606B208F8F8410034B47F /* serchan.h */,
 				D1B606B308F8F8410034B47F /* sfile.h */,
-				D1B606B408F8F8410034B47F /* shmvideo.h */,
 				D1B606B508F8F8410034B47F /* socket.h */,
 				D1B606B608F8F8410034B47F /* sound.h */,
 				D1B606B708F8F8410034B47F /* svcproc.h */,
@@ -2484,6 +2493,8 @@
 		D1B6075808F8F86B0034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D1887DEB0A27B67B00C938BB /* psasl.cxx */,
+				D1887D620A27A85500C938BB /* pssl.cxx */,
 				D1B6075A08F8F86B0034B47F /* asner.cxx */,
 				D1B6075D08F8F86B0034B47F /* cypher.cxx */,
 				D1B6075E08F8F86B0034B47F /* delaychan.cxx */,
@@ -2562,7 +2573,10 @@
 		D1CEE0E808F9009E007E4ABE /* Linked Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				D1CEE0EB08F9013C007E4ABE /* libresolv.9.dylib */,
+				D1887E1B0A27BB1600C938BB /* libresolv.dylib */,
+				D1887DCD0A27AEF300C938BB /* libssl.dylib */,
+				D1887DDC0A27B1E200C938BB /* libcrypto.dylib */,
+				D1887E190A27BAF300C938BB /* libsasl2.dylib */,
 				D1CEE0E908F90111007E4ABE /* LDAP.framework */,
 			);
 			name = "Linked Libraries";
@@ -2647,6 +2661,8 @@
 				D1CEE14808F9022B007E4ABE /* h323rtp.h */,
 				D1CEE14908F9022B007E4ABE /* h323trans.h */,
 				D1CEE14A08F9022B007E4ABE /* h450pdu.h */,
+				D1887CC40A2713E200C938BB /* h460.h */,
+				D15F84430A24874400FB2EDB /* h4601.h */,
 				D1CEE14B08F9022B007E4ABE /* h501pdu.h */,
 				D1CEE14C08F9022B007E4ABE /* peclient.h */,
 				D1CEE14D08F9022B007E4ABE /* q931.h */,
@@ -3121,6 +3137,7 @@
 				D1CEE32008F90262007E4ABE /* gkserver.cxx */,
 				D1CEE32108F90262007E4ABE /* h225ras.cxx */,
 				D1CEE32208F90262007E4ABE /* h235auth.cxx */,
+				D15F844B0A24880000FB2EDB /* h235auth1.cxx */,
 				D1CEE32408F90262007E4ABE /* h323.cxx */,
 				D1CEE32508F90262007E4ABE /* h323annexg.cxx */,
 				D1CEE32608F90263007E4ABE /* h323caps.cxx */,
@@ -3130,6 +3147,7 @@
 				D1CEE32A08F90263007E4ABE /* h323rtp.cxx */,
 				D1CEE32B08F90263007E4ABE /* h323trans.cxx */,
 				D1CEE32C08F90263007E4ABE /* h450pdu.cxx */,
+				D15F84470A24878400FB2EDB /* h4601.cxx */,
 				D1CEE32D08F90263007E4ABE /* h501pdu.cxx */,
 				D1CEE32E08F90263007E4ABE /* peclient.cxx */,
 				D1CEE32F08F90263007E4ABE /* q931.cxx */,
@@ -3311,6 +3329,7 @@
 		D1EB189A084379CE002CEF53 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				D1887E750A283DEA00C938BB /* Localizable.strings */,
 				D189803D082411AC007CD286 /* XMCodecDescriptions.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -3588,6 +3607,8 @@
 				D1B6082808F8F86C0034B47F /* udp.h in Headers */,
 				D1B6088108F8F86D0034B47F /* uerror.h in Headers */,
 				D1296DF509288A7A0077C77F /* psync.h in Headers */,
+				D1887E130A27BA2F00C938BB /* prop.h in Headers */,
+				D1887E140A27BA2F00C938BB /* sasl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3776,6 +3797,8 @@
 				D1F0B7C809DC50F6005D0464 /* h323h224.h in Headers */,
 				D1BFF0F009E2BB8E00D3665A /* h224handler.h in Headers */,
 				D1BFF0F109E2BB8E00D3665A /* h281handler.h in Headers */,
+				D15F84440A24874400FB2EDB /* h4601.h in Headers */,
+				D1887CC50A2713E200C938BB /* h460.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3795,45 +3818,6 @@
 			buildRules = (
 				D163335407A01B47003FD9C0 /* PBXBuildRule */,
 			);
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_CW_ASM_SYNTAX = NO;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = XMeeting_Prefix.pch;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNKNOWN_PRAGMAS = YES;
-				GCC_WARN_UNUSED_FUNCTION = NO;
-				GCC_WARN_UNUSED_LABEL = NO;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = NO;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(HOME)/pwlib/include",
-					"$(HOME)/opal/include",
-				);
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = (
-					"$(HOME)/pwlib/lib",
-					"$(HOME)/opal/lib",
-					/Users/hannes/pwlib/lib,
-					/Users/hannes/opal/lib,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = XMeeting;
-				WARNING_CFLAGS = "-Wno-long-double";
-				WRAPPER_EXTENSION = app;
-			};
 			dependencies = (
 				D1CEE11108F9020D007E4ABE /* PBXTargetDependency */,
 			);
@@ -3854,26 +3838,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_STYLE = DYNAMIC;
-				OPTIMIZATION_CFLAGS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = PWLib;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = pwlib;
@@ -3892,26 +3856,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_STYLE = DYNAMIC;
-				OPTIMIZATION_CFLAGS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = OPAL;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				D1CEE10D08F901F8007E4ABE /* PBXTargetDependency */,
 			);
@@ -3926,12 +3870,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = D11E93F508589A9200154C02 /* Build configuration list for PBXProject "XMeeting" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				4A9504CCFFE6A4B311CA0CBA /* Development */,
-				4A9504CDFFE6A4B311CA0CBA /* Deployment */,
-			);
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* XMeeting */;
 			projectDirPath = "";
@@ -4075,6 +4013,7 @@
 				D104D9A20A0E60D6000898F2 /* zoom_out.tif in Resources */,
 				D104D9C10A0E9947000898F2 /* DefaultURL_H323.tif in Resources */,
 				D104D9C20A0E9947000898F2 /* DefaultURL_SIP.tif in Resources */,
+				D1887E770A283DEA00C938BB /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4105,7 +4044,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 		D1F953B209B363530009B2AC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4223,6 +4162,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1B607FD08F8F86C0034B47F /* asner.cxx in Sources */,
+				D1887D630A27A85500C938BB /* pssl.cxx in Sources */,
+				D1887DEC0A27B67B00C938BB /* psasl.cxx in Sources */,
 				D1B6080008F8F86C0034B47F /* cypher.cxx in Sources */,
 				D1B6080108F8F86C0034B47F /* delaychan.cxx in Sources */,
 				D1B6080208F8F86C0034B47F /* dtmf.cxx in Sources */,
@@ -4474,6 +4415,8 @@
 				D1FC2F1709F52A83009C69EE /* h281.cxx in Sources */,
 				D1FC2F1809F52A83009C69EE /* h323h224.cxx in Sources */,
 				D1FC2F1909F52A84009C69EE /* q922.cxx in Sources */,
+				D15F84480A24878400FB2EDB /* h4601.cxx in Sources */,
+				D15F844C0A24880000FB2EDB /* h235auth1.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4555,6 +4498,14 @@
 				D16394C2083E23D600F7FD83 /* English */,
 			);
 			name = CallHistoryModule.nib;
+			sourceTree = "<group>";
+		};
+		D1887E750A283DEA00C938BB /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D1887E760A283DEA00C938BB /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		D189803D082411AC007CD286 /* XMCodecDescriptions.plist */ = {
@@ -4779,7 +4730,10 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G4;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__MACOSX__,
+					PTRACING,
+				);
 				GCC_USE_GCC3_PFE_SUPPORT = YES;
 				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = NO;
 				GCC_WARN_SHADOW = NO;
@@ -4787,7 +4741,10 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../pwlib/include;
+				HEADER_SEARCH_PATHS = (
+					/usr/include,
+					../pwlib/include,
+				);
 				INSTALL_PATH = "";
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
@@ -4823,7 +4780,10 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__MACOSX__,
+					PTRACING,
+				);
 				GCC_USE_GCC3_PFE_SUPPORT = YES;
 				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = NO;
 				GCC_WARN_SHADOW = NO;
@@ -4831,7 +4791,10 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../pwlib/include;
+				HEADER_SEARCH_PATHS = (
+					/usr/include,
+					../pwlib/include,
+				);
 				INSTALL_PATH = "";
 				LIBRARY_STYLE = STATIC;
 				MACH_O_TYPE = staticlib;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.17 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.18 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,7 +65,7 @@
 	{
 		[videoDevicesPopUp setEnabled:NO];
 		[videoDeviceSettingsButton setEnabled:NO];
-		[videoDisabledFld setStringValue:@"Video is disabled"];
+		[videoDisabledFld setStringValue:NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_VIDEO_DISABLED", @"")];
 	}
 	else
 	{
@@ -117,7 +117,7 @@
 
 - (NSString *)name
 {
-	return @"Audio/Video Control";
+	return NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_NAME", @"");
 }
 
 - (NSView *)contentView
@@ -422,7 +422,7 @@
 		
 		[videoDevicesPopUp setEnabled:NO];
 		[videoDeviceSettingsButton setEnabled:NO];
-		[videoDisabledFld setStringValue:@"Video is disabled"];
+		[videoDisabledFld setStringValue:NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_VIDEO_DISABLED", @"")];
 	}
 }
 

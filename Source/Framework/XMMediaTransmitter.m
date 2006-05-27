@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.42 2006/05/18 08:37:59 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.43 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -539,7 +539,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	id<XMVideoInputModule> module = [(XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:index] _videoInputModule];
 	NSString *description = [module descriptionForErrorCode:errorCode hintCode:hintCode device:device];
 	
-	NSRunAlertPanel(@"Problem with video device:", description, @"OK", nil, nil);
+	NSRunAlertPanel(NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @""), description, NSLocalizedString(@"OK", @""), nil, nil);
 }
 
 - (void)_handleMediaTransmitterThreadDidExit

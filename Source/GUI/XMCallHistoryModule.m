@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.17 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.18 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,7 +158,7 @@
 
 - (NSString *)name
 {
-	return @"History";
+	return NSLocalizedString(@"XM_CALL_HISTORY_MODULE_NAME", @"");
 }
 
 - (NSImage *)image
@@ -216,7 +216,7 @@
 - (void)_activeLocationDidChange:(NSNotification *)notif
 {
 	XMLocation *activeLocation = [[XMPreferencesManager sharedInstance] activeLocation];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Switched active location to <%@>", [activeLocation name]];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH", @""), [activeLocation name]];
 	
 	[self _logText:logText date:nil];
 	
@@ -237,7 +237,7 @@
 - (void)_didStartCalling:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Calling host \"%@\"", [activeCall callAddress]];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALLING", @""), [activeCall callAddress]];
 	
 	[self _logText:logText date:[activeCall callInitiationDate]];
 	
@@ -249,7 +249,7 @@
 
 - (void)_didNotStartCalling:(NSNotification *)notif
 {
-	NSString *logText = [[NSString alloc] initWithFormat:@"Calling host \"%@\" failed", [[callAddress addressResource] address]];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_FAILED", @""), [[callAddress addressResource] address]];
 	
 	[self _logText:logText date:nil];
 	
@@ -262,7 +262,7 @@
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Incoming call from \"%@\"", [activeCall remoteName]];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_INCOMING_CALL", @""), [activeCall remoteName]];
 	
 	[self _logText:logText date:[activeCall callInitiationDate]];
 	
@@ -280,7 +280,7 @@
 		[self _didReceiveIncomingCall:notif];
 	}
 	
-	NSString *logText = [[NSString alloc] initWithFormat:@"Call with \"%@\" established", [activeCall remoteName]];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED", @""), [activeCall remoteName]];
 	
 	[self _logText:logText date:[activeCall callStartDate]];
 	
@@ -301,11 +301,11 @@
 		
 		if(remoteName == nil)
 		{
-			remoteName = @"<Unknown>";
+			remoteName = NSLocalizedString(@"XM_UNKNOWN_HOST", @"");
 		}
 	}
 	
-	NSString *logText = [[NSString alloc] initWithFormat:@"Call with \"%@\" cleared", remoteName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_CLEARED", @""), remoteName];
 	
 	[self _logText:logText date:[activeCall callEndDate]];
 	
@@ -316,7 +316,7 @@
 
 - (void)_didNotEnableH323:(NSNotification *)notif
 {
-	[self _logText:@"Enabling the H.323 subsystem failed." date:nil];
+	[self _logText:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_H323_FAILURE", @"") date:nil];
 }
 
 - (void)_didRegisterAtGatekeeper:(NSNotification *)notif
@@ -329,7 +329,7 @@
 	
 	gatekeeperName = [[[XMCallManager sharedInstance] gatekeeperName] retain];
 	
-	NSString *logText = [[NSString alloc] initWithFormat:@"Registered at gatekeeper \"%@\"", gatekeeperName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_REGISTRATION", @""), gatekeeperName];
 	
 	[self _logText:logText date:nil];
 	
@@ -338,7 +338,7 @@
 
 - (void)_didUnregisterFromGatekeeper:(NSNotification *)notif
 {	
-	NSString *logText = [[NSString alloc] initWithFormat:@"Unregistered from gatekeeper \"%@\"", gatekeeperName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION", @""), gatekeeperName];
 	
 	[self _logText:logText date:nil];
 	
@@ -354,13 +354,13 @@
 	NSString *gkHost = [h323Account gatekeeper];
 	if(gkHost == nil)
 	{
-		gkHost = @"<Unknown>";
+		gkHost = NSLocalizedString(@"XM_UNKNOWN_HOST", @"");
 	}
 	
 	XMGatekeeperRegistrationFailReason failReason = [[XMCallManager sharedInstance] gatekeeperRegistrationFailReason];
 	NSString *failReasonString = XMGatekeeperRegistrationFailReasonString(failReason);
 	
-	NSString *logText = [[NSString alloc] initWithFormat:@"Failed to register at gatekeeper \"%@\" (%@)",
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_REG_FAILURE", @""),
 		gkHost, failReasonString];
 	
 	[self _logText:logText date:nil];
@@ -370,7 +370,7 @@
 
 - (void)_didNotEnableSIP:(NSNotification *)notif
 {
-	[self _logText:@"Enabling the SIP subsystem failed." date:nil];
+	[self _logText:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_FAILURE", @"") date:nil];
 }
 
 - (void)_didRegisterAtSIPRegistrar:(NSNotification *)notif
@@ -383,7 +383,7 @@
 	
 	sipRegistrarName = [[[XMCallManager sharedInstance] registrarHostAtIndex:0] retain];
 	
-	NSString *logText = [[NSString alloc] initWithFormat:@"Registered at SIP registrar \"%@\"", sipRegistrarName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION", @""), sipRegistrarName];
 	
 	[self _logText:logText date:nil];
 	
@@ -392,7 +392,7 @@
 
 - (void)_didUnregisterFromSIPRegistrar:(NSNotification *)notif
 {
-	NSString *logText = [[NSString alloc] initWithFormat:@"Unregistered from SIP registrar \"%@\"", sipRegistrarName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION", @""), sipRegistrarName];
 	
 	[self _logText:logText date:nil];
 	
@@ -408,13 +408,13 @@
 	NSString *sipRegistrarHost = [sipAccount registrar];
 	if(sipRegistrarHost == nil)
 	{
-		sipRegistrarHost = @"<Unknown>";
+		sipRegistrarHost = NSLocalizedString(@"XM_UNKNOWN_HOST", @"");
 	}
 	
 	XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationFailReasonAtIndex:0];
 	NSString *failReasonString = XMSIPStatusCodeString(failReason);
 		
-	NSString *logText = [[NSString alloc] initWithFormat:@"Failed to register at SIP registrar \"%@\" (%@)",
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE", @""),
 		sipRegistrarHost, failReasonString];
 	
 	[self _logText:logText date:nil];
@@ -425,7 +425,7 @@
 - (void)_didOpenOutgoingAudioStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingAudioCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: sending \"%@\"", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_OPENED_SENDING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -435,7 +435,7 @@
 - (void)_didOpenIncomingAudioStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingAudioCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: receiving \"%@\"", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_OPENED_RECEIVING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -445,7 +445,7 @@
 - (void)_didOpenOutgoingVideoStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingVideoCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: sending \"%@\"", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_OPENED_SENDING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -455,7 +455,7 @@
 - (void)_didOpenIncomingVideoStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingVideoCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream opened: receiving \"%@\"", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_OPENED_RECEIVING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -465,7 +465,7 @@
 - (void)_didCloseOutgoingAudioStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingAudioCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Outgoing)", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CLOSED_SENDING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -475,7 +475,7 @@
 - (void)_didCloseIncomingAudioStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingAudioCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Incoming)", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CLOSED_RECEIVING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -485,7 +485,7 @@
 - (void)_didCloseOutgoingVideoStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] outgoingVideoCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Outgoing)", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CLOSED_SENDING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	
@@ -495,7 +495,7 @@
 - (void)_didCloseIncomingVideoStream:(NSNotification *)notif
 {
 	NSString *codec = [[[XMCallManager sharedInstance] activeCall] incomingVideoCodec];
-	NSString *logText = [[NSString alloc] initWithFormat:@"Media stream closed: \"%@\" (Incoming)", codec];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CLOSED_RECEIVING", @""), codec];
 	
 	[self _logText:logText date:nil];
 	

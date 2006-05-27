@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.20 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.21 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -168,7 +168,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (NSString *)toolbarLabel
 {
-	return NSLocalizedString(@"Locations", @"LocationPreferencesModuleLabel");
+	return NSLocalizedString(@"XM_LOCATION_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
@@ -178,7 +178,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (NSString *)toolTipText
 {
-	return NSLocalizedString(@"Edit the Locations", @"LocationPreferencesModuleToolTip");
+	return NSLocalizedString(@"XM_LOCATION_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView
@@ -277,7 +277,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (IBAction)createNewLocation:(id)sender
 {
-	[newLocationNameField setStringValue:NSLocalizedString(@"New Location", @"New Location Name")];
+	[newLocationNameField setStringValue:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NEW_LOCATION", @"")];
 	[newLocationNameField selectText:self];
 	
 	// we obtain the window through the NSView's -window method
@@ -299,7 +299,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	unsigned index = [locations count];
 	
 	NSString *currentLocationName = [currentLocation name];
-	NSString *newName = [currentLocationName stringByAppendingString:NSLocalizedString(@" Copy", @"LocationCopySuffix")];
+	NSString *newName = [currentLocationName stringByAppendingString:NSLocalizedString(@"XM_LOCATION_PREFERENCES_COPY_SUFFIX", @"")];
 	XMLocation *duplicate = [currentLocation duplicateWithName:newName];
 	
 	[self _addLocation:duplicate];
@@ -363,7 +363,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	[utils startFetchingExternalAddress];
 	
-	[externalAddressField setStringValue:NSLocalizedString(@"Fetching...", @"")];
+	[externalAddressField setStringValue:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
 	[externalAddressField setEnabled:NO];
 	externalAddressIsValid = NO;
 }
@@ -582,7 +582,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[h323AccountsPopUp removeAllItems];
 	NSMenu *menu = [h323AccountsPopUp menu];
 	
-	NSMenuItem *noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", @"None")
+	NSMenuItem *noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NONE_ITEM", @"")
 													  action:NULL
 											   keyEquivalent:@""];
 	[noneItem setTag:0];
@@ -620,7 +620,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[sipAccountsPopUp removeAllItems];
 	menu = [sipAccountsPopUp menu];
 	
-	noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", @"None")
+	noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NONE_ITEM", @"")
 										  action:NULL
 								   keyEquivalent:@""];
 	[noneItem setTag:0];
@@ -943,11 +943,11 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		{
 			if(isFetchingExternalAddress)
 			{
-				displayString = NSLocalizedString(@"Fetching...", @"");
+				displayString = NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"");
 			}
 			else
 			{
-				displayString = NSLocalizedString(@"<Not available>", @"");
+				displayString = NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"");
 			}
 			textColor = [NSColor controlTextColor];
 			externalAddressIsValid = NO;

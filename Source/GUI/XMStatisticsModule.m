@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.12 2006/03/18 20:46:22 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.13 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,7 +65,7 @@
 
 - (NSString *)name
 {
-	return @"Statistics";
+	return NSLocalizedString(@"XM_STATISTICS_MODULE_NAME", @"");
 }
 
 - (NSImage *)image
@@ -150,13 +150,13 @@
 		switch (rowIndex)
 		{
 			case 0:
-				return @"Audio In";
+				return NSLocalizedString(@"XM_STATISTICS_MODULE_AUDIO_IN", @"");
 			case 1:
-				return @"Audio Out";
+				return NSLocalizedString(@"XM_STATISTICS_MODULE_AUDIO_OUT", @"");
 			case 2:
-				return @"Video In";
+				return NSLocalizedString(@"XM_STATISTICS_MODULE_VIDEO_IN", @"");
 			case 3:
-				return @"Video Out";
+				return NSLocalizedString(@"XM_STATISTICS_MODULE_VIDEO_OUT", @"");
 		}
 	}
 	else if([identifier isEqualToString:@"Codec"])

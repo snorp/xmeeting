@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.36 2006/05/24 10:11:49 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.37 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -538,7 +538,7 @@
 	[busyIndicator startAnimation:self];
 	[busyIndicator setHidden:NO];
 	
-	[statusField setStringValue:@"Setup. Please wait..."];
+	[statusField setStringValue:NSLocalizedString(@"XM_NO_CALL_SETUP_MESSAGE", @"")];
 	
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
@@ -581,7 +581,7 @@
 	[callAddressField setRepresentedObject:activeCallAddress];
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
-	[statusField setStringValue:NSLocalizedString(@"Preparing to call...", @"")];
+	[statusField setStringValue:NSLocalizedString(@"XM_NO_CALL_PREPARING_CALL", @"")];
 	
 	[self _invalidateCallEndReasonTimer];
 }
@@ -591,7 +591,7 @@
 	[callButton setEnabled:YES];
 	[callButton setImage:[NSImage imageNamed:@"hangup_24.tif"]];
 	[callButton setAlternateImage:[NSImage imageNamed:@"hangup_24_down.tif"]];
-	[statusField setStringValue:NSLocalizedString(@"Calling...", @"")];
+	[statusField setStringValue:NSLocalizedString(@"XM_NO_CALL_CALLING", @"")];
 	
 	isCalling = YES;
 }
@@ -605,14 +605,14 @@
 
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif
 {
-	[statusField setStringValue:NSLocalizedString(@"Ringing...", @"")];
+	[statusField setStringValue:NSLocalizedString(@"XM_NO_CALL_RINGING", @"")];
 }
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];
-	[statusField setStringValue:NSLocalizedString(@"Incoming Call", @"")];
+	[statusField setStringValue:NSLocalizedString(@"XM_NO_CALL_INCOMING_CALL", @"")];
 	
 	[self _invalidateCallEndReasonTimer];
 }
@@ -630,7 +630,7 @@
 	NSString *idleString = nil;
 	if([callInfo isOutgoingCall] && callEndReason != XMCallEndReason_EndedByLocalUser)
 	{
-		idleString = [[NSString alloc] initWithFormat:@"Idle (%@)", XMCallEndReasonString(callEndReason)];
+		idleString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_NO_CALL_IDLE_WITH_REASON", @""), XMCallEndReasonString(callEndReason)];
 	}
 	[self _updateStatusInformation:idleString];
 	[idleString release];
@@ -698,7 +698,7 @@
 	
 	if(localAddressCount == 0)
 	{
-		NSString *statusString = @"Offline (No network address)";
+		NSString *statusString = NSLocalizedString(@"XM_NO_CALL_NO_ADDRESS", @"");
 		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
 		[semaphoreButton setToolTip:statusString];
 		[statusField setStringValue:statusString];
@@ -716,19 +716,19 @@
 		
 		if(!enableH323 && !enableSIP)
 		{
-			statusString = @"Offline (No protocol enabled)";
+			statusString = NSLocalizedString(@"XM_NO_CALL_NO_PROTOCOL", @"");
 		}
 		else if(enableH323 && enableSIP)
 		{
-			statusString = @"Offline (Failed to enable H.323 and SIP)";
+			statusString = NSLocalizedString(@"XM_NO_CALL_PROTOCOL_FAILURE", @"");
 		}
 		else if(enableH323)
 		{
-			statusString = @"Offline (Failed to enable H.323)";
+			statusString = NSLocalizedString(@"XM_NO_CALL_H323_FAILURE", @"");
 		}
 		else
 		{
-			statusString = @"Offline (Failed to enable SIP)";
+			statusString = NSLocalizedString(@"XM_NO_CALL_SIP_FAILURE", @"");
 		}
 		
 		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
@@ -739,7 +739,7 @@
 		
 	if(statusFieldString == nil)
 	{
-		statusFieldString = NSLocalizedString(@"Idle", @"");
+		statusFieldString = NSLocalizedString(@"XM_NO_CALL_IDLE", @"");
 	}
 	[statusField setStringValue:statusFieldString];
 	
@@ -751,7 +751,7 @@
 		if(isH323Listening == NO)
 		{
 			isYellowSemaphore = YES;
-			[toolTipText appendString:@"H.323: Offline. Failed to enable H.323 system\n"];
+			[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_H323_FAILURE", @"")];
 		}
 		else if([activeLocation h323AccountTag] != 0)
 		{
@@ -759,16 +759,16 @@
 			if(gatekeeperName == nil) // using a gatekeeper but failed to register
 			{
 				isYellowSemaphore = YES;
-				[toolTipText appendString:@"H.323: Gatekeeper registration failed\n"];
+				[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_GK_FAILURE", @"")];
 			}
 			else
 			{
-				[toolTipText appendString:@"H.323: Registered with Gatekeeper\n"];
+				[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_GK_OK", @"")];
 			}
 		}
 		else
 		{
-			[toolTipText appendString:@"H.323: Ready. Not using a gatekeeper\n"];
+			[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NO_GK", @"")];
 		}
 	}
 	
@@ -777,7 +777,7 @@
 		if(isSIPListening == NO)
 		{
 			isYellowSemaphore = YES;
-			[toolTipText appendString:@"SIP: Offline. Failed to enable SIP system\n"];
+			[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_FAILURE", @"")];
 		}
 		else if([activeLocation sipAccountTag] != 0)
 		{
@@ -785,16 +785,16 @@
 			if(registrarCount == 0)
 			{
 				isYellowSemaphore = YES;
-				[toolTipText appendString:@"SIP: Registration failed\n"];
+				[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE", @"")];
 			}
 			else
 			{
-				[toolTipText appendString:@"SIP: Registered\n"];
+				[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_OK", @"")];
 			}
 		}
 		else
 		{
-			[toolTipText appendString:@"SIP: Ready. Not using a registrar\n"];
+			[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_NO_REG", @"")];
 		}
 	}
 	
@@ -822,7 +822,7 @@
 		}
 	}
 	
-	[toolTipText appendString:@"\nNetwork Addresses:"];
+	[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES", @"")];
 	
 	unsigned i;
 	for(i = 0; i < localAddressCount; i++)
@@ -833,7 +833,7 @@
 		
 		if(i == externalAddressIndex)
 		{
-			[toolTipText appendString:@" (External)"];
+			[toolTipText appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
 		}
 	}
 	
@@ -841,13 +841,13 @@
 	{
 		if(externalAddress == nil)
 		{
-			[toolTipText appendString:@"\nCould not fetch external address."];
+			[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS", @"")];
 		}
 		else
 		{
 			[toolTipText appendString:@"\n"];
 			[toolTipText appendString:externalAddress];
-			[toolTipText appendString:@" (External)"];
+			[toolTipText appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
 		}
 	}
 	

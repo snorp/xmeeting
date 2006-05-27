@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.16 2006/05/17 16:28:25 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.17 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -137,7 +137,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (NSString *)name
 {
-	return @"Live Camera Module";
+	return NSLocalizedString(@"XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME", @"");
 }
 
 - (void)setupWithInputManager:(id<XMVideoInputManager>)theInputManager
@@ -617,11 +617,11 @@ bail:
 	
 	if(hintCode == 0x005001)
 	{
-		formatString = @"Could not grab frames from the camera. Is the camera still attached to the computer?\nError: (%d, %x)\tDevice: %@";
+		formatString = NSLocalizedString(@"XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA", @"");
 	}
 	else
 	{
-		formatString = @"An internal error occured in the Live Camera Module.\nError Codes: (%d, %x)\t Device: %@\nPlease report this problem to hfriederich@users.sourceforge.net";
+		formatString = NSLocalizedString(@"XM_FRAMEWORK_SEQ_GRAB_INTERNAL", @"");
 	}
 	NSString *errorString = [NSString stringWithFormat:formatString, errorCode, hintCode, device];
 	return errorString;

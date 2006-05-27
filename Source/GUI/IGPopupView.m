@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.m,v 1.8 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: IGPopupView.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -139,7 +139,7 @@
 
 -(void) setTitle:(NSString*)t{
 	id tmp = title;
-	title = [[NSString stringWithFormat:@"Location: %@", t] retain];
+	title = [[NSString stringWithFormat:NSLocalizedString(@"IG_POPUP_VIEW_TITLE", @""), t] retain];
 	[tmp release];
 }
 

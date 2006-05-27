@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.15 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.16 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,7 +41,7 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 	
 	inputManager = nil;
 	
-	NSString *deviceName = NSLocalizedString(@"Screen %d", @"");
+	NSString *deviceName = NSLocalizedString(@"XM_FRAMEWORK_SCREEN_DEVICE_NAME", @"");
 	int i;
 	NSArray *screens = [NSScreen screens];	// array of NSScreen objects representing all of the screens available on the system.
 	
@@ -125,7 +125,7 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 
 - (NSString *)name
 {
-	return @"Screen Module";
+	return NSLocalizedString(@"XM_FRAMEWORK_SCREEN_MODULE_NAME", @"");
 }
 
 - (void)setupWithInputManager:(id<XMVideoInputManager>)theManager
@@ -355,7 +355,7 @@ Thousands of color:
 
 - (NSString *)descriptionForErrorCode:(int)errorCode hintCode:(int)code device:(NSString *)device
 {
-	return @"Cannot grab from screen with 256 colors";
+	return @"";
 }
 
 - (BOOL)hasSettingsForDevice:(NSString *)device

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecord.m,v 1.2 2006/05/24 10:11:49 hfriederich Exp $
+ * $Id: XMAddressBookRecord.m,v 1.3 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -262,7 +262,7 @@
 	
 	if(firstName == nil && lastName == nil && companyName == nil)
 	{
-		return @"<No Name>";
+		return NSLocalizedString(@"XM_NO_NAME_TEXT", @"");
 	}
 	
 	NSNumber *number = (NSNumber *)[addressBookPerson valueForProperty:kABPersonFlags];

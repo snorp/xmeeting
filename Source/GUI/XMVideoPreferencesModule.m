@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.5 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.6 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,7 +21,7 @@ NSString *XMKey_EnableIdentifier_ = @"Enabled";
 #define XMKey_EnabledIdentifier @"Enabled"
 NSString *XMKey_SettingsIdentifier = @"Settings";
 
-NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
+NSString *XMString_UseFirstAvailableDevice = @"";
 
 @interface XMVideoPreferencesModule (PrivateMethods)
 
@@ -52,7 +52,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 	[booleanCell release];
 	
 	NSButtonCell *buttonCell = [[NSButtonCell alloc] init];
-	[buttonCell setTitle:@"Show Settings..."];
+	[buttonCell setTitle:NSLocalizedString(@"XM_VIDEO_PREFERENCES_SHOW_SETTINGS", @"")];
 	[buttonCell setControlSize:NSSmallControlSize];
 	[buttonCell setBezelStyle:NSShadowlessSquareBezelStyle];
 	[buttonCell setFont:[NSFont controlContentFontOfSize:[NSFont labelFontSize]]];
@@ -69,6 +69,8 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateVideoDeviceList:)
 												 name:XMNotification_VideoManagerDidUpdateInputDeviceList
 											   object:nil];
+	
+	XMString_UseFirstAvailableDevice = NSLocalizedString(@"XM_VIDEO_PREFERENCES_FA_DEVICE", @"");
 }
 
 - (void)dealloc
@@ -92,7 +94,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 
 - (NSString *)toolbarLabel
 {
-	return NSLocalizedString(@"Video Input", @"VideoPreferencesModuleLabel");
+	return NSLocalizedString(@"XM_VIDEO_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
@@ -102,7 +104,7 @@ NSString *XMString_UseFirstAvailableDevice = @"<Use first available>";
 
 - (NSString *)toolTipText
 {
-	return NSLocalizedString(@"Video Input Preferences", @"VideoPreferencesModuleToolTip");
+	return NSLocalizedString(@"XM_VIDEO_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView

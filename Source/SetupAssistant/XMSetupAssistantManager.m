@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.8 2006/05/18 20:46:01 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -216,9 +216,9 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	// creating an empty location
 	location = (XMLocation *)[[[preferencesManager locations] objectAtIndex:0] retain];
 	h323Account = [[XMH323Account alloc] init];
-	[h323Account setName:NSLocalizedString(@"<Default Gatekeeper>", @"")];
+	[h323Account setName:NSLocalizedString(@"XM_SETUP_ASSISTANT_DEFAULT_GK", @"")];
 	sipAccount = [[XMSIPAccount alloc] init];
-	[sipAccount setName:NSLocalizedString(@"<Default Registrar>", @"")];
+	[sipAccount setName:NSLocalizedString(@"XM_SETUP_ASSISTANT_DEFAULT_REG", @"")];
 	
 	if(locationImportData != nil)
 	{
@@ -359,11 +359,11 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			{
 				if([utils isFetchingExternalAddress] == YES)
 				{
-					displayString = NSLocalizedString(@"Fetching...", @"");
+					displayString = NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"");
 				}
 				else
 				{
-					displayString = NSLocalizedString(@"<Not available>", @"");
+					displayString = NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"");
 				}
 				externalAddressIsValid = NO;
 			}
@@ -462,12 +462,12 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	if(isContinueButton == YES)
 	{
-		[continueButton setTitle:NSLocalizedString(@"Continue", @"")];
+		[continueButton setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_CONTINUE", @"")];
 		[continueButton setKeyEquivalent:@""];
 	}
 	else
 	{
-		[continueButton setTitle:NSLocalizedString(@"Finish", @"")];
+		[continueButton setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_FINISH", @"")];
 		[continueButton setKeyEquivalent:@"\r"];
 	}
 	
@@ -855,7 +855,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLIntroductionSettings
 {
-	[self _setTitle:NSLocalizedString(@"Welcome to XMeeting!", @"")];
+	[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_WELCOME", @"")];
 	[self _setShowCornerImage:NO];
 }
 
@@ -866,7 +866,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (NSView *)_prepareFLGeneralSettings
 {
-	[self _setTitle:@"Personal Information"];
+	[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"")];
 	[userNameField setStringValue:userName];
 	return userNameField;
 }
@@ -880,7 +880,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLLocationSettings
 {
-	[self _setTitle:@"Locations"];
+	[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATIONS", @"")];
 	int tag = (mode == XM_FIRST_APPLICATION_LAUNCH_MODE) ? 0 : 1;
 	[locationRadioButtons selectCellWithTag:tag];
 }
@@ -893,7 +893,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (NSView *)_prepareFLNewLocationSettings
 {
-	[self _setTitle:@"New Location"];
+	[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_NEW_LOCATION", @"")];
 	[locationNameField setStringValue:[location name]];
 	return locationNameField;
 }
@@ -905,7 +905,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLNetworkSettings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	int state;
@@ -968,7 +968,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLProtocolSettings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	int state = ([location enableH323] == YES) ? NSOnState : NSOffState;
@@ -991,7 +991,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLH323Settings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	int tag = ([location h323AccountTag] != 0) ? 0 : 1;
@@ -1013,7 +1013,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (NSView *)_prepareFLGatekeeperSettings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	NSString *gatekeeperAddress = [h323Account gatekeeper];
@@ -1085,7 +1085,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLSIPSettings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	int tag = ([location sipAccountTag] != 0) ? 0 : 1;
@@ -1108,7 +1108,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (NSView *)_prepareFLRegistrarSettings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	NSString *registrarAddress = [sipAccount registrar];
@@ -1180,7 +1180,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareFLVideoSettings
 {
-	NSString *titleString = [NSString stringWithFormat:@"Location: %@", [location name]];
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
 	int tag = ([location enableVideo] == YES) ? 0 : 1;
@@ -1254,10 +1254,10 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		{
 			NSAlert *alert = [[NSAlert alloc] init];
 			
-			[alert setMessageText:@"Location import failed"];
+			[alert setMessageText:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOC_IMPORT_FAILURE", @"")];
 			[alert setInformativeText:errorDescription];
 			[alert setAlertStyle:NSWarningAlertStyle];
-			[alert addButtonWithTitle:@"OK"];
+			[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
 			
 			[alert runModal];
 			mode = XM_FIRST_APPLICATION_LAUNCH_MODE;
@@ -1285,13 +1285,13 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	if(propertyList == nil)
 	{
-		*errorDescription = @"File does not contain valid data";
+		*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 		return nil;
 	}
 	
 	if(![propertyList isKindOfClass:[NSDictionary class]])
 	{
-		*errorDescription = @"File does not contain valid data";
+		*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 		return nil;
 	}
 	
@@ -1299,7 +1299,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	if((locationDicts == nil) || (![locationDicts isKindOfClass:[NSArray class]]))
 	{
-		*errorDescription = @"File does not contain valid data";
+		*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 		return nil;
 	}
 	
@@ -1309,7 +1309,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	{
 		if(![h323AccountDicts isKindOfClass:[NSArray class]])
 		{
-			*errorDescription = @"File does not contain valid data";
+			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 			return nil;
 		}
 
@@ -1341,7 +1341,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		if(count == 0)
 		{
-			*errorDescription = @"File does not contain valid data";
+			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 			return nil;
 		}
 	}
@@ -1352,7 +1352,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	{
 		if(![sipAccountDicts isKindOfClass:[NSArray class]])
 		{
-			*errorDescription = @"File does not contain valid data";
+			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 			return nil;
 		}
 		
@@ -1384,7 +1384,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		if(count == 0)
 		{
-			*errorDescription = @"File does not contain valid data";
+			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 			return nil;
 		}
 	}
@@ -1419,7 +1419,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			
 	if(count == 0)
 	{
-		*errorDescription = @"File does not contain valid data";
+		*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 		return nil;
 	}
 
@@ -1794,10 +1794,10 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		{
 			NSAlert *alert = [[NSAlert alloc] init];
 			
-			[alert setMessageText:@"Location import failed"];
+			[alert setMessageText:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOC_IMPORT_FAILURE", @"")];
 			[alert setInformativeText:errorDescription];
 			[alert setAlertStyle:NSWarningAlertStyle];
-			[alert addButtonWithTitle:@"OK"];
+			[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
 			
 			[alert runModal];
 			
@@ -1845,7 +1845,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	else
 	{
-		[self _setTitle:@"Import"];
+		[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_IMPORT", @"")];
 	}
 	
 	NSString *description = [dict objectForKey:XMKey_Description];
@@ -1871,7 +1871,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	else
 	{
-		[self _setTitle:@"Import"];
+		[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_IMPORT", @"")];
 	}
 	
 	XMLocation *theLocation = (XMLocation *)[locations objectAtIndex:[[locationIndexes objectAtIndex:0] unsignedIntValue]];
@@ -2002,7 +2002,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	else
 	{
-		[self _setTitle:@"Import"];
+		[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_IMPORT", @"")];
 	}
 	
 	XMH323Account *theH323Account = (XMH323Account *)[h323Accounts objectAtIndex:[[accountIndexes objectAtIndex:0] unsignedIntValue]];
@@ -2120,7 +2120,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	else
 	{
-		[self _setTitle:@"Import"];
+		[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_IMPORT", @"")];
 	}
 	
 	XMSIPAccount *theSIPAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:[[accountIndexes objectAtIndex:0] unsignedIntValue]];
@@ -2225,7 +2225,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_prepareLICompletedSettings
 {
-	[self _setTitle:@"Completed"];
+	[self _setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_COMPLETED", @"")];
 }
 
 - (void)_finishLICompletedSettings

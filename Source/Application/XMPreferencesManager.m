@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.20 2006/05/27 12:27:20 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,7 +125,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	
 	/* intermediate code to make sure that at least one location is present in UserDefaults */
 	/* later, this will be replaced by some sort of wizard popping up */
-	XMLocation *defaultLocation = [[XMLocation alloc] initWithName:NSLocalizedString(@"<Default Location>", @"")];
+	XMLocation *defaultLocation = [[XMLocation alloc] initWithName:NSLocalizedString(@"XM_DEFAULT_LOCATION_TEXT", @"")];
 	NSDictionary *dict = [defaultLocation dictionaryRepresentationWithH323Accounts:nil sipAccounts:nil];
 	NSArray *defaultLocationArray = [NSArray arrayWithObject:dict];
 	[defaultsDict setObject:defaultLocationArray forKey:XMKey_PreferencesManagerLocations];
