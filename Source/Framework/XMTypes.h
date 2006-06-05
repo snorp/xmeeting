@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.22 2006/04/26 21:49:03 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.23 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,14 +18,21 @@
 #pragma mark Enumerations
 
 /**
- * Defines the possible results of a NAT detection operation
+ * Defines the possible types of NAT present in the system
  **/
-typedef enum XMNATDetectionResult
+typedef enum XMNATType
 {
-	XMNATDetectionResult_Error = 0,
-	XMNATDetectionResult_NoNAT,
-	XMNATDetectionResult_HasNAT
-} XMNATDetectionResult;
+	XMNATType_Error = 0,
+	XMNATType_NoNAT,
+	XMNATType_ConeNAT,
+	XMNATType_RestrictedNAT,
+	XMNATType_PortRestrictedNAT,
+	XMNATType_SymmetricNAT,
+	XMNATType_SymmetricFirewall,
+	XMNATType_BlockedNAT,
+	XMNATType_PartialBlockedNAT,
+	XMNATType_UnknownNAT
+} XMNATType;
 
 /**
  * Defines all available call protocols

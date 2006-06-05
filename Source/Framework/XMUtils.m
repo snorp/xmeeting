@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.13 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.14 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,9 @@
 
 NSString *XMString_DynamicStoreName = @"XMeeting";
 NSString *XMString_DynamicStoreNotificationKey = @"State:/Network/Interface/.+/IPv4";
+
+#define XM_CHECKIP_URL @"http://checkip.dyndns.org"
+#define XM_CHECKIP_PREFIX @"<html><head><title>Current IP Check</title></head><body>Current IP Address: "
 
 void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info);
 
@@ -62,12 +65,16 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	SCDynamicStoreSetNotificationKeys(dynamicStore, NULL, (CFArrayRef)notificationKeys);
 	localAddresses = nil;
 	
-	isFetchingExternalAddress = NO;
-	didSucceedFetchingExternalAddress = YES;
-	externalAddressURLConnection = nil;
-	externalAddressURLData = nil;
-	externalAddress = nil;
-	externalAddressFetchFailReason = nil;
+	natType = XMNATType_NoNAT;
+	stunExternalAddress = nil;
+	
+	isFetchingCheckipExternalAddress = NO;
+	didSucceedFetchingCheckipExternalAddress = YES;
+	checkipURLConnection = nil;
+	checkipURLData = nil;
+	checkipExternalAddress = nil;
+	checkipExternalAddressFetchFailReason = nil;
+	checkipTimer = nil;
 	
 	[self _getLocalAddresses];
 	
@@ -88,36 +95,36 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 		dynamicStore = NULL;
 	}
 	
-	if(externalAddressURLConnection != nil)
+	if(checkipURLConnection != nil)
 	{
-		[externalAddressURLConnection cancel];
-		[externalAddressURLConnection release];
-		externalAddressURLConnection = nil;
+		[checkipURLConnection cancel];
+		[checkipURLConnection release];
+		checkipURLConnection = nil;
 	}
 	
-	if(externalAddressURLData != nil)
+	if(checkipURLData != nil)
 	{
-		[externalAddressURLData release];
-		externalAddressURLData = nil;
+		[checkipURLData release];
+		checkipURLData = nil;
 	}
 	
-	if(externalAddress != nil)
+	if(checkipExternalAddress != nil)
 	{
-		[externalAddress release];
-		externalAddress = nil;
+		[checkipExternalAddress release];
+		checkipExternalAddress = nil;
 	}
 	
-	if(externalAddressFetchFailReason != nil)
+	if(checkipExternalAddressFetchFailReason != nil)
 	{
-		[externalAddressFetchFailReason release];
-		externalAddressFetchFailReason = nil;
+		[checkipExternalAddressFetchFailReason release];
+		checkipExternalAddressFetchFailReason = nil;
 	}
 	
-	if(fetchingExternalAddressTimer != nil)
+	if(checkipTimer != nil)
 	{
-		[fetchingExternalAddressTimer invalidate];
-		[fetchingExternalAddressTimer release];
-		fetchingExternalAddressTimer = nil;
+		[checkipTimer invalidate];
+		[checkipTimer release];
+		checkipTimer = nil;
 	}
 }
 	
@@ -130,6 +137,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Handling local addresses
 
 - (NSArray *)localAddresses
@@ -137,123 +145,147 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	return localAddresses;
 }
 
-#pragma mark Fetching External Address
-
-- (void)startFetchingExternalAddress
-{
-	if(isFetchingExternalAddress == NO)
-	{
-		NSURL *externalAddressURL = [[NSURL alloc] initWithString:@"http://checkip.dyndns.org"];
-		NSURLRequest *externalAddressURLRequest = [[NSURLRequest alloc] initWithURL:externalAddressURL 
-																		cachePolicy:NSURLRequestReloadIgnoringCacheData
-																	timeoutInterval:10.0];
-		externalAddressURLConnection = [[NSURLConnection alloc] initWithRequest:externalAddressURLRequest delegate:self];
-		
-		// since the timeoutInterval in NSURLRequest for some reason doesn't work, we do our own timeout by
-		// using a timer and sending a -cancel message to the NSURLConnection when the timer fires
-		fetchingExternalAddressTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self
-																	   selector:@selector(_urlLoadingTimeout:) 
-																	   userInfo:nil repeats:NO] retain];
-		
-		[externalAddressURL release];
-		[externalAddressURLRequest release];
-		
-		isFetchingExternalAddress = YES;
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidStartFetchingExternalAddress object:self];
-	}
-}
-
-- (BOOL)isFetchingExternalAddress
-{
-	return isFetchingExternalAddress;
-}
-
-- (BOOL)didSucceedFetchingExternalAddress
-{
-	return didSucceedFetchingExternalAddress;
-}
-
-- (NSString *)externalAddress
-{
-	return externalAddress;
-}
-
-- (NSString *)externalAddressFetchFailReason
-{
-	return externalAddressFetchFailReason;
-}
-
+#pragma mark -
 #pragma mark NAT handling
 
-- (XMNATDetectionResult)natDetectionResult
+- (XMNATType)natType
 {	
 	if([localAddresses count] == 0)
 	{
 		// we have no network interface!
-		return XMNATDetectionResult_Error;
-	}
-	else if(externalAddress == nil)
-	{
-		if([self didSucceedFetchingExternalAddress] == YES)
-		{
-			// external address fetched
-			return XMNATDetectionResult_Error;
-		}
-		else
-		{
-			// we have no external address. Thus, we have a network
-			// interface but we haven't access to the internet
-			return XMNATDetectionResult_NoNAT;
-		}
-	}
-	else if([localAddresses containsObject:externalAddress])
-	{
-		return XMNATDetectionResult_NoNAT;
+		return XMNATType_Error;
 	}
 	
-	return XMNATDetectionResult_HasNAT;
+	if([_XMCallManagerSharedInstance _usesSTUN])
+	{
+		return natType;
+	}
+	else if(checkipExternalAddress == nil)
+	{
+		return XMNATType_Error;
+	}
+	else if([localAddresses containsObject:checkipExternalAddress])
+	{
+		return XMNATType_NoNAT;
+	}
+	
+	return XMNATType_UnknownNAT;
 }
 
+#pragma mark -
+#pragma mark STUN methods
+
+- (NSString *)stunExternalAddress
+{
+	return stunExternalAddress;
+}
+
+- (NSString *)stunServer
+{
+	if([_XMCallManagerSharedInstance _usesSTUN])
+	{
+		return [_XMCallManagerSharedInstance _stunServer];
+	}
+	
+	return nil;
+}
+
+- (void)updateSTUNInformation
+{	
+	if([_XMCallManagerSharedInstance _usesSTUN])
+	{
+		[XMOpalDispatcher _updateSTUNInformation];
+	}
+}
+
+#pragma mark -
+#pragma mark Fetching External Address using HTTP
+
+- (void)startFetchingCheckipExternalAddress
+{	
+	if(isFetchingCheckipExternalAddress == NO)
+	{
+		NSURL *checkipURL = [[NSURL alloc] initWithString:XM_CHECKIP_URL];
+		NSURLRequest *checkipURLRequest = [[NSURLRequest alloc] initWithURL:checkipURL 
+																cachePolicy:NSURLRequestReloadIgnoringCacheData
+															timeoutInterval:10.0];
+		checkipURLConnection = [[NSURLConnection alloc] initWithRequest:checkipURLRequest delegate:self];
+		
+		// since the timeoutInterval in NSURLRequest for some reason doesn't work, we do our own timeout by
+		// using a timer and sending a -cancel message to the NSURLConnection when the timer fires
+		checkipTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self
+													   selector:@selector(_urlLoadingTimeout:) 
+													   userInfo:nil repeats:NO] retain];
+		
+		[checkipURL release];
+		[checkipURLRequest release];
+		
+		isFetchingCheckipExternalAddress = YES;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:self];
+	}
+}
+
+- (BOOL)isFetchingCheckipExternalAddress
+{
+	return isFetchingCheckipExternalAddress;
+}
+
+- (BOOL)didSucceedFetchingCheckipExternalAddress
+{
+	return didSucceedFetchingCheckipExternalAddress;
+}
+
+- (NSString *)checkipExternalAddress
+{	
+	return checkipExternalAddress;
+}
+
+- (NSString *)checkipExternalAddressFetchFailReason
+{
+	return checkipExternalAddressFetchFailReason;
+}
+
+#pragma mark -
 #pragma mark NSURLConnection delegate Methods
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-	if(externalAddressURLData == nil)
+	if(checkipURLData == nil)
 	{
-		externalAddressURLData = [data mutableCopy];
+		checkipURLData = [data mutableCopy];
 	}
 	else
 	{
-		[externalAddressURLData appendData:data];
+		[checkipURLData appendData:data];
 	}
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-	if(connection != externalAddressURLConnection)
+	if(connection != checkipURLConnection)
 	{
 		return;
 	}
 	
-	if(externalAddress != nil)
+	if(checkipExternalAddress != nil)
 	{
-		[externalAddress release];
-		externalAddress = nil;
+		[checkipExternalAddress release];
+		checkipExternalAddress = nil;
 	}
 	
-	if(externalAddressFetchFailReason != nil)
+	if(checkipExternalAddressFetchFailReason != nil)
 	{
-		[externalAddressFetchFailReason release];
-		externalAddressFetchFailReason = nil;
+		[checkipExternalAddressFetchFailReason release];
+		checkipExternalAddressFetchFailReason = nil;
 	}
 	
-	if(externalAddressURLData != nil)
+	if(checkipURLData != nil)
 	{
 		// parsing the data for the address string
-		NSString *urlDataString = [[NSString alloc] initWithData:externalAddressURLData encoding:NSASCIIStringEncoding];
+		NSString *urlDataString = [[NSString alloc] initWithData:checkipURLData encoding:NSASCIIStringEncoding];
 		NSScanner *scanner = [[NSScanner alloc] initWithString:urlDataString];
 		
-		if([scanner scanString:@"<html><head><title>Current IP Check</title></head><body>Current IP Address: " intoString:nil])
+		if([scanner scanString:XM_CHECKIP_PREFIX intoString:nil])
 		{
 			int firstByte;
 			int secondByte;
@@ -264,18 +296,18 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 			   [scanner scanInt:&thirdByte] && [scanner scanString:@"." intoString:nil] &&
 			   [scanner scanInt:&fourthByte])
 			{
-				externalAddress = [[NSString alloc] initWithFormat:@"%d.%d.%d.%d", firstByte, secondByte, thirdByte, fourthByte];
+				checkipExternalAddress = [[NSString alloc] initWithFormat:@"%d.%d.%d.%d", firstByte, secondByte, thirdByte, fourthByte];
 			}
 		}
 		
-		if(externalAddress != nil)
+		if(checkipExternalAddress != nil)
 		{
-			didSucceedFetchingExternalAddress = YES;
+			didSucceedFetchingCheckipExternalAddress = YES;
 		}
 		else
 		{
-			didSucceedFetchingExternalAddress = NO;
-			externalAddressFetchFailReason = NSLocalizedString(@"XM_FRAMEWORK_INVALID_DATA", @"");
+			didSucceedFetchingCheckipExternalAddress = NO;
+			checkipExternalAddressFetchFailReason = NSLocalizedString(@"XM_FRAMEWORK_INVALID_DATA", @"");
 		}
 		
 		[scanner release];
@@ -283,101 +315,122 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	}
 	else
 	{
-		didSucceedFetchingExternalAddress = NO;
-		externalAddressFetchFailReason = NSLocalizedString(@"XM_FRAMEWORK_NO_DATA", @"");
+		didSucceedFetchingCheckipExternalAddress = NO;
+		checkipExternalAddressFetchFailReason = NSLocalizedString(@"XM_FRAMEWORK_NO_DATA", @"");
 	}
 	
-	if(externalAddressURLConnection != nil)
+	if(checkipURLConnection != nil)
 	{
-		[externalAddressURLConnection release];
-		externalAddressURLConnection = nil;
+		[checkipURLConnection release];
+		checkipURLConnection = nil;
 	}
 	
-	if(externalAddressURLData != nil)
+	if(checkipURLData != nil)
 	{
-		[externalAddressURLData release];
-		externalAddressURLData = nil;
+		[checkipURLData release];
+		checkipURLData = nil;
 	}
 	
-	if(fetchingExternalAddressTimer != nil)
+	if(checkipTimer != nil)
 	{
-		[fetchingExternalAddressTimer invalidate];
-		[fetchingExternalAddressTimer release];
-		fetchingExternalAddressTimer = nil;
+		[checkipTimer invalidate];
+		[checkipTimer release];
+		checkipTimer = nil;
 	}
 	
-	isFetchingExternalAddress = NO;
+	isFetchingCheckipExternalAddress = NO;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:self];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-	if(externalAddressURLConnection != nil)
+	if(checkipURLConnection != nil)
 	{
-		[externalAddressURLConnection release];
-		externalAddressURLConnection = nil;
+		[checkipURLConnection release];
+		checkipURLConnection = nil;
 	}
-	if(externalAddressURLData != nil)
+	if(checkipURLData != nil)
 	{
-		[externalAddressURLData release];
-		externalAddressURLData = nil;
+		[checkipURLData release];
+		checkipURLData = nil;
 	}
-	if(fetchingExternalAddressTimer != nil)
+	if(checkipTimer != nil)
 	{
-		[fetchingExternalAddressTimer invalidate];
-		[fetchingExternalAddressTimer release];
-		fetchingExternalAddressTimer = nil;
-	}
-	
-	if(externalAddress != nil)
-	{
-		[externalAddress release];
-		externalAddress = nil;
+		[checkipTimer invalidate];
+		[checkipTimer release];
+		checkipTimer = nil;
 	}
 	
-	if(externalAddressFetchFailReason != nil)
+	if(checkipExternalAddress != nil)
 	{
-		[externalAddressFetchFailReason release];
+		[checkipExternalAddress release];
+		checkipExternalAddress = nil;
 	}
-	externalAddressFetchFailReason = [[error localizedDescription] retain];
 	
-	didSucceedFetchingExternalAddress = NO;
-	isFetchingExternalAddress = NO;
+	if(checkipExternalAddressFetchFailReason != nil)
+	{
+		[checkipExternalAddressFetchFailReason release];
+	}
+	checkipExternalAddressFetchFailReason = [[error localizedDescription] retain];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
+	didSucceedFetchingCheckipExternalAddress = NO;
+	isFetchingCheckipExternalAddress = NO;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:self];
 }
 
+#pragma mark -
+#pragma mark STUN Feedback
+
+- (void)_handleSTUNInformation:(NSArray *)array
+{
+	NSNumber *number = [array objectAtIndex:0];
+	natType = (XMNATType)[number unsignedIntValue];
+	
+	NSString *address = (NSString *)[array objectAtIndex:1];
+	if([address isEqualToString:@""])
+	{
+		address = nil;
+	}
+	
+	[stunExternalAddress release];
+	stunExternalAddress = [address copy];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidUpdateSTUNInformation object:self];
+}
+
+#pragma mark -
 #pragma mark Private Methods
 
 - (void)_urlLoadingTimeout:(NSTimer *)timer
 {
-	[externalAddressURLConnection cancel];
-	[externalAddressURLConnection release];
-	externalAddressURLConnection = nil;
+	[checkipURLConnection cancel];
+	[checkipURLConnection release];
+	checkipURLConnection = nil;
 	
-	[externalAddressURLData release];
-	externalAddressURLData = nil;
+	[checkipURLData release];
+	checkipURLData = nil;
 	
-	[fetchingExternalAddressTimer release];
-	fetchingExternalAddressTimer = nil;
+	[checkipTimer release];
+	checkipTimer = nil;
 	
-	if(externalAddress != nil)
+	if(checkipExternalAddress != nil)
 	{
-		[externalAddress release];
-		externalAddress = nil;
+		[checkipExternalAddress release];
+		checkipExternalAddress = nil;
 	}
 	
-	if(externalAddressFetchFailReason != nil)
+	if(checkipExternalAddressFetchFailReason != nil)
 	{
-		[externalAddressFetchFailReason release];
+		[checkipExternalAddressFetchFailReason release];
 	}
-	externalAddressFetchFailReason = [NSLocalizedString(@"XM_FRAMEWORK_CONNECTION_TIMEOUT", @"") retain];
+	checkipExternalAddressFetchFailReason = [NSLocalizedString(@"XM_FRAMEWORK_CONNECTION_TIMEOUT", @"") retain];
 	
-	didSucceedFetchingExternalAddress = NO;
-	isFetchingExternalAddress = NO;
+	didSucceedFetchingCheckipExternalAddress = NO;
+	isFetchingCheckipExternalAddress = NO;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingExternalAddress object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:self];
 }
 
 - (void)_getLocalAddresses
@@ -418,7 +471,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	localAddresses = [addresses copy];
 	[addresses release];
 	
-	[self startFetchingExternalAddress];
+	[self startFetchingCheckipExternalAddress];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidUpdateLocalAddresses object:self];
 }

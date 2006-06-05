@@ -409,14 +409,10 @@
 		D1B6075708F8F8420034B47F /* ptlib.h in Headers */ = {isa = PBXBuildFile; fileRef = D1B606C508F8F8410034B47F /* ptlib.h */; };
 		D1B607FD08F8F86C0034B47F /* asner.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6075A08F8F86B0034B47F /* asner.cxx */; };
 		D1B6080008F8F86C0034B47F /* cypher.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6075D08F8F86B0034B47F /* cypher.cxx */; };
-		D1B6080108F8F86C0034B47F /* delaychan.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6075E08F8F86B0034B47F /* delaychan.cxx */; };
 		D1B6080208F8F86C0034B47F /* dtmf.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6075F08F8F86B0034B47F /* dtmf.cxx */; };
 		D1B6080308F8F86C0034B47F /* enum.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076008F8F86B0034B47F /* enum.cxx */; };
 		D1B6080808F8F86C0034B47F /* http.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076508F8F86B0034B47F /* http.cxx */; };
-		D1B6080908F8F86C0034B47F /* httpclnt.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076608F8F86B0034B47F /* httpclnt.cxx */; };
 		D1B6080E08F8F86C0034B47F /* inetprot.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076B08F8F86B0034B47F /* inetprot.cxx */; };
-		D1B6080F08F8F86C0034B47F /* ipacl.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076C08F8F86B0034B47F /* ipacl.cxx */; };
-		D1B6081008F8F86C0034B47F /* memfile.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076D08F8F86B0034B47F /* memfile.cxx */; };
 		D1B6081208F8F86C0034B47F /* pasn.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6076F08F8F86B0034B47F /* pasn.cxx */; };
 		D1B6081308F8F86C0034B47F /* pdns.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6077008F8F86B0034B47F /* pdns.cxx */; };
 		D1B6081408F8F86C0034B47F /* pils.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6077108F8F86B0034B47F /* pils.cxx */; };
@@ -834,6 +830,9 @@
 		D1E2DA1008F470D700BE224E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D1E2DA1608F470F200BE224E /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA1508F470F200BE224E /* QuickTime.framework */; };
 		D1E2DB8908F4720A00BE224E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DB8808F4720A00BE224E /* QuartzCore.framework */; };
+		D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */ = {isa = PBXBuildFile; fileRef = D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */; };
+		D1E913310A30F60700AEABA5 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DCD0A27AEF300C938BB /* libssl.dylib */; };
+		D1E9134A0A30F65300AEABA5 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DDC0A27B1E200C938BB /* libcrypto.dylib */; };
 		D1EB18AD08437A26002CEF53 /* AddressBook.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18AC08437A26002CEF53 /* AddressBook.tiff */; };
 		D1EB18BA0843D6B6002CEF53 /* ZeroConf.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18B90843D6B6002CEF53 /* ZeroConf.tiff */; };
 		D1EB18E00843D90D002CEF53 /* DialPad.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18DF0843D90D002CEF53 /* DialPad.tiff */; };
@@ -1089,8 +1088,6 @@
 		D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
-		D15B409009AD261D00A49EE7 /* jidctflt.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = jidctflt.cxx; sourceTree = "<group>"; };
-		D15B409209AD262800A49EE7 /* tinyjpeg.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = tinyjpeg.cxx; sourceTree = "<group>"; };
 		D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationFunctions.h; path = Source/Application/XMApplicationFunctions.h; sourceTree = "<group>"; };
 		D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationFunctions.m; path = Source/Application/XMApplicationFunctions.m; sourceTree = "<group>"; };
 		D15F84430A24874400FB2EDB /* h4601.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h4601.h; sourceTree = "<group>"; };
@@ -1352,14 +1349,10 @@
 		D1B606C508F8F8410034B47F /* ptlib.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptlib.h; path = ../pwlib/include/ptlib.h; sourceTree = SOURCE_ROOT; };
 		D1B6075A08F8F86B0034B47F /* asner.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = asner.cxx; sourceTree = "<group>"; };
 		D1B6075D08F8F86B0034B47F /* cypher.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cypher.cxx; sourceTree = "<group>"; };
-		D1B6075E08F8F86B0034B47F /* delaychan.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = delaychan.cxx; sourceTree = "<group>"; };
 		D1B6075F08F8F86B0034B47F /* dtmf.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = dtmf.cxx; sourceTree = "<group>"; };
 		D1B6076008F8F86B0034B47F /* enum.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = enum.cxx; sourceTree = "<group>"; };
 		D1B6076508F8F86B0034B47F /* http.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = http.cxx; sourceTree = "<group>"; };
-		D1B6076608F8F86B0034B47F /* httpclnt.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = httpclnt.cxx; sourceTree = "<group>"; };
 		D1B6076B08F8F86B0034B47F /* inetprot.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = inetprot.cxx; sourceTree = "<group>"; };
-		D1B6076C08F8F86B0034B47F /* ipacl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ipacl.cxx; sourceTree = "<group>"; };
-		D1B6076D08F8F86B0034B47F /* memfile.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = memfile.cxx; sourceTree = "<group>"; };
 		D1B6076F08F8F86B0034B47F /* pasn.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pasn.cxx; sourceTree = "<group>"; };
 		D1B6077008F8F86B0034B47F /* pdns.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pdns.cxx; sourceTree = "<group>"; };
 		D1B6077108F8F86B0034B47F /* pils.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pils.cxx; sourceTree = "<group>"; };
@@ -1370,7 +1363,7 @@
 		D1B6077B08F8F86B0034B47F /* pwavfile.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pwavfile.cxx; sourceTree = "<group>"; };
 		D1B6077F08F8F86B0034B47F /* qchannel.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = qchannel.cxx; sourceTree = "<group>"; };
 		D1B6078008F8F86B0034B47F /* random.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = random.cxx; sourceTree = "<group>"; };
-		D1B6078608F8F86B0034B47F /* udp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = udp.h; sourceTree = "<group>"; };
+		D1B6078608F8F86B0034B47F /* udp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = udp.h; path = ../../src/ptclib/udp.h; sourceTree = "<group>"; };
 		D1B6079008F8F86B0034B47F /* collect.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = collect.cxx; sourceTree = "<group>"; };
 		D1B6079108F8F86B0034B47F /* contain.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = contain.cxx; sourceTree = "<group>"; };
 		D1B6079208F8F86B0034B47F /* getdate.tab.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = getdate.tab.c; sourceTree = "<group>"; };
@@ -1787,6 +1780,7 @@
 		D1E2DA0F08F470D700BE224E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		D1E2DA1508F470F200BE224E /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		D1E2DB8808F4720A00BE224E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
+		D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = XMSTUNServers.plist; path = Resources/XMSTUNServers.plist; sourceTree = "<group>"; };
 		D1EB18AC08437A26002CEF53 /* AddressBook.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AddressBook.tiff; path = Resources/Images/AddressBook.tiff; sourceTree = "<group>"; };
 		D1EB18B90843D6B6002CEF53 /* ZeroConf.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ZeroConf.tiff; path = Resources/Images/ZeroConf.tiff; sourceTree = "<group>"; };
 		D1EB18DF0843D90D002CEF53 /* DialPad.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DialPad.tiff; path = Resources/Images/DialPad.tiff; sourceTree = "<group>"; };
@@ -1867,6 +1861,8 @@
 				D16333E307A020D9003FD9C0 /* AudioUnit.framework in Frameworks */,
 				D1E2DB8908F4720A00BE224E /* QuartzCore.framework in Frameworks */,
 				D197152E08F921F900295E05 /* opal.dylib in Frameworks */,
+				D1E9134A0A30F65300AEABA5 /* libcrypto.dylib in Frameworks */,
+				D1E913310A30F60700AEABA5 /* libssl.dylib in Frameworks */,
 				D197153308F922C400295E05 /* pwlib.dylib in Frameworks */,
 				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
 				D19628150924B4C1004892D0 /* Security.framework in Frameworks */,
@@ -2316,6 +2312,7 @@
 		D1B6062E08F8F8410034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D1B6078608F8F86B0034B47F /* udp.h */,
 				D1B6062F08F8F8410034B47F /* asnber.h */,
 				D1B6063008F8F8410034B47F /* asner.h */,
 				D1B6063108F8F8410034B47F /* asnper.h */,
@@ -2497,14 +2494,10 @@
 				D1887D620A27A85500C938BB /* pssl.cxx */,
 				D1B6075A08F8F86B0034B47F /* asner.cxx */,
 				D1B6075D08F8F86B0034B47F /* cypher.cxx */,
-				D1B6075E08F8F86B0034B47F /* delaychan.cxx */,
 				D1B6075F08F8F86B0034B47F /* dtmf.cxx */,
 				D1B6076008F8F86B0034B47F /* enum.cxx */,
 				D1B6076508F8F86B0034B47F /* http.cxx */,
-				D1B6076608F8F86B0034B47F /* httpclnt.cxx */,
 				D1B6076B08F8F86B0034B47F /* inetprot.cxx */,
-				D1B6076C08F8F86B0034B47F /* ipacl.cxx */,
-				D1B6076D08F8F86B0034B47F /* memfile.cxx */,
 				D1B6076F08F8F86B0034B47F /* pasn.cxx */,
 				D1B6077008F8F86B0034B47F /* pdns.cxx */,
 				D1B6077108F8F86B0034B47F /* pils.cxx */,
@@ -2515,7 +2508,6 @@
 				D1B6077B08F8F86B0034B47F /* pwavfile.cxx */,
 				D1B6077F08F8F86B0034B47F /* qchannel.cxx */,
 				D1B6078008F8F86B0034B47F /* random.cxx */,
-				D1B6078608F8F86B0034B47F /* udp.h */,
 			);
 			name = ptclib;
 			path = ../pwlib/src/ptclib;
@@ -2534,8 +2526,6 @@
 		D1B6078E08F8F86B0034B47F /* common */ = {
 			isa = PBXGroup;
 			children = (
-				D15B409209AD262800A49EE7 /* tinyjpeg.cxx */,
-				D15B409009AD261D00A49EE7 /* jidctflt.cxx */,
 				D1B6079008F8F86B0034B47F /* collect.cxx */,
 				D1B6079108F8F86B0034B47F /* contain.cxx */,
 				D1B6079208F8F86B0034B47F /* getdate.tab.c */,
@@ -3329,6 +3319,7 @@
 		D1EB189A084379CE002CEF53 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */,
 				D1887E750A283DEA00C938BB /* Localizable.strings */,
 				D189803D082411AC007CD286 /* XMCodecDescriptions.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,
@@ -4014,6 +4005,7 @@
 				D104D9C10A0E9947000898F2 /* DefaultURL_H323.tif in Resources */,
 				D104D9C20A0E9947000898F2 /* DefaultURL_SIP.tif in Resources */,
 				D1887E770A283DEA00C938BB /* Localizable.strings in Resources */,
+				D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4044,7 +4036,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 		D1F953B209B363530009B2AC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4165,14 +4157,10 @@
 				D1887D630A27A85500C938BB /* pssl.cxx in Sources */,
 				D1887DEC0A27B67B00C938BB /* psasl.cxx in Sources */,
 				D1B6080008F8F86C0034B47F /* cypher.cxx in Sources */,
-				D1B6080108F8F86C0034B47F /* delaychan.cxx in Sources */,
 				D1B6080208F8F86C0034B47F /* dtmf.cxx in Sources */,
 				D1B6080308F8F86C0034B47F /* enum.cxx in Sources */,
 				D1B6080808F8F86C0034B47F /* http.cxx in Sources */,
-				D1B6080908F8F86C0034B47F /* httpclnt.cxx in Sources */,
 				D1B6080E08F8F86C0034B47F /* inetprot.cxx in Sources */,
-				D1B6080F08F8F86C0034B47F /* ipacl.cxx in Sources */,
-				D1B6081008F8F86C0034B47F /* memfile.cxx in Sources */,
 				D1B6081208F8F86C0034B47F /* pasn.cxx in Sources */,
 				D1B6081308F8F86C0034B47F /* pdns.cxx in Sources */,
 				D1B6081408F8F86C0034B47F /* pils.cxx in Sources */,

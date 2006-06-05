@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.16 2006/04/18 21:58:46 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.17 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,14 +23,16 @@
 	SCDynamicStoreContext dynamicStoreContext;
 	NSArray *localAddresses;
 	
-	BOOL isFetchingExternalAddress;
-	BOOL didSucceedFetchingExternalAddress;
-	NSURLConnection *externalAddressURLConnection;
-	NSMutableData *externalAddressURLData;
-	NSString *externalAddress;
-	NSString *externalAddressFetchFailReason;
+	XMNATType natType;
+	NSString *stunExternalAddress;
 	
-	NSTimer *fetchingExternalAddressTimer;
+	BOOL isFetchingCheckipExternalAddress;
+	BOOL didSucceedFetchingCheckipExternalAddress;
+	NSURLConnection *checkipURLConnection;
+	NSMutableData *checkipURLData;
+	NSString *checkipExternalAddress;
+	NSString *checkipExternalAddressFetchFailReason;
+	NSTimer *checkipTimer;
 }
 
 /**
@@ -44,45 +46,72 @@
 - (NSArray *)localAddresses;
 
 /**
- * Starts a search for the external address on the network interface.
+ * Returns the type of NAT detected.
+ * The value returned may depend on the STUN settings of the currently
+ * active preferences set in XMCallManager.
+ * If a STUN-Server is used, returns the NAT-Type returned by the
+ * STUN-Server. If no STUN-Server is used, checks whether the external
+ * address is contained is found in the localAddresses array. If so,
+ * returns XMNATType_NoNAT. Else, returns XMNATType_UnknownNAT
+ **/
+- (XMNATType)natType;
+
+/**
+ * Forces an update of the STUN information. If there is no STUN server
+ * used at the moment, this method does nothing.
+ * If the STUN information is updated, the appropriate notification will
+ * be posted
+ **/
+- (void)updateSTUNInformation;
+
+/**
+ * Returns the external address as reported by the STUN server
+ **/
+- (NSString *)stunExternalAddress;
+
+/**
+ * Returns the name of the STUN server currently used
+ * This corresponds to the STUN server specified in the currently active
+ * XMPreferences instance of XMCallManager
+ **/
+- (NSString *)stunServer;
+
+/**
+ * Starts a search for the external address by a HTTP page
+ * that displays the external address to be used
  * This is a nonblocking action, the end of a search is reported by
  * sending the appropriate notification.
  **/
-- (void)startFetchingExternalAddress;
+- (void)startFetchingCheckipExternalAddress;
 
 /**
- * Returns whether a search for the external address is running or not.
+ * Returns whether the external address as reported by the HTTP
+ * method is currently being updated or not
  **/
-- (BOOL)isFetchingExternalAddress;
+- (BOOL)isFetchingCheckipExternalAddress;
 
 /**
- * Returns whether the last action of an external address fetch
- * was succesful or not. Returns YES if no external address has been
- * fetched yet, even if -externalAddress returns nil in this case.
+ * Returns whether the last attempt to fetch the external address
+ * by using the HTTP method was succesful or not.
+ * Returns YES if no external address has been fetched yet, even
+ * if -externalAddress returns nil in this case.
  **/
-- (BOOL)didSucceedFetchingExternalAddress;
+- (BOOL)didSucceedFetchingCheckipExternalAddress;
 
 /**
- * Returns the external address. If the external address hasn't been
- * obtained yet, this method starts a search but returns nil. Thus, this
- * method is nonblocking even if there is no external address yet.
+ * Returns the external address as determined by the HTTP Method. 
+ * If the external address hasn't been fetched yet, this method 
+ * starts a search but returns nil. Thus, this method is nonblocking
+ * even if there is no external address yet.
  **/
-- (NSString *)externalAddress;
+- (NSString *)checkipExternalAddress;
 
 /**
- * Returns the fail reason for the external address fetch
+ * Returns the fail reason for the external address fetch using
+ * the HTTP method.
+ * This string is returned localized if present.
  **/
-- (NSString *)externalAddressFetchFailReason;
-
-/**
- * This method returns the result of a NAT detection query.
- * Currently, this is done simply by comparing the local
- * and external address for equality. If the external address
- * is not yet available, returns XMNATDetectionResult_Error.
- * If no external address could be fetched, returns
- * XMNATDetectionResult_NoNAT.
- **/
-- (XMNATDetectionResult)natDetectionResult;
+- (NSString *)checkipExternalAddressFetchFailReason;
 
 @end
 

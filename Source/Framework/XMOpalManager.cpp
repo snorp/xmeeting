@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.26 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.27 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -318,6 +318,45 @@ void XMOpalManager::SetAvailableBandwidth(unsigned bandwidth)
 void XMOpalManager::ResetAvailableBandwidth()
 {
 	availableBandwidth = XM_MAX_BANDWIDTH;
+}
+
+void XMOpalManager::XMSetSTUNServer(const PString & server)
+{
+	PSTUNClient::NatTypes natType = SetSTUNServer(server);
+	
+	if(server.IsEmpty())
+	{
+		_XMHandleSTUNInformation(XMNATType_UnknownNAT, "");
+	}
+	else if(natType == PSTUNClient::UnknownNat)
+	{
+		_XMHandleSTUNInformation(XMNATType_Error, "");
+	}
+	else
+	{
+		_XMHandleSTUNInformation((XMNATType)natType, GetTranslationAddress().AsString());
+	}
+}
+
+void XMOpalManager::UpdateSTUNInformation()
+{
+	PSTUNClient * client = GetSTUN();
+	
+	if(client == NULL)
+	{
+		_XMHandleSTUNInformation(XMNATType_Error, "");
+	}
+	
+	PSTUNClient::NatTypes natType = client->GetNatType(TRUE);
+	
+	if(natType == PSTUNClient::UnknownNat)
+	{
+		_XMHandleSTUNInformation(XMNATType_Error, "");
+	}
+	else
+	{
+		_XMHandleSTUNInformation((XMNATType)natType, GetTranslationAddress().AsString());
+	}
 }
 
 #pragma mark Video Setup Methods

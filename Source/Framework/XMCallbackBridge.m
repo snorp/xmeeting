@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.20 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,20 @@
 #import "XMMediaReceiver.h"
 #import "XMPrivate.h"
 #import "XMCallInfo.h"
+
+#pragma mark -
+#pragma mark Setup Related Callbacks
+
+void _XMHandleSTUNInformation(XMNATType natType,
+							  const char *externalAddress)
+{
+	NSString *address = [[NSString alloc] initWithCString:externalAddress encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleNATType:natType externalAddress:address];
+	[address release];
+}
+
+#pragma mark -
+#pragma mark Call Related Callbacks
 
 void _XMHandleCallIsAlerting(unsigned callID)
 {
@@ -113,6 +127,7 @@ void _XMHandleVideoStreamClosed(unsigned callID, bool isIncomingStream)
 	[autoreleasePool release];
 }
 
+#pragma mark -
 #pragma mark MediaReceiver callbacks
 
 void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
@@ -172,6 +187,7 @@ void _XMUpdatePicture()
 	[autoreleasePool release];
 }
 
+#pragma mark -
 #pragma mark H.323 specific Callbacks
 
 void _XMHandleGatekeeperRegistration(const char *gatekeeperName)
@@ -186,6 +202,7 @@ void _XMHandleGatekeeperUnregistration()
 	[_XMOpalDispatcherSharedInstance _handleGatekeeperUnregistration];
 }
 
+#pragma mark -
 #pragma mark SIP specific Callbacks
 
 void _XMHandleSIPRegistration(const char *theHost, const char *theUsername)

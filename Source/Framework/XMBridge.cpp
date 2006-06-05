@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.24 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.25 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,6 +73,17 @@ void _XMSetBandwidthLimit(unsigned limit)
 void _XMResetAvailableBandwidth()
 {
 	XMOpalManager::ResetAvailableBandwidth();
+}
+
+void _XMSetSTUNServer(const char *address)
+{
+	PString str = address;
+	theManager->XMSetSTUNServer(str);
+}
+
+void _XMUpdateSTUNInformation()
+{
+	theManager->UpdateSTUNInformation();
 }
 
 void _XMSetTranslationAddress(const char *a)

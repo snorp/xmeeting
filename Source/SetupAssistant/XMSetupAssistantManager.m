@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.10 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -352,12 +352,12 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		if(flag == NO)
 		{
 			XMUtils *utils = [XMUtils sharedInstance];
-			NSString *externalAddress = [utils externalAddress];
+			NSString *externalAddress = [utils checkipExternalAddress];
 			NSString *displayString;
 			
 			if(externalAddress == nil)
 			{
-				if([utils isFetchingExternalAddress] == YES)
+				if([utils isFetchingCheckipExternalAddress] == YES)
 				{
 					displayString = NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"");
 				}
@@ -391,7 +391,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (IBAction)updateExternalAddress:(id)sender
 {
-	[[XMUtils sharedInstance] startFetchingExternalAddress];
+	[[XMUtils sharedInstance] startFetchingCheckipExternalAddress];
 }
 
 - (IBAction)protocolSwitchToggled:(id)sender
@@ -912,16 +912,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	XMUtils *utils = [XMUtils sharedInstance];
 	
-	if([utils externalAddress] == nil && [utils didSucceedFetchingExternalAddress] == YES)
+	if([utils checkipExternalAddress] == nil && [utils didSucceedFetchingCheckipExternalAddress] == YES)
 	{
-		[utils startFetchingExternalAddress];
+		[utils startFetchingCheckipExternalAddress];
 	}
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter addObserver:self selector:@selector(validateAddressTranslationInterface:)
-							   name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+							   name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-							   name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+							   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 	
 	[bandwidthLimitPopUp selectItemWithTag:[location bandwidthLimit]];
 	
@@ -962,8 +962,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
-	[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+	[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
+	[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 }
 
 - (void)_prepareFLProtocolSettings
@@ -1910,16 +1910,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	else if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
 	{
 		XMUtils *utils = [XMUtils sharedInstance];
-		if([utils externalAddress] == nil && [utils didSucceedFetchingExternalAddress] == YES)
+		if([utils checkipExternalAddress] == nil && [utils didSucceedFetchingCheckipExternalAddress] == YES)
 		{
-			[utils startFetchingExternalAddress];
+			[utils startFetchingCheckipExternalAddress];
 		}
 		
 		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 		[notificationCenter addObserver:self selector:@selector(validateAddressTranslationInterface:)
-								   name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+								   name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
 		[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-								   name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+								   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 		
 		[self validateAddressTranslationInterface:nil];
 	}
@@ -1976,8 +1976,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
 	{
 		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-		[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
-		[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+		[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
+		[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 	}
 	
 	[bandwidthLimitPopUp setEnabled:YES];
@@ -2234,7 +2234,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
 {
-	NSString *externalAddress = [[XMUtils sharedInstance] externalAddress];
+	NSString *externalAddress = [[XMUtils sharedInstance] checkipExternalAddress];
 	if(externalAddress != nil)
 	{
 		[externalAddressField setStringValue:externalAddress];

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.20 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.21 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,24 +25,30 @@ extern NSString *XMNotification_FrameworkDidClose;
 #pragma mark XMUtils Notifications
 
 /**
+ * Posted every time the local addresses do change. This happens
+ * if the system configuration location changes or if a network
+ * cable is plugged in and the host gets connected to a network.
+ **/
+extern NSString *XMNotification_UtilsDidUpdateLocalAddresses;
+
+/**
  * Posted every time the receiver starts a search for an external
  * address.
  **/
-extern NSString *XMNotification_UtilsDidStartFetchingExternalAddress;
+extern NSString *XMNotification_UtilsDidStartFetchingCheckipExternalAddress;
 
 /**
  * Posted every time a search for an external address ends.
  * The success or failure of the operation can be queried
  * from the XMUtils instance.
  **/
-extern NSString *XMNotification_UtilsDidEndFetchingExternalAddress;
+extern NSString *XMNotification_UtilsDidEndFetchingCheckipExternalAddress;
 
 /**
- * Posted every time the local addresses do change. This happens
- * if the system configuration location changes or if a network
- * cable is plugged in and the host gets connected to a network.
+ * Posted every time the STUN information (natType and probably
+ * external address) are updated
  **/
-extern NSString *XMNotification_UtilsDidUpdateLocalAddresses;
+extern NSString *XMNotification_UtilsDidUpdateSTUNInformation;
 
 #pragma mark XMCallManager Notifications
 
@@ -271,6 +277,8 @@ extern NSString *XMKey_PreferencesAutomaticallyAcceptIncomingCalls;
 
 // Network-specific keys
 extern NSString *XMKey_PreferencesBandwidthLimit;
+extern NSString *XMKey_PreferencesUseSTUN;
+extern NSString *XMKey_PreferencesSTUNServer;
 extern NSString *XMKey_PreferencesUseAddressTranslation;
 extern NSString *XMKey_PreferencesExternalAddress;
 extern NSString *XMKey_PreferencesTCPPortBase;

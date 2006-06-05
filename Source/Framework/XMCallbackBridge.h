@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.23 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.24 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,18 @@ extern "C" {
  * within the Cocoa/Objective-C layer, where the framework supports
  * such synchronization in an easy fashion
  **/
+	
+#pragma mark -
+#pragma mark Setup Related Callbacks
+
+/**
+ * Reports NAT-Type and External Address
+ **/
+void _XMHandleSTUNInformation(XMNATType natType,
+							  const char *externalAddress);
+	
+#pragma mark -
+#pragma mark Call Related Callbacks
 	
 /**
  * Indicates that the outgoing call is ringing at the remote party
@@ -75,6 +87,7 @@ void _XMHandleAudioStreamClosed(unsigned callID, bool isIncomingStream);
  **/
 void _XMHandleVideoStreamClosed(unsigned callID, bool IsIncomingStream);
 
+#pragma mark -
 #pragma mark MediaTransmitter & MediaReceiver callbacks
 
 /**
@@ -121,11 +134,13 @@ void _XMHandleH264PPSAtomData(void *data, unsigned length);
  **/
 void _XMUpdatePicture();
 
+#pragma mark -
 #pragma mark H.323 specific callbacks
 
 void _XMHandleGatekeeperRegistration(const char *gatekeeperName);
 void _XMHandleGatekeeperUnregistration();
 
+#pragma mark -
 #pragma mark SIP specific callbacks
 
 void _XMHandleSIPRegistration(const char *host, const char *username);

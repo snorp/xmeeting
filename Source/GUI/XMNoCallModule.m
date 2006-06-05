@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.37 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.38 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -91,7 +91,7 @@
 							   name:XMNotification_CallManagerDidEndSubsystemSetup
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
-							   name:XMNotification_UtilsDidEndFetchingExternalAddress
+							   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress
 							 object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
 							   name:XMNotification_UtilsDidUpdateLocalAddresses
@@ -814,7 +814,7 @@
 	
 	if(useAddressTranslation == YES)
 	{
-		externalAddress = [utils externalAddress];
+		externalAddress = [utils checkipExternalAddress];
 		
 		if(externalAddress != nil)
 		{

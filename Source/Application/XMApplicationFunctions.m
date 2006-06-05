@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.10 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,9 @@
  */
 
 #import "XMApplicationFunctions.h"
+
+#define XM_STUN_SERVERS_FILE_NAME @"XMSTUNServers"
+#define XM_STUN_SERVERS_FILE_TYPE @"plist"
 
 NSString *XMByteString(unsigned bytes)
 {
@@ -329,6 +332,36 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
 	}
 	
 	return statusCodeString;
+}
+
+NSArray *XMDefaultSTUNServers()
+{
+	static NSArray *servers = nil;
+	
+	if(servers == nil)
+	{
+		NSBundle *bundle = [NSBundle mainBundle];
+		NSString *filePath = [bundle pathForResource:XM_STUN_SERVERS_FILE_NAME
+											  ofType:XM_STUN_SERVERS_FILE_TYPE];
+		
+		NSData *data = [NSData dataWithContentsOfFile:filePath];
+		
+		NSString *errorString;
+		servers = (NSArray *)[NSPropertyListSerialization propertyListFromData:data
+															  mutabilityOption:NSPropertyListImmutable
+																		format:NULL
+															  errorDescription:&errorString];
+		
+		if(servers == nil)
+		{
+			[NSException raise:XMException_InternalConsistencyFailure format:@"Coulnd't load STUN Servers (%@)", errorString];
+			return nil;
+		}
+		
+		[servers retain];
+	}
+	
+	return servers;
 }
 
 @implementation NSString (XMExtensions)

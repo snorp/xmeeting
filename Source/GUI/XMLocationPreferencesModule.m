@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.21 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.22 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
 #import "XMLocation.h"
+#import "XMApplicationFunctions.h"
 #import "XMSetupAssistantManager.h"
 #import "XMBooleanCell.h"
 
@@ -39,6 +40,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 // user interface validation methods
 - (void)_validateLocationButtonUserInterface;
+- (void)_validateSTUNUserInterface;
 - (void)_validateAddressTranslationUserInterface;
 - (void)_validateExternalAddressUserInterface;
 - (void)_validateH323UserInterface;
@@ -89,6 +91,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	contentViewHeight = [contentView frame].size.height;
 	[prefWindowController addPreferencesModule:self];
 	
+	// setting the default list of STUN servers
+	[stunServerField addItemsWithObjectValues:XMDefaultSTUNServers()];
+	
 	// replacing the table column identifiers with better ones
 	NSTableColumn *tableColumn;
 	
@@ -127,16 +132,16 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[booleanCell release];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
-												 name:XMNotification_UtilsDidStartFetchingExternalAddress object:nil];
+												 name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-												 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+												 name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 
 	XMUtils *utils = [XMUtils sharedInstance];
-	if([utils didSucceedFetchingExternalAddress] && [utils externalAddress] == nil)
+	if([utils didSucceedFetchingCheckipExternalAddress] && [utils checkipExternalAddress] == nil)
 	{
 		// in this case, the external address has not yet been fetched, thus
 		// we start fetching the address
-		[utils startFetchingExternalAddress];
+		[utils startFetchingCheckipExternalAddress];
 		isFetchingExternalAddress = YES;
 	}
 	
@@ -351,8 +356,25 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[prefWindowController notePreferencesDidChange];
 }
 
-- (IBAction)toggleUseAddressTranslation:(id)sender
+- (IBAction)toggleNATMethod:(id)sender
 {
+	if(sender == useSTUNRadioButton)
+	{
+		[useIPAddressTranslationRadioButton setState:NSOffState];
+		[noneRadioButton setState:NSOffState];
+	}
+	else if(sender == useIPAddressTranslationRadioButton)
+	{
+		[useSTUNRadioButton setState:NSOffState];
+		[noneRadioButton setState:NSOffState];
+	}
+	else
+	{
+		[useSTUNRadioButton setState:NSOffState];
+		[useIPAddressTranslationRadioButton setState:NSOffState];
+	}
+	
+	[self _validateSTUNUserInterface];
 	[self _validateAddressTranslationUserInterface];
 	[self defaultAction:self];
 }
@@ -361,7 +383,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	XMUtils *utils = [XMUtils sharedInstance];
 	
-	[utils startFetchingExternalAddress];
+	[utils startFetchingCheckipExternalAddress];
 	
 	[externalAddressField setStringValue:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
 	[externalAddressField setEnabled:NO];
@@ -703,8 +725,35 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	unsigned index = [bandwidthLimitPopUp indexOfItemWithTag:bandwidth];
 	[bandwidthLimitPopUp selectItemAtIndex:index];
 	
-	state = ([currentLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
-	[useIPAddressTranslationSwitch setState:state];
+	state = ([currentLocation useSTUN] == YES) ? NSOnState : NSOffState;
+	[useSTUNRadioButton setState:state];
+	
+	if(state == NSOffState)
+	{
+		state = ([currentLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
+		[useIPAddressTranslationRadioButton setState:state];
+		
+		if(state == NSOffState)
+		{
+			[noneRadioButton setState:NSOnState];
+		}
+		else
+		{
+			[noneRadioButton setState:NSOffState];
+		}
+	}
+	else
+	{
+		[useIPAddressTranslationRadioButton setState:NSOffState];
+		[noneRadioButton setState:NSOffState];
+	}
+	
+	string = [currentLocation stunServer];
+	if(string == nil)
+	{
+		string = @"";
+	}
+	[stunServerField setStringValue:string];
 	
 	string = [currentLocation externalAddress];
 	if(string == nil)	// this means that the external address is automatically picked
@@ -810,6 +859,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[enableH264LimitedModeSwitch setState:state];
 	
 	// finally, it's time to validate some GUI-Elements
+	[self _validateSTUNUserInterface];
 	[self _validateAddressTranslationUserInterface];
 	[self _validateExternalAddressUserInterface];
 	[self _validateH323UserInterface];
@@ -826,7 +876,17 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	// saving the network section
 	[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
 	
-	flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	flag = ([useSTUNRadioButton state] == NSOnState) ? YES : NO;
+	[currentLocation setUseSTUN:flag];
+	
+	string = [stunServerField stringValue];
+	if([string isEqualToString:@""])
+	{
+		string = nil;
+	}
+	[currentLocation setSTUNServer:string];
+	
+	flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
 	[currentLocation setUseAddressTranslation:flag];
 	
 	string = [externalAddressField stringValue];
@@ -909,9 +969,16 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[deleteLocationButton setEnabled:flag];
 }
 
+- (void)_validateSTUNUserInterface
+{
+	BOOL flag = ([useSTUNRadioButton state] == NSOnState) ? YES : NO;
+	
+	[stunServerField setEnabled:flag];
+}
+
 - (void)_validateAddressTranslationUserInterface
 {
-	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	BOOL flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
 	
 	[autoGetExternalAddressSwitch setEnabled:flag];
 	[getExternalAddressButton setEnabled:flag];
@@ -936,7 +1003,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	if(flag == NO)
 	{
 		XMUtils *utils = [XMUtils sharedInstance];
-		NSString *externalAddress = [utils externalAddress];
+		NSString *externalAddress = [utils checkipExternalAddress];
 		NSString *displayString;
 		
 		if(externalAddress == nil)

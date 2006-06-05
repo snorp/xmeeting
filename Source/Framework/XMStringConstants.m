@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.18 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.19 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,9 +15,10 @@
 NSString *XMNotification_FrameworkDidInitialize = @"XMeetingFrameworkDidInitializeNotificaiton";
 NSString *XMNotification_FrameworkDidClose = @"XMeetingFrameworkDidCloseNotification";
 
-NSString *XMNotification_UtilsDidStartFetchingExternalAddress = @"XMeetingUtilsDidStartFetchingExternalAddressNotification";
-NSString *XMNotification_UtilsDidEndFetchingExternalAddress = @"XMeetingUtilsDidEndFetchingExternalAddressNotification";
-NSString *XMNotification_UtilsDidUpdateLocalAddresses = @"XMeetingUtilsDidUpdateLocalAddresses";
+NSString *XMNotification_UtilsDidUpdateLocalAddresses = @"XMeetingUtilsDidUpdateLocalAddressesNotification";
+NSString *XMNotification_UtilsDidStartFetchingCheckipExternalAddress = @"XMeetingUtilsDidStartFetchingCheckipExternalAddressNotification";
+NSString *XMNotification_UtilsDidEndFetchingCheckipExternalAddress = @"XMeetingUtilsDidEndFetchingCheckipExternalAddressNotification";
+NSString *XMNotification_UtilsDidUpdateSTUNInformation = @"XMeetingUtilsDidUpdateSTUNInformationNotification";
 
 NSString *XMNotification_CallManagerDidStartSubsystemSetup = @"XMeetingCallManagerDidStartSubsystemSetupNotification";
 NSString *XMNotification_CallManagerDidEndSubsystemSetup = @"XMeetingCallManagerDidEndSubsystemSetupNotification";
@@ -101,6 +102,8 @@ NSString *XMKey_PreferencesUserName = @"XMeeting_UserName";
 NSString *XMKey_PreferencesAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 
 NSString *XMKey_PreferencesBandwidthLimit = @"XMeeting_BandwidthLimit";
+NSString *XMKey_PreferencesUseSTUN = @"XMeeting_UseSTUN";
+NSString *XMKey_PreferencesSTUNServer = @"XMeeting_STUNServer";
 NSString *XMKey_PreferencesUseAddressTranslation = @"XMeeting_UseAddressTranslation";
 NSString *XMKey_PreferencesExternalAddress = @"XMeeting_ExternalAddress";
 NSString *XMKey_PreferencesTCPPortBase = @"XMeeting_TCPPortBase";

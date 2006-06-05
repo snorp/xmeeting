@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.20 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1021,6 +1021,16 @@
 														object:self];
 }
 
+- (BOOL)_usesSTUN
+{
+	return [activePreferences useSTUN];
+}
+
+- (NSString *)_stunServer
+{
+	return [activePreferences stunServer];
+}
+
 #pragma mark -
 #pragma mark Private Methods
 
@@ -1053,15 +1063,15 @@
 	{
 		if([preferences externalAddress] == nil)
 		{
-			externalAddress = [_XMUtilsSharedInstance externalAddress];
+			externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
 			if(externalAddress == nil)
 			{
-				if([_XMUtilsSharedInstance didSucceedFetchingExternalAddress] == YES)
+				if([_XMUtilsSharedInstance didSucceedFetchingCheckipExternalAddress] == YES)
 				{
 					// not yet fetched
-					[_XMUtilsSharedInstance startFetchingExternalAddress];
+					[_XMUtilsSharedInstance startFetchingCheckipExternalAddress];
 					[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-																 name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+																 name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 					
 					// we continue this job when the external address fetch task is finished
 					return;
@@ -1081,14 +1091,24 @@
 		sipListeningStatus = XM_SIP_NOT_LISTENING;
 	}
 	
+	// In case no interfaces are present, avoid the lengthy task of
+	// determining the NAT type
+	BOOL useSTUN = [preferences useSTUN];
+	if([[_XMUtilsSharedInstance localAddresses] count] == 0)
+	{
+		[preferences setUseSTUN:NO];
+	}
+	
 	// preparations complete
 	[XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
+	
+	[preferences setUseSTUN:useSTUN];
 }
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
 {
 	// removing the listener
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingExternalAddress object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 	
 	// do the subsystem setup again
 	[self _doSubsystemSetupWithPreferences:activePreferences];
@@ -1158,7 +1178,7 @@
 	[XMOpalDispatcher _initiateSpecificCallToAddress:processedAddress
 											protocol:callProtocol 
 										 preferences:modifiedPreferences 
-									 externalAddress:[_XMUtilsSharedInstance externalAddress]];
+									 externalAddress:[_XMUtilsSharedInstance checkipExternalAddress]];
 	
 	[modifiedPreferences release];
 	[processedAddress release];

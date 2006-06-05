@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.h,v 1.6 2006/04/18 21:58:45 hfriederich Exp $
+ * $Id: XMApplicationFunctions.h,v 1.7 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,11 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
  * Returns a textual representation for the SIP status code
  **/
 NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode);
+
+/**
+ * Returns an array containing addresses of known STUN Servers
+ **/
+NSArray *XMDefaultSTUNServers();
 
 /**
  * This category adds a useful method to determine whether a given string has a 

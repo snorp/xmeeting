@@ -85,7 +85,7 @@
                 toggleEnableH323 = id; 
                 toggleEnableSIP = id; 
                 toggleEnableVideo = id; 
-                toggleUseAddressTranslation = id; 
+                toggleNATMethod = id; 
             }; 
             CLASS = XMLocationPreferencesModule; 
             LANGUAGE = ObjC; 
@@ -125,6 +125,7 @@
                 newLocationNameField = NSTextField; 
                 newLocationOKButton = NSButton; 
                 newLocationSheet = NSPanel; 
+                noneRadioButton = NSButton; 
                 registrarAuthorizationUsernameField = NSTextField; 
                 registrarHostField = NSTextField; 
                 registrarUsernameField = NSTextField; 
@@ -134,7 +135,9 @@
                 sipProxyModeMatrix = NSMatrix; 
                 sipProxyPasswordField = NSTextField; 
                 sipProxyUsernameField = NSTextField; 
-                useIPAddressTranslationSwitch = NSButton; 
+                stunServerField = NSComboBox; 
+                useIPAddressTranslationRadioButton = NSButton; 
+                useSTUNRadioButton = NSButton; 
                 videoCodecPreferenceOrderTableView = NSTableView; 
                 videoFrameRateField = NSTextField; 
             }; 

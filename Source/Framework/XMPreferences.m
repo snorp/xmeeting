@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.15 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.16 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,6 +58,28 @@
 	else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
 	{
 		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseSTUN])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesSTUNServer])
+	{
+		if([value isKindOfClass:[NSString class]])
 		{
 			result = XM_VALID_VALUE;
 		}
@@ -327,6 +349,8 @@
 	automaticallyAcceptIncomingCalls = NO;
 	
 	bandwidthLimit = 0;
+	useSTUN = NO;
+	stunServer = nil;
 	useAddressTranslation = NO;
 	externalAddress = nil;
 	tcpPortBase = 30000;
@@ -403,6 +427,18 @@
 	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
 		[self setBandwidthLimit:[(NSNumber *)obj unsignedIntValue]];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesUseSTUN];
+	if(obj && [obj isKindOfClass:[NSNumber class]])
+	{
+		[self setUseSTUN:[(NSNumber *)obj boolValue]];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesSTUNServer];
+	if(obj && [obj isKindOfClass:[NSString class]])
+	{
+		[self setSTUNServer:(NSString *)obj];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesUseAddressTranslation];
@@ -611,6 +647,8 @@
 	[preferences setAutomaticallyAcceptIncomingCalls:[self automaticallyAcceptIncomingCalls]];
 	
 	[preferences setBandwidthLimit:[self bandwidthLimit]];
+	[preferences setUseSTUN:[self useSTUN]];
+	[preferences setSTUNServer:[self stunServer]];
 	[preferences setUseAddressTranslation:[self useAddressTranslation]];
 	[preferences setExternalAddress:[self externalAddress]];
 	[preferences setTCPPortBase:[self tcpPortBase]];
@@ -655,6 +693,8 @@
 		[self setUserName:[coder decodeObjectForKey:XMKey_PreferencesUserName]];
 		[self setAutomaticallyAcceptIncomingCalls:[coder decodeBoolForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls]];
 		[self setBandwidthLimit:[coder decodeIntForKey:XMKey_PreferencesBandwidthLimit]];
+		[self setUseSTUN:[coder decodeBoolForKey:XMKey_PreferencesUseSTUN]];
+		[self setSTUNServer:[coder decodeObjectForKey:XMKey_PreferencesSTUNServer]];
 		[self setUseAddressTranslation:[coder decodeBoolForKey:XMKey_PreferencesUseAddressTranslation]];
 		[self setExternalAddress:[coder decodeObjectForKey:XMKey_PreferencesExternalAddress]];
 		[self setTCPPortBase:[coder decodeIntForKey:XMKey_PreferencesTCPPortBase]];
@@ -745,6 +785,8 @@
 		[coder encodeBool:[self automaticallyAcceptIncomingCalls] forKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
 		
 		[coder encodeInt:[self bandwidthLimit] forKey:XMKey_PreferencesBandwidthLimit];
+		[coder encodeBool:[self useSTUN] forKey:XMKey_PreferencesUseSTUN];
+		[coder encodeObject:[self stunServer] forKey:XMKey_PreferencesSTUNServer];
 		[coder encodeBool:[self useAddressTranslation] forKey:XMKey_PreferencesUseAddressTranslation];
 		[coder encodeObject:[self externalAddress] forKey:XMKey_PreferencesExternalAddress];
 		[coder encodeInt:[self tcpPortBase] forKey:XMKey_PreferencesTCPPortBase];
@@ -784,6 +826,7 @@
 {
 	[userName release];
 	
+	[stunServer release];
 	[externalAddress release];
 	
 	[audioCodecList release];
@@ -828,6 +871,8 @@
 	if([[otherPreferences userName] isEqualToString:[self userName]] &&
 	   [otherPreferences automaticallyAcceptIncomingCalls] == [self automaticallyAcceptIncomingCalls] &&
 	   [otherPreferences bandwidthLimit] == [self bandwidthLimit] &&
+	   [otherPreferences useSTUN] == [self useSTUN] &&
+	   [[otherPreferences stunServer] isEqualToString:[self stunServer]] &&
 	   [otherPreferences useAddressTranslation] == [self useAddressTranslation] &&
 	   [[otherPreferences externalAddress] isEqualToString:[self externalAddress]] &&
 	   [otherPreferences tcpPortBase] == [self tcpPortBase] &&
@@ -889,6 +934,16 @@
 		number = [[NSNumber alloc] initWithUnsignedInt:integer];
 		[dict setObject:number forKey:XMKey_PreferencesBandwidthLimit];
 		[number release];
+	}
+	
+	number = [[NSNumber alloc] initWithBool:[self useSTUN]];
+	[dict setObject:number forKey:XMKey_PreferencesUseSTUN];
+	[number release];
+	
+	obj = [self stunServer];
+	if(obj)
+	{
+		[dict setObject:obj forKey:XMKey_PreferencesSTUNServer];
 	}
 	
 	number = [[NSNumber alloc] initWithBool:[self useAddressTranslation]];
@@ -1057,6 +1112,14 @@
 	{
 		return [NSNumber numberWithUnsignedInt:[self bandwidthLimit]];
 	}
+	else if([key isEqualToString:XMKey_PreferencesUseSTUN])
+	{
+		return [NSNumber numberWithBool:[self useSTUN]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesSTUNServer])
+	{
+		return [self stunServer];
+	}
 	else if([key isEqualToString:XMKey_PreferencesUseAddressTranslation])
 	{
 		return [NSNumber numberWithBool:[self useAddressTranslation]];
@@ -1188,6 +1251,28 @@
 		if([value isKindOfClass:[NSNumber class]])
 		{
 			[self setBandwidthLimit:[(NSNumber *)value unsignedIntValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesUseSTUN])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setUseSTUN:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesSTUNServer])
+	{
+		if([value isKindOfClass:[NSString class]])
+		{
+			[self setSTUNServer:(NSString *)value];
 		}
 		else
 		{
@@ -1483,6 +1568,28 @@
 - (void)setBandwidthLimit:(unsigned)limit
 {
 	bandwidthLimit = limit;
+}
+
+- (BOOL)useSTUN
+{
+	return useSTUN;
+}
+
+- (void)setUseSTUN:(BOOL)flag
+{
+	useSTUN = flag;
+}
+
+- (NSString *)stunServer
+{
+	return stunServer;
+}
+
+- (void)setSTUNServer:(NSString *)server
+{
+	NSString *old = stunServer;
+	stunServer = [server copy];
+	[old release];
 }
 
 - (BOOL)useAddressTranslation

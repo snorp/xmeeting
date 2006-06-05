@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.20 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.21 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,7 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_RetryGatekeeperRegistration,
 	_XMOpalDispatcherMessage_RetryEnableSIP,
 	_XMOpalDispatcherMessage_RetrySIPRegistrations,
+	_XMOpalDispatcherMessage_UpdateSTUNInformation,
 	
 	// Call Management messages
 	_XMOpalDispatcherMessage_InitiateCall = 0x0200,
@@ -65,6 +66,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleRetryGatekeeperRegistrationMessage:(NSArray *)messageComponents;
 - (void)_handleRetryEnableSIPMessage:(NSArray *)messageComponents;
 - (void)_handleRetrySIPRegistrationsMessage:(NSArray *)messageComponents;
+- (void)_handleUpdateSTUNInformationMessage;
 
 - (void)_handleInitiateCallMessage:(NSArray *)messageComponents;
 - (void)_handleInitiateSpecificCallMessage:(NSArray *)messageComponents;
@@ -166,6 +168,11 @@ typedef enum _XMOpalDispatcherMessage
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetrySIPRegistrations withComponents:components];
 	
 	[components release];
+}
+
++ (void)_updateSTUNInformation
+{
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_UpdateSTUNInformation withComponents:nil];
 }
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
@@ -577,6 +584,9 @@ typedef enum _XMOpalDispatcherMessage
 		case _XMOpalDispatcherMessage_RetrySIPRegistrations:
 			[self _handleRetrySIPRegistrationsMessage:[portMessage components]];
 			break;
+		case _XMOpalDispatcherMessage_UpdateSTUNInformation:
+			[self _handleUpdateSTUNInformationMessage];
+			break;
 		case _XMOpalDispatcherMessage_InitiateCall:
 			[self _handleInitiateCallMessage:[portMessage components]];
 			break;
@@ -734,6 +744,11 @@ typedef enum _XMOpalDispatcherMessage
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
 												   withObject:nil
 												waitUntilDone:NO];
+}
+
+- (void)_handleUpdateSTUNInformationMessage
+{
+	_XMUpdateSTUNInformation();
 }
 
 - (void)_handleInitiateCallMessage:(NSArray *)components
@@ -1312,6 +1327,17 @@ typedef enum _XMOpalDispatcherMessage
 	
 	_XMSetBandwidthLimit([preferences bandwidthLimit]);
 	
+	const char *stunServer = NULL;
+	if([preferences useSTUN] == YES)
+	{
+		NSString *server = [preferences stunServer];
+		if(server != nil)
+		{
+			stunServer = [server cStringUsingEncoding:NSASCIIStringEncoding];
+		}
+	}
+	_XMSetSTUNServer(stunServer);
+	
 	const char *translationAddress = NULL;
 	if([preferences useAddressTranslation] == YES)
 	{
@@ -1627,6 +1653,17 @@ typedef enum _XMOpalDispatcherMessage
 
 #pragma mark -
 #pragma mark Subsystem Feedback
+
+- (void)_handleNATType:(XMNATType)natType externalAddress:(NSString *)externalAddress
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)natType];
+	NSArray *array = [[NSArray alloc] initWithObjects:number, externalAddress, nil];
+	
+	[_XMUtilsSharedInstance _handleSTUNInformation:array];
+	
+	[array release];
+	[number release];
+}
 
 - (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.12 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.13 2006/06/05 22:24:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,8 @@
 	
 	/* Network settings */
 	unsigned	 bandwidthLimit;				// The bandwidth limit in bit/s (0 for no limit)
+	BOOL		 useSTUN;						// Set whether to use a STUN server or not
+	NSString	*stunServer;					// Address of the STUN server
 	BOOL		 useAddressTranslation;			// Set whether to use address translation or not (NAT)
 	NSString	*externalAddress;				// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
 	unsigned	 tcpPortBase;					// The lower limit of the tcp port range
@@ -121,6 +123,12 @@
 
 - (unsigned)bandwidthLimit;
 - (void)setBandwidthLimit:(unsigned)limit;
+
+- (BOOL)useSTUN;
+- (void)setUseSTUN:(BOOL)flag;
+
+- (NSString *)stunServer;
+- (void)setSTUNServer:(NSString *)string;
 
 - (BOOL)useAddressTranslation;
 - (void)setUseAddressTranslation:(BOOL)flag;
