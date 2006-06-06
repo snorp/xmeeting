@@ -1777,6 +1777,25 @@
 		D1D9A7220851DE8F00445833 /* XMStringConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMStringConstants.h; path = Source/Framework/XMStringConstants.h; sourceTree = "<group>"; };
 		D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323EndPoint.h; path = Source/Framework/XMH323EndPoint.h; sourceTree = "<group>"; };
 		D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323EndPoint.cpp; path = Source/Framework/XMH323EndPoint.cpp; sourceTree = "<group>"; };
+		D1E20B150A35FF9F00861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/AddressBook.nib; sourceTree = "<group>"; };
+		D1E20B420A35FFC200861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/CallHistoryModule.nib; sourceTree = "<group>"; };
+		D1E20B430A35FFD400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/DialPadModule.nib; sourceTree = "<group>"; };
+		D1E20B440A35FFD400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/InCallModule.nib; sourceTree = "<group>"; };
+		D1E20B450A35FFD400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/Info.nib; sourceTree = "<group>"; };
+		D1E20B460A35FFF700861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/LocalAudioVideoModule.nib; sourceTree = "<group>"; };
+		D1E20B470A36001300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		D1E20B480A36001300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/MainWindow.nib; sourceTree = "<group>"; };
+		D1E20B490A36001300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/NoCallModule.nib; sourceTree = "<group>"; };
+		D1E20B4A0A36001300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/Preferences.nib; sourceTree = "<group>"; };
+		D1E20B4B0A36001300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/SequenceGrabberSettings.nib; sourceTree = "<group>"; };
+		D1E20B4C0A36001400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/SetupAssistant.nib; sourceTree = "<group>"; };
+		D1E20B4D0A36001400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/StatisticsModule.nib; sourceTree = "<group>"; };
+		D1E20B4E0A36001400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/TextChatModule.nib; sourceTree = "<group>"; };
+		D1E20B4F0A36002400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/XMInspector.nib; sourceTree = "<group>"; };
+		D1E20B500A36003900861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
+		D1E20B510A36004A00861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D1E20B520A36007300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Italian; path = Italian.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
+		D1E20B530A3600A000861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D1E2DA0F08F470D700BE224E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		D1E2DA1508F470F200BE224E /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		D1E2DB8808F4720A00BE224E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
@@ -3182,22 +3201,22 @@
 		D1EB1894084379B5002CEF53 /* Nibs */ = {
 			isa = PBXGroup;
 			children = (
+				D1CE4B67083CDF3900B66B5D /* AddressBook.nib */,
+				D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */,
+				D1639415083E17A500F7FD83 /* DialPadModule.nib */,
+				D1ECCD160834911C008EBAE3 /* InCallModule.nib */,
+				1A348FB30984E4520033FA95 /* Info.nib */,
+				D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 				D1B4CC98082F594C00A444E1 /* MainWindow.nib */,
 				D1ECCD2E083491EB008EBAE3 /* NoCallModule.nib */,
-				D1ECCD160834911C008EBAE3 /* InCallModule.nib */,
-				1A348FB50984E4520033FA95 /* XMInspector.nib */,
-				1A348FB30984E4520033FA95 /* Info.nib */,
-				D163945D083E19E300F7FD83 /* StatisticsModule.nib */,
-				D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */,
-				D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */,
-				D1CE4B67083CDF3900B66B5D /* AddressBook.nib */,
-				D1B4D0050833937200A444E1 /* ZeroConfModule.nib */,
-				D1639415083E17A500F7FD83 /* DialPadModule.nib */,
-				D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */,
 				D1A02B24081E96D30018BD11 /* Preferences.nib */,
-				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
 				1AE62985099B7B4300793794 /* SequenceGrabberSettings.nib */,
+				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
+				D163945D083E19E300F7FD83 /* StatisticsModule.nib */,
+				D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */,
+				1A348FB50984E4520033FA95 /* XMInspector.nib */,
+				D1B4D0050833937200A444E1 /* ZeroConfModule.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -3862,6 +3881,13 @@
 			isa = PBXProject;
 			buildConfigurationList = D11E93F508589A9200154C02 /* Build configuration list for PBXProject "XMeeting" */;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				Italian,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* XMeeting */;
 			projectDirPath = "";
 			targets = (
@@ -4428,6 +4454,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
+				D1E20B530A3600A000861E00 /* Italian */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -4436,6 +4463,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				1A348FB40984E4520033FA95 /* English */,
+				D1E20B450A35FFD400861E00 /* Italian */,
 			);
 			name = Info.nib;
 			sourceTree = "<group>";
@@ -4444,6 +4472,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				1A348FB60984E4520033FA95 /* English */,
+				D1E20B4F0A36002400861E00 /* Italian */,
 			);
 			name = XMInspector.nib;
 			sourceTree = "<group>";
@@ -4452,6 +4481,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				1AE62986099B7B4300793794 /* English */,
+				D1E20B4B0A36001300861E00 /* Italian */,
 			);
 			name = SequenceGrabberSettings.nib;
 			sourceTree = "<group>";
@@ -4460,6 +4490,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
+				D1E20B470A36001300861E00 /* Italian */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -4468,6 +4499,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1639416083E17A500F7FD83 /* English */,
+				D1E20B430A35FFD400861E00 /* Italian */,
 			);
 			name = DialPadModule.nib;
 			sourceTree = "<group>";
@@ -4476,6 +4508,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D163945E083E19E300F7FD83 /* English */,
+				D1E20B4D0A36001400861E00 /* Italian */,
 			);
 			name = StatisticsModule.nib;
 			sourceTree = "<group>";
@@ -4484,6 +4517,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D16394C2083E23D600F7FD83 /* English */,
+				D1E20B420A35FFC200861E00 /* Italian */,
 			);
 			name = CallHistoryModule.nib;
 			sourceTree = "<group>";
@@ -4492,6 +4526,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1887E760A283DEA00C938BB /* English */,
+				D1E20B510A36004A00861E00 /* Italian */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -4500,6 +4535,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1897F7C0823EEF2007CD286 /* English */,
+				D1E20B520A36007300861E00 /* Italian */,
 			);
 			name = XMCodecDescriptions.plist;
 			sourceTree = "<group>";
@@ -4508,6 +4544,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1A02B25081E96D30018BD11 /* English */,
+				D1E20B4A0A36001300861E00 /* Italian */,
 			);
 			name = Preferences.nib;
 			sourceTree = "<group>";
@@ -4516,6 +4553,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1B4CC99082F594C00A444E1 /* English */,
+				D1E20B480A36001300861E00 /* Italian */,
 			);
 			name = MainWindow.nib;
 			sourceTree = "<group>";
@@ -4524,6 +4562,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1B4D0060833937200A444E1 /* English */,
+				D1E20B500A36003900861E00 /* Italian */,
 			);
 			name = ZeroConfModule.nib;
 			sourceTree = "<group>";
@@ -4532,6 +4571,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1CE4B68083CDF3900B66B5D /* English */,
+				D1E20B150A35FF9F00861E00 /* Italian */,
 			);
 			name = AddressBook.nib;
 			sourceTree = "<group>";
@@ -4540,6 +4580,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1ECCBF20833DDAD008EBAE3 /* English */,
+				D1E20B4E0A36001400861E00 /* Italian */,
 			);
 			name = TextChatModule.nib;
 			sourceTree = "<group>";
@@ -4548,6 +4589,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1ECCD170834911C008EBAE3 /* English */,
+				D1E20B440A35FFD400861E00 /* Italian */,
 			);
 			name = InCallModule.nib;
 			sourceTree = "<group>";
@@ -4556,6 +4598,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1ECCD2F083491EB008EBAE3 /* English */,
+				D1E20B490A36001300861E00 /* Italian */,
 			);
 			name = NoCallModule.nib;
 			sourceTree = "<group>";
@@ -4564,6 +4607,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1EF07520918B212008A8974 /* English */,
+				D1E20B4C0A36001400861E00 /* Italian */,
 			);
 			name = SetupAssistant.nib;
 			sourceTree = "<group>";
@@ -4572,6 +4616,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1F6067B08BBC5FC0005E9A0 /* English */,
+				D1E20B460A35FFF700861E00 /* Italian */,
 			);
 			name = LocalAudioVideoModule.nib;
 			sourceTree = "<group>";
