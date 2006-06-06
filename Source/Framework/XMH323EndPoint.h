@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.11 2006/03/13 23:46:23 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.12 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,10 @@ public:
 											  const PString & alias,
 											  const H323TransportAddress & address,
 											  H323SignalPDU * setupPDU);
+	
+	// H.460 support
+	virtual BOOL OnSendFeatureSet(unsigned, H225_FeatureSet &);
+    virtual void OnReceiveFeatureSet(unsigned, const H225_FeatureSet &);
 	
 private:
 	BOOL isListening;

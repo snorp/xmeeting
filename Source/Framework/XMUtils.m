@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.14 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.15 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -192,10 +192,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)updateSTUNInformation
 {	
-	if([_XMCallManagerSharedInstance _usesSTUN])
-	{
-		[XMOpalDispatcher _updateSTUNInformation];
-	}
+	[_XMCallManagerSharedInstance _updateSTUNInformation];
 }
 
 #pragma mark -
@@ -580,4 +577,5 @@ float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize)
 void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info)
 {
 	[_XMUtilsSharedInstance _getLocalAddresses];
+	[_XMUtilsSharedInstance updateSTUNInformation];
 }

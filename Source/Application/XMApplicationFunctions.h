@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.h,v 1.7 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMApplicationFunctions.h,v 1.8 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,6 +53,11 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode);
  * Returns an array containing addresses of known STUN Servers
  **/
 NSArray *XMDefaultSTUNServers();
+
+/**
+ * Returns a string representation of the NAT Type reported
+ **/
+NSString *XMNATTypeString(XMNATType type);
 
 /**
  * This category adds a useful method to determine whether a given string has a 

@@ -13,6 +13,7 @@
                 showPreferences = id; 
                 showTools = id; 
                 updateDeviceLists = id; 
+                updateNetworkInformation = id; 
             }; 
             CLASS = XMApplicationController; 
             LANGUAGE = ObjC; 

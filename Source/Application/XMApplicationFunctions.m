@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.10 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.11 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -362,6 +362,35 @@ NSArray *XMDefaultSTUNServers()
 	}
 	
 	return servers;
+}
+
+NSString *XMNATTypeString(XMNATType type)
+{
+	switch(type) {
+		
+		case XMNATType_Error:
+			return @"<Error>";
+		case XMNATType_NoNAT:
+			return @"None";
+		case XMNATType_ConeNAT:
+			return @"Cone NAT";
+		case XMNATType_RestrictedNAT:
+			return @"Restricted NAT";
+		case XMNATType_PortRestrictedNAT:
+			return @"Port Restricted NAT";
+		case XMNATType_SymmetricNAT:
+			return @"Symmetric NAT";
+		case XMNATType_SymmetricFirewall:
+			return @"SymmetricFirewall";
+		case XMNATType_BlockedNAT:
+			return @"Blocked NAT";
+		case XMNATType_PartialBlockedNAT:
+			return @"Partial Blocked NAT";
+		case XMNATType_UnknownNAT:
+			return @"Unknown NAT";
+		default:
+			return @"ERROR";
+	}
 }
 
 @implementation NSString (XMExtensions)

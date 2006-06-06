@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.16 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.17 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -74,7 +74,6 @@ public:
 	static void ResetAvailableBandwidth();
 	
 	void XMSetSTUNServer(const PString & server);
-	void UpdateSTUNInformation();
 	
 	/* Video setup methods */
 	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);

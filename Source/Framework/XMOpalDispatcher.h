@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.10 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.11 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,6 @@
 + (void)_retryGatekeeperRegistration:(XMPreferences *)preferences;
 + (void)_retryEnableSIP:(XMPreferences *)preferences;
 + (void)_retrySIPRegistrations:(XMPreferences *)preferences;
-+ (void)_updateSTUNInformation;
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
 + (void)_initiateSpecificCallToAddress:(NSString *)address 

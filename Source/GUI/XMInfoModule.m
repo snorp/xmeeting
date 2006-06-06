@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.13 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.14 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,10 +16,25 @@
 #import "XMApplicationFunctions.h"
 #import "XMInspectorController.h"
 
+#define XM_BOTTOM_SPACING 1
+#define XM_BOX_SPACING 15
+#define XM_BOX_Y 2
+#define XM_BOX_WIDTH 342
+#define XM_DISCLOSURE_OFFSET -2
+#define XM_HIDDEN_OFFSET 4
+
+#define XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT 17
+
+#define XM_SHOW_H323_DETAILS 1
+#define XM_SHOW_SIP_DETAILS 2
+
+#define XM_INFO_MODULE_DETAIL_STATUS_KEY @"XMeeting_InfoModuleDetailStatus"
+
 @interface XMInfoModule (PrivateMethods)
 
 - (void)_updateNetworkStatus:(NSNotification *)notif;
 - (void)_updateProtocolStatus:(NSNotification *)notif;
+- (void)_storeDetailStatus;
 
 @end
 
@@ -30,6 +45,13 @@
 - (id)init
 {
 	self = [super init];
+	
+	addressExtraHeight = 0;
+	h323BoxHeight = 0;
+	sipBoxHeight = 0;
+	
+	showH323Details = NO;
+	showSIPDetails = NO;
 	
 	return self;
 }
@@ -43,6 +65,10 @@
 {
 	contentViewSize = [contentView frame].size;
 	
+	h323BoxHeight = [h323Box frame].size.height - XM_HIDDEN_OFFSET;
+	sipBoxHeight = [sipBox frame].size.height - XM_HIDDEN_OFFSET;
+	float networkBoxHeight = [networkBox frame].size.height;
+	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
 	[notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
@@ -51,13 +77,102 @@
 	[notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
 							   name:XMNotification_UtilsDidUpdateLocalAddresses
 							 object:nil];
+	[notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
+							   name:XMNotification_UtilsDidUpdateSTUNInformation
+							 object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
 							   name:XMNotification_CallManagerDidEndSubsystemSetup
 							 object:nil];
+	
+	unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
+	
+	if(detailStatus & XM_SHOW_H323_DETAILS)
+	{
+		showH323Details = YES;
+		[h323Disclosure setState:NSOnState];
+	}
+	else
+	{
+		showH323Details = NO;
+		[h323Disclosure setState:NSOffState];
+	}
+	
+	if(detailStatus & XM_SHOW_SIP_DETAILS)
+	{
+		showSIPDetails = YES;
+		[sipDisclosure setState:NSOnState];
+	}
+	else
+	{
+		showSIPDetails = NO;
+		[sipDisclosure setState:NSOffState];
+	}
 
 	[self _updateNetworkStatus:nil];
 	[self _updateProtocolStatus:nil];
+	
+	// Manually adjusting the frame rects of the contained elements.
+	// Otherwise, the resulting GUI does not behave and look as
+	// expected, unfortunately
+	NSSize size = [self contentViewSize];
+	[contentView setFrameSize:size];
+	
+	NSRect frameRect = NSMakeRect(XM_BOTTOM_SPACING, XM_BOX_Y, XM_BOX_WIDTH, XM_HIDDEN_OFFSET);
+	if(showSIPDetails == YES)
+	{
+		frameRect.size.height += sipBoxHeight;
+	}
+	else
+	{
+		[sipBox setHidden:YES];
+	}
+	[sipBox setFrame:frameRect];
+	
+	frameRect.origin.y += frameRect.size.height+XM_DISCLOSURE_OFFSET;
+	
+	NSRect rect = [sipDisclosure frame];
+	rect.origin.y = frameRect.origin.y;
+	[sipDisclosure setFrame:rect];
+	rect = [sipTitle frame];
+	rect.origin.y = frameRect.origin.y;
+	[sipTitle setFrame:rect];
+	
+	frameRect.origin.y -= XM_DISCLOSURE_OFFSET;
+	frameRect.origin.y += XM_BOX_SPACING;
+	
+	frameRect.size.height = XM_HIDDEN_OFFSET;
+	
+	if(showH323Details == YES)
+	{
+		frameRect.size.height += h323BoxHeight;
+	}
+	else
+	{
+		[h323Box setHidden:YES];
+	}
+	[h323Box setFrame:frameRect];
+	
+	frameRect.origin.y += frameRect.size.height+XM_DISCLOSURE_OFFSET;
+	
+	rect = [h323Disclosure frame];
+	rect.origin.y = frameRect.origin.y;
+	[h323Disclosure setFrame:rect];
+	rect = [h323Title frame];
+	rect.origin.y = frameRect.origin.y;
+	[h323Title setFrame:rect];
+	
+	frameRect.origin.y -= XM_DISCLOSURE_OFFSET;
+	frameRect.origin.y += XM_BOX_SPACING;
+	
+	frameRect.size.height = networkBoxHeight + addressExtraHeight;
+	
+	[networkBox setFrame:frameRect];
+	
+	[ipAddressesField setAutoresizingMask:NSViewHeightSizable];
+	rect = [ipAddressesField frame];
+	rect.size.height += addressExtraHeight;
+	[ipAddressesField setFrame:rect];
 }
 
 #pragma mark -
@@ -88,7 +203,18 @@
 	// if not already done, causing the nib file to load
 	[self contentView];
 	
-	return contentViewSize;
+	int heightDifference = addressExtraHeight;
+	
+	if(showH323Details == NO)
+	{
+		heightDifference -= h323BoxHeight;
+	}
+	if(showSIPDetails == NO)
+	{
+		heightDifference -= sipBoxHeight;
+	}
+	
+	return NSMakeSize(contentViewSize.width, contentViewSize.height+heightDifference);
 }
 
 - (void)becomeActiveModule
@@ -102,6 +228,79 @@
 }
 
 #pragma mark -
+#pragma mark Action Methods
+
+- (IBAction)toggleShowH323Details:(id)sender
+{
+	showH323Details = !showH323Details;
+	
+	if(showH323Details == NO)
+	{
+		[h323Box setHidden:YES];
+	}
+	
+	[networkBox setAutoresizingMask:NSViewMinYMargin];
+	
+	[h323Box setAutoresizingMask:NSViewHeightSizable];
+	[h323Disclosure setAutoresizingMask:NSViewMinYMargin];
+	[h323Title setAutoresizingMask:NSViewMinYMargin];
+	
+	[self resizeContentView];
+	
+	[networkBox setAutoresizingMask:NSViewHeightSizable];
+	
+	[h323Box setAutoresizingMask:NSViewMaxYMargin];
+	[h323Disclosure setAutoresizingMask:NSViewMaxYMargin];
+	[h323Title setAutoresizingMask:NSViewMaxYMargin];
+	
+	if(showH323Details == YES)
+	{
+		[h323Box setHidden:NO];
+	}
+	
+	[self _storeDetailStatus];
+}
+
+- (IBAction)toggleShowSIPDetails:(id)sender
+{
+	showSIPDetails = !showSIPDetails;
+	
+	if(showSIPDetails == NO)
+	{
+		[sipBox setHidden:YES];
+	}
+	
+	[networkBox setAutoresizingMask:NSViewMinYMargin];
+	
+	[h323Box setAutoresizingMask:NSViewMinYMargin];
+	[h323Disclosure setAutoresizingMask:NSViewMinYMargin];
+	[h323Title setAutoresizingMask:NSViewMinYMargin];
+	
+	[sipBox setAutoresizingMask:NSViewHeightSizable];
+	[sipDisclosure setAutoresizingMask:NSViewMinYMargin];
+	[sipTitle setAutoresizingMask:NSViewMinYMargin];
+	
+	[self resizeContentView];
+	
+	[networkBox setAutoresizingMask:NSViewHeightSizable];
+	
+	[h323Box setAutoresizingMask:NSViewMaxYMargin];
+	[h323Disclosure setAutoresizingMask:NSViewMaxYMargin];
+	[h323Title setAutoresizingMask:NSViewMaxYMargin];
+	
+	[sipBox setAutoresizingMask:NSViewMaxYMargin];
+	[sipDisclosure setAutoresizingMask:NSViewMaxYMargin];
+	[sipTitle setAutoresizingMask:NSViewMaxYMargin];
+	
+	if(showSIPDetails == YES)
+	{
+		[sipBox setHidden:NO];
+	}
+	
+	[self _storeDetailStatus];
+}
+
+#pragma mark -
 #pragma mark Private Methods
 
 - (void)_updateNetworkStatus:(NSNotification *)notif
@@ -110,13 +309,15 @@
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
 	NSArray *localAddresses = [utils localAddresses];
-	NSString *externalAddress = [utils checkipExternalAddress];
 	unsigned localAddressCount = [localAddresses count];
 	
 	if(localAddressCount == 0)
 	{
 		[ipAddressesField setStringValue:@""];
 		[ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+		
+		addressExtraHeight = 0;
+		[self resizeContentView];
 		return;
 	}
 	
@@ -127,23 +328,62 @@
 	
 	for(i = 1; i < localAddressCount; i++)
 	{
-		[ipAddressString appendString:@", "];
+		[ipAddressString appendString:@"\n"];
 		[ipAddressString appendString:[localAddresses objectAtIndex:i]];
 	}
 	
-	BOOL useAddressTranslation = [[preferencesManager activeLocation] useAddressTranslation];
+	addressExtraHeight = (localAddressCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
 	
-	if(useAddressTranslation == YES && externalAddress != nil && ![localAddresses containsObject:externalAddress])
+	if([[preferencesManager activeLocation] useSTUN])
 	{
-		[ipAddressString appendString:@", "];
-		[ipAddressString appendString:externalAddress];
-		[ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
+		NSString *externalAddress = [utils stunExternalAddress];
+		if(externalAddress == nil)
+		{
+			externalAddress = [utils checkipExternalAddress];
+		}
+		
+		if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
+		{
+			[ipAddressString appendString:@"\n"];
+			[ipAddressString appendString:externalAddress];
+			[ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
+			addressExtraHeight += XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
+		}
+	}
+	else if([[preferencesManager activeLocation] useAddressTranslation])
+	{
+		NSString *externalAddress = [utils checkipExternalAddress];
+		
+		if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
+		{
+			[ipAddressString appendString:@"\n"];
+			[ipAddressString appendString:externalAddress];
+			[ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
+			addressExtraHeight += XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
+		}
 	}
 	
 	[ipAddressesField setStringValue:ipAddressString];
 	[ipAddressesField setToolTip:ipAddressString];
 	[ipAddressString release];
 	[ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+	
+	// Determining the NAT Type
+	XMNATType natType = [utils natType];
+	NSString *natTypeString = XMNATTypeString(natType);
+	[natTypeField setStringValue:natTypeString];
+	
+	if(natType == XMNATType_Error ||
+	   natType == XMNATType_SymmetricNAT)
+	{
+		[natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+	}
+	else
+	{
+		[natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+	}
+	
+	[self resizeContentView];
 }
 
 - (void)_updateProtocolStatus:(NSNotification *)notif
@@ -274,6 +514,22 @@
 		[registrarSemaphoreView setImage:nil];
 		[sipUsernameField setStringValue:@""];
 	}
+}
+
+- (void)_storeDetailStatus
+{
+	unsigned status = 0;
+	
+	if(showH323Details == YES)
+	{
+		status += XM_SHOW_H323_DETAILS;
+	}
+	if(showSIPDetails == YES)
+	{
+		status += XM_SHOW_SIP_DETAILS;
+	}
+	
+	[[NSUserDefaults standardUserDefaults] setInteger:status forKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
 }
 
 @end

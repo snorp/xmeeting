@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.27 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.28 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -321,7 +321,7 @@ void XMOpalManager::ResetAvailableBandwidth()
 }
 
 void XMOpalManager::XMSetSTUNServer(const PString & server)
-{
+{	
 	PSTUNClient::NatTypes natType = SetSTUNServer(server);
 	
 	if(server.IsEmpty())
@@ -332,30 +332,13 @@ void XMOpalManager::XMSetSTUNServer(const PString & server)
 	{
 		_XMHandleSTUNInformation(XMNATType_Error, "");
 	}
-	else
+	else if(GetTranslationAddress().IsValid())
 	{
 		_XMHandleSTUNInformation((XMNATType)natType, GetTranslationAddress().AsString());
 	}
-}
-
-void XMOpalManager::UpdateSTUNInformation()
-{
-	PSTUNClient * client = GetSTUN();
-	
-	if(client == NULL)
-	{
-		_XMHandleSTUNInformation(XMNATType_Error, "");
-	}
-	
-	PSTUNClient::NatTypes natType = client->GetNatType(TRUE);
-	
-	if(natType == PSTUNClient::UnknownNat)
-	{
-		_XMHandleSTUNInformation(XMNATType_Error, "");
-	}
 	else
 	{
-		_XMHandleSTUNInformation((XMNATType)natType, GetTranslationAddress().AsString());
+		_XMHandleSTUNInformation(XMNATType_Error, "");
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.34 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.35 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -192,6 +192,14 @@
 - (IBAction)retrySIPRegistration:(id)sender
 {
 	[[XMCallManager sharedInstance] retrySIPRegistrations];
+}
+
+- (IBAction)updateNetworkInformation:(id)sender
+{
+	XMUtils *utils = [XMUtils sharedInstance];
+	
+	[utils startFetchingCheckipExternalAddress];
+	[utils updateSTUNInformation];
 }
 
 - (IBAction)showInspector:(id)sender

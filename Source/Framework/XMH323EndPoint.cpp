@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.19 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.20 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@
 
 #include <h224/q922.h>
 
+//#include <h323/h46018.h>
+
 #include "XMCallbackBridge.h"
 #include "XMOpalManager.h"
 #include "XMH323Connection.h"
@@ -24,6 +26,8 @@
 #include <opal/transcoders.h>
 
 #pragma mark Init & Deallocation
+
+//static H460PluginServiceDescriptor<H460_FeatureStd18> H460_FeatureStd18_descriptor;
 
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager)
@@ -38,6 +42,11 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	SetInitialBandwidth(UINT_MAX);
 	
 	SetIsH224Enabled(TRUE);
+	
+	// Workaround to register the H.460 plugins
+	/*PString serviceName = "H460_FeatureStd18";
+	PString serviceType = "H460_Feature";
+	PPluginManager::GetPluginManager().RegisterService(serviceName, serviceType, &H460_FeatureStd18_descriptor);*/
 }
 
 XMH323EndPoint::~XMH323EndPoint()
@@ -300,4 +309,17 @@ H323Connection * XMH323EndPoint::CreateConnection(OpalCall & call,
 												  H323SignalPDU * setupPDU)
 {
 	return new XMH323Connection(call, *this, token, alias, address);
+}
+
+#pragma mark -
+#pragma mark H.460 support
+
+BOOL XMH323EndPoint::OnSendFeatureSet(unsigned id, H225_FeatureSet & message)
+{
+	return features.SendFeature(id, message);
+}
+
+void XMH323EndPoint::OnReceiveFeatureSet(unsigned id, const H225_FeatureSet & message)
+{
+	features.ReceiveFeature(id, message);
 }

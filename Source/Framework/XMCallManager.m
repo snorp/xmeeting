@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.20 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.21 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1021,6 +1021,11 @@
 														object:self];
 }
 
+- (void)_updateSTUNInformation
+{
+	[self _doSubsystemSetupWithPreferences:activePreferences];
+}
+
 - (BOOL)_usesSTUN
 {
 	return [activePreferences useSTUN];
@@ -1091,18 +1096,8 @@
 		sipListeningStatus = XM_SIP_NOT_LISTENING;
 	}
 	
-	// In case no interfaces are present, avoid the lengthy task of
-	// determining the NAT type
-	BOOL useSTUN = [preferences useSTUN];
-	if([[_XMUtilsSharedInstance localAddresses] count] == 0)
-	{
-		[preferences setUseSTUN:NO];
-	}
-	
 	// preparations complete
 	[XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
-	
-	[preferences setUseSTUN:useSTUN];
 }
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif

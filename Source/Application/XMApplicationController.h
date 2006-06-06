@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.16 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.17 2006/06/06 16:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,7 @@
 - (IBAction)retryGatekeeperRegistration:(id)sender;
 - (IBAction)retryEnableSIP:(id)sender;
 - (IBAction)retrySIPRegistration:(id)sender;
+- (IBAction)updateNetworkInformation:(id)sender;
 
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
