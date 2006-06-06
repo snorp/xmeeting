@@ -1,0 +1,27 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = XMInfoModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                gatekeeperField = NSTextField; 
+                gatekeeperSemaphoreView = NSImageView; 
+                h323StatusField = NSTextField; 
+                h323StatusSemaphoreView = NSImageView; 
+                ipAddressSemaphoreView = NSImageView; 
+                ipAddressesField = NSTextField; 
+                phoneNumberField = NSTextField; 
+                registrarField = NSTextField; 
+                registrarSemaphoreView = NSImageView; 
+                sipStatusField = NSTextField; 
+                sipStatusSemaphoreView = NSImageView; 
+                sipUsernameField = NSTextField; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

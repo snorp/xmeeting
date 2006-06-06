@@ -1,0 +1,229 @@
+/* General words */
+"Yes" = "Si";
+"No" = "No";
+"OK" = "OK";
+"Retry" = "Riprova";
+"Online" = "Connesso";
+"Save" = "Registra";
+"Don't Save" = "Non Registrare";
+"Abort" = "Interrompi";
+
+/* Alert messages */
+"XM_INCOMING_CALL_MESSAGE" = "Chiamata In Arrivo";
+"XM_INCOMING_CALL_INFO_TEXT" = "C'è una chiamata in arrivo da \"%@\"\nLa prendo oppure no?";
+
+"XM_CALL_FAILED_MESSAGE" = "Chiamata non riuscita";
+"XM_CALL_FAILED_INFO_TEXT" = "Impossibile chiamare \"%@\". (%@)";
+"XM_CALL_FAILED_H323_NOT_ENABLED" = "H.323 non è attivato";
+"XM_CALL_FAILED_GK_REQUIRED" = "L'indirizzo richiede un gatekeeper";
+"XM_CALL_FAILED_SIP_NOT_ENABLED" = "SIP non è attivato";
+"XM_CALL_FAILED_ALREADY_IN_CALL" = "Chiamata già in corso. Prego segnala questo problema!";
+
+"XM_ENABLE_H323_FAILED_MESSAGE" = "Attivazione H.323 Non Riuscita";
+"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Impossibile attivare il sottosistema H.323.\nC'è probabilmente un'altra applicazione H.323 in esecuzione.\nNon sarai in grado di effettuare chiamate H.323";
+
+"XM_GK_REG_FAILED_MESSAGE" = "Registrazione Gatekeeper Non Riuscita";
+"XM_GK_REG_FAILED_INFO_TEXT" = "Impossibile registrarsi al gatekeeper \"%@\" (%@). Non potrai utilizzare numeri di telefono durante la chiamata. %@";
+"XM_GK_NOT_FOUND_SUGGESTION" = "Prego controlla la tua connessione internet.";
+"XM_GK_REG_REJECT_SUGGESTION" = "Prego controlla la impostazioni del tuo gatekeeper.";
+"XM_GK_REG_FAILED_NOT_FOUND" = "Gatekeeper non trovato";
+"XM_GK_REG_FAILED_REJECTED" = "Il gatekeeper ha rifiutato la registrazione";
+
+"XM_ENABLE_SIP_FAILED_MESSAGE" = "Attivazione SIP Non Riuscita";
+"XM_ENABLE_SIP_FAILED_INFO_TEXT" = "Impossibile attivare il sottosistema SIP.";
+
+"XM_SIP_REG_FAILED_MESSAGE" = "Registrazione SIP Non Riuscita";
+"XM_SIP_REG_FAILED_INFO_TEXT" = "Impossibile registrarsi sul registrar SIP \"%@\" (%@). %@";
+"XM_SIP_UN_AUTHORIZED_SUGGESTION" = "Prego controlla le tue impostazioni di nome utente e password.";
+"XM_SIP_NOT_ACCEPTABLE_SUGGESTION" = "Prego controlla le tue impostazioni network.";
+"XM_SIP_BAD_GATEWAY_SUGGESTION" = "Prego controlla le tue impostazioni.";
+
+"XM_VIDEO_DEVICE_PROBLEM_MESSAGE" = "Problema con il dispositivo video:";
+
+/* Call end reason */
+"XM_CALL_END_USER_CLEARED" = "L'utente ha annullato la chiamata";
+"XM_CALL_END_REMOTE_REFUSED" = "Il destinatario ha rifiutato la chiamata";
+"XM_CALL_END_REMOTE_CLEARED" = "Il destinatario ha annullato la chiamata";
+"XM_CALL_END_REMOTE_NO_ANSWER" = "Il destinatario non ha risposto alla chiamata";
+"XM_CALL_END_REMOTE_ABORT" = "Il destinatario ha interrotto la chiamata";
+"XM_CALL_END_INTERNAL_FAILURE" = "Internal transport/connect failure";
+"XM_CALL_END_GK_CLEARED" = "Il gatekeeper ha annullato la chiamata";
+"XM_CALL_END_NO_USER" = "Utente non trovato";
+"XM_CALL_END_NO_BANDWIDTH" = "Ampiezza di banda insufficiente";
+"XM_CALL_END_CAP_EXCHANGE" = "Impossibile negoziare protocolli media comuni ad emtrambi";
+"XM_CALL_END_FORWARDED" = "Chiamata inoltrata";
+"XM_CALL_END_SECURITY_DENIAL" = "La chiamata non ha superato il controllo sicurezza";
+"XM_CALL_END_REMOTE_BUSY" = "Il destinatario è occupato";
+"XM_CALL_END_REMOTE_UNREACHABLE" = "Il destinatario non è raggiungibile";
+"XM_CALL_END_NO_ENDPOINT" = "Nessuna terminazione in esecuzione presso il destinatario";
+"XM_CALL_END_HOST_OFFLINE" = "L'host del destinatario non è connesso";
+"XM_CALL_END_DURATION_LIMIT" = "Limiti durata chiamata raggiunti";
+"XM_CALL_END_CONFERENCE_ID" = "ID conferenza non valido";
+
+/* Default names */
+"XM_NO_NAME_TEXT" = "<Nessun Nome>";
+"XM_DEFAULT_LOCATION_TEXT" = "<Posizione Default>";
+
+/* No Call Module */
+"XM_NO_CALL_SETUP_MESSAGE" = "Imposto. Prego attendere...";
+"XM_NO_CALL_PREPARING_CALL" = "Preparo chiamata...";
+"XM_NO_CALL_CALLING" = "Chiamo...";
+"XM_NO_CALL_RINGING" = "Faccio suonare...";
+"XM_NO_CALL_INCOMING_CALL" = "Chiamata Entrante";
+"XM_NO_CALL_IDLE" = "Inattivo";
+"XM_NO_CALL_IDLE_WITH_REASON" = "Inattivo (%@)";
+"XM_NO_CALL_NO_ADDRESS" = "Non conesso (Nessun indirizzo network)";
+"XM_NO_CALL_NO_PROTOCOL" = "Non conesso (Nessun protocollo attivo)";
+"XM_NO_CALL_PROTOCOL_FAILURE" = "Non conesso (Attivazione H.323 e SIP non riuscita)";
+"XM_NO_CALL_H323_FAILURE" = "Non conesso (Attivazione H.323 non riuscita)";
+"XM_NO_CALL_SIP_FAILURE" = "Non conesso (Attivazione SIP non riuscita)";
+"XM_NO_CALL_TOOLTIP_H323_FAILURE" = "H.323: Non conesso. Impossibile attivare il sistema H.323\n";
+"XM_NO_CALL_TOOLTIP_GK_FAILURE" = "H.323: Gatekeeper registration failed\n";
+"XM_NO_CALL_TOOLTIP_GK_OK" = "H.323: Registrato con un Gatekeeper\n";
+"XM_NO_CALL_TOOLTIP_NO_GK" = "H.323: Pronto. Senza usare un Gatekeeper\n";
+"XM_NO_CALL_TOOLTIP_SIP_FAILURE" = "SIP: Non connesso. Impossibile attivare il sistema SIP\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE" = "SIP: Registrazione non riuscita\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_OK" = "SIP: Registrato\n";
+"XM_NO_CALL_TOOLTIP_SIP_NO_REG" = "SIP: Pronto. Senza usare un Registrar\n";
+"XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES" = "\nIndirizzi Network:";
+"XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS" = "\nImpossibile ottenere un indirizzo esterno.";
+
+/* Inspector */
+"XM_INSPECTOR_INFO" = "Info";
+"XM_INSPECTOR_TOOLS" = "Strumenti";
+"XM_INSPECTOR_CONTACTS" = "Contatti";
+
+/* Info Module */
+"XM_INFO_MODULE_NAME" = "Stato";
+"XM_INFO_MODULE_REG_FAILURE" = "Impossibile registrarsi";
+"XM_INFO_MODULE_NO_REG" = "Non utilizzati";
+"XM_INFO_MODULE_PROTOCOL_FAILURE" = "Attivazione non riuscita";
+"XM_INFO_MODULE_NO_PROTOCOL" = "Non attivato";
+
+/* Statistics Module */
+"XM_STATISTICS_MODULE_NAME" = "Statistiche";
+"XM_STATISTICS_MODULE_AUDIO_IN" = "Ingresso Audio";
+"XM_STATISTICS_MODULE_AUDIO_OUT" = "Uscita Audio";
+"XM_STATISTICS_MODULE_VIDEO_IN" = "Ingresso Video";
+"XM_STATISTICS_MODULE_VIDEO_OUT" = "Uscita Video";
+
+/* Call History Module */
+"XM_CALL_HISTORY_MODULE_NAME" = "Cronologia";
+"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Posizione attiva passata a <%@>";
+"XM_CALL_HISTORY_MODULE_CALLING" = "Chiamata host \"%@\"";
+"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Chiamata host \"%@\" non riuscita";
+"XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Chiamata entrante da \"%@\"";
+"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Chiamata con \"%@\" stabilita";
+"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Chiamata con \"%@\" annullata";
+"XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Attivazione sottosistema H.323 non riuscita.";
+"XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Registrato sul gatekeeper \"%@\"";
+"XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Deregistrato dal gatekeeper \"%@\"";
+"XM_CALL_HISTORY_MODULE_GK_REG_FAILURE" = "Registrazione non riuscita sul gatekeeper \"%@\" (%@)";
+"XM_CALL_HISTORY_MODULE_SIP_FAILURE" = "Attivazione sottosistema SIP non riuscita.";
+"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION" = "Registrato sul registro SIP \"%@\"";
+"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION" = "Deregistrato dal registro SIP \"%@\"";
+"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE" = "Registrazione non riuscita sul registro SIP \"%@\" (%@)";
+"XM_CALL_HISTORY_MODULE_OPENED_SENDING" = "Stream media aperto: invio \"%@\"";
+"XM_CALL_HISTORY_MODULE_OPENED_RECEIVING" = "Stream media aperto: ricevo \"%@\"";
+"XM_CALL_HISTORY_MODULE_CLOSED_SENDING" = "Stream media chiuso: \"%@\" (Entrante)";
+"XM_CALL_HISTORY_MODULE_CLOSED_RECEIVING" = "Stream media chiuso: \"%@\" (Uscente)";
+
+/* Local Audio/Video module */
+"XM_AUDIO_VIDEO_MODULE_NAME" = "Controlli Audio/Video";
+"XM_AUDIO_VIDOE_MODULE_VIDEO_DISABLED" = "Il video non è attivo";
+
+/* Address Book Module */
+"XM_ADDRESS_BOOK_MODULE_NAME" = "Rubrica Indirizzi";
+"XM_ADDRESS_BOOK_MODULE_ADDRESS_TITLE" = "Indirizzo Chiamata XMeeting";
+"XM_ADDRESS_BOOK_MODULE_PHONE_TITLE" = "Numero di Telefono";
+
+/* Dial Pad Module */
+"XM_DIAL_PAD_MODULE_NAME" = "Telecomando";
+
+/* IG Popup View */
+"IG_POPUP_VIEW_TITLE" = "Posizione: %@";
+
+/* OSD Tooltips */
+"XM_OSD_TOOLTIP_ENTER_FS" = "Vai in modalità a schermo pieno";
+"XM_OSD_TOOLTIP_EXIT_FS" = "Esci da modalità a schermo pieno";
+"XM_OSD_TOOLTIP_ENABLE_PIP" = "Attiva Picture-in-Picture";
+"XM_OSD_TOOLTIP_DISABLE_PIP" = "Disattiva Picture-in-Picture";
+"XM_OSD_TOOLTIP_CLASSIC_PIP" = "Mostra Picture-in-Picture classico";
+"XM_OSD_TOOLTIP_3D_PIP" = "Mostra Picture-in-Picture 3D";
+"XM_OSD_TOOLTIP_SBS_PIP" = "Mostra Picture-in-Picture fianco a fianco";
+"XM_OSD_TOOLTIP_INFO" = "Ottieni Informazioni";
+"XM_OSD_TOOLTIP_TOOLS" = "Mostra Strumenti";
+"XM_OSD_TOOLTIP_HANGUP" = "Termina chiamata";
+"XM_OSD_TOOLTIP_MUTE" = "Attiva Microfono Muto";
+"XM_OSD_TOOLTIP_UNMUTE" = "Disattiva Microfono Muto";
+
+/* Call Info View */
+"XM_CALL_INFO_VIEW_SHOW_DETAILS" = "Mostra Dettagli";
+"XM_CALL_INFO_VIEW_HIDE_DETAILS" = "Nascondi Dettagli";
+"XM_CALL_INFO_VIEW_AUDIO" = "Audio:";
+"XM_CALL_INFO_VIEW_VIDEO" = "Video:";
+"XM_CALL_INFO_VIEW_DIRECTION_OUT" = "Direzione: Out";
+"XM_CALL_INFO_VIEW_DIRECTION_IN" = "Direzione: In";
+"XM_CALL_INFO_VIEW_END_REASON" = "Causa Termine Chiamata: %@";
+"XM_CALL_INFO_VIEW_START" = "Inizio: %@";
+"XM_CALL_INFO_VIEW_END" = "Fine: %@";
+"XM_CALL_INFO_VIEW_DURATION" = "Durata: %@";
+"XM_CALL_INFO_VIEW_NUMBER" = "Numero Remoto: %@";
+"XM_CALL_INFO_VIEW_ADDRESS" = "Indirizzo Remoto: %@";
+"XM_CALL_INFO_VIEW_APPLICATION" = "Applicazione Remota: %@";
+"XM_CALL_INFO_VIEW_SENT" = "%@ inviati usando <%@>";
+"XM_CALL_INFO_VIEW_RECV" = "%@ ricevuti usando <%@>";
+
+/* Preferences Window */
+"XM_PREFERENCES_WINDOW_CLOSE" = "Vuoi registrare le modifiche alla preferenze prima di chiudere?";
+"XM_GENERAL_PREFERENCES_NAME" = "Generale";
+"XM_GENERAL_PREFERENCES_TOOLTIP" = "Preferenze Generali";
+"XM_GENERAL_PREFERENCES_CHOOSE" = "Scegli";
+"XM_ACCOUNT_PREFERENCES_NAME" = "Account";
+"XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Preferenze Account";
+"XM_LOCATION_PREFERENCES_NAME" = "Posizioni";
+"XM_LOCATION_PREFERENCES_TOOLTIP" = "Modifica le Posizioni";
+"XM_LOCATION_PREFERENCES_NEW_LOCATION" = "Nuova Posizione";
+"XM_LOCATION_PREFERENCES_COPY_SUFFIX" = " Copia";
+"XM_LOCATION_PREFERENCES_NONE_ITEM" = "Nessuna";
+"XM_VIDEO_PREFERENCES_NAME" = "Ingresso Video";
+"XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferenze Ingresso Video";
+"XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Usa il primo disponibile>";
+"XM_VIDEO_PREFERENCES_SHOW_SETTINGS" = "Mostra Impostazioni...";
+
+/* Setup Assistant */
+"XM_SETUP_ASSISTANT_CONTINUE" = "Continua";
+"XM_SETUP_ASSISTANT_FINISH" = "Termina";
+"XM_SETUP_ASSISTANT_DEFAULT_GK" = "<Gatekeeper Default>";
+"XM_SETUP_ASSISTANT_DEFAULT_REG" = "<Registrar Default>";
+"XM_SETUP_ASSISTANT_WELCOME" = "Benvenuto a XMeeting!";
+"XM_SETUP_ASSISTANT_PI" = "Informazioni Personali";
+"XM_SETUP_ASSISTANT_LOCATIONS" = "Posizioni";
+"XM_SETUP_ASSISTANT_NEW_LOCATION" = "Nuova Posizione";
+"XM_SETUP_ASSISTANT_LOCATION" = "Posizione: %@";
+"XM_SETUP_ASSISTANT_LOC_IMPORT_FAILURE" = "Importazione posizioni non riuscita";
+"XM_SETUP_ASSISTANT_INVALID_FILE" = "Il file non contiene dati validi";
+"XM_SETUP_ASSISTANT_IMPORT" = "Importa";
+"XM_SETUP_ASSISTANT_COMPLETED" = "Completato";
+
+/* External Address */
+"XM_FETCHING_EXTERNAL_ADDRESS" = "Ottengo...";
+"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE" = "<Non disponibile>";
+
+/* Misc */
+"XM_UNKNOWN_REASON" = "Motivazione sconosciuta";
+"XM_UNKNOWN_HOST" = "<Sconosciuto>";
+"XM_DATE_FORMAT_STRING" = "%Y-%m-%d %H:%M:%S";
+"XM_EXTERNAL_ADDRESS_SUFFIX" = " (Esterno)";
+
+/* Framework */
+"XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Scadenza connessione";
+"XM_FRAMEWORK_INVALID_DATA" = "Dati Non Validi";
+"XM_FRAMEWORK_NO_DATA" = "Nessun Dato";
+"XM_FRAMEWORK_NO_DEVICE" = "<Nessun Dispositivo>";
+"XM_FRAMEWORK_UNKNOWN_DEVICE" = "Dispositivo Audio Sconosciuto";
+"XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME" = "Modulo Live Camera";
+"XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA" = "Impossibile ottenere fotogrammi dalla webcam. La webcam è ancora connessa al computer?\nErrore: (%d, %x)\tDispositivo: %@";
+"XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "Si è verificato un errore interno nel Modulo Live Camera.\nCodici Errore: (%d, %x)\t Device: %@\nPrego segnala questo problema (in inglese) a hfriederich@users.sourceforge.net";
+"XM_FRAMEWORK_SCREEN_MODULE_NAME" = "Modulo Schermo";
+"XM_FRAMEWORK_SCREEN_DEVICE_NAME" = "Schermo %d";

@@ -1,0 +1,27 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {toggleShowExtraInformation = id; }; 
+            CLASS = XMStatisticsModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                callDurationField = NSTextField; 
+                callInformationBox = NSBox; 
+                codecTableView = NSTableView; 
+                contentView = NSView; 
+                extraInformationDisclosure = NSButton; 
+                packetReceiveTimeField = NSTextField; 
+                packetSendTimeField = NSTextField; 
+                packetsLateField = NSTextField; 
+                packetsLostField = NSTextField; 
+                packetsOutOfOrderField = NSTextField; 
+                remotePartyNameField = NSTextField; 
+                roundTripDelayField = NSTextField; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }
+    ); 
+    IBVersion = 1; 
+}

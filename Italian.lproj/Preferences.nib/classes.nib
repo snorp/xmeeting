@@ -1,0 +1,169 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                addH323Account = id; 
+                addSIPAccount = id; 
+                cancelH323AccountEdit = id; 
+                cancelSIPAccountEdit = id; 
+                deleteH323Account = id; 
+                deleteSIPAccount = id; 
+                editH323Account = id; 
+                editSIPAccount = id; 
+                endH323AccountEdit = id; 
+                endSIPAccountEdit = id; 
+            }; 
+            CLASS = XMAccountPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addH323AccountButton = NSButton; 
+                addSIPAccountButton = NSButton; 
+                contentView = NSView; 
+                deleteH323AccountButton = NSButton; 
+                deleteSIPAccountButton = NSButton; 
+                editH323AccountButton = NSButton; 
+                editH323AccountPanel = NSPanel; 
+                editSIPAccountButton = NSButton; 
+                editSIPAccountPanel = NSPanel; 
+                h323AccountNameField = NSTextField; 
+                h323AccountsTableView = NSTableView; 
+                h323GatekeeperHostField = NSTextField; 
+                h323PasswordField = NSTextField; 
+                h323PhoneNumberField = NSTextField; 
+                h323UsernameField = NSTextField; 
+                locationModule = XMLocationPreferencesModule; 
+                sipAccountNameField = NSTextField; 
+                sipAccountsTableView = NSTableView; 
+                sipAuthorizationUsernameField = NSTextField; 
+                sipPasswordField = NSTextField; 
+                sipRegistrarHostField = NSTextField; 
+                sipUsernameField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                chooseDebugFilePath = id; 
+                defaultAction = id; 
+                toggleAutomaticallyHideInCallControls = id; 
+                toggleGenerateDebugLogFile = id; 
+            }; 
+            CLASS = XMGeneralPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                automaticallyAcceptIncomingCallsSwitch = NSButton; 
+                automaticallyEnterFullScreenSwitch = NSButton; 
+                automaticallyHideInCallControlsSwitch = NSButton; 
+                chooseDebugLogFilePathButton = NSButton; 
+                contentView = NSView; 
+                debugLogFilePathField = NSTextField; 
+                generateDebugLogSwitch = NSButton; 
+                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
+                showSelfViewMirroredSwitch = NSButton; 
+                userNameField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                actionButton = id; 
+                createNewLocation = id; 
+                defaultAction = id; 
+                deleteLocation = id; 
+                duplicateLocation = id; 
+                endNewLocationSheet = id; 
+                gatekeeperAccountSelected = id; 
+                getExternalAddress = id; 
+                importLocations = id; 
+                moveAudioCodec = id; 
+                moveVideoCodec = id; 
+                renameLocation = id; 
+                sipAccountSelected = id; 
+                sipProxyModeSelected = id; 
+                toggleAutoGetExternalAddress = id; 
+                toggleEnableH323 = id; 
+                toggleEnableSIP = id; 
+                toggleEnableVideo = id; 
+                toggleUseAddressTranslation = id; 
+            }; 
+            CLASS = XMLocationPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                accountModule = XMAccountPreferencesModule; 
+                actionButton = NSButton; 
+                actionPopup = NSPopUpButton; 
+                audioBufferSizeSlider = NSSlider; 
+                audioCodecPreferenceOrderTableView = NSTableView; 
+                autoGetExternalAddressSwitch = NSButton; 
+                bandwidthLimitPopUp = NSPopUpButton; 
+                contentView = NSView; 
+                deleteLocationButton = NSButton; 
+                enableFastStartSwitch = NSButton; 
+                enableH245TunnelSwitch = NSButton; 
+                enableH264LimitedModeSwitch = NSButton; 
+                enableH323Switch = NSButton; 
+                enableSIPSwitch = NSButton; 
+                enableVideoSwitch = NSButton; 
+                externalAddressField = NSTextField; 
+                gatekeeperHostField = NSTextField; 
+                gatekeeperPhoneNumberField = NSTextField; 
+                gatekeeperUserAliasField = NSTextField; 
+                getExternalAddressButton = NSButton; 
+                h323AccountsPopUp = NSPopUpButton; 
+                locationsTableView = NSTableView; 
+                maxTCPPortField = NSTextField; 
+                maxUDPPortField = NSTextField; 
+                minTCPPortField = NSTextField; 
+                minUDPPortField = NSTextField; 
+                moveAudioCodecDownButton = NSButton; 
+                moveAudioCodecUpButton = NSButton; 
+                moveVideoCodecDownButton = NSButton; 
+                moveVideoCodecUpButton = NSButton; 
+                newLocationButton = NSButton; 
+                newLocationCancelButton = NSButton; 
+                newLocationNameField = NSTextField; 
+                newLocationOKButton = NSButton; 
+                newLocationSheet = NSPanel; 
+                registrarAuthorizationUsernameField = NSTextField; 
+                registrarHostField = NSTextField; 
+                registrarUsernameField = NSTextField; 
+                sectionsTab = NSTabView; 
+                sipAccountsPopUp = NSPopUpButton; 
+                sipProxyHostField = NSTextField; 
+                sipProxyModeMatrix = NSMatrix; 
+                sipProxyPasswordField = NSTextField; 
+                sipProxyUsernameField = NSTextField; 
+                useIPAddressTranslationSwitch = NSButton; 
+                videoCodecPreferenceOrderTableView = NSTableView; 
+                videoFrameRateField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {applyPreferences = id; revertPreferences = id; }; 
+            CLASS = XMPreferencesWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {applyButton = NSButton; buttonToolbarView = NSView; revertButton = NSButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                closeVideoModuleSettingsPanel = id; 
+                preferredVideoDeviceSelectionDidChange = id; 
+                restoreDefaultVideoModuleSettings = id; 
+            }; 
+            CLASS = XMVideoPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                preferredVideoDevicePopUp = NSPopUpButton; 
+                videoModuleSettingsBox = NSBox; 
+                videoModuleSettingsPanel = NSPanel; 
+                videoModulesTableView = NSTableView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

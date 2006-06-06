@@ -1,0 +1,24 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                enterFullScreen = id; 
+                retryEnableH323 = id; 
+                retryEnableSIP = id; 
+                retryGatekeeperRegistration = id; 
+                retrySIPRegistration = id; 
+                showContacts = id; 
+                showInspector = id; 
+                showPreferences = id; 
+                showTools = id; 
+                updateDeviceLists = id; 
+            }; 
+            CLASS = XMApplicationController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSQuickDrawView; }
+    ); 
+    IBVersion = 1; 
+}

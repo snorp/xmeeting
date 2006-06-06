@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>XMeeting_AudioCodecs</key>
+	<array>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>64 kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<false/>
+			<key>XMeeting_Identifier</key>
+			<integer>1</integer>
+			<key>XMeeting_Name</key>
+			<string>G.711 uLaw</string>
+			<key>XMeeting_Quality</key>
+			<string>Good</string>
+		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>64 kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<false/>
+			<key>XMeeting_Identifier</key>
+			<integer>2</integer>
+			<key>XMeeting_Name</key>
+			<string>G.711 ALaw</string>
+			<key>XMeeting_Quality</key>
+			<string>Good</string>
+		</dict>
+	</array>
+	<key>XMeeting_VideoCodecs</key>
+	<array>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>64 - 768 kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<true/>
+			<key>XMeeting_Identifier</key>
+			<integer>101</integer>
+			<key>XMeeting_Name</key>
+			<string>H.263</string>
+			<key>XMeeting_Quality</key>
+			<string>Good</string>
+		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>64 - 768 kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<true/>
+			<key>XMeeting_Identifier</key>
+			<integer>102</integer>
+			<key>XMeeting_Name</key>
+			<string>H.264</string>
+			<key>XMeeting_Quality</key>
+			<string>Very Good</string>
+		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>64 - 768 kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<false/>
+			<key>XMeeting_Identifier</key>
+			<integer>100</integer>
+			<key>XMeeting_Name</key>
+			<string>H.261</string>
+			<key>XMeeting_Quality</key>
+			<string>O.K.</string>
+		</dict>
+	</array>
+</dict>
+</plist>
