@@ -187,6 +187,7 @@
 "XM_LOCATION_PREFERENCES_NEW_LOCATION" = "Nuova Posizione";
 "XM_LOCATION_PREFERENCES_COPY_SUFFIX" = " Copia";
 "XM_LOCATION_PREFERENCES_NONE_ITEM" = "Nessuna";
+"XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";"XM_LOCATION_PREFERENCES_NAME_SUGGESTION" = "Please choose another name";
 "XM_VIDEO_PREFERENCES_NAME" = "Ingresso Video";
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferenze Ingresso Video";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Usa il primo disponibile>";

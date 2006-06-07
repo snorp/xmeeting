@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.22 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.23 2006/06/07 10:44:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -66,6 +66,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 - (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)locations
 										h323Accounts:(NSArray *)h323Accounts
 										 sipAccounts:(NSArray *)sipAccounts;
+
+// Misc.
+- (void)_alertLocationName;
 
 @end
 
@@ -573,6 +576,20 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	if(sender == newLocationOKButton)
 	{
+		// check whether the name already exists
+		NSString *locationName = [newLocationNameField stringValue];
+		unsigned count = [locations count];
+		unsigned i;
+		for(i = 0; i < count; i++)
+		{
+			XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+			if([[location name] isEqualToString:locationName])
+			{
+				[self _alertLocationName];
+				
+				return;
+			}
+		}
 		returnCode = NSOKButton;
 	}
 	else
@@ -1173,7 +1190,28 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	{
 		if([anObject isKindOfClass:[NSString class]])
 		{
-			[(XMLocation *)[locations objectAtIndex:rowIndex] setName:(NSString *)anObject];
+			NSString *newName = (NSString *)anObject;
+			
+			// check whether this name already exists
+			unsigned count = [locations count];
+			unsigned i;
+			for(i = 0; i < count; i++)
+			{
+				if(i == rowIndex)
+				{
+					continue;
+				}
+				
+				XMLocation *location = [locations objectAtIndex:i];
+				
+				if([[location name] isEqualToString:newName])
+				{
+					[self _alertLocationName];
+					return;
+				}
+			}
+			
+			[(XMLocation *)[locations objectAtIndex:rowIndex] setName:newName];
 		}
 	}
 	
@@ -1307,6 +1345,29 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[self noteAccountsDidChange];
 	
 	unsigned count = [theLocations count];
+	unsigned i;
+	
+	// check for name collisions
+	for(i = 0; i < count; i++)
+	{
+		XMLocation *location = [theLocations objectAtIndex:i];
+		NSString *name = [location name];
+		
+		unsigned existingCount = [locations count];
+		unsigned j;
+		
+		for(j = 0; j < existingCount; j++)
+		{
+			XMLocation *testLocation = [locations objectAtIndex:j];
+			
+			if([[testLocation name] isEqualToString:name])
+			{
+				[location setName:[name stringByAppendingString:@" 1"]];
+				i--;
+				break;
+			}
+		}
+	}
 	
 	if(count != 0)
 	{
@@ -1325,6 +1386,21 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		[self defaultAction:self];
 		
 	}
+}
+
+#pragma mark -
+#pragma mark Misc Methods
+
+- (void)_alertLocationName
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+				
+	[alert setMessageText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NAME_EXISTS", @"")];
+	[alert setInformativeText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NAME_SUGGESTION", @"")];
+	[alert setAlertStyle:NSWarningAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+			
+	[alert runModal];
 }
 
 @end
