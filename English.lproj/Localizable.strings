@@ -109,7 +109,7 @@
 
 /* Call History Module */
 "XM_CALL_HISTORY_MODULE_NAME" = "History";
-"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Switched active location to <%@>";
+"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Switched active location to \"%@\"";
 "XM_CALL_HISTORY_MODULE_CALLING" = "Calling host \"%@\"";
 "XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Calling host \"%@\" failed";
 "XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Incoming call from \"%@\"";
@@ -127,6 +127,7 @@
 "XM_CALL_HISTORY_MODULE_OPENED_RECEIVING" = "Media stream opened: receiving \"%@\"";
 "XM_CALL_HISTORY_MODULE_CLOSED_SENDING" = "Media stream closed: \"%@\" (Outgoing)";
 "XM_CALL_HISTORY_MODULE_CLOSED_RECEIVING" = "Media stream closed: \"%@\" (Incoming)";
+"XM_CALL_HISTORY_MODULE_VIDEO_DEVICE_SWITCH" = "Switched video device to \"%@\"";
 
 /* Local Audio/Video module */
 "XM_AUDIO_VIDEO_MODULE_NAME" = "Audio/Video Control";

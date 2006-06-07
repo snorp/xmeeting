@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.19 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.20 2006/06/07 09:57:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,6 +45,8 @@
 - (void)_didCloseIncomingAudioStream:(NSNotification *)notif;
 - (void)_didCloseOutgoingVideoStream:(NSNotification *)notif;
 - (void)_didCloseIncomingVideoStream:(NSNotification *)notif;
+
+- (void)_didChangeVideoInputDevice:(NSNotification *)notif;
 
 - (void)_logText:(NSString *)text date:(NSDate *)date;
 
@@ -107,9 +109,14 @@
 	[notificationCenter addObserver:self selector:@selector(_didCloseIncomingVideoStream:)
 							   name:XMNotification_CallManagerDidCloseIncomingVideoStream object:nil];
 	
+	[notificationCenter addObserver:self selector:@selector(_didChangeVideoInputDevice:)
+							   name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
+	
 	nibLoader = nil;
 	
 	didLogIncomingCall = NO;
+	
+	locationName = nil;
 	
 	gatekeeperName = nil;
 	sipRegistrarName = nil;
@@ -128,9 +135,24 @@
 		[nibLoader release];
 	}
 	
+	if(locationName != nil)
+	{
+		[locationName release];
+	}
+	
 	if(gatekeeperName != nil)
 	{
 		[gatekeeperName release];
+	}
+	
+	if(sipRegistrarName != nil)
+	{
+		[sipRegistrarName release];
+	}
+	
+	if(videoDevice != nil)
+	{
+		[videoDevice release];
 	}
 	
 	if(callAddress != nil)
@@ -216,11 +238,20 @@
 - (void)_activeLocationDidChange:(NSNotification *)notif
 {
 	XMLocation *activeLocation = [[XMPreferencesManager sharedInstance] activeLocation];
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH", @""), [activeLocation name]];
 	
-	[self _logText:logText date:nil];
+	NSString *activeLocationName = [activeLocation name];
 	
-	[logText release];
+	if(![locationName isEqualToString:activeLocationName])
+	{
+		NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH", @""), activeLocationName];
+	
+		[self _logText:logText date:nil];
+	
+		[logText release];
+		
+		[locationName release];
+		locationName = [activeLocationName copy];
+	}
 }
 
 - (void)_didStartCallInitiation:(NSNotification *)notif
@@ -502,6 +533,23 @@
 	[logText release];
 }
 
+- (void)_didChangeVideoInputDevice:(NSNotification *)notif
+{
+	NSString *selectedDevice = [[XMVideoManager sharedInstance] selectedInputDevice];
+	
+	if(![videoDevice isEqualToString:selectedDevice])
+	{
+		NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_VIDEO_DEVICE_SWITCH", @""), selectedDevice];
+		
+		[self _logText:logText date:nil];
+		
+		[logText release];
+		
+		[videoDevice release];
+		videoDevice = [selectedDevice copy];
+	}
+}
+
 - (void)_logText:(NSString *)logText date:(NSDate *)date
 {
 	BOOL createdDate = NO;
@@ -553,7 +601,6 @@
 	[logTextStorage endEditing];
 	
 	NSString *debugLogMessage = [[NSString alloc] initWithFormat:@"%@ %@", [dateLogString string], [textLogString string]];
-	NSLog(@"Logging: %@", debugLogMessage);
 	XMLogMessage(debugLogMessage);
 	[debugLogMessage release];
 
