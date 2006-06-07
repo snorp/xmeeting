@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.38 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.39 2006/06/07 08:29:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,6 +21,8 @@
 #import "XMApplicationFunctions.h"
 #import "XMMainWindowController.h"
 #import "XMLocalVideoView.h"
+
+#define XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY @"XMeeting_NoCallModuleSelfViewStatus"
 
 #define VIDEO_INSET 5
 
@@ -140,6 +142,13 @@
 	else
 	{
 		[self _didStartSubsystemSetup:nil];
+	}
+	
+	BOOL showSelfView = [[NSUserDefaults standardUserDefaults] boolForKey:XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY];
+	
+	if(showSelfView)
+	{
+		[self performSelector:@selector(toggleShowSelfView:) withObject:nil afterDelay:0.0];
 	}
 }
 
@@ -283,6 +292,8 @@
 		doesShowSelfView = NO;
 		[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
 	}
+	
+	[[NSUserDefaults standardUserDefaults] setBool:doesShowSelfView forKey:XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY];
 }
 
 - (IBAction)showInfoInspector:(id)sender
