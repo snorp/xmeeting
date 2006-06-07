@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.20 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.21 2006/06/07 15:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -379,7 +379,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	unsigned count = [accounts count];
 	unsigned i;
 	
-	if(count == 0)
+	if(accounts == nil)
 	{
 		return;
 	}
@@ -448,7 +448,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	unsigned count = [accounts count];
 	unsigned i;
 	
-	if(count == 0)
+	if(accounts == nil)
 	{
 		return;
 	}

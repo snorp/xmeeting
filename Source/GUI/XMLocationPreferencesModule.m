@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.23 2006/06/07 10:44:34 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.24 2006/06/07 15:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,6 +69,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 // Misc.
 - (void)_alertLocationName;
+- (void)_alertNoProtocolEnabled:(XMLocation *)location;
 
 @end
 
@@ -890,6 +891,12 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	BOOL flag;
 	NSString *string;
 	
+	// warn if no protocol is enabled
+	if([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState)
+	{
+		[self _alertNoProtocolEnabled:currentLocation];
+	}
+	
 	// saving the network section
 	[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
 	
@@ -1347,6 +1354,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	unsigned count = [theLocations count];
 	unsigned i;
 	
+	unsigned index = [locations count];
+	
 	// check for name collisions
 	for(i = 0; i < count; i++)
 	{
@@ -1362,20 +1371,17 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 			
 			if([[testLocation name] isEqualToString:name])
 			{
-				[location setName:[name stringByAppendingString:@" 1"]];
-				i--;
-				break;
+				name = [name stringByAppendingString:@" 1"];
+				[location setName:name];
+				j = 0;
 			}
 		}
+		
+		[locations addObject:location];
 	}
 	
 	if(count != 0)
 	{
-		unsigned index = [locations count];
-		
-		// adding the location
-		[locations addObjectsFromArray:theLocations];
-		
 		// validate the GUI
 		NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
 		[locationsTableView reloadData];
@@ -1384,7 +1390,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		[self _validateLocationButtonUserInterface];
 		
 		[self defaultAction:self];
-		
 	}
 }
 
@@ -1396,11 +1401,31 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	NSAlert *alert = [[NSAlert alloc] init];
 				
 	[alert setMessageText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NAME_EXISTS", @"")];
-	[alert setInformativeText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NAME_SUGGESTION", @"")];
+	[alert setInformativeText:NSLocalizedString(@"XM_PREFERENCES_NAME_SUGGESTION", @"")];
 	[alert setAlertStyle:NSWarningAlertStyle];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
 			
 	[alert runModal];
+	
+	[alert release];
+}
+
+- (void)_alertNoProtocolEnabled:(XMLocation *)location
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+				
+	[alert setMessageText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED", @"")];
+	
+	NSString *infoText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO", @""), [location name]];
+	[alert setInformativeText:infoText];
+	[infoText release];
+	
+	[alert setAlertStyle:NSWarningAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	
+	[alert runModal];
+	
+	[alert release];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.4 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.5 2006/06/07 15:49:03 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,6 +26,8 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)_h323EditAccountPanelDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)_sipEditAccountPanelDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+
+- (void)_alertAccountName;
 
 @end
 
@@ -120,6 +122,8 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 - (void)savePreferences
 {
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
+	NSLog(@"H323Acc: ", [h323Accounts description]);
 	
 	[preferencesManager setH323Accounts:h323Accounts];
 	[preferencesManager setSIPAccounts:sipAccounts];
@@ -279,6 +283,27 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (IBAction)endH323AccountEdit:(id)sender
 {
+	NSString *name = [h323AccountNameField stringValue];
+	
+	unsigned count = [h323Accounts count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMH323Account *account = [h323Accounts objectAtIndex:i];
+		
+		if(account == h323AccountToEdit)
+		{
+			continue;
+		}
+		
+		if([[account name] isEqualToString:name])
+		{
+			[self _alertAccountName];
+			return;
+		}
+	}
+	
 	[NSApp endSheet:editH323AccountPanel returnCode:NSRunStoppedResponse];
 	[editH323AccountPanel orderOut:self];
 }
@@ -291,6 +316,27 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (IBAction)endSIPAccountEdit:(id)sender
 {
+	NSString *name = [sipAccountNameField stringValue];
+	
+	unsigned count = [sipAccounts count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMSIPAccount *account = [sipAccounts objectAtIndex:i];
+		
+		if(account == sipAccountToEdit)
+		{
+			continue;
+		}
+		
+		if([[account name] isEqualToString:name])
+		{
+			[self _alertAccountName];
+			return;
+		}
+	}
+	
 	[NSApp endSheet:editSIPAccountPanel returnCode:NSRunStoppedResponse];
 	[editSIPAccountPanel orderOut:self];
 }
@@ -326,7 +372,31 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)addH323Accounts:(NSArray *)theAccounts
 {
-	[h323Accounts addObjectsFromArray:theAccounts];
+	unsigned count = [theAccounts count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMH323Account *account = (XMH323Account *)[theAccounts objectAtIndex:i];
+		NSString *name = [account name];
+		
+		unsigned existingCount = [h323Accounts count];
+		unsigned j;
+		
+		for(j = 0; j < existingCount; j++)
+		{
+			XMH323Account *accountToTest = (XMH323Account *)[h323Accounts objectAtIndex:j];
+			
+			if([[accountToTest name] isEqualToString:name])
+			{
+				name = [name stringByAppendingString:@" 1"];
+				[account setName:name];
+				j = 0;
+			}
+		}
+		
+		[h323Accounts addObject:account];
+	}
 	
 	[self _validateButtons];
 	[h323AccountsTableView reloadData];
@@ -334,7 +404,31 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)addSIPAccounts:(NSArray *)theAccounts
 {
-	[sipAccounts addObjectsFromArray:theAccounts];
+	unsigned count = [theAccounts count];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		XMSIPAccount *account = (XMSIPAccount *)[theAccounts objectAtIndex:i];
+		NSString *name = [account name];
+		
+		unsigned existingCount = [sipAccounts count];
+		unsigned j;
+		
+		for(j = 0; j < existingCount; j++)
+		{
+			XMSIPAccount *accountToTest = (XMSIPAccount *)[sipAccounts objectAtIndex:j];
+			
+			if([[accountToTest name] isEqualToString:name])
+			{
+				name = [name stringByAppendingString:@" 1"];
+				[account setName:name];
+				j = 0;
+			}
+		}
+		
+		[sipAccounts addObject:account];
+	}
 	
 	[self _validateButtons];
 	[sipAccountsTableView reloadData];
@@ -564,6 +658,20 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 		[self _validateButtons];
 		[sipAccountsTableView reloadData];
 	}
+}
+
+- (void)_alertAccountName
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+				
+	[alert setMessageText:NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_NAME_EXISTS", @"")];
+	[alert setInformativeText:NSLocalizedString(@"XM_PREFERENCES_NAME_SUGGESTION", @"")];
+	[alert setAlertStyle:NSWarningAlertStyle];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	
+	[alert runModal];
+	
+	[alert release];
 }
 
 @end

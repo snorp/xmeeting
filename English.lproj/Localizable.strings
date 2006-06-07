@@ -177,18 +177,21 @@
 
 /* Preferences Window */
 "XM_PREFERENCES_WINDOW_CLOSE" = "Do you want to save the changed preferences before closing?";
+"XM_PREFERENCES_NAME_SUGGESTION" = "Please choose another name.";
 "XM_GENERAL_PREFERENCES_NAME" = "General";
 "XM_GENERAL_PREFERENCES_TOOLTIP" = "General Purpose Preferences";
 "XM_GENERAL_PREFERENCES_CHOOSE" = "Choose";
 "XM_ACCOUNT_PREFERENCES_NAME" = "Accounts";
 "XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Account Preferences";
+"XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Account name already exists";
 "XM_LOCATION_PREFERENCES_NAME" = "Locations";
 "XM_LOCATION_PREFERENCES_TOOLTIP" = "Edit the Locations";
 "XM_LOCATION_PREFERENCES_NEW_LOCATION" = "New Location";
 "XM_LOCATION_PREFERENCES_COPY_SUFFIX" = " Copy";
 "XM_LOCATION_PREFERENCES_NONE_ITEM" = "None";
 "XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";
-"XM_LOCATION_PREFERENCES_NAME_SUGGESTION" = "Please choose another name";
+"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";
+"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
 "XM_VIDEO_PREFERENCES_NAME" = "Video Input";
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Video Input Preferences";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Use first available>";

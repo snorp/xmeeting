@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.10 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.11 2006/06/07 15:49:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -266,6 +266,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	delegate = theModalDelegate;
 	didEndSelector = theDidEndSelector;
 	
+	currentKeysToAskIndex = 0;
+	
 	if(locationFilePath != nil)
 	{
 		[locationFilePath release];
@@ -300,9 +302,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	{
 		[self close];
 		[NSApp endSheet:[self window]];
-		NSArray *array = [[NSArray alloc] init];
-		[delegate performSelector:didEndSelector withObject:array];
-		[array release];
+		
+		[self _returnFromLocationImportAssistant:NSRunAbortedResponse];
 	}
 }
 
@@ -788,8 +789,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	{		
 		NSArray *array = [NSArray array];
 		locations = array;
-		h323Accounts = array;
-		sipAccounts = array;
+		h323Accounts = nil;
+		sipAccounts = nil;
 	}
 	else
 	{
@@ -804,7 +805,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			else
 			{
 				[location setH323AccountTag:0];
-				h323Accounts = [NSArray array];
+				h323Accounts = nil;
 			}
 			
 			if([location enableSIP] == YES && [location sipAccountTag] != 0)
@@ -814,7 +815,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			else
 			{
 				[location setSIPAccountTag:0];
-				sipAccounts = [NSArray array];
+				sipAccounts = nil;
 			}
 			
 			locations = [NSArray arrayWithObject:location];
@@ -824,6 +825,71 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			locations = [[[locationImportData objectForKey:XMKey_Locations] retain] autorelease];
 			h323Accounts = [[[locationImportData objectForKey:XMKey_H323Accounts] retain] autorelease];
 			sipAccounts = [[[locationImportData objectForKey:XMKey_SIPAccounts] retain] autorelease];
+			
+			// check for duplicate names
+			unsigned count = [locations count];
+			unsigned i;
+			for(i = 0; i < count; i++)
+			{
+				XMLocation *theLocation = (XMLocation *)[locations objectAtIndex:i];
+				NSString *name = [theLocation name];
+				
+				unsigned j;
+				for(j = 0; j < i; j++)
+				{
+					XMLocation *otherLocation = (XMLocation *)[locations objectAtIndex:j];
+					
+					if([[otherLocation name] isEqualToString:name])
+					{
+						name = [name stringByAppendingString:@" 1"];
+						[theLocation setName:name];
+						
+						j = 0;
+					}
+				}
+			}
+			
+			count = [h323Accounts count];
+			for(i = 0; i < count; i++)
+			{
+				XMH323Account *account = (XMH323Account *)[h323Accounts objectAtIndex:i];
+				NSString *name = [account name];
+				
+				unsigned j;
+				for(j = 0; j < i; j++)
+				{
+					XMH323Account *otherAccount = (XMH323Account *)[h323Accounts objectAtIndex:j];
+					
+					if([[otherAccount name] isEqualToString:name])
+					{
+						name = [name stringByAppendingString:@" 1"];
+						[account setName:name];
+						
+						j = 0;
+					}
+				}
+			}
+			
+			count = [sipAccounts count];
+			for(i = 0; i < count; i++)
+			{
+				XMSIPAccount *account = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
+				NSString *name = [account name];
+				
+				unsigned j;
+				for(j = 0; j < i; j++)
+				{
+					XMSIPAccount *otherAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:j];
+					
+					if([[otherAccount name] isEqualToString:name])
+					{
+						name = [name stringByAppendingString:@" 1"];
+						[account setName:name];
+						
+						j = 0;
+					}
+				}
+			}
 		}
 	}
 	
@@ -1314,6 +1380,13 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		}
 
 		unsigned count = [h323AccountDicts count];
+		
+		if(count == 0)
+		{
+			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
+			return nil;
+		}
+		
 		unsigned i;
 		NSMutableArray *parsedAccounts = [[NSMutableArray alloc] initWithCapacity:count];
 		
@@ -1336,14 +1409,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		count = [parsedAccounts count];
 		
-		[propertyList setObject:parsedAccounts forKey:XMKey_H323Accounts];
-		[parsedAccounts release];
-		
 		if(count == 0)
 		{
+			[parsedAccounts release];
+			
 			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 			return nil;
 		}
+		
+		[propertyList setObject:parsedAccounts forKey:XMKey_H323Accounts];
+		[parsedAccounts release];
 	}
 	
 	NSArray *sipAccountDicts = [propertyList objectForKey:XMKey_SIPAccounts];
@@ -1357,6 +1432,13 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		}
 		
 		unsigned count = [sipAccountDicts count];
+		
+		if(count == 0)
+		{
+			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
+			return nil;
+		}
+		
 		unsigned i;
 		NSMutableArray *parsedAccounts = [[NSMutableArray alloc] initWithCapacity:count];
 		
@@ -1379,14 +1461,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		count = [parsedAccounts count];
 		
-		[propertyList setObject:parsedAccounts forKey:XMKey_SIPAccounts];
-		[parsedAccounts release];
-		
 		if(count == 0)
 		{
+			[parsedAccounts release];
+			
 			*errorDescription = NSLocalizedString(@"XM_SETUP_ASSISTANT_INVALID_FILE", @"");
 			return nil;
 		}
+		
+		[propertyList setObject:parsedAccounts forKey:XMKey_SIPAccounts];
+		[parsedAccounts release];
 	}
 		
 	unsigned count = [locationDicts count];
@@ -1427,7 +1511,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 }
 
 - (void)_returnFromLocationImportAssistant:(int)returnCode
-{
+{	
 	NSArray *locations = nil;
 	NSArray *h323Accounts = nil;
 	NSArray *sipAccounts = nil;
@@ -1801,9 +1885,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			
 			[alert runModal];
 			
-			NSArray *array = [[NSArray alloc] init];
-			[delegate performSelector:didEndSelector withObject:array];
-			[array release];
+			[self _returnFromLocationImportAssistant:NSRunAbortedResponse];
+
 			return;
 		}
 		

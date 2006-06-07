@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.35 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.36 2006/06/07 15:49:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -664,8 +664,8 @@
 {
 	NSArray *array = [NSArray array];
 	[self _setupApplicationWithLocations:array
-							h323Accounts:array
-							 sipAccounts:array];
+							h323Accounts:nil
+							 sipAccounts:nil];
 }
 
 - (void)_setupApplicationWithLocations:(NSArray *)locations
