@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.16 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.17 2006/06/07 21:45:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,6 +64,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	NSArray *notificationKeys = [[NSArray alloc] initWithObjects:XMString_DynamicStoreNotificationKey, nil];
 	SCDynamicStoreSetNotificationKeys(dynamicStore, NULL, (CFArrayRef)notificationKeys);
 	localAddresses = nil;
+	localAddressInterfaces = nil;
 	
 	natType = XMNATType_NoNAT;
 	stunExternalAddress = nil;
@@ -143,6 +144,11 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 - (NSArray *)localAddresses
 {
 	return localAddresses;
+}
+
+- (NSArray *)localAddressInterfaces
+{
+	return localAddressInterfaces;
 }
 
 #pragma mark -
@@ -432,34 +438,61 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)_getLocalAddresses
 {
-	NSString *interfacesKey = (NSString *)SCDynamicStoreKeyCreateNetworkInterface(NULL, kSCDynamicStoreDomainState);
-	NSDictionary *interfacesDict = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)interfacesKey);
-	NSArray *interfaces = (NSArray *)[interfacesDict objectForKey:@"Interfaces"];
 	NSMutableArray *addresses = [[NSMutableArray alloc] initWithCapacity:3];
+	NSMutableArray *interfaces = [[NSMutableArray alloc] initWithCapacity:3];
 	
+	/**
+	 * The goal is to get both an array of IPv4 addresses AND a human readable string of the interface name this
+	 * ip address belongs to.
+	 * To obtain this, the dynamic store is searched for matches to
+	 * State:/Network/Service/[^/]+/IPv4
+	 * Once the IP addresses are obtained, the Setup: domain is searched for the given Service information to obtain
+	 * the human readable name
+	 **/
+	NSArray *keys = (NSArray *)SCDynamicStoreCopyKeyList(dynamicStore, (CFStringRef)@"State:/Network/Service/[^/]+/IPv4");
+	
+	unsigned count = [keys count];
 	unsigned i;
-	unsigned count = [interfaces count];
-	
 	for(i = 0; i < count; i++)
 	{
-		NSString *interface = (NSString *)[interfaces objectAtIndex:i];
-		if([interface isEqualToString:@"lo0"])
-		{
-			continue;
-		}
-		NSString *interfaceKey = (NSString *)SCDynamicStoreKeyCreateNetworkInterfaceEntity(NULL, kSCDynamicStoreDomainState,
-																						   (CFStringRef)interface, kSCEntNetIPv4);
-		NSDictionary *interfaceDict = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)interfaceKey);
+		NSString *key = (NSString *)[keys objectAtIndex:i];
 		
-		if(interfaceDict != NULL)
+		// obtaining the address
+		NSDictionary *serviceDict = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)key);
+		
+		NSArray *interfaceAddresses = (NSArray *)[serviceDict objectForKey:@"Addresses"];
+		
+		// getting the service-ID
+		NSString *serviceID = [[key stringByDeletingLastPathComponent] lastPathComponent];
+		
+		// searching the Setup: domain for the info about this service
+		NSString *servicePath = @"Setup:/Network/Service/";
+		NSString *serviceKey = [servicePath stringByAppendingPathComponent:serviceID];
+		NSDictionary *serviceInfo = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)serviceKey);
+		
+		NSString *interfaceName = [serviceInfo objectForKey:@"UserDefinedName"];
+		if(interfaceName == nil)
 		{
-			NSArray *interfaceAddresses = [interfaceDict objectForKey:@"Addresses"];
-			[addresses addObjectsFromArray:interfaceAddresses];
+			interfaceName = [serviceDict objectForKey:@"InterfaceName"];
 		}
-		[interfaceKey release];
- 	}
+		if(interfaceName == nil)
+		{
+			interfaceName = @"";
+		}
+		
+		unsigned addressCount = [interfaceAddresses count];
+		unsigned j;
+		for(j = 0; j < addressCount; j++)
+		{
+			[addresses addObject:[interfaceAddresses objectAtIndex:j]];
+			[interfaces addObject:interfaceName];
+		}
+		
+		[serviceDict release];
+		[serviceInfo release];
+	}
 	
-	[interfacesKey release];
+	[keys release];
 	
 	if(localAddresses != nil)
 	{
@@ -467,6 +500,13 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 	}
 	localAddresses = [addresses copy];
 	[addresses release];
+	
+	if(localAddressInterfaces != nil)
+	{
+		[localAddressInterfaces release];
+	}
+	localAddressInterfaces = [interfaces copy];
+	[interfaces release];
 	
 	[self startFetchingCheckipExternalAddress];
 	

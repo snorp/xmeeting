@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.18 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.19 2006/06/07 21:45:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,7 @@
 	SCDynamicStoreRef dynamicStore;
 	SCDynamicStoreContext dynamicStoreContext;
 	NSArray *localAddresses;
+	NSArray *localAddressInterfaces;
 	
 	XMNATType natType;
 	NSString *stunExternalAddress;
@@ -44,6 +45,12 @@
  * Returns the local addresses for this computer
  **/
 - (NSArray *)localAddresses;
+
+/**
+ * Returns the (human readable) interfaces corresponding to the
+ * addresses returned by -localAddresses
+ **/
+- (NSArray *)localAddressInterfaces;
 
 /**
  * Returns the type of NAT detected.

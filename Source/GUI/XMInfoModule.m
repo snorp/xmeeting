@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.15 2006/06/07 10:50:18 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.16 2006/06/07 21:45:52 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,13 +17,12 @@
 #import "XMInspectorController.h"
 
 #define XM_BOTTOM_SPACING 1
-#define XM_BOX_SPACING 15
-#define XM_BOX_Y 2
-#define XM_BOX_WIDTH 342
+#define XM_BOX_X 2
+#define XM_BOX_SPACING 13
 #define XM_DISCLOSURE_OFFSET -2
 #define XM_HIDDEN_OFFSET 4
 
-#define XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT 17
+#define XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT 14
 
 #define XM_SHOW_H323_DETAILS 1
 #define XM_SHOW_SIP_DETAILS 2
@@ -68,6 +67,7 @@
 	h323BoxHeight = [h323Box frame].size.height - XM_HIDDEN_OFFSET;
 	sipBoxHeight = [sipBox frame].size.height - XM_HIDDEN_OFFSET;
 	float networkBoxHeight = [networkBox frame].size.height;
+	float boxWidth = [networkBox frame].size.width;
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
@@ -118,7 +118,7 @@
 	NSSize size = [self contentViewSize];
 	[contentView setFrameSize:size];
 	
-	NSRect frameRect = NSMakeRect(XM_BOTTOM_SPACING, XM_BOX_Y, XM_BOX_WIDTH, XM_HIDDEN_OFFSET);
+	NSRect frameRect = NSMakeRect(XM_BOX_X, XM_BOTTOM_SPACING, boxWidth, XM_HIDDEN_OFFSET);
 	if(showSIPDetails == YES)
 	{
 		frameRect.size.height += sipBoxHeight;
@@ -307,6 +307,7 @@
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
 	NSArray *localAddresses = [utils localAddresses];
+	NSArray *localAddressInterfaces = [utils localAddressInterfaces];
 	unsigned localAddressCount = [localAddresses count];
 	
 	if(localAddressCount == 0)
@@ -316,18 +317,28 @@
 		
 		addressExtraHeight = 0;
 		[self resizeContentView];
+		
+		[natTypeField setStringValue:@""];
+		[natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+		
 		return;
 	}
 	
 	NSMutableString *ipAddressString = [[NSMutableString alloc] initWithCapacity:30];
 	unsigned i;
 	
-	[ipAddressString appendString:[localAddresses objectAtIndex:0]];
+	NSString *stringToAppend = [[NSString alloc] initWithFormat:@"%@ (%@)", [localAddresses objectAtIndex:0],
+																			[localAddressInterfaces objectAtIndex:0]];
+	[ipAddressString appendString:stringToAppend];
+	[stringToAppend release];
 	
 	for(i = 1; i < localAddressCount; i++)
 	{
-		[ipAddressString appendString:@"\n"];
-		[ipAddressString appendString:[localAddresses objectAtIndex:i]];
+		NSString *stringToAppend = [[NSString alloc] initWithFormat:@"\n%@ (%@)", 
+														[localAddresses objectAtIndex:i],
+														[localAddressInterfaces objectAtIndex:i]];
+		[ipAddressString appendString:stringToAppend];
+		[stringToAppend release];
 	}
 	
 	addressExtraHeight = (localAddressCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
