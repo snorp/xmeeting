@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.26 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.27 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -363,4 +363,12 @@ void _XMSendPacket(unsigned sessionID, bool setMarkerBit)
 void _XMDidStopTransmitting(unsigned sessionID)
 {
 	XMTransmitterMediaPatch::HandleDidStopTransmitting(sessionID);
+}
+
+#pragma mark -
+#pragma mark Message Logging
+
+void _XMLogMessage(const char *message)
+{
+	XMOpalManager::LogMessage(message);
 }

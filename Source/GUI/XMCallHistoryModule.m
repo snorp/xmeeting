@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.18 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.19 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -551,6 +551,11 @@
 	[textStorageMutableString appendString:@" "];
 	[logTextStorage appendAttributedString:textLogString];
 	[logTextStorage endEditing];
+	
+	NSString *debugLogMessage = [[NSString alloc] initWithFormat:@"%@ %@", [dateLogString string], [textLogString string]];
+	NSLog(@"Logging: %@", debugLogMessage);
+	XMLogMessage(debugLogMessage);
+	[debugLogMessage release];
 
 	[dateLogString release];
 	[textLogString release];

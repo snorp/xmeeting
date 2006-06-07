@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.17 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.18 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,5 +140,10 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize);
  **/
 float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize);
 float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize);
+
+/**
+ * Logs the message given by string to the debug log
+ **/
+void XMLogMessage(NSString *message);
 
 #endif // __XM_UTILS_H__

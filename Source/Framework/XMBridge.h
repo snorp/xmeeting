@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.25 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.26 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -224,6 +224,10 @@ void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp);
 void _XMAppendData(unsigned sessionID, void *data, unsigned length);
 void _XMSendPacket(unsigned sessionID, bool setMarkerBit);
 void _XMDidStopTransmitting(unsigned sessionID);
+
+#pragma mark Message Logging
+
+void _XMLogMessage(const char *message);
 
 #pragma mark MediaFormat Functions
 

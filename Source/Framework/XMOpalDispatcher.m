@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.22 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.23 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1103,11 +1103,13 @@ typedef enum _XMOpalDispatcherMessage
 	
 	if(isIncomingStream == YES)
 	{
-		[_XMCallManagerSharedInstance _handleIncomingAudioStreamOpened:codec];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingAudioStreamOpened:) 
+													   withObject:codec waitUntilDone:NO];
 	}
 	else
 	{
-		[_XMCallManagerSharedInstance _handleOutgoingAudioStreamOpened:codec];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingAudioStreamOpened:)
+													   withObject:codec waitUntilDone:NO];
 	}
 }
 
@@ -1159,11 +1161,13 @@ typedef enum _XMOpalDispatcherMessage
 	
 	if(isIncomingStream == YES)
 	{
-		[_XMCallManagerSharedInstance _handleIncomingVideoStreamOpened:codecString];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingVideoStreamOpened:)
+													   withObject:codecString waitUntilDone:NO];
 	}
 	else
 	{
-		[_XMCallManagerSharedInstance _handleOutgoingVideoStreamOpened:codecString];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingVideoStreamOpened:)
+													   withObject:codecString waitUntilDone:NO];
 	}
 	
 	[codecString release];
@@ -1187,11 +1191,13 @@ typedef enum _XMOpalDispatcherMessage
 
 	if(isIncomingStream == YES)
 	{
-		[_XMCallManagerSharedInstance _handleIncomingAudioStreamClosed];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingAudioStreamClosed)
+													   withObject:nil waitUntilDone:NO];
 	}
 	else
 	{
-		[_XMCallManagerSharedInstance _handleOutgoingAudioStreamClosed];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingAudioStreamClosed)
+													   withObject:nil waitUntilDone:NO];
 	}
 }
 
@@ -1213,11 +1219,13 @@ typedef enum _XMOpalDispatcherMessage
 	
 	if(isIncomingStream == YES)
 	{
-		[_XMCallManagerSharedInstance _handleIncomingVideoStreamClosed];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingVideoStreamClosed)
+													   withObject:nil waitUntilDone:NO];
 	}
 	else
 	{
-		[_XMCallManagerSharedInstance _handleOutgoingVideoStreamClosed];
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingVideoStreamClosed)
+													   withObject:nil waitUntilDone:NO];
 	}
 }
 

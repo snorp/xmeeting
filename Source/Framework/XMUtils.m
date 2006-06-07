@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.15 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.16 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -572,6 +572,13 @@ float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize)
 		// 11:9 aspect ratio
 		return height * (11.0 / 9.0);
 	}
+}
+
+void XMLogMessage(NSString *message)
+{
+	const char *msg = [message cStringUsingEncoding:NSASCIIStringEncoding];
+	
+	_XMLogMessage(msg);
 }
 
 void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info)

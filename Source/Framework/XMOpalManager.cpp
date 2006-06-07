@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.28 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.29 2006/06/07 09:23:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -342,6 +342,7 @@ void XMOpalManager::XMSetSTUNServer(const PString & server)
 	}
 }
 
+#pragma mark -
 #pragma mark Video Setup Methods
 
 void XMOpalManager::SetVideoFunctionality(BOOL newEnableVideoTransmit, BOOL newEnableVideoReceive)
@@ -366,6 +367,15 @@ unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall()
 	}
 }
 
+#pragma mark -
+#pragma mark Debug Log Information
+
+void XMOpalManager::LogMessage(const PString & message)
+{
+	PTRACE(1, message);
+}
+
+#pragma mark -
 #pragma mark Private Methods
 
 BOOL XMOpalManager::IsOutgoingMedia(OpalMediaStream & stream)
