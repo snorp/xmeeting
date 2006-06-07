@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpenGLUtilities.m,v 1.2 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOpenGLUtilities.m,v 1.3 2006/06/07 10:50:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,7 +37,8 @@ Camera XMMakeCamera(Vector3 eye, Vector3 sceneCenter, Vector3 up)
 	return res;
 }
 
-void outputCharacter(float x, float y, float z, char *string) {
+void outputCharacter(float x, float y, float z, char *string)
+{
 	int len, i;
 	glRasterPos3f(x, y, z);
 	len = (int) strlen(string);
@@ -47,14 +48,16 @@ void outputCharacter(float x, float y, float z, char *string) {
 }
 
 //Debug methods
-NSString* XMStringFromCamera(Camera* camera){
+NSString* XMStringFromCamera(Camera* camera)
+{
 	return [NSString stringWithFormat:@"\tEye: %f, %f, %f\n\tCenter: %f, %f, %f\n\tup Vector: %f, %f, %f",
 										camera->eye.x, camera->eye.y, camera->eye.z,
 										camera->sceneCenter.x, camera->sceneCenter.y, camera->sceneCenter.z,
 										camera->upVector.x, camera->upVector.y, camera->upVector.z];
 }
 
-NSString* XMStringFromPlacement(Placement* placement){
+NSString* XMStringFromPlacement(Placement* placement)
+{
 	return [NSString stringWithFormat:@"\tPosition: %f, %f, %f\n\tRotation Axis: %f, %f, %f\n\tScaling: %f, %f, %f\n\tRotation Angle: %f, Reflected: %@",
 		placement->position.x, placement->position.y, placement->position.z,
 		placement->rotationAxis.x, placement->rotationAxis.y, placement->rotationAxis.z,
@@ -71,7 +74,8 @@ NSString* XMStringFromScene(Scene* scene){
 										XMStringFromPlacement(&(scene->remoteVideoPlacement))];
 }
 
-void drawAxisAt(GLfloat x, GLfloat y, GLfloat z){
+void drawAxisAt(GLfloat x, GLfloat y, GLfloat z)
+{
 	glColor3f(1.0, 0,0.0);
 	glLoadIdentity(); //no transformation
 	glBegin(GL_LINES);

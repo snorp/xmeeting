@@ -1,5 +1,5 @@
 /*
- * $Id: XMInstantActionButton.m,v 1.3 2006/04/23 16:18:57 hfriederich Exp $
+ * $Id: XMInstantActionButton.m,v 1.4 2006/06/07 10:50:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,6 +84,7 @@
 	NSPoint localPoint = [self convertPoint:windowPoint fromView:nil];
 	
 	BOOL isInside = NSPointInRect(localPoint, [self bounds]);
+	
 	[self _setHighlighted:isInside];
 }
 

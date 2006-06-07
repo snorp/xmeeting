@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.14 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.15 2006/06/07 10:50:18 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,7 +140,6 @@
 	
 	frameRect.origin.y -= XM_DISCLOSURE_OFFSET;
 	frameRect.origin.y += XM_BOX_SPACING;
-	
 	frameRect.size.height = XM_HIDDEN_OFFSET;
 	
 	if(showH323Details == YES)
@@ -164,7 +163,6 @@
 	
 	frameRect.origin.y -= XM_DISCLOSURE_OFFSET;
 	frameRect.origin.y += XM_BOX_SPACING;
-	
 	frameRect.size.height = networkBoxHeight + addressExtraHeight;
 	
 	[networkBox setFrame:frameRect];
