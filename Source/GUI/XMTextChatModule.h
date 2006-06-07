@@ -1,5 +1,5 @@
 /*
- * $Id: XMTextChatModule.h,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMTextChatModule.h,v 1.4 2006/06/07 10:10:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,8 +16,6 @@
 
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;
-	
-	NSNib *nibLoader;
 }
 
 @end

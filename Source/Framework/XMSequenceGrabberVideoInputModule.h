@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.h,v 1.5 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.h,v 1.6 2006/06/07 10:10:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,6 @@
 	unsigned short contrast;
 	unsigned short sharpness;
 	
-	NSNib *nibLoader;
 	IBOutlet NSView *settingsView;
 	
 	IBOutlet NSSlider *brightnessSlider;

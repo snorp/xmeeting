@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.13 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.14 2006/06/07 10:10:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,7 +24,6 @@
 {
 	self = [super init];
 	
-	nibLoader = nil;
 	activeCall = nil;
 	
 	oldDate = nil;
@@ -38,13 +37,13 @@
 	videoSendBitrate = -1.0f;
 	videoReceiveBitrate = -1.0f;
 	
+	contentView = nil;
+	
 	return self;
 }
 
 - (void)dealloc
-{
-	[nibLoader release];
-	
+{	
 	[activeCall release];
 	
 	[oldDate release];
@@ -75,10 +74,9 @@
 
 - (NSView *)contentView
 {
-	if(nibLoader == nil)
+	if(contentView == nil)
 	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"StatisticsModule" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+		[NSBundle loadNibNamed:@"StatisticsModule" owner:self];
 	}
 	
 	return contentView;

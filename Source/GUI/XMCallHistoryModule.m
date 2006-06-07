@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.20 2006/06/07 09:57:29 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.21 2006/06/07 10:10:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,8 +112,6 @@
 	[notificationCenter addObserver:self selector:@selector(_didChangeVideoInputDevice:)
 							   name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
 	
-	nibLoader = nil;
-	
 	didLogIncomingCall = NO;
 	
 	locationName = nil;
@@ -123,17 +121,17 @@
 	
 	callAddress = nil;
 	
+	contentView = nil;
+	
+	// causing some logs to appear immediately
+	[self _activeLocationDidChange:nil];
+	
 	return self;
 }
 
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	if(nibLoader != nil)
-	{
-		[nibLoader release];
-	}
 	
 	if(locationName != nil)
 	{
@@ -190,10 +188,9 @@
 
 - (NSView *)contentView
 {
-	if(nibLoader == nil)
+	if(contentView == nil)
 	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"CallHistoryModule" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+		[NSBundle loadNibNamed:@"CallHistoryModule" owner:self];
 	}
 	
 	return contentView;

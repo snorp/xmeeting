@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.17 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.18 2006/06/07 10:10:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -111,7 +111,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	contrast = 0;
 	sharpness = 0;
 	
-	nibLoader = nil;
+	settingsView = nil;
 	
 	return self;
 }
@@ -122,8 +122,6 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	[deviceNames release];
 	[deviceNameIndexes release];
 	[selectedDevice release];
-	
-	[nibLoader release];
 	
 	[super dealloc];
 }
@@ -650,7 +648,7 @@ bail:
 	unsigned short theContrast;
 	unsigned short theSharpness;
 	
-	if(nibLoader == nil)
+	if(settingsView == nil)
 	{
 		theBrightness = brightness;
 		theHue = hue;
@@ -833,10 +831,9 @@ bail:
 
 - (NSView *)settingsViewForDevice:(NSString *)device
 {
-	if(nibLoader == nil)
+	if(settingsView == nil)
 	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"SequenceGrabberSettings" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+		[NSBundle loadNibNamed:@"SequenceGrabberSettings" owner:self];
 	}
 	
 	[self _updateSliders];
@@ -1085,7 +1082,7 @@ bail:
 	number = [values objectAtIndex:4];
 	sharpness = [number unsignedShortValue];
 	
-	if(nibLoader != nil)
+	if(settingsView != nil)
 	{
 		[self _updateSliders];
 	}
