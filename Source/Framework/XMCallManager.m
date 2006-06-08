@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.21 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.22 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -712,6 +712,15 @@
 	
 	activeCall = [call retain];
 	
+	NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
+	NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
+	
+	unsigned index = [localAddresses indexOfObject:[activeCall localAddress]];
+	if(index != NSNotFound)
+	{
+		[activeCall _setLocalAddressInterface:[localAddressInterfaces objectAtIndex:index]];
+	}
+	
 	callManagerStatus = XM_CALL_MANAGER_IN_CALL;
 	
 	//Play sound! (the current ring comes from iChat. It may be wise to use a royalty-free one)
@@ -743,11 +752,22 @@
 		NSString *remoteNumber = (NSString *)[remotePartyInformations objectAtIndex:1];
 		NSString *remoteAddress = (NSString *)[remotePartyInformations objectAtIndex:2];
 		NSString *remoteApplication = (NSString *)[remotePartyInformations objectAtIndex:3];
+		NSString *localAddress = (NSString *)[remotePartyInformations objectAtIndex:4];
 		
 		[activeCall _setRemoteName:remoteName];
 		[activeCall _setRemoteNumber:remoteNumber];
 		[activeCall _setRemoteAddress:remoteAddress];
 		[activeCall _setRemoteApplication:remoteApplication];
+		[activeCall _setLocalAddress:localAddress];
+		
+		NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
+		NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
+		
+		unsigned index = [localAddresses indexOfObject:localAddress];
+		if(index != NSNotFound)
+		{
+			[activeCall _setLocalAddressInterface:[localAddressInterfaces objectAtIndex:index]];
+		}
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEstablishCall

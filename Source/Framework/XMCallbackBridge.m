@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.20 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.21 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,7 +41,8 @@ void _XMHandleIncomingCall(unsigned callID,
 						   const char *remoteName,
 						   const char *remoteNumber,
 						   const char *remoteAddress,
-						   const char *remoteApplication)
+						   const char *remoteApplication,
+						   const char *theLocalAddress)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
@@ -49,27 +50,34 @@ void _XMHandleIncomingCall(unsigned callID,
 	NSString *number = [[NSString alloc] initWithCString:remoteNumber encoding:NSASCIIStringEncoding];
 	NSString *address = [[NSString alloc] initWithCString:remoteAddress encoding:NSASCIIStringEncoding];
 	NSString *application = [[NSString alloc] initWithCString:remoteApplication encoding:NSASCIIStringEncoding];
+	NSString *localAddress = [[NSString alloc] initWithCString:theLocalAddress encoding:NSASCIIStringEncoding];
 	
 	[XMOpalDispatcher _incomingCall:callID
 						   protocol:protocol
 						 remoteName:name
 					   remoteNumber:number
 					  remoteAddress:address
-				  remoteApplication:application];
+				  remoteApplication:application
+					   localAddress:localAddress];
 
 	[name release];
 	[number release];
 	[address release];
 	[application release];
+	[localAddress release];
 	
 	[autoreleasePool release];
 }
 
-void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall)
+void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall, const char *localAddress)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMOpalDispatcher _callEstablished:callID incoming:isIncomingCall];
+	NSString *addressString = [[NSString alloc] initWithCString:localAddress encoding:NSASCIIStringEncoding];
+	
+	[XMOpalDispatcher _callEstablished:callID incoming:isIncomingCall localAddress:addressString];
+	
+	[addressString release];
 	
 	[autoreleasePool release];
 }

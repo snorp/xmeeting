@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.7 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.8 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,6 +29,7 @@
 		remoteAddress:(NSString *)theRemoteAddress
 	remoteApplication:(NSString *)theRemoteApplication
 		  callAddress:(NSString *)theCallAddress
+		 localAddress:(NSString *)theLocalAddress
 		   callStatus:(XMCallStatus)theStatus;
 {
 	self = [super init];
@@ -41,6 +42,8 @@
 	remoteAddress = [theRemoteAddress copy];
 	remoteApplication = [theRemoteApplication copy];
 	callAddress = [theCallAddress copy];
+	localAddress = [theLocalAddress copy];
+	localAddressInterface = nil;
 	callStatus = theStatus;
 	
 	// setting the end reason to an impossible value
@@ -95,6 +98,7 @@
 	[remoteAddress release];
 	[remoteApplication release];
 	[callAddress release];
+	[localAddress release];
 	
 	[callInitiationDate release];
 	[callStartDate release];
@@ -143,6 +147,16 @@
 - (NSString *)callAddress
 {
 	return callAddress;
+}
+
+- (NSString *)localAddress
+{
+	return localAddress;
+}
+
+- (NSString *)localAddressInterface
+{
+	return localAddressInterface;
 }
 
 - (XMCallStatus)callStatus
@@ -384,6 +398,20 @@
 {
 	NSString *old = remoteApplication;
 	remoteApplication = [theApplication copy];
+	[old release];
+}
+
+- (void)_setLocalAddress:(NSString *)theLocalAddress
+{
+	NSString *old = localAddress;
+	localAddress = [theLocalAddress copy];
+	[old release];
+}
+
+- (void)_setLocalAddressInterface:(NSString *)theInterface
+{
+	NSString *old = localAddressInterface;
+	localAddressInterface = [theInterface copy];
 	[old release];
 }
 

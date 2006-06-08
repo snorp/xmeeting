@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.9 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.10 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,8 @@
 	NSString *remoteAddress;
 	NSString *remoteApplication;
 	NSString *callAddress;
+	NSString *localAddress;
+	NSString *localAddressInterface;
 	
 	XMCallStatus callStatus;
 	XMCallEndReason callEndReason;
@@ -90,6 +92,18 @@
  * If this is an incoming call, returns nil
  **/
 - (NSString *)callAddress;
+
+/**
+ * Returns the local address over which the
+ * call is / was running
+ **/
+- (NSString *)localAddress;
+
+/**
+ * Returns the network interface about which
+ * the call did run in a human readable fashion
+ **/
+- (NSString *)localAddressInterface;
 
 /**
  * Returns the current state of the call

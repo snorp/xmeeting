@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.11 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.12 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,10 +48,13 @@
 		   remoteName:(NSString *)remoteName
 		 remoteNumber:(NSString *)remoteNumber
 		remoteAddress:(NSString *)remoteAddress
-	remoteApplication:(NSString *)remoteApplication;
+	remoteApplication:(NSString *)remoteApplication
+		 localAddress:(NSString *)localAddress;
 + (void)_acceptIncomingCall:(unsigned)callID;
 + (void)_rejectIncomingCall:(unsigned)callID;
-+ (void)_callEstablished:(unsigned)callID incoming:(BOOL)isIncomingCall;
++ (void)_callEstablished:(unsigned)callID 
+				incoming:(BOOL)isIncomingCall
+			localAddress:(NSString *)localAddress;
 + (void)_clearCall:(unsigned)callID;
 + (void)_callCleared:(unsigned)callID reason:(XMCallEndReason)callEndReason;
 

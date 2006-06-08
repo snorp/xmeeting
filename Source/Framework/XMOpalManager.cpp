@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.29 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.30 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #include "XMTransmitterMediaPatch.h"
 #include "XMReceiverMediaPatch.h"
 #include "XMProcess.h"
+#include "XMConnection.h"
 
 #include <ptlib.h>
 
@@ -174,15 +175,40 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 #pragma mark overriding some callbacks
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
-{	
+{
+	unsigned callID = call.GetToken().AsUnsigned();
+	
+	// determine the direction of the call by the fact which endpoint is
+	// connected with the first connection
+	// Is there a better way to determine this?
 	BOOL isIncomingCall = TRUE;
 	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
 	if(PIsDescendant(&endPoint, XMEndPoint))
 	{
 		isIncomingCall = FALSE;
 	}
-	unsigned callID = call.GetToken().AsUnsigned();
-	_XMHandleCallEstablished(callID, isIncomingCall);
+	
+	// Determine the IP address this call is running on
+	PSafePtr<OpalConnection> connection;
+	if(isIncomingCall)
+	{
+		connection = call.GetConnection(0);
+	}
+	else
+	{
+		connection = call.GetConnection(1);
+	}
+	PIPSocket::Address address(0);
+	connection->GetTransport().GetLocalAddress().GetIpAddress(address);
+	
+	if(address.IsValid())
+	{
+		_XMHandleCallEstablished(callID, isIncomingCall, address.AsString());
+	}
+	else
+	{
+		_XMHandleCallEstablished(callID, isIncomingCall, "");
+	}
 	OpalManager::OnEstablishedCall(call);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.21 2006/06/07 10:10:15 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.22 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -308,7 +308,24 @@
 		[self _didReceiveIncomingCall:notif];
 	}
 	
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED", @""), [activeCall remoteName]];
+	NSString *localAddress = [activeCall localAddress];
+	NSString *localAddressInterface = [activeCall localAddressInterface];
+	
+	if(localAddress == nil)
+	{
+		localAddress = NSLocalizedString(@"XM_UNKNOWN", @"");
+	}
+	if(localAddressInterface == nil)
+	{
+		localAddressInterface = NSLocalizedString(@"XM_UNKNOWN", @"");
+	}
+	
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED", @""), 
+															[activeCall remoteName], 
+															localAddress,
+															localAddressInterface,
+															[activeCall remoteAddress],
+															[activeCall remoteApplication]];
 	
 	[self _logText:logText date:[activeCall callStartDate]];
 	
@@ -329,11 +346,13 @@
 		
 		if(remoteName == nil)
 		{
-			remoteName = NSLocalizedString(@"XM_UNKNOWN_HOST", @"");
+			remoteName = NSLocalizedString(@"XM_UNKNOWN", @"");
 		}
 	}
 	
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_CLEARED", @""), remoteName];
+	NSString *durationString = XMTimeString((unsigned)[activeCall callDuration]);
+	
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_CLEARED", @""), remoteName, durationString];
 	
 	[self _logText:logText date:[activeCall callEndDate]];
 	
@@ -382,7 +401,7 @@
 	NSString *gkHost = [h323Account gatekeeper];
 	if(gkHost == nil)
 	{
-		gkHost = NSLocalizedString(@"XM_UNKNOWN_HOST", @"");
+		gkHost = NSLocalizedString(@"XM_UNKNOWN", @"");
 	}
 	
 	XMGatekeeperRegistrationFailReason failReason = [[XMCallManager sharedInstance] gatekeeperRegistrationFailReason];
@@ -436,7 +455,7 @@
 	NSString *sipRegistrarHost = [sipAccount registrar];
 	if(sipRegistrarHost == nil)
 	{
-		sipRegistrarHost = NSLocalizedString(@"XM_UNKNOWN_HOST", @"");
+		sipRegistrarHost = NSLocalizedString(@"XM_UNKNOWN", @"");
 	}
 	
 	XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationFailReasonAtIndex:0];

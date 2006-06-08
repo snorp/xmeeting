@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.14 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.15 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,12 +175,22 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 	
 	isIncomingCall = TRUE;
 	
+	// determine the IP address this connection runs on
+	PIPSocket::Address address(0);
+	connection.GetCall().GetOtherPartyConnection(connection)->GetTransport().GetLocalAddress().GetIpAddress(address);
+	PString localAddress = address.AsString();
+	if(!address.IsValid())
+	{
+		localAddress = "";
+	}
+	
 	_XMHandleIncomingCall(callID,
 						  callProtocol,
 						  connection.GetRemotePartyName(),
 						  connection.GetRemotePartyNumber(),
 						  connection.GetRemotePartyAddress(),
-						  connection.GetRemoteApplication());
+						  connection.GetRemoteApplication(),
+						  localAddress);
 }
 
 void XMEndPoint::AcceptIncomingCall()

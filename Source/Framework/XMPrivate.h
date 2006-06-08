@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.29 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.30 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,8 @@ void _XMThreadExit();
 void _XMCheckCloseStatus();
 
 @class ABPerson, XMCallStatistics;
+
+#pragma mark -
 
 @interface XMUtils (FrameworkMethods)
 
@@ -138,7 +140,6 @@ void _XMCheckCloseStatus();
 // Called every time an attempt to register at a SIP registrar failed
 - (void)_handleSIPRegistrationFailure:(NSArray *)info;
 
-#pragma mark -
 #pragma mark Misc.
 
 - (void)_updateSTUNInformation;
@@ -146,6 +147,8 @@ void _XMCheckCloseStatus();
 - (NSString *)_stunServer;
 
 @end
+
+#pragma mark -
 
 @interface XMCallInfo (FrameworkMethods)
 
@@ -156,6 +159,7 @@ void _XMCheckCloseStatus();
 		remoteAddress:(NSString *)remoteAddress
 	remoteApplication:(NSString *)remoteApplication
 		  callAddress:(NSString *)callAddress
+		 localAddress:(NSString *)localAddress
 		   callStatus:(XMCallStatus)status;
 
 - (unsigned)_callID;
@@ -167,6 +171,8 @@ void _XMCheckCloseStatus();
 - (void)_setRemoteNumber:(NSString *)remoteNumber;
 - (void)_setRemoteAddress:(NSString *)remoteAddress;
 - (void)_setRemoteApplication:(NSString *)remoteApplication;
+- (void)_setLocalAddress:(NSString *)localAddress;
+- (void)_setLocalAddressInterface:(NSString *)localAddressInterface;
 - (void)_setIncomingAudioCodec:(NSString *)codec;
 - (void)_setOutgoingAudioCodec:(NSString *)codec;
 - (void)_setIncomingVideoCodec:(NSString *)codec;
@@ -175,6 +181,8 @@ void _XMCheckCloseStatus();
 - (void)_updateCallStatistics:(XMCallStatistics *)callStatistics;
 
 @end
+
+#pragma mark -
 
 @interface XMPreferences (FrameworkMethods)
 

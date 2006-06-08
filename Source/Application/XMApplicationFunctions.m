@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.11 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.12 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,11 +44,11 @@ NSString *XMTimeString(unsigned time)
 	
 	if(hours > 0)
 	{
-		return [NSString stringWithFormat:@"%d:%d:%d", hours, minutes, seconds];
+		return [NSString stringWithFormat:@"%d:%02d:%02d", hours, minutes, seconds];
 	}
 	else
 	{
-		return [NSString stringWithFormat:@"%d:%d", minutes, seconds];
+		return [NSString stringWithFormat:@"%d:%02d", minutes, seconds];
 	}
 }
 

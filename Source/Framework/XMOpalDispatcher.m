@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.23 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.24 2006/06/08 08:54:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -225,6 +225,7 @@ typedef enum _XMOpalDispatcherMessage
 		 remoteNumber:(NSString *)remoteNumber
 		remoteAddress:(NSString *)remoteAddress
 	remoteApplication:(NSString *)remoteApplication
+		 localAddress:(NSString *)localAddress
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
 	NSData *callData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -238,9 +239,11 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *numberData = [NSKeyedArchiver archivedDataWithRootObject:remoteNumber];
 	NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:remoteAddress];
 	NSData *applicationData = [NSKeyedArchiver archivedDataWithRootObject:remoteApplication];
+	NSData *localAddressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
 	
 	NSArray *components = [[NSArray alloc] initWithObjects:callData, protocolData, nameData,
-												numberData, addressData, applicationData, nil];
+												numberData, addressData, applicationData, 
+												localAddressData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_IncomingCall withComponents:components];
 	
@@ -273,7 +276,7 @@ typedef enum _XMOpalDispatcherMessage
 	[components release];
 }
 
-+ (void)_callEstablished:(unsigned)callID incoming:(BOOL)isIncomingCall
++ (void)_callEstablished:(unsigned)callID incoming:(BOOL)isIncomingCall localAddress:(NSString *)localAddress
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
 	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -283,7 +286,9 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, nil];
+	NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, addressData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallEstablished withComponents:components];
 	
@@ -787,6 +792,7 @@ typedef enum _XMOpalDispatcherMessage
 													 remoteAddress:nil
 												 remoteApplication:nil
 													   callAddress:address
+													  localAddress:nil
 														callStatus:XMCallStatus_Calling];
 		
 		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiated:)
@@ -858,6 +864,7 @@ typedef enum _XMOpalDispatcherMessage
 													 remoteAddress:nil
 												 remoteApplication:nil
 													   callAddress:address
+													  localAddress:nil
 														callStatus:XMCallStatus_Calling];
 		
 		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiated:)
@@ -899,6 +906,7 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *remoteNumberData = (NSData *)[messageComponents objectAtIndex:3];
 	NSData *remoteAddressData = (NSData *)[messageComponents objectAtIndex:4];
 	NSData *remoteApplicationData = (NSData *)[messageComponents objectAtIndex:5];
+	NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:6];
 	
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
 	unsigned theCallID = [number unsignedIntValue];
@@ -931,6 +939,7 @@ typedef enum _XMOpalDispatcherMessage
 	NSString *remoteNumber = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteNumberData];
 	NSString *remoteAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteAddressData];
 	NSString *remoteApplication = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteApplicationData];
+	NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
 	
 	XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
 													  protocol:protocol
@@ -939,6 +948,7 @@ typedef enum _XMOpalDispatcherMessage
 												 remoteAddress:remoteAddress
 											 remoteApplication:remoteApplication
 												   callAddress:nil
+												  localAddress:localAddress
 													callStatus:XMCallStatus_Incoming];
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingCall:)
@@ -988,6 +998,9 @@ typedef enum _XMOpalDispatcherMessage
 	NSNumber *incomingNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:incomingData];
 	BOOL isIncomingCall = [incomingNumber boolValue];
 	
+	NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:2];
+	NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
+	
 	if(theCallID != callID)
 	{
 		NSLog(@"callID mismatch in callEstablished: %d to current %d", (int)theCallID, (int)callID);
@@ -1011,12 +1024,14 @@ typedef enum _XMOpalDispatcherMessage
 		NSString *remoteApplicationString = [[NSString alloc] initWithCString:remoteApplication encoding:NSASCIIStringEncoding];
 		
 		remotePartyInformations = [[NSArray alloc] initWithObjects:remoteNameString, remoteNumberString, remoteAddressString,
-													remoteApplicationString, nil];
+													remoteApplicationString, localAddress, nil];
 	}
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallEstablished:)
 												   withObject:remotePartyInformations
 												waitUntilDone:NO];
+	
+	[remotePartyInformations release];
 	
 	callStatisticsUpdateIntervalTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0
 																		  target:self
