@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.21 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.22 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,13 +104,14 @@ void _XMHandleAudioStreamOpened(unsigned callID, const char *codec, bool isIncom
 	[autoreleasePool release];
 }
 
-void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, XMVideoSize videoSize, bool isIncomingStream)
+void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, XMVideoSize videoSize, bool isIncomingStream,
+								unsigned videoWidth, unsigned videoHeight)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
 	NSString *codecString = [[NSString alloc] initWithCString:codec encoding:NSASCIIStringEncoding];
 	
-	[XMOpalDispatcher _videoStreamOpened:callID codec:codecString size:videoSize incoming:isIncomingStream];
+	[XMOpalDispatcher _videoStreamOpened:callID codec:codecString size:videoSize incoming:isIncomingStream width:videoWidth height:videoHeight];
 	
 	[codecString release];
 	

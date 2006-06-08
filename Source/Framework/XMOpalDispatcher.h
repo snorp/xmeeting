@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.12 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.13 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,7 +64,9 @@
 + (void)_videoStreamOpened:(unsigned)callID 
 					 codec:(NSString *)codec 
 					  size:(XMVideoSize)videoSize
-				  incoming:(BOOL)isIncomingStream;
+				  incoming:(BOOL)isIncomingStream
+					 width:(unsigned)width
+					height:(unsigned)height;
 
 + (void)_audioStreamClosed:(unsigned)callID
 				  incoming:(BOOL)isIncomingStream;

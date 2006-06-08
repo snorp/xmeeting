@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.36 2006/06/07 15:49:03 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.37 2006/06/08 11:57:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -301,7 +301,7 @@
 
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
-	
+	// ensure that the propagation of the notification doesn't get blocked
 	[self performSelector:@selector(_displayIncomingCallAlert) withObject:nil afterDelay:0.0];
 }
 
@@ -372,6 +372,12 @@
 
 - (void)_displayIncomingCallAlert
 {
+	//Play sound! (the current ring comes from iChat. It may be wise to use a royalty-free one)
+	[[NSSound soundNamed:@"Ringer.aiff"] play];
+	
+	//deminiaturize on call
+	[[[NSApp windows] objectAtIndex:0] deminiaturize:self];
+	
 	incomingCallAlert = [[NSAlert alloc] init];
 	
 	[incomingCallAlert setMessageText:NSLocalizedString(@"Incoming Call", @"")];

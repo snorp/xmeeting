@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.16 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,6 +62,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	
 	localVideoSize = XMVideoSize_NoVideo;
 	remoteVideoSize = XMVideoSize_NoVideo;
+	remoteVideoDimensions = NSMakeSize(0, 0);
 	
 	// Initializing the OpenGL structures
 	videoLock = [[NSLock alloc] init];
@@ -268,6 +269,11 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	return remoteVideoSize;
 }
 
+- (NSSize)remoteVideoDimensions
+{
+	return remoteVideoDimensions;
+}
+
 - (void)addVideoView:(id<XMVideoView>)videoView
 {
 	[videoLock lock];
@@ -383,9 +389,18 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidChangeSelectedInputDevice object:self];
 }
 
-- (void)_handleVideoReceivingStart:(NSNumber *)videoSize
+- (void)_handleVideoReceivingStart:(NSArray *)info
 {
-	remoteVideoSize = (XMVideoSize)[videoSize unsignedIntValue];
+	NSNumber *number = [info objectAtIndex:0];
+	remoteVideoSize = (XMVideoSize)[number unsignedIntValue];
+	
+	number = [info objectAtIndex:1];
+	unsigned width = [number unsignedIntValue];
+	
+	number = [info objectAtIndex:2];
+	unsigned height = [number unsignedIntValue];
+	
+	remoteVideoDimensions = NSMakeSize(width, height);
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartReceivingVideo object:self];
 }
@@ -393,6 +408,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)_handleVideoReceivingEnd
 {
 	remoteVideoSize = XMVideoSize_NoVideo;
+	remoteVideoDimensions = NSMakeSize(0, 0);
 	
 	[videoLock lock];
 	

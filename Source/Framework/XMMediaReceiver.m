@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.22 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.23 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,9 +59,9 @@ expGolombSymbol -= 1;
 @interface XMMediaReceiver (PrivateMethods)
 
 - (UInt32)_getH264AVCCAtomLength;
-- (XMVideoSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length;
-- (XMVideoSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length;
-- (XMVideoSize)_getH264VideoSize;
+- (NSSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length videoSize:(XMVideoSize *)size;
+- (NSSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length videoSize:(XMVideoSize *)size;
+- (NSSize)_getH264VideoSize:(XMVideoSize *)size;
 - (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer;
 
 - (void)_releaseDecompressionSession;
@@ -167,10 +167,10 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(videoDecompressionSession == NULL)
 	{
 		ImageDescriptionHandle imageDesc;
-		NSSize videoDimensions;
 		CodecType codecType;
 		char *codecName;
 		
+		NSSize videoDimensions;
 		XMVideoSize videoMediaSize;
 		
 		switch(videoCodecIdentifier)
@@ -178,12 +178,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			case XMCodecIdentifier_H261:
 				codecType = kH261CodecType;
 				codecName = "H.261";
-				videoMediaSize = [self _getH261VideoSize:data length:length];
+				videoDimensions = [self _getH261VideoSize:data length:length videoSize:&videoMediaSize];
 				break;
 			case XMCodecIdentifier_H263:
 				codecType = kH263CodecType;
 				codecName = "H.263";
-				videoMediaSize = [self _getH263VideoSize:data length:length];
+				videoDimensions = [self _getH263VideoSize:data length:length videoSize:&videoMediaSize];
 				break;
 			case XMCodecIdentifier_H264:
 				codecType =  kH264CodecType;
@@ -195,7 +195,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 				}
 				else
 				{
-					videoMediaSize = [self _getH264VideoSize];
+					videoDimensions = [self _getH264VideoSize:&videoMediaSize];
 				}
 				break;
 			default:
@@ -207,8 +207,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			NSLog(@"No valid data video size");
 			return NO;
 		}
-		
-		videoDimensions = XMGetVideoFrameDimensions(videoMediaSize);
 		
 		imageDesc = (ImageDescriptionHandle)NewHandleClear(sizeof(**imageDesc)+4);
 		(**imageDesc).idSize = sizeof( **imageDesc)+4;
@@ -227,7 +225,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		(**imageDesc).vRes = Long2Fix(72);
 		(**imageDesc).dataSize = 0;
 		(**imageDesc).frameCount = 1;
-		CopyCStringToPascal(codecName, (**imageDesc).name);
 		(**imageDesc).depth = 24;
 		(**imageDesc).clutID = -1;
 		
@@ -283,14 +280,21 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		DisposeHandle((Handle)imageDesc);
 		
-		number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoMediaSize];
+		NSNumber *sizeNumber = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoMediaSize];
+		NSNumber *widthNumber = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoDimensions.width];
+		NSNumber *heightNumber = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoDimensions.height];
+		NSArray *array = [[NSArray alloc] initWithObjects:sizeNumber, widthNumber, heightNumber, nil];
+		
 		[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoReceivingStart:)
-														withObject:number waitUntilDone:NO];
-		[number release];
+														withObject:array waitUntilDone:NO];
+		[array release];
+		[sizeNumber release];
+		[widthNumber release];
+		[heightNumber release];
 		
 		// Informing the application that we've started sending a certain codec. This is done here since
 		// in case of H.264, the size has to be extracted from the SPS atom.
-		_XMHandleVideoStreamOpened(0, codecName, videoMediaSize, true);
+		_XMHandleVideoStreamOpened(0, codecName, videoMediaSize, true, (unsigned)videoDimensions.width, (unsigned)videoDimensions.height);
 	}
 	err = ICMDecompressionSessionDecodeFrame(videoDecompressionSession,
 											 data, length,
@@ -425,7 +429,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	return avccLength;
 }
 
-- (XMVideoSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length;
+- (NSSize)_getH261VideoSize:(UInt8 *)frame length:(UInt32)length videoSize:(XMVideoSize *)size;
 {
 	UInt8 *data = frame;
 	UInt32 dataIndex = 0;
@@ -434,7 +438,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	if(length < 4)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	if(frame[0] == 0 &&
@@ -442,7 +447,8 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	   frame[2] == 0 &&
 	   frame[3] == 0)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	// determining the PSC location
@@ -456,22 +462,26 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	readBit();
 	if(bit != 0)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	readBit();
 	if(bit != 0)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	readBit();
 	if(bit != 0)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	readBit();
 	if(bit != 0)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	// scanning past TR, SplitScreenIndicator, DocumentCameraIndicator, FreezePictureRelease
@@ -480,19 +490,22 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	readBit();
 	if(bit == 0)
 	{
-		return XMVideoSize_QCIF;
+		*size = XMVideoSize_QCIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_QCIF);
 	}
 	else
 	{
-		return XMVideoSize_CIF;
+		*size = XMVideoSize_CIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_CIF);
 	}
 }
 
-- (XMVideoSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length
+- (NSSize)_getH263VideoSize:(UInt8 *)frame length:(UInt32)length videoSize:(XMVideoSize *)videoSize
 {	
 	if(length < 5)
 	{
-		return XMVideoSize_NoVideo;
+		*videoSize = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	if(frame[0] == 0 &&
@@ -501,13 +514,15 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	   frame[3] == 0 &&
 	   frame[4] == 0)
 	{
-		return XMVideoSize_NoVideo;
+		*videoSize = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	if(frame[0] != 0 ||
 	   frame[1] != 0)
 	{
-		return XMVideoSize_NoVideo;
+		*videoSize = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	UInt8 *data = frame;
@@ -542,27 +557,32 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	if(size == 1)
 	{
-		return XMVideoSize_SQCIF;
+		*videoSize = XMVideoSize_SQCIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_SQCIF);
 	}
 	else if(size == 2)
 	{
-		return XMVideoSize_QCIF;
+		*videoSize = XMVideoSize_QCIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_QCIF);
 	}
 	else if(size == 3)
 	{
-		return XMVideoSize_CIF;
+		*videoSize = XMVideoSize_CIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_CIF);
 	}
 	else
 	{
-		return XMVideoSize_NoVideo;
+		*videoSize = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 }
 
-- (XMVideoSize)_getH264VideoSize
+- (NSSize)_getH264VideoSize:(XMVideoSize *)size
 {
 	if(numberOfH264SPSAtoms == 0)
 	{
-		return XMVideoSize_NoVideo;
+		*size = XMVideoSize_NoVideo;
+		return NSMakeSize(0, 0);
 	}
 	
 	const UInt8 *data = h264SPSAtoms[0].data;
@@ -629,19 +649,18 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	if(picWidthMinus1 == 21 && picHeightMinus1 == 17)
 	{
-		return XMVideoSize_CIF;
+		*size = XMVideoSize_CIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_CIF);
 	}
 	else if(picWidthMinus1 == 10 && picHeightMinus1 == 8)
 	{
-		return XMVideoSize_QCIF;
-	}
-	else if(picWidthMinus1 == 19 && picHeightMinus1 == 14)
-	{
-		return XMVideoSize_320_240;
+		*size = XMVideoSize_QCIF;
+		return XMGetVideoFrameDimensions(XMVideoSize_QCIF);
 	}
 	
-	// Return CIF to have at least a valid dimension
-	return XMVideoSize_CIF;
+	// Return XMVideoSize_Custom and the actual size
+	*size = XMVideoSize_Custom;
+	return NSMakeSize(((picWidthMinus1+1)*16), ((picHeightMinus1+1)*16));
 }
 
 - (void)_createH264AVCCAtomInBuffer:(UInt8 *)buffer

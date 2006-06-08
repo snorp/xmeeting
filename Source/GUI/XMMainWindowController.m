@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.17 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.18 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,8 +62,6 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	modules = nil;
 	
 	activeModuleIndex = UINT_MAX;
-	
-	selfViewShown = NO;
 	
 	fullScreenWindow = nil;
 	isFullScreen = NO;
@@ -181,52 +179,6 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 	[window setFrame:windowFrame display:YES animate:YES];
 	
 	[self _setMinAndMaxWindowSizes];	
-}
-
-#pragma mark Action Methods
-
-- (IBAction)showSelfView:(id)sender{
-	/*NSRect originalWindowRect = [[self window] frame];
-	NSRect newFrame = originalWindowRect;
-	
-	if (selfView == nil){
-		selfView = [[XMLocalVideoView alloc] init];
-
-		float width = originalWindowRect.size.width - 6.0;
-		float height = XMGetVideoHeightForWidth(width);
-				
-		[selfView setFrame:NSMakeRect(0.0, 0.0, width, height)];
-		//[selfView setShouldDisplayOSD:NO];
-	}
-
-	if (!selfViewShown){
-		newFrame.size.height += [selfView frame].size.height;
-		newFrame.origin.y -= [selfView frame].size.height;
-		[[self window] setFrame:newFrame display:YES animate:YES];	
-		[[[self window] contentView] addSubview:selfView];
-
-		NSPoint origin = NSMakePoint((newFrame.size.width - [selfView frame].size.width) / 2.0, [[mainModules objectAtIndex:0] contentViewSize].height + 15.0);
-		[selfView setFrameOrigin:origin];
-		
-		if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
-		{
-			[selfView startDisplayingLocalVideo];
-		}
-	
-		selfViewShown = YES;
-	}
-	else
-	{
-		[selfView removeFromSuperviewWithoutNeedingDisplay];
-		[selfView stopDisplayingLocalVideo];
-		newFrame.size.height -= [selfView frame].size.height;
-		newFrame.origin.y += [selfView frame].size.height;
-		[[self window] setFrame:newFrame display:YES animate:YES];
-		selfViewShown = NO;
-	}	
-	[[self window] setMinSize:NSMakeSize(newFrame.size.width, newFrame.size.height - 20.0)];
-	[[self window] setMaxSize:NSMakeSize(newFrame.size.width, newFrame.size.height - 20.0)];
-*/
 }
 
 #pragma mark NSWindow Delegate Methods

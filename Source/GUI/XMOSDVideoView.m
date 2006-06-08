@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.13 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.14 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -603,14 +603,19 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	}
 	
 	// ensure correct aspect ratio when in full screen
-	XMVideoSize remoteVideoSize = [[XMVideoManager sharedInstance] remoteVideoSize];
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	XMVideoSize remoteVideoSize = [videoManager remoteVideoSize];
 	
 	float aspectRatio = 0;
 	
-	if(remoteVideoSize == XMVideoSize_SQCIF ||
-	   remoteVideoSize == XMVideoSize_320_240)
+	if(remoteVideoSize == XMVideoSize_SQCIF)
 	{
 		aspectRatio = 4.0/3.0;
+	}
+	else if(remoteVideoSize == XMVideoSize_Custom)
+	{
+		NSSize dimensions = [videoManager remoteVideoDimensions];
+		aspectRatio = dimensions.width/dimensions.height;
 	}
 	else
 	{

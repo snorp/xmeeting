@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.15 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.16 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,7 @@
 	BOOL isGrabbing;
 	XMVideoSize localVideoSize;
 	XMVideoSize remoteVideoSize;
+	NSSize remoteVideoDimensions;
 	
 	NSLock *videoLock;
 	NSOpenGLPixelFormat *openGLPixelFormat;
@@ -165,6 +166,14 @@
  * If no video is received, returns XMVideoSize_NoVideo.
  **/
 - (XMVideoSize)remoteVideoSize;
+
+/**
+ * Returns the dimensions of the remote video frame
+ * If -remoteVideoSize is XMVideoSize_Custom,
+ * this method returns the actual dimensions of the video
+ * frame
+ **/
+- (NSSize)remoteVideoDimensions;
 
 /**
  * Adds videoView to the list of views interested in rendering

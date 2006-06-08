@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.22 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.23 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -722,14 +722,6 @@
 	}
 	
 	callManagerStatus = XM_CALL_MANAGER_IN_CALL;
-	
-	//Play sound! (the current ring comes from iChat. It may be wise to use a royalty-free one)
-	// BOGUS: Move outside Framework!
-	[[NSSound soundNamed:@"Ringer.aiff"] play];
-	
-	//deminiaturize on call
-	// BOGUS: Move outside Framework
-	[[[NSApp windows] objectAtIndex:0] deminiaturize:self];
 	
 	if(automaticallyAcceptIncomingCalls == YES)
 	{

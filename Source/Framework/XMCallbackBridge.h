@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.25 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.26 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,7 +76,11 @@ void _XMHandleAudioStreamOpened(unsigned callID, const char *codec, bool isIncom
 /**
  * This function is called every time a new video stream is opened.
  **/
-void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, XMVideoSize videoSize, bool isIncomingStream);
+void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, 
+								XMVideoSize videoSize, 
+								bool isIncomingStream,
+								unsigned videoWidth,
+								unsigned videoHeight);
 
 /**
  * This function is called every time an existing audio stream is closed.

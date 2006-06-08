@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.10 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.11 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,10 +24,7 @@
 	NSArray *modules;
 	unsigned activeModuleIndex;
 	
-	BOOL selfViewShown;
-	
 	XMFullScreenWindow *fullScreenWindow;
-	IBOutlet id test;
 	BOOL isFullScreen;
 }
 
@@ -81,11 +78,6 @@
  * have changed. This may cause the main window to be resized
  **/
 - (void)noteSizeValuesDidChangeOfModule:(id<XMMainWindowModule>)module;
-
-/**
- * User Interface action methods
- **/
-- (IBAction)showSelfView:(id)sender;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.23 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.24 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -222,7 +222,7 @@ typedef enum XMVideoSize
 	XMVideoSize_CIF,
 	XMVideoSize_4CIF,
 	XMVideoSize_16CIF,
-	XMVideoSize_320_240,
+	XMVideoSize_Custom,
 	XMVideoSizeCount
 } XMVideoSize;
 

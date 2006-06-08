@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.24 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.25 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -345,6 +345,7 @@ typedef enum _XMOpalDispatcherMessage
 }
 
 + (void)_videoStreamOpened:(unsigned)callID codec:(NSString *)codec size:(XMVideoSize)videoSize incoming:(BOOL)isIncomingStream
+					 width:(unsigned)width height:(unsigned)height
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
 	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
@@ -360,7 +361,15 @@ typedef enum _XMOpalDispatcherMessage
 	NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
 	[number release];
 	
-	NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, sizeData, incomingData, nil];
+	number = [[NSNumber alloc] initWithUnsignedInt:width];
+	NSData *widthData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:height];
+	NSData *heightData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, sizeData, incomingData, widthData, heightData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_VideoStreamOpened withComponents:components];
 	
@@ -1151,28 +1160,36 @@ typedef enum _XMOpalDispatcherMessage
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
 	BOOL isIncomingStream = [number boolValue];
 	
+	NSData *widthData = (NSData *)[messageComponents objectAtIndex:4];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:widthData];
+	unsigned width = [number unsignedIntValue];
+	
+	NSData *heightData = (NSData *)[messageComponents objectAtIndex:5];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:heightData];
+	unsigned height = [number unsignedIntValue];
+	
 	NSString *sizeString = nil;
 	
 	switch(videoSize)
 	{
 		case XMVideoSize_SQCIF:
-			sizeString = @"SQCIF";
+			sizeString = @" (SQCIF)";
 			break;
 		case XMVideoSize_QCIF:
-			sizeString = @"QCIF";
+			sizeString = @" (QCIF)";
 			break;
 		case XMVideoSize_CIF:
-			sizeString = @"CIF";
+			sizeString = @" (CIF)";
 			break;
-		case XMVideoSize_320_240:
-			sizeString = @"320x240";
+		case XMVideoSize_Custom:
+			sizeString = [NSString stringWithFormat:@" (%dx%d)", width, height];
 			break;
 		default:
-			sizeString = @"UNKNOWN";
+			sizeString = @" <unknown>";
 			break;
 	}
 	
-	NSString *codecString = [[NSString alloc] initWithFormat:@"%@ (%@)", codec, sizeString];
+	NSString *codecString = [[NSString alloc] initWithFormat:@"%@%@", codec, sizeString];
 	
 	if(isIncomingStream == YES)
 	{

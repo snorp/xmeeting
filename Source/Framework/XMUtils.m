@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.17 2006/06/07 21:45:52 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.18 2006/06/08 11:57:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -569,8 +569,6 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 			return NSMakeSize(704, 576);
 		case XMVideoSize_16CIF:
 			return NSMakeSize(1408, 1152);
-		case XMVideoSize_320_240:
-			return NSMakeSize(320, 240);
 		default:
 			return NSMakeSize(0, 0);
 	}
@@ -578,12 +576,13 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 
 float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize)
 {
-	if(videoSize == XMVideoSize_NoVideo)
+	if(videoSize == XMVideoSize_NoVideo ||
+	   videoSize == XMVideoSize_Custom) // when video size is custom, the aspect ration cannot be determined without looking at the video frames
 	{
 		return 0;
 	}
-	if(videoSize == XMVideoSize_SQCIF ||
-	   videoSize == XMVideoSize_320_240)
+		
+	if(videoSize == XMVideoSize_SQCIF)
 	{
 		// 4:3 aspect ratio
 		return width * (3.0 / 4.0);
@@ -601,8 +600,7 @@ float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize)
 	{
 		return 0;
 	}
-	if(videoSize == XMVideoSize_SQCIF ||
-	   videoSize == XMVideoSize_320_240)
+	if(videoSize == XMVideoSize_SQCIF)
 	{
 		// 4:3 aspect ratio
 		return height * (4.0 / 3.0);
