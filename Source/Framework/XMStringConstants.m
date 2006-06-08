@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.19 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.20 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,6 +55,8 @@ NSString *XMNotification_CallManagerDidCloseOutgoingVideoStream = @"XMeetingCall
 NSString *XMNotification_CallManagerDidCloseIncomingVideoStream = @"XMeetingCallManagerDidCloseIncomingVideoStreamNotification";
 
 NSString *XMNotification_CallManagerDidUpdateCallStatistics = @"XMeetingCallManagerDidUpdateCallStatisticsNotification";
+
+NSString *XMNotification_CallManagerDidOpenFECCChannel = @"XMeetingCallManagerDidOpenFECCChannel";
 
 NSString *XMNotification_AudioManagerInputDeviceDidChange = @"XMeetingAudioManagerInputDeviceDidChangeNotification";
 NSString *XMNotification_AudioManagerOutputDeviceDidChange = @"XMeetingAudioManagerOutputDeviceDidChangeNotification";

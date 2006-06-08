@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.21 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.22 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -199,6 +199,12 @@ extern NSString *XMNotification_CallManagerDidCloseIncomingVideoStream;
  * Posted when the call statistics are updated
  **/
 extern NSString *XMNotification_CallManagerDidUpdateCallStatistics;
+
+/**
+ * Posted when a FECC channel was opened. This channel will remain
+ * open until the call is finished
+ **/
+extern NSString *XMNotification_CallManagerDidOpenFECCChannel;
 
 #pragma mark XMAudioManager Notifications
 

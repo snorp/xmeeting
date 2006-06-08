@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.13 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.14 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,6 +72,8 @@
 				  incoming:(BOOL)isIncomingStream;
 + (void)_videoStreamClosed:(unsigned)callID 
 				  incoming:(BOOL)isIncomingStream;
+
++ (void)_feccChannelOpened;
 
 + (void)_sendUserInputToneForCall:(unsigned)callID
 							 tone:(char)tone;

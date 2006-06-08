@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.31 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.32 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,6 +95,8 @@ void _XMCheckCloseStatus();
 - (void)_handleIncomingAudioStreamClosed;
 - (void)_handleOutgoingVideoStreamClosed;
 - (void)_handleIncomingVideoStreamClosed;
+
+- (void)_handleFECCChannelOpened;
 
 #pragma mark H.323 callbacks
 

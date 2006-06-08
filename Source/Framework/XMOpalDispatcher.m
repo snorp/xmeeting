@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.25 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.26 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,11 +36,12 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_ClearCall,
 	_XMOpalDispatcherMessage_CallCleared,
 	
-	// Media stream message
+	// Media callback messages
 	_XMOpalDispatcherMessage_AudioStreamOpened = 0x0300,
 	_XMOpalDispatcherMessage_VideoStreamOpened,
 	_XMOpalDispatcherMessage_AudioStreamClosed,
 	_XMOpalDispatcherMessage_VideoStreamClosed,
+	_XMOpalDispatcherMessage_FECCChannelOpened,
 	
 	// InCall messages
 	_XMOpalDispatcherMessage_SendUserInputTone = 0x400,
@@ -80,6 +81,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents;
 - (void)_handleAudioStreamClosedMessage:(NSArray *)messageComponents;
 - (void)_handleVideoStreamClosedMessage:(NSArray *)messageComponents;
+- (void)_handleFECCChannelOpenedMessage;
 
 - (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents;
 - (void)_handleSendUserInputStringMessage:(NSArray *)messageComponents;
@@ -410,6 +412,11 @@ typedef enum _XMOpalDispatcherMessage
 	[components release];
 }
 
++ (void)_feccChannelOpened
+{
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_FECCChannelOpened withComponents:nil];
+}
+
 + (void)_sendUserInputToneForCall:(unsigned)callID tone:(char)tone
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
@@ -629,6 +636,9 @@ typedef enum _XMOpalDispatcherMessage
 			break;
 		case _XMOpalDispatcherMessage_VideoStreamClosed:
 			[self _handleVideoStreamClosedMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_FECCChannelOpened:
+			[self _handleFECCChannelOpenedMessage];
 			break;
 		case _XMOpalDispatcherMessage_SendUserInputTone:
 			[self _handleSendUserInputToneMessage:[portMessage components]];
@@ -1259,6 +1269,12 @@ typedef enum _XMOpalDispatcherMessage
 		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingVideoStreamClosed)
 													   withObject:nil waitUntilDone:NO];
 	}
+}
+
+- (void)_handleFECCChannelOpenedMessage
+{
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleFECCChannelOpened)
+												   withObject:nil waitUntilDone:NO];
 }
 
 - (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents

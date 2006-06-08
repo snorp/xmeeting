@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.18 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.19 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,6 +61,8 @@ public:
 	virtual BOOL OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream);
 	virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source);
+	
+	virtual OpalH281Handler * CreateH281ProtocolHandler(OpalH224Handler & h224Handler) const;
 	
 	/* General setup methods */
 	void SetUserName(const PString & name);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.23 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.24 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,6 +94,8 @@
 	activeCall = nil;
 	needsSubsystemSetupAfterCallEnd = NO;
 	callStartFailReason = XMCallStartFailReason_NoFailure;
+	
+	canSendCameraEvents = NO;
 	
 	gatekeeperName = nil;
 	gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
@@ -587,6 +589,11 @@
 	[XMOpalDispatcher _sendUserInputStringForCall:callID string:string];
 }
 
+- (BOOL)canSendCameraEvents
+{
+	return canSendCameraEvents;
+}
+
 - (void)startCameraEvent:(XMCameraEvent)cameraEvent
 {
 	if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
@@ -768,6 +775,8 @@
 
 - (void)_handleCallCleared:(NSNumber *)callEndReason
 {
+	canSendCameraEvents = NO;
+	
 	XMCallEndReason reason = (XMCallEndReason)[callEndReason unsignedIntValue];
 	[activeCall _setCallStatus:XMCallStatus_Ended];
 	[activeCall _setCallEndReason:reason];
@@ -851,6 +860,13 @@
 - (void)_handleIncomingVideoStreamClosed
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseIncomingVideoStream
+														object:self];
+}
+
+- (void)_handleFECCChannelOpened
+{
+	canSendCameraEvents = YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenFECCChannel
 														object:self];
 }
 

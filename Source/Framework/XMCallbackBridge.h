@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.26 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.27 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -91,6 +91,11 @@ void _XMHandleAudioStreamClosed(unsigned callID, bool isIncomingStream);
  * This function is called every time an existing video stream is closed.
  **/
 void _XMHandleVideoStreamClosed(unsigned callID, bool IsIncomingStream);
+
+/**
+ * This function is called every time a FECC channel is opened
+ **/
+void _XMHandleFECCChannelOpened();
 
 #pragma mark -
 #pragma mark MediaTransmitter & MediaReceiver callbacks

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.22 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.23 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -134,6 +134,11 @@ void _XMHandleVideoStreamClosed(unsigned callID, bool isIncomingStream)
 	[XMOpalDispatcher _videoStreamClosed:callID incoming:isIncomingStream];
 	
 	[autoreleasePool release];
+}
+
+void _XMHandleFECCChannelOpened()
+{
+	[XMOpalDispatcher _feccChannelOpened];
 }
 
 #pragma mark -

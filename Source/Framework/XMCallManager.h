@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.22 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.23 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,8 @@
 	XMCallInfo *activeCall;
 	BOOL needsSubsystemSetupAfterCallEnd;
 	XMCallStartFailReason callStartFailReason;
+	
+	BOOL canSendCameraEvents;
 	
 	// h.323 variables
 	NSString *gatekeeperName;
@@ -270,6 +272,12 @@
  * call. Otherwise, an exception will be raised
  **/
 - (void)sendUserInputString:(NSString *)string;
+
+/**
+ * Returns whether the manager can transmit camera events to
+ * the remote party or not.
+ **/
+- (BOOL)canSendCameraEvents;
 
 /**
  * Sends a camera event to the remote party. Calling this method is only

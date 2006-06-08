@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.12 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.13 2006/06/08 15:31:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,13 @@
 - (void)_startZoomOut:(id)sender;
 - (void)_stop;
 
+- (void)_didEstablishCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
+- (void)_didOpenFECCChannel:(NSNotification *)notif;
+
+- (void)_setDialPadButtonsEnabled:(BOOL)flag;
+- (void)_setFECCButtonsEnabled:(BOOL)flag;
+
 @end
 
 @implementation XMDialPadModule
@@ -35,6 +42,8 @@
 
 - (void)dealloc
 {	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
 	[super dealloc];
 }
 
@@ -64,6 +73,31 @@
 	[zoomOutButton setTarget:self];
 	[zoomOutButton setBecomesPressedAction:@selector(_startZoomOut:)];
 	[zoomOutButton setBecomesReleasedAction:@selector(_stop:)];
+	
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+							   name:XMNotification_CallManagerDidEstablishCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didOpenFECCChannel:)
+							   name:XMNotification_CallManagerDidOpenFECCChannel object:nil];
+	
+	XMCallManager *callManager = [XMCallManager sharedInstance];
+	
+	BOOL enableDialPadButtons = NO;
+	if([callManager isInCall])
+	{
+		enableDialPadButtons = YES;
+	}
+	BOOL enableFECCButtons = NO;
+	if([callManager canSendCameraEvents])
+	{
+		enableFECCButtons = YES;
+	}
+	
+	[self _setDialPadButtonsEnabled:enableDialPadButtons];
+	[self _setFECCButtonsEnabled:enableFECCButtons];
 }
 
 - (NSString *)name
@@ -239,6 +273,54 @@
 	{
 		[callManager stopCameraEvent];
 	}
+}
+
+#pragma mark -
+#pragma mark Notification Methods
+
+- (void)_didEstablishCall:(NSNotification *)notif
+{
+	[self _setDialPadButtonsEnabled:YES];
+}
+
+- (void)_didClearCall:(NSNotification *)notif
+{
+	[self _setDialPadButtonsEnabled:NO];
+	[self _setFECCButtonsEnabled:NO];
+}
+
+- (void)_didOpenFECCChannel:(NSNotification *)notif
+{
+	[self _setFECCButtonsEnabled:YES];
+}
+
+#pragma mark -
+#pragma mark Private Methods
+
+- (void)_setDialPadButtonsEnabled:(BOOL)flag
+{
+	[button0 setEnabled:flag];
+	[button1 setEnabled:flag];
+	[button2 setEnabled:flag];
+	[button3 setEnabled:flag];
+	[button4 setEnabled:flag];
+	[button5 setEnabled:flag];
+	[button6 setEnabled:flag];
+	[button7 setEnabled:flag];
+	[button8 setEnabled:flag];
+	[button9 setEnabled:flag];
+	[button10 setEnabled:flag];
+	[button11 setEnabled:flag];
+}
+
+- (void)_setFECCButtonsEnabled:(BOOL)flag
+{
+	[upButton setEnabled:flag];
+	[downButton setEnabled:flag];
+	[leftButton setEnabled:flag];
+	[rightButton setEnabled:flag];
+	[zoomInButton setEnabled:flag];
+	[zoomOutButton setEnabled:flag];
 }
 
 @end
