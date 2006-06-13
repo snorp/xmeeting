@@ -12,10 +12,14 @@
 		<string>280 452 720 207 0 0 1280 832 </string>
 		<key>338</key>
 		<string>280 422 720 267 0 0 1280 832 </string>
+		<key>558</key>
+		<string>280 457 720 198 0 0 1280 832 </string>
+		<key>559</key>
+		<string>280 401 720 309 0 0 1280 832 </string>
 		<key>7</key>
-		<string>374 413 720 282 0 0 1280 832 </string>
+		<string>216 520 720 194 0 0 1280 832 </string>
 		<key>9</key>
-		<string>65 423 720 385 0 0 1280 832 </string>
+		<string>94 436 720 385 0 0 1280 832 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>446.1</string>
@@ -40,16 +44,16 @@
 			<string>478</string>
 			<string>476</string>
 		</array>
-		<key>12</key>
+		<key>15</key>
 		<array>
-			<string>481</string>
-			<string>479</string>
+			<string>580</string>
+			<string>579</string>
 		</array>
-		<key>13</key>
+		<key>16</key>
 		<array>
-			<string>483</string>
-			<string>489</string>
-			<string>482</string>
+			<string>582</string>
+			<string>587</string>
+			<string>581</string>
 		</array>
 		<key>2</key>
 		<array>
@@ -85,14 +89,14 @@
 		</array>
 	</dict>
 	<key>IBLastGroupID</key>
-	<string>15</string>
+	<string>17</string>
 	<key>IBLockedObjects</key>
 	<array>
 		<integer>9</integer>
 	</array>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>9</integer>
+		<integer>7</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8I127</string>

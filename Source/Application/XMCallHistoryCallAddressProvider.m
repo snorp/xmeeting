@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.7 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.8 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,10 +112,12 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	if(flag == YES)
 	{
 		[[XMCallAddressManager sharedInstance] addCallAddressProvider:self];
+		isActiveCallAddressProvider = YES;
 	}
 	else
 	{
 		[[XMCallAddressManager sharedInstance] removeCallAddressProvider:self];
+		isActiveCallAddressProvider = NO;
 	}
 }
 

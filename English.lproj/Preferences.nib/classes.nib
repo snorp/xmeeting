@@ -43,6 +43,37 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            ACTIONS = {defaultAction = id; toggleEnableABPhoneNumbers = id; }; 
+            CLASS = XMAddressBookPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                enableABDatabaseSearchSwitch = NSButton; 
+                enableABPhoneNumbersSwitch = NSButton; 
+                phoneNumberProtocolMatrix = NSMatrix; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                defaultAction = id; 
+                toggleAutomaticallyHideInCallControls = id; 
+                togglePlaySoundOnIncomingCall = id; 
+            }; 
+            CLASS = XMAppearancePreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                automaticallyEnterFullScreenSwitch = NSButton; 
+                automaticallyHideInCallControlsSwitch = NSButton; 
+                contentView = NSView; 
+                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
+                playSoundOnIncomingCallSwitch = NSButton; 
+                showSelfViewMirroredSwitch = NSButton; 
+                soundTypePopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
             ACTIONS = {
                 chooseDebugFilePath = id; 
                 defaultAction = id; 

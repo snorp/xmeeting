@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.h,v 1.5 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.h,v 1.6 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,19 +28,12 @@ extern NSString *XMKey_GeneralPreferencesModuleIdentifier;
 	IBOutlet NSButton *generateDebugLogSwitch;
 	IBOutlet NSTextField *debugLogFilePathField;
 	IBOutlet NSButton *chooseDebugLogFilePathButton;
-	
-	IBOutlet NSButton *automaticallyEnterFullScreenSwitch;
-	IBOutlet NSButton *showSelfViewMirroredSwitch;
-	IBOutlet NSButton *automaticallyHideInCallControlsSwitch;
-	IBOutlet NSPopUpButton *inCallControlsHideAndShowEffectPopUp;
 }
 
 - (IBAction)defaultAction:(id)sender;
 
 - (IBAction)toggleGenerateDebugLogFile:(id)sender;
 - (IBAction)chooseDebugFilePath:(id)sender;
-
-- (IBAction)toggleAutomaticallyHideInCallControls:(id)sender;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.5 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.6 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,13 +96,15 @@ extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
 /**
  * Returns the address book record belonging to the person specified and having the
  * identifier specified. The identifier is of type like the ones used by ABMultiValue
- * instances to identify the data records. the identifier is only checked with the identifiers
+ * instances to identify the data records. The identifier is checked with the identifiers
  * contained by the multi value stored with the XMAddressBookProperty_HumanReadableCallAddress
- * property.
+ * property, if isPhoneNumber is NO. If isPhoneNumber is YES, the identifier is checked
+ * with the identifiers contained in the multi value stored with the kABPhoneProperty.
  * if identifier is nil, a new record is created which is marked as needing to be added
- * to the person as soon as a call adress was set.
+ * to the person as soon as a call adress was set. This only works when isPhoneNumber is NO.
  **/
-- (XMAddressBookRecord *)recordForPerson:(ABPerson *)person identifier:(NSString *)identifier;
+- (XMAddressBookRecord *)recordForPerson:(ABPerson *)person identifier:(NSString *)identifier
+						   isPhoneNumber:(BOOL)isPhoneNumber;
 
 /**
  * Sets the primary identifier for the person specified

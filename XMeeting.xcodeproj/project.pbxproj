@@ -253,6 +253,11 @@
 		D1A5E1FD09C8835E0063B926 /* XMLocalVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */; };
 		D1A5E9E409C9C69F0063B926 /* XMInspectorModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */; };
 		D1A5EE1609CB08E30063B926 /* DummyImage.gif in Resources */ = {isa = PBXBuildFile; fileRef = D1A5EE1509CB08E30063B926 /* DummyImage.gif */; };
+		D1AF63D60A39415200CAF35F /* XMAppearancePreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1AF63D40A39415200CAF35F /* XMAppearancePreferencesModule.h */; };
+		D1AF63D70A39415200CAF35F /* XMAppearancePreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1AF63D50A39415200CAF35F /* XMAppearancePreferencesModule.m */; };
+		D1AF63DC0A39416700CAF35F /* XMAddressBookPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1AF63DA0A39416700CAF35F /* XMAddressBookPreferencesModule.h */; };
+		D1AF63DD0A39416700CAF35F /* XMAddressBookPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1AF63DB0A39416700CAF35F /* XMAddressBookPreferencesModule.m */; };
+		D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */; };
 		D1AF73DB084D02C200D50883 /* XMCallAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */; };
 		D1AF744D084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = D1AF744C084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m */; };
 		D1B06A5C086A9C5E00563EDB /* Loudspeaker.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1B06A5A086A9C5E00563EDB /* Loudspeaker.tiff */; };
@@ -1184,6 +1189,11 @@
 		D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMLocalVideoView.m; path = Source/GUI/XMLocalVideoView.m; sourceTree = "<group>"; };
 		D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInspectorModule.m; path = Source/GUI/XMInspectorModule.m; sourceTree = "<group>"; };
 		D1A5EE1509CB08E30063B926 /* DummyImage.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = DummyImage.gif; path = Resources/Images/DummyImage.gif; sourceTree = "<group>"; };
+		D1AF63D40A39415200CAF35F /* XMAppearancePreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAppearancePreferencesModule.h; path = Source/GUI/XMAppearancePreferencesModule.h; sourceTree = "<group>"; };
+		D1AF63D50A39415200CAF35F /* XMAppearancePreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAppearancePreferencesModule.m; path = Source/GUI/XMAppearancePreferencesModule.m; sourceTree = "<group>"; };
+		D1AF63DA0A39416700CAF35F /* XMAddressBookPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPreferencesModule.h; path = Source/GUI/XMAddressBookPreferencesModule.h; sourceTree = "<group>"; };
+		D1AF63DB0A39416700CAF35F /* XMAddressBookPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPreferencesModule.m; path = Source/GUI/XMAddressBookPreferencesModule.m; sourceTree = "<group>"; };
+		D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = appearancePreferences.tif; path = Resources/Images/appearancePreferences.tif; sourceTree = "<group>"; };
 		D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallAddressManager.h; path = Source/Application/XMCallAddressManager.h; sourceTree = "<group>"; };
 		D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallAddressManager.m; path = Source/Application/XMCallAddressManager.m; sourceTree = "<group>"; };
 		D1AF744B084DA1BE00D50883 /* XMAddressBookCallAddressProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookCallAddressProvider.h; path = Source/Application/XMAddressBookCallAddressProvider.h; sourceTree = "<group>"; };
@@ -2199,12 +2209,16 @@
 				D1A02AB6081E4B8C0018BD11 /* XMPreferencesModule.h */,
 				D1A02ADB081E56DB0018BD11 /* XMGeneralPreferencesModule.h */,
 				D1A02ADC081E56DB0018BD11 /* XMGeneralPreferencesModule.m */,
+				D1AF63D40A39415200CAF35F /* XMAppearancePreferencesModule.h */,
+				D1AF63D50A39415200CAF35F /* XMAppearancePreferencesModule.m */,
 				D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */,
 				D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */,
 				D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */,
 				D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */,
 				D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */,
 				D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */,
+				D1AF63DA0A39416700CAF35F /* XMAddressBookPreferencesModule.h */,
+				D1AF63DB0A39416700CAF35F /* XMAddressBookPreferencesModule.m */,
 			);
 			name = "Preferences Window";
 			sourceTree = "<group>";
@@ -3231,6 +3245,7 @@
 				1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */,
 				D1EB18AC08437A26002CEF53 /* AddressBook.tiff */,
 				D120614309FBDE5100179B6C /* AddressBook_16.tiff */,
+				D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */,
 				1ADAFBD80990EBA700F6C5FF /* Call_24.tif */,
 				1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */,
 				D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */,
@@ -3463,6 +3478,8 @@
 				D102AFFD09EA770F0050239C /* XMInstantActionButton.h in Headers */,
 				D12077B90A011A0900179B6C /* XMRTPH263PlusPacketizer.h in Headers */,
 				D12077BA0A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h in Headers */,
+				D1AF63D60A39415200CAF35F /* XMAppearancePreferencesModule.h in Headers */,
+				D1AF63DC0A39416700CAF35F /* XMAddressBookPreferencesModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4032,6 +4049,7 @@
 				D104D9C20A0E9947000898F2 /* DefaultURL_SIP.tif in Resources */,
 				D1887E770A283DEA00C938BB /* Localizable.strings in Resources */,
 				D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */,
+				D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4172,6 +4190,8 @@
 				D102A8FC09E6B4DA0050239C /* XMDialPadModule.m in Sources */,
 				D102AFFE09EA770F0050239C /* XMInstantActionButton.m in Sources */,
 				D12077B80A011A0900179B6C /* XMRTPH263PlusPacketizer.c in Sources */,
+				D1AF63D70A39415200CAF35F /* XMAppearancePreferencesModule.m in Sources */,
+				D1AF63DD0A39416700CAF35F /* XMAddressBookPreferencesModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

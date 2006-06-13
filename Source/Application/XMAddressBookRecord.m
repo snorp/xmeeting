@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecord.m,v 1.3 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMAddressBookRecord.m,v 1.4 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 #import "XMSimpleAddressResource.h"
 #import "XMAddressBookManager.h"
 #import "XMAddressBookCallAddressProvider.h"
+#import "XMPreferencesManager.h"
 
 #define XM_ILLEGAL_INDEX NSNotFound
 #define XM_UNKNOWN_INDEX NSNotFound-1
@@ -102,7 +103,8 @@
 		
 		NSString *phoneNumber = [multiValue valueAtIndex:(index & XM_PHONE_NUMBER_CLEAR_MASK)];
 		
-		XMSimpleAddressResource *addressResource = [[XMSimpleAddressResource alloc] initWithAddress:phoneNumber callProtocol:XMCallProtocol_SIP];
+		XMCallProtocol callProtocol = [[XMPreferencesManager sharedInstance] addressBookPhoneNumberProtocol];
+		XMSimpleAddressResource *addressResource = [[XMSimpleAddressResource alloc] initWithAddress:phoneNumber callProtocol:callProtocol];
 		
 		return [addressResource autorelease];
 	}

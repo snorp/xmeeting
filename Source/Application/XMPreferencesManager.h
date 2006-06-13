@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.12 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.13 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_PREFERENCES_MANAGER_H__
 
 #import <Cocoa/Cocoa.h>
+#import "XMeeting.h"
 
 @class XMH323Account, XMSIPAccount, XMLocation;
 
@@ -29,8 +30,14 @@ extern NSString *XMKey_PreferencesManagerAutomaticallyEnterFullScreen;
 extern NSString *XMKey_PreferencesManagerShowSelfViewMirrored;
 extern NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls;
 extern NSString *XMKey_PreferencesManagerInCallControlHideAndShowEffect;
+extern NSString *XMKey_PreferencesManagerAlertIncomingCalls;
+extern NSString *XMKey_PreferencesManagerIncomingCallAlertType;
 extern NSString *XMKey_PreferencesManagerDisabledVideoModules;
 extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
+
+extern NSString *XMKey_PreferencesManagerSearchAddressBookDatabase;
+extern NSString *XMKey_PreferencesManagerEnableAddressBookPhoneNumbers;
+extern NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol;
 
 typedef enum XMInCallControlHideAndShowEffect
 {
@@ -38,6 +45,14 @@ typedef enum XMInCallControlHideAndShowEffect
 	XMInCallControlHideAndShowEffect_Fade,
 	XMInCallControlHideAndShowEffect_Roll
 } XMInCallControlHideAndShowEffect;
+
+typedef enum XMIncomingCallAlertType
+{
+	XMIncomingCallAlertType_NoAlert = 0,
+	XMIncomingCallAlertType_Ringing,
+	XMIncomingCallAlertType_RingOnce,
+	XMIncomingCallAlertType_Beep
+} XMIncomingCallAlertType;
 
 /**
  * XMPreferencesManager deals with the various task concerning
@@ -248,6 +263,12 @@ typedef enum XMInCallControlHideAndShowEffect
 - (XMInCallControlHideAndShowEffect)inCallControlHideAndShowEffect;
 - (void)setInCallControlHideAndShowEffect:(XMInCallControlHideAndShowEffect)effect;
 
+- (BOOL)alertIncomingCalls;
+- (void)setAlertIncomingCalls:(BOOL)flag;
+
+- (XMIncomingCallAlertType)incomingCallAlertType;
+- (void)setIncomingCallAlertType:(XMIncomingCallAlertType)alertType;
+
 /**
  * Returns the password found for the service and account specified
  **/
@@ -277,6 +298,18 @@ typedef enum XMInCallControlHideAndShowEffect
  * Sets the name of the preferred video input device.
  **/
 - (void)setPreferredVideoInputDevice:(NSString *)device;
+
+/**
+ * Address Book settings
+ **/
+- (BOOL)searchAddressBookDatabase;
+- (void)setSearchAddressBookDatabase:(BOOL)flag;
+
+- (BOOL)enableAddressBookPhoneNumbers;
+- (void)setEnableAddressBookPhoneNumbers:(BOOL)flag;
+
+- (XMCallProtocol)addressBookPhoneNumberProtocol;
+- (void)setAddressBookPhoneNumberProtocol:(XMCallProtocol)callProtocol;
 
 @end
 

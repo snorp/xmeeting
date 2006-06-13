@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.10 2006/05/24 10:11:49 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.11 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,10 +76,12 @@
 	if(flag == YES)
 	{
 		[[XMCallAddressManager sharedInstance] addCallAddressProvider:self];
+		isActiveCallAddressProvider = YES;
 	}
 	else
 	{
 		[[XMCallAddressManager sharedInstance] removeCallAddressProvider:self];
+		isActiveCallAddressProvider = NO;
 	}
 }
 

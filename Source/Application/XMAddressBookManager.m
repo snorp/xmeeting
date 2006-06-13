@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.7 2006/05/24 10:11:49 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.8 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 
 #import "XMSimpleAddressResource.h"
 #import "XMAddressBookRecord.h"
+#import "XMPreferencesManager.h"
 #import "XMApplicationFunctions.h"
 
 #define XM_UNKNOWN_INDEX NSNotFound-1
@@ -123,22 +124,37 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 	
 	NSMutableArray *validRecords = [[NSMutableArray alloc] initWithCapacity:count];
 	
+	BOOL searchPhoneNumbers = [[XMPreferencesManager sharedInstance] enableAddressBookPhoneNumbers];
+	
 	for(i = 0; i < count; i++)
 	{
 		ABPerson *person = (ABPerson *)[people objectAtIndex:i];
-		ABMultiValue *multiValue = (ABMultiValue *)[person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+		ABMultiValue *addressMultiValue = (ABMultiValue *)[person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 		
-		if(multiValue == nil)
+		if(addressMultiValue != nil)
 		{
-			continue;
+			unsigned index = [self _indexOfPrimaryCallAddressForPerson:person];
+		
+			XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index
+																		 propertyMatch:XMAddressBookRecordPropertyMatch_CallAddressMatch];
+			[validRecords addObject:record];
+			[record release];
 		}
 		
-		unsigned index = [self _indexOfPrimaryCallAddressForPerson:person];
-		
-		XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index
-																	 propertyMatch:XMAddressBookRecordPropertyMatch_NoMatch];
-		[validRecords addObject:record];
-		[record release];
+		if(searchPhoneNumbers == YES)
+		{
+			ABMultiValue *phoneNumberMultiValue = (ABMultiValue *)[person valueForProperty:kABPhoneProperty];
+			if(phoneNumberMultiValue != nil)
+			{
+				unsigned index = [self _indexOfPrimaryPhoneNumberForPerson:person];
+			
+				XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index
+																			 propertyMatch:XMAddressBookRecordPropertyMatch_PhoneNumberMatch];
+			
+				[validRecords addObject:record];
+				[record release];
+			}
+		}
 	}
 	
 	return [validRecords autorelease];
@@ -197,20 +213,40 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 #pragma mark Searching the Database
 
 - (XMAddressBookRecord *)recordForPerson:(ABPerson *)person identifier:(NSString *)identifier
+						   isPhoneNumber:(BOOL)isPhoneNumber
 {
 	unsigned index;
 	
+	XMAddressBookRecordPropertyMatch propertyMatch = XMAddressBookRecordPropertyMatch_CallAddressMatch;
+	
 	if(identifier == nil)
 	{
-		index = XM_UNKNOWN_INDEX;
+		if(isPhoneNumber == NO)
+		{
+			index = XM_UNKNOWN_INDEX;
+		}
+		else
+		{
+			return nil;
+		}
 	}
 	else
 	{
-		ABMultiValue *multiValue = [person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
+		NSString *property = XMAddressBookProperty_HumanReadableCallAddress;
+		if(isPhoneNumber == YES)
+		{
+			property = kABPhoneProperty;
+			propertyMatch = XMAddressBookRecordPropertyMatch_PhoneNumberMatch;
+		}
+		ABMultiValue *multiValue = [person valueForProperty:property];
 		index = [multiValue indexForIdentifier:identifier];
+		if(isPhoneNumber == YES)
+		{
+			index |= XM_PHONE_NUMBER_MASK;
+		}
 	}
 	
-	XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index propertyMatch:XMAddressBookRecordPropertyMatch_NoMatch];
+	XMAddressBookRecord *record = [[XMAddressBookRecord alloc] _initWithPerson:person index:index propertyMatch:propertyMatch];
 	return [record autorelease];
 }
 
@@ -242,6 +278,8 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 {
 	NSRange searchStringRange = NSMakeRange(0, [searchString length]);
 	
+	BOOL searchPhoneNumbers = [[XMPreferencesManager sharedInstance] enableAddressBookPhoneNumbers];
+	
 	ABSearchElement *finalSearchElement;	// the searchElement with which we actually query the database
 	
 	// Names are searched only by the first token to allow entering firstName lastName or similar constructs
@@ -263,14 +301,27 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 																			 label:nil key:nil value:searchString
 																		comparison:kABPrefixMatchCaseInsensitive];
 	
-	ABSearchElement *phoneNumberSearchElement = [ABPerson searchElementForProperty:kABPhoneProperty label:nil key:nil
-																			 value:searchString
-																		comparison:kABPrefixMatchCaseInsensitive];
+	ABSearchElement *phoneNumberSearchElement = nil;
 	
-	NSArray *stringSearchElements = [[NSArray alloc] initWithObjects:firstNameSearchElement, lastNameSearchElement, companyNameSearchElement,
-		callAddressSearchElement, phoneNumberSearchElement, nil];
-	finalSearchElement = [ABSearchElement searchElementForConjunction:kABSearchOr children:stringSearchElements];
-	[stringSearchElements release];
+	if(searchPhoneNumbers == YES)
+	{
+	
+		phoneNumberSearchElement = [ABPerson searchElementForProperty:kABPhoneProperty label:nil key:nil
+																value:searchString
+														   comparison:kABPrefixMatchCaseInsensitive];
+	
+		NSArray *searchElements = [[NSArray alloc] initWithObjects:firstNameSearchElement, lastNameSearchElement, companyNameSearchElement,
+												callAddressSearchElement, phoneNumberSearchElement, nil];
+		finalSearchElement = [ABSearchElement searchElementForConjunction:kABSearchOr children:searchElements];
+		[searchElements release];
+	}
+	else
+	{
+		NSArray *searchElements = [[NSArray alloc] initWithObjects:firstNameSearchElement, lastNameSearchElement, companyNameSearchElement,
+												callAddressSearchElement, nil];
+		finalSearchElement = [ABSearchElement searchElementForConjunction:kABSearchOr children:searchElements];
+		[searchElements release];
+	}
 	
 	NSArray *matchedRecords = [addressBook recordsMatchingSearchElement:finalSearchElement];
 	
@@ -284,8 +335,14 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 		
 		ABMultiValue *callAddressMultiValue = [record valueForProperty:XMAddressBookProperty_HumanReadableCallAddress];
 		unsigned callAddressCount = [callAddressMultiValue count];
-		ABMultiValue *phoneNumberMultiValue = [record valueForProperty:kABPhoneProperty];
-		unsigned phoneNumberCount = [phoneNumberMultiValue count];
+		ABMultiValue *phoneNumberMultiValue = nil;
+		unsigned phoneNumberCount = 0;
+		
+		if(searchPhoneNumbers)
+		{
+			phoneNumberMultiValue = [record valueForProperty:kABPhoneProperty];
+			phoneNumberCount = [phoneNumberMultiValue count];
+		}
 		
 		if(callAddressCount != 0 || phoneNumberCount != 0)
 		{
@@ -461,7 +518,7 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 					}
 				}
 			}
-			if([phoneNumberSearchElement matchesRecord:record])
+			if(phoneNumberSearchElement != nil && [phoneNumberSearchElement matchesRecord:record])
 			{
 				unsigned j;
 				

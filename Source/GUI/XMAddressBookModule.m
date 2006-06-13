@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.19 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.20 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #import "XMCallAddressManager.h"
 #import "XMAddressBookManager.h"
 #import "XMAddressBookRecord.h"
+#import "XMPreferencesManager.h"
 #import "XMMainWindowController.h"
 
 #define XM_DEFAULT_TAG 0
@@ -38,6 +39,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (void)_validateSpecificGatekeeperPart;
 - (void)_validateEditOKButton;
+
+- (void)_preferencesDidChange:(NSNotification *)notif;
 
 @end
 
@@ -76,8 +79,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	[addressBookView addProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	[addressBookView setColumnTitle:NSLocalizedString(@"XM_ADDRESS_BOOK_MODULE_ADDRESS_TITLE", @"") forProperty:XMAddressBookProperty_HumanReadableCallAddress];
 	
-	// also display phone numbers
-	[addressBookView addProperty:kABPhoneProperty];
+	// eventually display phone numbers
 	[addressBookView setColumnTitle:NSLocalizedString(@"XM_ADDRESS_BOOK_MODULE_PHONE_TITLE", @"") forProperty:kABPhoneProperty];
 	
 	// registering some notification
@@ -87,6 +89,13 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 						   selector:@selector(_recordSelectionDidChange:)
 							   name:ABPeoplePickerValueSelectionDidChangeNotification
 							 object:nil];
+	[notificationCenter addObserver:self
+						   selector:@selector(_preferencesDidChange:)
+							   name:XMNotification_PreferencesManagerDidChangePreferences
+							 object:nil];
+	
+	// setup of interface
+	[self _preferencesDidChange:nil];
 	
 	// validating the buttons
 	[self _validateCallButton];
@@ -170,8 +179,15 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		identifier = (NSString *)[selectedIdentifiers objectAtIndex:0];
 	}
 	
-	XMAddressBookRecord *record = [[XMAddressBookManager sharedInstance] recordForPerson:person identifier:identifier];
+	BOOL isPhoneNumber = NO;
+	if([[addressBookView displayedProperty] isEqualToString:kABPhoneProperty])
+	{
+		isPhoneNumber = YES;
+	}
 	
+	XMAddressBookRecord *record = [[XMAddressBookManager sharedInstance] recordForPerson:person identifier:identifier
+																		   isPhoneNumber:isPhoneNumber];
+
 	[[XMCallAddressManager sharedInstance] makeCallToAddress:record];
 }
 
@@ -211,7 +227,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		identifier = (NSString *)[selectedIdentifiers objectAtIndex:0];
 	}
 	
-	XMAddressBookRecord *record = [[XMAddressBookManager sharedInstance] recordForPerson:person identifier:identifier];
+	XMAddressBookRecord *record = [[XMAddressBookManager sharedInstance] recordForPerson:person identifier:identifier
+																		   isPhoneNumber:NO];
 	[self _editRecord:record];
 }
 
@@ -226,7 +243,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	
 	ABPerson *person = (ABPerson *)[selectedRecords objectAtIndex:0];
 	
-	XMAddressBookRecord *record = [[XMAddressBookManager sharedInstance] recordForPerson:person identifier:nil];
+	XMAddressBookRecord *record = [[XMAddressBookManager sharedInstance] recordForPerson:person identifier:nil
+																		   isPhoneNumber:NO];
 	[self _editRecord:record];
 }
 
@@ -260,6 +278,12 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (IBAction)addressBookDoubleAction:(id)sender
 {
+	if([[addressBookView displayedProperty] isEqualToString:kABPhoneProperty])
+	{
+		[self launchAddressBook:nil];
+		return;
+	}
+	
 	BOOL isEdit = [self _canEditSelectedRecord];
 	
 	if(isEdit)
@@ -403,7 +427,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	
 	[self cancelNewRecord:self];
 	
-	XMAddressBookRecord *record = [addressBookManager recordForPerson:person identifier:nil];
+	XMAddressBookRecord *record = [addressBookManager recordForPerson:person identifier:nil isPhoneNumber:NO];
 	
 	[self _editRecord:record];
 }
@@ -437,6 +461,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		{
 			return NO;
 		}
+		
+		if([[addressBookView displayedProperty] isEqualToString:kABPhoneProperty])
+		{
+			return NO;
+		}
 	}
 	else if(tag == 2)
 	{
@@ -450,6 +479,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (BOOL)_canEditSelectedRecord
 {
+	if([[addressBookView displayedProperty] isEqualToString:kABPhoneProperty])
+	{
+		return NO;
+	}
+	
 	NSArray *selectedRecords = [addressBookView selectedRecords];
 	
 	if([selectedRecords count] == 0)
@@ -611,31 +645,33 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 - (void)_validateCallButton
 {
-	BOOL enableCallButton = [self _canEditSelectedRecord];
-	[callButton setEnabled:enableCallButton];
-	/*NSArray *selectedRecords = [addressBookView selectedRecords];
-	ABPerson<XMAddressBookRecord> *person;
+	NSArray *selectedRecords = [addressBookView selectedRecords];
 	
 	BOOL enableCallButton = YES;
-	BOOL enableEditButton = YES;
 	
 	if([selectedRecords count] == 0)
 	{
-		enableEditButton = NO;
 		enableCallButton = NO;
 	}
 	else
 	{
-		person = (ABPerson<XMAddressBookRecord> *)[selectedRecords objectAtIndex:0];
+		ABPerson *person = (ABPerson *)[selectedRecords objectAtIndex:0];
+		NSString *displayedProperty = [addressBookView displayedProperty];
 		
-		if([person isValid] == NO)
+		if([displayedProperty isEqualToString:kABPhoneProperty])
+		{
+			if([person valueForProperty:kABPhoneProperty] == nil)
+			{
+				enableCallButton = NO;
+			}
+		}
+		else if([person valueForProperty:XMAddressBookProperty_HumanReadableCallAddress] == nil)
 		{
 			enableCallButton = NO;
 		}
 	}
 	
 	[callButton setEnabled:enableCallButton];
-	[editButton setEnabled:enableEditButton];*/
 }
 
 - (void)_displayProtocol:(XMCallProtocol)protocol
@@ -750,30 +786,18 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	[okButton setEnabled:enableOKButton];
 }
 
-@end
-
-/*
-@implementation ABPerson (XMCallAddressMethods)
-
-- (id<XMCallAddressProvider>)provider
+- (void)_preferencesDidChange:(NSNotification *)notif
 {
-	return nil;
-}
-
-- (XMAddressResource *)addressResource
-{
-	return [(ABPerson<XMAddressBookRecord> *)self callAddress];
-}
-
-- (NSString *)displayString
-{
-	return [(ABPerson<XMAddressBookRecord> *)self displayName];
-}
-
-- (NSString *)displayImage
-{
-	return [NSImage imageNamed:@"AddressBook"];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
+	if([preferencesManager enableAddressBookPhoneNumbers])
+	{
+		[addressBookView addProperty:kABPhoneProperty];
+	}
+	else
+	{
+		[addressBookView removeProperty:kABPhoneProperty];
+	}
 }
 
 @end
-*/

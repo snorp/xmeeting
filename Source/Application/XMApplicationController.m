@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.37 2006/06/08 11:57:31 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.38 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,8 +42,9 @@
 
 @interface XMApplicationController (PrivateMethods)
 
-// location / video management
+// preferences management
 - (void)_activeLocationDidChange:(NSNotification *)notif;
+- (void)_preferencesDidChange:(NSNotification *)notif;
 
 // Call management
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
@@ -110,6 +111,8 @@
 	
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
+	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
+							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
 							   name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
@@ -200,6 +203,14 @@
 	
 	[utils startFetchingCheckipExternalAddress];
 	[utils updateSTUNInformation];
+	
+
+	[[XMMainWindowController sharedInstance] showMainWindow];
+}
+
+- (IBAction)showMainWindow:(id)sender
+{
+	[[XMMainWindowController sharedInstance] showMainWindow];
 }
 
 - (IBAction)showInspector:(id)sender
@@ -268,6 +279,12 @@
 #pragma mark -
 #pragma mark NSApplication delegate methods
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)flag
+{
+	[[XMMainWindowController sharedInstance] showMainWindow];
+	return YES;
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
 	// Close the preferences window in a proper fashion
@@ -296,6 +313,20 @@
 	else
 	{
 		[videoManager stopGrabbing];
+	}
+}
+
+- (void)_preferencesDidChange:(NSNotification *)notif
+{
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+	
+	if([preferencesManager searchAddressBookDatabase] == YES)
+	{
+		[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
+	}
+	else
+	{
+		[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:NO];
 	}
 }
 
@@ -372,13 +403,32 @@
 
 - (void)_displayIncomingCallAlert
 {
-	//Play sound! (the current ring comes from iChat. It may be wise to use a royalty-free one)
-	[[NSSound soundNamed:@"Ringer.aiff"] play];
+	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
-	//deminiaturize on call
-	[[[NSApp windows] objectAtIndex:0] deminiaturize:self];
+	// show main window on call
+	[[XMMainWindowController sharedInstance] showMainWindow];
 	
 	incomingCallAlert = [[NSAlert alloc] init];
+	
+	if([preferencesManager alertIncomingCalls] == YES)
+	{
+		alertType = [preferencesManager incomingCallAlertType];
+		
+		switch(alertType)
+		{
+			case XMIncomingCallAlertType_Ringing:
+			case XMIncomingCallAlertType_RingOnce:
+				incomingCallSound = [[NSSound soundNamed:@"Ringer.aiff"] retain];
+				[incomingCallSound setDelegate:self];
+				[incomingCallSound play];
+				break;
+			case XMIncomingCallAlertType_Beep:
+				NSBeep();
+				break;
+			default:
+				break;
+		}
+	}
 	
 	[incomingCallAlert setMessageText:NSLocalizedString(@"Incoming Call", @"")];
 	
@@ -407,6 +457,9 @@
 	
 	[incomingCallAlert release];
 	incomingCallAlert = nil;
+	[incomingCallSound stop];
+	[incomingCallSound release];
+	incomingCallSound = nil;
 }
 
 - (void)_displayCallStartFailedAlert:(NSString *)address
@@ -595,6 +648,13 @@
 	[alert release];
 }
 
+- (void)sound:(NSSound *)sound didFinishPlaying:(BOOL)didFinish
+{
+	if(didFinish == YES && alertType == XMIncomingCallAlertType_Ringing)
+	{
+		[sound play];
+	}
+}
 #pragma mark -
 #pragma mark Menu Validation
 
@@ -680,7 +740,9 @@
 {		
 	// registering the call address providers
 	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
-	[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
+	
+	[self _preferencesDidChange:nil];
+	//[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];
@@ -735,6 +797,7 @@
 	[self _activeLocationDidChange:nil];
 	
 	incomingCallAlert = nil;
+	incomingCallSound = nil;
 }
 
 @end

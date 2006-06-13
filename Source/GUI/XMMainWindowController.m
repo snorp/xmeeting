@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.18 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.19 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -190,7 +190,7 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 
 - (void)windowWillClose:(NSNotification *)notif
 {
-	[NSApp terminate:self];
+	//[NSApp terminate:self];
 }
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)newSize

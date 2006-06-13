@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.17 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.18 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,8 @@
 #define __XM_APPLICATION_CONTROLLER_H__
 
 #import <Cocoa/Cocoa.h>
+
+#import "XMPreferencesManager.h"
 
 @class XMNoCallModule, XMInCallModule;
 @class XMInfoModule, XMStatisticsModule, XMCallHistoryModule;
@@ -42,6 +44,8 @@
 	BOOL isFullScreen;
 	
 	NSAlert *incomingCallAlert;
+	NSSound *incomingCallSound;
+	XMIncomingCallAlertType alertType;
 	
 	NSString *calledAddress;
 }
@@ -58,6 +62,7 @@
 - (IBAction)retrySIPRegistration:(id)sender;
 - (IBAction)updateNetworkInformation:(id)sender;
 
+- (IBAction)showMainWindow:(id)sender;
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showTools:(id)sender;
 - (IBAction)showContacts:(id)sender;

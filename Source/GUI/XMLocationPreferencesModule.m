@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.24 2006/06/07 15:49:03 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.25 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -167,7 +167,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (unsigned)position
 {
-	return 2;
+	return 3;
 }
 
 - (NSString *)identifier

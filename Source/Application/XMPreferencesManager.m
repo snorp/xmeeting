@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.21 2006/06/07 15:49:03 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.22 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,8 +28,14 @@ NSString *XMKey_PreferencesManagerAutomaticallyEnterFullScreen = @"XMeeting_Auto
 NSString *XMKey_PreferencesManagerShowSelfViewMirrored = @"XMeeting_ShowSelfViewMirrored";
 NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls = @"XMeeting_AutomaticallyHideInCallControls";
 NSString *XMKey_PreferencesManagerInCallControlHideAndShowEffect = @"XMeeting_InCallControlHideAndShowEffect";
+NSString *XMKey_PreferencesManagerAlertIncomingCalls = @"XMeeting_AlertIncomingCalls";
+NSString *XMKey_PreferencesManagerIncomingCallAlertType = @"XMeeting_IncomingCallAlertType";
 NSString *XMKey_PreferencesManagerDisabledVideoModules = @"XMeeting_DisabledVideoModules";
 NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
+
+NSString *XMKey_PreferencesManagerSearchAddressBookDatabase = @"XMeeting_SearchAddressBookDatabase";
+NSString *XMKey_PreferencesManagerEnableAddressBookPhoneNumbers = @"XMeeting_EnableAddressBookPhoneNumbers";
+NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_AddressBookPhoneNumberProtocol";
 
 @interface XMPreferencesManager (PrivateMethods)
 
@@ -142,7 +148,7 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:YES];
+	number = [[NSNumber alloc] initWithBool:NO];
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerAutomaticallyHideInCallControls];
 	[number release];
 	
@@ -150,11 +156,30 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerInCallControlHideAndShowEffect];
 	[number release];
 	
+	number = [[NSNumber alloc] initWithBool:YES];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerAlertIncomingCalls];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMIncomingCallAlertType_Ringing];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerIncomingCallAlertType];
+	[number release];
+	
 	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMScreenVideoInputModule", nil];
 	[defaultsDict setObject:initialDisabledVideoModules forKey:XMKey_PreferencesManagerDisabledVideoModules];
 	[initialDisabledVideoModules release];
 	
-	// code to be written yet
+	number = [[NSNumber alloc] initWithBool:YES];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerSearchAddressBookDatabase];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:NO];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerEnableAddressBookPhoneNumbers];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallProtocol_H323];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerAddressBookPhoneNumberProtocol];
+	[number release];
+	
 	[userDefaults registerDefaults:defaultsDict];
 	[defaultsDict release];
 	
@@ -666,6 +691,26 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	[[NSUserDefaults standardUserDefaults] setInteger:(int)effect forKey:XMKey_PreferencesManagerInCallControlHideAndShowEffect];
 }
 
+- (BOOL)alertIncomingCalls
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerAlertIncomingCalls];
+}
+
+- (void)setAlertIncomingCalls:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerAlertIncomingCalls];
+}
+
+- (XMIncomingCallAlertType)incomingCallAlertType
+{
+	return (XMIncomingCallAlertType)[[NSUserDefaults standardUserDefaults] integerForKey:XMKey_PreferencesManagerIncomingCallAlertType];
+}
+
+- (void)setIncomingCallAlertType:(XMIncomingCallAlertType)alertType
+{
+	[[NSUserDefaults standardUserDefaults] setInteger:(int)alertType forKey:XMKey_PreferencesManagerIncomingCallAlertType];
+}
+
 - (NSString *)passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName
 {
 	OSStatus err = noErr;
@@ -860,6 +905,36 @@ NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_Preferr
 	{
 		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
 	}
+}
+
+- (BOOL)searchAddressBookDatabase
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerSearchAddressBookDatabase];
+}
+
+- (void)setSearchAddressBookDatabase:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerSearchAddressBookDatabase];
+}
+
+- (BOOL)enableAddressBookPhoneNumbers
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerEnableAddressBookPhoneNumbers];
+}
+
+- (void)setEnableAddressBookPhoneNumbers:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerEnableAddressBookPhoneNumbers];
+}
+
+- (XMCallProtocol)addressBookPhoneNumberProtocol
+{
+	return (XMCallProtocol)[[NSUserDefaults standardUserDefaults] integerForKey:XMKey_PreferencesManagerAddressBookPhoneNumberProtocol];
+}
+
+- (void)setAddressBookPhoneNumberProtocol:(XMCallProtocol)callProtocol
+{
+	[[NSUserDefaults standardUserDefaults] setInteger:(int)callProtocol forKey:XMKey_PreferencesManagerAddressBookPhoneNumberProtocol];
 }
 
 #pragma mark Private Methods

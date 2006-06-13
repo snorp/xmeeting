@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.8 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.9 2006/06/13 20:27:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -99,21 +99,8 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	}
 	[debugLogFilePathField setStringValue:debugLogFilePath];
 	
-	state = ([prefManager automaticallyEnterFullScreen] == YES) ? NSOnState : NSOffState;
-	[automaticallyEnterFullScreenSwitch setState:state];
-	
-	state = ([prefManager showSelfViewMirrored] == YES) ? NSOnState : NSOffState;
-	[showSelfViewMirroredSwitch setState:state];
-	
-	state = ([prefManager automaticallyHideInCallControls] == YES) ? NSOnState : NSOffState;
-	[automaticallyHideInCallControlsSwitch setState:state];
-	
-	XMInCallControlHideAndShowEffect effect = [prefManager inCallControlHideAndShowEffect];
-	[inCallControlsHideAndShowEffectPopUp selectItemAtIndex:(unsigned)effect];
-	
 	// validating the user interface
 	[self toggleGenerateDebugLogFile:self];
-	[self toggleAutomaticallyHideInCallControls:self];
 }
 
 - (void)savePreferences
@@ -130,18 +117,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	
 	NSString *path = [debugLogFilePathField stringValue];
 	[XMPreferencesManager setPTraceFilePath:path];
-	
-	flag = ([automaticallyEnterFullScreenSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setAutomaticallyEnterFullScreen:flag];
-	
-	flag = ([showSelfViewMirroredSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setShowSelfViewMirrored:flag];
-	
-	flag = ([automaticallyHideInCallControlsSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setAutomaticallyHideInCallControls:flag];
-	
-	XMInCallControlHideAndShowEffect effect = (XMInCallControlHideAndShowEffect)[inCallControlsHideAndShowEffectPopUp indexOfSelectedItem];
-	[prefManager setInCallControlHideAndShowEffect:effect];
 }
 
 #pragma mark -
@@ -180,16 +155,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 	
 	[savePanel beginSheetForDirectory:directory file:file modalForWindow:[contentView window] modalDelegate:self
 					   didEndSelector:@selector(_chooseDebugFilePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
-}
-
-- (IBAction)toggleAutomaticallyHideInCallControls:(id)sender
-{
-	int state = [automaticallyHideInCallControlsSwitch state];
-	BOOL enablePopUp = (state == NSOnState) ? YES : NO;
-	
-	[inCallControlsHideAndShowEffectPopUp setEnabled:enablePopUp];
-	
-	[self defaultAction:self];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notif
