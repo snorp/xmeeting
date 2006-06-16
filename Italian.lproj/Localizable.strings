@@ -181,6 +181,8 @@
 "XM_GENERAL_PREFERENCES_NAME" = "Generale";
 "XM_GENERAL_PREFERENCES_TOOLTIP" = "Preferenze Generali";
 "XM_GENERAL_PREFERENCES_CHOOSE" = "Scegli";
+"XM_APPEARANCE_PREFERENCES_NAME" = "Appearance";
+"XM_APPEARANCE_PREFERENCES_TOOLTIP" = "Edit the appearance of XMeeting";
 "XM_ACCOUNT_PREFERENCES_NAME" = "Account";
 "XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Preferenze Account";
 "XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Account name already exists";
@@ -195,6 +197,8 @@
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferenze Ingresso Video";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Usa il primo disponibile>";
 "XM_VIDEO_PREFERENCES_SHOW_SETTINGS" = "Mostra Impostazioni...";
+"XM_ADDRESS_BOOK_PREFERENCES_NAME" = "Address Book";
+"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Edit the Address Book integration of XMeeting";
 
 /* Setup Assistant */
 "XM_SETUP_ASSISTANT_CONTINUE" = "Continua";

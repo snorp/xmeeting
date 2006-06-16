@@ -43,24 +43,50 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            ACTIONS = {defaultAction = id; toggleEnableABPhoneNumbers = id; }; 
+            CLASS = XMAddressBookPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                enableABDatabaseSearchSwitch = NSButton; 
+                enableABPhoneNumbersSwitch = NSButton; 
+                phoneNumberProtocolMatrix = NSMatrix; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                defaultAction = id; 
+                toggleAutomaticallyHideInCallControls = id; 
+                togglePlaySoundOnIncomingCall = id; 
+            }; 
+            CLASS = XMAppearancePreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                automaticallyEnterFullScreenSwitch = NSButton; 
+                automaticallyHideInCallControlsSwitch = NSButton; 
+                contentView = NSView; 
+                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
+                playSoundOnIncomingCallSwitch = NSButton; 
+                showSelfViewMirroredSwitch = NSButton; 
+                soundTypePopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
             ACTIONS = {
                 chooseDebugFilePath = id; 
                 defaultAction = id; 
-                toggleAutomaticallyHideInCallControls = id; 
                 toggleGenerateDebugLogFile = id; 
             }; 
             CLASS = XMGeneralPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 automaticallyAcceptIncomingCallsSwitch = NSButton; 
-                automaticallyEnterFullScreenSwitch = NSButton; 
-                automaticallyHideInCallControlsSwitch = NSButton; 
                 chooseDebugLogFilePathButton = NSButton; 
                 contentView = NSView; 
                 debugLogFilePathField = NSTextField; 
                 generateDebugLogSwitch = NSButton; 
-                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
-                showSelfViewMirroredSwitch = NSButton; 
                 userNameField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 
