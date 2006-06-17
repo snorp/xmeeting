@@ -1414,6 +1414,25 @@
 		D1BFF0EE09E2BB8E00D3665A /* h224handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h224handler.h; sourceTree = "<group>"; };
 		D1BFF0EF09E2BB8E00D3665A /* h281handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h281handler.h; sourceTree = "<group>"; };
 		D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
+		D1C8FC5D0A435ACC00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/AddressBook.nib; sourceTree = "<group>"; };
+		D1C8FC5E0A435ACC00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/CallHistoryModule.nib; sourceTree = "<group>"; };
+		D1C8FC5F0A435AE400EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/DialPadModule.nib; sourceTree = "<group>"; };
+		D1C8FC600A435AE400EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/InCallModule.nib; sourceTree = "<group>"; };
+		D1C8FC610A435AE400EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Info.nib; sourceTree = "<group>"; };
+		D1C8FC620A435B1C00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/LocalAudioVideoModule.nib; sourceTree = "<group>"; };
+		D1C8FC630A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		D1C8FC640A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainWindow.nib; sourceTree = "<group>"; };
+		D1C8FC650A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/NoCallModule.nib; sourceTree = "<group>"; };
+		D1C8FC660A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Preferences.nib; sourceTree = "<group>"; };
+		D1C8FC670A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/SequenceGrabberSettings.nib; sourceTree = "<group>"; };
+		D1C8FC680A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/SetupAssistant.nib; sourceTree = "<group>"; };
+		D1C8FC690A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/StatisticsModule.nib; sourceTree = "<group>"; };
+		D1C8FC6A0A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/TextChatModule.nib; sourceTree = "<group>"; };
+		D1C8FC6B0A435B4500EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/XMInspector.nib; sourceTree = "<group>"; };
+		D1C8FC6C0A435B4500EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
+		D1C8FC6E0A435B9D00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D1C8FC6F0A435BC600EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = French; path = French.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
+		D1C8FC700A435BE400EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D1CE4B60083CDED900B66B5D /* XMAddressBookModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookModule.h; path = Source/GUI/XMAddressBookModule.h; sourceTree = "<group>"; };
 		D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookModule.m; path = Source/GUI/XMAddressBookModule.m; sourceTree = "<group>"; };
 		D1CE4B68083CDF3900B66B5D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/AddressBook.nib; sourceTree = "<group>"; };
@@ -4475,6 +4494,7 @@
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
 				D1E20B530A3600A000861E00 /* Italian */,
+				D1C8FC700A435BE400EF1A8C /* French */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -4484,6 +4504,7 @@
 			children = (
 				1A348FB40984E4520033FA95 /* English */,
 				D1E20B450A35FFD400861E00 /* Italian */,
+				D1C8FC610A435AE400EF1A8C /* French */,
 			);
 			name = Info.nib;
 			sourceTree = "<group>";
@@ -4493,6 +4514,7 @@
 			children = (
 				1A348FB60984E4520033FA95 /* English */,
 				D1E20B4F0A36002400861E00 /* Italian */,
+				D1C8FC6B0A435B4500EF1A8C /* French */,
 			);
 			name = XMInspector.nib;
 			sourceTree = "<group>";
@@ -4502,6 +4524,7 @@
 			children = (
 				1AE62986099B7B4300793794 /* English */,
 				D1E20B4B0A36001300861E00 /* Italian */,
+				D1C8FC670A435B2E00EF1A8C /* French */,
 			);
 			name = SequenceGrabberSettings.nib;
 			sourceTree = "<group>";
@@ -4511,6 +4534,7 @@
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
 				D1E20B470A36001300861E00 /* Italian */,
+				D1C8FC630A435B2E00EF1A8C /* French */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -4520,6 +4544,7 @@
 			children = (
 				D1639416083E17A500F7FD83 /* English */,
 				D1E20B430A35FFD400861E00 /* Italian */,
+				D1C8FC5F0A435AE400EF1A8C /* French */,
 			);
 			name = DialPadModule.nib;
 			sourceTree = "<group>";
@@ -4529,6 +4554,7 @@
 			children = (
 				D163945E083E19E300F7FD83 /* English */,
 				D1E20B4D0A36001400861E00 /* Italian */,
+				D1C8FC690A435B2E00EF1A8C /* French */,
 			);
 			name = StatisticsModule.nib;
 			sourceTree = "<group>";
@@ -4538,6 +4564,7 @@
 			children = (
 				D16394C2083E23D600F7FD83 /* English */,
 				D1E20B420A35FFC200861E00 /* Italian */,
+				D1C8FC5E0A435ACC00EF1A8C /* French */,
 			);
 			name = CallHistoryModule.nib;
 			sourceTree = "<group>";
@@ -4547,6 +4574,7 @@
 			children = (
 				D1887E760A283DEA00C938BB /* English */,
 				D1E20B510A36004A00861E00 /* Italian */,
+				D1C8FC6E0A435B9D00EF1A8C /* French */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -4556,6 +4584,7 @@
 			children = (
 				D1897F7C0823EEF2007CD286 /* English */,
 				D1E20B520A36007300861E00 /* Italian */,
+				D1C8FC6F0A435BC600EF1A8C /* French */,
 			);
 			name = XMCodecDescriptions.plist;
 			sourceTree = "<group>";
@@ -4565,6 +4594,7 @@
 			children = (
 				D1A02B25081E96D30018BD11 /* English */,
 				D1E20B4A0A36001300861E00 /* Italian */,
+				D1C8FC660A435B2E00EF1A8C /* French */,
 			);
 			name = Preferences.nib;
 			sourceTree = "<group>";
@@ -4574,6 +4604,7 @@
 			children = (
 				D1B4CC99082F594C00A444E1 /* English */,
 				D1E20B480A36001300861E00 /* Italian */,
+				D1C8FC640A435B2E00EF1A8C /* French */,
 			);
 			name = MainWindow.nib;
 			sourceTree = "<group>";
@@ -4583,6 +4614,7 @@
 			children = (
 				D1B4D0060833937200A444E1 /* English */,
 				D1E20B500A36003900861E00 /* Italian */,
+				D1C8FC6C0A435B4500EF1A8C /* French */,
 			);
 			name = ZeroConfModule.nib;
 			sourceTree = "<group>";
@@ -4592,6 +4624,7 @@
 			children = (
 				D1CE4B68083CDF3900B66B5D /* English */,
 				D1E20B150A35FF9F00861E00 /* Italian */,
+				D1C8FC5D0A435ACC00EF1A8C /* French */,
 			);
 			name = AddressBook.nib;
 			sourceTree = "<group>";
@@ -4601,6 +4634,7 @@
 			children = (
 				D1ECCBF20833DDAD008EBAE3 /* English */,
 				D1E20B4E0A36001400861E00 /* Italian */,
+				D1C8FC6A0A435B2E00EF1A8C /* French */,
 			);
 			name = TextChatModule.nib;
 			sourceTree = "<group>";
@@ -4610,6 +4644,7 @@
 			children = (
 				D1ECCD170834911C008EBAE3 /* English */,
 				D1E20B440A35FFD400861E00 /* Italian */,
+				D1C8FC600A435AE400EF1A8C /* French */,
 			);
 			name = InCallModule.nib;
 			sourceTree = "<group>";
@@ -4619,6 +4654,7 @@
 			children = (
 				D1ECCD2F083491EB008EBAE3 /* English */,
 				D1E20B490A36001300861E00 /* Italian */,
+				D1C8FC650A435B2E00EF1A8C /* French */,
 			);
 			name = NoCallModule.nib;
 			sourceTree = "<group>";
@@ -4628,6 +4664,7 @@
 			children = (
 				D1EF07520918B212008A8974 /* English */,
 				D1E20B4C0A36001400861E00 /* Italian */,
+				D1C8FC680A435B2E00EF1A8C /* French */,
 			);
 			name = SetupAssistant.nib;
 			sourceTree = "<group>";
@@ -4637,6 +4674,7 @@
 			children = (
 				D1F6067B08BBC5FC0005E9A0 /* English */,
 				D1E20B460A35FFF700861E00 /* Italian */,
+				D1C8FC620A435B1C00EF1A8C /* French */,
 			);
 			name = LocalAudioVideoModule.nib;
 			sourceTree = "<group>";
