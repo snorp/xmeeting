@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {toggleShowH323Details = id; toggleShowSIPDetails = id; }; 
+            CLASS = XMInfoModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                gatekeeperField = NSTextField; 
+                gatekeeperSemaphoreView = NSImageView; 
+                h323Box = NSBox; 
+                h323Disclosure = NSButton; 
+                h323StatusField = NSTextField; 
+                h323StatusSemaphoreView = NSImageView; 
+                h323Title = NSTextField; 
+                ipAddressSemaphoreView = NSImageView; 
+                ipAddressesField = NSTextField; 
+                natTypeField = NSTextField; 
+                natTypeSemaphoreView = NSImageView; 
+                networkBox = NSBox; 
+                phoneNumberField = NSTextField; 
+                registrarField = NSTextField; 
+                registrarSemaphoreView = NSImageView; 
+                sipBox = NSBox; 
+                sipDisclosure = NSButton; 
+                sipStatusField = NSTextField; 
+                sipStatusSemaphoreView = NSImageView; 
+                sipTitle = NSTextField; 
+                sipUsernameField = NSTextField; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

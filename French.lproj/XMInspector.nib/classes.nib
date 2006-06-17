@@ -1,0 +1,33 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {
+            ACTIONS = {changePage = id; }; 
+            CLASS = XMInspectorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {contentBox = NSBox; pageController = NSSegmentedControl; panel = NSPanel; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {showAdditionModuleInSeparateWindow = id; toggleShowAdditionContent = id; }; 
+            CLASS = XMMainWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                additionContentDisclosure = NSButton; 
+                bottomContentBox = NSBox; 
+                horizontalSeparator = NSBox; 
+                localVideoWindow = NSWindow; 
+                mainContentBox = NSBox; 
+                rightContentBox = NSBox; 
+                separateWindowButton = XMMouseOverButton; 
+                separatorContentBox = NSBox; 
+                separatorContentView = NSView; 
+                statusBarContentBox = NSBox; 
+                statusBarContentView = NSView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
