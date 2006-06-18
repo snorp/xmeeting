@@ -10,7 +10,7 @@
 
 /* Alert messages */
 "XM_INCOMING_CALL_MESSAGE" = "Chiamata In Arrivo";
-"XM_INCOMING_CALL_INFO_TEXT" = "C'è una chiamata in arrivo da \"%@\"\nLa prendo oppure no?";
+"XM_INCOMING_CALL_INFO_TEXT" = "C'è una chiamata in arrivo da \"%@\"\nRispondo?";
 
 "XM_CALL_FAILED_MESSAGE" = "Chiamata non riuscita";
 "XM_CALL_FAILED_INFO_TEXT" = "Impossibile chiamare \"%@\". (%@)";
@@ -46,7 +46,7 @@
 "XM_CALL_END_REMOTE_CLEARED" = "Il destinatario ha annullato la chiamata";
 "XM_CALL_END_REMOTE_NO_ANSWER" = "Il destinatario non ha risposto alla chiamata";
 "XM_CALL_END_REMOTE_ABORT" = "Il destinatario ha interrotto la chiamata";
-"XM_CALL_END_INTERNAL_FAILURE" = "Internal transport/connect failure";
+"XM_CALL_END_INTERNAL_FAILURE" = "Errore interno di trasporto/connessione";
 "XM_CALL_END_GK_CLEARED" = "Il gatekeeper ha annullato la chiamata";
 "XM_CALL_END_NO_USER" = "Utente non trovato";
 "XM_CALL_END_NO_BANDWIDTH" = "Ampiezza di banda insufficiente";
@@ -177,28 +177,29 @@
 
 /* Preferences Window */
 "XM_PREFERENCES_WINDOW_CLOSE" = "Vuoi registrare le modifiche alla preferenze prima di chiudere?";
-"XM_PREFERENCES_NAME_SUGGESTION" = "Please choose another name";
+"XM_PREFERENCES_NAME_SUGGESTION" = "Prego scegli un altro nome";
 "XM_GENERAL_PREFERENCES_NAME" = "Generale";
 "XM_GENERAL_PREFERENCES_TOOLTIP" = "Preferenze Generali";
 "XM_GENERAL_PREFERENCES_CHOOSE" = "Scegli";
-"XM_APPEARANCE_PREFERENCES_NAME" = "Appearance";
-"XM_APPEARANCE_PREFERENCES_TOOLTIP" = "Edit the appearance of XMeeting";
+"XM_APPEARANCE_PREFERENCES_NAME" = "Aspetto";
+"XM_APPEARANCE_PREFERENCES_TOOLTIP" = "Modifica l'aspetto di XMeeting";
 "XM_ACCOUNT_PREFERENCES_NAME" = "Account";
 "XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Preferenze Account";
-"XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Account name already exists";
+"XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Nome account già esistente";
 "XM_LOCATION_PREFERENCES_NAME" = "Posizioni";
 "XM_LOCATION_PREFERENCES_TOOLTIP" = "Modifica le Posizioni";
 "XM_LOCATION_PREFERENCES_NEW_LOCATION" = "Nuova Posizione";
 "XM_LOCATION_PREFERENCES_COPY_SUFFIX" = " Copia";
 "XM_LOCATION_PREFERENCES_NONE_ITEM" = "Nessuna";
-"XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";
-"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
+"XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Nome posizione già esistente";
+"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "Nessun Protocollo attivato";
+"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Né il protocollo H.323 né il protocollo SIP sono attivati nella posizione \"%@\". Non potrai effettuare chiamate quando questa posizione verrà attivata.";
 "XM_VIDEO_PREFERENCES_NAME" = "Ingresso Video";
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferenze Ingresso Video";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Usa il primo disponibile>";
 "XM_VIDEO_PREFERENCES_SHOW_SETTINGS" = "Mostra Impostazioni...";
-"XM_ADDRESS_BOOK_PREFERENCES_NAME" = "Address Book";
-"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Edit the Address Book integration of XMeeting";
+"XM_ADDRESS_BOOK_PREFERENCES_NAME" = "Rubrica Indirizzi";
+"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Modifica le impostazioni di integrazione di Rubrica Indirizzi con XMeeting";
 
 /* Setup Assistant */
 "XM_SETUP_ASSISTANT_CONTINUE" = "Continua";
