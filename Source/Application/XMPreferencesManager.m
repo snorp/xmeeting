@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.23 2006/06/20 13:33:58 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.24 2006/06/20 14:37:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -284,7 +284,6 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	NSDictionary *videoManagerSettings = [userDefaults objectForKey:XMKey_PreferencesManagerVideoManagerSettings];
 	if(videoManagerSettings != nil)
 	{
-		NSLog(@"setting settings");
 		[videoManager setSettings:videoManagerSettings];
 	}
 }
