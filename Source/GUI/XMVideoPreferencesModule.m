@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.7 2006/06/13 20:27:19 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.8 2006/06/20 13:33:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -146,6 +146,8 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 	}
 	
 	[prefManager setPreferredVideoInputDevice:preferredDevice];
+	
+	[prefManager storeVideoManagerSettings];
 }
 
 #pragma mark NSTableView methods

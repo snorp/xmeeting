@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.22 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.23 2006/06/20 13:33:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,7 @@ NSString *XMKey_PreferencesManagerAlertIncomingCalls = @"XMeeting_AlertIncomingC
 NSString *XMKey_PreferencesManagerIncomingCallAlertType = @"XMeeting_IncomingCallAlertType";
 NSString *XMKey_PreferencesManagerDisabledVideoModules = @"XMeeting_DisabledVideoModules";
 NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
+NSString *XMKey_PreferencesManagerVideoManagerSettings = @"XMeeting_VideoManagerSettings";
 
 NSString *XMKey_PreferencesManagerSearchAddressBookDatabase = @"XMeeting_SearchAddressBookDatabase";
 NSString *XMKey_PreferencesManagerEnableAddressBookPhoneNumbers = @"XMeeting_EnableAddressBookPhoneNumbers";
@@ -278,6 +279,13 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_setInitialVideoInputDevice:)
 													 name:XMNotification_VideoManagerDidUpdateInputDeviceList
 												   object:nil];
+	}
+	
+	NSDictionary *videoManagerSettings = [userDefaults objectForKey:XMKey_PreferencesManagerVideoManagerSettings];
+	if(videoManagerSettings != nil)
+	{
+		NSLog(@"setting settings");
+		[videoManager setSettings:videoManagerSettings];
 	}
 }
 
@@ -905,6 +913,13 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	{
 		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
 	}
+}
+
+- (void)storeVideoManagerSettings
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	NSDictionary *videoManagerSettings = [videoManager settings];
+	[[NSUserDefaults standardUserDefaults] setObject:videoManagerSettings forKey:XMKey_PreferencesManagerVideoManagerSettings];
 }
 
 - (BOOL)searchAddressBookDatabase

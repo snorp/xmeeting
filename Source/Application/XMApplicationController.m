@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.38 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.39 2006/06/20 13:33:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -289,6 +289,9 @@
 {
 	// Close the preferences window in a proper fashion
 	[[XMPreferencesWindowController sharedInstance] closePreferencesWindow];
+	
+	// Store unsaved changes
+	[[XMPreferencesManager sharedInstance] storeVideoManagerSettings];
 	
 	XMCloseFramework();
 	

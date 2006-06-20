@@ -466,6 +466,9 @@
 		D1BFF0F009E2BB8E00D3665A /* h224handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BFF0EE09E2BB8E00D3665A /* h224handler.h */; };
 		D1BFF0F109E2BB8E00D3665A /* h281handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BFF0EF09E2BB8E00D3665A /* h281handler.h */; };
 		D1C1E316099B8BEA00815263 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */; };
+		D1C8FCC80A44070D00EF1A8C /* XMStillImageVideoInputModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1C8FCC60A44070D00EF1A8C /* XMStillImageVideoInputModule.h */; };
+		D1C8FCC90A44070D00EF1A8C /* XMStillImageVideoInputModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */; };
+		D1C8FCD30A4407E600EF1A8C /* StillImageSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1C8FCD10A4407E600EF1A8C /* StillImageSettings.nib */; };
 		D1CE4B62083CDED900B66B5D /* XMAddressBookModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */; };
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
 		D1CE4B76083CE0FC00B66B5D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
@@ -1433,6 +1436,9 @@
 		D1C8FC6E0A435B9D00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D1C8FC6F0A435BC600EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = French; path = French.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
 		D1C8FC700A435BE400EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D1C8FCC60A44070D00EF1A8C /* XMStillImageVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMStillImageVideoInputModule.h; path = Source/Framework/XMStillImageVideoInputModule.h; sourceTree = "<group>"; };
+		D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMStillImageVideoInputModule.m; path = Source/Framework/XMStillImageVideoInputModule.m; sourceTree = "<group>"; };
+		D1C8FCD20A4407E600EF1A8C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/StillImageSettings.nib; sourceTree = "<group>"; };
 		D1CE4B60083CDED900B66B5D /* XMAddressBookModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookModule.h; path = Source/GUI/XMAddressBookModule.h; sourceTree = "<group>"; };
 		D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookModule.m; path = Source/GUI/XMAddressBookModule.m; sourceTree = "<group>"; };
 		D1CE4B68083CDF3900B66B5D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/AddressBook.nib; sourceTree = "<group>"; };
@@ -2127,6 +2133,8 @@
 				D132789908C7A40800298F25 /* XMVideoInputModule.h */,
 				D1FE53F708F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.h */,
 				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
+				D1C8FCC60A44070D00EF1A8C /* XMStillImageVideoInputModule.h */,
+				D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */,
 				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
 				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
 				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
@@ -3246,6 +3254,7 @@
 				D1A02B24081E96D30018BD11 /* Preferences.nib */,
 				1AE62985099B7B4300793794 /* SequenceGrabberSettings.nib */,
 				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
+				D1C8FCD10A4407E600EF1A8C /* StillImageSettings.nib */,
 				D163945D083E19E300F7FD83 /* StatisticsModule.nib */,
 				D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */,
 				1A348FB50984E4520033FA95 /* XMInspector.nib */,
@@ -3499,6 +3508,7 @@
 				D12077BA0A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h in Headers */,
 				D1AF63D60A39415200CAF35F /* XMAppearancePreferencesModule.h in Headers */,
 				D1AF63DC0A39416700CAF35F /* XMAddressBookPreferencesModule.h in Headers */,
+				D1C8FCC80A44070D00EF1A8C /* XMStillImageVideoInputModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4069,6 +4079,7 @@
 				D1887E770A283DEA00C938BB /* Localizable.strings in Resources */,
 				D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */,
 				D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */,
+				D1C8FCD30A4407E600EF1A8C /* StillImageSettings.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4099,7 +4110,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 		D1F953B209B363530009B2AC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4211,6 +4222,7 @@
 				D12077B80A011A0900179B6C /* XMRTPH263PlusPacketizer.c in Sources */,
 				D1AF63D70A39415200CAF35F /* XMAppearancePreferencesModule.m in Sources */,
 				D1AF63DD0A39416700CAF35F /* XMAddressBookPreferencesModule.m in Sources */,
+				D1C8FCC90A44070D00EF1A8C /* XMStillImageVideoInputModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4617,6 +4629,14 @@
 				D1C8FC6C0A435B4500EF1A8C /* French */,
 			);
 			name = ZeroConfModule.nib;
+			sourceTree = "<group>";
+		};
+		D1C8FCD10A4407E600EF1A8C /* StillImageSettings.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D1C8FCD20A4407E600EF1A8C /* English */,
+			);
+			name = StillImageSettings.nib;
 			sourceTree = "<group>";
 		};
 		D1CE4B67083CDF3900B66B5D /* AddressBook.nib */ = {

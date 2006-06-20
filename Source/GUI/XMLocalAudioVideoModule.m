@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.18 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.19 2006/06/20 13:33:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,8 @@
 - (void)_validateAudioControls;
 - (void)_didStartVideoInputDeviceListUpdate:(NSNotification *)notif;
 - (void)_didUpdateVideoInputDeviceList:(NSNotification *)notif;
+- (void)_didStartVideoInputDeviceChange:(NSNotification *)notif;
+- (void)_didChangeSelectedVideoInputDevice:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
 - (void)_preferencesDidChange:(NSNotification *)notif;
@@ -101,6 +103,10 @@
 							   name:XMNotification_VideoManagerDidStartInputDeviceListUpdate object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateVideoInputDeviceList:)
 							   name:XMNotification_VideoManagerDidUpdateInputDeviceList object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStartVideoInputDeviceChange:)
+							   name:XMNotification_VideoManagerDidStartSelectedInputDeviceChange object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didChangeSelectedVideoInputDevice:)
+							   name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioInputVolumeDidChange:)
 							   name:XMNotification_AudioManagerInputVolumeDidChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioOutputVolumeDidChange:)
@@ -165,14 +171,6 @@
 	NSString *device = [videoDevicesPopUp titleOfSelectedItem];
 	
 	[videoManager setSelectedInputDevice:device];
-	
-	BOOL settingsButtonIsEnabled = NO;
-	if([videoManager deviceHasSettings:device])
-	{
-		settingsButtonIsEnabled = YES;
-	}
-	
-	[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
 }
 
 - (IBAction)showVideoDeviceSettings:(id)sender
@@ -354,6 +352,35 @@
 		}
 	
 		[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
+	}
+}
+
+- (void)_didStartVideoInputDeviceChange:(NSNotification *)notif
+{
+	[videoDevicesPopUp setEnabled:NO];
+	[videoDeviceSettingsButton setEnabled:NO];
+}
+
+- (void)_didChangeSelectedVideoInputDevice:(NSNotification *)notif
+{
+	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
+	
+	NSString *device = [videoManager selectedInputDevice];
+	
+	[videoDevicesPopUp selectItemWithTitle:device];
+	[videoDevicesPopUp setEnabled:YES];
+	
+	BOOL settingsButtonIsEnabled = NO;
+	if([videoManager deviceHasSettings:device])
+	{
+		settingsButtonIsEnabled = YES;
+	}
+	
+	[videoDeviceSettingsButton setEnabled:settingsButtonIsEnabled];
+	
+	if([videoManager requiresSettingsDialogWhenDeviceIsSelected:device])
+	{
+		[self showVideoDeviceSettings:nil];
 	}
 }
 

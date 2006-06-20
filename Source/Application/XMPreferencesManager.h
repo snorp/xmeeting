@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.13 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.14 2006/06/20 13:33:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,6 +34,7 @@ extern NSString *XMKey_PreferencesManagerAlertIncomingCalls;
 extern NSString *XMKey_PreferencesManagerIncomingCallAlertType;
 extern NSString *XMKey_PreferencesManagerDisabledVideoModules;
 extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
+extern NSString *XMKey_PreferencesManagerVideoManagerSettings;
 
 extern NSString *XMKey_PreferencesManagerSearchAddressBookDatabase;
 extern NSString *XMKey_PreferencesManagerEnableAddressBookPhoneNumbers;
@@ -298,6 +299,11 @@ typedef enum XMIncomingCallAlertType
  * Sets the name of the preferred video input device.
  **/
 - (void)setPreferredVideoInputDevice:(NSString *)device;
+
+/**
+ * Save the video manager settings
+ **/
+- (void)storeVideoManagerSettings;
 
 /**
  * Address Book settings
