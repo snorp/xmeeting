@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.43 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.44 2006/06/20 13:33:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,7 @@
 #import "XMRTPH264Packetizer.h"
 
 #import "XMSequenceGrabberVideoInputModule.h"
+#import "XMStillImageVideoInputModule.h"
 #import "XMScreenVideoInputModule.h"
 #import "XMDummyVideoInputModule.h"
 
@@ -294,20 +295,24 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	receivePort = [[NSPort port] retain];
 	
 	XMSequenceGrabberVideoInputModule *seqGrabModule = [[XMSequenceGrabberVideoInputModule alloc] _init];
+	XMStillImageVideoInputModule *stillImageModule = [[XMStillImageVideoInputModule alloc] _init];
 	XMScreenVideoInputModule *screenModule = [[XMScreenVideoInputModule alloc] _init];
 	XMDummyVideoInputModule *dummyModule = [[XMDummyVideoInputModule alloc] _init];
 	
 	XMVideoInputModuleWrapper *seqGrabWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:seqGrabModule];
+	XMVideoInputModuleWrapper *stillImageWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:stillImageModule];
 	XMVideoInputModuleWrapper *screenWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:screenModule];
 	XMVideoInputModuleWrapper *dummyWrapper = [[XMVideoInputModuleWrapper alloc] _initWithVideoInputModule:dummyModule];
 		
-	videoInputModules = [[NSArray alloc] initWithObjects:seqGrabWrapper, screenWrapper, dummyWrapper, nil];
+	videoInputModules = [[NSArray alloc] initWithObjects:seqGrabWrapper, stillImageWrapper, screenWrapper, dummyWrapper, nil];
 	
 	[seqGrabModule release];
+	[stillImageModule release];
 	[screenModule release];
 	[dummyModule release];
 	
 	[seqGrabWrapper release];
+	[stillImageWrapper release];
 	[screenWrapper release];
 	[dummyWrapper release];
 	

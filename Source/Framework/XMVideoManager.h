@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.16 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.17 2006/06/20 13:33:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,6 @@
  **/
 @interface XMVideoManager : NSObject {
 	
-	NSMutableArray *videoInputModules;
 	NSMutableArray *videoViews;
 	
 	NSArray *inputDevices;
@@ -230,6 +229,18 @@
  * Creates a texture to be used within the video system
  **/
 - (CVOpenGLTextureRef)createTextureFromImage:(CVPixelBufferRef)pixelBuffer;
+
+/**
+ * Returns a dictionary containing settings for the various video
+ * modules
+ **/
+- (NSDictionary *)settings;
+
+/**
+ * Configures the video modules according to the settings
+ * dictionary specified
+ **/
+- (void)setSettings:(NSDictionary *)settings;
 
 @end
 

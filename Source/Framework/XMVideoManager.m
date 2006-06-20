@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.16 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.17 2006/06/20 13:33:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,7 +54,6 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 {
 	self = [super init];
 	
-	videoInputModules = nil;
 	videoViews = [[NSMutableArray alloc] initWithCapacity:3];
 	
 	inputDevices = nil;
@@ -102,11 +101,6 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	
 	[videoLock lock];
 	
-	if(videoInputModules != nil)
-	{
-		[videoInputModules release];
-		videoInputModules = nil;
-	}
 	if(videoViews != nil)
 	{
 		[videoViews release];
@@ -345,6 +339,46 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	}
 	
 	return openGLTexture;
+}
+
+- (NSDictionary *)settings
+{
+	unsigned count = [_XMMediaTransmitterSharedInstance _videoModuleCount];
+	
+	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:count];
+	
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		id<XMVideoModule> module = [_XMMediaTransmitterSharedInstance _videoModuleAtIndex:i];
+		NSDictionary *moduleDict = [module permamentSettings];
+		
+		if(moduleDict != nil)
+		{
+			[dict setObject:moduleDict forKey:[module identifier]];
+		}
+	}
+	
+	return dict;
+}
+
+- (void)setSettings:(NSDictionary *)settings
+{
+	unsigned count = [_XMMediaTransmitterSharedInstance _videoModuleCount];
+	unsigned i;
+	
+	for(i = 0; i < count; i++)
+	{
+		id<XMVideoModule> module = [_XMMediaTransmitterSharedInstance _videoModuleAtIndex:i];
+		
+		NSDictionary *dict = (NSDictionary *)[settings objectForKey:[module identifier]];
+		
+		if(dict != nil)
+		{
+			[module setPermamentSettings:dict];
+		}
+	}
 }
 
 #pragma mark Framework Methods
