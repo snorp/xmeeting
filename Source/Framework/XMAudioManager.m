@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.5 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.6 2006/06/20 14:36:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -416,7 +416,8 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	}
 	else
 	{
-		name = [NSString stringWithCString:deviceName];
+		name = [[NSString alloc] initWithCString:deviceName encoding:NSUTF8StringEncoding];
+		[name autorelease];
 	}
 	return name;
 }
