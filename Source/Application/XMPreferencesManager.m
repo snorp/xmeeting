@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.24 2006/06/20 14:37:00 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.25 2006/06/20 20:14:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -303,7 +303,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 #pragma mark Synchronization Methods
 
 - (void)synchronizeAndNotify
-{		
+{	
 	[self synchronize];
 	
 	// post the notification

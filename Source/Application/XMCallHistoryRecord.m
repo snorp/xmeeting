@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.12 2006/06/07 15:50:45 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.13 2006/06/20 20:14:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMAddressBookRecord.h"
 #import "XMCallHistoryCallAddressProvider.h"
 #import "XMSimpleAddressResource.h"
+#import "XMPreferencesManager.h"
 
 NSString *XMKey_CallHistoryRecordAddress = @"XMeeting_CallAddress";
 NSString *XMKey_CallHistoryRecordProtocol = @"XMeeting_Protocol";
@@ -195,8 +196,11 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	
 	BOOL didChange = NO;
 	
-	// check for matches in the AddressBook database
-	addressBookRecord = [[XMAddressBookManager sharedInstance] recordWithCallAddress:[self address]];
+	if([[XMPreferencesManager sharedInstance] searchAddressBookDatabase])
+	{
+		// check for matches in the AddressBook database
+		addressBookRecord = [[XMAddressBookManager sharedInstance] recordWithCallAddress:[self address]];
+	}
 	
 	if(addressBookRecord != nil)
 	{

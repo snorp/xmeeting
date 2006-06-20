@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.39 2006/06/20 13:33:58 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.40 2006/06/20 20:14:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -141,6 +141,9 @@
 	{
 		[self performSelector:@selector(_showSetupAssistant) withObject:nil afterDelay:0.0];
 	}
+	
+	// ensuring that the address book manager is initialized
+	[XMAddressBookManager sharedInstance];
 }
 
 - (void)dealloc

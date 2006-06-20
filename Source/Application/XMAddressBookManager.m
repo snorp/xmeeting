@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.8 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.9 2006/06/20 20:14:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -93,16 +93,21 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 	// ensure backwards compatibility
 	[self _transformRecordsFrom_0_1];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
-												 name:kABDatabaseChangedNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
-												 name:kABDatabaseChangedExternallyNotification object:nil];
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	[notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
+							   name:kABDatabaseChangedNotification object:nil];
+	[notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
+							   name:kABDatabaseChangedExternallyNotification object:nil];
+	[notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
+							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
 	
 	return self;
 }
 
 - (void)dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
 	if(addressBook != nil)
 	{
 		[addressBook release];
