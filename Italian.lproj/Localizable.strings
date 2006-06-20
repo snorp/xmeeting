@@ -235,5 +235,8 @@
 "XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME" = "Modulo Live Camera";
 "XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA" = "Impossibile ottenere fotogrammi dalla webcam. La webcam è ancora connessa al computer?\nErrore: (%d, %x)\tDispositivo: %@";
 "XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "Si è verificato un errore interno nel Modulo Live Camera.\nCodici Errore: (%d, %x)\t Device: %@\nPrego segnala questo problema (in inglese) a hfriederich@users.sourceforge.net";
+"XM_FRAMEWORK_STILL_MODULE_NAME" = "Still Image Module";
+"XM_FRAMEWORK_STILL_MODULE_ERROR" = "Cannot open selected image";
+"XM_FRAMEWORK_STILL_MODULE_NO_IMAGE" = "no image";
 "XM_FRAMEWORK_SCREEN_MODULE_NAME" = "Modulo Schermo";
 "XM_FRAMEWORK_SCREEN_DEVICE_NAME" = "Schermo %d";

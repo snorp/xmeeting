@@ -1,0 +1,29 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                "_changeImage" = id; 
+                "_scaleTypeChanged" = id; 
+                "_togglePreserveImagePath" = id; 
+            }; 
+            CLASS = XMStillImageVideoInputModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                deviceSettingsView = NSView; 
+                imageScaling = NSPopUpButton; 
+                moduleSettingsView = NSView; 
+                pathField = NSTextField; 
+                preserveImagePathSwitch = NSButton; 
+                previewImage = NSImageView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
