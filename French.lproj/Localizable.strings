@@ -235,5 +235,8 @@
 "XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME" = "Module Camera Direct";
 "XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA" = "Ne peut pas saisir d'images depuis la camera. Est-elle toujours connectée à l'ordinateur?\nErreur: (%d, %x)\tPériphérique: %@";
 "XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "Une erreur interne a eu lieu dans le module de direct.\nCodes d'Erreur: (%d, %x)\t Périphérique: %@\nVeuillez faire remonter le bug à hfriederich@users.sourceforge.net";
+"XM_FRAMEWORK_STILL_MODULE_NAME" = "Still Image Module";
+"XM_FRAMEWORK_STILL_MODULE_ERROR" = "Cannot open selected image";
+"XM_FRAMEWORK_STILL_MODULE_NO_IMAGE" = "no image";
 "XM_FRAMEWORK_SCREEN_MODULE_NAME" = "Module Ecran";
 "XM_FRAMEWORK_SCREEN_DEVICE_NAME" = "Ecran %d";
