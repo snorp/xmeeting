@@ -841,6 +841,7 @@
 		D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */ = {isa = PBXBuildFile; fileRef = D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */; };
 		D1E913310A30F60700AEABA5 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DCD0A27AEF300C938BB /* libssl.dylib */; };
 		D1E9134A0A30F65300AEABA5 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DDC0A27B1E200C938BB /* libcrypto.dylib */; };
+		D1E9137E0A4833F7005CDF27 /* config.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1E9137D0A4833F7005CDF27 /* config.cxx */; };
 		D1EB18AD08437A26002CEF53 /* AddressBook.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18AC08437A26002CEF53 /* AddressBook.tiff */; };
 		D1EB18BA0843D6B6002CEF53 /* ZeroConf.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18B90843D6B6002CEF53 /* ZeroConf.tiff */; };
 		D1EB18E00843D90D002CEF53 /* DialPad.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18DF0843D90D002CEF53 /* DialPad.tiff */; };
@@ -1013,7 +1014,7 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* XMeeting_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMeeting_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* XMeeting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XMeeting.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* XMeeting.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = XMeeting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263Packetizer.h; path = Source/Framework/XMRTPH263Packetizer.h; sourceTree = "<group>"; };
 		D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMRTPH263Packetizer.c; path = Source/Framework/XMRTPH263Packetizer.c; sourceTree = "<group>"; };
 		D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PacketizerDispatch.h; path = Source/Framework/XMRTPH263PacketizerDispatch.h; sourceTree = "<group>"; };
@@ -1835,6 +1836,8 @@
 		D1E2DA1508F470F200BE224E /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		D1E2DB8808F4720A00BE224E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = XMSTUNServers.plist; path = Resources/XMSTUNServers.plist; sourceTree = "<group>"; };
+		D1E9137D0A4833F7005CDF27 /* config.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = config.cxx; sourceTree = "<group>"; };
+		D1E9139E0A483640005CDF27 /* pconfig.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pconfig.cxx; sourceTree = "<group>"; };
 		D1EB18AC08437A26002CEF53 /* AddressBook.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AddressBook.tiff; path = Resources/Images/AddressBook.tiff; sourceTree = "<group>"; };
 		D1EB18B90843D6B6002CEF53 /* ZeroConf.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ZeroConf.tiff; path = Resources/Images/ZeroConf.tiff; sourceTree = "<group>"; };
 		D1EB18DF0843D90D002CEF53 /* DialPad.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DialPad.tiff; path = Resources/Images/DialPad.tiff; sourceTree = "<group>"; };
@@ -2593,6 +2596,7 @@
 				D1B6079508F8F86B0034B47F /* object.cxx */,
 				D1B6079608F8F86B0034B47F /* osutils.cxx */,
 				D1B6079C08F8F86B0034B47F /* pluginmgr.cxx */,
+				D1E9139E0A483640005CDF27 /* pconfig.cxx */,
 				D1B6079D08F8F86B0034B47F /* ptime.cxx */,
 				D1B6079F08F8F86B0034B47F /* qos.cxx */,
 				D1B607B908F8F86C0034B47F /* safecoll.cxx */,
@@ -2610,6 +2614,7 @@
 				D1B607C308F8F86C0034B47F /* assert.cxx */,
 				D1B607D008F8F86C0034B47F /* channel.cxx */,
 				D1B607E808F8F86C0034B47F /* osutil.cxx */,
+				D1E9137D0A4833F7005CDF27 /* config.cxx */,
 				D1B607EE08F8F86C0034B47F /* socket.cxx */,
 				D1B607F108F8F86C0034B47F /* switch.cxx */,
 				D1B607F208F8F86C0034B47F /* tlib.cxx */,
@@ -4110,7 +4115,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"Running configure not needed\";\nelse\necho \"Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile\n\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"Running bison not needed\";\nelse\necho \"Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 		D1F953B209B363530009B2AC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4270,6 +4275,7 @@
 				D1B6087B08F8F86D0034B47F /* tlib.cxx in Sources */,
 				D1B6088008F8F86D0034B47F /* udll.cxx in Sources */,
 				D1B6088208F8F86D0034B47F /* uicmp.cxx in Sources */,
+				D1E9137E0A4833F7005CDF27 /* config.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
