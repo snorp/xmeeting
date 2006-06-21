@@ -114,7 +114,7 @@
 "XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Chiamata host \"%@\" non riuscita";
 "XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Chiamata entrante da \"%@\"";
 "XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Chiamata con \"%@\" stabilita.\nLocal IP Address: %@ (%@)\nRemote Address: %@\nRemote Application: \"%@\".";
-"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Chiamata con \"%@\" annullata.\nDuration: %@";
+"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Chiamata con \"%@\" annullata.\nDuration: %@\nCausa Termine Chiamata: %@";
 "XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Attivazione sottosistema H.323 non riuscita.";
 "XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Registrato sul gatekeeper \"%@\"";
 "XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Deregistrato dal gatekeeper \"%@\"";
@@ -230,6 +230,7 @@
 "XM_UNKNOWN" = "<Sconosciuto>";
 "XM_DATE_FORMAT_STRING" = "%Y-%m-%d %H:%M:%S";
 "XM_EXTERNAL_ADDRESS_SUFFIX" = " (Esterno)";
+"XM_EXTERNAL_ADDRESS" = "Esterno";
 
 /* Framework */
 "XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Scadenza connessione";

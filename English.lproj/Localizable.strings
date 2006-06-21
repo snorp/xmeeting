@@ -114,7 +114,7 @@
 "XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Calling host \"%@\" failed";
 "XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Incoming call from \"%@\"";
 "XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Call with \"%@\" established.\nLocal IP Address: %@ (%@).\nRemote Address: %@\nRemote Application: \"%@\".";
-"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Call with \"%@\" cleared.\nDuration: %@";
+"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Call with \"%@\" cleared.\nDuration: %@\nCall End Reason: %@";
 "XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Enabling the H.323 subsystem failed.";
 "XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Registered at gatekeeper \"%@\"";
 "XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Unregistered from gatekeeper \"%@\"";
@@ -230,6 +230,7 @@
 "XM_UNKNOWN" = "<Unknown>";
 "XM_DATE_FORMAT_STRING" = "%Y-%m-%d %H:%M:%S";
 "XM_EXTERNAL_ADDRESS_SUFFIX" = " (External)";
+"XM_EXTERNAL_ADDRESS" = "External";
 
 /* Framework */
 "XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Connection timeout";

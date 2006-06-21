@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.6 2006/06/21 18:22:58 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.7 2006/06/21 20:34:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -860,6 +860,15 @@
 		if(localAddress != nil)
 		{
 			NSString *localInterface = [callInfo localAddressInterface];
+			
+			if(localInterface == nil || [localInterface isEqualToString:@"<UNK>"])
+			{
+				localInterface = NSLocalizedString(@"XM_UNKNOWN", @"");
+			}
+			else if([localInterface isEqualToString:@"<EXT>"])
+			{
+				localInterface = NSLocalizedString(@"XM_EXTERNAL_ADDRESS", @"");
+			}
 			localAddressString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_LOCAL_ADDRESS", @""), localAddress, localInterface];
 		}
 		

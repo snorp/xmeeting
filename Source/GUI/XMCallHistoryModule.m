@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.22 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.23 2006/06/21 20:34:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -315,9 +315,13 @@
 	{
 		localAddress = NSLocalizedString(@"XM_UNKNOWN", @"");
 	}
-	if(localAddressInterface == nil)
+	if(localAddressInterface == nil || [localAddressInterface isEqualToString:@"<UNK>"])
 	{
 		localAddressInterface = NSLocalizedString(@"XM_UNKNOWN", @"");
+	}
+	else if([localAddressInterface isEqualToString:@"<EXT>"])
+	{
+		localAddressInterface = NSLocalizedString(@"XM_EXTERNAL_ADDRESS", @"");
 	}
 	
 	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED", @""), 
@@ -351,8 +355,9 @@
 	}
 	
 	NSString *durationString = XMTimeString((unsigned)[activeCall callDuration]);
+	NSString *callEndReasonString = XMCallEndReasonString([activeCall callEndReason]);
 	
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_CLEARED", @""), remoteName, durationString];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_CLEARED", @""), remoteName, durationString, callEndReasonString];
 	
 	[self _logText:logText date:[activeCall callEndDate]];
 	

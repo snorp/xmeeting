@@ -114,7 +114,7 @@
 "XM_CALL_HISTORY_MODULE_CALL_FAILED" = "L'appel de l'hote \"%@\" a echoué";
 "XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Appel entrant de \"%@\"";
 "XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Appel de \"%@\" etabli.\nLocal IP Address: %@ (%@).\nRemote Address: %@\nRemote Application: \"%@\".";
-"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Appel de \"%@\" terminé.\nDuration: %@";
+"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Appel de \"%@\" terminé.\nDuration: %@\nRaison de la fin de l'appel: %@";
 "XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Activation du sous-systeme H.323 echoué.";
 "XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Enregistre sur la passerelle \"%@\"";
 "XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Deconnecté de la passerelle \"%@\"";
@@ -230,6 +230,7 @@
 "XM_UNKNOWN_HOST" = "<Inconnu>";
 "XM_DATE_FORMAT_STRING" = "%d-%m-%Y %H:%M:%S";
 "XM_EXTERNAL_ADDRESS_SUFFIX" = " (Externe)";
+"XM_EXTERNAL_ADDRESS" = "Externe";
 
 /* Framework */
 "XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Delai de connexion dépassé";
