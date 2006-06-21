@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.5 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.6 2006/06/21 18:22:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,12 +16,14 @@
 #define SMALL_LINE_HEIGHT 13
 #define TEXT_OFFSET 8
 #define VERTICAL_SPACING 4
-#define HORIZONTAL_SPACING 10
+#define HORIZONTAL_SPACING 20
 #define DISCLOSURE_SIZE 11
 
 #define DISCLOSURE_CLOSED 0
 #define DISCLOSURE_OPEN 1
 #define DISCLOSURE_CHANGING 2
+
+#define ANIMATION_STEPS 15
 
 @interface XMCallInfoView (PrivateMethods)
 
@@ -64,6 +66,8 @@
 	
 	disclosureState = DISCLOSURE_CLOSED;
 	
+	resizeAnimation = nil;
+	
 	return self;
 }
 
@@ -77,6 +81,7 @@
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Public Methods
 
 - (XMCallInfo *)callInfo
@@ -97,10 +102,22 @@
 	{
 		return 0.0f;
 	}
+	
+	if(resizeAnimation != nil)
+	{
+		NSAnimationProgress progress = [resizeAnimation currentProgress];
 		
-	return [self _calculateHeightForWidth:width];
+		float heightDifference = animationTargetHeight - animationStartHeight;
+		
+		return animationStartHeight + (progress * heightDifference);
+	}
+	else
+	{
+		return [self _calculateHeightForWidth:width];
+	}
 }
 
+#pragma mark -
 #pragma mark NSView Methods
 
 - (void)setFrame:(NSRect)frameRect
@@ -127,7 +144,23 @@
 	{
 		disclosureState -= DISCLOSURE_CHANGING;
 		disclosureState = !disclosureState;
-		[(XMRecentCallsView *)[self superview] noteSubviewHeightDidChange:self];
+		resizeAnimation = [[NSAnimation alloc] initWithDuration:0.3 animationCurve:NSAnimationEaseInOut];
+		[resizeAnimation setDelegate:self];
+		
+		unsigned i;
+		for(i = 0; i < ANIMATION_STEPS; i++)
+		{
+			[resizeAnimation addProgressMark:((float)i/ANIMATION_STEPS)];
+		}
+		
+		NSRect frame = [self frame];
+		animationStartHeight = frame.size.height;
+		animationTargetHeight = [self _calculateHeightForWidth:frame.size.width];
+		[resizeAnimation startAnimation];
+		[resizeAnimation release];
+		resizeAnimation = nil;
+		[self setNeedsDisplay:YES];
+		//[(XMRecentCallsView *)[self superview] noteSubviewHeightDidChange:self];
 	}
 }
 
@@ -181,7 +214,7 @@
 	[self _drawDisclosure]; 
 	
 	// releasing the strings again
-	if(![self inLiveResize])
+	if(![self inLiveResize] && resizeAnimation == nil)
 	{
 		[self _releaseStrings];
 	}
@@ -192,6 +225,15 @@
 	[self _releaseStrings];
 }
 
+#pragma mark -
+#pragma mark Resize Animation
+
+- (void)animation:(NSAnimation *)animation didReachProgressMark:(NSAnimationProgress)progress
+{
+	[(XMRecentCallsView *)[self superview] noteSubviewHeightDidChange:self];
+}
+
+#pragma mark -
 #pragma mark Private Methods
 
 + (NSColor *)_titleBackgroundColor
@@ -342,7 +384,7 @@
 						  LINE_HEIGHT);
 	[textDrawCell drawWithFrame:drawRect inView:self];
 		
-	if(disclosureState == DISCLOSURE_CLOSED)
+	if(disclosureState == DISCLOSURE_CLOSED || resizeAnimation != nil)
 	{
 		return;
 	}
@@ -448,6 +490,23 @@
 	y -= (SMALL_LINE_HEIGHT + VERTICAL_SPACING);
 	availableWidth = width - 3*TEXT_OFFSET;
 	BOOL didDrawSection = NO;
+	
+	// drawing the local address
+	if(localAddressString != nil)
+	{
+		[textDrawCell setStringValue:localAddressString];
+		cellSize = [textDrawCell cellSize];
+		if(cellSize.width > availableWidth)
+		{
+			cellSize.width = availableWidth;
+		}
+		drawRect = NSMakeRect(x, y, cellSize.width, SMALL_LINE_HEIGHT);
+		[textDrawCell drawWithFrame:drawRect inView:self];
+		
+		didDrawSection = YES;
+		
+		y -= SMALL_LINE_HEIGHT;
+	}
 	
 	// drawing the remote number
 	if(remoteNumberString != nil)
@@ -685,6 +744,11 @@
 	{
 		return height;
 	}
+	
+	if(localAddressString != nil)
+	{
+		height += (SMALL_LINE_HEIGHT + VERTICAL_SPACING);
+	}
 
 	if(remoteNumberString != nil ||
 	   remoteAddressString != nil ||
@@ -781,7 +845,7 @@
 	endReasonString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_END_REASON", @""), endReason];
 	
 	NSDate *startDate = [callInfo callInitiationDate];
-	if(startDate != nil)
+	if(startDate != nil && disclosureState != DISCLOSURE_CLOSED)
 	{
 		NSString *startDateString = [startDate descriptionWithCalendarFormat:XMDateFormatString()
 																	timeZone:nil
@@ -791,6 +855,13 @@
 		
 		NSString *callDuration = XMTimeString((unsigned)[callInfo callDuration]);
 		callDurationString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_DURATION", @""), callDuration];
+		
+		NSString *localAddress = [callInfo localAddress];
+		if(localAddress != nil)
+		{
+			NSString *localInterface = [callInfo localAddressInterface];
+			localAddressString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_LOCAL_ADDRESS", @""), localAddress, localInterface];
+		}
 		
 		NSString *remoteNumber = [callInfo remoteNumber];
 		if(remoteNumber != nil)
@@ -860,6 +931,9 @@
 		
 		[callDurationString release];
 		callDurationString = nil;
+		
+		[localAddressString release];
+		localAddressString = nil;
 		
 		[remoteNumberString release];
 		remoteNumberString = nil;

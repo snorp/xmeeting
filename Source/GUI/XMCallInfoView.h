@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMCallInfoView.h,v 1.4 2006/06/21 18:22:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,12 +24,17 @@
 	NSRect disclosureRect;
 	unsigned disclosureState;
 	
+	NSAnimation *resizeAnimation;
+	float animationStartHeight;
+	float animationTargetHeight;
+	
 	NSString *endDateString;
 	NSString *callStartString;
 	NSString *callEndString;
 	NSString *callDurationString;
 	NSString *callDirectionString;
 	NSString *endReasonString;
+	NSString *localAddressString;
 	NSString *remoteNumberString;
 	NSString *remoteAddressString;
 	NSString *remoteApplicationString;

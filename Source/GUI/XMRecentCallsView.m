@@ -1,5 +1,5 @@
 /*
- * $Id: XMRecentCallsView.m,v 1.3 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: XMRecentCallsView.m,v 1.4 2006/06/21 18:22:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,12 +10,12 @@
 #import "XMRecentCallsView.h"
 #import "XMCallInfoView.h"
 
-#define SPACING 2
+#define SPACING 4
 
 @interface XMRecentCallsView (PrivateMethods)
 
 - (void)_callCleared:(NSNotification *)notif;
-- (void)_layoutSubviews;
+- (void)_layoutSubviews:(BOOL)animate;
 
 @end
 
@@ -47,9 +47,105 @@
 
 - (void)noteSubviewHeightDidChange:(NSView *)subview
 {
-	[self _layoutSubviews];
+	// unlike the case of live resize, the width of the objects
+	// does not change. Thus, the other subviews do not change
+	// in height either.
+	NSArray *subviews = [self subviews];
+	unsigned index = [subviews indexOfObject:subview];
+	
+	if(index == NSNotFound)
+	{
+		return;
+	}
 	
 	NSRect frame = [subview frame];
+	float width = frame.size.width;
+	float currentHeight = frame.size.height;
+	float newHeight = [(XMCallInfoView *)subview requiredHeightForWidth:width];
+	
+	float actualHeight = [scrollView contentSize].height;
+	NSRect viewFrame = [self frame];
+	float totalHeightDifference = viewFrame.size.height - actualHeight;
+	float newTotalHeight;
+	
+	float heightDifference = newHeight - currentHeight;
+	
+	float heightOffsetDifference;
+	float totalHeight;
+	
+	unsigned count = [subviews count];
+	unsigned i;
+	for(i = 0; i < count; i++)
+	{
+		XMCallInfoView *infoView = (XMCallInfoView *)[subviews objectAtIndex:i];
+		frame = [infoView frame];
+		
+		if(i == 0)
+		{
+			float heightOffset = frame.origin.y - SPACING;
+			float newHeightOffset;
+			if(totalHeightDifference > 0)
+			{
+				newTotalHeight = viewFrame.size.height + heightDifference;
+				if(newTotalHeight < actualHeight)
+				{
+					newHeightOffset = actualHeight - newTotalHeight;
+					newTotalHeight = actualHeight;
+				}
+				else
+				{
+					newHeightOffset = 0;
+				}
+			}
+			else
+			{
+				newTotalHeight = viewFrame.size.height + heightDifference - heightOffset;
+				if(newTotalHeight < actualHeight)
+				{
+					newHeightOffset = actualHeight - newTotalHeight;
+					newTotalHeight = actualHeight;
+				}
+				else
+				{
+					newHeightOffset = 0;
+				}
+			}
+			
+			if(newHeightOffset < 0)
+			{
+				newHeightOffset = 0;
+			}
+			
+			heightOffsetDifference = heightOffset - newHeightOffset;
+		}
+		
+		if(i < index)
+		{
+			frame.origin.y -= heightOffsetDifference;
+		}
+		else if(i == index)
+		{
+			frame.origin.y -= heightOffsetDifference;
+			frame.size.height = newHeight;
+		}
+		else
+		{
+			frame.origin.y += (heightDifference - heightOffsetDifference);
+		}
+		[infoView setFrame:frame];
+		
+		if(i == (count - 1))
+		{
+			totalHeight = frame.origin.y + frame.size.height + SPACING;
+		}
+	}
+	
+	viewFrame.size.height = newTotalHeight;
+
+	[self setFrame:viewFrame];
+	[self display];
+	
+	frame = [subview frame];
 	
 	frame.size.height += SPACING;
 	
@@ -62,7 +158,7 @@
 {
 	if(layoutDone == NO || [self inLiveResize])
 	{
-		[self _layoutSubviews];
+		[self _layoutSubviews:NO];
 		layoutDone = YES;
 	}
 	[super drawRect:frameRect];
@@ -80,7 +176,7 @@
 	[self addSubview:callInfoView];
 	[callInfoView release];
 	
-	[self _layoutSubviews];
+	[self _layoutSubviews:NO];
 	
 	NSRect frame = [callInfoView frame];
 	frame.size.height += SPACING;
@@ -88,7 +184,7 @@
 	[self scrollRectToVisible:frame];
 }
 
-- (void)_layoutSubviews
+- (void)_layoutSubviews:(BOOL)animate
 {
 	NSArray *subviews = [self subviews];
 	
