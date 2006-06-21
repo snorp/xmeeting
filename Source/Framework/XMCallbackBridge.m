@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.24 2006/06/21 18:24:26 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.25 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -91,6 +91,19 @@ void _XMHandleCallCleared(unsigned callID, XMCallEndReason endReason)
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
 	[XMOpalDispatcher _callCleared:callID reason:endReason];
+	
+	[autoreleasePool release];
+}
+
+void _XMHandleCallReleased(unsigned callID, const char *localAddress)
+{
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	NSString *addressString = [[NSString alloc] initWithCString:localAddress encoding:NSASCIIStringEncoding];
+	
+	[XMOpalDispatcher _callReleased:callID localAddress:addressString];
+	
+	[addressString release];
 	
 	[autoreleasePool release];
 }

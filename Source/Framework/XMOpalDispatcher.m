@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.26 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.27 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,6 +35,7 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_CallEstablished,
 	_XMOpalDispatcherMessage_ClearCall,
 	_XMOpalDispatcherMessage_CallCleared,
+	_XMOpalDispatcherMessage_CallReleased,
 	
 	// Media callback messages
 	_XMOpalDispatcherMessage_AudioStreamOpened = 0x0300,
@@ -76,6 +77,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleCallEstablishedMessage:(NSArray *)messageComponents;
 - (void)_handleClearCallMessage:(NSArray *)messageComponents;
 - (void)_handleCallClearedMessage:(NSArray *)messageComponents;
+- (void)_handleCallReleasedMessage:(NSArray *)messageComponents;
 
 - (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents;
 - (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents;
@@ -323,6 +325,21 @@ typedef enum _XMOpalDispatcherMessage
 	NSArray *components = [[NSArray alloc] initWithObjects:idData, callEndReasonData, nil];
 	
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallCleared withComponents:components];
+	
+	[components release];
+}
+
++ (void)_callReleased:(unsigned)callID localAddress:(NSString *)localAddress
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
+	NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:idData, addressData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallReleased withComponents:components];
 	
 	[components release];
 }
@@ -624,6 +641,9 @@ typedef enum _XMOpalDispatcherMessage
 			break;
 		case _XMOpalDispatcherMessage_CallCleared:
 			[self _handleCallClearedMessage:[portMessage components]];
+			break;
+		case _XMOpalDispatcherMessage_CallReleased:
+			[self _handleCallReleasedMessage:[portMessage components]];
 			break;
 		case _XMOpalDispatcherMessage_AudioStreamOpened:
 			[self _handleAudioStreamOpenedMessage:[portMessage components]];
@@ -1114,6 +1134,26 @@ typedef enum _XMOpalDispatcherMessage
 	}
 	
 	callID = 0;
+}
+
+- (void)_handleCallReleasedMessage:(NSArray *)messageComponents
+{
+	NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *callIDNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
+	unsigned theCallID = [callIDNumber unsignedIntValue];
+	
+	if((theCallID != callID) && (callID != UINT_MAX))
+	{
+		NSLog(@"callID mismatch in callReleased: %d to current %d", (int)theCallID, (int)callID);
+		return;
+	}
+	
+	NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:1];
+	NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
+	
+	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleLocalAddress:)
+												   withObject:localAddress
+												waitUntilDone:NO];
 }
 
 - (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents

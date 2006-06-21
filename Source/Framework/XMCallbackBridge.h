@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.27 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.28 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -67,6 +67,11 @@ void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall, const char *
  * supplying the callID and the CallEndReason.
  **/
 void _XMHandleCallCleared(unsigned callID, XMCallEndReason callEndReason);
+
+/**
+ * Reports the local interface used when the call is released
+ **/
+void _XMHandleCallReleased(unsigned callID, const char *localAddress);
 
 /**
  * This function is called every time a new audio stream is opened.

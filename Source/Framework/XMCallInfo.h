@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.10 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.11 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -101,7 +101,10 @@
 
 /**
  * Returns the network interface about which
- * the call did run in a human readable fashion
+ * the call did run in a human readable fashion.
+ * Returns "<EXT>" if the local address matches
+ * the external address at the time the call was.
+ * Returns "<UNK>" if the interface isn't known.
  **/
 - (NSString *)localAddressInterface;
 

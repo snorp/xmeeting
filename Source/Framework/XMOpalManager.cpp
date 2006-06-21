@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.32 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.33 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -213,7 +213,7 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 }
 
 void XMOpalManager::OnClearedCall(OpalCall & call)
-{
+{	
 	unsigned callID = call.GetToken().AsUnsigned();
 	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
@@ -221,6 +221,17 @@ void XMOpalManager::OnClearedCall(OpalCall & call)
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
+	if(!PIsDescendant(&connection, XMConnection))
+	{
+		PIPSocket::Address address(0);
+		connection.GetTransport().GetLocalAddress().GetIpAddress(address);
+		
+		if(address.IsValid())
+		{
+			unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+			_XMHandleCallReleased(callID, address.AsString());
+		}
+	}
 	OpalManager::OnReleased(connection);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.24 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.25 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -722,11 +722,30 @@
 	NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
 	NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
 	
-	unsigned index = [localAddresses indexOfObject:[activeCall localAddress]];
+	NSString *localAddress = [call localAddress];
+	NSString *localAddressInterface;
+	unsigned index = [localAddresses indexOfObject:localAddress];
 	if(index != NSNotFound)
 	{
-		[activeCall _setLocalAddressInterface:[localAddressInterfaces objectAtIndex:index]];
+		localAddressInterface = (NSString *)[localAddressInterfaces objectAtIndex:index];
 	}
+	else
+	{
+		NSString *externalAddress = [_XMUtilsSharedInstance stunExternalAddress];
+		if(externalAddress == nil)
+		{
+			externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
+		}
+		
+		if([localAddress isEqualToString:externalAddress])
+		{
+			localAddressInterface = @"<EXT>";
+		}
+		else
+		{
+			localAddressInterface = @"<UNK>";
+		}
+	}	
 	
 	callManagerStatus = XM_CALL_MANAGER_IN_CALL;
 	
@@ -763,10 +782,29 @@
 		NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
 		
 		unsigned index = [localAddresses indexOfObject:localAddress];
+		NSString *localAddressInterface;
 		if(index != NSNotFound)
 		{
-			[activeCall _setLocalAddressInterface:[localAddressInterfaces objectAtIndex:index]];
+			localAddressInterface = (NSString *)[localAddressInterfaces objectAtIndex:index];
 		}
+		else
+		{
+			NSString *externalAddress = [_XMUtilsSharedInstance stunExternalAddress];
+			if(externalAddress == nil)
+			{
+				externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
+			}
+			
+			if([localAddress isEqualToString:externalAddress])
+			{
+				localAddressInterface = @"<EXT>";
+			}
+			else
+			{
+				localAddressInterface = @"<UNK>";
+			}
+		}
+		[activeCall _setLocalAddressInterface:localAddressInterface];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEstablishCall
@@ -796,6 +834,42 @@
 	
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidClearCall
 															object:self];
+	}
+}
+
+- (void)_handleLocalAddress:(NSString *)address
+{
+	if([activeCall localAddress] == nil)
+	{
+		[activeCall _setLocalAddress:address];
+		
+		NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
+		NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
+		
+		unsigned index = [localAddresses indexOfObject:address];
+		NSString *localAddressInterface;
+		if(index != NSNotFound)
+		{
+			localAddressInterface = (NSString *)[localAddressInterfaces objectAtIndex:index];
+		}
+		else
+		{
+			NSString *externalAddress = [_XMUtilsSharedInstance stunExternalAddress];
+			if(externalAddress == nil)
+			{
+				externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
+			}
+			
+			if([address isEqualToString:externalAddress])
+			{
+				localAddressInterface = @"<EXT>";
+			}
+			else
+			{
+				localAddressInterface = @"<UNK>";
+			}
+		}
+		[activeCall _setLocalAddressInterface:localAddressInterface];
 	}
 }
 

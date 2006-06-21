@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.14 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.15 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,7 @@
 			localAddress:(NSString *)localAddress;
 + (void)_clearCall:(unsigned)callID;
 + (void)_callCleared:(unsigned)callID reason:(XMCallEndReason)callEndReason;
++ (void)_callReleased:(unsigned)callID localAddress:(NSString *)localAddress;
 
 + (void)_audioStreamOpened:(unsigned)callID 
 					 codec:(NSString *)codec

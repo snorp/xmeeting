@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.32 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.33 2006/06/21 20:33:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -80,6 +80,9 @@ void _XMCheckCloseStatus();
 
 // Called when the call is cleared
 - (void)_handleCallCleared:(NSNumber *)endReason;
+
+// Called to determine the local address
+- (void)_handleLocalAddress:(NSString *)localAddress;
 
 // Called when the call statistics are updated
 - (void)_handleCallStatisticsUpdate:(XMCallStatistics *)callStatistics;
