@@ -9,8 +9,8 @@
 "Abort" = "Annuler";
 
 /* Alert messages */
-"XM_INCOMING_CALL_MESSAGE" = "Appel entrant";
 "XM_INCOMING_CALL_INFO_TEXT" = "Appel de \"%@\"\nAccepter l'appel ou non??";
+"XM_INCOMING_CALL_DETAILS" = "Protocole: %@\nAdresse distante: %@\nNumero distant: %@\nApplication distante: %@\nAdresse locale: %@ (%@)";
 
 "XM_CALL_FAILED_MESSAGE" = "Appel échoué";
 "XM_CALL_FAILED_INFO_TEXT" = "Impossible d'appeler \"%@\". (%@)";
@@ -227,7 +227,7 @@
 
 /* Misc */
 "XM_UNKNOWN_REASON" = "Raison inconnue";
-"XM_UNKNOWN_HOST" = "<Inconnu>";
+"XM_UNKNOWN" = "<Inconnu>";
 "XM_DATE_FORMAT_STRING" = "%d-%m-%Y %H:%M:%S";
 "XM_EXTERNAL_ADDRESS_SUFFIX" = " (Externe)";
 "XM_EXTERNAL_ADDRESS" = "Externe";

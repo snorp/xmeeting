@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.18 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.19 2006/06/21 22:16:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@
 @class XMInfoModule, XMStatisticsModule, XMCallHistoryModule;
 @class XMLocalAudioVideoModule, XMDialPadModule;
 @class XMAddressBookModule;
+@class XMIncomingCallAlert;
 
 /**
  * XMApplicationController is responsible for the main menu and
@@ -43,7 +44,7 @@
 	
 	BOOL isFullScreen;
 	
-	NSAlert *incomingCallAlert;
+	XMIncomingCallAlert *incomingCallAlert;
 	NSSound *incomingCallSound;
 	XMIncomingCallAlertType alertType;
 	

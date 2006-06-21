@@ -136,6 +136,9 @@
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
+		D11C5E520A49EC730030633D /* XMIncomingCallAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */; };
+		D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */; };
+		D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = D11C5E630A49ED950030633D /* IncomingCallAlert.nib */; };
 		D1205AF909F986A000179B6C /* down_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF709F986A000179B6C /* down_arrow_down.tif */; };
 		D1205AFA09F986A000179B6C /* down_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF809F986A000179B6C /* down_arrow.tif */; };
 		D1205B0A09F9899600179B6C /* left_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205B0609F9899600179B6C /* left_arrow_down.tif */; };
@@ -1058,6 +1061,10 @@
 		D10AFEB307B3781700BBC8EA /* XMUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMUtils.m; path = Source/Framework/XMUtils.m; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
+		D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMIncomingCallAlert.h; sourceTree = "<group>"; };
+		D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMIncomingCallAlert.m; sourceTree = "<group>"; };
+		D11C5E640A49ED950030633D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
+		D11C5F230A49F9F90030633D /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
 		D1205AF709F986A000179B6C /* down_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow_down.tif; path = Resources/Images/down_arrow_down.tif; sourceTree = "<group>"; };
 		D1205AF809F986A000179B6C /* down_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow.tif; path = Resources/Images/down_arrow.tif; sourceTree = "<group>"; };
 		D1205B0609F9899600179B6C /* left_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = left_arrow_down.tif; path = Resources/Images/left_arrow_down.tif; sourceTree = "<group>"; };
@@ -2024,6 +2031,8 @@
 				D13274F008C6F2BB00298F25 /* XMCallInfoView.m */,
 				D102AFFB09EA770F0050239C /* XMInstantActionButton.h */,
 				D102AFFC09EA770F0050239C /* XMInstantActionButton.m */,
+				D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */,
+				D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */,
 			);
 			name = "GUI-Objects";
 			path = Source/GUI;
@@ -3264,6 +3273,7 @@
 				D1ECCBF10833DDAD008EBAE3 /* TextChatModule.nib */,
 				1A348FB50984E4520033FA95 /* XMInspector.nib */,
 				D1B4D0050833937200A444E1 /* ZeroConfModule.nib */,
+				D11C5E630A49ED950030633D /* IncomingCallAlert.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -3514,6 +3524,7 @@
 				D1AF63D60A39415200CAF35F /* XMAppearancePreferencesModule.h in Headers */,
 				D1AF63DC0A39416700CAF35F /* XMAddressBookPreferencesModule.h in Headers */,
 				D1C8FCC80A44070D00EF1A8C /* XMStillImageVideoInputModule.h in Headers */,
+				D11C5E520A49EC730030633D /* XMIncomingCallAlert.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4085,6 +4096,7 @@
 				D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */,
 				D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */,
 				D1C8FCD30A4407E600EF1A8C /* StillImageSettings.nib in Resources */,
+				D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4228,6 +4240,7 @@
 				D1AF63D70A39415200CAF35F /* XMAppearancePreferencesModule.m in Sources */,
 				D1AF63DD0A39416700CAF35F /* XMAddressBookPreferencesModule.m in Sources */,
 				D1C8FCC90A44070D00EF1A8C /* XMStillImageVideoInputModule.m in Sources */,
+				D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4555,6 +4568,15 @@
 				D1C8FC630A435B2E00EF1A8C /* French */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		D11C5E630A49ED950030633D /* IncomingCallAlert.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D11C5E640A49ED950030633D /* English */,
+				D11C5F230A49F9F90030633D /* French */,
+			);
+			name = IncomingCallAlert.nib;
 			sourceTree = "<group>";
 		};
 		D1639415083E17A500F7FD83 /* DialPadModule.nib */ = {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.40 2006/06/20 20:14:39 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.41 2006/06/21 22:16:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,6 +39,8 @@
 #import "XMPreferencesWindowController.h"
 
 #import "XMSetupAssistantManager.h"
+
+#import "XMIncomingCallAlert.h"
 
 @interface XMApplicationController (PrivateMethods)
 
@@ -414,8 +416,6 @@
 	// show main window on call
 	[[XMMainWindowController sharedInstance] showMainWindow];
 	
-	incomingCallAlert = [[NSAlert alloc] init];
-	
 	if([preferencesManager alertIncomingCalls] == YES)
 	{
 		alertType = [preferencesManager incomingCallAlertType];
@@ -436,19 +436,9 @@
 		}
 	}
 	
-	[incomingCallAlert setMessageText:NSLocalizedString(@"Incoming Call", @"")];
-	
-	NSString *informativeTextFormat = NSLocalizedString(@"Incoming call from \"%@\"\nTake call or not?", @"");
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
-	NSString *remoteName = [activeCall remoteName];
 	
-	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, remoteName];
-	[incomingCallAlert setInformativeText:informativeText];
-	[informativeText release];
-	
-	[incomingCallAlert setAlertStyle:NSInformationalAlertStyle];
-	[incomingCallAlert addButtonWithTitle:NSLocalizedString(@"Yes", @"")];
-	[incomingCallAlert addButtonWithTitle:NSLocalizedString(@"No", @"")];
+	incomingCallAlert = [[XMIncomingCallAlert alloc] initWithCallInfo:activeCall];
 	
 	int result = [incomingCallAlert runModal];
 	
@@ -659,8 +649,9 @@
 	if(didFinish == YES && alertType == XMIncomingCallAlertType_Ringing)
 	{
 		[sound play];
-	}
+	}	
 }
+
 #pragma mark -
 #pragma mark Menu Validation
 

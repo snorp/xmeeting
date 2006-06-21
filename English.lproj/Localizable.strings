@@ -9,8 +9,8 @@
 "Abort" = "Abort";
 
 /* Alert messages */
-"XM_INCOMING_CALL_MESSAGE" = "Incoming Call";
 "XM_INCOMING_CALL_INFO_TEXT" = "Incoming call from \"%@\"\nTake call or not?";
+"XM_INCOMING_CALL_DETAILS" = "Protocol: %@\nRemote Address: %@\nRemote Number: %@\nRemote Application: %@\nLocal Address: %@ (%@)";
 
 "XM_CALL_FAILED_MESSAGE" = "Call failed";
 "XM_CALL_FAILED_INFO_TEXT" = "Unable to call \"%@\". (%@)";

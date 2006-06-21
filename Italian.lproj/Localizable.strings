@@ -9,8 +9,8 @@
 "Abort" = "Interrompi";
 
 /* Alert messages */
-"XM_INCOMING_CALL_MESSAGE" = "Chiamata In Arrivo";
 "XM_INCOMING_CALL_INFO_TEXT" = "C'è una chiamata in arrivo da \"%@\"\nRispondo?";
+"XM_INCOMING_CALL_DETAILS" = "Protocollo: %@\nIndirizzo Remoto: %@\nNumero Remoto: %@\nApplicazione Remota: %@\nLocal Address: %@ (%@)";
 
 "XM_CALL_FAILED_MESSAGE" = "Chiamata non riuscita";
 "XM_CALL_FAILED_INFO_TEXT" = "Impossibile chiamare \"%@\". (%@)";
