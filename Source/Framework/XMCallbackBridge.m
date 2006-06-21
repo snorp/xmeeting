@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.23 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.24 2006/06/21 18:24:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,9 +20,13 @@
 void _XMHandleSTUNInformation(XMNATType natType,
 							  const char *externalAddress)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *address = [[NSString alloc] initWithCString:externalAddress encoding:NSASCIIStringEncoding];
 	[_XMOpalDispatcherSharedInstance _handleNATType:natType externalAddress:address];
 	[address release];
+	
+	[autoreleasePool release];
 }
 
 #pragma mark -
@@ -138,7 +142,11 @@ void _XMHandleVideoStreamClosed(unsigned callID, bool isIncomingStream)
 
 void _XMHandleFECCChannelOpened()
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	[XMOpalDispatcher _feccChannelOpened];
+	
+	[autoreleasePool release];
 }
 
 #pragma mark -
@@ -206,14 +214,22 @@ void _XMUpdatePicture()
 
 void _XMHandleGatekeeperRegistration(const char *gatekeeperName)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *name = [[NSString alloc] initWithCString:gatekeeperName encoding:NSASCIIStringEncoding];
 	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistration:name];
 	[name release];
+	
+	[autoreleasePool release];
 }
 
 void _XMHandleGatekeeperUnregistration()
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	[_XMOpalDispatcherSharedInstance _handleGatekeeperUnregistration];
+	
+	[autoreleasePool release];
 }
 
 #pragma mark -
@@ -221,32 +237,48 @@ void _XMHandleGatekeeperUnregistration()
 
 void _XMHandleSIPRegistration(const char *theHost, const char *theUsername)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
 	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
 	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationForHost:host username:username];
 	[host release];
 	[username release];
+	
+	[autoreleasePool release];
 }
 
 void _XMHandleSIPUnregistration(const char *theHost, const char *theUsername)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
 	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
 	[_XMOpalDispatcherSharedInstance _handleSIPUnregistrationForHost:host username:username];
 	[host release];
 	[username release];
+	
+	[autoreleasePool release];
 }
 
 void _XMHandleSIPRegistrationFailure(const char *theHost, const char *theUsername, XMSIPStatusCode failReason)
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
 	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
 	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailureForHost:host username:username failReason:failReason];
 	[host release];
 	[username release];
+	
+	[autoreleasePool release];
 }
 
 void _XMHandleRegistrarSetupCompleted()
 {
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
 	[_XMOpalDispatcherSharedInstance _handleRegistrarSetupCompleted];
+	
+	[autoreleasePool release];
 }
