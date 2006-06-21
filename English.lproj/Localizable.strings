@@ -110,9 +110,9 @@
 /* Call History Module */
 "XM_CALL_HISTORY_MODULE_NAME" = "History";
 "XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Switched active location to \"%@\"";
-"XM_CALL_HISTORY_MODULE_CALLING" = "Calling host \"%@\"";
-"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Calling host \"%@\" failed";
-"XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Incoming call from \"%@\"";
+"XM_CALL_HISTORY_MODULE_CALLING" = "Calling host \"%@\" using %@";
+"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Calling host \"%@\" using %@ failed";
+"XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Incoming call from \"%@\" using %@";
 "XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Call with \"%@\" established.\nLocal IP Address: %@ (%@).\nRemote Address: %@\nRemote Application: \"%@\".";
 "XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Call with \"%@\" cleared.\nDuration: %@\nCall End Reason: %@";
 "XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Enabling the H.323 subsystem failed.";
@@ -165,6 +165,7 @@
 "XM_CALL_INFO_VIEW_VIDEO" = "Video:";
 "XM_CALL_INFO_VIEW_DIRECTION_OUT" = "Direction: Out";
 "XM_CALL_INFO_VIEW_DIRECTION_IN" = "Direction: In";
+"XM_CALL_INFO_VIEW_PROTOCOL" = "Protocol: %@";
 "XM_CALL_INFO_VIEW_END_REASON" = "Call End Reason: %@";
 "XM_CALL_INFO_VIEW_START" = "Start: %@";
 "XM_CALL_INFO_VIEW_END" = "End: %@";

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.23 2006/06/21 20:34:26 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.24 2006/06/21 22:54:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -265,7 +265,21 @@
 - (void)_didStartCalling:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALLING", @""), [activeCall callAddress]];
+	
+	NSString *theCallAddress = [activeCall callAddress];
+	XMCallProtocol callProtocol = [activeCall protocol];
+	NSString *callProtocolString;
+	
+	if(callProtocol == XMCallProtocol_H323)
+	{
+		callProtocolString = @"H.323";
+	}
+	else
+	{
+		callProtocolString = @"SIP";
+	}
+	
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALLING", @""), theCallAddress, callProtocolString];
 	
 	[self _logText:logText date:[activeCall callInitiationDate]];
 	
@@ -277,7 +291,19 @@
 
 - (void)_didNotStartCalling:(NSNotification *)notif
 {
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_FAILED", @""), [[callAddress addressResource] address]];
+	XMAddressResource *addressResource = [callAddress addressResource];
+	NSString *addressString = [addressResource address];
+	XMCallProtocol callProtocol = [addressResource callProtocol];
+	NSString *protocolString;
+	if(callProtocol == XMCallProtocol_H323)
+	{
+		protocolString = @"H.323";
+	}
+	else
+	{
+		protocolString = @"SIP";
+	}
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_FAILED", @""), addressString, protocolString];
 	
 	[self _logText:logText date:nil];
 	
@@ -290,7 +316,20 @@
 - (void)_didReceiveIncomingCall:(NSNotification *)notif
 {
 	XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_INCOMING_CALL", @""), [activeCall remoteName]];
+	NSString *remoteName = [activeCall remoteName];
+	
+	XMCallProtocol callProtocol = [activeCall protocol];
+	NSString *protocolString;
+	
+	if(callProtocol == XMCallProtocol_H323)
+	{
+		protocolString = @"H.323";
+	}
+	else
+	{
+		protocolString = @"SIP";
+	}
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_INCOMING_CALL", @""), remoteName, protocolString];
 	
 	[self _logText:logText date:[activeCall callInitiationDate]];
 	

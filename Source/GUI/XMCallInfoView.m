@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.7 2006/06/21 20:34:26 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.8 2006/06/21 22:54:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -463,6 +463,22 @@
 	x += (cellSize.width + HORIZONTAL_SPACING);
 	availableWidth -= (cellSize.width + HORIZONTAL_SPACING);
 	
+	// drawing the callProtocol
+	[textDrawCell setStringValue:callProtocolString];
+	cellSize = [textDrawCell cellSize];
+	if(cellSize.width > availableWidth)
+	{
+		x = 2*TEXT_OFFSET;
+		y -= SMALL_LINE_HEIGHT;
+		availableWidth = width - 3*TEXT_OFFSET;
+	}
+	drawRect = NSMakeRect(x, y, cellSize.width, SMALL_LINE_HEIGHT);
+	[textDrawCell drawWithFrame:drawRect inView:self];
+	
+	// adjusting the x / availableWidth values
+	x += (cellSize.width + HORIZONTAL_SPACING);
+	availableWidth -= (cellSize.width + HORIZONTAL_SPACING);
+	
 	// drawing the callEndReason
 	[textDrawCell setStringValue:endReasonString];
 	cellSize = [textDrawCell cellSize];
@@ -733,6 +749,18 @@
 	cellSize = [textDrawCell cellSize];
 	availableWidth -= (cellSize.width + HORIZONTAL_SPACING);
 	
+	[textDrawCell setStringValue:callProtocolString];
+	cellSize = [textDrawCell cellSize];
+	if(cellSize.width > availableWidth)
+	{
+		height += SMALL_LINE_HEIGHT;
+		availableWidth = width - 3*TEXT_OFFSET;
+	}
+	else
+	{
+		availableWidth -= (cellSize.width + HORIZONTAL_SPACING);
+	}
+	
 	[textDrawCell setStringValue:endReasonString];
 	cellSize = [textDrawCell cellSize];
 	if(cellSize.width > availableWidth)
@@ -841,6 +869,18 @@
 		callDirectionString = NSLocalizedString(@"XM_CALL_INFO_VIEW_DIRECTION_IN", @"");
 	}
 	
+	XMCallProtocol callProtocol = [callInfo protocol];
+	NSString *protocolString;
+	if(callProtocol == XMCallProtocol_H323)
+	{
+		protocolString = @"H.323";
+	}
+	else
+	{
+		protocolString = @"SIP";
+	}
+	callProtocolString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_PROTOCOL", @""), protocolString];
+	
 	NSString *endReason = XMCallEndReasonString([callInfo callEndReason]);
 	endReasonString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_END_REASON", @""), endReason];
 	
@@ -926,6 +966,9 @@
 	endDateString = nil;
 	
 	callDirectionString = nil;
+	
+	[callProtocolString release];
+	callProtocolString = nil;
 	
 	[endReasonString release];
 	endReasonString = nil;

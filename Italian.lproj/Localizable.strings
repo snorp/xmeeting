@@ -110,9 +110,9 @@
 /* Call History Module */
 "XM_CALL_HISTORY_MODULE_NAME" = "Cronologia";
 "XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Posizione attiva passata a \"%@\"";
-"XM_CALL_HISTORY_MODULE_CALLING" = "Chiamata host \"%@\"";
-"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Chiamata host \"%@\" non riuscita";
-"XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Chiamata entrante da \"%@\"";
+"XM_CALL_HISTORY_MODULE_CALLING" = "Chiamata host \"%@\" par %@";
+"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "Chiamata host \"%@\" par %@ non riuscita";
+"XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Chiamata entrante da \"%@\" par %@";
 "XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Chiamata con \"%@\" stabilita.\nLocal IP Address: %@ (%@)\nRemote Address: %@\nRemote Application: \"%@\".";
 "XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Chiamata con \"%@\" annullata.\nDuration: %@\nCausa Termine Chiamata: %@";
 "XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Attivazione sottosistema H.323 non riuscita.";
@@ -165,6 +165,7 @@
 "XM_CALL_INFO_VIEW_VIDEO" = "Video:";
 "XM_CALL_INFO_VIEW_DIRECTION_OUT" = "Direzione: Out";
 "XM_CALL_INFO_VIEW_DIRECTION_IN" = "Direzione: In";
+"XM_CALL_INFO_VIEW_PROTOCOL" = "Protocollo: %@";
 "XM_CALL_INFO_VIEW_END_REASON" = "Causa Termine Chiamata: %@";
 "XM_CALL_INFO_VIEW_START" = "Inizio: %@";
 "XM_CALL_INFO_VIEW_END" = "Fine: %@";

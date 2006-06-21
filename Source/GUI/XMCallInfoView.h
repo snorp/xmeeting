@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.h,v 1.4 2006/06/21 18:22:58 hfriederich Exp $
+ * $Id: XMCallInfoView.h,v 1.5 2006/06/21 22:54:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,6 +33,7 @@
 	NSString *callEndString;
 	NSString *callDurationString;
 	NSString *callDirectionString;
+	NSString *callProtocolString;
 	NSString *endReasonString;
 	NSString *localAddressString;
 	NSString *remoteNumberString;
