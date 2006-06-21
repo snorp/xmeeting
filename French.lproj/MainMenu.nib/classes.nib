@@ -10,9 +10,11 @@
                 retrySIPRegistration = id; 
                 showContacts = id; 
                 showInspector = id; 
+                showMainWindow = id; 
                 showPreferences = id; 
                 showTools = id; 
                 updateDeviceLists = id; 
+                updateNetworkInformation = id; 
             }; 
             CLASS = XMApplicationController; 
             LANGUAGE = ObjC; 
