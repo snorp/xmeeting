@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.11 2006/06/07 15:49:04 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.12 2006/06/21 11:32:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,7 @@
 #import "XMLocation.h"
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
+#import "XMApplicationFunctions.h"
 
 #define XM_QUIT_APPLICATION UINT_MAX
 
@@ -35,11 +36,12 @@
 #define XM_LI_COMPLETED_VIEW_TAG 13
 
 #define XM_NETWORK_SETTINGS_VIEW_TAG 21
-#define XM_H323_SETTINGS_VIEW_TAG 22
-#define XM_GATEKEEPER_SETTINGS_VIEW_TAG 23
-#define XM_SIP_SETTINGS_VIEW_TAG 24
-#define XM_REGISTRAR_SETTINGS_VIEW_TAG 25
-#define XM_VIDEO_SETTINGS_VIEW_TAG 26
+#define XM_NAT_SETTINGS_VIEW_TAG 22
+#define XM_H323_SETTINGS_VIEW_TAG 23
+#define XM_GATEKEEPER_SETTINGS_VIEW_TAG 24
+#define XM_SIP_SETTINGS_VIEW_TAG 25
+#define XM_REGISTRAR_SETTINGS_VIEW_TAG 26
+#define XM_VIDEO_SETTINGS_VIEW_TAG 27
 
 #define XMKey_SetupAssistantNibName @"SetupAssistant"
 
@@ -83,6 +85,9 @@
 
 - (void)_prepareFLProtocolSettings;
 - (void)_finishFLProtocolSettings;
+
+- (void)_prepareFLNATSettings;
+- (void)_finishFLNATSettings;
 
 - (void)_prepareFLH323Settings;
 - (void)_finishFLH323Settings;
@@ -128,7 +133,14 @@
 - (void)_prepareLICompletedSettings;
 - (void)_finishLICompletedSettings;
 
+- (void)_didStartFetchingExternalAddress:(NSNotification *)notif;
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
+- (void)_didUpdateSTUNInformation:(NSNotification *)notif;
+- (void)_setupNATTypeView;
+
+- (void)_validateSTUNUserInterface;
+- (void)_validateAddressTranslationUserInterface;
+- (void)_validateExternalAddressUserInterface;
 
 @end
 
@@ -249,6 +261,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	[location setSIPAccountTag:[sipAccount tag]];
 	[location setSIPProxyMode:XMSIPProxyMode_UseSIPAccount];
 	
+	detectedNATType = XMNATType_Error;
+	
 	[[self window] center];
 	[self showWindow:self];
 }
@@ -331,68 +345,113 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 }
 
+- (IBAction)updateNATType:(id)sender
+{
+	detectedNATType = XMNATType_Error;
+	[self _prepareFLNATSettings];
+}
+
+- (IBAction)continueNATSettings:(id)sender
+{
+	[stunServerField removeAllItems];
+	[stunServerField addItemsWithObjectValues:XMDefaultSTUNServers()];
+		
+	int state = ([location useSTUN] == YES) ? NSOnState : NSOffState;
+	[useSTUNRadioButton setState:state];
+	
+	if(state == NSOffState)
+	{
+		state = ([location useAddressTranslation] == YES) ? NSOnState : NSOffState;
+		[useIPAddressTranslationRadioButton setState:state];
+		
+		if(state == NSOffState)
+		{
+			[noneRadioButton setState:NSOnState];
+		}
+		else
+		{
+			[noneRadioButton setState:NSOffState];
+		}
+	}
+	else
+	{
+		[useIPAddressTranslationRadioButton setState:NSOffState];
+		[noneRadioButton setState:NSOffState];
+	}
+	
+	NSString *string = [location stunServer];
+	if(string == nil)
+	{
+		string = @"";
+	}
+	[stunServerField setStringValue:string];
+	
+	string = [location externalAddress];
+	if(string == nil)
+	{
+		state = NSOnState;
+		string = @"";
+	}
+	else
+	{	
+		state = NSOffState;
+	}
+	[externalAddressField setStringValue:string];
+	[automaticallyGetExternalAddressSwitch setState:state];
+	
+	[self _validateSTUNUserInterface];
+	[self _validateAddressTranslationUserInterface];
+	
+	[contentBox setContentView:natSettingsView];
+	
+	[continueButton setEnabled:YES];
+	[goBackButton setEnabled:YES];
+	[cancelButton setEnabled:YES];	
+}
+
+- (IBAction)toggleNATMethod:(id)sender
+{
+	if(sender == useSTUNRadioButton)
+	{
+		[useIPAddressTranslationRadioButton setState:NSOffState];
+		[noneRadioButton setState:NSOffState];
+	}
+	else if(sender == useIPAddressTranslationRadioButton)
+	{
+		[useSTUNRadioButton setState:NSOffState];
+		[noneRadioButton setState:NSOffState];
+	}
+	else
+	{
+		[useSTUNRadioButton setState:NSOffState];
+		[useIPAddressTranslationRadioButton setState:NSOffState];
+	}
+	
+	[self _validateSTUNUserInterface];
+	[self _validateAddressTranslationUserInterface];
+}
+
+- (IBAction)getExternalAddress:(id)sender
+{
+	XMUtils *utils = [XMUtils sharedInstance];
+	
+	[utils startFetchingCheckipExternalAddress];
+	
+	[externalAddressField setStringValue:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
+	[externalAddressField setEnabled:NO];
+	externalAddressIsValid = NO;
+}
+
+- (IBAction)toggleAutoGetExternalAddress:(id)sender
+{
+	[self _validateExternalAddressUserInterface];
+}
+
 // implementing to allow the application termination even
 // when inside this modal loop
 - (IBAction)terminate:(id)sender
 {
 	[NSApp terminate:sender];
-}
-
-- (IBAction)validateAddressTranslationInterface:(id)sender
-{
-	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
-	
-	[updateExternalAddressButton setEnabled:flag];
-	[automaticallyGetExternalAddressSwitch setEnabled:flag];
-	
-	if(flag == YES)
-	{
-		flag = ([automaticallyGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
-		[externalAddressField setEnabled:flag];
-		
-		if(flag == NO)
-		{
-			XMUtils *utils = [XMUtils sharedInstance];
-			NSString *externalAddress = [utils checkipExternalAddress];
-			NSString *displayString;
-			
-			if(externalAddress == nil)
-			{
-				if([utils isFetchingCheckipExternalAddress] == YES)
-				{
-					displayString = NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"");
-				}
-				else
-				{
-					displayString = NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"");
-				}
-				externalAddressIsValid = NO;
-			}
-			else
-			{
-				displayString = externalAddress;
-				externalAddressIsValid = YES;
-			}
-			
-			[externalAddressField setStringValue:displayString];
-		}
-		else
-		{
-			if(!externalAddressIsValid)
-			{
-				[externalAddressField setStringValue:@""];
-			}
-		}
-	}
-	else
-	{
-		[externalAddressField setEnabled:NO];
-	}
-}
-
-- (IBAction)updateExternalAddress:(id)sender
-{
-	[[XMUtils sharedInstance] startFetchingCheckipExternalAddress];
 }
 
 - (IBAction)protocolSwitchToggled:(id)sender
@@ -459,6 +518,11 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			break;
 		default:
 			break;
+	}
+	
+	if([contentBox contentView] == flNATDetectionView)
+	{
+		enableGoBackButton = NO;
 	}
 	
 	if(isContinueButton == YES)
@@ -531,6 +595,13 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			
 		case XM_NETWORK_SETTINGS_VIEW_TAG:
 			[self _finishFLNetworkSettings];
+			nextView = flNATDetectionView;
+			viewTag = XM_NAT_SETTINGS_VIEW_TAG;
+			[self _prepareFLNATSettings];
+			break;
+			
+		case XM_NAT_SETTINGS_VIEW_TAG:
+			[self _finishFLNATSettings];
 			nextView = flProtocolsView;
 			viewTag = XM_FL_PROTOCOLS_VIEW_TAG;
 			[self _prepareFLProtocolSettings];
@@ -670,11 +741,18 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			firstResponder = [self _prepareFLNewLocationSettings];
 			break;
 			
-		case XM_FL_PROTOCOLS_VIEW_TAG:
-			[self _finishFLProtocolSettings];
+		case XM_NAT_SETTINGS_VIEW_TAG:
+			[self _finishFLNATSettings];
 			nextView = networkSettingsView;
 			viewTag = XM_NETWORK_SETTINGS_VIEW_TAG;
 			[self _prepareFLNetworkSettings];
+			break;
+			
+		case XM_FL_PROTOCOLS_VIEW_TAG:
+			[self _finishFLProtocolSettings];
+			nextView = flNATDetectionView;
+			viewTag = XM_NAT_SETTINGS_VIEW_TAG;
+			[self _prepareFLNATSettings];
 			break;
 			
 		case XM_H323_SETTINGS_VIEW_TAG:
@@ -974,7 +1052,31 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
-	int state;
+	[bandwidthLimitPopUp selectItemWithTag:[location bandwidthLimit]];
+}
+
+- (void)_finishFLNetworkSettings
+{
+	[location setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
+	
+	/*BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	[location setUseAddressTranslation:flag];*/
+	
+	/*flag = ([automaticallyGetExternalAddressSwitch state] == NSOnState) ? YES : NO;
+	if(flag == YES)
+	{
+		[location setExternalAddress:nil];
+	}
+	else
+	{
+		[location setExternalAddress:[externalAddressField stringValue]];
+	}*/
+}
+
+- (void)_prepareFLNATSettings
+{
+	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
+	[self _setTitle:titleString];
 	
 	XMUtils *utils = [XMUtils sharedInstance];
 	
@@ -984,48 +1086,62 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter addObserver:self selector:@selector(validateAddressTranslationInterface:)
+	[notificationCenter addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 	
-	[bandwidthLimitPopUp selectItemWithTag:[location bandwidthLimit]];
+	[continueButton setEnabled:NO];
+	[goBackButton setEnabled:NO];
+	[cancelButton setEnabled:NO];
 	
-	state = ([location useAddressTranslation] == YES) ? NSOnState : NSOffState;
-	[useIPAddressTranslationSwitch setState:state];
-	
-	NSString *externalAddress = [location externalAddress];
-	if(externalAddress == nil)
+	if(detectedNATType == XMNATType_Error)
 	{
-		state = NSOnState;
-		externalAddress = @"";
+		[natTypeBox setHidden:YES];
+		[natDetectionBox setHidden:NO];
+		[natTypeField setStringValue:@""];
+		[continueNATSettingsButton setEnabled:NO];
+		
+		[natDetectionProgressIndicator startAnimation:self];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didUpdateSTUNInformation:)
+													 name:XMNotification_UtilsDidUpdateSTUNInformation object:nil];
+		
+		XMPreferences *preferences = [[XMPreferences alloc] init];
+		[preferences setUseSTUN:YES];
+		NSArray *array = XMDefaultSTUNServers();
+		[preferences setSTUNServer:(NSString *)[array objectAtIndex:0]];
+		
+		[[XMCallManager sharedInstance] setActivePreferences:preferences];
+		[preferences release];
 	}
 	else
 	{
-		state = NSOffState;
+		[self _setupNATTypeView];
 	}
-	[externalAddressField setStringValue:externalAddress];
-	[automaticallyGetExternalAddressSwitch setState:state];
-	
-	[self validateAddressTranslationInterface:nil];
 }
 
-- (void)_finishFLNetworkSettings
+- (void)_finishFLNATSettings
 {
-	[location setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
+	BOOL flag = ([useSTUNRadioButton state] == NSOnState) ? YES : NO;
+	[location setUseSTUN:flag];
 	
-	BOOL flag = ([useIPAddressTranslationSwitch state] == NSOnState) ? YES : NO;
+	NSString *string = [stunServerField stringValue];
+	if([string isEqualToString:@""])
+	{
+		string = nil;
+	}
+	[location setSTUNServer:string];
+	
+	flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
 	[location setUseAddressTranslation:flag];
 	
-	flag = ([automaticallyGetExternalAddressSwitch state] == NSOnState) ? YES : NO;
-	if(flag == YES)
+	string = [externalAddressField stringValue];
+	if([string isEqualToString:@""] || [automaticallyGetExternalAddressSwitch state] == NSOnState)
 	{
-		[location setExternalAddress:nil];
+		string = nil;
 	}
-	else
-	{
-		[location setExternalAddress:[externalAddressField stringValue]];
-	}
+	[location setExternalAddress:string];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
@@ -1628,9 +1744,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_PreferencesBandwidthLimit] ||
-				   [keys containsObject:XMKey_PreferencesUseAddressTranslation] ||
-				   [keys containsObject:XMKey_PreferencesExternalAddress])
+				if([keys containsObject:XMKey_PreferencesBandwidthLimit])
 				{
 					nextView = networkSettingsView;
 					viewTag = XM_NETWORK_SETTINGS_VIEW_TAG;
@@ -1786,9 +1900,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_PreferencesBandwidthLimit] ||
-				   [keys containsObject:XMKey_PreferencesUseAddressTranslation] ||
-				   [keys containsObject:XMKey_PreferencesExternalAddress])
+				if([keys containsObject:XMKey_PreferencesBandwidthLimit])
 				{
 					nextView = networkSettingsView;
 					viewTag = XM_NETWORK_SETTINGS_VIEW_TAG;
@@ -1969,7 +2081,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	[bandwidthLimitPopUp setEnabled:enableBandwidthLimit];
 	[bandwidthLimitPopUp selectItemWithTag:[theLocation bandwidthLimit]];
 	
-	int state = ([theLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
+	/*int state = ([theLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
 	[useIPAddressTranslationSwitch setState:state];
 	
 	NSString *externalAddress = [theLocation externalAddress];
@@ -2012,7 +2124,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		[externalAddressField setEnabled:NO];
 		[automaticallyGetExternalAddressSwitch setEnabled:NO];
 		[updateExternalAddressButton setEnabled:NO];
-	}
+	}*/
 }
 
 - (void)_finishLINetworkSettings
@@ -2035,7 +2147,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			[locationToChange setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
 		}
 		
-		if([keys containsObject:XMKey_PreferencesExternalAddress])
+		/*if([keys containsObject:XMKey_PreferencesExternalAddress])
 		{
 			[locationToChange setExternalAddress:[externalAddressField stringValue]];
 		}
@@ -2053,21 +2165,21 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			{
 				[locationToChange setExternalAddress:[externalAddressField stringValue]];
 			}
-		}
+		}*/
 	}
 
-	if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
+	/*if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
 	{
 		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 		[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
 		[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
-	}
+	}*/
 	
 	[bandwidthLimitPopUp setEnabled:YES];
-	[useIPAddressTranslationSwitch setEnabled:YES];
-	[externalAddressField setEnabled:YES];
-	[automaticallyGetExternalAddressSwitch setEnabled:YES];
-	[updateExternalAddressButton setEnabled:YES];
+	//[useIPAddressTranslationSwitch setEnabled:YES];
+	//[externalAddressField setEnabled:YES];
+	//[automaticallyGetExternalAddressSwitch setEnabled:YES];
+	//[updateExternalAddressButton setEnabled:YES];
 }
 
 - (NSView *)_prepareLIGatekeeperSettings
@@ -2315,6 +2427,11 @@ static XMSetupAssistantManager *sharedInstance = nil;
 {
 }
 
+- (void)_didStartFetchingExternalAddress:(NSNotification *)notif
+{
+	[self _validateAddressTranslationUserInterface];
+}
+
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
 {
 	NSString *externalAddress = [[XMUtils sharedInstance] checkipExternalAddress];
@@ -2322,7 +2439,118 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	{
 		[externalAddressField setStringValue:externalAddress];
 	}
-	[self validateAddressTranslationInterface:nil];
+	[self _validateAddressTranslationUserInterface];
+}
+
+- (void)_didUpdateSTUNInformation:(NSNotification *)notif
+{
+	XMUtils *utils = [XMUtils sharedInstance];
+	
+	detectedNATType = [utils natType];
+	[self _setupNATTypeView];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidUpdateSTUNInformation object:nil];
+}
+
+- (void)_setupNATTypeView
+{
+	[natDetectionProgressIndicator stopAnimation:self];
+	
+	[natDetectionBox setHidden:YES];
+	[natTypeBox setHidden:NO];
+	[continueNATSettingsButton setEnabled:YES];
+	
+	[natTypeField setStringValue:XMNATTypeString(detectedNATType)];
+	
+	NSString *explanationString = @"";
+	switch(detectedNATType)
+	{
+		case XMNATType_Error:
+			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_NAT_ERROR", @"");
+			break;
+		case XMNATType_NoNAT:
+			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_NO_NAT", @"");
+			break;
+		case XMNATType_SymmetricNAT:
+			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_SYMMETRIC_NAT", @"");
+			break;
+		default:
+			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_DEFAULT_NAT", @"");
+			break;
+	}
+	
+	[natTypeExplanationField setStringValue:explanationString];
+}
+
+- (void)_validateSTUNUserInterface
+{
+	BOOL flag = ([useSTUNRadioButton state] == NSOnState) ? YES : NO;
+	
+	[stunServerField setEnabled:flag];
+}
+
+- (void)_validateAddressTranslationUserInterface
+{
+	BOOL flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
+	
+	[automaticallyGetExternalAddressSwitch setEnabled:flag];
+	[updateExternalAddressButton setEnabled:flag];
+	
+	if(flag)
+	{
+		[self _validateExternalAddressUserInterface];
+	}
+	else
+	{
+		[externalAddressField setEnabled:NO];
+	}
+}
+
+- (void)_validateExternalAddressUserInterface
+{
+	BOOL flag = ([automaticallyGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
+	[externalAddressField setEnabled:flag];
+	
+	NSColor *textColor;
+	
+	if(flag == NO)
+	{
+		XMUtils *utils = [XMUtils sharedInstance];
+		NSString *externalAddress = [utils checkipExternalAddress];
+		NSString *displayString;
+		
+		if(externalAddress == nil)
+		{
+			if([utils isFetchingCheckipExternalAddress])
+			{
+				displayString = NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"");
+			}
+			else
+			{
+				displayString = NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"");
+			}
+			textColor = [NSColor controlTextColor];
+			externalAddressIsValid = NO;
+		}
+		else
+		{
+			displayString = externalAddress;
+			textColor = [NSColor controlTextColor];
+			externalAddressIsValid = YES;
+		}
+		
+		[externalAddressField setStringValue:displayString];
+	}
+	else
+	{
+		if(!externalAddressIsValid)
+		{
+			[externalAddressField setStringValue:@""];
+		}
+		textColor = [NSColor controlTextColor];
+	}
+	
+	[externalAddressField setTextColor:textColor];
 }
 
 @end

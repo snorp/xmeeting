@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.4 2006/05/16 21:33:49 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.5 2006/06/21 11:32:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "XMeeting.h"
+
 @class XMLocation;
 @class XMH323Account;
 @class XMSIPAccount;
@@ -19,8 +21,6 @@
  * Keys that are understood when importing locations:
  *
  * XMKey_PreferencesBandwidthLimit
- * XMKey_PreferencesExternalAddress
- * XMKey_PreferencesUseAddressTranslation
  * XMKey_H323AccountUsername
  * XMKey_H323AccountPhoneNumber
  * XMKey_H323AccountPassword
@@ -56,6 +56,7 @@
 	IBOutlet NSView *flGeneralSettingsView;
 	IBOutlet NSView *flLocationView;
 	IBOutlet NSView *flNewLocationView;
+	IBOutlet NSView *flNATDetectionView;
 	IBOutlet NSView *flProtocolsView;
 	IBOutlet NSView *flCompletedView;
 	
@@ -63,6 +64,7 @@
 	IBOutlet NSView *liCompletedView;
 	
 	IBOutlet NSView *networkSettingsView;
+	IBOutlet NSView *natSettingsView;
 	IBOutlet NSView *h323SettingsView;
 	IBOutlet NSView *gatekeeperSettingsView;
 	IBOutlet NSView *sipSettingsView;
@@ -79,6 +81,15 @@
 	// flNewLocation objects
 	IBOutlet NSTextField *locationNameField;
 	
+	// flNATDetection objects
+	IBOutlet NSBox *natDetectionBox;
+	IBOutlet NSBox *natTypeBox;
+	IBOutlet NSProgressIndicator *natDetectionProgressIndicator;
+	IBOutlet NSTextField *natTypeField;
+	IBOutlet NSTextField *natTypeExplanationField;
+	IBOutlet NSButton *continueNATSettingsButton;
+	XMNATType detectedNATType;
+	
 	// flProtocol objects;
 	IBOutlet NSButton *enableH323Switch;
 	IBOutlet NSButton *enableSIPSwitch;
@@ -88,11 +99,16 @@
 	
 	// networkSettings objects
 	IBOutlet NSPopUpButton *bandwidthLimitPopUp;
-	IBOutlet NSButton *useIPAddressTranslationSwitch;
+	
+	// natSettings object
+	IBOutlet NSButton *useSTUNRadioButton;
+	IBOutlet NSComboBox *stunServerField;
+	IBOutlet NSButton *useIPAddressTranslationRadioButton;
 	IBOutlet NSTextField *externalAddressField;
 	IBOutlet NSButton *updateExternalAddressButton;
 	IBOutlet NSButton *automaticallyGetExternalAddressSwitch;
 	BOOL externalAddressIsValid;
+	IBOutlet NSButton *noneRadioButton;
 	
 	// h323Settings objects
 	IBOutlet NSMatrix *useGatekeeperRadioButtons;
@@ -157,9 +173,14 @@
 - (IBAction)continueAssistant:(id)sender;
 - (IBAction)goBackAssistant:(id)sender;
 
-// Action methods for Address Translation
-- (IBAction)validateAddressTranslationInterface:(id)sender;
-- (IBAction)updateExternalAddress:(id)sender;
+// Action methods for NAT Detection
+- (IBAction)updateNATType:(id)sender;
+- (IBAction)continueNATSettings:(id)sender;
+
+// Action methods for NAT Traversal
+- (IBAction)toggleNATMethod:(id)sender;
+- (IBAction)getExternalAddress:(id)sender;
+- (IBAction)toggleAutoGetExternalAddress:(id)sender;
 
 // Action methods for protocol activation
 - (IBAction)protocolSwitchToggled:(id)sender;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.6 2006/06/20 14:36:24 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.7 2006/06/21 11:32:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -162,8 +162,6 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 
 - (NSString *)defaultInputDevice
 {
-	OSStatus err = noErr;
-	UInt32 deviceIDSize;
 	AudioDeviceID deviceID = [self _defaultDeviceForDirection:XM_INPUT_DIRECTION];
 	
 	return [self _nameForDeviceID:deviceID];
@@ -180,8 +178,6 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 
 - (NSString *)defaultOutputDevice
 {
-	OSStatus err = noErr;
-	UInt32 deviceIDSize;
 	AudioDeviceID deviceID = [self _defaultDeviceForDirection:XM_OUTPUT_DIRECTION];
 	
 	return [self _nameForDeviceID:deviceID];
