@@ -1,5 +1,5 @@
 /*
- * $Id: XMProcess.h,v 1.3 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMProcess.h,v 1.4 2006/06/22 21:12:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #define __XM_PROCESS_H__
 
 #include <ptlib.h>
+#include <ptlib/pprocess.h>
 
 class XMProcess : public PProcess
 {
