@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.16 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.17 2006/06/22 11:35:43 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -204,8 +204,6 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 		
 		float radius = 10.0f;
 		
-		NSDrawWindowBackground(frame);
-		
 		NSBezierPath *path = [[NSBezierPath alloc] init];
 		[path moveToPoint:NSMakePoint(NSMidX(frame),NSMaxY(frame))];
 		[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(frame),NSMaxY(frame)) toPoint:NSMakePoint(NSMaxX(frame),NSMidY(frame)) radius:radius];
@@ -225,6 +223,10 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 
 - (BOOL)isOpaque
 {
+	if(displayStatus == XM_DISPLAY_NOTHING)
+	{
+		return NO;
+	}
 	return YES;
 }
 
