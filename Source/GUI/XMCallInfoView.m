@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.8 2006/06/21 22:54:10 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.9 2006/06/22 10:13:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,6 +61,7 @@
 	[textDrawCell setDrawsBackground:NO];
 	[textDrawCell setBezeled:NO];
 	[textDrawCell setBordered:NO];
+	[textDrawCell setLineBreakMode:NSLineBreakByTruncatingTail];
 	
 	[self _calculateDisclosureRect:frameRect];
 	
