@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.14 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.15 2006/06/22 08:36:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -197,7 +197,21 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	}
 	else
 	{
-		NSRectFill(rect);
+		NSRect frame = [self bounds];
+		
+		float radius = 10.0f;
+		
+		NSDrawWindowBackground(frame);
+		
+		NSBezierPath *path = [[NSBezierPath alloc] init];
+		[path moveToPoint:NSMakePoint(NSMidX(frame),NSMaxY(frame))];
+		[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(frame),NSMaxY(frame)) toPoint:NSMakePoint(NSMaxX(frame),NSMidY(frame)) radius:radius];
+		[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMaxX(frame),NSMinY(frame)) toPoint:NSMakePoint(NSMidX(frame),NSMinY(frame)) radius:radius];
+		[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(frame),NSMinY(frame)) toPoint:NSMakePoint(NSMinX(frame),NSMidY(frame)) radius:radius];
+		[path appendBezierPathWithArcFromPoint:NSMakePoint(NSMinX(frame),NSMaxY(frame)) toPoint:NSMakePoint(NSMidX(frame),NSMaxY(frame)) radius:radius];
+		[path closePath];
+		
+		[path fill];
 	}
 	
 	if(osdDisplayMode == XMOSDDisplayMode_AlwaysVisible && doesShowOSD == NO)

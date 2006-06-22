@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.h,v 1.10 2006/03/23 10:04:48 hfriederich Exp $
+ * $Id: XMInCallModule.h,v 1.11 2006/06/22 08:36:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,7 @@
 	IBOutlet NSView *contentView;
 	NSSize contentViewMinSize;
 	NSSize contentViewSize;
+	NSSize noVideoContentViewSize;
 	
 	IBOutlet XMOSDVideoView *videoView;
 

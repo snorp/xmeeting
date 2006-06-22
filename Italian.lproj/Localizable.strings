@@ -131,7 +131,7 @@
 
 /* Local Audio/Video module */
 "XM_AUDIO_VIDEO_MODULE_NAME" = "Controlli Audio/Video";
-"XM_AUDIO_VIDOE_MODULE_VIDEO_DISABLED" = "Il video non è attivo";
+"XM_AUDIO_VIDEO_MODULE_VIDEO_DISABLED" = "Il video non è attivo";
 
 /* Address Book Module */
 "XM_ADDRESS_BOOK_MODULE_NAME" = "Rubrica Indirizzi";

@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.24 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.25 2006/06/22 08:36:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,9 @@
 #define VIDEO_INSET_LEFT 5.0
 #define VIDEO_INSET_RIGHT 5.0
 #define VIDEO_INSET_BOTTOM 25.0
+
+#define NO_VIDEO_WIDTH 290
+#define NO_VIDEO_HEIGHT 65
 
 NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 
@@ -54,6 +57,11 @@ NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 {
 	contentViewMinSize = [contentView bounds].size;
 	contentViewSize = contentViewMinSize;
+	
+	float videoHeight = [videoView frame].size.height;
+	
+	noVideoContentViewSize.width = NO_VIDEO_WIDTH;
+	noVideoContentViewSize.height = (contentViewSize.height + NO_VIDEO_HEIGHT - videoHeight);
 }
 
 - (NSString *)name
@@ -86,15 +94,22 @@ NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 	}
 	else
 	{
-		return contentViewMinSize;
+		return noVideoContentViewSize;
 	}
 }
 
 - (NSSize)contentViewMinSize
 {
 	[self contentView];
-
-	return contentViewMinSize;
+	
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		return contentViewMinSize;
+	}
+	else
+	{
+		return noVideoContentViewSize;
+	}
 }
 
 - (NSSize)contentViewMaxSize
@@ -107,7 +122,7 @@ NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 	}
 	else
 	{
-		return contentViewMinSize;
+		return noVideoContentViewSize;
 	}
 }
 
@@ -179,7 +194,8 @@ NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 	}
 	else
 	{
-		[videoView setNoVideoImage:[NSImage imageNamed:@"no_video_screen"]];
+		//[videoView setNoVideoImage:[NSImage imageNamed:@"no_video_screen"]];
+		[videoView setNoVideoImage:nil];
 		[videoView startDisplayingNoVideo];
 	}
 	
@@ -211,7 +227,10 @@ NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 	NSString *settings = [videoView settings];
 	[[NSUserDefaults standardUserDefaults] setObject:settings forKey:XMKey_VideoViewSettings];
 	
-	contentViewSize = [contentView bounds].size;
+	if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
+	{
+		contentViewSize = [contentView bounds].size;
+	}
 }
 
 - (void)beginFullScreen
