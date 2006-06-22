@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.m,v 1.6 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMInCallOSD.m,v 1.7 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,6 +180,26 @@
 	[number release];
 }
 
+- (void)setMutesAudioInput:(BOOL)mutes
+{
+	int theState;
+	
+	if(mutes == YES)
+	{
+		theState = 1;
+	}
+	else
+	{
+		theState = 0;
+	}
+	
+	NSNumber *number = [[NSNumber alloc] initWithInt:theState];
+	[[buttons objectAtIndex:8] setObject:number forKey:@"CurrentStateIndex"];
+	[number release];
+	
+	[self setNeedsDisplay:YES];
+}
+
 - (void)setIsFullScreen:(BOOL)isFullscreen
 {
 	if (isFullscreen)
@@ -247,20 +267,14 @@
 {	
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
-	volume = (unsigned)[audioManager inputVolume];
-	
-	if([audioManager setInputVolume:0])
-	{
-	}
+	[audioManager setMutesInput:YES];
 }
 
 - (void)unmute
 {
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
-	if(![audioManager setInputVolume:volume])
-	{
-	}
+	[audioManager setMutesInput:NO];
 }
 
 #pragma mark -

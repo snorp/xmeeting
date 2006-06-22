@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioOnlyOSD.h,v 1.2 2006/03/23 10:04:47 hfriederich Exp $
+ * $Id: XMAudioOnlyOSD.h,v 1.3 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,6 +21,8 @@
 }
 
 - (id)initWithFrame:(NSRect)frameRect videoView:(XMOSDVideoView *)videoView andSize:(XMOSDSize)size;
+
+- (void)setMutesAudioInput:(BOOL)mutes;
 
 @end
 

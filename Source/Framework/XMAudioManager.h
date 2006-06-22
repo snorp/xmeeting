@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.h,v 1.5 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.6 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,14 +69,14 @@
 - (BOOL)canAlterInputVolume;
 - (unsigned)inputVolume;
 - (BOOL)setInputVolume:(unsigned)vol;
-- (BOOL)mutesInputVolume;
-- (BOOL)setMutesInputVolume:(BOOL)muteVolume;
+- (BOOL)mutesInput;
+- (BOOL)setMutesInput:(BOOL)muteVolume;
 
 - (BOOL)canAlterOutputVolume;
 - (unsigned)outputVolume;
 - (BOOL)setOutputVolume:(unsigned)vol;
-- (BOOL)mutesOutputVolume;
-- (BOOL)setMutesOutputVolume:(BOOL)muteVolume;
+- (BOOL)mutesOutput;
+- (BOOL)setMutesOutput:(BOOL)muteVolume;
 
 @end
 

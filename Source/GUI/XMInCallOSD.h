@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.h,v 1.3 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMInCallOSD.h,v 1.4 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,6 +31,7 @@
 
 //Functions to set the state of buttons directly
 - (void)setPinPMode:(XMPinPMode)mode;
+- (void)setMutesAudioInput:(BOOL)mutes;
 - (void)setIsFullScreen:(BOOL)isFullscreen;
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.7 2006/04/19 09:07:48 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.8 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -163,15 +163,15 @@ BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 		OnEstablished();
 	}
 	
-	if(mediaStream.IsSource())
+	/*if(mediaStream.IsSource())
 	{    
-		/*OpalMediaPatch * patch = mediaStream.GetPatch();
+		OpalMediaPatch * patch = mediaStream.GetPatch();
 		if (patch != NULL && mediaStream.GetSessionID() == OpalMediaFormat::DefaultAudioSessionID) 
 		{
-			silenceDetector->SetParameters(endPoint.GetManager().GetSilenceDetectParams());
+			silenceDetector->SetParameters(GetEndPoint().GetManager().GetSilenceDetectParams());
 			patch->AddFilter(silenceDetector->GetReceiveHandler(), OpalPCM16);
-		}*/
-	}
+		}
+	}*/
 	
 	return TRUE;
 }

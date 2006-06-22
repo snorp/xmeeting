@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.7 2006/06/21 11:32:14 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.8 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -258,12 +258,12 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	return [self _setVolume:volume forDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 }
 
-- (BOOL)mutesInputVolume
+- (BOOL)mutesInput
 {
 	return selectedInputDeviceIsMuted;
 }
 
-- (BOOL)setMutesInputVolume:(BOOL)muteFlag
+- (BOOL)setMutesInput:(BOOL)muteFlag
 {	
 	if((muteFlag == YES && selectedInputDeviceIsMuted == YES) ||
 	   (muteFlag == NO && selectedInputDeviceIsMuted == NO))
@@ -273,6 +273,9 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 	setMuteAudioInputDevice(muteFlag);
 	selectedInputDeviceIsMuted = muteFlag;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerInputVolumeDidChange object:self];
+	
 	return YES;
 }
 
@@ -291,12 +294,12 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	return [self _setVolume:volume forDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
 }
 
-- (BOOL)mutesOutputVolume
+- (BOOL)mutesOutput
 {
 	return selectedOutputDeviceIsMuted;
 }
 
-- (BOOL)setMutesOutputVolume:(BOOL)muteFlag
+- (BOOL)setMutesOutput:(BOOL)muteFlag
 {
 	if((muteFlag == YES && selectedOutputDeviceIsMuted == YES) ||
 	   (muteFlag == NO && selectedOutputDeviceIsMuted == NO))
@@ -306,6 +309,8 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 	setMuteAudioOutputDevice(muteFlag);
 	selectedOutputDeviceIsMuted = muteFlag;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputVolumeDidChange object:self];
 	
 	return YES;
 }

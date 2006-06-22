@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioOnlyOSD.m,v 1.4 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMAudioOnlyOSD.m,v 1.5 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,6 +76,31 @@
 }
 
 #pragma mark -
+#pragma mark Public Methods
+
+- (void)setMutesAudioInput:(BOOL)mutes
+{
+	int theState;
+	
+	if(mutes == YES)
+	{
+		NSLog(@"ONE");
+		theState = 1;
+	}
+	else
+	{
+		NSLog(@"ZERO");
+		theState = 0;
+	}
+	
+	NSNumber *number = [[NSNumber alloc] initWithInt:theState];
+	[[buttons objectAtIndex:3] setObject:number forKey:@"CurrentStateIndex"];
+	[number release];
+	
+	[self setNeedsDisplay:YES];
+}
+
+#pragma mark -
 #pragma mark OSD Action Methods
 
 - (void)showInspector
@@ -99,20 +124,14 @@
 {	
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
-	//volume = (unsigned)[audioManager inputVolume];
-	
-	/*if([audioManager setInputVolume:0])
-	{
-	}*/
+	[audioManager setMutesInput:YES];
 }
 
 - (void)unmute
 {
 	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
 	
-	/*if(![audioManager setInputVolume:volume])
-	{
-	}*/
+	[audioManager setMutesInput:NO];
 }	
 
 @end

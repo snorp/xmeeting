@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.m,v 1.15 2006/06/22 08:36:42 hfriederich Exp $
+ * $Id: XMOSDVideoView.m,v 1.16 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,6 +43,7 @@
 - (void)_windowWillMiniaturize:(NSNotification *)notif;
 - (void)_windowDidDeminiaturize:(NSNotification *)notif;
 - (void)_didChangeSelectedInputDevice:(NSNotification *)notif;
+- (void)_didChangeInputVolume:(NSNotification *)notif;
 - (void)_frameDidChange:(NSNotification *)notif;
 
 //Drawing
@@ -139,6 +140,8 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 							   name:NSWindowDidDeminiaturizeNotification object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didChangeSelectedInputDevice:)
 							   name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didChangeInputVolume:)
+							   name:XMNotification_AudioManagerInputVolumeDidChange object:nil];
 }
 
 - (void)dealloc
@@ -1111,6 +1114,25 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 	[self _checkNeedsMirroring];
 }
 
+- (void)_didChangeInputVolume:(NSNotification *)notif
+{	
+	if(osd != nil)
+	{
+		XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+		
+		BOOL mutesInput = [audioManager mutesInput];
+		
+		if(displayStatus == XM_DISPLAY_VIDEO)
+		{
+			[(XMInCallOSD *)osd setMutesAudioInput:mutesInput];
+		}
+		else
+		{
+			[(XMAudioOnlyOSD *)osd setMutesAudioInput:mutesInput];
+		}
+	}
+}
+
 - (void)_frameDidChange:(NSNotification *)notif
 {
 	if(osd != nil)
@@ -1159,10 +1181,18 @@ void XMOSDVideoViewPixelBufferReleaseCallback(void *releaseRefCon,
 			[(XMInCallOSD *)osd setIsFullScreen:isFullScreen];
 			[(XMInCallOSD *)osd setEnableComplexPinPModes:enableComplexPinPModes];
 			[(XMInCallOSD *)osd setPinPMode:[self pinpMode]];
+			
+			XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+			BOOL mutesAudioInput = [audioManager mutesInput];
+			[(XMInCallOSD *)osd setMutesAudioInput:mutesAudioInput];
 		}
 		else if(displayStatus == XM_DISPLAY_NO_VIDEO)
 		{
 			osd = [[XMAudioOnlyOSD alloc] initWithFrame:[self frame] videoView:self andSize:osdSize];
+			
+			XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+			BOOL mutesAudioInput = [audioManager mutesInput];
+			[(XMAudioOnlyOSD *)osd setMutesAudioInput:mutesAudioInput];
 		}
 		
 		osdControllerWindow = [[XMOnScreenControllerWindow alloc] initWithControllerView:osd contentRect:viewRect];

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.20 2006/06/22 08:43:50 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.21 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@
 - (void)_didChangeSelectedVideoInputDevice:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
+- (void)_audioInputMuteStatusDidChange:(NSNotification *)notif;
+- (void)_audioOutputMuteStatusDidChange:(NSNotification *)notif;
 - (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_activeLocationDidChange:(NSNotification *)notif;
 
@@ -216,7 +218,7 @@
 	
 	[audioInputVolumeSlider setIntValue:[audioManager inputVolume]];
 	
-	int state = ([audioManager mutesInputVolume] == YES) ? NSOnState : NSOffState;
+	int state = ([audioManager mutesInput] == YES) ? NSOnState : NSOffState;
 	[muteAudioInputSwitch setState:state];
 	
 	[self _validateAudioControls];
@@ -235,7 +237,7 @@
 	
 	[audioOutputVolumeSlider setIntValue:[audioManager outputVolume]];
 	
-	int state = ([audioManager mutesOutputVolume] == YES) ? NSOnState : NSOffState;
+	int state = ([audioManager mutesOutput] == YES) ? NSOnState : NSOffState;
 	[muteAudioOutputSwitch setState:state];
 	
 	[self _validateAudioControls];
@@ -273,9 +275,9 @@
 	
 	BOOL muteAudio = ([muteAudioInputSwitch state] == NSOnState) ? YES : NO;
 	
-	if(![audioManager setMutesInputVolume:muteAudio])
+	if(![audioManager setMutesInput:muteAudio])
 	{
-		int state = ([audioManager mutesInputVolume] == YES) ? NSOnState : NSOffState;
+		int state = ([audioManager mutesInput] == YES) ? NSOnState : NSOffState;
 		[muteAudioInputSwitch setState:state];
 	}
 }
@@ -286,9 +288,9 @@
 	
 	BOOL muteAudio = ([muteAudioOutputSwitch state] == NSOnState) ? YES : NO;
 	
-	if(![audioManager setMutesOutputVolume:muteAudio])
+	if(![audioManager setMutesOutput:muteAudio])
 	{
-		int state = ([audioManager mutesOutputVolume] == YES) ? NSOnState : NSOffState;
+		int state = ([audioManager mutesOutput] == YES) ? NSOnState : NSOffState;
 		[muteAudioOutputSwitch setState:state];
 	}
 }
@@ -392,7 +394,7 @@
 	
 	[audioInputVolumeSlider setIntValue:[audioManager inputVolume]];
 	
-	int state = ([audioManager mutesInputVolume] == YES) ? NSOnState : NSOffState;
+	int state = ([audioManager mutesInput] == YES) ? NSOnState : NSOffState;
 	[muteAudioInputSwitch setState:state];
 }
 
@@ -402,7 +404,7 @@
 	
 	[audioOutputVolumeSlider setIntValue:[audioManager outputVolume]];
 	
-	int state = ([audioManager mutesOutputVolume] == YES) ? NSOnState : NSOffState;
+	int state = ([audioManager mutesOutput] == YES) ? NSOnState : NSOffState;
 	[muteAudioOutputSwitch setState:state];
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.4 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.5 2006/06/22 11:11:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -195,10 +195,12 @@ BOOL XMSoundChannel::Open(const PString & deviceName,
 	if(direction == Player)
 	{
 		activePlayDevice = this;
+		isMuted = activePlayDeviceIsMuted;
 	}
 	else
 	{
 		activeRecordDevice = this;
+		isMuted = activeRecordDeviceIsMuted;
 	}
 	deviceEditMutex.Signal();
 	
@@ -790,7 +792,7 @@ void XMSoundChannel::CloseDevice()
 
 void XMSoundChannel::SetDeviceMuted(BOOL muteFlag)
 {
-	if(muteFlag == TRUE)
+	if(muteFlag == FALSE)
 	{
 		StartAudioConversion();
 	}
