@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioOnlyOSD.m,v 1.5 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMAudioOnlyOSD.m,v 1.6 2006/06/22 11:36:54 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,12 +84,10 @@
 	
 	if(mutes == YES)
 	{
-		NSLog(@"ONE");
 		theState = 1;
 	}
 	else
 	{
-		NSLog(@"ZERO");
 		theState = 0;
 	}
 	
