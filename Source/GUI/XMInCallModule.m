@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallModule.m,v 1.25 2006/06/22 08:36:42 hfriederich Exp $
+ * $Id: XMInCallModule.m,v 1.26 2006/06/22 11:28:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -189,6 +189,9 @@ NSString *XMKey_VideoViewSettings = @"XMeeting_VideoViewSettings";
 		// For simplicity, we consider only the main display
 		BOOL enableComplexModes = CGDisplayUsesOpenGLAcceleration(CGMainDisplayID());
 		[videoView setEnableComplexPinPModes:enableComplexModes];
+		
+		BOOL mirrorLocalVideo = [preferencesManager showSelfViewMirrored];
+		[videoView setLocalVideoMirrored:mirrorLocalVideo];
 		
 		[videoView startDisplayingVideo];
 	}

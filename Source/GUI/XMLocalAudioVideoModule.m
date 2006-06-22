@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.21 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.22 2006/06/22 11:28:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -450,6 +450,9 @@
 		}
 		
 		[videoDisabledFld setStringValue:@""];
+		
+		BOOL mirrorLocalVideo = [[XMPreferencesManager sharedInstance] showSelfViewMirrored];
+		[localVideoView setLocalVideoMirrored:mirrorLocalVideo];
 	}
 	else
 	{
