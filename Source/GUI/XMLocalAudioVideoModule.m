@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.19 2006/06/20 13:33:58 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.20 2006/06/22 08:43:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -146,6 +146,7 @@
 
 - (void)becomeActiveModule
 {
+	isActive = YES;
 	[self _activeLocationDidChange:nil];
 }
 
@@ -155,6 +156,7 @@
 	// one is active
 	[localVideoView stopDisplayingLocalVideo];
 	[localVideoView stopDisplayingNoVideo];
+	isActive = NO;
 }
 
 #pragma mark Action Methods
@@ -422,6 +424,11 @@
 
 - (void)_activeLocationDidChange:(NSNotification *)notif
 {
+	if(isActive == NO)
+	{
+		return;
+	}
+	
 	XMLocation *location = [[XMPreferencesManager sharedInstance] activeLocation];
 	
 	BOOL showVideoContent = [location enableVideo];

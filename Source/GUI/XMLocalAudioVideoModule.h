@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.10 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.11 2006/06/22 08:43:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,7 @@
 	
 	IBOutlet NSView *contentView;
 	NSSize contentViewSize;
+	BOOL isActive;
 	
 	IBOutlet XMLocalVideoView *localVideoView;
 	IBOutlet NSPopUpButton *videoDevicesPopUp;
