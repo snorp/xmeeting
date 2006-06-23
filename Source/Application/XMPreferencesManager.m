@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.25 2006/06/20 20:14:39 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.26 2006/06/23 11:22:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,7 +165,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerIncomingCallAlertType];
 	[number release];
 	
-	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMScreenVideoInputModule", nil];
+	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMStillImageVideoInputModule", @"XMScreenVideoInputModule", nil];
 	[defaultsDict setObject:initialDisabledVideoModules forKey:XMKey_PreferencesManagerDisabledVideoModules];
 	[initialDisabledVideoModules release];
 	
