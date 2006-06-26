@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.25 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.26 2006/06/26 14:33:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -907,6 +907,11 @@
 
 - (void)_handleIncomingVideoStreamOpened:(NSString *)codec
 {
+	if([activeCall incomingVideoCodec] != nil)
+	{
+		return;
+	}
+	
 	[activeCall _setIncomingVideoCodec:codec];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenIncomingVideoStream
