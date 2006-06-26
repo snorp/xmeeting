@@ -1,0 +1,62 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                addNewRecord = id; 
+                call = id; 
+                callProtocolSelected = id; 
+                cancelNewRecord = id; 
+                cogWheelAction = id; 
+                editAddress = id; 
+                endEditRecordSheet = id; 
+                labelSelected = id; 
+                launchAddressBook = id; 
+                makePrimaryAddress = id; 
+                newAddress = id; 
+                newRecord = id; 
+                toggleUseSpecificGatekeeper = id; 
+            }; 
+            CLASS = XMAddressBookModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                actionButton = NSButton; 
+                actionPopup = NSPopUpButton; 
+                addressBookView = ABPeoplePickerView; 
+                addressEditBox = NSBox; 
+                callButton = NSButton; 
+                callProtocolPopUp = NSPopUpButton; 
+                cancelButton = NSButton; 
+                contentView = NSView; 
+                deleteButton = NSButton; 
+                editRecordSheet = NSPanel; 
+                firstNameField = NSTextField; 
+                h323CallAddressField = NSTextField; 
+                h323GatekeeperHostField = NSTextField; 
+                h323GatekeeperPhoneNumberField = NSTextField; 
+                h323GatekeeperUsernameField = NSTextField; 
+                h323View = NSView; 
+                isOrganizationSwitch = NSButton; 
+                labelField = NSTextField; 
+                labelPopUp = NSPopUpButton; 
+                lastNameField = NSTextField; 
+                newRecordButton = NSButton; 
+                newRecordSheet = NSPanel; 
+                okButton = NSButton; 
+                organizationField = NSTextField; 
+                recordNameField = NSTextField; 
+                sipCallAddressField = NSTextField; 
+                sipView = NSView; 
+                useSpecificGatekeeperSwitch = NSButton; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

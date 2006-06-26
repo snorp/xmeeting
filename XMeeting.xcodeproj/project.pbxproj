@@ -1059,6 +1059,30 @@
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
 		D10AFEB307B3781700BBC8EA /* XMUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMUtils.m; path = Source/Framework/XMUtils.m; sourceTree = "<group>"; };
+		D10B8A970A50044800003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/AddressBook.nib; sourceTree = "<group>"; };
+		D10B8A980A50044800003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/CallHistoryModule.nib; sourceTree = "<group>"; };
+		D10B8A990A50044800003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/DialPadModule.nib; sourceTree = "<group>"; };
+		D10B8A9A0A50044800003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/InCallModule.nib; sourceTree = "<group>"; };
+		D10B8A9B0A50044800003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
+		D10B8A9C0A50044800003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/Info.nib; sourceTree = "<group>"; };
+		D10B8A9D0A50045400003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/LocalAudioVideoModule.nib; sourceTree = "<group>"; };
+		D10B8A9E0A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		D10B8A9F0A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/MainWindow.nib; sourceTree = "<group>"; };
+		D10B8AA00A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/NoCallModule.nib; sourceTree = "<group>"; };
+		D10B8AA10A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/Preferences.nib; sourceTree = "<group>"; };
+		D10B8AA20A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/SequenceGrabberSettings.nib; sourceTree = "<group>"; };
+		D10B8AA30A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/SetupAssistant.nib; sourceTree = "<group>"; };
+		D10B8AA40A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/StatisticsModule.nib; sourceTree = "<group>"; };
+		D10B8AA50A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/StillImageSettings.nib; sourceTree = "<group>"; };
+		D10B8AA60A50046300003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/TextChatModule.nib; sourceTree = "<group>"; };
+		D10B8AA70A50047000003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/XMInspector.nib; sourceTree = "<group>"; };
+		D10B8AA80A50047000003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
+		D10B8AA90A50048B00003A33 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
+		D10B8AAA0A5004A600003A33 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/StillImageSettings.nib; sourceTree = "<group>"; };
+		D10B8AAB0A5004B500003A33 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/StillImageSettings.nib; sourceTree = "<group>"; };
+		D10B8AAC0A5004E400003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D10B8AAD0A5004F600003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = German; path = German.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
+		D10B8AAE0A50050900003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
 		D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMIncomingCallAlert.h; sourceTree = "<group>"; };
@@ -4526,6 +4550,7 @@
 				089C165DFE840E0CC02AAC07 /* English */,
 				D1E20B530A3600A000861E00 /* Italian */,
 				D1C8FC700A435BE400EF1A8C /* French */,
+				D10B8AAE0A50050900003A33 /* German */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -4536,6 +4561,7 @@
 				1A348FB40984E4520033FA95 /* English */,
 				D1E20B450A35FFD400861E00 /* Italian */,
 				D1C8FC610A435AE400EF1A8C /* French */,
+				D10B8A9C0A50044800003A33 /* German */,
 			);
 			name = Info.nib;
 			sourceTree = "<group>";
@@ -4546,6 +4572,7 @@
 				1A348FB60984E4520033FA95 /* English */,
 				D1E20B4F0A36002400861E00 /* Italian */,
 				D1C8FC6B0A435B4500EF1A8C /* French */,
+				D10B8AA70A50047000003A33 /* German */,
 			);
 			name = XMInspector.nib;
 			sourceTree = "<group>";
@@ -4556,6 +4583,7 @@
 				1AE62986099B7B4300793794 /* English */,
 				D1E20B4B0A36001300861E00 /* Italian */,
 				D1C8FC670A435B2E00EF1A8C /* French */,
+				D10B8AA20A50046300003A33 /* German */,
 			);
 			name = SequenceGrabberSettings.nib;
 			sourceTree = "<group>";
@@ -4566,6 +4594,7 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 				D1E20B470A36001300861E00 /* Italian */,
 				D1C8FC630A435B2E00EF1A8C /* French */,
+				D10B8A9E0A50046300003A33 /* German */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -4575,6 +4604,8 @@
 			children = (
 				D11C5E640A49ED950030633D /* English */,
 				D11C5F230A49F9F90030633D /* French */,
+				D10B8A9B0A50044800003A33 /* German */,
+				D10B8AA90A50048B00003A33 /* Italian */,
 			);
 			name = IncomingCallAlert.nib;
 			sourceTree = "<group>";
@@ -4585,6 +4616,7 @@
 				D1639416083E17A500F7FD83 /* English */,
 				D1E20B430A35FFD400861E00 /* Italian */,
 				D1C8FC5F0A435AE400EF1A8C /* French */,
+				D10B8A990A50044800003A33 /* German */,
 			);
 			name = DialPadModule.nib;
 			sourceTree = "<group>";
@@ -4595,6 +4627,7 @@
 				D163945E083E19E300F7FD83 /* English */,
 				D1E20B4D0A36001400861E00 /* Italian */,
 				D1C8FC690A435B2E00EF1A8C /* French */,
+				D10B8AA40A50046300003A33 /* German */,
 			);
 			name = StatisticsModule.nib;
 			sourceTree = "<group>";
@@ -4605,6 +4638,7 @@
 				D16394C2083E23D600F7FD83 /* English */,
 				D1E20B420A35FFC200861E00 /* Italian */,
 				D1C8FC5E0A435ACC00EF1A8C /* French */,
+				D10B8A980A50044800003A33 /* German */,
 			);
 			name = CallHistoryModule.nib;
 			sourceTree = "<group>";
@@ -4615,6 +4649,7 @@
 				D1887E760A283DEA00C938BB /* English */,
 				D1E20B510A36004A00861E00 /* Italian */,
 				D1C8FC6E0A435B9D00EF1A8C /* French */,
+				D10B8AAC0A5004E400003A33 /* German */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -4625,6 +4660,7 @@
 				D1897F7C0823EEF2007CD286 /* English */,
 				D1E20B520A36007300861E00 /* Italian */,
 				D1C8FC6F0A435BC600EF1A8C /* French */,
+				D10B8AAD0A5004F600003A33 /* German */,
 			);
 			name = XMCodecDescriptions.plist;
 			sourceTree = "<group>";
@@ -4635,6 +4671,7 @@
 				D1A02B25081E96D30018BD11 /* English */,
 				D1E20B4A0A36001300861E00 /* Italian */,
 				D1C8FC660A435B2E00EF1A8C /* French */,
+				D10B8AA10A50046300003A33 /* German */,
 			);
 			name = Preferences.nib;
 			sourceTree = "<group>";
@@ -4645,6 +4682,7 @@
 				D1B4CC99082F594C00A444E1 /* English */,
 				D1E20B480A36001300861E00 /* Italian */,
 				D1C8FC640A435B2E00EF1A8C /* French */,
+				D10B8A9F0A50046300003A33 /* German */,
 			);
 			name = MainWindow.nib;
 			sourceTree = "<group>";
@@ -4655,6 +4693,7 @@
 				D1B4D0060833937200A444E1 /* English */,
 				D1E20B500A36003900861E00 /* Italian */,
 				D1C8FC6C0A435B4500EF1A8C /* French */,
+				D10B8AA80A50047000003A33 /* German */,
 			);
 			name = ZeroConfModule.nib;
 			sourceTree = "<group>";
@@ -4663,6 +4702,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				D1C8FCD20A4407E600EF1A8C /* English */,
+				D10B8AA50A50046300003A33 /* German */,
+				D10B8AAA0A5004A600003A33 /* French */,
+				D10B8AAB0A5004B500003A33 /* Italian */,
 			);
 			name = StillImageSettings.nib;
 			sourceTree = "<group>";
@@ -4673,6 +4715,7 @@
 				D1CE4B68083CDF3900B66B5D /* English */,
 				D1E20B150A35FF9F00861E00 /* Italian */,
 				D1C8FC5D0A435ACC00EF1A8C /* French */,
+				D10B8A970A50044800003A33 /* German */,
 			);
 			name = AddressBook.nib;
 			sourceTree = "<group>";
@@ -4683,6 +4726,7 @@
 				D1ECCBF20833DDAD008EBAE3 /* English */,
 				D1E20B4E0A36001400861E00 /* Italian */,
 				D1C8FC6A0A435B2E00EF1A8C /* French */,
+				D10B8AA60A50046300003A33 /* German */,
 			);
 			name = TextChatModule.nib;
 			sourceTree = "<group>";
@@ -4693,6 +4737,7 @@
 				D1ECCD170834911C008EBAE3 /* English */,
 				D1E20B440A35FFD400861E00 /* Italian */,
 				D1C8FC600A435AE400EF1A8C /* French */,
+				D10B8A9A0A50044800003A33 /* German */,
 			);
 			name = InCallModule.nib;
 			sourceTree = "<group>";
@@ -4703,6 +4748,7 @@
 				D1ECCD2F083491EB008EBAE3 /* English */,
 				D1E20B490A36001300861E00 /* Italian */,
 				D1C8FC650A435B2E00EF1A8C /* French */,
+				D10B8AA00A50046300003A33 /* German */,
 			);
 			name = NoCallModule.nib;
 			sourceTree = "<group>";
@@ -4713,6 +4759,7 @@
 				D1EF07520918B212008A8974 /* English */,
 				D1E20B4C0A36001400861E00 /* Italian */,
 				D1C8FC680A435B2E00EF1A8C /* French */,
+				D10B8AA30A50046300003A33 /* German */,
 			);
 			name = SetupAssistant.nib;
 			sourceTree = "<group>";
@@ -4723,6 +4770,7 @@
 				D1F6067B08BBC5FC0005E9A0 /* English */,
 				D1E20B460A35FFF700861E00 /* Italian */,
 				D1C8FC620A435B1C00EF1A8C /* French */,
+				D10B8A9D0A50045400003A33 /* German */,
 			);
 			name = LocalAudioVideoModule.nib;
 			sourceTree = "<group>";

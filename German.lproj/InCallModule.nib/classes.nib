@@ -1,0 +1,29 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {clearCall = id; }; 
+            CLASS = XMInCallModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                remotePartyField = NSTextField; 
+                videoView = XMOSDVideoView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = XMInCallView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                buttonContentView = NSView; 
+                statusContentView = NSView; 
+                videoContentView = NSView; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = XMOSDVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = XMSimpleVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

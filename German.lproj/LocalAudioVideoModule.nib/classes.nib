@@ -1,0 +1,43 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = XMEventAwareWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                changeAudioInputDevice = id; 
+                changeAudioInputVolume = id; 
+                changeAudioOutputDevice = id; 
+                changeAudioOutputVolume = id; 
+                changeVideoDevice = id; 
+                closeVideoDeviceSettingsPanel = id; 
+                restoreDefaultSettings = id; 
+                showVideoDeviceSettings = id; 
+                toggleMuteAudioInput = id; 
+                toggleMuteAudioOutput = id; 
+                updateDeviceLists = id; 
+            }; 
+            CLASS = XMLocalAudioVideoModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                audioInputDevicesPopUp = NSPopUpButton; 
+                audioInputVolumeSlider = NSSlider; 
+                audioOutputDevicesPopUp = NSPopUpButton; 
+                audioOutputVolumeSlider = NSSlider; 
+                contentView = NSView; 
+                localVideoView = XMLocalVideoView; 
+                muteAudioInputSwitch = NSButton; 
+                muteAudioOutputSwitch = NSButton; 
+                videoDeviceSettingsBox = NSBox; 
+                videoDeviceSettingsButton = NSButton; 
+                videoDeviceSettingsPanel = NSPanel; 
+                videoDeviceSettingsView = XMLocalVideoView; 
+                videoDevicesPopUp = NSPopUpButton; 
+                videoDisabledFld = NSTextField; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

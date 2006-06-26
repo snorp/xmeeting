@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {acceptCall = id; rejectCall = id; toggleShowDetails = id; }; 
+            CLASS = XMIncomingCallAlert; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {detailsField = NSTextField; infoField = NSTextField; panel = NSPanel; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

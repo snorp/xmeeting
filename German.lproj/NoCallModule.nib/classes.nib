@@ -1,0 +1,58 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = IGPopupView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {theMenu = NSMenu; }; 
+            SUPERCLASS = NSPopUpButton; 
+        }, 
+        {
+            CLASS = XMDatabaseField; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; representedObject = id; }; 
+            SUPERCLASS = NSTextField; 
+        }, 
+        {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            ACTIONS = {
+                showAdditionModuleInSeparateWindow = id; 
+                showSelfView = id; 
+                toggleShowAdditionContent = id; 
+            }; 
+            CLASS = XMMainWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mainContentBox = NSBox; selfViewDrawer = NSDrawer; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                call = id; 
+                changeActiveLocation = id; 
+                showContacts = id; 
+                showInfoInspector = id; 
+                showTools = id; 
+                toggleShowSelfView = id; 
+            }; 
+            CLASS = XMNoCallModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                busyIndicator = NSProgressIndicator; 
+                callAddressField = XMDatabaseField; 
+                callButton = NSButton; 
+                contentView = NSView; 
+                locationsPopUpButton = NSPopUpButton; 
+                selfView = XMLocalVideoView; 
+                semaphoreButton = NSButton; 
+                statusField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

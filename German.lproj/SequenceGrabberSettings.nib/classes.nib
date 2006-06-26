@@ -1,0 +1,31 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {"_sliderValueChanged" = id; }; 
+            CLASS = XMSequenceGrabberVideoInputModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                brightnessField = NSTextField; 
+                brightnessSlider = NSSlider; 
+                contrastField = NSTextField; 
+                contrastSlider = NSSlider; 
+                hueField = NSTextField; 
+                hueSlider = NSSlider; 
+                inputManager = id; 
+                saturationField = NSTextField; 
+                saturationSlider = NSSlider; 
+                settingsView = NSView; 
+                sharpnessField = NSTextField; 
+                sharpnessSlider = NSSlider; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

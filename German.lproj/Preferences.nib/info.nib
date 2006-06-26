@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBDocumentLocation</key>
+	<string>22 547 356 240 0 0 1280 832 </string>
+	<key>IBEditorPositions</key>
+	<dict>
+		<key>20</key>
+		<string>595 591 135 79 0 0 1280 832 </string>
+		<key>291</key>
+		<string>168 545 720 207 0 0 1280 832 </string>
+		<key>338</key>
+		<string>32 455 720 267 0 0 1280 832 </string>
+		<key>558</key>
+		<string>280 457 720 198 0 0 1280 832 </string>
+		<key>559</key>
+		<string>508 181 720 309 0 0 1280 832 </string>
+		<key>7</key>
+		<string>280 459 720 194 0 0 1280 832 </string>
+		<key>9</key>
+		<string>280 363 720 385 0 0 1280 832 </string>
+	</dict>
+	<key>IBFramework Version</key>
+	<string>446.1</string>
+	<key>IBGroupedObjects</key>
+	<dict>
+		<key>1</key>
+		<array>
+			<string>115</string>
+			<string>117</string>
+			<string>231</string>
+			<string>232</string>
+		</array>
+		<key>10</key>
+		<array>
+			<string>259</string>
+			<string>480</string>
+		</array>
+		<key>11</key>
+		<array>
+			<string>474</string>
+			<string>475</string>
+			<string>478</string>
+			<string>476</string>
+		</array>
+		<key>15</key>
+		<array>
+			<string>580</string>
+			<string>579</string>
+		</array>
+		<key>16</key>
+		<array>
+			<string>582</string>
+			<string>587</string>
+			<string>581</string>
+		</array>
+		<key>7</key>
+		<array>
+			<string>103</string>
+			<string>76</string>
+			<string>77</string>
+			<string>104</string>
+			<string>78</string>
+			<string>105</string>
+			<string>106</string>
+			<string>79</string>
+		</array>
+		<key>9</key>
+		<array>
+			<string>102</string>
+			<string>101</string>
+			<string>477</string>
+		</array>
+	</dict>
+	<key>IBLastGroupID</key>
+	<string>17</string>
+	<key>IBLockedObjects</key>
+	<array>
+		<integer>9</integer>
+	</array>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>9</integer>
+	</array>
+	<key>IBSystem Version</key>
+	<string>8I127</string>
+</dict>
+</plist>
