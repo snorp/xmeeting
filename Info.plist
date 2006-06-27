@@ -6,6 +6,8 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>XMeeting</string>
+	<key>CFBundleGetInfoString</key>
+	<string>© XMeeting project, 2005-2006</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>Manual</string>
 	<key>CFBundleHelpBookName</key>
@@ -16,12 +18,18 @@
 	<string>net.sourceforge.xmeeting.XMeeting</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>XMeeting</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.2</string>
+	<string>0.3</string>
+	<key>NSAppleScriptEnabled</key>
+	<string>NO</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

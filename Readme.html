@@ -1,1 +1,204 @@
-<html><head><title>Readme: XMeeting v0.2</title></head><body><h1>XMeeting Readme</h1><p><a href="#req">System Requirements</a><br><a href="#con">Contact</a><br><a href="#man">Manual</a><br><a href="#loc">Localization</a><br><a href="#cre">Credits</a><br><a href="#rnt">Release Notes for Release 0.2</a><br><a href="#rno">Older Release Notes</a><br><a href="#bug">Known Bugs</a></p>Thank you for downloading XMeeting!<br>In this document, you will find all information related to this particular release ofXMeeting. For more information about the XMeeting project in general, project roadmap,planned releases or actual news, please visit the project's webpage found at<a href="http://xmeeting.sourceforge.net/">http://xmeeting.sourceforge.net/</a>.<br><br>While XMeeting offers better compatibility and video quality than ohphoneX ever did, it is too early to consider XMeeting a one-to-one replacement for ohphoneX. If you intend to use H.323 video conferencing in a productive environment, we recommend you to stay with ohphoneX.<br><br><b>Important: If you have been using XMeeting 0.1, please read the<a href="#rnt">Release Notes for Release 0.2</a></b><hr><p><a name="req"><h3>System Requirements</h3></a>Mac OS X 10.4 or newer with QuickTime 7 installed. (PPC or intel)<br>Recommended: An QuickTime compatible USB or FireWire webcam (e.g. iSight)</p><p>Some functions will be disabled on machines with older and less powerful graphic cards.</p><hr><p><a name="con"><h3>Contact</h3></a>Any help or contribution to the XMeeting project is well-appreciated. Please feel free to contact us.If you have bug reports, feature requests or patches, please use the <a href="http://http://sourceforge.net/tracker/?group_id=74721&atid=541839">bug-tracking facilities</a>at sourceforge.net. In addition, you can also use the <a href="http://lists.sourceforge.net/lists/listinfo/xmeeting-application">xmeeting-application</a>mailing list. The project's admin can be contacted by sending mail to<a href="mailto:hfriederich@users.sourceforge.net">hfriederich@users.sourceforge.net</a>.</p><hr><p><a name="man"><h3>Manual</h3></a>Starting with version 0.2, XMeeting will ship with a manual. The manual covers all relevanttopics about XMeeting. However, many topics are mentioned very briefly only. The manual willbe updated in regular time intervals and we ask everyone to report us typos and other sortsof errors.</p><hr><p><a name"loc"><h3>Localization</h3></a>While XMeeting is designed to be localizable, the GUI is still work-in-progress. Therefore, keepingall localizations up-to-date would require a huge amount of time and resources. That's why we don'tconsider XMeeting ready for localization yet. Please contact us if you want to provide alocalization for your native language, so that we can inform you when we consider XMeeting readyfor localization.</p><hr><a name="cre"><h3>Credits</h3></a>XMeeting release 0.2 by NET's XMeeting project team. The team consists of Hannes Friederich(software engineering), Thomas Rechsteiner (testing, gatekeeper & conferencing setup) and is led by Dr Thomas Piendl. The NET XMeeting contributionis completely funded by NET <a href="http://www.net.ethz.ch/">http://www.net.ethz.ch/</a>, apart of the Swiss Federal Institute of Technology Zurich <a href="http://www.ethz.ch">http://www.ethz.ch/</a>.<br><br>The new Graphical User Interface (GUI) is contributed by SWITCH <a href="http://www.switch.ch">http://www.switch.ch</a> by funding the work of Ivan Guajana(software engineering). SWITCH supports and fosters cross-platform video-conferencing and therefore decided to contribute to the XMeeting project by offering a new user interface.<br><br>The Screen Video input Module is contributed by Mark Fleming, Learning Technology Specialistat Queen's University, Ontario, Canada.</p><hr><p><a name="rnt"><h3>Release Notes for Release 0.2</h3></a>XMeeting 0.2 uses a slightly different preferences system than XMeeting 0.1.New is the use of Accounts for H.323 and SIP. This means that the H.323 gatekeeper settingswill be lost when launching XMeeting 0.2. You will have to add this information again in thepreferences window, section &quot;Accounts&quot;. Alternatively, you can remove the preferencesfile (usually found at ~/Library/Preferences/net.sourceforge.xmeeting.xmeeting.plist) and usethe Setup Assistant to setup XMeeting.<br><br>New features:<ul><li>Support for the SIP protocol. XMeeting can now do both H.323 and SIP. TheSIP support is still basic and is not yet considered stable. Also, in the currentversion, only the H.261 and H.263 video codecs are supported when using SIP</li><li>Support for H.224/H.281 (Far End Camera Control) to improve compatiblility withCodian MCUs.<li>Improved H.323 system to improve compatibility with other clients</li><li>Improved H.263 compatibility</li><li>Improved handling of resources if video is disabled</li><li>Various GUI improvements</li><li>Much, much more...</li></ul>Fixed bugs:<ul><li>Fixes incorrect bandwidth requests when making calls using a gatekeeper</li><li>Fixes problems when a phone number was entered with spaces in between</li><li>Fixes a bug that prevented the Address Book from appearing for the second time</li><li>Fixes a problem that if no remote video was received, it wasn't possible to accessthe in-call controls</li><li>Adds a workaround for the case that the H.263 decoder starts displaying a green screeninstead of the remote video</li><li>Adds a workaround for improved handling of video on older machines</li></ul></p><hr><p><a name="rno"><h3>Older Release Notes</h3></a><b>v0.1:</b><br>This is the first &quot;official&quot; beta release of XMeeting which ships with the followingfeatures:<ul><li>Support for the H.323 protocol. SIP support is planned.</li><li>A new implementation of the underlying XMeeting framework, redesigned from scratch.This framework builds upon the PWLib and OPAL libraries from the <a href="http://sourceforge.net/projects/openh323">OpenH323 project</a></li><li>Support for QuickTime video codecs, improving the quality and bandwidth usage comparedto ohphoneX.</li><li>Supported video codecs: H.264 (partially), H.263 and H.261. Sending H.264 will not workin most cases unless sending between two XMeeting clients. There exists an option&quot;Enable H.264 Limited Mode&quot; in preferences that allows to send H.264 with alimited bandwidth used and certain other restrictions. However, <b>this mode is NOT standard compliant</b>!</li><li>Supported audio codecs: G.711 uLaw and ALaw. More codecs will be added later</li><li>A completely redesigned Graphical User Interface (GUI) with support for FullScreen video,Picture-in-Picture (PiP) and many other useful features.</li><li>The concept of encapsulating relevant preferences in a super-set, called location. This makes it easy to adjust the application behaviour to your current location. (e.g. &quot;Home&quot; or&quot;Office&quot;)</li><li>A new system for providing video input, using a modular interface. XMeeting ships with twomodules, a Live Camera Module for QuickTime compatible webcams and a Screen Module for capturingand sending screen content.</li><li>A new Setup Assistant for first-time launch. The assistant can also be used for importinglocations from existing files, intelligently asking the user for the missing information. Thisis the ideal solution for distributing XMeeting along with predefined preferences. Please contactHannes Friederich if you plan to use this feature.</li></ul></p><hr><p><a name="bug"><h3>Known Bugs</h3></a><ul><li>In some rare cases, calling a remote party seems to take long time without showing any success.</li><li>After some calls, XMeeting is no longer registered at a gatekeeper, even if indicating so.Terminating XMeeting may take a long time in this case.</li><li>XMeeting may crash randomly and rarely when in a call. This is especially true when receivingH.264</li></ul></p></body></html>
+<html>
+<head>
+<title>Readme: XMeeting v0.2</title>
+</head>
+
+<body>
+
+<h1>XMeeting Readme</h1>
+
+<p>
+<a href="#req">System Requirements</a>
+<br>
+<a href="#con">Contact</a>
+<br>
+<a href="#man">Manual</a>
+<br>
+<a href="#loc">Localization</a>
+<br>
+<a href="#cre">Credits</a>
+<br>
+<a href="#rnt">Release Notes for Release 0.2</a>
+<br>
+<a href="#rno">Older Release Notes</a>
+<br>
+<a href="#bug">Known Bugs</a>
+</p>
+
+Thank you for downloading XMeeting!
+<br>
+In this document, you will find all information related to this particular release of
+XMeeting. For more information about the XMeeting project in general, project roadmap,
+planned releases or actual news, please visit the project's webpage found at
+<a href="http://xmeeting.sourceforge.net/">http://xmeeting.sourceforge.net/</a>.
+<br>
+<br>
+While XMeeting offers better compatibility and video quality than ohphoneX ever did, 
+it is too early to consider XMeeting a one-to-one replacement for ohphoneX. 
+If you intend to use H.323 video conferencing in a productive environment, 
+we recommend you to stay with ohphoneX.
+<br>
+<br>
+<b>Important: If you have been using XMeeting 0.1, please read the
+<a href="#rnt">Release Notes for Release 0.2</a></b>
+
+<hr>
+
+<p>
+<a name="req"><h3>System Requirements</h3></a>
+Mac OS X 10.4 or newer with QuickTime 7 installed. (PPC or intel)
+<br>
+Recommended: An QuickTime compatible USB or FireWire webcam (e.g. iSight)
+</p>
+
+<p>
+Some functions will be disabled on machines with older and less powerful graphic cards.
+</p>
+
+<hr>
+
+<p>
+<a name="con"><h3>Contact</h3></a>
+Any help or contribution to the XMeeting project is well-appreciated. Please feel free to contact us.
+If you have bug reports, feature requests or patches, please use the 
+<a href="http://http://sourceforge.net/tracker/?group_id=74721&atid=541839">bug-tracking facilities</a>
+at sourceforge.net. In addition, you can also use the 
+<a href="http://lists.sourceforge.net/lists/listinfo/xmeeting-application">xmeeting-application</a>
+mailing list. The project's admin can be contacted by sending mail to
+<a href="mailto:hfriederich@users.sourceforge.net">hfriederich@users.sourceforge.net</a>.
+</p>
+
+<hr>
+
+<p>
+<a name="man"><h3>Manual</h3></a>
+Starting with version 0.2, XMeeting will ship with a manual. The manual covers all relevant
+topics about XMeeting. However, many topics are mentioned very briefly only. The manual will
+be updated in regular time intervals and we ask everyone to report us typos and other sorts
+of errors.
+</p>
+
+<hr>
+
+<p>
+<a name"loc"><h3>Localization</h3></a>
+While XMeeting is designed to be localizable, the GUI is still work-in-progress. Therefore, keeping
+all localizations up-to-date would require a huge amount of time and resources. That's why we don't
+consider XMeeting ready for localization yet. Please contact us if you want to provide a
+localization for your native language, so that we can inform you when we consider XMeeting ready
+for localization.
+</p>
+
+<hr>
+
+<a name="cre"><h3>Credits</h3></a>
+XMeeting release 0.2 by NET's XMeeting project team. The team consists of Hannes Friederich
+(software engineering), Thomas Rechsteiner (testing, gatekeeper & conferencing setup) and is 
+led by Dr Thomas Piendl. The NET XMeeting contribution
+is completely funded by NET <a href="http://www.net.ethz.ch/">http://www.net.ethz.ch/</a>, a
+part of the Swiss Federal Institute of Technology Zurich 
+<a href="http://www.ethz.ch">http://www.ethz.ch/</a>.
+<br>
+<br>
+The new Graphical User Interface (GUI) is contributed by SWITCH 
+<a href="http://www.switch.ch">http://www.switch.ch</a> by funding the work of Ivan Guajana
+(software engineering). SWITCH supports and fosters cross-platform video-conferencing 
+and therefore decided to contribute to the XMeeting project by offering a new user interface.
+<br>
+<br>
+The Screen Video input Module is contributed by Mark Fleming, Learning Technology Specialist
+at Queen's University, Ontario, Canada.
+</p>
+
+<hr>
+
+<p>
+<a name="rnt"><h3>Release Notes for Release 0.2</h3></a>
+XMeeting 0.2 uses a slightly different preferences system than XMeeting 0.1.
+New is the use of Accounts for H.323 and SIP. This means that the H.323 gatekeeper settings
+will be lost when launching XMeeting 0.2. You will have to add this information again in the
+preferences window, section &quot;Accounts&quot;. Alternatively, you can remove the preferences
+file (usually found at ~/Library/Preferences/net.sourceforge.xmeeting.xmeeting.plist) and use
+the Setup Assistant to setup XMeeting.
+<br>
+<br>
+New features:
+<ul>
+<li>Support for the SIP protocol. XMeeting can now do both H.323 and SIP. The
+SIP support is still basic and is not yet considered stable. Also, in the current
+version, only the H.261 and H.263 video codecs are supported when using SIP</li>
+<li>Support for H.224/H.281 (Far End Camera Control) to improve compatiblility with
+Codian MCUs.
+<li>Improved H.323 system to improve compatibility with other clients</li>
+<li>Improved H.263 compatibility</li>
+<li>Improved handling of resources if video is disabled</li>
+<li>Various GUI improvements</li>
+<li>Much, much more...</li>
+</ul>
+
+Fixed bugs:
+<ul>
+<li>Fixes incorrect bandwidth requests when making calls using a gatekeeper</li>
+<li>Fixes problems when a phone number was entered with spaces in between</li>
+<li>Fixes a bug that prevented the Address Book from appearing for the second time</li>
+<li>Fixes a problem that if no remote video was received, it wasn't possible to access
+the in-call controls</li>
+<li>Adds a workaround for the case that the H.263 decoder starts displaying a green screen
+instead of the remote video</li>
+<li>Adds a workaround for improved handling of video on older machines</li>
+</ul>
+</p>
+
+<hr>
+
+<p>
+<a name="rno"><h3>Older Release Notes</h3></a>
+<b>v0.1:</b>
+<br>
+This is the first &quot;official&quot; beta release of XMeeting which ships with the following
+features:
+
+<ul>
+<li>Support for the H.323 protocol. SIP support is planned.</li>
+<li>A new implementation of the underlying XMeeting framework, redesigned from scratch.
+This framework builds upon the PWLib and OPAL libraries from the 
+<a href="http://sourceforge.net/projects/openh323">OpenH323 project</a></li>
+<li>Support for QuickTime video codecs, improving the quality and bandwidth usage compared
+to ohphoneX.</li>
+<li>Supported video codecs: H.264 (partially), H.263 and H.261. Sending H.264 will not work
+in most cases unless sending between two XMeeting clients. There exists an option
+&quot;Enable H.264 Limited Mode&quot; in preferences that allows to send H.264 with a
+limited bandwidth used and certain other restrictions. However, <b>this mode is NOT 
+standard compliant</b>!</li>
+<li>Supported audio codecs: G.711 uLaw and ALaw. More codecs will be added later</li>
+<li>A completely redesigned Graphical User Interface (GUI) with support for FullScreen video,
+Picture-in-Picture (PiP) and many other useful features.</li>
+<li>The concept of encapsulating relevant preferences in a super-set, called location. This makes 
+it easy to adjust the application behaviour to your current location. (e.g. &quot;Home&quot; or
+&quot;Office&quot;)</li>
+<li>A new system for providing video input, using a modular interface. XMeeting ships with two
+modules, a Live Camera Module for QuickTime compatible webcams and a Screen Module for capturing
+and sending screen content.</li>
+<li>A new Setup Assistant for first-time launch. The assistant can also be used for importing
+locations from existing files, intelligently asking the user for the missing information. This
+is the ideal solution for distributing XMeeting along with predefined preferences. Please contact
+Hannes Friederich if you plan to use this feature.</li>
+</ul>
+</p>
+
+<hr>
+
+<p>
+<a name="bug"><h3>Known Bugs</h3></a>
+<ul>
+<li>In some rare cases, calling a remote party seems to take long time without showing any 
+success.</li>
+<li>After some calls, XMeeting is no longer registered at a gatekeeper, even if indicating so.
+Terminating XMeeting may take a long time in this case.</li>
+<li>XMeeting may crash randomly and rarely when in a call. This is especially true when receiving
+H.264</li>
+</ul>
+</p>
+
+</body>
+</html>
