@@ -6,6 +6,10 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>XMeeting</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>Manual</string>
+	<key>CFBundleHelpBookName</key>
+	<string>XMeeting Manual</string>
 	<key>CFBundleIconFile</key>
 	<string>XMeeting</string>
 	<key>CFBundleIdentifier</key>
