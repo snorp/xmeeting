@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.8 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.9 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,6 +41,9 @@
 - (void)_outputVolumeDidChange;
 
 @end
+
+OSStatus XMAudioManagerDeviceListPropertyListenerProc(AudioHardwarePropertyID inPropertyID,
+													  void *inClientData);
 
 OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 														UInt32 inChannel,
@@ -98,6 +101,10 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	[self _addVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	[self _addVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
 	
+	AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices,
+									 XMAudioManagerDeviceListPropertyListenerProc,
+									 NULL);
+	
 	return self;
 }
 
@@ -126,6 +133,9 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 	[self _removeVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	[self _removeVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
+	
+	AudioHardwareRemovePropertyListener(kAudioHardwarePropertyDevices,
+										XMAudioManagerDeviceListPropertyListenerProc);
 }
 
 - (void)dealloc
@@ -139,15 +149,53 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 
 - (void)updateDeviceLists
 {
-	// We do a lazy approach by just releasing
-	// the cached values.
-	// The new values are not obtained before
-	// the next call to -audio<DIRECTION>Devices
 	[inputDevices release];
 	inputDevices = nil;
 	
 	[outputDevices release];
 	outputDevices = nil;
+	
+	// getting the new devices
+	[self inputDevices];
+	[self outputDevices];
+	
+	AudioDeviceID newDeviceID = [self _deviceIDForName:selectedInputDevice direction:XM_INPUT_DIRECTION];
+	if(newDeviceID == kAudioDeviceUnknown)
+	{
+		newDeviceID = [self _defaultDeviceForDirection:XM_INPUT_DIRECTION];
+	}
+	
+	if(newDeviceID != selectedInputDeviceID)
+	{
+		[self _removeVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
+		
+		_XMSetSelectedAudioInputDevice((unsigned int)newDeviceID);
+		selectedInputDeviceID = newDeviceID;
+		[selectedInputDevice release];
+		selectedInputDevice = [[self _nameForDeviceID:selectedInputDeviceID] copy];
+		
+		[self _addVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
+	}
+	
+	newDeviceID = [self _deviceIDForName:selectedOutputDevice direction:XM_OUTPUT_DIRECTION];
+	if(newDeviceID == kAudioDeviceUnknown)
+	{
+		newDeviceID = [self _defaultDeviceForDirection:XM_OUTPUT_DIRECTION];
+	}
+	
+	if(newDeviceID != selectedOutputDeviceID)
+	{
+		[self _removeVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
+		
+		_XMSetSelectedAudioOutputDevice((unsigned int)newDeviceID);
+		selectedOutputDeviceID = newDeviceID;
+		[selectedOutputDevice release];
+		selectedOutputDevice = [[self _nameForDeviceID:selectedOutputDeviceID] copy];
+		
+		[self _addVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidUpdateDeviceLists object:self];
 }
 
 - (NSArray *)inputDevices
@@ -203,11 +251,19 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	}
 	
 	AudioDeviceID deviceID = [self _deviceIDForName:deviceName direction:XM_INPUT_DIRECTION];
-	setSelectedAudioInputDevice((unsigned int)deviceID);
+	if(deviceID == kAudioDeviceUnknown && ![deviceName isEqualToString:noDeviceName])
+	{
+		return NO;
+	}
+	
+	[self _removeVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
+	_XMSetSelectedAudioInputDevice((unsigned int)deviceID);
 	
 	selectedInputDeviceID = deviceID;
 	selectedInputDevice = [deviceName copy];
 	selectedInputDeviceIsMuted = NO;
+	
+	[self _addVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	
 	return YES;
 }
@@ -232,11 +288,20 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	}
 	
 	AudioDeviceID deviceID = [self _deviceIDForName:deviceName direction:XM_OUTPUT_DIRECTION];
-	setSelectedAudioOutputDevice((unsigned int)deviceID);
+	if(deviceID == kAudioDeviceUnknown  && ![deviceName isEqualToString:noDeviceName])
+	{
+		return NO;
+	}
+	
+	[self _removeVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
+	
+	_XMSetSelectedAudioOutputDevice((unsigned int)deviceID);
 	
 	selectedOutputDeviceID = deviceID;
 	selectedOutputDevice = [deviceName copy];
 	selectedOutputDeviceIsMuted = NO;
+	
+	[self _addVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
 	
 	return YES;
 }
@@ -650,17 +715,15 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		return;
 	}
 	
-	OSStatus err;
+	AudioDeviceAddPropertyListener(deviceID, 1, direction,
+								   kAudioDevicePropertyVolumeScalar,
+								   XMAudioManagerVolumeChangePropertyListenerProc,
+								   NULL);
 	
-	err = AudioDeviceAddPropertyListener(deviceID, 1, direction,
-										 kAudioDevicePropertyVolumeScalar,
-										 XMAudioManagerVolumeChangePropertyListenerProc,
-										 NULL);
-	
-	if(err != kAudioHardwareNoError)
+	/*if(err != kAudioHardwareNoError)
 	{
 		NSLog(@"adding the prop listener failed");
-	}
+	}*/
 }
 
 - (void)_removeVolumePropertyListenerForDevice:(AudioDeviceID)deviceID direction:(XM_DIRECTION)direction
@@ -670,16 +733,14 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		return;
 	}
 	
-	OSStatus err;
+	AudioDeviceRemovePropertyListener(deviceID, 1, direction,
+									  kAudioDevicePropertyVolumeScalar,
+									  XMAudioManagerVolumeChangePropertyListenerProc);
 	
-	err = AudioDeviceRemovePropertyListener(deviceID, 1, direction,
-										 kAudioDevicePropertyVolumeScalar,
-										 XMAudioManagerVolumeChangePropertyListenerProc);
-	
-	if(err != kAudioHardwareNoError)
+	/*if(err != kAudioHardwareNoError)
 	{
 		NSLog(@"removing the prop listener failed");
-	}
+	}*/
 }
 
 - (void)_inputVolumeDidChange;
@@ -697,6 +758,14 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 @end
 
 #pragma mark CoreAudio PropertyListener Proc
+
+OSStatus XMAudioManagerDeviceListPropertyListenerProc(AudioHardwarePropertyID inPropertyID,
+													  void *inClientData)
+{
+	[[XMAudioManager sharedInstance] performSelectorOnMainThread:@selector(updateDeviceLists)
+													  withObject:nil waitUntilDone:NO];
+	return noErr;
+}
 
 OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 														UInt32 inChannel,

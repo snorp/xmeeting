@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.14 2006/06/20 13:33:58 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.15 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,8 @@ extern NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls;
 extern NSString *XMKey_PreferencesManagerInCallControlHideAndShowEffect;
 extern NSString *XMKey_PreferencesManagerAlertIncomingCalls;
 extern NSString *XMKey_PreferencesManagerIncomingCallAlertType;
+extern NSString *XMKey_PreferencesManagerPreferredAudioOutputDevice;
+extern NSString *XMKey_PreferencesManagerPreferredAudioInputDevice;
 extern NSString *XMKey_PreferencesManagerDisabledVideoModules;
 extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
 extern NSString *XMKey_PreferencesManagerVideoManagerSettings;
@@ -279,6 +281,26 @@ typedef enum XMIncomingCallAlertType
  * Sets the password for service and account specified
  **/
 - (void)setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
+
+/**
+ * Returns the name of the preferred audio output device.
+ **/
+- (NSString *)preferredAudioOutputDevice;
+
+/**
+ * Stores the name of the preferred audio output device.
+ **/
+- (void)setPreferredAudioOutputDevice:(NSString *)device;
+
+/**
+ * Returns the name of the preferred audio input device.
+ **/
+- (NSString *)preferredAudioInputDevice;
+
+/**
+ * Stores the name of the preferred audio input device.
+ **/
+- (void)setPreferredAudioInputDevice:(NSString *)device;
 
 /**
  * Returns an array containing identifiers of the disabled video modules

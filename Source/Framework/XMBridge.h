@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.26 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.27 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -101,14 +101,14 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 // The underlying system is call-by-reference
 //const char *getSelectedAudioInputDevice();
 //bool setSelectedAudioInputDevice(const char *device);
-void setSelectedAudioInputDevice(unsigned int device);
-void setMuteAudioInputDevice(bool muteFlag);
+void _XMSetSelectedAudioInputDevice(unsigned int device);
+void _XMSetMuteAudioInputDevice(bool muteFlag);
 
 // The underlying system is call-by-reference
 //const char *getSelectedAudioOutputDevice();
 //bool setSelectedAudioOutputDevice(const char *device);
-void setSelectedAudioOutputDevice(unsigned int device);
-void setMuteAudioOutputDevice(bool muteFlag);
+void _XMSetSelectedAudioOutputDevice(unsigned int device);
+void _XMSetMuteAudioOutputDevice(bool muteFlag);
 
 void _XMSetAudioBufferSize(unsigned value);
 void _XMStopAudio();

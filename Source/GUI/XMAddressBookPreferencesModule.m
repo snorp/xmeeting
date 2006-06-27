@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookPreferencesModule.m,v 1.1 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookPreferencesModule.m,v 1.2 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,7 +43,7 @@
 
 - (unsigned)position
 {
-	return 5;
+	return 6;
 }
 
 - (NSString *)identifier

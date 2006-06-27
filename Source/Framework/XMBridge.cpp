@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.27 2006/06/07 09:23:41 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.28 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,22 +102,22 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 #pragma mark -
 #pragma mark Audio Functions
 
-void setSelectedAudioInputDevice(unsigned int deviceID)
+void _XMSetSelectedAudioInputDevice(unsigned int deviceID)
 {
 	XMSoundChannel::SetRecordDevice(deviceID);
 }
 
-void setMuteAudioInputDevice(bool muteFlag)
+void _XMSetMuteAudioInputDevice(bool muteFlag)
 {
 	XMSoundChannel::SetRecordDeviceMuted(muteFlag);
 }
 
-void setSelectedAudioOutputDevice(unsigned int deviceID)
+void _XMSetSelectedAudioOutputDevice(unsigned int deviceID)
 {
 	XMSoundChannel::SetPlayDevice(deviceID);
 }
 
-void setMuteAudioOutputDevice(bool muteFlag)
+void _XMSetMuteAudioOutputDevice(bool muteFlag)
 {
 	XMSoundChannel::SetPlayDeviceMuted(muteFlag);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.8 2006/06/20 13:33:58 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.9 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,8 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 @end
 
 @implementation XMVideoPreferencesModule
+
+#pragma mark Init & Deallocation Methods
 
 - (id)init
 {
@@ -70,11 +72,13 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 												 name:XMNotification_VideoManagerDidUpdateInputDeviceList
 											   object:nil];
 	
-	XMString_UseFirstAvailableDevice = NSLocalizedString(@"XM_VIDEO_PREFERENCES_FA_DEVICE", @"");
+	XMString_UseFirstAvailableDevice = [NSLocalizedString(@"XM_VIDEO_PREFERENCES_FA_DEVICE", @"") retain];
 }
 
 - (void)dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
 	[prefWindowController release];
 	
 	[disabledVideoModules release];
@@ -82,9 +86,12 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 	[super dealloc];
 }
 
+#pragma mark -
+#pragma mark XMPreferencesModule methods
+
 - (unsigned)position
 {
-	return 4;
+	return 5;
 }
 
 - (NSString *)identifier
@@ -150,6 +157,7 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 	[prefManager storeVideoManagerSettings];
 }
 
+#pragma mark -
 #pragma mark NSTableView methods
 
 - (unsigned)numberOfRowsInTableView:(NSTableView *)tableView
@@ -210,6 +218,7 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 	}
 }
 
+#pragma mark -
 #pragma mark User Interface Methods
 
 - (void)_showSettingsDialog:(id)sender
@@ -259,6 +268,7 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 	[videoModuleSettingsBox setContentView:nil];
 }
 
+#pragma mark -
 #pragma mark Private Methods
 
 - (void)_updateVideoDeviceList:(NSNotification *)notif

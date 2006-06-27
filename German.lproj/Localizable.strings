@@ -196,6 +196,9 @@
 "XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Umgebungsname existiert bereits";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "Kein Verbindungsprotokoll aktiviert";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Weder das H.323 noch das SIP Protokoll sind aktiviert in der Umgebung \"%@\". Sie können keine Anrufe tätigen wenn diese Umgebung aktiviert ist.";
+"XM_AUDIO_PREFERENCES_NAME" = "Audio";
+"XM_AUDIO_PREFERENCES_TOOLTIP" = "Einstellungen für Audio Ein- und Ausgabe";
+"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE" = "<Standardgerät benützen>";
 "XM_VIDEO_PREFERENCES_NAME" = "Videoeingabe";
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Einstellungen für die Video-Module";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Erstes verfügbares>";

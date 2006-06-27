@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.22 2006/06/22 11:28:06 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.23 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,8 +23,7 @@
 - (void)_didChangeSelectedVideoInputDevice:(NSNotification *)notif;
 - (void)_audioInputVolumeDidChange:(NSNotification *)notif;
 - (void)_audioOutputVolumeDidChange:(NSNotification *)notif;
-- (void)_audioInputMuteStatusDidChange:(NSNotification *)notif;
-- (void)_audioOutputMuteStatusDidChange:(NSNotification *)notif;
+- (void)_didUpdateAudioDeviceLists:(NSNotification *)notif;
 - (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_activeLocationDidChange:(NSNotification *)notif;
 
@@ -85,17 +84,7 @@
 	}
 	
 	// configuring the audio content
-	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
-	[audioInputDevicesPopUp removeAllItems];
-	[audioInputDevicesPopUp addItemsWithTitles:[audioManager inputDevices]];
-	
-	[audioInputDevicesPopUp selectItemWithTitle:[audioManager selectedInputDevice]];
-	[audioOutputDevicesPopUp removeAllItems];
-	[audioOutputDevicesPopUp addItemsWithTitles:[audioManager outputDevices]];
-	[audioOutputDevicesPopUp selectItemWithTitle:[audioManager selectedOutputDevice]];
-	
-	[self _audioInputVolumeDidChange:nil];
-	[self _audioOutputVolumeDidChange:nil];
+	[self _didUpdateAudioDeviceLists:nil];
 	[self _validateAudioControls];
 	
 	// registering for notifications
@@ -113,6 +102,8 @@
 							   name:XMNotification_AudioManagerInputVolumeDidChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_audioOutputVolumeDidChange:)
 							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUpdateAudioDeviceLists:)
+							   name:XMNotification_AudioManagerDidUpdateDeviceLists object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
@@ -406,6 +397,21 @@
 	
 	int state = ([audioManager mutesOutput] == YES) ? NSOnState : NSOffState;
 	[muteAudioOutputSwitch setState:state];
+}
+
+- (void)_didUpdateAudioDeviceLists:(NSNotification *)notif
+{
+	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+	[audioInputDevicesPopUp removeAllItems];
+	[audioInputDevicesPopUp addItemsWithTitles:[audioManager inputDevices]];
+	[audioInputDevicesPopUp selectItemWithTitle:[audioManager selectedInputDevice]];
+	
+	[audioOutputDevicesPopUp removeAllItems];
+	[audioOutputDevicesPopUp addItemsWithTitles:[audioManager outputDevices]];
+	[audioOutputDevicesPopUp selectItemWithTitle:[audioManager selectedOutputDevice]];
+	
+	[self _audioInputVolumeDidChange:nil];
+	[self _audioOutputVolumeDidChange:nil];
 }
 
 - (void)_preferencesDidChange:(NSNotification *)notif

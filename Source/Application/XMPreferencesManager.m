@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.26 2006/06/23 11:22:33 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.27 2006/06/27 18:05:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,8 @@ NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls = @"XMeeting_A
 NSString *XMKey_PreferencesManagerInCallControlHideAndShowEffect = @"XMeeting_InCallControlHideAndShowEffect";
 NSString *XMKey_PreferencesManagerAlertIncomingCalls = @"XMeeting_AlertIncomingCalls";
 NSString *XMKey_PreferencesManagerIncomingCallAlertType = @"XMeeting_IncomingCallAlertType";
+NSString *XMKey_PreferencesManagerPreferredAudioOutputDevice = @"XMeeting_PreferredAudioOutputDevice";
+NSString *XMKey_PreferencesManagerPreferredAudioInputDevice = @"XMeeting_PreferredAudioInputDevice";
 NSString *XMKey_PreferencesManagerDisabledVideoModules = @"XMeeting_DisabledVideoModules";
 NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
 NSString *XMKey_PreferencesManagerVideoManagerSettings = @"XMeeting_VideoManagerSettings";
@@ -45,6 +47,8 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (NSString *)_passwordForServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
 - (void)_setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
+
+- (void)_setInitialAudioDevices;
 
 - (void)_setInitialVideoInputDevice:(NSNotification *)notif;
 
@@ -269,6 +273,8 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 			}
 		}
 	}
+	
+	[self _setInitialAudioDevices];
 	
 	if([videoManager inputDevices] != nil)
 	{
@@ -854,6 +860,40 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	}
 }
 
+- (NSString *)preferredAudioOutputDevice
+{
+	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_PreferencesManagerPreferredAudioOutputDevice];
+}
+
+- (void)setPreferredAudioOutputDevice:(NSString *)device
+{
+	if(device == nil)
+	{
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferencesManagerPreferredAudioOutputDevice];
+	}
+	else
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredAudioOutputDevice];
+	}
+}
+
+- (NSString *)preferredAudioInputDevice
+{
+	return [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_PreferencesManagerPreferredAudioInputDevice];
+}
+
+- (void)setPreferredAudioInputDevice:(NSString *)device
+{
+	if(device == nil)
+	{
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferencesManagerPreferredAudioInputDevice];
+	}
+	else
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredAudioInputDevice];
+	}
+}
+
 - (NSArray *)disabledVideoModules
 {
 	NSArray *disabledVideoModules = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_PreferencesManagerDisabledVideoModules];
@@ -951,7 +991,33 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	[[NSUserDefaults standardUserDefaults] setInteger:(int)callProtocol forKey:XMKey_PreferencesManagerAddressBookPhoneNumberProtocol];
 }
 
+#pragma mark -
 #pragma mark Private Methods
+
+- (void)_setInitialAudioDevices
+{
+	NSString *preferredInputDevice = [self preferredAudioInputDevice];
+	NSString *preferredOutputDevice = [self preferredAudioOutputDevice];
+	
+	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+	
+	if(preferredInputDevice != nil)
+	{
+		NSArray *inputDevices = [audioManager inputDevices];
+		if([inputDevices containsObject:preferredInputDevice])
+		{
+			[audioManager setSelectedInputDevice:preferredInputDevice];
+		}
+	}
+	if(preferredOutputDevice != nil)
+	{
+		NSArray *outputDevices = [audioManager outputDevices];
+		if([outputDevices containsObject:preferredOutputDevice])
+		{
+			[audioManager setSelectedOutputDevice:preferredOutputDevice];
+		}
+	}
+}
 
 - (void)_setInitialVideoInputDevice:(NSNotification *)notif
 {

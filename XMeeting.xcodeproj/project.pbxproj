@@ -138,6 +138,9 @@
 		D10B8E0C0A512F5D00003A33 /* logo.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DFA0A512E7500003A33 /* logo.tiff */; };
 		D10B8E0D0A512F5D00003A33 /* mainwindow.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DFB0A512E7500003A33 /* mainwindow.png */; };
 		D10B8E0E0A512F5D00003A33 /* osd.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DFC0A512E7500003A33 /* osd.png */; };
+		D10B914E0A519B1C00003A33 /* XMAudioPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D10B914C0A519B1C00003A33 /* XMAudioPreferencesModule.h */; };
+		D10B914F0A519B1C00003A33 /* XMAudioPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D10B914D0A519B1C00003A33 /* XMAudioPreferencesModule.m */; };
+		D10B91A00A51A10100003A33 /* Audio.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D10B919F0A51A10100003A33 /* Audio.tiff */; };
 		D10D49E4093CA220000DD61E /* XMWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = D10D49E2093CA220000DD61E /* XMWindow.h */; };
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
@@ -1122,6 +1125,9 @@
 		D10B8DFB0A512E7500003A33 /* mainwindow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mainwindow.png; sourceTree = "<group>"; };
 		D10B8DFC0A512E7500003A33 /* osd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = osd.png; sourceTree = "<group>"; };
 		D10B8DFD0A512E7500003A33 /* manual.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = manual.html; sourceTree = "<group>"; };
+		D10B914C0A519B1C00003A33 /* XMAudioPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAudioPreferencesModule.h; path = Source/GUI/XMAudioPreferencesModule.h; sourceTree = "<group>"; };
+		D10B914D0A519B1C00003A33 /* XMAudioPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAudioPreferencesModule.m; path = Source/GUI/XMAudioPreferencesModule.m; sourceTree = "<group>"; };
+		D10B919F0A51A10100003A33 /* Audio.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Audio.tiff; path = Resources/Images/Audio.tiff; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
 		D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMIncomingCallAlert.h; sourceTree = "<group>"; };
@@ -2338,6 +2344,8 @@
 				D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */,
 				D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */,
 				D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */,
+				D10B914C0A519B1C00003A33 /* XMAudioPreferencesModule.h */,
+				D10B914D0A519B1C00003A33 /* XMAudioPreferencesModule.m */,
 				D12E63A70999503F004EF9F8 /* XMVideoPreferencesModule.h */,
 				D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */,
 				D1AF63DA0A39416700CAF35F /* XMAddressBookPreferencesModule.h */,
@@ -3373,6 +3381,7 @@
 				D1EB18AC08437A26002CEF53 /* AddressBook.tiff */,
 				D120614309FBDE5100179B6C /* AddressBook_16.tiff */,
 				D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */,
+				D10B919F0A51A10100003A33 /* Audio.tiff */,
 				1ADAFBD80990EBA700F6C5FF /* Call_24.tif */,
 				1ADAFBD70990EBA700F6C5FF /* Call_24_down.tif */,
 				D1EB18EF0843DEC9002CEF53 /* CallHistory.tiff */,
@@ -3610,6 +3619,7 @@
 				D1AF63DC0A39416700CAF35F /* XMAddressBookPreferencesModule.h in Headers */,
 				D1C8FCC80A44070D00EF1A8C /* XMStillImageVideoInputModule.h in Headers */,
 				D11C5E520A49EC730030633D /* XMIncomingCallAlert.h in Headers */,
+				D10B914E0A519B1C00003A33 /* XMAudioPreferencesModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4184,6 +4194,7 @@
 				D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */,
 				D1C8FCD30A4407E600EF1A8C /* StillImageSettings.nib in Resources */,
 				D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */,
+				D10B91A00A51A10100003A33 /* Audio.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4328,6 +4339,7 @@
 				D1AF63DD0A39416700CAF35F /* XMAddressBookPreferencesModule.m in Sources */,
 				D1C8FCC90A44070D00EF1A8C /* XMStillImageVideoInputModule.m in Sources */,
 				D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */,
+				D10B914F0A519B1C00003A33 /* XMAudioPreferencesModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
