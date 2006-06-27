@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.7 2006/05/17 16:44:58 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.8 2006/06/27 22:07:39 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -75,6 +75,11 @@ BOOL XMSIPConnection::XMWriteINVITE(OpalTransport & transport, void *param)
 	SIPTransaction * invite = new SIPInvite(connection, transport);
 	
 	// Adjust the SDP video formats
+	if(invite->HasSDP() == FALSE)
+	{	
+		delete invite;
+		return FALSE;
+	}
 	SDPSessionDescription & sdp = invite->GetSDP();
 	AdjustSessionDescription(sdp);
 	
@@ -83,6 +88,7 @@ BOOL XMSIPConnection::XMWriteINVITE(OpalTransport & transport, void *param)
 		return TRUE;
 	}
 
+	delete invite;
 	return FALSE;
 }
 
@@ -651,6 +657,13 @@ void XMSIPConnection::OnReceivedAuthenticationRequired(SIPTransaction & transact
 	}
 	
 	SIPTransaction * invite = new SIPInvite(*this, *transport);
+	
+	if(invite->HasSDP() == FALSE)
+	{
+		// should not happen. Simply ignore
+		delete invite;
+		return;
+	}
 	
 	AdjustSessionDescription(invite->GetSDP());
 	
