@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Readme: XMeeting v0.2</title>
+<title>Readme: XMeeting v0.3</title>
 </head>
 
 <body>
@@ -18,7 +18,7 @@
 <br>
 <a href="#cre">Credits</a>
 <br>
-<a href="#rnt">Release Notes for Release 0.2</a>
+<a href="#rnt">Release Notes for Release 0.3</a>
 <br>
 <a href="#rno">Older Release Notes</a>
 <br>
@@ -33,14 +33,8 @@ planned releases or actual news, please visit the project's webpage found at
 <a href="http://xmeeting.sourceforge.net/">http://xmeeting.sourceforge.net/</a>.
 <br>
 <br>
-While XMeeting offers better compatibility and video quality than ohphoneX ever did, 
-it is too early to consider XMeeting a one-to-one replacement for ohphoneX. 
-If you intend to use H.323 video conferencing in a productive environment, 
-we recommend you to stay with ohphoneX.
-<br>
-<br>
-<b>Important: If you have been using XMeeting 0.1, please read the
-<a href="#rnt">Release Notes for Release 0.2</a></b>
+<b>Important: If you are upgrading from XMeeting 0.1, please read the
+<a href="#rno">Release Notes for Release 0.2</a></b>
 
 <hr>
 
@@ -82,11 +76,9 @@ of errors.
 
 <p>
 <a name"loc"><h3>Localization</h3></a>
-While XMeeting is designed to be localizable, the GUI is still work-in-progress. Therefore, keeping
-all localizations up-to-date would require a huge amount of time and resources. That's why we don't
-consider XMeeting ready for localization yet. Please contact us if you want to provide a
-localization for your native language, so that we can inform you when we consider XMeeting ready
-for localization.
+Starting with version 0.3, XMeeting is fully internationalized and ready localization. Version 0.3
+already ships with Italian, French and German localizations. Please contact us if you want to 
+provide a localization for your native language.
 </p>
 
 <hr>
@@ -106,14 +98,49 @@ The new Graphical User Interface (GUI) is contributed by SWITCH
 and therefore decided to contribute to the XMeeting project by offering a new user interface.
 <br>
 <br>
-The Screen Video input Module is contributed by Mark Fleming, Learning Technology Specialist
+The Still Image &amp; Screen video input modules are contributed by Mark Fleming, Learning Technology Specialist
 at Queen's University, Ontario, Canada.
+<br>
+<br>The localizations are provided by (in order of appearance):
+<br>
+<br>
+<table border=0 width=500>
+<tr><th align="left">Language</th><th align="left">Translator</td></tr>
+<tr><td>Italian</td><td>Marcello Teodori</td></tr>
+<tr><td>French</td><td>Jo&euml;l Vimenet</td></tr>
+<tr><td>German</td><td>Hannes Friederich</td></tr>
+</table>
 </p>
 
 <hr>
 
 <p>
-<a name="rnt"><h3>Release Notes for Release 0.2</h3></a>
+<a name="rnt"><h3>Release Notes for Version 0.3</h3></a>
+New features:
+<ul>
+<li>Support for STUN (Simple Traversal of UDP through NAT), improving NAT traversal.</li>
+<li>Improved Address Book integration, allowing to call phone numbers stored in the Address Book database.</li>
+<li>Support for localizations, adding Italian, French and German localizations.</li>
+<li>New Still Image video input module.</li>
+<li>XMeeting no longer quits when closing the main window.</li>
+<li>More information available about calls and network interfaces.</li>
+<li>The GUI now remembers the state when quitting XMeeting.</li>
+<li>Various other GUI improvements.</li>
+</ul>
+
+Fixed bugs:
+<ul>
+<li>Fixed video handling to allow custom picture formats (H.264).</li>
+<li>Fixed problems with debug log generation. Debug logs now contain more information.</li>
+<li>Removes duplicated log statements.</li>
+</ul>
+</p>
+
+<hr>
+
+<p>
+<a name="rno"><h3>Older Release Notes</h3></a>
+<b>v0.2:</b><br>
 XMeeting 0.2 uses a slightly different preferences system than XMeeting 0.1.
 New is the use of Accounts for H.323 and SIP. This means that the H.323 gatekeeper settings
 will be lost when launching XMeeting 0.2. You will have to add this information again in the
@@ -149,10 +176,6 @@ instead of the remote video</li>
 </ul>
 </p>
 
-<hr>
-
-<p>
-<a name="rno"><h3>Older Release Notes</h3></a>
 <b>v0.1:</b>
 <br>
 This is the first &quot;official&quot; beta release of XMeeting which ships with the following
