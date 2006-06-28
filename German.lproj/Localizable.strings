@@ -247,6 +247,7 @@
 "XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "Ein interner Fehler ist im Kameramodul aufgetreten.\nFehler: (%d, %x)\t Gerät: %@\nBitte melden Sie dieses Problem an hfriederich@users.sourceforge.net";
 "XM_FRAMEWORK_STILL_MODULE_NAME" = "Bildmodul";
 "XM_FRAMEWORK_STILL_MODULE_ERROR" = "Kann gewähltes Bild nicht öffnen";
+"XM_FRAMEWORK_STILL_MODULE_DEVICE_NAME" = "Bild";
 "XM_FRAMEWORK_STILL_MODULE_NO_IMAGE" = "Kein Bild";
 "XM_FRAMEWORK_SCREEN_MODULE_NAME" = "Bildschirmmodul";
 "XM_FRAMEWORK_SCREEN_DEVICE_NAME" = "Bildschirm %d";

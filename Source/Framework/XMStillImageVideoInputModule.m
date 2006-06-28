@@ -1,5 +1,5 @@
 /*
- * $Id: XMStillImageVideoInputModule.m,v 1.1 2006/06/20 13:31:28 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.m,v 1.2 2006/06/28 06:55:45 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,8 @@ void XMScreenPixelBufferReleaseCallback(void *releaseRefCon,
 {
 	self = [super init];
 	
-	stillNames = [[NSArray alloc] initWithObjects:@"Still Image", nil];
+	NSString *deviceName = NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_DEVICE_NAME", @"");
+	stillNames = [[NSArray alloc] initWithObjects:deviceName, nil];
 	inputManager = nil;
 	
 	preserveImagePath = NO;
