@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.10 2006/06/28 07:14:09 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,7 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	
 	SetInitialBandwidth(UINT_MAX);
 	
-	SetUserAgent("XMeeting/0.2");
+	SetUserAgent("XMeeting/0.3");
 }
 
 XMSIPEndPoint::~XMSIPEndPoint()

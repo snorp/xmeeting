@@ -1,5 +1,5 @@
 /*
- * $Id: XMProcess.cpp,v 1.5 2006/05/17 23:54:05 hfriederich Exp $
+ * $Id: XMProcess.cpp,v 1.6 2006/06/28 07:14:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,7 @@
 #include "XMProcess.h"
 
 XMProcess::XMProcess() 
-: PProcess("XMeeting", "XMeeting.app", 0, 2, BetaCode, 1) 
+: PProcess("XMeeting", "XMeeting.app", 0, 3, BetaCode, 1) 
 {
 }
 
