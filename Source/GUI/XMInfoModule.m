@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.16 2006/06/07 21:45:52 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.17 2006/06/28 07:28:50 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -383,7 +383,8 @@
 	[natTypeField setStringValue:natTypeString];
 	
 	if(natType == XMNATType_Error ||
-	   natType == XMNATType_SymmetricNAT)
+	   natType == XMNATType_SymmetricNAT ||
+	   natType == XMNATType_BlockedNAT)
 	{
 		[natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
 	}

@@ -219,7 +219,7 @@
 "XM_SETUP_ASSISTANT_COMPLETED" = "terminé";
 "XM_SETUP_ASSISTANT_NO_NAT" = "It appears that you are not behind a NAT. You may choose to not use STUN or IP address translation in the next view.";
 "XM_SETUP_ASSISTANT_DEFAULT_NAT" = "It appears that you are behind a NAT. It is recommended to enable STUN in the next view or calls may not work.";
-"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "It appears that you are behind a NAT of type \"Symmetric NAT\". The STUN protocol cannot help in this case. You need to use port forwarding in your NAT device or calls may not work.";
+"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "It appears that you are behind a NAT of type \"%@\". The STUN protocol cannot help in this case. You need to use port forwarding in your NAT device or calls may not work.";
 "XM_SETUP_ASSISTANT_NAT_ERROR" = "XMeeting could not determine whether you are behind a NAT or not. Your computer is probably not connected to the Internet right now.";
 
 /* External Address */

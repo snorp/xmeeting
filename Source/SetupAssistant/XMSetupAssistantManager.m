@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.12 2006/06/21 11:32:14 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.13 2006/06/28 07:28:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -2472,7 +2472,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_NO_NAT", @"");
 			break;
 		case XMNATType_SymmetricNAT:
-			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_SYMMETRIC_NAT", @"");
+		case XMNATType_BlockedNAT:
+			explanationString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_SYMMETRIC_NAT", @""), XMNATTypeString(detectedNATType)];
 			break;
 		default:
 			explanationString = NSLocalizedString(@"XM_SETUP_ASSISTANT_DEFAULT_NAT", @"");

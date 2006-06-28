@@ -222,7 +222,7 @@
 "XM_SETUP_ASSISTANT_COMPLETED" = "Komplett";
 "XM_SETUP_ASSISTANT_NO_NAT" = "Es scheint so, dass sich ihr Computer nicht hinter einer NAT befindet. Sie können STUN und IP-Adressübersetzung im nächsten Abschnitt deaktivieren.";
 "XM_SETUP_ASSISTANT_DEFAULT_NAT" = "Es scheint so, dass sich ihr Computer hinter einer NAT befindet. Es wird empfohlen, im nächsten Abschnitt STUN zu aktivieren, oder Anrufe könnten fehlschlagen";
-"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "Es scheint so, dass sich ihr Computer hinter einer NAT vom Typ \"Symmetric NAT\" befindet. Das STUN-Protokoll kann in diesem Fall nicht helfen. Sie müssen Port Forwarding in ihrem NAT-Gerät aktivieren oder die Anrufe werden fehlschlagen.";
+"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "Es scheint so, dass sich ihr Computer hinter einer NAT vom Typ \"%@\" befindet. Das STUN-Protokoll kann in diesem Fall nicht helfen. Sie müssen Port Forwarding in ihrem NAT-Gerät aktivieren oder die Anrufe werden fehlschlagen.";
 "XM_SETUP_ASSISTANT_NAT_ERROR" = "XMeeting konnte nicht bestimmen, ob sich ihr Computer hinter einer NAT befindet oder nicht. Ihr computer ist möglicherweise zur Zeit nicht mit dem Internet verbunden.";
 
 /* External Address */
