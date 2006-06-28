@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.39 2006/06/07 08:29:48 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.40 2006/06/28 19:13:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -320,7 +320,8 @@
 		[[XMCallManager sharedInstance] clearActiveCall];
 		[callButton setEnabled:NO];
 		[statusField setStringValue:NSLocalizedString(@"Hangup...", @"")];
-		
+		[semaphoreButton setImage:[NSImage imageNamed:@"semaphore_yellow"]];
+			
 		return;
 	}
 	
