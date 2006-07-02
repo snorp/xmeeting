@@ -196,6 +196,9 @@
 "XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
+"XM_AUDIO_PREFERENCES_NAME" = "Audio";
+"XM_AUDIO_PREFERENCES_TOOLTIP" = "Audio";
+"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE" = "<périphérique par defaut>";
 "XM_VIDEO_PREFERENCES_NAME" = "Entree Video";
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferences de l'Entree Video";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Utiliser le premier disponible>";

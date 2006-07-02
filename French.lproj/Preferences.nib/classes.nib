@@ -75,6 +75,20 @@
         }, 
         {
             ACTIONS = {
+                preferredInputDeviceSelectionDidChange = id; 
+                preferredOutputDeviceSelectionDidChange = id; 
+            }; 
+            CLASS = XMAudioPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                preferredInputDevicePopUp = NSPopUpButton; 
+                preferredOutputDevicePopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
                 chooseDebugFilePath = id; 
                 defaultAction = id; 
                 toggleGenerateDebugLogFile = id; 

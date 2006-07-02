@@ -196,6 +196,9 @@
 "XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Nome posizione già esistente";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "Nessun Protocollo attivato";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Né il protocollo H.323 né il protocollo SIP sono attivati nella posizione \"%@\". Non potrai effettuare chiamate quando questa posizione verrà attivata.";
+"XM_AUDIO_PREFERENCES_NAME" = "Audio";
+"XM_AUDIO_PREFERENCES_TOOLTIP" = "Preferenze Audio";
+"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE" = "<Usa Default>";
 "XM_VIDEO_PREFERENCES_NAME" = "Ingresso Video";
 "XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferenze Ingresso Video";
 "XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Usa il primo disponibile>";
