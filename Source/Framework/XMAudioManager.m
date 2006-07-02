@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.9 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.10 2006/07/02 14:48:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -336,7 +336,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		return YES;
 	}
 	
-	setMuteAudioInputDevice(muteFlag);
+	_XMSetMuteAudioInputDevice(muteFlag);
 	selectedInputDeviceIsMuted = muteFlag;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerInputVolumeDidChange object:self];
@@ -372,7 +372,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		return YES;
 	}
 	
-	setMuteAudioOutputDevice(muteFlag);
+	_XMSetMuteAudioOutputDevice(muteFlag);
 	selectedOutputDeviceIsMuted = muteFlag;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputVolumeDidChange object:self];
