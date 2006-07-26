@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.26 2006/06/26 14:33:31 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.27 2006/07/26 20:03:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -661,8 +661,8 @@
 	}
 	else if(callManagerStatus == XM_CALL_MANAGER_SUBSYSTEM_SETUP)
 	{
-		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
 		callManagerStatus = XM_CALL_MANAGER_READY;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
 	}
 }
 

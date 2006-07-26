@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.19 2006/06/21 22:16:48 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.20 2006/07/26 20:03:53 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,7 @@
 	
 	BOOL isFullScreen;
 	
-	XMIncomingCallAlert *incomingCallAlert;
+	NSObject *activeAlert;
 	NSSound *incomingCallSound;
 	XMIncomingCallAlertType alertType;
 	
