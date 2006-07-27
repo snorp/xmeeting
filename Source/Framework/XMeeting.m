@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.10 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.11 2006/07/27 21:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -115,6 +115,8 @@ void _XMThreadExit() {
 		_XMMediaTransmitterSharedInstance = nil;
 		
 		_XMInitializedStatus = XM_FRAMEWORK_NOT_INITIALIZED;
+		
+		usleep(200000);
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_FrameworkDidClose object:nil];
 	}

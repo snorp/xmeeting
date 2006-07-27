@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.14 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.15 2006/07/27 21:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -219,6 +219,7 @@ class XM_H323_H263_Capability : public XMH323VideoCapability
 	PCLASSINFO(XM_H323_H263_Capability, XMH323VideoCapability);
 	
 public:
+	XM_H323_H263_Capability();
 	XM_H323_H263_Capability(BOOL isH263PlusCapability);
 	virtual PObject * Clone() const;
 	virtual Comparison Compare(const PObject & obj) const;
@@ -255,6 +256,15 @@ private :
 	unsigned slowCif16MPI;
 	
 	BOOL isH263PlusCapability;
+};
+
+class XM_H323_H263PLUS_Capability : public XM_H323_H263_Capability
+{
+	PCLASSINFO(XM_H323_H263PLUS_Capability, XM_H323_H263_Capability);
+	
+public:
+	
+	XM_H323_H263PLUS_Capability();
 };
 
 class XM_H323_H264_Capability : public XMH323VideoCapability
@@ -324,18 +334,11 @@ void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 #pragma mark -
 #pragma mark Macros
 
-#define XM_REGISTER_H323_CAPABILITIES \
-	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H264, _XMMediaFormat_H264, H323_NO_EP_VAR) \
-		{ return new XM_H323_H264_Capability(); } \
-	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H263PLUS, _XMMediaFormat_H263Plus, H323_NO_EP_VAR) \
-		{ return new XM_H323_H263_Capability(TRUE); } \
-	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H263, _XMMediaFormat_H263, H323_NO_EP_VAR) \
-		{ return new XM_H323_H263_Capability(FALSE); } \
-	H323_REGISTER_CAPABILITY_FUNCTION(XM_H323_H261, _XMMediaFormat_H261, H323_NO_EP_VAR) \
-		{ return new XM_H323_H261_Capability(); } \
-
 #define XM_REGISTER_FORMATS() \
-	XM_REGISTER_H323_CAPABILITIES \
+	static H323CapabilityFactory::Worker<XM_H323_H261_Capability> h261Factory(XM_MEDIA_FORMAT_H261, true); \
+    static H323CapabilityFactory::Worker<XM_H323_H263_Capability> h263Factory(XM_MEDIA_FORMAT_H263, true); \
+    static H323CapabilityFactory::Worker<XM_H323_H263PLUS_Capability> h263PlusFactory(XM_MEDIA_FORMAT_H263PLUS, true); \
+    static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
 	OPAL_REGISTER_TRANSCODER(XM_H261_VIDEO, XM_MEDIA_FORMAT_H261, XM_MEDIA_FORMAT_VIDEO); \
 	OPAL_REGISTER_TRANSCODER(XM_H263_VIDEO, XM_MEDIA_FORMAT_H263, XM_MEDIA_FORMAT_VIDEO); \
 	OPAL_REGISTER_TRANSCODER(XM_H263PLUS_VIDEO, XM_MEDIA_FORMAT_H263PLUS, XM_MEDIA_FORMAT_VIDEO); \

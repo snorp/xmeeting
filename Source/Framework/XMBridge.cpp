@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.28 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.29 2006/07/27 21:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -156,22 +156,6 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	PStringArray disabledCodecsArray = PStringArray(disabledCodecCount, disabledCodecs, TRUE);
 	
 	// these codecs are currently disabled by default
-	disabledCodecsArray.AppendString("G.726-16k");
-	disabledCodecsArray.AppendString("G.726-24k");
-	disabledCodecsArray.AppendString("G.726-32k");
-	disabledCodecsArray.AppendString("G.726-40k");
-	disabledCodecsArray.AppendString("SpeexNarrow-18.2k");
-	disabledCodecsArray.AppendString("SpeexNarrow-5.95k");
-	disabledCodecsArray.AppendString("SpeexNarrow-8k");
-	disabledCodecsArray.AppendString("SpeexNarrow-11k");
-	disabledCodecsArray.AppendString("SpeexNarrow-15k");
-	disabledCodecsArray.AppendString("SpeexWide-20.6k");
-	disabledCodecsArray.AppendString("GSM-06.10");
-	disabledCodecsArray.AppendString("iLBC-13k3");
-	disabledCodecsArray.AppendString("iLBC-15k2");
-	disabledCodecsArray.AppendString("LPC-10");
-	disabledCodecsArray.AppendString("MS-GSM");
-	disabledCodecsArray.AppendString("MS-IMA-ADPCM");
 	disabledCodecsArray.AppendString("DUMMY");
 	
 	theManager->SetMediaFormatMask(disabledCodecsArray);

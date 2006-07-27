@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.19 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.20 2006/07/27 21:13:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -553,6 +553,11 @@ PObject::Comparison XM_H323_H261_Capability::CompareTo(const XMH323VideoCapabili
 #pragma mark -
 #pragma mark XM_H323_H263_Capability methods
 
+XM_H323_H263_Capability::XM_H323_H263_Capability()
+{
+	XM_H323_H263_Capability(FALSE);
+}
+
 XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
 {
 	sqcifMPI = 1;
@@ -1084,6 +1089,14 @@ PObject::Comparison XM_H323_H263_Capability::CompareTo(const XMH323VideoCapabili
 BOOL XM_H323_H263_Capability::IsH263PlusCapability() const
 {
 	return isH263PlusCapability;
+}
+
+#pragma mark -
+#pragma mark XM_H323_H263PLUS_Capability Methods
+
+XM_H323_H263PLUS_Capability::XM_H323_H263PLUS_Capability()
+: XM_H323_H263_Capability(TRUE)
+{
 }
 
 #pragma mark -
