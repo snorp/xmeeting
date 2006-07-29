@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.10 2006/06/28 07:14:09 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.11 2006/07/29 08:54:36 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,7 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	
 	SetInitialBandwidth(UINT_MAX);
 	
-	SetUserAgent("XMeeting/0.3");
+	SetUserAgent("XMeeting/0.3.1");
 }
 
 XMSIPEndPoint::~XMSIPEndPoint()
@@ -70,8 +70,6 @@ BOOL XMSIPEndPoint::IsListening()
 void XMSIPEndPoint::PrepareRegistrarSetup()
 {
 	PWaitAndSignal m(registrarListMutex);
-	
-	//SetProxy("sip.ethz.ch", "hannesf", "quartz83");
 	
 	unsigned i;
 	unsigned count = activeRegistrars.GetSize();
