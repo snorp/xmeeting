@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.8 2006/06/27 22:07:39 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.9 2006/07/30 19:44:12 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -473,7 +473,7 @@ void XMSIPConnection::AdjustMediaFormats(OpalMediaFormatList & mediaFormats) con
 	{
 		mediaFormats.RemoveAt(index);
 	}
-	index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H261);
+	index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H264);
 	if(index != P_MAX_INDEX)
 	{
 		mediaFormats.RemoveAt(index);
