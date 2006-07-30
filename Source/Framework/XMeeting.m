@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.11 2006/07/27 21:13:21 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.12 2006/07/30 19:45:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,12 @@ XMMediaReceiver *_XMMediaReceiverSharedInstance = nil;
 
 void XMInitFramework(NSString *pTracePath)
 {
+	// Set the PWLIBPLUGINDIR environment variable to the plugins directory of XMeeting, or PWLib
+	// will search the entire filesystem for pugins before starting up...
+	NSBundle *bundle = [NSBundle bundleForClass:[XMCallManager class]];
+	NSString *pluginsPath = [[bundle resourcePath] stringByAppendingPathComponent:@"Plugins"];
+	setenv("PWLIBPLUGINDIR", [pluginsPath cStringUsingEncoding:NSASCIIStringEncoding], 1);
+	
 	if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZED)
 	{
 		// The Framework is already initialized
