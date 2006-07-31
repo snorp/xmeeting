@@ -20,7 +20,7 @@
 <br>
 <a href="#cre">Credits</a>
 <br>
-<a href="#rnt">Release Notes for Release 0.3</a>
+<a href="#rnt">Release Notes for Release 0.3.1</a>
 <br>
 <a href="#rno">Older Release Notes</a>
 <br>
@@ -55,7 +55,7 @@ Some functions will be disabled on machines with older and less powerful graphic
 
 <p>
 <a name="feat"><h3>Features</h3></a>
-This release of XMeeting (0.3) ships with the following key features:
+This release of XMeeting (0.3.1) ships with the following key features:
 </p>
 
 <p><b>Communication Protocols:</b>
@@ -129,7 +129,7 @@ still appear in English. We will fix this in future releases.
 <hr>
 
 <a name="cre"><h3>Credits</h3></a>
-XMeeting release 0.3 by NET's XMeeting project team. The team consists of Hannes Friederich
+XMeeting release 0.3.1 by NET's XMeeting project team. The team consists of Hannes Friederich
 (software engineering), Thomas Rechsteiner (testing, gatekeeper & conferencing setup) and is 
 led by Dr Thomas Piendl. The NET XMeeting contribution
 is completely funded by NET <a href="http://www.net.ethz.ch/">http://www.net.ethz.ch/</a>, a
@@ -160,7 +160,23 @@ at Queen's University, Ontario, Canada.
 <hr>
 
 <p>
-<a name="rnt"><h3>Release Notes for Version 0.3</h3></a>
+<a name="rnt"><h3>Release Notes for Version 0.3.1</h3></a>
+Fixed bugs:
+<ul>
+<li>Fixes problems with registration on certain SIP registration servers</li>
+<li>Fixes problems when making an audio-only SIP call whith video enabled</li>
+<li>Several minor bug fixes</li>
+</ul>
+In addition, the underlying PWLib/OPAL libraries have undergone several architectural
+changes between XMeeting 0.3 and XMeeting 0.3.1.
+</p>
+
+<hr>
+
+<p>
+<a name="rno"><h3>Older Release Notes</h3></a>
+</p>
+<p><b>v0.3:</b><br>
 New features:
 <ul>
 <li>Support for STUN (Simple Traversal of UDP through NAT), improving NAT traversal.</li>
@@ -182,11 +198,6 @@ Fixed bugs:
 <li>Removes duplicated log statements.</li>
 </ul>
 </p>
-
-<hr>
-
-<p>
-<a name="rno"><h3>Older Release Notes</h3></a>
 <b>v0.2:</b><br>
 XMeeting 0.2 uses a slightly different preferences system than XMeeting 0.1.
 New is the use of Accounts for H.323 and SIP. This means that the H.323 gatekeeper settings
