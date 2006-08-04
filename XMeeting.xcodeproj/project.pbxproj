@@ -146,35 +146,13 @@
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
 		D10FD6570A7D49C700935B10 /* speex_preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6560A7D49C700935B10 /* speex_preprocess.c */; };
-		D10FD6680A7D4A6900935B10 /* exc_5_64_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6610A7D4A6900935B10 /* exc_5_64_table.c */; };
-		D10FD6690A7D4A6900935B10 /* exc_5_256_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6620A7D4A6900935B10 /* exc_5_256_table.c */; };
-		D10FD66A0A7D4A6900935B10 /* exc_8_128_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6630A7D4A6900935B10 /* exc_8_128_table.c */; };
-		D10FD66B0A7D4A6900935B10 /* exc_10_16_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6640A7D4A6900935B10 /* exc_10_16_table.c */; };
-		D10FD66C0A7D4A6900935B10 /* exc_10_32_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6650A7D4A6900935B10 /* exc_10_32_table.c */; };
-		D10FD66D0A7D4A6900935B10 /* exc_20_32_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6660A7D4A6900935B10 /* exc_20_32_table.c */; };
 		D10FD66E0A7D4A6900935B10 /* fftwrap.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6670A7D4A6900935B10 /* fftwrap.c */; };
-		D10FD6710A7D4AA600935B10 /* bits.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6700A7D4AA600935B10 /* bits.c */; };
-		D10FD67B0A7D4AC700935B10 /* gain_table_lbr.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6740A7D4AC600935B10 /* gain_table_lbr.c */; };
-		D10FD67C0A7D4AC700935B10 /* gain_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6750A7D4AC600935B10 /* gain_table.c */; };
-		D10FD67D0A7D4AC700935B10 /* hexc_10_32_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6760A7D4AC600935B10 /* hexc_10_32_table.c */; };
-		D10FD67E0A7D4AC700935B10 /* hexc_table.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6770A7D4AC700935B10 /* hexc_table.c */; };
-		D10FD67F0A7D4AC700935B10 /* high_lsp_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6780A7D4AC700935B10 /* high_lsp_tables.c */; };
-		D10FD6800A7D4AC700935B10 /* jitter.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6790A7D4AC700935B10 /* jitter.c */; };
 		D10FD6810A7D4AC700935B10 /* kiss_fft.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD67A0A7D4AC700935B10 /* kiss_fft.c */; };
-		D10FD6840A7D4AF900935B10 /* filters.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6830A7D4AF900935B10 /* filters.c */; };
-		D10FD6860A7D4B1800935B10 /* speex_callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6850A7D4B1800935B10 /* speex_callbacks.c */; };
 		D10FD6970A7D4B7300935B10 /* kiss_fftr.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6880A7D4B7300935B10 /* kiss_fftr.c */; };
-		D10FD6980A7D4B7300935B10 /* lbr_48k_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6890A7D4B7300935B10 /* lbr_48k_tables.c */; };
-		D10FD6990A7D4B7300935B10 /* lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD68A0A7D4B7300935B10 /* lpc.c */; };
-		D10FD69A0A7D4B7300935B10 /* lsp_tables_nb.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD68B0A7D4B7300935B10 /* lsp_tables_nb.c */; };
-		D10FD69B0A7D4B7300935B10 /* lsp.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD68C0A7D4B7300935B10 /* lsp.c */; };
 		D10FD69C0A7D4B7300935B10 /* math_approx.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD68D0A7D4B7300935B10 /* math_approx.c */; };
 		D10FD69D0A7D4B7300935B10 /* mdf.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD68E0A7D4B7300935B10 /* mdf.c */; };
-		D10FD69E0A7D4B7300935B10 /* medfilter.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD68F0A7D4B7300935B10 /* medfilter.c */; };
 		D10FD69F0A7D4B7300935B10 /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6900A7D4B7300935B10 /* misc.c */; };
-		D10FD6A30A7D4B7300935B10 /* quant_lsp.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6940A7D4B7300935B10 /* quant_lsp.c */; };
 		D10FD6A50A7D4B7300935B10 /* smallft.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6960A7D4B7300935B10 /* smallft.c */; };
-		D10FD6AB0A7D4C4A00935B10 /* speex.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6AA0A7D4C4A00935B10 /* speex.c */; };
 		D11C5E520A49EC730030633D /* XMIncomingCallAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */; };
 		D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */; };
 		D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = D11C5E630A49ED950030633D /* IncomingCallAlert.nib */; };
@@ -644,27 +622,6 @@
 		D1CEE40D08F90263007E4ABE /* opalwavfile.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE2BF08F90262007E4ABE /* opalwavfile.cxx */; };
 		D1CEE40E08F90263007E4ABE /* rfc2833.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE2C008F90262007E4ABE /* rfc2833.cxx */; };
 		D1CEE40F08F90263007E4ABE /* silencedetect.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE2C108F90262007E4ABE /* silencedetect.cxx */; };
-		D1CEE44608F90263007E4ABE /* bsd-endian.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30108F90262007E4ABE /* bsd-endian.h */; };
-		D1CEE44708F90263007E4ABE /* bv.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE30208F90262007E4ABE /* bv.c */; };
-		D1CEE44808F90263007E4ABE /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30308F90262007E4ABE /* config.h */; };
-		D1CEE44908F90263007E4ABE /* crdef.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30408F90262007E4ABE /* crdef.h */; };
-		D1CEE44A08F90263007E4ABE /* dct.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE30508F90262007E4ABE /* dct.cxx */; };
-		D1CEE44B08F90263007E4ABE /* dct.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30608F90262007E4ABE /* dct.h */; };
-		D1CEE44C08F90263007E4ABE /* encoder-h261.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE30708F90262007E4ABE /* encoder-h261.cxx */; };
-		D1CEE44D08F90263007E4ABE /* encoder-h261.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30808F90262007E4ABE /* encoder-h261.h */; };
-		D1CEE44E08F90263007E4ABE /* encoder.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30908F90262007E4ABE /* encoder.h */; };
-		D1CEE44F08F90263007E4ABE /* grabber.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30A08F90262007E4ABE /* grabber.h */; };
-		D1CEE45008F90263007E4ABE /* huffcode.c in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE30B08F90262007E4ABE /* huffcode.c */; };
-		D1CEE45108F90263007E4ABE /* p64-huff.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30C08F90262007E4ABE /* p64-huff.h */; };
-		D1CEE45208F90263007E4ABE /* p64.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE30D08F90262007E4ABE /* p64.cxx */; };
-		D1CEE45308F90263007E4ABE /* p64.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE30E08F90262007E4ABE /* p64.h */; };
-		D1CEE45408F90263007E4ABE /* p64encoder.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE30F08F90262007E4ABE /* p64encoder.cxx */; };
-		D1CEE45508F90263007E4ABE /* p64encoder.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE31008F90262007E4ABE /* p64encoder.h */; };
-		D1CEE45608F90263007E4ABE /* transmitter.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31108F90262007E4ABE /* transmitter.cxx */; };
-		D1CEE45708F90263007E4ABE /* transmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE31208F90262007E4ABE /* transmitter.h */; };
-		D1CEE45808F90263007E4ABE /* vid_coder.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31308F90262007E4ABE /* vid_coder.cxx */; };
-		D1CEE45908F90263007E4ABE /* vid_coder.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE31408F90262007E4ABE /* vid_coder.h */; };
-		D1CEE45A08F90263007E4ABE /* videoframe.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE31508F90262007E4ABE /* videoframe.h */; };
 		D1CEE45B08F90263007E4ABE /* vidcodec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31608F90262007E4ABE /* vidcodec.cxx */; };
 		D1CEE45C08F90263007E4ABE /* channels.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31C08F90262007E4ABE /* channels.cxx */; };
 		D1CEE45F08F90263007E4ABE /* gkserver.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32008F90262007E4ABE /* gkserver.cxx */; };
@@ -979,35 +936,13 @@
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
 		D10FD6560A7D49C700935B10 /* speex_preprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = speex_preprocess.c; path = speex/libspeex/speex_preprocess.c; sourceTree = "<group>"; };
-		D10FD6610A7D4A6900935B10 /* exc_5_64_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = exc_5_64_table.c; path = speex/libspeex/exc_5_64_table.c; sourceTree = "<group>"; };
-		D10FD6620A7D4A6900935B10 /* exc_5_256_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = exc_5_256_table.c; path = speex/libspeex/exc_5_256_table.c; sourceTree = "<group>"; };
-		D10FD6630A7D4A6900935B10 /* exc_8_128_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = exc_8_128_table.c; path = speex/libspeex/exc_8_128_table.c; sourceTree = "<group>"; };
-		D10FD6640A7D4A6900935B10 /* exc_10_16_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = exc_10_16_table.c; path = speex/libspeex/exc_10_16_table.c; sourceTree = "<group>"; };
-		D10FD6650A7D4A6900935B10 /* exc_10_32_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = exc_10_32_table.c; path = speex/libspeex/exc_10_32_table.c; sourceTree = "<group>"; };
-		D10FD6660A7D4A6900935B10 /* exc_20_32_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = exc_20_32_table.c; path = speex/libspeex/exc_20_32_table.c; sourceTree = "<group>"; };
 		D10FD6670A7D4A6900935B10 /* fftwrap.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = fftwrap.c; path = speex/libspeex/fftwrap.c; sourceTree = "<group>"; };
-		D10FD6700A7D4AA600935B10 /* bits.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bits.c; path = speex/libspeex/bits.c; sourceTree = "<group>"; };
-		D10FD6740A7D4AC600935B10 /* gain_table_lbr.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gain_table_lbr.c; path = speex/libspeex/gain_table_lbr.c; sourceTree = "<group>"; };
-		D10FD6750A7D4AC600935B10 /* gain_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gain_table.c; path = speex/libspeex/gain_table.c; sourceTree = "<group>"; };
-		D10FD6760A7D4AC600935B10 /* hexc_10_32_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hexc_10_32_table.c; path = speex/libspeex/hexc_10_32_table.c; sourceTree = "<group>"; };
-		D10FD6770A7D4AC700935B10 /* hexc_table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hexc_table.c; path = speex/libspeex/hexc_table.c; sourceTree = "<group>"; };
-		D10FD6780A7D4AC700935B10 /* high_lsp_tables.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = high_lsp_tables.c; path = speex/libspeex/high_lsp_tables.c; sourceTree = "<group>"; };
-		D10FD6790A7D4AC700935B10 /* jitter.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jitter.c; path = speex/libspeex/jitter.c; sourceTree = "<group>"; };
 		D10FD67A0A7D4AC700935B10 /* kiss_fft.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = kiss_fft.c; path = speex/libspeex/kiss_fft.c; sourceTree = "<group>"; };
-		D10FD6830A7D4AF900935B10 /* filters.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = filters.c; path = speex/libspeex/filters.c; sourceTree = "<group>"; };
-		D10FD6850A7D4B1800935B10 /* speex_callbacks.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = speex_callbacks.c; path = speex/libspeex/speex_callbacks.c; sourceTree = "<group>"; };
 		D10FD6880A7D4B7300935B10 /* kiss_fftr.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = kiss_fftr.c; path = speex/libspeex/kiss_fftr.c; sourceTree = "<group>"; };
-		D10FD6890A7D4B7300935B10 /* lbr_48k_tables.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = lbr_48k_tables.c; path = speex/libspeex/lbr_48k_tables.c; sourceTree = "<group>"; };
-		D10FD68A0A7D4B7300935B10 /* lpc.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = lpc.c; path = speex/libspeex/lpc.c; sourceTree = "<group>"; };
-		D10FD68B0A7D4B7300935B10 /* lsp_tables_nb.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = lsp_tables_nb.c; path = speex/libspeex/lsp_tables_nb.c; sourceTree = "<group>"; };
-		D10FD68C0A7D4B7300935B10 /* lsp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = lsp.c; path = speex/libspeex/lsp.c; sourceTree = "<group>"; };
 		D10FD68D0A7D4B7300935B10 /* math_approx.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = math_approx.c; path = speex/libspeex/math_approx.c; sourceTree = "<group>"; };
 		D10FD68E0A7D4B7300935B10 /* mdf.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = mdf.c; path = speex/libspeex/mdf.c; sourceTree = "<group>"; };
-		D10FD68F0A7D4B7300935B10 /* medfilter.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = medfilter.c; path = speex/libspeex/medfilter.c; sourceTree = "<group>"; };
 		D10FD6900A7D4B7300935B10 /* misc.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = misc.c; path = speex/libspeex/misc.c; sourceTree = "<group>"; };
-		D10FD6940A7D4B7300935B10 /* quant_lsp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = quant_lsp.c; path = speex/libspeex/quant_lsp.c; sourceTree = "<group>"; };
 		D10FD6960A7D4B7300935B10 /* smallft.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = smallft.c; path = speex/libspeex/smallft.c; sourceTree = "<group>"; };
-		D10FD6AA0A7D4C4A00935B10 /* speex.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = speex.c; path = speex/libspeex/speex.c; sourceTree = "<group>"; };
 		D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMIncomingCallAlert.h; sourceTree = "<group>"; };
 		D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMIncomingCallAlert.m; sourceTree = "<group>"; };
 		D11C5E640A49ED950030633D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
@@ -1530,27 +1465,6 @@
 		D1CEE2BF08F90262007E4ABE /* opalwavfile.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = opalwavfile.cxx; sourceTree = "<group>"; };
 		D1CEE2C008F90262007E4ABE /* rfc2833.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = rfc2833.cxx; sourceTree = "<group>"; };
 		D1CEE2C108F90262007E4ABE /* silencedetect.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = silencedetect.cxx; sourceTree = "<group>"; };
-		D1CEE30108F90262007E4ABE /* bsd-endian.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "bsd-endian.h"; sourceTree = "<group>"; };
-		D1CEE30208F90262007E4ABE /* bv.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = bv.c; sourceTree = "<group>"; };
-		D1CEE30308F90262007E4ABE /* config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		D1CEE30408F90262007E4ABE /* crdef.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = crdef.h; sourceTree = "<group>"; };
-		D1CEE30508F90262007E4ABE /* dct.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = dct.cxx; sourceTree = "<group>"; };
-		D1CEE30608F90262007E4ABE /* dct.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = dct.h; sourceTree = "<group>"; };
-		D1CEE30708F90262007E4ABE /* encoder-h261.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = "encoder-h261.cxx"; sourceTree = "<group>"; };
-		D1CEE30808F90262007E4ABE /* encoder-h261.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "encoder-h261.h"; sourceTree = "<group>"; };
-		D1CEE30908F90262007E4ABE /* encoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = encoder.h; sourceTree = "<group>"; };
-		D1CEE30A08F90262007E4ABE /* grabber.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = grabber.h; sourceTree = "<group>"; };
-		D1CEE30B08F90262007E4ABE /* huffcode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = huffcode.c; sourceTree = "<group>"; };
-		D1CEE30C08F90262007E4ABE /* p64-huff.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "p64-huff.h"; sourceTree = "<group>"; };
-		D1CEE30D08F90262007E4ABE /* p64.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = p64.cxx; sourceTree = "<group>"; };
-		D1CEE30E08F90262007E4ABE /* p64.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = p64.h; sourceTree = "<group>"; };
-		D1CEE30F08F90262007E4ABE /* p64encoder.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = p64encoder.cxx; sourceTree = "<group>"; };
-		D1CEE31008F90262007E4ABE /* p64encoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = p64encoder.h; sourceTree = "<group>"; };
-		D1CEE31108F90262007E4ABE /* transmitter.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = transmitter.cxx; sourceTree = "<group>"; };
-		D1CEE31208F90262007E4ABE /* transmitter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = transmitter.h; sourceTree = "<group>"; };
-		D1CEE31308F90262007E4ABE /* vid_coder.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = vid_coder.cxx; sourceTree = "<group>"; };
-		D1CEE31408F90262007E4ABE /* vid_coder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = vid_coder.h; sourceTree = "<group>"; };
-		D1CEE31508F90262007E4ABE /* videoframe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = videoframe.h; sourceTree = "<group>"; };
 		D1CEE31608F90262007E4ABE /* vidcodec.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = vidcodec.cxx; sourceTree = "<group>"; };
 		D1CEE31C08F90262007E4ABE /* channels.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = channels.cxx; sourceTree = "<group>"; };
 		D1CEE31D08F90262007E4ABE /* gkclient.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gkclient.cxx; sourceTree = "<group>"; };
@@ -2009,35 +1923,13 @@
 		D10FD65B0A7D49E700935B10 /* speex */ = {
 			isa = PBXGroup;
 			children = (
-				D10FD6700A7D4AA600935B10 /* bits.c */,
-				D10FD6640A7D4A6900935B10 /* exc_10_16_table.c */,
-				D10FD6650A7D4A6900935B10 /* exc_10_32_table.c */,
-				D10FD6660A7D4A6900935B10 /* exc_20_32_table.c */,
-				D10FD6620A7D4A6900935B10 /* exc_5_256_table.c */,
-				D10FD6610A7D4A6900935B10 /* exc_5_64_table.c */,
-				D10FD6630A7D4A6900935B10 /* exc_8_128_table.c */,
 				D10FD6670A7D4A6900935B10 /* fftwrap.c */,
-				D10FD6830A7D4AF900935B10 /* filters.c */,
-				D10FD6750A7D4AC600935B10 /* gain_table.c */,
-				D10FD6740A7D4AC600935B10 /* gain_table_lbr.c */,
-				D10FD6760A7D4AC600935B10 /* hexc_10_32_table.c */,
-				D10FD6770A7D4AC700935B10 /* hexc_table.c */,
-				D10FD6780A7D4AC700935B10 /* high_lsp_tables.c */,
-				D10FD6790A7D4AC700935B10 /* jitter.c */,
 				D10FD67A0A7D4AC700935B10 /* kiss_fft.c */,
 				D10FD6880A7D4B7300935B10 /* kiss_fftr.c */,
-				D10FD6890A7D4B7300935B10 /* lbr_48k_tables.c */,
-				D10FD68A0A7D4B7300935B10 /* lpc.c */,
-				D10FD68C0A7D4B7300935B10 /* lsp.c */,
-				D10FD68B0A7D4B7300935B10 /* lsp_tables_nb.c */,
 				D10FD68D0A7D4B7300935B10 /* math_approx.c */,
 				D10FD68E0A7D4B7300935B10 /* mdf.c */,
-				D10FD68F0A7D4B7300935B10 /* medfilter.c */,
-				D10FD6AA0A7D4C4A00935B10 /* speex.c */,
 				D10FD6900A7D4B7300935B10 /* misc.c */,
-				D10FD6940A7D4B7300935B10 /* quant_lsp.c */,
 				D10FD6960A7D4B7300935B10 /* smallft.c */,
-				D10FD6850A7D4B1800935B10 /* speex_callbacks.c */,
 				D10FD6560A7D49C700935B10 /* speex_preprocess.c */,
 			);
 			name = speex;
@@ -2737,40 +2629,11 @@
 				D1CEE2BF08F90262007E4ABE /* opalwavfile.cxx */,
 				D1CEE2C008F90262007E4ABE /* rfc2833.cxx */,
 				D1CEE2C108F90262007E4ABE /* silencedetect.cxx */,
-				D1CEE30008F90262007E4ABE /* vic */,
 				D1CEE31608F90262007E4ABE /* vidcodec.cxx */,
 			);
 			name = codec;
 			path = ../opal/src/codec;
 			sourceTree = SOURCE_ROOT;
-		};
-		D1CEE30008F90262007E4ABE /* vic */ = {
-			isa = PBXGroup;
-			children = (
-				D1CEE30108F90262007E4ABE /* bsd-endian.h */,
-				D1CEE30208F90262007E4ABE /* bv.c */,
-				D1CEE30308F90262007E4ABE /* config.h */,
-				D1CEE30408F90262007E4ABE /* crdef.h */,
-				D1CEE30508F90262007E4ABE /* dct.cxx */,
-				D1CEE30608F90262007E4ABE /* dct.h */,
-				D1CEE30708F90262007E4ABE /* encoder-h261.cxx */,
-				D1CEE30808F90262007E4ABE /* encoder-h261.h */,
-				D1CEE30908F90262007E4ABE /* encoder.h */,
-				D1CEE30A08F90262007E4ABE /* grabber.h */,
-				D1CEE30B08F90262007E4ABE /* huffcode.c */,
-				D1CEE30C08F90262007E4ABE /* p64-huff.h */,
-				D1CEE30D08F90262007E4ABE /* p64.cxx */,
-				D1CEE30E08F90262007E4ABE /* p64.h */,
-				D1CEE30F08F90262007E4ABE /* p64encoder.cxx */,
-				D1CEE31008F90262007E4ABE /* p64encoder.h */,
-				D1CEE31108F90262007E4ABE /* transmitter.cxx */,
-				D1CEE31208F90262007E4ABE /* transmitter.h */,
-				D1CEE31308F90262007E4ABE /* vid_coder.cxx */,
-				D1CEE31408F90262007E4ABE /* vid_coder.h */,
-				D1CEE31508F90262007E4ABE /* videoframe.h */,
-			);
-			path = vic;
-			sourceTree = "<group>";
 		};
 		D1CEE31B08F90262007E4ABE /* h323 */ = {
 			isa = PBXGroup;
@@ -3370,19 +3233,6 @@
 				D1CEE1F408F9022B007E4ABE /* h323t120.h in Headers */,
 				D1CEE1F508F9022B007E4ABE /* t120proto.h in Headers */,
 				D1CEE1F608F9022B007E4ABE /* x224.h in Headers */,
-				D1CEE44608F90263007E4ABE /* bsd-endian.h in Headers */,
-				D1CEE44808F90263007E4ABE /* config.h in Headers */,
-				D1CEE44908F90263007E4ABE /* crdef.h in Headers */,
-				D1CEE44B08F90263007E4ABE /* dct.h in Headers */,
-				D1CEE44D08F90263007E4ABE /* encoder-h261.h in Headers */,
-				D1CEE44E08F90263007E4ABE /* encoder.h in Headers */,
-				D1CEE44F08F90263007E4ABE /* grabber.h in Headers */,
-				D1CEE45108F90263007E4ABE /* p64-huff.h in Headers */,
-				D1CEE45308F90263007E4ABE /* p64.h in Headers */,
-				D1CEE45508F90263007E4ABE /* p64encoder.h in Headers */,
-				D1CEE45708F90263007E4ABE /* transmitter.h in Headers */,
-				D1CEE45908F90263007E4ABE /* vid_coder.h in Headers */,
-				D1CEE45A08F90263007E4ABE /* videoframe.h in Headers */,
 				D1F49D1F097E55490010A324 /* echocancel.h in Headers */,
 				D1F0B78A09DC4867005D0464 /* h224.h in Headers */,
 				D1F0B78B09DC4867005D0464 /* h281.h in Headers */,
@@ -3849,14 +3699,6 @@
 				D1CEE40D08F90263007E4ABE /* opalwavfile.cxx in Sources */,
 				D1CEE40E08F90263007E4ABE /* rfc2833.cxx in Sources */,
 				D1CEE40F08F90263007E4ABE /* silencedetect.cxx in Sources */,
-				D1CEE44708F90263007E4ABE /* bv.c in Sources */,
-				D1CEE44A08F90263007E4ABE /* dct.cxx in Sources */,
-				D1CEE44C08F90263007E4ABE /* encoder-h261.cxx in Sources */,
-				D1CEE45008F90263007E4ABE /* huffcode.c in Sources */,
-				D1CEE45208F90263007E4ABE /* p64.cxx in Sources */,
-				D1CEE45408F90263007E4ABE /* p64encoder.cxx in Sources */,
-				D1CEE45608F90263007E4ABE /* transmitter.cxx in Sources */,
-				D1CEE45808F90263007E4ABE /* vid_coder.cxx in Sources */,
 				D1CEE45B08F90263007E4ABE /* vidcodec.cxx in Sources */,
 				D1CEE45C08F90263007E4ABE /* channels.cxx in Sources */,
 				D1CEE45F08F90263007E4ABE /* gkserver.cxx in Sources */,
@@ -3907,35 +3749,13 @@
 				D1B581800A76C24A005DF33D /* opalglobalstatics.cxx in Sources */,
 				D1B581830A76C299005DF33D /* opalpluginmgr.cxx in Sources */,
 				D10FD6570A7D49C700935B10 /* speex_preprocess.c in Sources */,
-				D10FD6680A7D4A6900935B10 /* exc_5_64_table.c in Sources */,
-				D10FD6690A7D4A6900935B10 /* exc_5_256_table.c in Sources */,
-				D10FD66A0A7D4A6900935B10 /* exc_8_128_table.c in Sources */,
-				D10FD66B0A7D4A6900935B10 /* exc_10_16_table.c in Sources */,
-				D10FD66C0A7D4A6900935B10 /* exc_10_32_table.c in Sources */,
-				D10FD66D0A7D4A6900935B10 /* exc_20_32_table.c in Sources */,
 				D10FD66E0A7D4A6900935B10 /* fftwrap.c in Sources */,
-				D10FD6710A7D4AA600935B10 /* bits.c in Sources */,
-				D10FD67B0A7D4AC700935B10 /* gain_table_lbr.c in Sources */,
-				D10FD67C0A7D4AC700935B10 /* gain_table.c in Sources */,
-				D10FD67D0A7D4AC700935B10 /* hexc_10_32_table.c in Sources */,
-				D10FD67E0A7D4AC700935B10 /* hexc_table.c in Sources */,
-				D10FD67F0A7D4AC700935B10 /* high_lsp_tables.c in Sources */,
-				D10FD6800A7D4AC700935B10 /* jitter.c in Sources */,
 				D10FD6810A7D4AC700935B10 /* kiss_fft.c in Sources */,
-				D10FD6840A7D4AF900935B10 /* filters.c in Sources */,
-				D10FD6860A7D4B1800935B10 /* speex_callbacks.c in Sources */,
 				D10FD6970A7D4B7300935B10 /* kiss_fftr.c in Sources */,
-				D10FD6980A7D4B7300935B10 /* lbr_48k_tables.c in Sources */,
-				D10FD6990A7D4B7300935B10 /* lpc.c in Sources */,
-				D10FD69A0A7D4B7300935B10 /* lsp_tables_nb.c in Sources */,
-				D10FD69B0A7D4B7300935B10 /* lsp.c in Sources */,
 				D10FD69C0A7D4B7300935B10 /* math_approx.c in Sources */,
 				D10FD69D0A7D4B7300935B10 /* mdf.c in Sources */,
-				D10FD69E0A7D4B7300935B10 /* medfilter.c in Sources */,
 				D10FD69F0A7D4B7300935B10 /* misc.c in Sources */,
-				D10FD6A30A7D4B7300935B10 /* quant_lsp.c in Sources */,
 				D10FD6A50A7D4B7300935B10 /* smallft.c in Sources */,
-				D10FD6AB0A7D4C4A00935B10 /* speex.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

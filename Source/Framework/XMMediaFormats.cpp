@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.20 2006/07/27 21:13:21 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.21 2006/08/04 20:46:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,7 +7,6 @@
  */
 
 #include <asn/h245.h>
-#include <codec/h261codec.h>
 
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
