@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.3 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.4 2006/08/04 21:33:10 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,6 +61,10 @@ public:
 					  const PString & authorizationUsername,
 					  const PString & password);
 	void FinishRegistrarSetup();
+	
+	void UseProxy(const PString & hostname,
+				  const PString & username,
+				  const PString & password);
 	
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	

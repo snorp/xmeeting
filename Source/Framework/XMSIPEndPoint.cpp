@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.11 2006/07/29 08:54:36 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.12 2006/08/04 21:33:10 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -201,6 +201,25 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 	{
 		_XMHandleRegistrarSetupCompleted();
 	}
+}
+
+void XMSIPEndPoint::UseProxy(const PString & hostname,
+							 const PString & username,
+							 const PString & password)
+{
+	PString adjustedUsername;
+	
+	PINDEX location = username.Find('@');
+	if(location != P_MAX_INDEX)
+	{
+		adjustedUsername = username.Left(location);
+	}
+	else
+	{
+		adjustedUsername = username;
+	}
+	
+	SetProxy(hostname, username, password);
 }
 
 void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)

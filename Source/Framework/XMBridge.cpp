@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.29 2006/07/27 21:13:21 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.30 2006/08/04 21:33:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -216,7 +216,7 @@ void _XMSetSIPProxy(const char *host,
 					const char *username,
 					const char *password)
 {
-	sipEndPoint->SetProxy(host, username, password);
+	sipEndPoint->UseProxy(host, username, password);
 }
 
 void _XMPrepareRegistrarSetup()
