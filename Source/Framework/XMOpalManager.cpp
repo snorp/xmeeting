@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.35 2006/08/05 19:49:19 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.36 2006/08/05 20:17:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -321,6 +321,7 @@ void XMOpalManager::SetUserName(const PString & username)
 {
 	OpalManager::SetDefaultUserName(username);
 	h323EndPoint->SetDefaultDisplayName(username);
+	sipEndPoint->SetDefaultDisplayName(username);
 }
 
 #pragma mark Network Setup Methods
