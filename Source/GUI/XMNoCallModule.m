@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.40 2006/06/28 19:13:18 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.41 2006/08/05 22:11:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,7 @@
 #import "XMLocalVideoView.h"
 
 #define XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY @"XMeeting_NoCallModuleSelfViewStatus"
+#define XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY @"XMeeting_NoCallModuleCallProtocol"
 
 #define VIDEO_INSET 5
 
@@ -130,8 +131,12 @@
 	// substracting the space used by the self view
 	contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
 
-	// initial call protocol is H.323 unless restricted from preferences
-	[self _setCallProtocol:XMCallProtocol_H323];
+	XMCallProtocol initialCallProtocol = (XMCallProtocol)[[NSUserDefaults standardUserDefaults] integerForKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
+	if(initialCallProtocol == XMCallProtocol_UnknownProtocol)
+	{
+		initialCallProtocol = XMCallProtocol_H323;
+	}
+	[self _setCallProtocol:initialCallProtocol];
 	[self _preferencesDidChange:nil];
 	
 	// determining in which state we currently are
@@ -332,6 +337,10 @@
 		NSLog(@"ERROR: NO REPRESENTED OBJECT!");
 		return;
 	}
+	
+	// remember the call protocol used.
+	XMCallProtocol protocolUsed = [[callAddress addressResource] callProtocol];
+	[self _setCallProtocol:protocolUsed];
 
 	[[XMCallAddressManager sharedInstance] makeCallToAddress:callAddress];
 }
@@ -901,6 +910,8 @@
 		XMSimpleAddressResource *resource = (XMSimpleAddressResource *)representedObject;
 		[resource setCallProtocol:callProtocol];
 	}
+	
+	[[NSUserDefaults standardUserDefaults] setInteger:(int)currentCallProtocol forKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
 }
 
 @end

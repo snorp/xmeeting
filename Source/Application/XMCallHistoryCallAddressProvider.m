@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.8 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.9 2006/08/05 22:11:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -258,11 +258,16 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 		{
 			if(i == 0)
 			{
+				// Update the user defaults in case the user chose a different cal protocol
+				[self _synchronizeUserDefaults];
 				return;
 			}
 			else
 			{
-				[callHistoryRecords exchangeObjectAtIndex:i withObjectAtIndex:0];
+				[record retain];
+				[callHistoryRecords removeObjectAtIndex:i];
+				[callHistoryRecords insertObject:record atIndex:0];
+				[record release];
 				[self _synchronizeUserDefaults];
 				
 				[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallHistoryCallAddressProviderDataDidChange object:self];
