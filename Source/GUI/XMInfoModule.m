@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.17 2006/06/28 07:28:50 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.18 2006/08/05 15:13:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -383,10 +383,15 @@
 	[natTypeField setStringValue:natTypeString];
 	
 	if(natType == XMNATType_Error ||
-	   natType == XMNATType_SymmetricNAT ||
 	   natType == XMNATType_BlockedNAT)
 	{
 		[natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+	}
+	else if(natType == XMNATType_SymmetricNAT ||
+			natType == XMNATType_SymmetricFirewall ||
+			natType == XMNATType_PartialBlockedNAT)
+	{
+		[natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow"]];
 	}
 	else
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.30 2006/08/04 21:33:10 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.31 2006/08/05 15:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -75,16 +75,12 @@ void _XMResetAvailableBandwidth()
 	XMOpalManager::ResetAvailableBandwidth();
 }
 
-void _XMSetSTUNServer(const char *address)
+void _XMSetNATInformation(const char *stunServer,
+						  const char *translationAddress)
 {
-	PString str = address;
-	theManager->XMSetSTUNServer(str);
-}
-
-void _XMSetTranslationAddress(const char *a)
-{
-	PString str = a;
-	theManager->SetTranslationAddress(str);
+	PString server = stunServer;
+	PString address = translationAddress;
+	theManager->SetNATInformation(stunServer, translationAddress);
 }
 
 void _XMSetPortRanges(unsigned int udpPortMin, 

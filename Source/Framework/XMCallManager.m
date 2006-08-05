@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.27 2006/07/26 20:03:54 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.28 2006/08/05 15:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1171,24 +1171,18 @@
 	[number release];
 	
 	NSString *externalAddress = nil;
-	if([preferences useAddressTranslation])
+	externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
+	if(externalAddress == nil)
 	{
-		if([preferences externalAddress] == nil)
+		if([_XMUtilsSharedInstance didSucceedFetchingCheckipExternalAddress] == YES)
 		{
-			externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
-			if(externalAddress == nil)
-			{
-				if([_XMUtilsSharedInstance didSucceedFetchingCheckipExternalAddress] == YES)
-				{
-					// not yet fetched
-					[_XMUtilsSharedInstance startFetchingCheckipExternalAddress];
-					[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-																 name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
+			// not yet fetched
+			[_XMUtilsSharedInstance startFetchingCheckipExternalAddress];
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
+														 name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 					
-					// we continue this job when the external address fetch task is finished
-					return;
-				}
-			}
+			// we continue this job when the external address fetch task is finished
+			return;
 		}
 	}
 	

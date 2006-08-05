@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.27 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.28 2006/08/05 15:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1409,6 +1409,7 @@ typedef enum _XMOpalDispatcherMessage
 	_XMSetBandwidthLimit([preferences bandwidthLimit]);
 	
 	const char *stunServer = NULL;
+	const char *translationAddress = NULL;
 	if([preferences useSTUN] == YES)
 	{
 		NSString *server = [preferences stunServer];
@@ -1417,20 +1418,18 @@ typedef enum _XMOpalDispatcherMessage
 			stunServer = [server cStringUsingEncoding:NSASCIIStringEncoding];
 		}
 	}
-	_XMSetSTUNServer(stunServer);
-	
-	const char *translationAddress = NULL;
 	if([preferences useAddressTranslation] == YES)
 	{
 		NSString *externalAddress = [preferences externalAddress];
-		if(externalAddress == nil)
+		if(externalAddress != nil)
 		{
-			externalAddress = suppliedExternalAddress;
+			translationAddress = [externalAddress cStringUsingEncoding:NSASCIIStringEncoding];
 		}
-		
-		translationAddress = [externalAddress cStringUsingEncoding:NSASCIIStringEncoding];
 	}
-	_XMSetTranslationAddress(translationAddress);
+	if(translationAddress == NULL) {
+		translationAddress = [suppliedExternalAddress cStringUsingEncoding:NSASCIIStringEncoding];
+	}
+	_XMSetNATInformation(stunServer, translationAddress);
 	
 	_XMSetPortRanges([preferences udpPortBase],
 					 [preferences udpPortMax],

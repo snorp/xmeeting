@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.33 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.34 2006/08/05 15:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -363,25 +363,69 @@ void XMOpalManager::ResetAvailableBandwidth()
 	availableBandwidth = XM_MAX_BANDWIDTH;
 }
 
-void XMOpalManager::XMSetSTUNServer(const PString & server)
-{	
-	PSTUNClient::NatTypes natType = SetSTUNServer(server);
+void XMOpalManager::SetNATInformation(const PString & stunServer,
+									  const PString & theTranslationAddress)
+{
+	//
+	// In case STUN works as expected, use it. In case of failures,
+	// SymmetricNAT, SymmetricFirewall, PartialBlockedNAT, dont' use
+	// STUN but rather rely on the translationAddress feature only.
+	// This has the advantage that in case of STUN problems, connections
+	// may still work...
+	//
+	if(stun != NULL) {
+		delete stun;
+		stun = NULL;
+	}
 	
-	if(server.IsEmpty())
+	if(stunServer.IsEmpty())
 	{
+		SetTranslationAddress(theTranslationAddress);
 		_XMHandleSTUNInformation(XMNATType_UnknownNAT, "");
-	}
-	else if(natType == PSTUNClient::UnknownNat)
-	{
-		_XMHandleSTUNInformation(XMNATType_Error, "");
-	}
-	else if(GetTranslationAddress().IsValid())
-	{
-		_XMHandleSTUNInformation((XMNATType)natType, GetTranslationAddress().AsString());
 	}
 	else
 	{
-		_XMHandleSTUNInformation(XMNATType_Error, "");
+		stun = new PSTUNClient(stunServer, GetUDPPortBase(), GetUDPPortMax(),
+								GetRtpIpPortBase(), GetRtpIpPortMax());
+		PSTUNClient::NatTypes natType = stun->GetNatType();
+		
+		switch(natType) {
+		
+			case PSTUNClient::UnknownNat:
+			case PSTUNClient::BlockedNat:
+				delete stun;
+				stun = NULL;
+				SetTranslationAddress(theTranslationAddress);
+				_XMHandleSTUNInformation(XMNATType_Error, "");
+				break;
+			case PSTUNClient::OpenNat:
+			case PSTUNClient::ConeNat:
+			case PSTUNClient::RestrictedNat:
+			case PSTUNClient::PortRestrictedNat:
+				stun->GetExternalAddress(translationAddress);
+				if(GetTranslationAddress().IsValid()) {
+					_XMHandleSTUNInformation((XMNATType)natType, GetTranslationAddress().AsString());
+				}
+				else
+				{
+					delete stun;
+					stun = NULL;
+					SetTranslationAddress(theTranslationAddress);
+					_XMHandleSTUNInformation(XMNATType_Error, "");
+				}
+				break;
+			case PSTUNClient::SymmetricNat:
+			case PSTUNClient::SymmetricFirewall:
+			case PSTUNClient::PartialBlockedNat:
+			default:
+				delete stun;
+				stun = NULL;
+				PIPSocket::Address stunExternalAddress;
+				stun->GetExternalAddress(stunExternalAddress);
+				SetTranslationAddress(theTranslationAddress);
+				_XMHandleSTUNInformation((XMNATType)natType, stunExternalAddress.AsString());
+				break;
+		}
 	}
 }
 

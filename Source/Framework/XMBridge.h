@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.27 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.28 2006/08/05 15:13:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,18 +73,11 @@ void _XMSetBandwidthLimit(unsigned limit);
 void _XMResetAvailableBandwidth();
 
 /**
- * Sets the STUN Server to be used.
- * The results of this operation are reported back
- * separately
+ * Sets the NAT information to use to establish
+ * NAT traversal
  **/
-void _XMSetSTUNServer(const char *address);
-
-/**
- * Sets the translation address (usually the NAT address)
- * to enable NAT-Tunneling
- **/
-void _XMSetTranslationAddress(const char *address);
-
+void _XMSetNATInformation(const char *stunServer,
+						  const char *translationAddress);
 /**
  * defines which port ranges to use to establish
  * the media streams
