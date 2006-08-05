@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.8 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.9 2006/08/05 23:20:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -78,7 +78,7 @@ void XMConnection::InitiateCall()
 	{
 		if(!ownerCall.OnSetUp(*this))
 		{
-			Release(EndedByNoAccept);
+			Release(EndedByTransportFail);
 		}
 	}
 }
