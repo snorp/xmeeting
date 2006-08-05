@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.34 2006/08/05 15:13:57 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.35 2006/08/05 19:49:19 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -224,7 +224,11 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
 	if(!PIsDescendant(&connection, XMConnection))
 	{
 		PIPSocket::Address address(0);
-		connection.GetTransport().GetLocalAddress().GetIpAddress(address);
+		OpalTransport *transport = &(connection.GetTransport());
+		if(transport != NULL) {
+			OpalTransportAddress transportAddress = transport->GetLocalAddress();
+			transportAddress.GetIpAddress(address);
+		}
 		
 		if(address.IsValid())
 		{

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.28 2006/08/05 15:13:57 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.29 2006/08/05 19:49:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -171,6 +171,8 @@ void _XMUseRegistrar(const char *host,
 					 const char *authorizationUsername,
 					 const char *password);
 void _XMFinishRegistrarSetup();
+
+bool _XMIsSIPRegistered();
 
 #pragma mark Call Management functions
 

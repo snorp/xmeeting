@@ -17,6 +17,7 @@
 "XM_CALL_FAILED_H323_NOT_ENABLED" = "H.323 est désactivé";
 "XM_CALL_FAILED_GK_REQUIRED" = "L'adresse nécessite une passerelle";
 "XM_CALL_FAILED_SIP_NOT_ENABLED" = "SIP est désactivé";
+"XM_CALL_FAILED_SIP_REGISTRAR_REQUIRED" = "Address requires a SIP registrar";
 "XM_CALL_FAILED_ALREADY_IN_CALL" = "Déjà en communication. Veuillez transmettre le problème";
 
 "XM_ENABLE_H323_FAILED_MESSAGE" = "Echec de l'activation H.323";

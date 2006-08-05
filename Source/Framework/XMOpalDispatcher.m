@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.28 2006/08/05 15:13:57 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.29 2006/08/05 19:49:19 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -811,6 +811,11 @@ typedef enum _XMOpalDispatcherMessage
 	if((protocol == XMCallProtocol_SIP) && (_XMIsSIPEnabled() == NO))
 	{
 		[self _sendCallStartFailReason:XMCallStartFailReason_SIPNotEnabled address:address];
+		return;
+	}
+	if((protocol == XMCallProtocol_SIP) && XMIsPhoneNumber(address) && (_XMIsSIPRegistered() == NO))
+	{
+		[self _sendCallStartFailReason:XMCallStartFailReason_SIPRegistrarRequired address:address];
 		return;
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.31 2006/08/05 15:13:57 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.32 2006/08/05 19:49:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -231,6 +231,11 @@ void _XMUseRegistrar(const char *host,
 void _XMFinishRegistrarSetup()
 {
 	sipEndPoint->FinishRegistrarSetup();
+}
+
+bool _XMIsSIPRegistered()
+{
+	return (sipEndPoint->GetRegistrationsCount() != 0);
 }
 
 #pragma mark -

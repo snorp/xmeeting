@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.43 2006/07/26 20:03:54 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.44 2006/08/05 19:49:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -498,6 +498,9 @@
 			break;
 		case XMCallStartFailReason_SIPNotEnabled:
 			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_SIP_NOT_ENABLED", @"");
+			break;
+		case XMCallStartFailReason_SIPRegistrarRequired:
+			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_SIP_REGISTRAR_REQUIRED", @"");
 			break;
 		case XMCallStartFailReason_AlreadyInCall:
 			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_ALREADY_IN_CALL", @"");
