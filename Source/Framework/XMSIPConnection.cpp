@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.9 2006/07/30 19:44:12 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.10 2006/08/06 09:24:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,65 +31,12 @@ XMSIPConnection::~XMSIPConnection()
 {
 }
 
-BOOL XMSIPConnection::SetUpConnection()
+void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
 {
-	SIPURL transportAddress = targetAddress;
-	
-	PTRACE(2, "SIP\tSetUpConnection: " << remotePartyAddress);
-	// Do a DNS SRV lookup
-	
-	/*
-    PIPSocketAddressAndPortVector addrs;
-    if (PDNS::LookupSRV(targetAddress.GetHostName(), "_sip._udp", targetAddress.GetPort(), addrs)) {
-		transportAddress.SetHostName(addrs[0].address.AsString());
-		transportAddress.SetPort(addrs [0].port);
-    }
-	 */
-
-	originating = TRUE;
-	
-	delete transport;
-	transport = endpoint.CreateTransport(transportAddress.GetHostAddress());
-	lastTransportAddress = transportAddress.GetHostAddress();
-	if (transport == NULL) {
-		Release(EndedByTransportFail);
-		return FALSE;
+	if(invite.HasSDP()) {
+		SDPSessionDescription & sdp = invite.GetSDP();
+		AdjustSessionDescription(sdp);
 	}
-	
-	if (!transport->WriteConnect(XMWriteINVITE, this)) {
-		PTRACE(1, "SIP\tCould not write to " << targetAddress << " - " << transport->GetErrorText());
-		Release(EndedByTransportFail);
-		return FALSE;
-	}
-	
-	releaseMethod = ReleaseWithCANCEL;
-	return TRUE;
-}
-
-BOOL XMSIPConnection::XMWriteINVITE(OpalTransport & transport, void *param)
-{
-	XMSIPConnection & connection = *(XMSIPConnection *)param;
-	
-	connection.SetLocalPartyAddress();
-	
-	SIPTransaction * invite = new SIPInvite(connection, transport);
-	
-	// Adjust the SDP video formats
-	if(invite->HasSDP() == FALSE)
-	{	
-		delete invite;
-		return FALSE;
-	}
-	SDPSessionDescription & sdp = invite->GetSDP();
-	AdjustSessionDescription(sdp);
-	
-	if (invite->Start()) {
-		connection.invitations.Append(invite);
-		return TRUE;
-	}
-
-	delete invite;
-	return FALSE;
 }
 
 BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,

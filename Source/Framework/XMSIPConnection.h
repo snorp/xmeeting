@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.4 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.5 2006/08/06 09:24:08 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,8 +27,7 @@ public:
 	
 	~XMSIPConnection();
 	
-	virtual BOOL SetUpConnection();
-	static BOOL XMWriteINVITE(OpalTransport & transport, void *param);
+	virtual void OnCreatingINVITE(SIP_PDU & invite);
 	
 	virtual BOOL OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
 										   SDPMediaDescription::MediaType mediaType,
