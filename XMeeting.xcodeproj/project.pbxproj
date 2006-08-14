@@ -950,8 +950,8 @@
 		D10B8AA90A50048B00003A33 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
 		D10B8AAA0A5004A600003A33 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/StillImageSettings.nib; sourceTree = "<group>"; };
 		D10B8AAB0A5004B500003A33 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/StillImageSettings.nib; sourceTree = "<group>"; };
-		D10B8AAC0A5004E400003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
-		D10B8AAD0A5004F600003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = German; path = German.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
+		D10B8AAC0A5004E400003A33 /* German */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D10B8AAD0A5004F600003A33 /* German */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = German; path = German.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
 		D10B8AAE0A50050900003A33 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D10B8DF80A512E7500003A33 /* ab_gatekeeper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ab_gatekeeper.png; sourceTree = "<group>"; };
 		D10B8DF90A512E7500003A33 /* locations.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = locations.png; sourceTree = "<group>"; };
@@ -1360,8 +1360,8 @@
 		D1C8FC6A0A435B2E00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/TextChatModule.nib; sourceTree = "<group>"; };
 		D1C8FC6B0A435B4500EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/XMInspector.nib; sourceTree = "<group>"; };
 		D1C8FC6C0A435B4500EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
-		D1C8FC6E0A435B9D00EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
-		D1C8FC6F0A435BC600EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = French; path = French.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
+		D1C8FC6E0A435B9D00EF1A8C /* French */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D1C8FC6F0A435BC600EF1A8C /* French */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = French; path = French.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
 		D1C8FC700A435BE400EF1A8C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D1C8FCC60A44070D00EF1A8C /* XMStillImageVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMStillImageVideoInputModule.h; path = Source/Framework/XMStillImageVideoInputModule.h; sourceTree = "<group>"; };
 		D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMStillImageVideoInputModule.m; path = Source/Framework/XMStillImageVideoInputModule.m; sourceTree = "<group>"; };
@@ -1560,9 +1560,9 @@
 		D1E20B4E0A36001400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/TextChatModule.nib; sourceTree = "<group>"; };
 		D1E20B4F0A36002400861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/XMInspector.nib; sourceTree = "<group>"; };
 		D1E20B500A36003900861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
-		D1E20B510A36004A00861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
-		D1E20B520A36007300861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Italian; path = Italian.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
-		D1E20B530A3600A000861E00 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D1E20B510A36004A00861E00 /* Italian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D1E20B520A36007300861E00 /* Italian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = Italian; path = Italian.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
+		D1E20B530A3600A000861E00 /* Italian */ = {isa = PBXFileReference; explicitFileType = text.plist.strings; name = Italian; path = Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D1E2DA0F08F470D700BE224E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		D1E2DA1508F470F200BE224E /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		D1E2DB8808F4720A00BE224E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
