@@ -1,6 +1,7 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSLevelIndicator; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {CLASS = XMEventAwareWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
@@ -21,6 +22,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 audioInputDevicesPopUp = NSPopUpButton; 
+                audioInputLevelIndicator = NSLevelIndicator; 
                 audioInputVolumeSlider = NSSlider; 
                 audioOutputDevicesPopUp = NSPopUpButton; 
                 audioOutputVolumeSlider = NSSlider; 
