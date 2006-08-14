@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.9 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.10 2006/08/14 19:45:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -174,6 +174,11 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (void)closePreferencesWindow
 {
+	if([self isWindowLoaded] == NO)
+	{
+		return;
+	}
+	
 	if([[self window] isVisible] && preferencesHaveChanged)
 	{
 		/* We first ask the user whether he wants to save the changes made */
