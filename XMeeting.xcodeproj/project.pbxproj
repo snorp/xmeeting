@@ -485,6 +485,12 @@
 		D1BB8E9709BB9BCD000897D9 /* XMAccountPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */; };
 		D1BB8E9809BB9BCD000897D9 /* XMAccountPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */; };
 		D1BB917409BCDF99000897D9 /* accountPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1BB917309BCDF99000897D9 /* accountPreferences.tif */; };
+		D1BD61DA0A9104E3007C8E46 /* manuel.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1BD61CF0A9104B2007C8E46 /* manuel.html */; };
+		D1BD61DB0A9104EC007C8E46 /* ab_gatekeeper.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1BD61CA0A9104B2007C8E46 /* ab_gatekeeper.png */; };
+		D1BD61DC0A9104EC007C8E46 /* locations.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1BD61CB0A9104B2007C8E46 /* locations.png */; };
+		D1BD61DD0A9104EC007C8E46 /* logo.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1BD61CC0A9104B2007C8E46 /* logo.tiff */; };
+		D1BD61DE0A9104EC007C8E46 /* mainwindow.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1BD61CD0A9104B2007C8E46 /* mainwindow.png */; };
+		D1BD61DF0A9104EC007C8E46 /* osd.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1BD61CE0A9104B2007C8E46 /* osd.png */; };
 		D1BFF0F009E2BB8E00D3665A /* h224handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BFF0EE09E2BB8E00D3665A /* h224handler.h */; };
 		D1BFF0F109E2BB8E00D3665A /* h281handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BFF0EF09E2BB8E00D3665A /* h281handler.h */; };
 		D1C1E316099B8BEA00815263 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */; };
@@ -747,7 +753,7 @@
 		D10B8E050A512F0100003A33 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = Manual;
+			dstPath = English.lproj/Manual;
 			dstSubfolderSpec = 7;
 			files = (
 				D10B8E070A512F3400003A33 /* manual.html in CopyFiles */,
@@ -757,7 +763,7 @@
 		D10B8E080A512F4A00003A33 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = Manual/images;
+			dstPath = English.lproj/Manual/images;
 			dstSubfolderSpec = 7;
 			files = (
 				D10B8E0A0A512F5D00003A33 /* ab_gatekeeper.png in CopyFiles */,
@@ -765,6 +771,30 @@
 				D10B8E0C0A512F5D00003A33 /* logo.tiff in CopyFiles */,
 				D10B8E0D0A512F5D00003A33 /* mainwindow.png in CopyFiles */,
 				D10B8E0E0A512F5D00003A33 /* osd.png in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1BD61C40A91042D007C8E46 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = French.lproj/Manual;
+			dstSubfolderSpec = 7;
+			files = (
+				D1BD61DA0A9104E3007C8E46 /* manuel.html in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1BD61C60A910474007C8E46 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = French.lproj/Manual/images;
+			dstSubfolderSpec = 7;
+			files = (
+				D1BD61DB0A9104EC007C8E46 /* ab_gatekeeper.png in CopyFiles */,
+				D1BD61DC0A9104EC007C8E46 /* locations.png in CopyFiles */,
+				D1BD61DD0A9104EC007C8E46 /* logo.tiff in CopyFiles */,
+				D1BD61DE0A9104EC007C8E46 /* mainwindow.png in CopyFiles */,
+				D1BD61DF0A9104EC007C8E46 /* osd.png in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1305,6 +1335,12 @@
 		D1BB8E9509BB9BCD000897D9 /* XMAccountPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAccountPreferencesModule.h; path = Source/GUI/XMAccountPreferencesModule.h; sourceTree = "<group>"; };
 		D1BB8E9609BB9BCD000897D9 /* XMAccountPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAccountPreferencesModule.m; path = Source/GUI/XMAccountPreferencesModule.m; sourceTree = "<group>"; };
 		D1BB917309BCDF99000897D9 /* accountPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = accountPreferences.tif; path = Resources/Images/accountPreferences.tif; sourceTree = "<group>"; };
+		D1BD61CA0A9104B2007C8E46 /* ab_gatekeeper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ab_gatekeeper.png; sourceTree = "<group>"; };
+		D1BD61CB0A9104B2007C8E46 /* locations.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = locations.png; sourceTree = "<group>"; };
+		D1BD61CC0A9104B2007C8E46 /* logo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = logo.tiff; sourceTree = "<group>"; };
+		D1BD61CD0A9104B2007C8E46 /* mainwindow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mainwindow.png; sourceTree = "<group>"; };
+		D1BD61CE0A9104B2007C8E46 /* osd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = osd.png; sourceTree = "<group>"; };
+		D1BD61CF0A9104B2007C8E46 /* manuel.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = manuel.html; sourceTree = "<group>"; };
 		D1BFF0EE09E2BB8E00D3665A /* h224handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h224handler.h; sourceTree = "<group>"; };
 		D1BFF0EF09E2BB8E00D3665A /* h281handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h281handler.h; sourceTree = "<group>"; };
 		D1C1E315099B8BEA00815263 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
@@ -1897,12 +1933,13 @@
 			name = OPAL;
 			sourceTree = "<group>";
 		};
-		D10B8DF60A512E7500003A33 /* Manual */ = {
+		D10B8DF60A512E7500003A33 /* Manual (English) */ = {
 			isa = PBXGroup;
 			children = (
 				D10B8DF70A512E7500003A33 /* images */,
 				D10B8DFD0A512E7500003A33 /* manual.html */,
 			);
+			name = "Manual (English)";
 			path = Manual;
 			sourceTree = "<group>";
 		};
@@ -2347,6 +2384,28 @@
 				D1B607F908F8F86C0034B47F /* uicmp.cxx */,
 			);
 			path = unix;
+			sourceTree = "<group>";
+		};
+		D1BD61C80A9104B2007C8E46 /* Manual (French) */ = {
+			isa = PBXGroup;
+			children = (
+				D1BD61C90A9104B2007C8E46 /* images */,
+				D1BD61CF0A9104B2007C8E46 /* manuel.html */,
+			);
+			name = "Manual (French)";
+			path = French.lproj/Manual;
+			sourceTree = "<group>";
+		};
+		D1BD61C90A9104B2007C8E46 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				D1BD61CA0A9104B2007C8E46 /* ab_gatekeeper.png */,
+				D1BD61CB0A9104B2007C8E46 /* locations.png */,
+				D1BD61CC0A9104B2007C8E46 /* logo.tiff */,
+				D1BD61CD0A9104B2007C8E46 /* mainwindow.png */,
+				D1BD61CE0A9104B2007C8E46 /* osd.png */,
+			);
+			path = images;
 			sourceTree = "<group>";
 		};
 		D1CEE0E808F9009E007E4ABE /* Linked Libraries */ = {
@@ -2837,7 +2896,8 @@
 		D1EB189A084379CE002CEF53 /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				D10B8DF60A512E7500003A33 /* Manual */,
+				D10B8DF60A512E7500003A33 /* Manual (English) */,
+				D1BD61C80A9104B2007C8E46 /* Manual (French) */,
 				D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */,
 				D1887E750A283DEA00C938BB /* Localizable.strings */,
 				D189803D082411AC007CD286 /* XMCodecDescriptions.plist */,
@@ -3255,6 +3315,8 @@
 				1A0AB04F09ACA47300DD66BD /* ShellScript */,
 				D10B8E050A512F0100003A33 /* CopyFiles */,
 				D10B8E080A512F4A00003A33 /* CopyFiles */,
+				D1BD61C40A91042D007C8E46 /* CopyFiles */,
+				D1BD61C60A910474007C8E46 /* CopyFiles */,
 			);
 			buildRules = (
 				D163335407A01B47003FD9C0 /* PBXBuildRule */,
