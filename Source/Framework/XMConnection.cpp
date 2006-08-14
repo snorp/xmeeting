@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.9 2006/08/05 23:20:09 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.10 2006/08/14 18:46:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,15 +27,19 @@ XMConnection::~XMConnection()
 
 BOOL XMConnection::SetUpConnection()
 {
-	remotePartyName = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyName();
-	remotePartyAddress = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyAddress();
-	remoteApplication = ownerCall.GetOtherPartyConnection(*this)->GetRemoteApplication();
+	if(phase < AlertingPhase) {
+		remotePartyName = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyName();
+		remotePartyAddress = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyAddress();
+		remoteApplication = ownerCall.GetOtherPartyConnection(*this)->GetRemoteApplication();
 	
-	phase = AlertingPhase;
-	endpoint.OnShowIncoming(*this);
-	OnAlerting();
+		phase = AlertingPhase;
+		endpoint.OnShowIncoming(*this);
+		OnAlerting();
 	
-	return TRUE;
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 BOOL XMConnection::SetAlerting(const PString & calleeName,
@@ -147,7 +151,7 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 	{
 		return NULL;
 	}
-	return new OpalAudioMediaStream(mediaFormat, sessionID, isSource, 20, soundChannel);
+	return new OpalAudioMediaStream(mediaFormat, sessionID, isSource, 2, soundChannel);
 }
 
 BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
