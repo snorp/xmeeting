@@ -1,4 +1,4 @@
-/* General words */
+﻿/* General words */
 "Yes" = "Oui";
 "No" = "Non";
 "OK" = "OK";
@@ -9,85 +9,84 @@
 "Abort" = "Annuler";
 
 /* Alert messages */
-"XM_INCOMING_CALL_INFO_TEXT" = "Appel de \"%@\"\nAccepter l'appel ou non??";
-"XM_INCOMING_CALL_DETAILS" = "Protocole: %@\nAdresse distante: %@\nNumero distant: %@\nApplication distante: %@\nAdresse locale: %@ (%@)";
+"XM_INCOMING_CALL_INFO_TEXT" = "Appel de \"%@\"\nAccepter l'appel ?";
+"XM_INCOMING_CALL_DETAILS" = "Protocole : %@\nAdresse distante : %@\nNuméro distant: %@\nApplication distante : %@\nAdresse locale : %@ (%@)";
 
-"XM_CALL_FAILED_MESSAGE" = "Appel échoué";
+"XM_CALL_FAILED_MESSAGE" = "Échec de l'appel";
 "XM_CALL_FAILED_INFO_TEXT" = "Impossible d'appeler \"%@\". (%@)";
-"XM_CALL_FAILED_H323_NOT_ENABLED" = "H.323 est désactivé";
-"XM_CALL_FAILED_GK_REQUIRED" = "L'adresse nécessite une passerelle";
-"XM_CALL_FAILED_SIP_NOT_ENABLED" = "SIP est désactivé";
-"XM_CALL_FAILED_SIP_REGISTRAR_REQUIRED" = "Address requires a SIP registrar";
-"XM_CALL_FAILED_ALREADY_IN_CALL" = "Déjà en communication. Veuillez transmettre le problème";
+"XM_CALL_FAILED_H323_NOT_ENABLED" = "H.323 n'est pas activé";
+"XM_CALL_FAILED_GK_REQUIRED" = "Ce type d'adresse nécessite une gatekeeper";
+"XM_CALL_FAILED_SIP_NOT_ENABLED" = "SIP n'est pas activé";
+"XM_CALL_FAILED_ALREADY_IN_CALL" = "Déjà en communication. Veuillez faire remonter le problème !";
 
-"XM_ENABLE_H323_FAILED_MESSAGE" = "Echec de l'activation H.323";
-"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Impossible d'activer le sous-systeme H.323.\nIl y a probablement une autre application H.323 en cours.\nVous ne pourrez pas passer d'appels avec H.323";
+"XM_ENABLE_H323_FAILED_MESSAGE" = "Échec de l'activation H.323";
+"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Impossible d'activer H.323.\nIl y a probablement une autre application H.323 en cours.\nVous ne pourrez pas appeler en utilisant H.323";
 
-"XM_GK_REG_FAILED_MESSAGE" = "Echec de l'enregistrement de la passerelle";
-"XM_GK_REG_FAILED_INFO_TEXT" = "Impossible de s'enregistrer sur la passerelle \"%@\" (%@). Vous ne pourrez pas utiliser de numéros de téléphones lors de vos appels. %@";
+"XM_GK_REG_FAILED_MESSAGE" = "Échec de l'enregistrement sur la gatekeeper";
+"XM_GK_REG_FAILED_INFO_TEXT" = "Impossible de s'enregistrer sur la gatekeeper \"%@\" (%@). Vous ne pourrez pas utiliser de numéros de téléphone pour vos appels. %@";
 "XM_GK_NOT_FOUND_SUGGESTION" = "Veuillez vérifier votre connexion.";
-"XM_GK_REG_REJECT_SUGGESTION" = "Veuillez vérifier la configuration de votre passerelle.";
-"XM_GK_REG_FAILED_NOT_FOUND" = "Passerelle non trouvée";
-"XM_GK_REG_FAILED_REJECTED" = "Enregistrement de la passerelle rejeté";
+"XM_GK_REG_REJECT_SUGGESTION" = "Veuillez vérifier la configuration de votre gatekeeper.";
+"XM_GK_REG_FAILED_NOT_FOUND" = "gatekeeper non trouvée";
+"XM_GK_REG_FAILED_REJECTED" = "Enregistrement rejeté par la gatekeeper";
 
-"XM_ENABLE_SIP_FAILED_MESSAGE" = "Echec de l'activation SIP";
-"XM_ENABLE_SIP_FAILED_INFO_TEXT" = "Impossible d'activer le sous-systeme SIP.";
+"XM_ENABLE_SIP_FAILED_MESSAGE" = "Échec de l'activation SIP";
+"XM_ENABLE_SIP_FAILED_INFO_TEXT" = "Impossible d'activer SIP.";
 
-"XM_SIP_REG_FAILED_MESSAGE" = "Echec de l'enregistrement SIP";
-"XM_SIP_REG_FAILED_INFO_TEXT" = "Impossible de s'enregistrer sur le registre SIP \"%@\" (%@). %@";
-"XM_SIP_UN_AUTHORIZED_SUGGESTION" = "Veuillez vérifier la configuration de vos noms d'utilisateurs et mots de passe";
+"XM_SIP_REG_FAILED_MESSAGE" = "Échec de l'enregistrement SIP";
+"XM_SIP_REG_FAILED_INFO_TEXT" = "Impossible de s'enregistrer sur le registrar SIP \"%@\" (%@). %@";
+"XM_SIP_UN_AUTHORIZED_SUGGESTION" = "Veuillez vérifier la configuration de vos noms d'utilisateur et mot de passe";
 "XM_SIP_NOT_ACCEPTABLE_SUGGESTION" = "Veuillez vérifier votre configuration réseau.";
 "XM_SIP_BAD_GATEWAY_SUGGESTION" = "Veuillez vérifier votre configuration.";
 
-"XM_VIDEO_DEVICE_PROBLEM_MESSAGE" = "Problème avec les périphériques video:";
+"XM_VIDEO_DEVICE_PROBLEM_MESSAGE" = "Problème avec le périphérique vidéo:";
 
 /* Call end reason */
-"XM_CALL_END_USER_CLEARED" = "L'utilisateur a annule l'appel";
-"XM_CALL_END_REMOTE_REFUSED" = "L'utilisateur distant a refuse l'appel";
-"XM_CALL_END_REMOTE_CLEARED" = "L'utilisateur distant a annule l'appel";
-"XM_CALL_END_REMOTE_NO_ANSWER" = "L'utilisateur distant n'a pas repondu";
-"XM_CALL_END_REMOTE_ABORT" = "L'utilisateur distant a stoppe l'appel";
-"XM_CALL_END_INTERNAL_FAILURE" = "Erreur de transport/connexion";
-"XM_CALL_END_GK_CLEARED" = "La passerelle a annule l'appel";
-"XM_CALL_END_NO_USER" = "Pas d'utilisateur trouve";
+"XM_CALL_END_USER_CLEARED" = "L'utilisateur a annulé l'appel";
+"XM_CALL_END_REMOTE_REFUSED" = "L'utilisateur distant a refusé l'appel";
+"XM_CALL_END_REMOTE_CLEARED" = "L'utilisateur distant a annulé l'appel";
+"XM_CALL_END_REMOTE_NO_ANSWER" = "L'utilisateur distant n'a pas répondu";
+"XM_CALL_END_REMOTE_ABORT" = "L'utilisateur distant a stoppé l'appel";
+"XM_CALL_END_INTERNAL_FAILURE" = "Erreur interne de transport/connexion";
+"XM_CALL_END_GK_CLEARED" = "La gatekeeper a annulé l'appel";
+"XM_CALL_END_NO_USER" = "Utilisateur non trouvé";
 "XM_CALL_END_NO_BANDWIDTH" = "Bande passante insuffisante";
-"XM_CALL_END_CAP_EXCHANGE" = "No common media capabilities";
-"XM_CALL_END_FORWARDED" = "Call forwarded";
-"XM_CALL_END_SECURITY_DENIAL" = "Call failed security check";
-"XM_CALL_END_REMOTE_BUSY" = "Occupe";
-"XM_CALL_END_REMOTE_UNREACHABLE" = "Injoignable";
-"XM_CALL_END_NO_ENDPOINT" = "No endpoint running at remote party";
-"XM_CALL_END_HOST_OFFLINE" = "l'hote distant est deconnecté";
-"XM_CALL_END_DURATION_LIMIT" = "Duree limite d'appel atteinte";
-"XM_CALL_END_CONFERENCE_ID" = "ID conference invalide";
+"XM_CALL_END_CAP_EXCHANGE" = "Aucun format de media commun supporté";
+"XM_CALL_END_FORWARDED" = "Appel transféré";
+"XM_CALL_END_SECURITY_DENIAL" = "Appel annulé pour raison de sécurité";
+"XM_CALL_END_REMOTE_BUSY" = "Système distant occupé";
+"XM_CALL_END_REMOTE_UNREACHABLE" = "Système distant injoignable";
+"XM_CALL_END_NO_ENDPOINT" = "Pas de système de conférence disponible sur le système distant";
+"XM_CALL_END_HOST_OFFLINE" = "Hôte distant déconnecté";
+"XM_CALL_END_DURATION_LIMIT" = "Durée limite d'appel atteinte";
+"XM_CALL_END_CONFERENCE_ID" = "Identification de conférence invalide";
 
 /* Default names */
-"XM_NO_NAME_TEXT" = "<Pas de nom>";
-"XM_DEFAULT_LOCATION_TEXT" = "<Lieu par defaut>";
+"XM_NO_NAME_TEXT" = "<Sans nom>";
+"XM_DEFAULT_LOCATION_TEXT" = "Par défaut";
 
 /* No Call Module */
-"XM_NO_CALL_SETUP_MESSAGE" = "Configuration. Veuillez patienter...";
-"XM_NO_CALL_PREPARING_CALL" = "Preparation de l'appel...";
-"XM_NO_CALL_CALLING" = "Appelle...";
-"XM_NO_CALL_RINGING" = "Sonne...";
+"XM_NO_CALL_SETUP_MESSAGE" = "Configuration en cours. Veuillez patienter...";
+"XM_NO_CALL_PREPARING_CALL" = "Préparation de l'appel...";
+"XM_NO_CALL_CALLING" = "Appel...";
+"XM_NO_CALL_RINGING" = "Sonnerie...";
 "XM_NO_CALL_INCOMING_CALL" = "Appel entrant";
 "XM_NO_CALL_IDLE" = "Inactif";
 "XM_NO_CALL_IDLE_WITH_REASON" = "Inactif (%@)";
-"XM_NO_CALL_NO_ADDRESS" = "Deconnecté (Pas d'adresse reseau)";
-"XM_NO_CALL_NO_PROTOCOL" = "Deconnecté (pas de protocole active)";
-"XM_NO_CALL_PROTOCOL_FAILURE" = "Deconnecté (Echec de l'activation H.323 et SIP)";
-"XM_NO_CALL_H323_FAILURE" = "Deconnecté (Echec de l'activation H.323)";
-"XM_NO_CALL_SIP_FAILURE" = "Deconnecté (Echec de l'activation SIP)";
-"XM_NO_CALL_TOOLTIP_H323_FAILURE" = "H.323: Deconnecté. Echec de l'activation du systeme H.323\n";
-"XM_NO_CALL_TOOLTIP_GK_FAILURE" = "H.323: Echec de l'enregistrement de la passerelle\n";
-"XM_NO_CALL_TOOLTIP_GK_OK" = "H.323: Enregistre sur la passerelle\n";
-"XM_NO_CALL_TOOLTIP_NO_GK" = "H.323: Prêt. N'utilise pas de passerelle\n";
-"XM_NO_CALL_TOOLTIP_SIP_FAILURE" = "SIP: Deconnecté. Echec de l'activation du systeme SIP\n";
-"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE" = "SIP: Echec de l'enregistrement\n";
-"XM_NO_CALL_TOOLTIP_SIP_REG_OK" = "SIP: Enregistre\n";
-"XM_NO_CALL_TOOLTIP_SIP_NO_REG" = "SIP: Prêt. N'utilise pas de registre\n";
-"XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES" = "\nAdresses reseau:";
-"XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS" = "\nNe peut pas joindre l'adresse distante.";
+"XM_NO_CALL_NO_ADDRESS" = "Déconnecté (pas d'adresse réseau)";
+"XM_NO_CALL_NO_PROTOCOL" = "Déconnecté (pas de protocole activé)";
+"XM_NO_CALL_PROTOCOL_FAILURE" = "Déconnecté (échec de l'activation H.323 et SIP)";
+"XM_NO_CALL_H323_FAILURE" = "Déconnecté (échec de l'activation H.323)";
+"XM_NO_CALL_SIP_FAILURE" = "Déconnecté (échec de l'activation SIP)";
+"XM_NO_CALL_TOOLTIP_H323_FAILURE" = "H.323 : déconnecté. Échec de l'activation H.323\n";
+"XM_NO_CALL_TOOLTIP_GK_FAILURE" = "H.323 : échec de l'enregistrement sur la gatekeeper\n";
+"XM_NO_CALL_TOOLTIP_GK_OK" = "H.323 : enregistré sur la gatekeeper\n";
+"XM_NO_CALL_TOOLTIP_NO_GK" = "H.323 : Prêt. Sans gatekeeper\n";
+"XM_NO_CALL_TOOLTIP_SIP_FAILURE" = "SIP : déconnecté. Échec de l'activation SIP\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE" = "SIP : échec de l'enregistrement\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_OK" = "SIP : enregistré\n";
+"XM_NO_CALL_TOOLTIP_SIP_NO_REG" = "SIP : prêt. Sans registrar\n";
+"XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES" = "\nAdresses réseau :";
+"XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS" = "\nAdresse externe impossible à récupérer.";
 
 /* Inspector */
 "XM_INSPECTOR_INFO" = "Info";
@@ -95,136 +94,136 @@
 "XM_INSPECTOR_CONTACTS" = "Contacts";
 
 /* Info Module */
-"XM_INFO_MODULE_NAME" = "Status";
-"XM_INFO_MODULE_REG_FAILURE" = "Echec de l'enregistrement";
-"XM_INFO_MODULE_NO_REG" = "Inutilise";
-"XM_INFO_MODULE_PROTOCOL_FAILURE" = "Echec de l'activation";
-"XM_INFO_MODULE_NO_PROTOCOL" = "Desactive";
+"XM_INFO_MODULE_NAME" = "État";
+"XM_INFO_MODULE_REG_FAILURE" = "Échec de l'enregistrement";
+"XM_INFO_MODULE_NO_REG" = "Inutilisé";
+"XM_INFO_MODULE_PROTOCOL_FAILURE" = "Échec de l'activation";
+"XM_INFO_MODULE_NO_PROTOCOL" = "Désactivé";
 
 /* Statistics Module */
 "XM_STATISTICS_MODULE_NAME" = "Statistiques";
-"XM_STATISTICS_MODULE_AUDIO_IN" = "Entree Audio";
+"XM_STATISTICS_MODULE_AUDIO_IN" = "Entrée Audio";
 "XM_STATISTICS_MODULE_AUDIO_OUT" = "Sortie Audio";
-"XM_STATISTICS_MODULE_VIDEO_IN" = "Entree Video";
-"XM_STATISTICS_MODULE_VIDEO_OUT" = "Sortie Video";
+"XM_STATISTICS_MODULE_VIDEO_IN" = "Entrée Vidéo";
+"XM_STATISTICS_MODULE_VIDEO_OUT" = "Sortie Vidéo";
 
 /* Call History Module */
 "XM_CALL_HISTORY_MODULE_NAME" = "Historique";
-"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Changement de lieu actif \"%@\"";
-"XM_CALL_HISTORY_MODULE_CALLING" = "Appelle l'hote \"%@\" par %@";
-"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "L'appel de l'hote \"%@\" par %@ a echoué";
+"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH" = "Configuration réglée sur \"%@\"";
+"XM_CALL_HISTORY_MODULE_CALLING" = "Appel de l'hôte \"%@\" par %@";
+"XM_CALL_HISTORY_MODULE_CALL_FAILED" = "L'appel de l'hôte \"%@\" par %@ a échoué";
 "XM_CALL_HISTORY_MODULE_INCOMING_CALL" = "Appel entrant de \"%@\" par %@";
-"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Appel de \"%@\" etabli.\nLocal IP Address: %@ (%@).\nRemote Address: %@\nRemote Application: \"%@\".";
-"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Appel de \"%@\" terminé.\nDuration: %@\nRaison de la fin de l'appel: %@";
-"XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Activation du sous-systeme H.323 echoué.";
-"XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Enregistre sur la passerelle \"%@\"";
-"XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Deconnecté de la passerelle \"%@\"";
-"XM_CALL_HISTORY_MODULE_GK_REG_FAILURE" = "Echec de l'enregistrement sur la passerelle \"%@\" (%@)";
-"XM_CALL_HISTORY_MODULE_SIP_FAILURE" = "Activation du sous-systeme SIP echouée.";
-"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION" = "Enregistre sur le registre SIP\"%@\"";
-"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION" = "Deconnecté du registre SIP \"%@\"";
-"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE" = "Echec de l'enregistrement sur le registre SIP \"%@\" (%@)";
-"XM_CALL_HISTORY_MODULE_OPENED_SENDING" = "Flux ouvert: envoi \"%@\"";
-"XM_CALL_HISTORY_MODULE_OPENED_RECEIVING" = "Flux ouvert: reçoit \"%@\"";
-"XM_CALL_HISTORY_MODULE_CLOSED_SENDING" = "Flux ferme: \"%@\" (Sortant)";
-"XM_CALL_HISTORY_MODULE_CLOSED_RECEIVING" = "Flux ferme: \"%@\" (Entrant)";
-"XM_CALL_HISTORY_MODULE_VIDEO_DEVICE_SWITCH" = "Switched video device to \"%@\"";
+"XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Appel de \"%@\" établi.\nAdresse IP locale : %@ (%@).\nAdresse distante : %@\nApplication distante : \"%@\".";
+"XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Appel de \"%@\" terminé.\nDurée : %@\nRaison de la fin de l'appel : %@";
+"XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Échec de l'activation H.323.";
+"XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Enregistré sur la gatekeeper \"%@\"";
+"XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Fin d'enregistrement sur la gatekeeper \"%@\"";
+"XM_CALL_HISTORY_MODULE_GK_REG_FAILURE" = "Échec de l'enregistrement sur la gatekeeper \"%@\" (%@)";
+"XM_CALL_HISTORY_MODULE_SIP_FAILURE" = "Échec de l'activation de SIP.";
+"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION" = "Enregistré sur le registrar SIP\"%@\"";
+"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION" = "Fin d'enregistrement sur le registrar SIP \"%@\"";
+"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE" = "Échec de l'enregistrement sur le registrar SIP \"%@\" (%@)";
+"XM_CALL_HISTORY_MODULE_OPENED_SENDING" = "Flux media ouvert : émission en cours\"%@\"";
+"XM_CALL_HISTORY_MODULE_OPENED_RECEIVING" = "Flux media ouvert : réception en cours \"%@\"";
+"XM_CALL_HISTORY_MODULE_CLOSED_SENDING" = "Flux media fermé : \"%@\" (Sortant)";
+"XM_CALL_HISTORY_MODULE_CLOSED_RECEIVING" = "Flux media fermé: \"%@\" (Entrant)";
+"XM_CALL_HISTORY_MODULE_VIDEO_DEVICE_SWITCH" = "Périphérique vidéo réglé sur \"%@\"";
 
 /* Local Audio/Video module */
-"XM_AUDIO_VIDEO_MODULE_NAME" = "Controle Audio/Video";
-"XM_AUDIO_VIDEO_MODULE_VIDEO_DISABLED" = "La video est desactivee";
+"XM_AUDIO_VIDEO_MODULE_NAME" = "Réglage Audio/Video";
+"XM_AUDIO_VIDEO_MODULE_VIDEO_DISABLED" = "La vidéo est désactivée";
 
 /* Address Book Module */
 "XM_ADDRESS_BOOK_MODULE_NAME" = "Carnet d'adresses";
-"XM_ADDRESS_BOOK_MODULE_ADDRESS_TITLE" = "Adresse d'appel XMeeting";
-"XM_ADDRESS_BOOK_MODULE_PHONE_TITLE" = "Numero de telephone";
+"XM_ADDRESS_BOOK_MODULE_ADDRESS_TITLE" = "N° d'appel XMeeting";
+"XM_ADDRESS_BOOK_MODULE_PHONE_TITLE" = "Numéro de téléphone (E164)";
 
 /* Dial Pad Module */
-"XM_DIAL_PAD_MODULE_NAME" = "Controle distant";
+"XM_DIAL_PAD_MODULE_NAME" = "Contrôle à distance";
 
 /* IG Popup View */
-"IG_POPUP_VIEW_TITLE" = "Lieu: %@";
+"IG_POPUP_VIEW_TITLE" = "Configuration : %@";
 
 /* OSD Tooltips */
-"XM_OSD_TOOLTIP_ENTER_FS" = "Mode plein-ecran";
-"XM_OSD_TOOLTIP_EXIT_FS" = "Quitter le mode plein-ecran";
-"XM_OSD_TOOLTIP_ENABLE_PIP" = "Activer Image-dans-l'Image";
-"XM_OSD_TOOLTIP_DISABLE_PIP" = "Desactiver Image-dans-l'Image";
-"XM_OSD_TOOLTIP_CLASSIC_PIP" = "Image-dans-l'Image classique";
-"XM_OSD_TOOLTIP_3D_PIP" = "Image-dans-l'Image 3D";
-"XM_OSD_TOOLTIP_SBS_PIP" = "Image-dans-l'image cote-à-cote";
-"XM_OSD_TOOLTIP_INFO" = "Montrer l'Inspecteur d'Info";
-"XM_OSD_TOOLTIP_TOOLS" = "Monter les Outils";
+"XM_OSD_TOOLTIP_ENTER_FS" = "Mode plein écran";
+"XM_OSD_TOOLTIP_EXIT_FS" = "Quitter le mode plein écran";
+"XM_OSD_TOOLTIP_ENABLE_PIP" = "Activer PIP (Image-dans-l'Image)";
+"XM_OSD_TOOLTIP_DISABLE_PIP" = "Désactiver PIP (Image-dans-l'Image)";
+"XM_OSD_TOOLTIP_CLASSIC_PIP" = "PIP classique";
+"XM_OSD_TOOLTIP_3D_PIP" = "PIP 3D";
+"XM_OSD_TOOLTIP_SBS_PIP" = "PIP côte-à-côte";
+"XM_OSD_TOOLTIP_INFO" = "Ouvrir l'Inspecteur d'info";
+"XM_OSD_TOOLTIP_TOOLS" = "Ouvrir la fenêtre Outils";
 "XM_OSD_TOOLTIP_HANGUP" = "Terminer l'appel";
-"XM_OSD_TOOLTIP_MUTE" = "Couper le Microphone";
-"XM_OSD_TOOLTIP_UNMUTE" = "Activer le Microphone";
+"XM_OSD_TOOLTIP_MUTE" = "Fermer le micro";
+"XM_OSD_TOOLTIP_UNMUTE" = "Ouvrir le micro";
 
 /* Call Info View */
-"XM_CALL_INFO_VIEW_SHOW_DETAILS" = "Montrer les Details";
-"XM_CALL_INFO_VIEW_HIDE_DETAILS" = "Masquer les Details";
-"XM_CALL_INFO_VIEW_AUDIO" = "Audio:";
-"XM_CALL_INFO_VIEW_VIDEO" = "Video:";
-"XM_CALL_INFO_VIEW_DIRECTION_OUT" = "Direction: Sortie";
-"XM_CALL_INFO_VIEW_DIRECTION_IN" = "Direction: Entree";
-"XM_CALL_INFO_VIEW_PROTOCOL" = "Protocole: %@";
-"XM_CALL_INFO_VIEW_END_REASON" = "Raison de la fin de l'appel: %@";
-"XM_CALL_INFO_VIEW_START" = "Debut: %@";
-"XM_CALL_INFO_VIEW_END" = "Fin: %@";
-"XM_CALL_INFO_VIEW_DURATION" = "Duree: %@";
-"XM_CALL_INFO_VIEW_NUMBER" = "Numero distant: %@";
-"XM_CALL_INFO_VIEW_ADDRESS" = "Adresse distante: %@";
-"XM_CALL_INFO_VIEW_APPLICATION" = "Application distante: %@";
-"XM_CALL_INFO_VIEW_SENT" = "%@ envoye en utilisant <%@>";
-"XM_CALL_INFO_VIEW_RECV" = "%@ reçu en utilisant <%@>";
-"XM_CALL_INFO_VIEW_LOCAL_ADDRESS" = "Local Address: %@ (%@)";
+"XM_CALL_INFO_VIEW_SHOW_DETAILS" = "Montrer les détails";
+"XM_CALL_INFO_VIEW_HIDE_DETAILS" = "Masquer les détails";
+"XM_CALL_INFO_VIEW_AUDIO" = "Audio :";
+"XM_CALL_INFO_VIEW_VIDEO" = "Vidéo :";
+"XM_CALL_INFO_VIEW_DIRECTION_OUT" = "Sens : Sortie";
+"XM_CALL_INFO_VIEW_DIRECTION_IN" = "Sens : Entrée";
+"XM_CALL_INFO_VIEW_PROTOCOL" = "Protocole : %@";
+"XM_CALL_INFO_VIEW_END_REASON" = "Raison de la fin de l'appel : %@";
+"XM_CALL_INFO_VIEW_START" = "Début : %@";
+"XM_CALL_INFO_VIEW_END" = "Fin : %@";
+"XM_CALL_INFO_VIEW_DURATION" = "Durée : %@";
+"XM_CALL_INFO_VIEW_NUMBER" = "Numéro distant : %@";
+"XM_CALL_INFO_VIEW_ADDRESS" = "Adresse distante : %@";
+"XM_CALL_INFO_VIEW_APPLICATION" = "Application distante : %@";
+"XM_CALL_INFO_VIEW_SENT" = "%@ envoyés en utilisant <%@>";
+"XM_CALL_INFO_VIEW_RECV" = "%@ reçus en utilisant <%@>";
+"XM_CALL_INFO_VIEW_LOCAL_ADDRESS" = "Adresse locale : %@ (%@)";
 
 /* Preferences Window */
-"XM_PREFERENCES_WINDOW_CLOSE" = "Voulez-vous enregistrer les preferences qui ont ete modifiees?";
-"XM_PREFERENCES_NAME_SUGGESTION" = "Please choose another name.";
-"XM_GENERAL_PREFERENCES_NAME" = "General";
-"XM_GENERAL_PREFERENCES_TOOLTIP" = "Preferences generales";
+"XM_PREFERENCES_WINDOW_CLOSE" = "Voulez-vous enregistrer les nouvelles préférences ?";
+"XM_PREFERENCES_NAME_SUGGESTION" = "Veuillez choisir un autre nom.";
+"XM_GENERAL_PREFERENCES_NAME" = "Général";
+"XM_GENERAL_PREFERENCES_TOOLTIP" = "Préférences générales";
 "XM_GENERAL_PREFERENCES_CHOOSE" = "Choisir";
-"XM_APPEARANCE_PREFERENCES_NAME" = "Appearance";
-"XM_APPEARANCE_PREFERENCES_TOOLTIP" = "Edit the appearance of XMeeting";
+"XM_APPEARANCE_PREFERENCES_NAME" = "Interface utilisateur";
+"XM_APPEARANCE_PREFERENCES_TOOLTIP" = "Modifier l'interface utilisateur de XMeeting";
 "XM_ACCOUNT_PREFERENCES_NAME" = "Comptes";
-"XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Preferences des comptes";
-"XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Account name already exists";
-"XM_LOCATION_PREFERENCES_NAME" = "Lieux";
-"XM_LOCATION_PREFERENCES_TOOLTIP" = "Editer les Lieux";
-"XM_LOCATION_PREFERENCES_NEW_LOCATION" = "Nouveau Lieu";
+"XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Préférences des comptes";
+"XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Le compte existe déjà";
+"XM_LOCATION_PREFERENCES_NAME" = "Configurations";
+"XM_LOCATION_PREFERENCES_TOOLTIP" = "Modifier les configurations";
+"XM_LOCATION_PREFERENCES_NEW_LOCATION" = "Nouvelle configuration";
 "XM_LOCATION_PREFERENCES_COPY_SUFFIX" = " Copier";
 "XM_LOCATION_PREFERENCES_NONE_ITEM" = "Aucun";
-"XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";
-"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";
-"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
+"XM_LOCATION_PREFERENCES_NAME_EXISTS" = "La configuration existe déjà";
+"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "Aucun protocole activé";
+"XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Pas de protocole H.323 ou SIP activé pour la configuration \"%@\". Vous ne pourrez pas émettre d'appels avec cette configuration active.";
 "XM_AUDIO_PREFERENCES_NAME" = "Audio";
-"XM_AUDIO_PREFERENCES_TOOLTIP" = "Audio";
-"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE" = "<périphérique par defaut>";
-"XM_VIDEO_PREFERENCES_NAME" = "Entree Video";
-"XM_VIDEO_PREFERENCES_TOOLTIP" = "Preferences de l'Entree Video";
-"XM_VIDEO_PREFERENCES_FA_DEVICE" = "<Utiliser le premier disponible>";
-"XM_VIDEO_PREFERENCES_SHOW_SETTINGS" = "Monter la configuration...";
-"XM_ADDRESS_BOOK_PREFERENCES_NAME"= "Address Book";
-"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Edit the Address Book integration of XMeeting";
+"XM_AUDIO_PREFERENCES_TOOLTIP" = "Préférences Audio";
+"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE" = "<périphérique par défaut>";
+"XM_VIDEO_PREFERENCES_NAME" = "Entrée Vidéo";
+"XM_VIDEO_PREFERENCES_TOOLTIP" = "Préférences de l'entrée vidéo";
+"XM_VIDEO_PREFERENCES_FA_DEVICE" = "Utiliser le premier disponible";
+"XM_VIDEO_PREFERENCES_SHOW_SETTINGS" = "Montrer les réglages...";
+"XM_ADDRESS_BOOK_PREFERENCES_NAME"= "Carnet d'adresses";
+"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Modifier l'intégration d'XMeeting au carnet d'adresses";
 
 /* Setup Assistant */
 "XM_SETUP_ASSISTANT_CONTINUE" = "Continuer";
 "XM_SETUP_ASSISTANT_FINISH" = "Terminer";
-"XM_SETUP_ASSISTANT_DEFAULT_GK" = "<Passerelle par defaut>";
-"XM_SETUP_ASSISTANT_DEFAULT_REG" = "<Registre par defaut>";
-"XM_SETUP_ASSISTANT_WELCOME" = "Bienvenue dans XMeeting!";
+"XM_SETUP_ASSISTANT_DEFAULT_GK" = "<gatekeeper par défaut>";
+"XM_SETUP_ASSISTANT_DEFAULT_REG" = "<registrar par défaut>";
+"XM_SETUP_ASSISTANT_WELCOME" = "Bienvenue dans XMeeting !";
 "XM_SETUP_ASSISTANT_PI" = "Informations Personnelles";
-"XM_SETUP_ASSISTANT_LOCATIONS" = "Lieux";
-"XM_SETUP_ASSISTANT_NEW_LOCATION" = "Nouveau Lieu";
-"XM_SETUP_ASSISTANT_LOCATION" = "Lieu: %@";
-"XM_SETUP_ASSISTANT_LOC_IMPORT_FAILURE" = "Echec de l'import des Lieux";
-"XM_SETUP_ASSISTANT_INVALID_FILE" = "Le fichier contient des donnees non-valides";
-"XM_SETUP_ASSISTANT_IMPORT" = "Import";
-"XM_SETUP_ASSISTANT_COMPLETED" = "terminé";
-"XM_SETUP_ASSISTANT_NO_NAT" = "It appears that you are not behind a NAT. You may choose to not use STUN or IP address translation in the next view.";
-"XM_SETUP_ASSISTANT_DEFAULT_NAT" = "It appears that you are behind a NAT. It is recommended to enable STUN in the next view or calls may not work.";
-"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "It appears that you are behind a NAT of type \"%@\". The STUN protocol cannot help in this case. You need to use port forwarding in your NAT device or calls may not work.";
-"XM_SETUP_ASSISTANT_NAT_ERROR" = "XMeeting could not determine whether you are behind a NAT or not. Your computer is probably not connected to the Internet right now.";
+"XM_SETUP_ASSISTANT_LOCATIONS" = "Configurations";
+"XM_SETUP_ASSISTANT_NEW_LOCATION" = "Nouvelle configuration";
+"XM_SETUP_ASSISTANT_LOCATION" = "Configuration : %@";
+"XM_SETUP_ASSISTANT_LOC_IMPORT_FAILURE" = "Échec de l'importation des configurations";
+"XM_SETUP_ASSISTANT_INVALID_FILE" = "Le fichier ne contient pas des données valides";
+"XM_SETUP_ASSISTANT_IMPORT" = "Importation";
+"XM_SETUP_ASSISTANT_COMPLETED" = "Terminé";
+"XM_SETUP_ASSISTANT_NO_NAT" = "Il semble que vous ne soyez pas derrière un NAT. Vous devriez choisir de ne pas utiliser STUN ou la translation d'adresse IP dans l'écran suivant.";
+"XM_SETUP_ASSISTANT_DEFAULT_NAT" = "Il semble que vous soyez derrière un NAT. Vous devriez valider STUN dans l'écran suivant, ou vos appels pourraient ne pas marcher.";
+"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "Il semble que vous soyez derrière un NAT du type \"%@\". Le protocole STUN n'est d'aucun secours dans ce cas. Vous devez utiliser le port forwarding dans votre routeur NAT, ou vos appels pourraient ne pas marcher.";
+"XM_SETUP_ASSISTANT_NAT_ERROR" = "XMeeting n'a pas pu déterminer si vous êtes derrière un NAT ou non. Votre ordinateur n'est probablement pas connecté à Internet en ce moment.";
 
 /* External Address */
 "XM_FETCHING_EXTERNAL_ADDRESS" = "Recherche...";
@@ -238,17 +237,17 @@
 "XM_EXTERNAL_ADDRESS" = "Externe";
 
 /* Framework */
-"XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Delai de connexion dépassé";
-"XM_FRAMEWORK_INVALID_DATA" = "Donnee invalide";
-"XM_FRAMEWORK_NO_DATA" = "Pas de donnees";
+"XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Délai de connexion dépassé";
+"XM_FRAMEWORK_INVALID_DATA" = "Données invalides";
+"XM_FRAMEWORK_NO_DATA" = "Pas de données";
 "XM_FRAMEWORK_NO_DEVICE" = "<Aucun périphérique>";
-"XM_FRAMEWORK_UNKNOWN_DEVICE" = "périphérique Audio Inconnu";
-"XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME" = "Module Camera Direct";
-"XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA" = "Ne peut pas saisir d'images depuis la camera. Est-elle toujours connectée à l'ordinateur?\nErreur: (%d, %x)\tPériphérique: %@";
-"XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "Une erreur interne a eu lieu dans le module de direct.\nCodes d'Erreur: (%d, %x)\t Périphérique: %@\nVeuillez faire remonter le bug à hfriederich@users.sourceforge.net";
-"XM_FRAMEWORK_STILL_MODULE_NAME" = "Still Image Module";
-"XM_FRAMEWORK_STILL_MODULE_ERROR" = "Cannot open selected image";
-"XM_FRAMEWORK_STILL_MODULE_DEVICE_NAME" = "Still Image";
-"XM_FRAMEWORK_STILL_MODULE_NO_IMAGE" = "no image";
-"XM_FRAMEWORK_SCREEN_MODULE_NAME" = "Module Ecran";
-"XM_FRAMEWORK_SCREEN_DEVICE_NAME" = "Ecran %d";
+"XM_FRAMEWORK_UNKNOWN_DEVICE" = "Périphérique audio inconnu";
+"XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME" = "Module Caméra En direct";
+"XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA" = "Impossible d'obtenir des images depuis la caméra. Est-elle toujours connectée à l'ordinateur ?\nErreur : (%d, %x)\tPériphérique : %@";
+"XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "Une erreur interne a eu lieu dans le module de direct.\nCodes d'Erreur : (%d, %x)\t Périphérique : %@\nVeuillez faire remonter le bug à hfriederich@users.sourceforge.net";
+"XM_FRAMEWORK_STILL_MODULE_NAME" = "Module Image fixe";
+"XM_FRAMEWORK_STILL_MODULE_ERROR" = "Impossible d'ouvrir l'image sélectionnée";
+"XM_FRAMEWORK_STILL_MODULE_DEVICE_NAME" = "Image fixe";
+"XM_FRAMEWORK_STILL_MODULE_NO_IMAGE" = "Pas d'image";
+"XM_FRAMEWORK_SCREEN_MODULE_NAME" = "Module Copie d'écran";
+"XM_FRAMEWORK_SCREEN_DEVICE_NAME" = "Copie d'écran %d";

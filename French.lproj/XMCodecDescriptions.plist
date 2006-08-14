@@ -14,7 +14,7 @@
 			<key>XMeeting_Name</key>
 			<string>G.711 uLaw</string>
 			<key>XMeeting_Quality</key>
-			<string>Good</string>
+			<string>Bonne</string>
 		</dict>
 		<dict>
 			<key>XMeeting_Bandwidth</key>
@@ -26,7 +26,7 @@
 			<key>XMeeting_Name</key>
 			<string>G.711 ALaw</string>
 			<key>XMeeting_Quality</key>
-			<string>Good</string>
+			<string>Bonne</string>
 		</dict>
 	</array>
 	<key>XMeeting_VideoCodecs</key>
@@ -41,7 +41,7 @@
 			<key>XMeeting_Name</key>
 			<string>H.263</string>
 			<key>XMeeting_Quality</key>
-			<string>Good</string>
+			<string>Bonne</string>
 		</dict>
 		<dict>
 			<key>XMeeting_Bandwidth</key>
@@ -53,7 +53,7 @@
 			<key>XMeeting_Name</key>
 			<string>H.264</string>
 			<key>XMeeting_Quality</key>
-			<string>Very Good</string>
+			<string>Très bonne</string>
 		</dict>
 		<dict>
 			<key>XMeeting_Bandwidth</key>
