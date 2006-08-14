@@ -517,7 +517,6 @@
 		D1CEE1A008F9022B007E4ABE /* x880.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12708F9022B007E4ABE /* x880.h */; };
 		D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12908F9022B007E4ABE /* allcodecs.h */; settings = {ATTRIBUTES = (); }; };
 		D1CEE1A208F9022B007E4ABE /* g711codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12A08F9022B007E4ABE /* g711codec.h */; };
-		D1CEE1A608F9022B007E4ABE /* h261codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12E08F9022B007E4ABE /* h261codec.h */; };
 		D1CEE1AA08F9022B007E4ABE /* opalwavfile.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE13208F9022B007E4ABE /* opalwavfile.h */; };
 		D1CEE1AB08F9022B007E4ABE /* rfc2833.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE13308F9022B007E4ABE /* rfc2833.h */; };
 		D1CEE1AC08F9022B007E4ABE /* silencedetect.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE13408F9022B007E4ABE /* silencedetect.h */; };
@@ -1360,7 +1359,6 @@
 		D1CEE12708F9022B007E4ABE /* x880.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = x880.h; sourceTree = "<group>"; };
 		D1CEE12908F9022B007E4ABE /* allcodecs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = allcodecs.h; sourceTree = "<group>"; };
 		D1CEE12A08F9022B007E4ABE /* g711codec.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = g711codec.h; sourceTree = "<group>"; };
-		D1CEE12E08F9022B007E4ABE /* h261codec.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h261codec.h; sourceTree = "<group>"; };
 		D1CEE13208F9022B007E4ABE /* opalwavfile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = opalwavfile.h; sourceTree = "<group>"; };
 		D1CEE13308F9022B007E4ABE /* rfc2833.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = rfc2833.h; sourceTree = "<group>"; };
 		D1CEE13408F9022B007E4ABE /* silencedetect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = silencedetect.h; sourceTree = "<group>"; };
@@ -2407,7 +2405,6 @@
 				D1CEE12908F9022B007E4ABE /* allcodecs.h */,
 				D1F49D02097E50790010A324 /* echocancel.h */,
 				D1CEE12A08F9022B007E4ABE /* g711codec.h */,
-				D1CEE12E08F9022B007E4ABE /* h261codec.h */,
 				D1CEE13208F9022B007E4ABE /* opalwavfile.h */,
 				D1CEE13308F9022B007E4ABE /* rfc2833.h */,
 				D1CEE13408F9022B007E4ABE /* silencedetect.h */,
@@ -3156,7 +3153,6 @@
 				D1CEE1A008F9022B007E4ABE /* x880.h in Headers */,
 				D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */,
 				D1CEE1A208F9022B007E4ABE /* g711codec.h in Headers */,
-				D1CEE1A608F9022B007E4ABE /* h261codec.h in Headers */,
 				D1CEE1AA08F9022B007E4ABE /* opalwavfile.h in Headers */,
 				D1CEE1AB08F9022B007E4ABE /* rfc2833.h in Headers */,
 				D1CEE1AC08F9022B007E4ABE /* silencedetect.h in Headers */,
