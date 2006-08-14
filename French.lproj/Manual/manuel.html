@@ -1,0 +1,1651 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="fr">
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta name="AppleTitle" content="XMeeting Manual">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>Manuel XMeeting</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<table border="0">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>
+      
+      
+      
+      
+      
+      
+      <h1>Manuel XMeeting</h1>
+
+
+
+
+
+
+Auteurs : Hannes Friederich&nbsp;<br>
+
+
+
+
+
+
+Parties de texte bas&eacute;es sur le travail de Ivan Guajana<br>
+
+
+
+
+
+
+Version fran&ccedil;aise : Christian Helft<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+Derni&egrave;re mise &agrave; jour : 28 juin 2006&nbsp;<br>
+
+
+
+
+
+
+XMeeting version 0.3
+      </td>
+
+
+
+
+
+
+
+      <td>
+      <img src="images/logo.tiff">
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<!-- *********************TABLE OF CONTENTS****************** -->
+
+<h3>Table des mati&egrave;res</h3>
+
+
+
+
+
+
+
+
+<ol>
+
+
+
+
+
+
+
+  <li><a href="#introduction">Introduction</a></li>
+
+
+
+
+
+
+
+  <li><a href="#locations_accounts">Configurations &amp; Comptes</a></li>
+
+
+
+
+
+
+
+  <li><a href="#first_launch">Premi&egrave;re ex&eacute;cution</a></li>
+
+
+
+
+
+
+
+  <li><a href="#user_interface">Interface utilisateur</a></li>
+
+
+
+
+
+
+
+  <li><a href="#preferences">Pr&eacute;f&eacute;rences</a></li>
+
+
+
+
+
+
+
+  <li><a href="#importing">Importation de configurations</a></li>
+
+
+
+
+
+
+
+</ol>
+
+
+
+
+
+
+
+
+<!-- *********************INTRODUCTION*********************** -->
+
+<a name="introduction">
+<h3>1. Introduction</h3>
+
+
+
+
+
+
+</a>
+
+<p>Bienvenue et merci d'avoir choisi XMeeting ! <br>
+
+
+
+
+
+
+XMeeting est un outil de vid&eacute;oconf&eacute;rence puissant capable
+d'utiliser diff&eacute;rents protocoles de communication. &Agrave;
+l'heure actuelle, les protocoles H323 et SIP sont support&eacute;s.
+</p>
+
+
+
+
+
+
+Bien que nous ayons l'intention d'en faire un outil de
+vid&eacute;oconf&eacute;rence puissant dot&eacute; de
+caract&eacute;ristiques de niveau professionnel, XMeeting a
+&eacute;t&eacute; con&ccedil;u pour &ecirc;tre facile &agrave;
+appr&eacute;hender, aussi intuitif &agrave; utiliser que possible et
+muni d'une bonne interface utilisateur. Cependant, quelques
+connaissances de base sur la vid&eacute;oconf&eacute;rence sont
+indispensables pour utiliser XMeeting. Cet aspect n'est pas
+trait&eacute; dans ce manuel.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Le but de ce manuel est d'exposer bri&egrave;vement les principaux
+concepts qui sous-tendent XMeeting et comment l'interface utilisateur
+fonctionne. Du fait qu'XMeeting est un produit Open Source, des
+modifications dans l'application peuvent survenir &agrave; tout moment,
+et un tel manuel peut devenir caduque en tr&egrave;s peu de temps. Nous
+essayons de le maintenir &agrave; jour &agrave; chaque release, mais il
+se peut qu'on ait oubli&eacute; de nouvelles fonctionnalit&eacute;s ou
+de n'avoir pas eu temps de les incorporer. C'est pourquoi il est
+important que vous nous fassiez remonter l'information d&egrave;s que
+vous avez trouv&eacute; quelque chose qui doit &ecirc;tre
+corrig&eacute;, que ce soit dans l'application elle-m&ecirc;me ou dans
+ce manuel.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+L'&eacute;quipe XMeeting.
+
+
+<!-- *********************LOCATIONS AND ACCOUNTS************* -->
+
+<a name="locations_accounts">
+<h3>2. Configurations et Comptes</h3>
+
+
+
+
+
+
+</a>
+
+<p>De nos jours, beaucoup de gens utilisent des ordinateurs portables
+qu'ils emportent partout. Cependant, la vitesse du r&eacute;seau peut
+&ecirc;tre diff&eacute;rente &agrave; la maison ou au bureau. En plus,
+les r&eacute;glages du firewall/NAT peuvent &ecirc;tre
+diff&eacute;rents dans les deux cas. Malheureusement, les
+r&eacute;glages du r&eacute;seau peuvent avoir une tr&egrave;s grande
+influence sur les fonctionnalit&eacute;s d'un outil de
+vid&eacute;oconf&eacute;rence bas&eacute; sur H323 ou SIP.<br>
+
+
+
+
+
+
+Il serait quelque peu laborieux d'avoir chaque fois &agrave; aller dans
+les pr&eacute;f&eacute;rences changer un ou deux param&egrave;tres pour
+qu'Xmeeting fonctionne correctement.</p>
+
+
+
+
+
+
+De m&ecirc;me, vous pourriez parfois vouloir&nbsp;utiliser la
+totalit&eacute; de la bande passante disponible pour avoir la meilleure
+qualit&eacute; possible. Mais parfois aussi, vous voudriez
+t&eacute;l&eacute;charger un tr&egrave;s gros fichier en parall&egrave;le
+avec une vid&eacute;oconf&eacute;rence en cours. Et donc limiter la
+bande passante consomm&eacute;e par celle-ci. Bien s&ucirc;r, vous
+pouvez toujours aller dans la fen&ecirc;tre des
+pr&eacute;f&eacute;rences, ajuster la limite de bande passante et tout
+le tra-la-la. Mais ce n'est pas tr&egrave;s confortable, avouons-le.<br>
+
+
+
+
+
+
+<p><b><u>Configurations</u></b><br>
+
+
+
+
+
+
+</p>
+
+
+
+
+
+
+<p>La solution &agrave; ce probl&egrave;me est similaire &agrave; celle
+fournie par Apple pour les r&eacute;glages r&eacute;seau. On peut
+d&eacute;finir diff&eacute;rentes configurations r&eacute;seau et
+activer la configuration la plus appropri&eacute;e quand le besoin s'en fait sentir,
+tr&egrave;s facilement.<br>
+
+
+
+
+
+
+Dans XMeeting, une configuration englobe tout un jeu de
+pr&eacute;f&eacute;rences susceptibles de changer d'un endroit &agrave;
+un autre. Une configuration contient des informations sur :</p>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+  <li>l'&eacute;tat du r&eacute;seau et la limite de bande passante</li>
+
+
+
+
+
+
+
+  <li>quels protocoles (H323 / SIP) sont activ&eacute;s</li>
+
+
+
+
+
+
+
+  <li>les r&eacute;glages sp&eacute;cifique &agrave; un protocole</li>
+
+
+
+
+
+
+
+  <li>quels codecs sont activ&eacute;s et leur ordre de pr&eacute;f&eacute;rence</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+Vous pouvez ainsi d&eacute;finir de nombreuses configurations
+diff&eacute;rentes, que vous pouvez adapter pr&eacute;cis&eacute;ment
+&agrave; vos besoins.<br>
+
+
+
+
+
+
+<p><b><u>Comptes</u></b><br>
+
+
+
+
+
+
+</p>
+
+
+
+
+
+
+<p>Dans le monde H323, il est possible de s'enregistrer sur une
+gatekeeper de fa&ccedil;on &agrave; pouvoir se faire appeler via un
+num&eacute;ro de t&eacute;l&eacute;phone ou un nom plut&ocirc;t qu'une
+adresse r&eacute;seau. Dans le monde SIP, le m&ecirc;me service existe
+gr&acirc;ce &agrave; ce qu'on appelle des registrars. De plus, dans le
+monde SIP, il est quasiment obligatoire d'utiliser un registrar.</p>
+
+
+
+
+
+
+<p>Pour s'enregistrer sur une gatekeeper ou un registrar, il faut
+fournir des informations de compte telles que nom d'utilisateur,
+num&eacute;ro de t&eacute;l&eacute;phone et parfois mot de passe
+&eacute;galement.<br>
+
+
+
+
+
+
+&Agrave; partir de la version 0.2, XMeeting ne m&eacute;morise plus ces
+informations directement dans les configurations, mais plut&ocirc;t
+dans des comptes H323 ou SIP explicites. Les configurations "pointent"
+sur ces comptes. Il est ainsi possible d'avoir plusieurs configurations
+qui utilisent le m&ecirc;me compte. S'il faut changer les
+param&egrave;tres d'un compte, on le fait une seule fois pour toutes
+les configurations correspondantes.</p>
+
+
+
+
+
+
+<p>Si vous ne voulez utiliser qu'un seul jeu de
+pr&eacute;f&eacute;rences, inutile de se pr&eacute;occuper de ce genre
+de d&eacute;tails. L'Assistant R&eacute;glages &nbsp;(voir  <a href="manuel.html#first_launch">3. Premi&egrave;re ex&eacute;cution</a>) s'occupera de tous les param&egrave;tres pour vous. </p>
+
+
+
+
+
+
+&nbsp;<a name="first_launch">
+<h3>3. Premi&egrave;re ex&eacute;cution</h3>
+
+
+
+
+
+
+</a>
+
+<p>Quand XMeeting d&eacute;marre pour la premi&egrave;re fois,
+l'Assistant R&eacute;glages est d'abord lanc&eacute; plut&ocirc;t que
+d'afficher simplement la fen&ecirc;tre principale. Cet assistant va
+vous aider &agrave; configurer XMeeting. Il va cr&eacute;er et
+param&eacute;trer une Configuration et -si besoin est- un compte H323
+ou SIP.<br>
+
+
+
+
+
+
+Pour plus de d&eacute;tails &agrave; propos des Configurations et Comptes, veuillez vous r&eacute;f&eacute;rer &agrave; <a href="manuel.html#locations_accounts">2. Configuration &amp; Comptes</a>.</p>
+
+
+
+
+
+
+Au lieu de cr&eacute;er&nbsp;une Configuration, vous pouvez aussi
+importer des configurations pr&eacute;d&eacute;finies &agrave; partir
+d'un fichier. Pour plus d'informations, veuillez consulter <a href="manuel.html#importing">6. Importation de Configurations</a>.
+<p>Si vous quittez l'Assistant Configuration, une configuration par
+d&eacute;faut ne fournissant aucune fonctionnalit&eacute; sera
+activ&eacute;e. Vous devez alors ouvrir les pr&eacute;f&eacute;rences
+et configurer XMeeting.</p>
+
+
+
+
+
+
+&nbsp;<a name="user_interface">
+<h3>4.&nbsp;Interface utilisateur</h3>
+
+
+
+
+
+
+</a>
+
+<p>
+<span style="text-decoration: underline;"><span style="font-weight: bold;">Fen&ecirc;tre principale</span></span>
+<br>
+
+
+
+
+
+
+La fen&ecirc;tre principale d'Xmeeting se pr&eacute;sente ainsi :
+</p>
+
+
+
+
+
+
+
+
+<p>
+<img src="images/mainwindow.png">
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>LED d'&eacute;tat</u><br>
+
+
+
+
+
+Trois couleurs indiquent l'&eacute;tat d'XMeeting :
+<br>
+
+
+
+
+
+
+
+<i>Vert&nbsp;</i>: Tout va bien.<br>
+
+
+
+
+
+
+
+<i>Orange&nbsp; </i>: Quelques probl&egrave;mes, mais il est encore possible de lancer des appels.
+<br>
+
+
+
+
+
+
+
+<i>Rouge </i>: S&eacute;rieux probl&egrave;mes. XMeeting ne peut plus &eacute;mettre ou&nbsp;recevoir  des appels.<br>
+
+
+
+
+
+On peut cliquer sur la LED pour ouvrir la fen&ecirc;tre d'&eacute;tat
+dans laquelle on trouvera des informations plus
+d&eacute;taill&eacute;es sur ce qui marche ou pas.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">&Eacute;tat</span>
+<br>
+
+
+
+
+
+Affiche une information d'&eacute;tat basique telle que "Inactif", "D&eacute;connect&eacute;', "Appel entrant".
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Configuration active</u><br>
+
+
+
+
+
+Affiche la configuration active et permet &agrave; l'utilisateur d'en choisir une autre.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Afficher/Masquer la vid&eacute;o locale</u>
+<br>
+
+
+
+
+
+Affiche/Masque une pr&eacute;visualisation du
+p&eacute;riph&eacute;rique vid&eacute;o actuellement en service
+(cam&eacute;ra, &eacute;cran).
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Afficher les outils</u><br>
+
+
+
+
+
+Affiche la fen&ecirc;tre des outils
+</p>
+
+
+
+
+
+
+
+
+<p><u>Afficher les contacts</u><br>
+
+
+
+
+
+Affiche la fen&ecirc;tre des contacts
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Bouton d'appel</u>
+<br>
+
+
+
+
+
+Lance l'appel du site distant
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Champ d'adresse</u>
+<br>
+
+
+
+
+
+</p>
+
+
+
+
+
+<p>Pour appeler un site distant, entrez son adresse ici. Pendant la
+saisie, XMeeting affichera toutes les adresses que vous avez
+pr&eacute;c&eacute;demment entr&eacute;es. L'ic&ocirc;ne sur la gauche
+indique le type d'adresse que vous avez entr&eacute;e. Si, par exemple,
+l'adresse que vous &ecirc;tes en train de saisir est parmi celles
+r&eacute;cemment appel&eacute;es, l'ic&ocirc;ne affich&eacute;e sera
+diff&eacute;rente de celle par d&eacute;faut. De plus, l'ic&ocirc;ne
+indique quel protocole (H323 ou SIP) sera utilis&eacute; quand vous
+appellerez.<br>
+
+
+
+
+
+En pressant le bouton &agrave; droite du champ, vous ouvrez un menu
+avec toutes les adresses contenues dans la base d'XMeeting. Cette base
+est constitu&eacute;e des dix derni&egrave;res adresses appel&eacute;es
+et de la totalit&eacute; des adresses XMeeting contenues dans le Carnet
+d'Adresses.</p>
+
+
+
+
+
+<p><u>Choisir le protocole d'appel (H323 ou SIP)</u><br>
+
+
+
+
+
+</p>
+
+
+
+
+
+<p>Du fait qu'XMeeting supporte &agrave; la fois H323 et SIP, vous
+devez toujours indiquer quel protocole utiliser quand vous
+&eacute;mettez un appel. Si un seul protocole est activ&eacute;, il
+sera choisi par d&eacute;faut. Vous pouvez toujours saisir n'importe
+quel protocole, m&ecirc;me si celui-ci n'est pas activ&eacute;.
+Cependant, vous obtiendrez un message d'erreur si vous essayez
+d'&eacute;mettre un appel dans ces conditions.<br>
+
+
+
+
+
+On peut choisir un protocole de diverses mani&egrave;res :</p>
+
+
+
+
+
+<ul>
+
+
+
+
+
+  <li>si vous indiquez le pr&eacute;fixe "h323:" ou "sip:", XMeeting basculera automatiquement sur ce protocole.</li>
+
+
+
+
+
+
+
+  <li>quand vous cliquez sur l'ic&ocirc;ne, un menu vous permettra de
+s&eacute;lectionner un protocole. Si l'adresse en cours de saisie
+existe dans le Carnet d'adresses, vous ne pourrez pas choisir le
+protocole. Au lieu de cela, vous verrez une liste d'adresses
+alternatives associ&eacute;es &agrave; l'entr&eacute;e dans le Carnet
+d'adresses.</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+<p>
+<b><u>Contr&ocirc;les pendant l'appel</u></b><br>
+
+
+
+
+
+Une fois la communication &eacute;tablie, le contenu de la
+fen&ecirc;tre principale d&eacute;crit ci-dessus est remplac&eacute;
+par l'image du site distant. Pour effectuer des r&eacute;glages ou
+raccrocher au cours d'une communication, vous utiliserez les
+contr&ocirc;les pendant l'appel. Si vous survolez la zone
+inf&eacute;rieure de la fen&ecirc;tre f'affichage du site distant, les
+contr&ocirc;les suivants apparaitront :
+</p>
+
+
+
+
+
+
+
+
+<p>
+<img src="images/osd.png">
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Basculer en plein &eacute;cran</span>
+<br>
+
+
+
+
+
+Commute l'affichage plein &eacute;cran/fen&ecirc;tre.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Activer/d&eacute;sactiver l'Image dans l'image (PIP)</span>
+<br>
+
+
+
+
+
+Si le mode Image dans l'image (Picture in Picture, PIP) est
+activ&eacute;, &agrave; la fois le site distant et la vid&eacute;o
+locale sont affich&eacute;s. L'agencement des deux images est
+d&eacute;termin&eacute; par le mode Image dans l'image (PIP).
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Image dans l'image (PIP)</span>
+<br>
+
+
+
+
+
+Commute entre les divers modes Image dans l'image (PIP). Les modes suivants sont disponibles :
+</p>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li><i>Classique </i>: La vid&eacute;o locale apparait dans un
+petit rectangle incrust&eacute; dans la vid&eacute;o distante. Vous
+pouvez d&eacute;placer la vid&eacute;o locale &agrave;
+l'int&eacute;rieur de la fen&ecirc;tre.</li>
+
+
+
+
+
+
+
+  <li><i>C&ocirc;te &agrave; c&ocirc;te </i>: Les vid&eacute;os
+locale et distante sont affich&eacute;es c&ocirc;te &agrave; c&ocirc;te
+&agrave; la m&ecirc;me taille. La fen&ecirc;tre de gauche est la
+vid&eacute;o distante, celle de droite la vid&eacute;o locale.</li>
+
+
+
+
+
+
+
+  <li><i>3D </i>: Similaire au mode c&ocirc;te &agrave; c&ocirc;te,
+mais avec un effet de perspective comme si les participants
+&eacute;taient assis &agrave; une table. Connu sous le nom de "mode
+&agrave; la iChat". </li>
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Afficher les infos</span>
+<br>
+
+
+
+
+
+
+
+Affiche la fen&ecirc;tre d'infos
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Afficher les outils</u><br>
+
+
+
+
+
+
+
+Affiche la fen&ecirc;tre des outils
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Micro on/off</span><u></u><br>
+
+
+
+
+
+
+
+D&eacute;sactive/active le microphone local
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Raccrocher</span><br>
+
+
+
+
+
+Termine l'appel en cours.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Inspecteur de Contacts</u></b>
+<br>
+
+
+
+
+L'Inspecteur de contacts administre toutes sortes de contacts, que ce
+soit des contacts SIP (pas encore support&eacute;) ou des contacts
+stock&eacute;s dans la base de donn&eacute;es du Carnet d'adresses.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<span style="text-decoration: underline;">Carnet d'adresse</span>
+<br>
+
+
+
+L'outil Carnet d'adresses vous permet de g&eacute;rer vos contacts
+stock&eacute;s dans l'annuaire du Carnet d'adresse. Vous pouvez ajouter
+des nouvelles entr&eacute;es, ajouter des adresses H323 ou SIP
+&agrave; des entr&eacute;es existantes et modifier les adresses
+stock&eacute;es.<br>
+
+
+
+Quand vous &eacute;ditez une adresse, vous devez toujours
+pr&eacute;ciser quel protocole cette adresse utilise. L'intitul&eacute;
+du champ correspondant vous aide &agrave; identifier de quel champ il
+s'agit. Pour plus de d&eacute;tails sur les intitul&eacute;s de champ,
+r&eacute;f&eacute;rez-vous &agrave; l'aide de l'application Carnet
+d'adresses.
+</p>
+
+
+
+
+
+
+
+
+<p>Dans le cas d'une adresse H323, vous pouvez &eacute;galement
+ajouter de l'information suppl&eacute;mentaire &agrave; l'adresse
+d'appel elle-m&ecirc;me. Vous pouvez forcer XMeeting &agrave; utiliser
+une gatekeeper sp&eacute;cifique chaque fois que vous appelez cette
+adress. La plupart du temps, cette fonctionnalit&eacute; n'est pas
+n&eacute;cessaire, mais elle peut se r&eacute;v&eacute;ler utile pour
+des tests. On pourrait obtenir le m&ecirc;me r&eacute;sultat en
+cr&eacute;ant deux comptes H323 pour deux gatekeepers
+diff&eacute;rentes et deux configurations qui pointent vers ces
+comptes, mais l'approche propos&eacute;e ici est plus ad&eacute;quate.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<img src="images/ab_gatekeeper.png">
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Inspecteur d'Info</u></b>
+<br>
+
+
+L'inspecteur d'info affiche des informations utiles sur l'&eacute;tat
+du r&eacute;seau et sur les appels r&eacute;cents ou en cours.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>&Eacute;tat</u><br>
+
+
+Des informations d&eacute;taill&eacute;es sur l'&eacute;tat du
+r&eacute;seau en g&eacute;n&eacute;ral ainsi que sur celui des
+protocoles H323 et SIP sont affich&eacute;es ici.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Statistiques</u>
+<br>
+
+
+Pendant un appel, des statistiques utiles telles que le codec en
+service, la bande passante utilis&eacute;e et le "round trip delay"
+sont disponible ici.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Historique</u>
+<br>
+
+
+Tous les appels &eacute;mis ou re&ccedil;us depuis le lancement de
+l'application sont list&eacute;s ici. Ils peuvent &ecirc;tre
+examin&eacute;s plus&nbsp;&agrave; fond, avec des d&eacute;tails tels
+que la dur&eacute;e de l'appel, les codecs utilis&eacute;s etc.<br>
+
+
+Le "Log" fournit une trace de toutes sortes d'activit&eacute;s et
+&eacute;v&eacute;nements survenus lors de l'ex&eacute;cution
+d'XMeeting.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Inspecteur d'Outils</u></b>
+<br>
+
+
+L'inspecteur d'outils fournit des outils pour contr&ocirc;ler l'audio
+et la vid&eacute;o, &agrave; la fois localement et sur le site distant.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Contr&ocirc;le Audio/Video</u>
+<br>
+
+
+Cet outil permet de s&eacute;lectionner les p&eacute;riph&eacute;riques
+audio/vid&eacute;o, d'ajuster les r&eacute;glages de volume et
+vid&eacute;o.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Contr&ocirc;le &agrave; distance</u><br>
+
+
+Cet outil fournit un pav&eacute; num&eacute;rique pour num&eacute;roter
+pendant un appel. Les fl&egrave;ches permettent de contr&ocirc;ler la
+cam&eacute;ra distante (si cette fonctionnalit&eacute; est disponible),
+ou par exemple naviguer &agrave; travers une liste de
+conf&eacute;rences si on est connect&eacute; &agrave; un MCU Codian.
+</p>
+
+
+
+
+
+
+
+
+<!-- *********************PREFERENCES************************ -->
+
+<a name="preferences">
+<h3>5. Pr&eacute;f&eacute;rences</h3>
+
+
+
+
+
+
+</a>
+
+<p>Cette section commente bri&egrave;vement les param&egrave;tres disponibles dans la fen&ecirc;tre des pr&eacute;f&eacute;rences.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>G&eacute;n&eacute;ral</u></b>
+<br>
+
+
+
+
+Contient les param&egrave;tres au niveau de l'application tels le Nom Affich&eacute; et les options de debug.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Produire une trace de debug</u>
+<br>
+
+
+Lors de la remont&eacute;e de probl&egrave;mes tels que pas de
+vid&eacute;o/audio, mauvaise vid&eacute;o, crashes etc., une trace de
+debug peut fournir des informations pr&eacute;cieuses. En
+g&eacute;n&eacute;ral, vous n'avez pas besoin d'activer cette fonction.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Interface utilisateur</u></b><br>
+
+
+Cette section g&egrave;re l'interface utilisateur d'XMeeting. Vous
+pouvez sp&eacute;cifier comment XMeeting doit se comporter lors d'appel
+entrant etc.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Vue personnelle invers&eacute;e</u><br>
+
+
+Certaines personnes souhaitent se voir dans la fen&ecirc;tre de la
+vid&eacute;o locale comme elles se voient dans un miroir.
+L'aper&ccedil;u local affiche l'image comme la voient &nbsp;les
+interlocuteurs. Vous pouvez demander &agrave; XMeeting d'afficher
+l'image comme vue dans un miroir.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Comptes</u></b><br>
+
+
+Cette section vous permet de g&eacute;rer les comptes H323 et SIP.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Configurations</u></b><br>
+
+
+Le panneau Configurations vous permet d'&eacute;diter les configurations d'XMeeting.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<img src="images/locations.png">
+</p>
+
+
+
+
+
+
+
+
+<p>&Agrave; gauche, vous pouvez s&eacute;lectionner la configuration
+&agrave; &eacute;diter. Les r&eacute;glages correspondants s'affichent
+alors dans la partie de droite.<br>
+
+Vous pouvez aussi cr&eacute;er de nouvelles configurations, dupliquer
+ou supprimer des configurations existantes et en importer &agrave;
+partir d'un fichier. (Voir <a href="#importing">6. Importer des configurations</a>)
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>R&eacute;seau</u><br>
+
+ici, vous pouvez sp&eacute;cifier une limite sur la bande passante
+utilis&eacute;e et d'autres r&eacute;glages r&eacute;seaux. Si vous
+&ecirc;tes derri&egrave;re un NAT (typiquement chez vous si vous avez
+install&eacute; un routeur WiFi), vous devez probablement activer STUN,
+sous peine de ne pas pouvoir recevoir les flux vid&eacute;o/audio du
+site distant. Une autre possibilit&eacute; pour traverser le NAT est
+d'utiliser la translation d'adresse IP. Dans ce cas, vous devrez sans
+doute valider l'option "Port Forwarding" dans votre appareil qui assure
+la fonction NAT (en g&eacute;n&eacute;ral votre routeur WiFi) pour
+faire fonctionner correctement vos appels.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>H323</u>&nbsp;<br>
+
+Permet d'activer/d&eacute;sactiver H323 pour cette configuration. Vous
+pouvez aussi choisir ici quel compte H323 utiliser pour cette
+configuration (si H323 est activ&eacute;).
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>SIP</u>
+<br>
+
+Permet de choisir quel compte SIP et quels r&eacute;glages proxy utiliser.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Audio</u>
+<br>
+
+Permet de valider/d&eacute;valider les codecs audio et de
+sp&eacute;cifier un ordre de pr&eacute;f&eacute;rence pour ceux-ci.
+Utiliser un buffer audio plus grand peut aboutir &agrave; une meilleure
+qualit&eacute; audio, au prix d'un plus grand d&eacute;calage dans le
+temps. (Cette fonctionnalit&eacute; n'est pas encore
+impl&eacute;ment&eacute;e)
+</p>
+
+
+
+
+
+
+
+
+<p>
+<u>Video</u>
+<br>
+
+Bien qu'Xmeeting ait &eacute;t&eacute; concu comme une application de
+vid&eacute;oconf&eacute;rence, on peut d&eacute;valider la vid&eacute;o
+pour faire des appels audio pur. Vous pouvez &eacute;galement
+pr&eacute;ciser &agrave; quels taux de rafraichissement d'images
+XMeeting doit envoyer la vid&eacute;o. Une valeur plus faible peut
+fournir une meilleure qualit&eacute; d'image au d&eacute;triment de la
+fluidit&eacute;. Cependant, pour un taux donn&eacute;
+sp&eacute;cifi&eacute; ici, XMeeting est susceptible d'envoyer des
+images &agrave; un taux plus faible, selon la source vid&eacute;o en
+service et les r&eacute;glages du site distant.<br>
+
+L'ordre de pr&eacute;f&eacute;rence d'utilisation des codecs
+vid&eacute;o disponibles peut &ecirc;tre modifi&eacute; et les codecs
+peuvent &ecirc;tre valid&eacute;s d&eacute;valid&eacute;s selon vos
+besoins.<br>
+
+L'option Activer le mode H.264 limit&eacute; met en service un mode
+particulier pour H.264 qui n'est pas 100% standard. Certains
+syst&egrave;mes H323 peuvent avoir des probl&egrave;mes pour
+d&eacute;coder le flux vid&eacute;o H.264 envoy&eacute; par XMeeting.
+Si on ne valide pas cette option, XMeeting n'enverra pas du H.264 dans
+la plupart des cas &mdash; m&ecirc;me si le syst&egrave;me distant peut
+faire du H.264. Une conf&eacute;rence entre deux XMeeting marchera
+toujours en H.264 si celui-ci est valid&eacute; des deux
+c&ocirc;t&eacute;s.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Entr&eacute;e Vid&eacute;o</u></b><br>
+
+XMeeting utilise une approche modulaire pour les sources vid&eacute;o.
+Chaque module peut &ecirc;tre activ&eacute; ou d&eacute;sactiv&eacute;.
+Le module&nbsp;<span style="font-style: italic;">Direct</span> est
+celui par d&eacute;faut et le plus utile. Il permet de
+s&eacute;lectionner comme source toute cam&eacute;ra compatible
+QuickTime.</p>
+
+<p>Le deuxi&egrave;me module disponible, <span style="font-style: italic;">Image fixe</span>,
+permet d'envoyer des images &agrave; partir d'un fichier. Vous pouvez
+choisir quelle image envoyer et comment l'image doit &ecirc;tre
+restitu&eacute;e. Ce module est d&eacute;sactiv&eacute; par
+d&eacute;faut, s&eacute;lectionnez
+Pr&eacute;f&eacute;rences/Entr&eacute;e vid&eacute;o pour l'activer.<br>
+
+
+
+
+
+
+
+<br>
+
+Le troisi&egrave;me module, <span style="font-style: italic;">&Eacute;cran</span>,
+permet d'envoyer le contenu de l'&eacute;cran. Sur un syst&egrave;me
+multi-&eacute;cran, vous devez s&eacute;lectionner lequel
+envoyer.&nbsp;Ce module est d&eacute;sactiv&eacute; par d&eacute;faut,
+s&eacute;lectionnez Pr&eacute;f&eacute;rences/Entr&eacute;e
+vid&eacute;o pour l'activer.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Note : La source vid&eacute;o peut &ecirc;tre commut&eacute;e pendant les appels.<br>
+
+
+
+
+
+
+
+<br>
+
+D'autres modules sont pr&eacute;vus, dont Vid&eacute;o enregistr&eacute;e.
+</p>
+
+
+
+
+
+
+
+
+<p>
+<b><u>Carnet d'adresses</u></b><br>
+
+Cette section permet de contr&ocirc;ler les interactions entre XMetting
+et l'application Carnet d'adresses. XMeeting est capable d'une
+int&eacute;gration pouss&eacute;e avec Carnet d'adresses qui vous aide
+&agrave; g&eacute;rer vos contacts.
+</p>
+
+
+
+
+
+
+
+
+<!-- *********************IMPORTING LOCATIONS**************** -->
+
+<a name="importing">
+<h3>6. Importer des configurations</h3>
+
+
+
+
+
+
+</a>
+
+<p>XMeeting est dot&eacute; d'une fonction puissante d'importation de
+configurations &agrave; partir d'un fichier. Si l'utilisateur choisit
+d'importer des configurations &agrave; partir d'un fichier, que ce soit
+&agrave; la premi&egrave;re activation de l'application ou dans la
+fen&ecirc;tre des pr&eacute;f&eacute;rences, l'Assistant
+R&eacute;glages ne demandera que l'information manquante dans les
+configurations import&eacute;es. Cette fonctionnalit&eacute; est
+tr&egrave;s utile pour d&eacute;ployer XMeeting dans une entreprise,
+puisque l'administrateur syst&egrave;me peut pr&eacute;parer une
+configuration avec les r&eacute;glages corrects pour le r&eacute;seau,
+la bande passante et la vid&eacute;o. Il ne reste plus &agrave;
+l'utilisateur qu'&agrave; entrer ses donn&eacute;es personnelles pour
+une gatekeeper par exemple (nom d'utilisateur, num&eacute;ro de
+t&eacute;l&eacute;phone). Quand il importera une telle configuration,
+l'Assistant R&eacute;glages demandera sp&eacute;cifiquement cette
+information, sans tout le reste.</p>
+
+
+
+
+
+<p>Si vous souhaitez plus d'informations sur cette fonctionnalit&eacute;, contactez 
+<a href="mailto:hfriederich@users.sourceforge.net">hfriederich@users.sourceforge.net</a>
+</p>
+
+
+
+
+
+
+</body>
+</html>
