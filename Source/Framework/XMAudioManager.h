@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.h,v 1.6 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.7 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,6 +31,10 @@
 	
 	NSString *noDeviceName;
 	NSString *unknownDeviceName;
+	
+	BOOL doesMeasureSignalLevels;
+	double inputLevel;
+	double outputLevel;
 }
 
 /**
@@ -77,6 +81,14 @@
 - (BOOL)setOutputVolume:(unsigned)vol;
 - (BOOL)mutesOutput;
 - (BOOL)setMutesOutput:(BOOL)muteVolume;
+
+/**
+ * Getting information about input/output levels
+ **/
+- (BOOL)doesMeasureSignalLevels;
+- (void)setDoesMeasureSignalLevels:(BOOL)flag;
+- (double)inputLevel;
+- (double)outputLevel;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.20 2006/08/05 15:13:57 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.21 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,7 @@ class XMOpalManager : public OpalManager
 	
 public:
 	static void InitOpal(const PString & pTracePath);
+	static void CloseOpal();
 	
 	XMOpalManager();
 	~XMOpalManager();
@@ -55,6 +56,7 @@ public:
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	
 	/* overriding some callbacks */
+	virtual BOOL OnIncomingConnection(OpalConnection & connection);
 	virtual void OnEstablishedCall(OpalCall & call);
 	virtual void OnClearedCall(OpalCall & call);
 	virtual void OnReleased(OpalConnection & connection);

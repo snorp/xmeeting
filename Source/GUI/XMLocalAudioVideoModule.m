@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.23 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.24 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,11 +104,20 @@
 							   name:XMNotification_AudioManagerOutputVolumeDidChange object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateAudioDeviceLists:)
 							   name:XMNotification_AudioManagerDidUpdateDeviceLists object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didUpdateAudioInputLevel:)
+							   name:XMNotification_AudioManagerDidUpdateInputLevel object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
 	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
+	
+	/* InterfaceBuilder uses the levelIndicator with a fixed height of 18px.
+	   Instead of building our own level indicator, the height is set to 8px
+	   here to get the desired effect */
+	NSRect frame = [audioInputLevelIndicator frame];
+	frame.size.height = 8;
+	[audioInputLevelIndicator setFrame:frame];
 	
 }
 
@@ -141,6 +150,8 @@
 {
 	isActive = YES;
 	[self _activeLocationDidChange:nil];
+	
+	[[XMAudioManager sharedInstance] setDoesMeasureSignalLevels:YES];
 }
 
 - (void)becomeInactiveModule
@@ -150,6 +161,8 @@
 	[localVideoView stopDisplayingLocalVideo];
 	[localVideoView stopDisplayingNoVideo];
 	isActive = NO;
+	
+	[[XMAudioManager sharedInstance] setDoesMeasureSignalLevels:NO];
 }
 
 #pragma mark Action Methods
@@ -469,6 +482,14 @@
 		[videoDeviceSettingsButton setEnabled:NO];
 		[videoDisabledFld setStringValue:NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_VIDEO_DISABLED", @"")];
 	}
+}
+
+- (void)_didUpdateAudioInputLevel:(NSNotification *)notif
+{
+	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+	double level = [audioManager inputLevel];
+	
+	[audioInputLevelIndicator setDoubleValue:(22.0 * level)];
 }
 
 @end

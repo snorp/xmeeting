@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.25 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.26 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -220,6 +220,25 @@ void _XMUpdatePicture()
 	[XMMediaTransmitter _updatePicture];
 	
 	[autoreleasePool release];
+}
+
+void _XMHandleAudioInputLevel(double level)
+{
+	NSNumber *number = [[NSNumber alloc] initWithDouble:level];
+	
+	[_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioInputLevel:)
+													withObject:number waitUntilDone:NO];
+	[number release];
+}
+
+void _XMHandleAudioOutputLevel(double level)
+{
+	NSNumber *number = [[NSNumber alloc] initWithDouble:level];
+	
+	[_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioOutputLevel:)
+													withObject:number waitUntilDone:NO];
+	
+	[number release];
 }
 
 #pragma mark -

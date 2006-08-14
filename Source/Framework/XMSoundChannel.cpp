@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.5 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.6 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #include "XMSoundChannel.h"
 #include "XMCircularBuffer.h"
 #include "XMCircularBuffer.cpp"
+#include "XMCallbackBridge.h"
 
 #define checkStatus( err, location ) \
 if(err) {\
@@ -17,6 +18,10 @@ if(err) {\
 }
 
 #define XM_MIN_INPUT_FILL 20
+
+extern "C" {
+	unsigned char linear2ulaw(int pcm_val);
+};
 
 PCREATE_SOUND_PLUGIN(XMSoundChannel, XMSoundChannel);
 
@@ -27,14 +32,18 @@ static PMutex deviceEditMutex;
 static XMSoundChannel *activePlayDevice = NULL;
 static AudioDeviceID activePlayDeviceID = kAudioDeviceUnknown;
 static BOOL activePlayDeviceIsMuted = FALSE; 
-static XMSoundChannel *activeRecordDevice = NULL;
-static AudioDeviceID activeRecordDeviceID = kAudioDeviceUnknown;
-static BOOL activeRecordDeviceIsMuted = FALSE;
+static XMSoundChannel *recordDevice = NULL;
+static AudioDeviceID recordDeviceID = kAudioDeviceUnknown;
+static BOOL recordDeviceIsMuted = FALSE;
+static BOOL measureSignalLevels = FALSE;
+static int inputSignalLevelCounter = 0;
 
 #pragma mark Static Methods
 
 void XMSoundChannel::Init()
 {
+	deviceEditMutex.Wait();
+	
 	OSStatus err = noErr;
 	
 	UInt32 deviceIDSize = sizeof(AudioDeviceID);
@@ -46,8 +55,32 @@ void XMSoundChannel::Init()
 	
 	err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
 								   &deviceIDSize,
-								   &activeRecordDeviceID);
+								   &recordDeviceID);
 	checkStatus(err, 51);
+	
+	// Start the default record device that is always running.
+	// to enable input level metering
+	PString deviceName = XMSoundChannelDevice;
+	recordDevice = new XMSoundChannel(deviceName, PSoundChannel::Recorder,
+									  1, 8000, 16);
+	recordDevice->SetBuffers(320, 2);
+	recordDevice->StartRecording();
+	
+	deviceEditMutex.Signal();
+}
+
+void XMSoundChannel::DoClose()
+{
+	deviceEditMutex.Wait();
+	
+	StopChannels();
+	if(recordDevice != NULL) {
+		recordDevice->StopAudioConversion();
+		delete recordDevice;
+		recordDevice = NULL;
+	}
+	
+	deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetPlayDevice(unsigned int device)
@@ -91,17 +124,17 @@ void XMSoundChannel::SetRecordDevice(unsigned int device)
 	
 	AudioDeviceID deviceID = (AudioDeviceID)device;
 	
-	if(activeRecordDeviceID != deviceID)
+	if(recordDeviceID != deviceID)
 	{
-		activeRecordDeviceID = deviceID;
+		recordDeviceID = deviceID;
 		
-		if(activeRecordDevice)
+		if(recordDevice)
 		{
-			activeRecordDevice->Restart(activeRecordDeviceID);
+			recordDevice->Restart(recordDeviceID);
 		}
 	}
 	
-	activeRecordDeviceIsMuted = FALSE;
+	recordDeviceIsMuted = FALSE;
 	
 	deviceEditMutex.Signal();
 }
@@ -110,14 +143,19 @@ void XMSoundChannel::SetRecordDeviceMuted(BOOL muteFlag)
 {
 	deviceEditMutex.Wait();
 	
-	if(activeRecordDevice != NULL)
+	if(recordDevice != NULL)
 	{
-		activeRecordDevice->SetDeviceMuted(muteFlag);
+		recordDevice->SetDeviceMuted(muteFlag);
 	}
 	
-	activeRecordDeviceIsMuted = muteFlag;
+	recordDeviceIsMuted = muteFlag;
 	
 	deviceEditMutex.Signal();
+}
+
+void XMSoundChannel::SetMeasureSignalLevels(BOOL flag)
+{
+	measureSignalLevels = flag;
 }
 
 void XMSoundChannel::StopChannels()
@@ -126,10 +164,6 @@ void XMSoundChannel::StopChannels()
 	if(activePlayDevice != NULL)
 	{
 		activePlayDevice->StopAudioConversion();
-	}
-	if(activeRecordDevice != NULL)
-	{
-		activeRecordDevice->StopAudioConversion();
 	}
 	deviceEditMutex.Signal();
 }
@@ -153,15 +187,10 @@ XMSoundChannel::XMSoundChannel(const PString & device,
 
 XMSoundChannel::~XMSoundChannel()
 {
-	
 	deviceEditMutex.Wait();
 	if(direction == Player)
 	{
 		activePlayDevice = NULL;
-	}
-	else
-	{
-		activeRecordDevice = NULL;
 	}
 	deviceEditMutex.Signal();
 	
@@ -179,6 +208,7 @@ PStringList XMSoundChannel::GetDeviceNames(PSoundChannel::Directions direction)
 	PStringList devices;
 	
 	devices.AppendString(XMSoundChannelDevice);
+	devices.AppendString(XMInputSoundChannelDevice);
 	
 	return devices;
 }
@@ -191,6 +221,14 @@ BOOL XMSoundChannel::Open(const PString & deviceName,
 {
 	OSStatus err;
 	
+	if(deviceName == XMInputSoundChannelDevice)
+	{
+		isInputProxy = TRUE;
+		os_handle = 8;
+		state = format_set_;
+		return TRUE;
+	}
+	
 	deviceEditMutex.Wait();
 	if(direction == Player)
 	{
@@ -199,12 +237,11 @@ BOOL XMSoundChannel::Open(const PString & deviceName,
 	}
 	else
 	{
-		activeRecordDevice = this;
-		isMuted = activeRecordDeviceIsMuted;
+		isMuted = recordDeviceIsMuted;
 	}
 	deviceEditMutex.Signal();
 	
-	if(strcmp(deviceName, XMSoundChannelDevice) != 0)
+	if(deviceName != XMSoundChannelDevice)
 	{
 		mDeviceID = kAudioDeviceUnknown;
 		return FALSE;
@@ -232,14 +269,14 @@ BOOL XMSoundChannel::Open(const PString & deviceName,
 		}
 		else
 		{
-			if(activeRecordDeviceID == kAudioDeviceUnknown)
+			if(recordDeviceID == kAudioDeviceUnknown)
 			{
 				err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
 											   &theSize, &deviceID);
 			}
 			else
 			{
-				deviceID = activeRecordDeviceID;
+				deviceID = recordDeviceID;
 				err = kAudioHardwareNoError;
 			}
 		}
@@ -258,11 +295,19 @@ BOOL XMSoundChannel::Open(const PString & deviceName,
 
 BOOL XMSoundChannel::IsOpen() const
 {
+	if(isInputProxy == TRUE)
+	{
+		return TRUE;
+	}
 	return os_handle >= 0;
 }
 
 unsigned XMSoundChannel::GetChannels() const
 {
+	if(isInputProxy == TRUE)
+	{
+		return recordDevice->GetChannels();
+	}
 	if(state >= format_set_)
 	{
 		return pwlibASBD.mChannelsPerFrame;
@@ -272,6 +317,10 @@ unsigned XMSoundChannel::GetChannels() const
 
 unsigned XMSoundChannel::GetSampleRate() const
 {
+	if(isInputProxy == TRUE)
+	{
+		return recordDevice->GetSampleRate();
+	}
 	if(state >= format_set_)
 	{
 		return (unsigned)(pwlibASBD.mSampleRate);
@@ -281,6 +330,10 @@ unsigned XMSoundChannel::GetSampleRate() const
 
 unsigned XMSoundChannel::GetSampleSize() const
 {
+	if(isInputProxy == TRUE)
+	{
+		return recordDevice->GetSampleSize();
+	}
 	if(state >= format_set_)
 	{
 		return (unsigned)(pwlibASBD.mBitsPerChannel);
@@ -293,6 +346,11 @@ BOOL XMSoundChannel::SetFormat(unsigned numChannels,
 							   unsigned bitsPerSample)
 {
 	PAssert((sampleRate == 8000 && numChannels == 1 && bitsPerSample == 16), PUnsupportedFeature);
+	
+	if(isInputProxy)
+	{
+		return TRUE;
+	}
 	
 	if(numChannels != 1 || sampleRate != 8000 || bitsPerSample != 16 || state != open_)
 	{
@@ -379,6 +437,10 @@ BOOL XMSoundChannel::SetFormat(unsigned numChannels,
 BOOL XMSoundChannel::GetBuffers(PINDEX & size,
 								PINDEX & count)
 {
+	if(isInputProxy)
+	{
+		return recordDevice->GetBuffers(size, count);
+	}
 	size = bufferSizeBytes;
 	count = bufferCount;
 	return TRUE;
@@ -398,6 +460,10 @@ BOOL XMSoundChannel::GetBuffers(PINDEX & size,
 BOOL XMSoundChannel::SetBuffers(PINDEX bufferSize,
 								PINDEX bufferCount)
 {
+	if(isInputProxy)
+	{
+		return TRUE;
+	}
 	OSStatus err = noErr;
 
 	PAssert((bufferSize > 0 && bufferCount > 0 && bufferCount < 65536), PInvalidParameter);
@@ -479,6 +545,11 @@ BOOL XMSoundChannel::SetBuffers(PINDEX bufferSize,
 BOOL XMSoundChannel::Read(void *buffer,
 						  PINDEX length)
 {
+	if(isInputProxy)
+	{
+		BOOL result = recordDevice->Read(buffer, length);
+		return result;
+	}
 	if(state < buffer_set_)
 	{
 		return FALSE;
@@ -509,9 +580,22 @@ BOOL XMSoundChannel::Read(void *buffer,
 	return TRUE;
 }
 
+PINDEX XMSoundChannel::GetLastReadCount() const
+{
+	if(isInputProxy)
+	{
+		return recordDevice->GetLastReadCount();
+	}
+	return lastReadCount;
+}
+
 BOOL XMSoundChannel::Write(const void *buffer,
 						   PINDEX length)
 {
+	if(isInputProxy)
+	{
+		return FALSE;
+	}
 	if(state < buffer_set_)
 	{
 		return FALSE;
@@ -546,6 +630,10 @@ BOOL XMSoundChannel::Write(const void *buffer,
 
 BOOL XMSoundChannel::StartRecording()
 {
+	if(isInputProxy)
+	{
+		return TRUE;
+	}
 	if(state != buffer_set_){
 		return FALSE;
 	}
@@ -562,6 +650,10 @@ BOOL XMSoundChannel::StartRecording()
 
 BOOL XMSoundChannel::IsRecordBufferFull()
 {
+	if(isInputProxy)
+	{
+		return recordDevice->IsRecordBufferFull();
+	}
 	PAssert(direction == Recorder, PInvalidParameter);
 	
 	if(state != buffer_set_)
@@ -579,6 +671,10 @@ BOOL XMSoundChannel::IsRecordBufferFull()
 
 BOOL XMSoundChannel::AreAllRecordBuffersFull()
 {
+	if(isInputProxy)
+	{
+		return recordDevice->AreAllRecordBuffersFull();
+	}
 	PAssert(direction == Recorder, PInvalidParameter);
 	
 	if(state != buffer_set_|| 
@@ -682,6 +778,7 @@ void XMSoundChannel::CommonConstruct()
 	mRecordInputBufferSize = 0;
 	mOutputBufferList = NULL;
 	mRecordOutputBufferSize = 0;
+	isInputProxy = FALSE;
 }
 
 BOOL XMSoundChannel::OpenDevice(AudioDeviceID deviceID, 
@@ -1430,6 +1527,44 @@ OSStatus XMSoundChannel::RecordProc(void *inRefCon,
 		This->mCircularBuffer->Fill((char*)audio_buf->mData, 
 									audio_buf->mDataByteSize, 
 									false, true); // do not wait, overwrite oldest frames
+		
+		/* Doing a (primitive) form of level metering: if the measureInputLevel flag is
+		 * set, calculate the average of the absolute values of the samples just processed. 
+		 * This uses the same  algorithm as OpalPCM16SilenceDetector::GetAverageSignalLevel() */
+		if(measureSignalLevels == TRUE) 
+		{
+			if(inputSignalLevelCounter % 4 == 0)
+			{
+				int sum = 0;
+				PINDEX samples = audio_buf->mDataByteSize/2;
+				const short *pcm = (const short *)audio_buf->mData;
+				const short *end = pcm + samples;
+				while (pcm != end) {
+					if(*pcm < 0) {
+						sum -= *pcm++;
+					} else {
+						sum += *pcm++;
+					}
+				}
+			
+				int intLevel = sum/samples;
+			
+				// convert it to logarithmic scale
+				intLevel = linear2ulaw(intLevel) ^ 0xff;
+			
+				// filter out some noise
+				if(intLevel < 15) {
+					intLevel = 0;
+				}
+			
+				// transform it into double and normalizing it
+				// signed 8-bit integer: maximum is 128
+				double doubleLevel = (intLevel / 128.0);
+			
+				_XMHandleAudioInputLevel(doubleLevel);
+			}
+		}
+		inputSignalLevelCounter++;
 	}
 
 	return err;

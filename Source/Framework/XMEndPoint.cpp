@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.15 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.16 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,7 +100,16 @@ XMConnection * XMEndPoint::CreateConnection(OpalCall & call, PString & token)
 PSoundChannel * XMEndPoint::CreateSoundChannel(const XMConnection & connection,
 											   BOOL isSource)
 {
-	PString deviceName = XMSoundChannelDevice;
+	PString deviceName;
+	
+	if(isSource)
+	{
+		deviceName = XMInputSoundChannelDevice;
+	}
+	else
+	{
+		deviceName = XMSoundChannelDevice;
+	}
 	
 	PSoundChannel * soundChannel = new PSoundChannel();
 	

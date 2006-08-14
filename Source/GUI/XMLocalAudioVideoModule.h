@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.11 2006/06/22 08:43:50 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.12 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,7 +29,8 @@
 	IBOutlet NSSlider *audioInputVolumeSlider;
 	IBOutlet NSSlider *audioOutputVolumeSlider;
 	IBOutlet NSButton *muteAudioInputSwitch;
-	IBOutlet NSButton *muteAudioOutputSwitch;	
+	IBOutlet NSButton *muteAudioOutputSwitch;
+	IBOutlet NSLevelIndicator *audioInputLevelIndicator;
 	IBOutlet NSTextField *videoDisabledFld;	
 	
 	IBOutlet NSPanel *videoDeviceSettingsPanel;

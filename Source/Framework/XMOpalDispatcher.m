@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.29 2006/08/05 19:49:19 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.30 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -584,6 +584,8 @@ typedef enum _XMOpalDispatcherMessage
 	
 	// running the run loop
 	[[NSRunLoop currentRunLoop] run];
+	
+	_XMCloseSubsystem();
 	
 	[self performSelectorOnMainThread:@selector(_handleOpalDispatcherThreadDidExit) withObject:nil waitUntilDone:NO];
 	

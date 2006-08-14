@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.33 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.34 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -236,6 +236,9 @@ void _XMCheckCloseStatus();
 
 - (id)_init;
 - (void)_close;
+
+- (void)_handleAudioInputLevel:(NSNumber *)level;
+- (void)_handleAudioOutputLevel:(NSNumber *)level;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.10 2006/07/02 14:48:18 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.11 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -97,6 +97,10 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	selectedInputDevice = [[self _nameForDeviceID:selectedInputDeviceID] copy];
 	selectedOutputDeviceID = [self _defaultDeviceForDirection:XM_OUTPUT_DIRECTION];
 	selectedOutputDevice = [[self _nameForDeviceID:selectedOutputDeviceID] copy];
+	
+	doesMeasureSignalLevels = NO;
+	inputLevel = 0.0;
+	outputLevel = 0.0;
 	
 	[self _addVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	[self _addVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
@@ -341,6 +345,12 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerInputVolumeDidChange object:self];
 	
+	if(muteFlag == YES)
+	{
+		inputLevel = 0.0;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidUpdateInputLevel object:self];
+	}
+	
 	return YES;
 }
 
@@ -377,7 +387,46 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputVolumeDidChange object:self];
 	
+	if(muteFlag == YES)
+	{
+		outputLevel = 0.0;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidUpdateOutputLevel object:self];
+	}
+	
 	return YES;
+}
+
+- (BOOL)doesMeasureSignalLevels
+{
+	return doesMeasureSignalLevels;
+}
+
+- (void)setDoesMeasureSignalLevels:(BOOL)flag
+{
+	doesMeasureSignalLevels = flag;
+	_XMSetMeasureAudioSignalLevels(flag);
+	if(doesMeasureSignalLevels == NO)
+	{
+		// Fall back zo zero
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputVolumeDidChange object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerInputVolumeDidChange object:self];
+	}
+}
+
+- (double)inputLevel
+{
+	if(doesMeasureSignalLevels == YES) {
+		return inputLevel;
+	}
+	return 0.0;
+}
+
+- (double)outputLevel
+{
+	if(doesMeasureSignalLevels == YES) {
+		return outputLevel;
+	}
+	return 0.0;
 }
 
 #pragma mark Private Methods
@@ -753,6 +802,30 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerOutputVolumeDidChange
 														object:self];
+}
+
+- (void)_handleAudioInputLevel:(NSNumber *)level
+{
+	if(selectedInputDeviceIsMuted == YES)
+	{
+		return;
+	}
+	inputLevel = [level doubleValue];
+	if(doesMeasureSignalLevels)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidUpdateInputLevel
+															object:self];
+	}
+}
+
+- (void)_handleAudioOutputLevel:(NSNumber *)level
+{
+	outputLevel = [level doubleValue];
+	if(doesMeasureSignalLevels)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidUpdateOutputLevel
+															object:self];
+	}
 }
 
 @end

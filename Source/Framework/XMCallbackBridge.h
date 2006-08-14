@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.28 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.29 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -148,6 +148,16 @@ void _XMHandleH264PPSAtomData(void *data, unsigned length);
  * MediaTransmitter
  **/
 void _XMUpdatePicture();
+
+/**
+ * Reports the audio level of the recorder stream
+ **/
+void _XMHandleAudioInputLevel(double level);
+
+/**
+ * Reports the audio level of the player stream
+ **/
+void _XMHandleAudioOutputLevel(double level);
 
 #pragma mark -
 #pragma mark H.323 specific callbacks

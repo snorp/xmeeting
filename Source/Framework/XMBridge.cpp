@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.32 2006/08/05 19:49:18 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.33 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,23 @@ void _XMInitSubsystem(const char *pTracePath)
 		sipEndPoint = theManager->SIPEndPoint();
 		
 		XMSoundChannel::Init();
+	}
+}
+
+void _XMCloseSubsystem()
+{
+	if(theManager != NULL)
+	{
+		XMOpalManager::CloseOpal();
+		
+		XMSoundChannel::DoClose();
+		
+		callEndPoint = NULL;
+		h323EndPoint = NULL;
+		sipEndPoint = NULL;
+		
+		//delete theManager; // doesn't work, would crash XMeeting :-(
+		theManager = NULL;
 	}
 }
 
@@ -116,6 +133,11 @@ void _XMSetSelectedAudioOutputDevice(unsigned int deviceID)
 void _XMSetMuteAudioOutputDevice(bool muteFlag)
 {
 	XMSoundChannel::SetPlayDeviceMuted(muteFlag);
+}
+
+void _XMSetMeasureAudioSignalLevels(bool flag)
+{
+	XMSoundChannel::SetMeasureSignalLevels(flag);
 }
 
 void _XMSetAudioBufferSize(unsigned size)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.h,v 1.3 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.4 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,14 +29,22 @@ class XMCircularBuffer;
 
 class XMSoundChannel : public PSoundChannel
 {
+	PCLASSINFO(XMSoundChannel, PSoundChannel);
+	
 public:
 
-#pragma mark Static Methods
+#pragma mark -
+#pragma mark Static XMeeting Methods
 	
 	/**
 	 * Does necessary initialization
 	 **/
 	static void Init();
+	
+	/**
+	 * Closes the devics if needed
+	 **/
+	static void DoClose();
 	
 	/**
 	 * Static Methods for changing devices / mute
@@ -47,12 +55,18 @@ public:
 	static void SetRecordDeviceMuted(BOOL muteFlag);
 	
 	/**
+	 * Signal level metering
+	 **/
+	static void SetMeasureSignalLevels(BOOL flag);
+	
+	/**
 	 * Instructs both play and record channel to immediately stop playing.
 	 * Needed to avoid the output unit to produce noise when the connection
 	 * is closed
 	 **/
 	static void StopChannels();
-	
+
+#pragma mark -
 #pragma mark Public Methods
 	
 	/**
@@ -101,12 +115,14 @@ public:
 	
 	// Performing I/O
 	virtual BOOL Read(void *buffer, PINDEX length);
+	virtual PINDEX GetLastReadCount() const;
 	virtual BOOL Write(const void *buffer, PINDEX length);
 	
 	virtual BOOL StartRecording();
 	virtual BOOL IsRecordBufferFull();
 	virtual BOOL AreAllRecordBuffersFull();
-	
+
+#pragma mark -
 #pragma mark Unimplemented Methods
 	
 	/**
@@ -125,7 +141,8 @@ public:
 	virtual BOOL WaitForAllRecordBuffersFull();
 	
 private:
-	
+
+#pragma mark -
 #pragma mark Private Methods
 	
 	void CommonConstruct();
@@ -170,6 +187,7 @@ private:
 							   AudioBufferList *ioData);
 	
 #pragma mark Instance Variables
+	
 	enum State{
 		init_,
 		open_,
@@ -212,6 +230,8 @@ private:
 	
 	AudioBufferList *mOutputBufferList;
 	UInt32 mRecordOutputBufferSize;
+	
+	BOOL isInputProxy;
 	
 	PMutex editMutex;
 	

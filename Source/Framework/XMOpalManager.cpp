@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.37 2006/08/06 10:37:30 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.38 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,6 +41,10 @@ void XMOpalManager::InitOpal(const PString & pTracePath)
 			PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
 		}
 	}
+}
+
+void XMOpalManager::CloseOpal()
+{
 }
 
 XMOpalManager::XMOpalManager()
@@ -173,6 +177,14 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 }
 
 #pragma mark overriding some callbacks
+
+BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
+{
+	// Make sure that one connection is accepted only once.
+	// This is especially important in case there are several INVITEs arriving,
+	// probably sent over different interfaces by the remote client
+	return OpalManager::OnIncomingConnection(connection);
+}
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {

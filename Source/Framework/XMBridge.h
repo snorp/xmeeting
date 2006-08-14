@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.29 2006/08/05 19:49:18 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.30 2006/08/14 18:33:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,6 +45,11 @@ extern "C" {
  * It is safe to call initOPAL() multiple times.
  **/
 void _XMInitSubsystem(const char *pTracePath);
+	
+/**
+ * Closes the OPAL system
+ **/
+void _XMCloseSubsystem();
 
 #pragma mark General Setup Functions
 
@@ -102,6 +107,8 @@ void _XMSetMuteAudioInputDevice(bool muteFlag);
 //bool setSelectedAudioOutputDevice(const char *device);
 void _XMSetSelectedAudioOutputDevice(unsigned int device);
 void _XMSetMuteAudioOutputDevice(bool muteFlag);
+
+void _XMSetMeasureAudioSignalLevels(bool flag);
 
 void _XMSetAudioBufferSize(unsigned value);
 void _XMStopAudio();
@@ -234,9 +241,10 @@ const char *_XMMediaFormatForCodecIdentifierWithVideoSize(XMCodecIdentifier code
 #pragma mark Constants
 
 /**
- * Device Names used within OPAL
+ * Audio Device Names used within OPAL
  **/
 #define XMSoundChannelDevice "XMSoundChannelDevice"
+#define XMInputSoundChannelDevice "XMInputSoundChannelDevice"
 
 #ifdef __cplusplus
 }
