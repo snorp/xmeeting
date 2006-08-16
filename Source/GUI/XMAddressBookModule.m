@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.20 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.21 2006/08/16 05:50:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,11 +18,11 @@
 #import "XMPreferencesManager.h"
 #import "XMMainWindowController.h"
 
-#define XM_DEFAULT_TAG 0
-#define XM_HOME_TAG 1
-#define XM_WORK_TAG 2
-#define XM_OTHER_TAG 3
-#define XM_CUSTOM_TAG 4
+#define XM_DEFAULT_TAG 20
+#define XM_HOME_TAG 21
+#define XM_WORK_TAG 22
+#define XM_OTHER_TAG 23
+#define XM_CUSTOM_TAG 24
 
 NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeoplePickerView";
 
@@ -471,7 +471,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	{
 		return [self _canEditSelectedRecord];
 	}
-	
+
 	return YES;
 }
 
@@ -715,8 +715,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 	[editRecordSheet recalculateKeyViewLoop];
 	
 	int index = [labelPopUp indexOfSelectedItem];
-	[labelPopUp removeItemAtIndex:0];
-	[labelPopUp insertItemWithTitle:labelString atIndex:0];
+	[[labelPopUp itemAtIndex:0] setTitle:labelString];
 	[labelPopUp selectItemAtIndex:index];
 }
 
