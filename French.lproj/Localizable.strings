@@ -70,8 +70,8 @@
 "XM_NO_CALL_CALLING" = "Appel...";
 "XM_NO_CALL_RINGING" = "Sonnerie...";
 "XM_NO_CALL_INCOMING_CALL" = "Appel entrant";
-"XM_NO_CALL_IDLE" = "Inactif";
-"XM_NO_CALL_IDLE_WITH_REASON" = "Inactif (%@)";
+"XM_NO_CALL_IDLE" = "En attente d'appel";
+"XM_NO_CALL_IDLE_WITH_REASON" = "En attente d'appel (%@)";
 "XM_NO_CALL_NO_ADDRESS" = "Déconnecté (pas d'adresse réseau)";
 "XM_NO_CALL_NO_PROTOCOL" = "Déconnecté (pas de protocole activé)";
 "XM_NO_CALL_PROTOCOL_FAILURE" = "Déconnecté (échec de l'activation H.323 et SIP)";
