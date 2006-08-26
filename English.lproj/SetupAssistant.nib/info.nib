@@ -3,50 +3,49 @@
 <plist version="1.0">
 <dict>
 	<key>IBDocumentLocation</key>
-	<string>39 134 356 240 0 0 1280 832 </string>
+	<string>616 67 360 627 0 0 1920 1178 </string>
 	<key>IBEditorPositions</key>
 	<dict>
 		<key>107</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>141</key>
-		<string>271 429 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>148</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>180</key>
 		<string>410 393 460 326 0 0 1280 832 </string>
 		<key>194</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>201</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>233</key>
-		<string>517 473 460 326 0 0 1280 832 </string>
+		<string>199 642 460 326 0 0 1920 1178 </string>
 		<key>248</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>310 451 460 326 0 0 1920 1178 </string>
 		<key>25</key>
-		<string>207 399 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>28</key>
-		<string>410 392 460 327 0 0 1280 832 </string>
+		<string>728 621 460 327 0 0 1920 1178 </string>
 		<key>37</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>45</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>46</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>47</key>
-		<string>410 393 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 		<key>48</key>
-		<string>280 401 460 326 0 0 1280 832 </string>
+		<string>987 94 460 326 0 0 1920 1178 </string>
 		<key>97</key>
-		<string>87 422 460 326 0 0 1280 832 </string>
+		<string>728 622 460 326 0 0 1920 1178 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>446.1</string>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>248</integer>
-		<integer>233</integer>
+		<integer>48</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>8I127</string>
+	<string>8J2135</string>
 </dict>
 </plist>
