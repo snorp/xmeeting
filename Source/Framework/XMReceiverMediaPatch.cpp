@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.22 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.23 2006/08/26 08:20:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -86,6 +86,10 @@ void XMReceiverMediaPatch::Main()
 	{
 		packets[i] = new XMRTPPacket(source.GetDataSize());
 	}
+	
+	// make sure the RTP session does NOT ignore out of order packets
+	OpalRTPMediaStream & rtpStream = (OpalRTPMediaStream &)source;
+	rtpStream.GetRtpSession().SetIgnoreOutOfOrderPackets(FALSE);
 	
 	BYTE *frameBuffer = (BYTE *)malloc(sizeof(BYTE) * XM_FRAME_BUFFER_SIZE);
 	
