@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.12 2006/07/30 19:45:10 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.13 2006/08/26 12:46:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,8 @@ void XMInitFramework(NSString *pTracePath)
 	// will search the entire filesystem for pugins before starting up...
 	NSBundle *bundle = [NSBundle bundleForClass:[XMCallManager class]];
 	NSString *pluginsPath = [[bundle resourcePath] stringByAppendingPathComponent:@"Plugins"];
-	setenv("PWLIBPLUGINDIR", [pluginsPath cStringUsingEncoding:NSASCIIStringEncoding], 1);
+	const char *string = [pluginsPath cStringUsingEncoding:NSUTF8StringEncoding];
+	setenv("PWLIBPLUGINDIR", string, 1);
 	
 	if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZED)
 	{
