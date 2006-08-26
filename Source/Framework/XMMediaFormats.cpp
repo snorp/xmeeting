@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.21 2006/08/04 20:46:08 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.22 2006/08/26 08:18:19 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -554,7 +554,21 @@ PObject::Comparison XM_H323_H261_Capability::CompareTo(const XMH323VideoCapabili
 
 XM_H323_H263_Capability::XM_H323_H263_Capability()
 {
-	XM_H323_H263_Capability(FALSE);
+	sqcifMPI = 1;
+	qcifMPI = 1;
+	cifMPI = 1;
+	cif4MPI = 0;
+	cif16MPI = 0;
+	
+	maxBitRate = _XMGetMaxH263BitRate();
+	
+	slowSqcifMPI = 0;
+	slowQcifMPI = 0;
+	slowCifMPI = 0;
+	slowCif4MPI = 0;
+	slowCif16MPI = 0;
+	
+	isH263PlusCapability = FALSE;
 }
 
 XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
@@ -577,8 +591,9 @@ XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
 }
 
 PObject * XM_H323_H263_Capability::Clone() const
-{
+{	
 	XM_H323_H263_Capability *h263Capability = new XM_H323_H263_Capability(*this);
+	
 	return h263Capability;
 }
 
@@ -596,7 +611,7 @@ PObject::Comparison XM_H323_H263_Capability::Compare(const PObject & obj) const
 	}
 	
 	const XM_H323_H263_Capability & other = (const XM_H323_H263_Capability &)obj;
-
+	
 	if(((sqcifMPI > 0) && (other.sqcifMPI > 0)) ||
 	   ((qcifMPI > 0) && (other.qcifMPI > 0)) ||
 	   ((cifMPI > 0) && (other.cifMPI > 0)) ||
