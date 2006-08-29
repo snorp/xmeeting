@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.44 2006/06/20 13:33:11 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.45 2006/08/29 06:05:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -90,9 +90,6 @@ typedef enum XMMediaTransmitterMessage
 							   length:(UInt32)dataLength
 					 imageDescription:(ImageDescriptionHandle)imageDesc 
 							timeStamp:(UInt32)timeStamp;
-
-- (void)_adjustH261Data:(UInt8 *)h261Data;
-
 @end
 
 @interface XMVideoInputModuleWrapper : NSObject <XMVideoModule> {
@@ -127,6 +124,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData,
 void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon, 
 												  const void *baseAddress);
 UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
+
+void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame);
 
 @implementation XMMediaTransmitter
 
@@ -1881,7 +1880,7 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	// Making H.261 stream standard compliant
 	if(codecType == kH261CodecType)
 	{
-		[self _adjustH261Data:data];
+		_XMAdjustH261Data(data, needsPictureUpdate);
 	}
 	
 	sampleData.data = (const UInt8 *)data;
@@ -1908,53 +1907,6 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 	}
 	
 	return err;
-}
-
-#define scanBit(theDataIndex, theMask) \
-{ \
-	theMask >>= 1; \
-		if(theMask == 0) { \
-			theDataIndex++; \
-				theMask = 0x80; \
-		} \
-}
-
-#define readBit(out, theData, theDataIndex, theMask) \
-{ \
-	out = theData[theDataIndex] & theMask; \
-		scanBit(theDataIndex, theMask); \
-}
-
-- (void)_adjustH261Data:(UInt8 *)h261Data
-{	
-	// In the H.261 standard, there are two bits in PTYPE which
-	// were originally unused. The first bit of them is now the
-	// flag defining the still image mode. If this mode isn't used,
-	// the flag should be set to one. This applies to the second
-	// unused bit as well. Unfortunately, QuickTime sets these two
-	// bits to zero, which causes problems on Tandberg devices.
-	// Therefore, these bits are here set to one
-	UInt32 dataIndex = 1;
-	UInt8 mask = 0x01;
-	
-	UInt8 bit;
-	readBit(bit, h261Data, dataIndex, mask);
-	
-	while(bit == 0)
-	{
-		readBit(bit, h261Data, dataIndex, mask);
-	}
-	
-	dataIndex += 1;
-	scanBit(dataIndex, mask);
-	scanBit(dataIndex, mask);
-	scanBit(dataIndex, mask);
-	scanBit(dataIndex, mask);
-	scanBit(dataIndex, mask);
-	
-	h261Data[dataIndex] |= mask;
-	scanBit(dataIndex, mask);
-	h261Data[dataIndex] |= mask;
 }
 
 @end
@@ -2571,4 +2523,58 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette)
 	}
 	
 	return table;
+}
+
+#define scanBit(theDataIndex, theMask) \
+{ \
+	theMask >>= 1; \
+		if(theMask == 0) { \
+			theDataIndex++; \
+			theMask = 0x80; \
+		} \
+}
+
+#define readBit(out, theData, theDataIndex, theMask) \
+{ \
+	out = theData[theDataIndex] & theMask; \
+	scanBit(theDataIndex, theMask); \
+}
+
+void _XMAdjustH261Data(UInt8 *h261Data, BOOL isINTRAFrame)
+{
+	
+	// In the H.261 standard, there are two bits in PTYPE which
+	// were originally unused. The first bit of them is now the
+	// flag defining the still image mode. If this mode isn't used,
+	// the flag should be set to one. This applies to the second
+	// unused bit as well. Unfortunately, QuickTime sets these two
+	// bits to zero, which causes problems on Tandberg devices.
+	// Therefore, these bits are here set to one
+	// In addition, the Freeze picture release bit should be set
+	// whenever an INTRA frame is sent to make some polycom devices
+	// happy.
+	UInt32 dataIndex = 1;
+	UInt8 mask = 0x01;
+	
+	UInt8 bit;
+	readBit(bit, h261Data, dataIndex, mask);
+	
+	while(bit == 0)
+	{
+		readBit(bit, h261Data, dataIndex, mask);
+	}
+	
+	dataIndex += 1;
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	if(isINTRAFrame) {
+		h261Data[dataIndex] |= mask;
+	}
+	scanBit(dataIndex, mask);
+	scanBit(dataIndex, mask);
+	
+	h261Data[dataIndex] |= mask;
+	scanBit(dataIndex, mask);
+	h261Data[dataIndex] |= mask;
 }
