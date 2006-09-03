@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.8 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.9 2006/09/03 21:39:29 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -239,6 +239,7 @@ static XMInspectorController *contactsInstance;
 - (void)_setupInterface
 {
 	[panel setTitle:name];
+	[panel setHidesOnDeactivate:NO];
 	
 	int moduleCount = [modules count];
 	[pageController setSegmentCount:moduleCount];
@@ -316,7 +317,7 @@ static XMInspectorController *contactsInstance;
 	}
 	else
 	{
-		[panel setLevel:NSFloatingWindowLevel];
+		[panel setLevel:NSNormalWindowLevel];
 	}
 }
 
