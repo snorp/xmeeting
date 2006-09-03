@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.18 2006/06/07 10:10:15 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.19 2006/09/03 21:40:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,7 +59,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (void)_openAndConfigureSeqGrabComponent;
 - (void)_disposeSeqGrabComponent;
-- (BOOL)_openAndConfigureChannel;
+- (OSErr)_openAndConfigureChannel;
 - (BOOL)_createDecompressionSession;
 - (BOOL)_disposeDecompressionSession;
 - (OSErr)_processGrabData:(Ptr)grabData length:(long)length time:(TimeValue)time;
@@ -185,7 +185,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	// to the lack of an attached video device, we'll try again here
 	if(videoChannel == NULL)
 	{
-		if([self _openAndConfigureChannel] == NO)
+		if([self _openAndConfigureChannel] != noErr)
 		{
 			videoChannel = NULL;
 		}
@@ -282,7 +282,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	if(videoChannel == NULL)
 	{
-		if([self _openAndConfigureChannel] == NO)
+		if((err = [self _openAndConfigureChannel]) != noErr)
 		{
 			hintCode = 0x004002;
 			goto bail;
@@ -919,7 +919,7 @@ bail:
 	}
 }
 
-- (BOOL)_openAndConfigureChannel
+- (OSErr)_openAndConfigureChannel
 {
 	ComponentResult err = noErr;
 	
@@ -927,16 +927,16 @@ bail:
 	if(err != noErr)
 	{
 		// this indicates that probably no video input device is attached
-		return NO;
+		return err;
 	}
 	
 	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
 	if(err != noErr)
 	{
-		return NO;
+		return err;
 	}
 
-	return YES;
+	return noErr;
 }
 
 - (BOOL)_createDecompressionSession
