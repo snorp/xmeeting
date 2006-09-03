@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.12 2006/08/04 21:33:10 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.13 2006/09/03 21:41:13 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -153,12 +153,12 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 {
 	PWaitAndSignal m(registrarListMutex);
 	
-	unsigned i;
+	int i;
 	unsigned count = activeRegistrars.GetSize();
 	
-	for(i = count; i > 0; i--)
+	for(i = (count-1); i >= 0; i--)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i-1];
+		XMSIPRegistrarRecord & record = activeRegistrars[i];
 		
 		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_UNREGISTER)
 		{
@@ -170,7 +170,7 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REMOVE)
 		{
-			activeRegistrars.RemoveAt(i-1);
+			activeRegistrars.RemoveAt(i);
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
@@ -282,12 +282,12 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 										 SIP_PDU::StatusCodes reason,
 										 BOOL wasRegistering)
 {
-	PWaitAndSignal m(registrarListMutex);
-	
 	if(wasRegistering == FALSE)
 	{
 		return;
 	}
+	
+	PWaitAndSignal m(registrarListMutex);
 	
 	BOOL setupIsComplete = TRUE;
 	
@@ -339,12 +339,12 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 								 const PString & username,
 								 BOOL wasRegistering)
 {
-	PWaitAndSignal m(registrarListMutex);
-	
 	if(wasRegistering == FALSE)
 	{
 		return;
 	}
+	
+	PWaitAndSignal m(registrarListMutex);
 	
 	BOOL setupIsComplete = TRUE;
 	
