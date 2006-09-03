@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Channel.cpp,v 1.3 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMH323Channel.cpp,v 1.4 2006/09/03 21:37:34 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include "XMH323Channel.h"
 
 #include <asn/h245.h>
+#include <opal/mediastrm.h>
 
 #include "XMMediaFormats.h"
 #include "XMTransmitterMediaPatch.h"
@@ -51,4 +52,15 @@ BOOL XMH323Channel::OnSendingPDU(H245_H2250LogicalChannelParameters & param) con
 	}
 	
 	return TRUE;
+}
+
+BOOL XMH323Channel::Start() 
+{
+	BOOL result = H323_RTPChannel::Start();
+	if(result == TRUE) 
+	{
+		mediaStream->SetCommandNotifier(PCREATE_NOTIFIER(OnMediaCommand));
+	}
+	
+	return result;
 }
