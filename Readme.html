@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Readme: XMeeting v0.3</title>
+<title>Readme: XMeeting v0.3.2</title>
 </head>
 
 <body>
@@ -55,7 +55,7 @@ Some functions will be disabled on machines with older and less powerful graphic
 
 <p>
 <a name="feat"><h3>Features</h3></a>
-This release of XMeeting (0.3.1) ships with the following key features:
+This release of XMeeting (0.3.2) ships with the following key features:
 </p>
 
 <p><b>Communication Protocols:</b>
@@ -122,14 +122,14 @@ of errors.
 Starting with version 0.3, XMeeting is fully internationalized and ready localization. Version 0.3
 already ships with Italian, French and German localizations. Please contact us if you want to 
 provide a localization for your native language.
-<br>Please note that the French and Italian localization are not 100% complete. Some sentences will
+<br>Please note that the Italian localization is not 100% complete. Some sentences will
 still appear in English. We will fix this in future releases.
 </p>
 
 <hr>
 
 <a name="cre"><h3>Credits</h3></a>
-XMeeting release 0.3.1 by NET's XMeeting project team. The team consists of Hannes Friederich
+XMeeting release 0.3.2 by NET's XMeeting project team. The team consists of Hannes Friederich
 (software engineering), Thomas Rechsteiner (testing, gatekeeper & conferencing setup) and is 
 led by Dr Thomas Piendl. The NET XMeeting contribution
 is completely funded by NET <a href="http://www.net.ethz.ch/">http://www.net.ethz.ch/</a>, a
@@ -152,7 +152,7 @@ at Queen's University, Ontario, Canada.
 <table border=0 width=500>
 <tr><th align="left">Language</th><th align="left">Translator</td></tr>
 <tr><td>Italian</td><td>Marcello Teodori</td></tr>
-<tr><td>French</td><td>Jo&euml;l Vimenet</td></tr>
+<tr><td>French</td><td>Jo&euml;l Vimenet &amp; Christian Helft</td></tr>
 <tr><td>German</td><td>Hannes Friederich</td></tr>
 </table>
 </p>
@@ -160,12 +160,20 @@ at Queen's University, Ontario, Canada.
 <hr>
 
 <p>
-<a name="rnt"><h3>Release Notes for Version 0.3.1</h3></a>
+<a name="rnt"><h3>Release Notes for Version 0.3.2</h3></a>
+New Features:
+<ul>
+<li>Audio input volume metering</li>
+<li>Inspector windows no longer hide when XMeeting is not the active application</li>
+<li>The manual is now available in French</li>
+</ul>
 Fixed bugs:
 <ul>
-<li>Fixes problems with registration on certain SIP registration servers</li>
-<li>Fixes problems when making an audio-only SIP call whith video enabled</li>
-<li>Several minor bug fixes</li>
+<li>Improves STUN support</li>
+<li>Fixes several stability problems when using SIP</li>
+<li>Improves H.261 compatibility (Polycom MGC)</li>
+<li>Improves H.263 compatiblity (
+<li>Many other small bug fixes</li>
 </ul>
 In addition, the underlying PWLib/OPAL libraries have undergone several architectural
 changes between XMeeting 0.3 and XMeeting 0.3.1.
@@ -176,6 +184,17 @@ changes between XMeeting 0.3 and XMeeting 0.3.1.
 <p>
 <a name="rno"><h3>Older Release Notes</h3></a>
 </p>
+<p><b>v0.3.1:</b><br>
+Fixed bugs:
+<ul>
+<li>Fixes problems with registration on certain SIP registration servers</li>
+<li>Fixes problems when making an audio-only SIP call whith video enabled</li>
+<li>Several minor bug fixes</li>
+</ul>
+In addition, the underlying PWLib/OPAL libraries have undergone several architectural
+changes between XMeeting 0.3 and XMeeting 0.3.1.
+</p>
+
 <p><b>v0.3:</b><br>
 New features:
 <ul>
@@ -272,6 +291,8 @@ Hannes Friederich if you plan to use this feature.</li>
 <p>
 <a name="bug"><h3>Known Bugs</h3></a>
 <ul>
+<li>At the moment, XMeeting does not work with several Bluetooth Headsets</li>
+<li>H.263 does not work well with some Polycom devices</li>
 <li>In some rare cases, calling a remote party seems to take long time without showing any 
 success.</li>
 <li>After some calls, XMeeting is no longer registered at a gatekeeper, even if indicating so.
