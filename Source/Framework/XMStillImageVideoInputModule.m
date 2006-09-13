@@ -1,5 +1,5 @@
 /*
- * $Id: XMStillImageVideoInputModule.m,v 1.2 2006/06/28 06:55:45 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.m,v 1.3 2006/09/13 21:20:12 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,9 +7,6 @@
  */
 
 #import "XMStillImageVideoInputModule.h"
-
-void XMScreenPixelBufferReleaseCallback(void *releaseRefCon, 
-									   const void *baseAddress);
 
 
 @interface XMStillImageVideoInputModule (PrivateMethods)
