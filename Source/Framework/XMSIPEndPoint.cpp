@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.13 2006/09/03 21:41:13 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.14 2006/09/13 21:17:56 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -166,7 +166,7 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 			
 			_XMHandleSIPUnregistration(record.GetHost(), record.GetUsername());
 			
-			activeRegistrars.RemoveAt(i-1);
+			activeRegistrars.RemoveAt(i);
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REMOVE)
 		{
