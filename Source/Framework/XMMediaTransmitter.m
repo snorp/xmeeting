@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.45 2006/08/29 06:05:50 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.46 2006/09/13 21:14:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,6 +126,7 @@ void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon,
 UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame);
+void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 
 @implementation XMMediaTransmitter
 
@@ -1882,6 +1883,10 @@ void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame);
 	{
 		_XMAdjustH261Data(data, needsPictureUpdate);
 	}
+	else if(codecType == kH263CodecType)
+	{
+		_XMAdjustH263Data(data, needsPictureUpdate);
+	}
 	
 	sampleData.data = (const UInt8 *)data;
 	
@@ -2577,4 +2582,12 @@ void _XMAdjustH261Data(UInt8 *h261Data, BOOL isINTRAFrame)
 	h261Data[dataIndex] |= mask;
 	scanBit(dataIndex, mask);
 	h261Data[dataIndex] |= mask;
+}
+
+void _XMAdjustH263Data(UInt8 *h263Data, BOOL isINTRAFrame)
+{
+	if(isINTRAFrame)
+	{
+		h263Data[4] |= 0x20;
+	}
 }
