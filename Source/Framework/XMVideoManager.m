@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.17 2006/06/20 13:33:11 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.18 2006/09/13 21:23:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMVideoManager.h"
 #import "XMMediaTransmitter.h"
 #import "XMVideoView.h"
+#import "XMCallRecorder.h"
 
 static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink, 
 									   const CVTimeStamp *inNow, 
@@ -473,7 +474,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 }
 
 - (void)_handleLocalVideoFrame:(CVPixelBufferRef)pixelBuffer
-{	
+{
 	[videoLock lock];
 	
 	// preventing to run any drawing operation after -_close has been
@@ -499,6 +500,8 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	localVideoTextureDidChange = YES;
 	
 	[videoLock unlock];
+		
+	[_XMCallRecorderSharedInstance _handleUncompressedLocalVideoFrame:pixelBuffer];
 }
 
 - (void)_handleRemoteVideoFrame:(CVPixelBufferRef)pixelBuffer
@@ -528,6 +531,8 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	remoteVideoTextureDidChange = YES;
 	
 	[videoLock unlock];
+	
+	[_XMCallRecorderSharedInstance _handleUncompressedRemoteVideoFrame:pixelBuffer];
 }
 
 #pragma mark Private Methods

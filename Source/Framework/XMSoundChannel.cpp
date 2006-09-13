@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.6 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.7 2006/09/13 21:23:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,6 +21,8 @@ if(err) {\
 
 extern "C" {
 	unsigned char linear2ulaw(int pcm_val);
+	void _XMHandleLocalAudioFrames(void *localAudioFrames, unsigned numberOfFrames);
+	void _XMHandleRemoteAudioFrames(void *remoteAudioFrames, unsigned numberOfFrames);
 };
 
 PCREATE_SOUND_PLUGIN(XMSoundChannel, XMSoundChannel);
@@ -561,8 +563,8 @@ BOOL XMSoundChannel::Read(void *buffer,
 		bzero(buffer, length);
 		
 		// we are working with non-interleaved or mono
-		UInt32 nr_samples = length / pwlibASBD.mBytesPerFrame; 
-		usleep(UInt32(nr_samples/pwlibASBD.mSampleRate * 1000000)); // 10E-6 [s]
+		UInt32 nr_samples = length / pwlibASBD.mBytesPerFrame;
+		usleep(UInt32(nr_samples/pwlibASBD.mSampleRate * 1000000)); // sleep the amount of time to elapse
 		return TRUE; 
 	}
 	
@@ -624,6 +626,8 @@ BOOL XMSoundChannel::Write(const void *buffer,
 	
 	// Write to circular buffer with locking 
 	lastWriteCount = mCircularBuffer->Fill((const char*)buffer, length, true);
+	
+	_XMHandleRemoteAudioFrames((void *)buffer, (length/2));
 	
 	return TRUE;
 }
@@ -1412,7 +1416,6 @@ OSStatus XMSoundChannel::ComplexBufferFillRecord(AudioConverterRef inAudioConver
 	*ioNumberDataPackets = ioBytes / hwASBD.mBytesPerPacket;
 	
 	return err;
-	
 }
 
 /*
@@ -1527,6 +1530,8 @@ OSStatus XMSoundChannel::RecordProc(void *inRefCon,
 		This->mCircularBuffer->Fill((char*)audio_buf->mData, 
 									audio_buf->mDataByteSize, 
 									false, true); // do not wait, overwrite oldest frames
+		
+		_XMHandleLocalAudioFrames(audio_buf->mData, (audio_buf->mDataByteSize/2));
 		
 		/* Doing a (primitive) form of level metering: if the measureInputLevel flag is
 		 * set, calculate the average of the absolute values of the samples just processed. 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.34 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.35 2006/09/13 21:23:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,7 @@
 #import "XMMediaReceiver.h"
 #import "XMVideoView.h"
 #import "XMGeneralPurposeAddressResource.h"
+#import "XMCallRecorder.h"
 
 extern unsigned _XMInitializedStatus;
 extern XMUtils *_XMUtilsSharedInstance;
@@ -35,6 +36,7 @@ extern XMVideoManager *_XMVideoManagerSharedInstance;
 extern XMOpalDispatcher *_XMOpalDispatcherSharedInstance;
 extern XMMediaTransmitter *_XMMediaTransmitterSharedInstance;
 extern XMMediaReceiver *_XMMediaReceiverSharedInstance;
+extern XMCallRecorder *_XMCallRecorderSharedInstance;
 
 void _XMThreadExit();
 void _XMCheckCloseStatus();
@@ -264,6 +266,16 @@ void _XMCheckCloseStatus();
 
 - (BOOL)_doesModifyPreferences:(XMPreferences *)preferences;
 - (void)_modifyPreferences:(XMPreferences *)preferences;
+
+@end
+
+@interface XMCallRecorder (FrameworkMethods)
+
+- (id)_init;
+- (void)_close;
+
+- (void)_handleUncompressedLocalVideoFrame:(CVPixelBufferRef)localVideoFrame;
+- (void)_handleUncompressedRemoteVideoFrame:(CVPixelBufferRef)remoteVideoFrame;
 
 @end
 

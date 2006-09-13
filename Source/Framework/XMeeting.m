@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.13 2006/08/26 12:46:01 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.14 2006/09/13 21:23:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,7 +16,7 @@
 #define XM_FRAMEWORK_NOT_INITIALIZED 0
 #define XM_FRAMEWORK_INITIALIZED 1
 #define XM_FRAMEWORK_CLOSE_CALLED 2
-#define XM_FRAMEWORK_SEPARATE_THREADS 2
+#define XM_FRAMEWORK_SEPARATE_THREADS 3
 
 #define XM_FRAMEWORK_ALL_THREADS_CLOSED XM_FRAMEWORK_CLOSE_CALLED + XM_FRAMEWORK_SEPARATE_THREADS
 
@@ -29,6 +29,7 @@ XMVideoManager *_XMVideoManagerSharedInstance = nil;
 XMOpalDispatcher *_XMOpalDispatcherSharedInstance = nil;
 XMMediaTransmitter *_XMMediaTransmitterSharedInstance = nil;
 XMMediaReceiver *_XMMediaReceiverSharedInstance = nil;
+XMCallRecorder *_XMCallRecorderSharedInstance = nil;
 
 void XMInitFramework(NSString *pTracePath)
 {
@@ -56,6 +57,7 @@ void XMInitFramework(NSString *pTracePath)
 	_XMOpalDispatcherSharedInstance = [[XMOpalDispatcher alloc] _init];
 	_XMMediaTransmitterSharedInstance = [[XMMediaTransmitter alloc] _init];
 	_XMMediaReceiverSharedInstance = [[XMMediaReceiver alloc] _init];
+	_XMCallRecorderSharedInstance = [[XMCallRecorder alloc] _init];
 	
 	// starting the OpalDispatcher Thread
 	[NSThread detachNewThreadSelector:@selector(_runOpalDispatcherThread:) toTarget:_XMOpalDispatcherSharedInstance withObject:pTracePath];
@@ -80,6 +82,8 @@ void XMCloseFramework()
 	// have terminated before posting the appropriate
 	// notification
 	
+	_XMInitializedStatus = XM_FRAMEWORK_CLOSE_CALLED;
+	
 	[_XMUtilsSharedInstance _close];
 	[_XMCallManagerSharedInstance _close];
 	[_XMCodecManagerSharedInstance _close];
@@ -88,8 +92,7 @@ void XMCloseFramework()
 	[_XMOpalDispatcherSharedInstance _close];
 	[_XMMediaTransmitterSharedInstance _close];
 	[_XMMediaReceiverSharedInstance _close];
-	
-	_XMInitializedStatus = XM_FRAMEWORK_CLOSE_CALLED;
+	[_XMCallRecorderSharedInstance _close];
 }
 
 void _XMThreadExit() {

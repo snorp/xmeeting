@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.25 2006/08/05 19:49:19 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.26 2006/09/13 21:23:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -204,12 +204,35 @@ typedef enum XMCodecIdentifier
 	XMCodecIdentifier_G711_uLaw = 1,
 	XMCodecIdentifier_G711_ALaw,
 	
+	// Audio Recording Codecs
+	XMCodecIdentifier_LinearPCM,
+	
 	// Video Codecs
 	XMCodecIdentifier_H261 = 100,
 	XMCodecIdentifier_H263,
-	XMCodecIdentifier_H264
+	XMCodecIdentifier_H264,
+	
+	// Video Recording Codecs
+	XMCodecIdentifier_MPEG4 = 150,
+	XMCodecIdentifier_Motion_JPEG_A,
+	XMCodecIdentifier_Motion_JPEG_B,
 	
 } XMCodecIdentifier;
+
+/**
+ * Defines the available codec quailities
+ * for video recording. These are the same
+ * as QuickTime's constants defined in
+ * ImageCompression.h
+ **/
+typedef enum XMCodecQuality
+{
+	XMCodecQuality_Max            = 0x000003FF,
+	XMCodecQuality_Min            = 0x00000000,
+	XMCodecQuality_Low            = 0x00000100,
+	XMCodecQuality_Normal         = 0x00000200,
+	XMCodecQuality_High           = 0x00000300
+} XMCodecQuality;
 
 /**
  * Defines the various VideoSizes which are supported

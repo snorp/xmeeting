@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.22 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.23 2006/09/13 21:23:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -74,6 +74,10 @@ NSString *XMNotification_VideoManagerDidStartTransmittingVideo = @"XMeetingVideo
 NSString *XMNotification_VideoManagerDidEndTransmittingVideo = @"XMeetingVideoManagerDidStartTransmittingVideo";
 NSString *XMNotification_VideoManagerDidStartReceivingVideo = @"XMeetingVideoManagerDidStartReceivingVideoNotification";
 NSString *XMNotification_VideoManagerDidEndReceivingVideo = @"XMeetingVideoManagerDidEndReceivingVideoNotification";
+
+NSString *XMNotification_CallRecorderDidStartRecording = @"XMeetingCallRecorderDidStartRecordingNotification";
+NSString *XMNotification_CallRecorderDidEndRecording = @"XMeetingCallRecorderDidEndRecordingNotification";
+NSString *XMNotification_CallRecorderDidGetError = @"XMeetingCallRecorderDidGetErrorNotification";
 
 #pragma mark Exceptions
 
