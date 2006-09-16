@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.h,v 1.1 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMCallRecorder.h,v 1.2 2006/09/16 16:54:47 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -66,7 +66,7 @@
  * However, the framerate of the recorded video may be significantly lower than is the flag is not set.
  **/
 - (BOOL)startRecordingInRecompressionModeToFile:(NSString *)file videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier 
-							  videoCodecQuality:(XMCodecQuality)videoCodecQuality videoBandwidthLimit:(unsigned)videoBandwidthLimit
+							  videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
 						   audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier
 						   lowPriorityRecording:(BOOL)lowPriorityRecording;
 
@@ -80,10 +80,10 @@
 - (BOOL)isRecording;
 
 /**
- * Returns which codecs can control the rate to send. the videoBandwidthLimit parameter
+ * Returns which codecs can control the data rate to compress. the videoBandwidthLimit parameter
  * has only an effect if using these codecs
  **/
-- (BOOL)videoCodecSupportsFramerateControl:(XMCodecIdentifier)codecIdentifier;
+- (BOOL)videoCodecSupportsDataRateControl:(XMCodecIdentifier)codecIdentifier;
 
 /**
  * Returns an error description if the recoring failed somehow

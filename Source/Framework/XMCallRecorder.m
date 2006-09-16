@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.m,v 1.1 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMCallRecorder.m,v 1.2 2006/09/16 16:54:47 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -189,7 +189,7 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 - (BOOL)startRecordingInRecompressionModeToFile:(NSString *)filePath
 						   videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier 
 							  videoCodecQuality:(XMCodecQuality)videoCodecQuality
-							videoBandwidthLimit:(unsigned)videoBandwidthLimit
+								  videoDataRate:(unsigned)videoDataRate
 						   audioCodecIdentifier:(XMCodecIdentifier)theAudioCodecIdentifier
 						   lowPriorityRecording:(BOOL)lowPriorityRecording;
 {
@@ -236,7 +236,7 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 	}
 	result = [self _prepareVideoRecordingInRecompressionMode:videoCodecIdentifier
 													 quality:videoCodecQuality
-											  bandwidthLimit:videoBandwidthLimit];
+											  bandwidthLimit:videoDataRate];
 	if(result == NO)
 	{
 		[self _cleanupMovie];
@@ -366,7 +366,7 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 	return isRecording;
 }
 
-- (BOOL)videoCodecSupportsFramerateControl:(XMCodecIdentifier)codecIdentifier
+- (BOOL)videoCodecSupportsDataRateControl:(XMCodecIdentifier)codecIdentifier
 {
 	switch(codecIdentifier)
 	{
