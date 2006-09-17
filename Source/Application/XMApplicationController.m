@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.44 2006/08/05 19:49:18 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.45 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,7 @@
 
 #import "XMLocalAudioVideoModule.h"
 #import "XMDialPadModule.h"
+#import "XMCallRecorderModule.h"
 
 #import "XMAddressBookModule.h"
 
@@ -60,6 +61,8 @@
 - (void)_didNotEnableSIP:(NSNotification *)notif;
 - (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif;
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
+- (void)_videoManagerDidGetError:(NSNotification *)notif;
+- (void)_callRecorderDidGetError:(NSNotification *)notif;
 
 // terminating the application
 - (void)_frameworkClosed:(NSNotification *)notif;
@@ -71,6 +74,8 @@
 - (void)_displayGatekeeperRegistrationFailedAlert;
 - (void)_displayEnablingSIPFailedAlert;
 - (void)_displaySIPRegistrationFailedAlert;
+- (void)_displayVideoManagerErrorAlert;
+- (void)_displayCallRecorderErrorAlert;
 
 // validating menu items
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
@@ -136,6 +141,10 @@
 							   name:XMNotification_CallManagerDidNotRegisterAtSIPRegistrar object:nil];
 	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
 							   name:XMNotification_FrameworkDidClose object:nil];
+	[notificationCenter addObserver:self selector:@selector(_videoManagerDidGetError:)
+							   name:XMNotification_VideoManagerDidGetError object:nil];
+	[notificationCenter addObserver:self selector:@selector(_callRecorderDidGetError:)
+							   name:XMNotification_CallRecorderDidGetError object:nil];
 	
 	// depending on wheter preferences are in the system, the setup assistant is shown or not.
 	if([XMPreferencesManager doesHavePreferences] == YES)
@@ -161,11 +170,12 @@
 	[callHistoryModule release];
 	
 	[localAudioVideoModule release];
+	[dialPadModule release];
+	[callRecorderModule release];
 	
 	[addressBookModule release];
 	
 	//[zeroConfModule release];
-	//[dialPadModule release];
 	//[textChatModule release];
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -414,9 +424,21 @@
 }
 
 - (void)_frameworkDidClose:(NSNotification *)notif
-{
+{	
 	// Now it's time to terminate the application
 	[NSApp replyToApplicationShouldTerminate:YES];
+}
+
+- (void)_videoManagerDidGetError:(NSNotification *)notif
+{
+	// same as _didNotStartCalling
+	[self performSelector:@selector(_displayVideoManagerErrorAlert) withObject:nil afterDelay:0.0];
+}
+
+- (void)_callRecorderDidGetError:(NSNotification *)notif
+{
+	// same as _didNotStartCalling
+	[self performSelector:@selector(_displayCallRecorderErrorAlert) withObject:nil afterDelay:0.0];
 }
 
 #pragma mark -
@@ -671,6 +693,43 @@
 	activeAlert = nil;
 }
 
+- (void)_displayVideoManagerErrorAlert
+{
+	activeAlert = [[NSAlert alloc] init];
+	NSString *errorDescription = [[XMVideoManager sharedInstance] errorDescription];
+	
+	[(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @"")];
+	[(NSAlert *)activeAlert setInformativeText:errorDescription];
+	
+	[(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
+	[(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	
+	[(NSAlert *)activeAlert runModal];
+	
+	[activeAlert release];
+	activeAlert = nil;
+}
+
+- (void)_displayCallRecorderErrorAlert
+{
+	activeAlert = [[NSAlert alloc] init];
+	NSString *errorDescription = [[XMCallRecorder sharedInstance] errorDescription];
+	
+	[(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_CALL_RECORDER_ERROR_MESSAGE", @"")];
+	NSString *infoTextFormat = NSLocalizedString(@"XM_CALL_RECORDER_ERROR_INFO_TEXT", @"");
+	NSString *infoText = [[NSString alloc] initWithFormat:infoTextFormat, errorDescription];
+	[(NSAlert *)activeAlert setInformativeText:infoText];
+	[infoText release];
+	
+	[(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
+	[(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+	
+	[(NSAlert *)activeAlert runModal];
+	
+	[activeAlert release];
+	activeAlert = nil;
+}
+
 - (void)sound:(NSSound *)sound didFinishPlaying:(BOOL)didFinish
 {
 	if(didFinish == YES && alertType == XMIncomingCallAlertType_Ringing)
@@ -766,7 +825,6 @@
 	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	
 	[self _preferencesDidChange:nil];
-	//[[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];
@@ -788,7 +846,9 @@
 	[localAudioVideoModule setTag:XMInspectorControllerTag_Tools];
 	dialPadModule = [[XMDialPadModule alloc] init];
 	[dialPadModule setTag:XMInspectorControllerTag_Tools];
-	NSArray *toolsModules = [[NSArray alloc] initWithObjects:localAudioVideoModule, dialPadModule, nil];
+	callRecorderModule = [[XMCallRecorderModule alloc] init];
+	[callRecorderModule setTag:XMInspectorControllerTag_Tools];
+	NSArray *toolsModules = [[NSArray alloc] initWithObjects:localAudioVideoModule, dialPadModule, callRecorderModule, nil];
 	[[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Tools] setModules:toolsModules];
 	[toolsModules release];
 	
@@ -816,6 +876,7 @@
 	
 	// show the main window
 	[[XMMainWindowController sharedInstance] showMainWindow];
+	[[XMMainWindowController sharedInstance] showModule:noCallModule fullScreen:NO];
 	
 	// start grabbing from the video sources if needed
 	[self _activeLocationDidChange:nil];

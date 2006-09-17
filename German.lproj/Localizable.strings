@@ -41,6 +41,9 @@
 
 "XM_VIDEO_DEVICE_PROBLEM_MESSAGE" = "Probleme eines Video-Gerätes:";
 
+"XM_CALL_RECORDER_ERROR_MESSAGE" = "Recording Error:";
+"XM_CALL_RECORDER_ERROR_INFO_TEXT" = "The following error occurred while recording: %@. If this problem persists, please report it.";
+
 /* Call end reason */
 "XM_CALL_END_USER_CLEARED" = "Benutzer hat aufgelegt";
 "XM_CALL_END_REMOTE_REFUSED" = "Gegenseite hat den Anruf zurückgewiesen";
@@ -141,6 +144,11 @@
 
 /* Dial Pad Module */
 "XM_DIAL_PAD_MODULE_NAME" = "Fernsteuerung";
+
+/* Call Recorder Module */
+"XM_CALL_RECORDER_MODULE_NAME" = "Record Calls";
+"XM_CALL_RECORDER_MODULE_START_RECORDING" = "Start Recording...";
+"XM_CALL_RECORDER_MODULE_STOP_RECORDING" = "Stop Recording";
 
 /* IG Popup View */
 "IG_POPUP_VIEW_TITLE" = "Umgebung: %@";

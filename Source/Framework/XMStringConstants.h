@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.25 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.26 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -269,6 +269,11 @@ extern NSString *XMNotification_VideoManagerDidStartReceivingVideo;
  * remote party
  **/
 extern NSString *XMNotification_VideoManagerDidEndReceivingVideo;
+
+/**
+ * Posted when the VideoManager encounters an error.
+ **/
+extern NSString *XMNotification_VideoManagerDidGetError;
 
 #pragma mark XMCallRecorder Notifications
 

@@ -145,6 +145,11 @@
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
 		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
+		D10E40180AAD8454009EA376 /* XMCallRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = D10E40160AAD8454009EA376 /* XMCallRecorder.h */; };
+		D10E40190AAD8454009EA376 /* XMCallRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = D10E40170AAD8454009EA376 /* XMCallRecorder.m */; };
+		D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */; };
+		D10E45440AADEC40009EA376 /* XMCallRecorderModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D10E45420AADEC40009EA376 /* XMCallRecorderModule.h */; };
+		D10E45450AADEC40009EA376 /* XMCallRecorderModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D10E45430AADEC40009EA376 /* XMCallRecorderModule.m */; };
 		D10FD6570A7D49C700935B10 /* speex_preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6560A7D49C700935B10 /* speex_preprocess.c */; };
 		D10FD66E0A7D4A6900935B10 /* fftwrap.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6670A7D4A6900935B10 /* fftwrap.c */; };
 		D10FD6810A7D4AC700935B10 /* kiss_fft.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD67A0A7D4AC700935B10 /* kiss_fft.c */; };
@@ -967,6 +972,11 @@
 		D10B919F0A51A10100003A33 /* Audio.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Audio.tiff; path = Resources/Images/Audio.tiff; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
+		D10E40160AAD8454009EA376 /* XMCallRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallRecorder.h; path = Source/Framework/XMCallRecorder.h; sourceTree = "<group>"; };
+		D10E40170AAD8454009EA376 /* XMCallRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallRecorder.m; path = Source/Framework/XMCallRecorder.m; sourceTree = "<group>"; };
+		D10E453E0AADEC11009EA376 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CallRecorderModule.nib; sourceTree = "<group>"; };
+		D10E45420AADEC40009EA376 /* XMCallRecorderModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallRecorderModule.h; path = Source/GUI/XMCallRecorderModule.h; sourceTree = "<group>"; };
+		D10E45430AADEC40009EA376 /* XMCallRecorderModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallRecorderModule.m; path = Source/GUI/XMCallRecorderModule.m; sourceTree = "<group>"; };
 		D10FD6560A7D49C700935B10 /* speex_preprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = speex_preprocess.c; path = speex/libspeex/speex_preprocess.c; sourceTree = "<group>"; };
 		D10FD6670A7D4A6900935B10 /* fftwrap.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = fftwrap.c; path = speex/libspeex/fftwrap.c; sourceTree = "<group>"; };
 		D10FD67A0A7D4AC700935B10 /* kiss_fft.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = kiss_fft.c; path = speex/libspeex/kiss_fft.c; sourceTree = "<group>"; };
@@ -1023,6 +1033,9 @@
 		D15F84430A24874400FB2EDB /* h4601.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h4601.h; sourceTree = "<group>"; };
 		D15F84470A24878400FB2EDB /* h4601.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h4601.cxx; sourceTree = "<group>"; };
 		D15F844B0A24880000FB2EDB /* h235auth1.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h235auth1.cxx; sourceTree = "<group>"; };
+		D1610DEE0ABD497D00B41229 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/CallRecorderModule.nib; sourceTree = "<group>"; };
+		D1610DEF0ABD499600B41229 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/CallRecorderModule.nib; sourceTree = "<group>"; };
+		D1610DF00ABD49A400B41229 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/CallRecorderModule.nib; sourceTree = "<group>"; };
 		D162158209F0F91600647E48 /* CallHistory_H323.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory_H323.tiff; path = Resources/Images/CallHistory_H323.tiff; sourceTree = "<group>"; };
 		D162158309F0F91600647E48 /* CallHistory_SIP.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory_SIP.tiff; path = Resources/Images/CallHistory_SIP.tiff; sourceTree = "<group>"; };
 		D163336307A01BD5003FD9C0 /* XMApplicationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationController.h; path = Source/Application/XMApplicationController.h; sourceTree = "<group>"; };
@@ -1882,6 +1895,8 @@
 				D198B481097636F300180551 /* XMRTPH264Packetizer.h */,
 				D198B482097636F300180551 /* XMRTPH264Packetizer.c */,
 				D198B4870976371D00180551 /* XMRTPH264PacketizerDispatch.h */,
+				D10E40160AAD8454009EA376 /* XMCallRecorder.h */,
+				D10E40170AAD8454009EA376 /* XMCallRecorder.m */,
 			);
 			name = "Obj-C";
 			sourceTree = "<group>";
@@ -2106,6 +2121,8 @@
 				D163941B083E17ED00F7FD83 /* XMDialPadModule.m */,
 				D1ECCBF60833DDD5008EBAE3 /* XMTextChatModule.h */,
 				D1ECCBF70833DDD5008EBAE3 /* XMTextChatModule.m */,
+				D10E45420AADEC40009EA376 /* XMCallRecorderModule.h */,
+				D10E45430AADEC40009EA376 /* XMCallRecorderModule.m */,
 			);
 			name = "Window Management";
 			sourceTree = "<group>";
@@ -2781,6 +2798,7 @@
 				1A348FB50984E4520033FA95 /* XMInspector.nib */,
 				D1B4D0050833937200A444E1 /* ZeroConfModule.nib */,
 				D11C5E630A49ED950030633D /* IncomingCallAlert.nib */,
+				D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -3038,6 +3056,8 @@
 				D11C5E520A49EC730030633D /* XMIncomingCallAlert.h in Headers */,
 				D10B914E0A519B1C00003A33 /* XMAudioPreferencesModule.h in Headers */,
 				D1BD63A40A950B6C007C8E46 /* XMURICommand.h in Headers */,
+				D10E40180AAD8454009EA376 /* XMCallRecorder.h in Headers */,
+				D10E45440AADEC40009EA376 /* XMCallRecorderModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3540,6 +3560,7 @@
 				D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */,
 				D10B91A00A51A10100003A33 /* Audio.tiff in Resources */,
 				D1BD64420A951A2E007C8E46 /* uri.scriptSuite in Resources */,
+				D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3686,6 +3707,8 @@
 				D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */,
 				D10B914F0A519B1C00003A33 /* XMAudioPreferencesModule.m in Sources */,
 				D1BD63A50A950B6C007C8E46 /* XMURICommand.m in Sources */,
+				D10E40190AAD8454009EA376 /* XMCallRecorder.m in Sources */,
+				D10E45450AADEC40009EA376 /* XMCallRecorderModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3898,6 +3921,17 @@
 				D10B8A9E0A50046300003A33 /* German */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D10E453E0AADEC11009EA376 /* English */,
+				D1610DEE0ABD497D00B41229 /* French */,
+				D1610DEF0ABD499600B41229 /* German */,
+				D1610DF00ABD49A400B41229 /* Italian */,
+			);
+			name = CallRecorderModule.nib;
 			sourceTree = "<group>";
 		};
 		D11C5E630A49ED950030633D /* IncomingCallAlert.nib */ = {

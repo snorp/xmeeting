@@ -1,0 +1,33 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                toggleEnableVideoBandwidthLimit = id; 
+                toggleLowPriorityRecording = id; 
+                toggleRecordAudio = id; 
+                toggleRecordVideo = id; 
+                toggleRecording = id; 
+                videoCodecSelected = id; 
+                videoQualitySelected = id; 
+            }; 
+            CLASS = XMCallRecorderModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contentView = NSView; 
+                dataRateLimitField = NSTextField; 
+                dataRateLimitSwitch = NSButton; 
+                filePathTextField = NSTextField; 
+                lowPrioritySwitch = NSButton; 
+                recordAudioSwitch = NSButton; 
+                recordButton = NSButton; 
+                recordVideoSwitch = NSButton; 
+                videoCodecPopUp = NSPopUpButton; 
+                videoQualitySlider = NSSlider; 
+            }; 
+            SUPERCLASS = XMInspectorModule; 
+        }, 
+        {CLASS = XMInspectorModule; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.h,v 1.2 2006/09/16 16:54:47 hfriederich Exp $
+ * $Id: XMCallRecorder.h,v 1.3 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -88,7 +88,7 @@
 /**
  * Returns an error description if the recoring failed somehow
  **/
-- (NSString *)getErrorDescription;
+- (NSString *)errorDescription;
 
 @end
 

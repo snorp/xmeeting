@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.m,v 1.2 2006/09/16 16:54:47 hfriederich Exp $
+ * $Id: XMCallRecorder.m,v 1.3 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -380,7 +380,7 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 	}
 }
 
-- (NSString *)getErrorDescription
+- (NSString *)errorDescription
 {
 	if(errorCode == noErr)
 	{
@@ -782,7 +782,6 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 
 - (void)_handleErrorReport
 {
-	NSLog(@"Got ErrorReport: %d, %x", errorCode, locationCode);
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallRecorderDidGetError object:self];
 }
 

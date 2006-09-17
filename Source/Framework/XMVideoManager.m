@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.18 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.19 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -88,6 +88,8 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	
 	displayLink = NULL;
 	
+	errorDescription = nil;
+	
 	return self;
 }
 
@@ -141,6 +143,8 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	[self _close];
 	
 	[videoLock release];
+	
+	[errorDescription release];
 	
 	[super dealloc];
 }
@@ -382,6 +386,11 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	}
 }
 
+- (NSString *)errorDescription
+{
+	return errorDescription;
+}
+
 #pragma mark Framework Methods
 
 - (void)_handleDeviceList:(NSArray *)deviceList
@@ -471,6 +480,14 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	localVideoSize = XMVideoSize_NoVideo;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidEndTransmittingVideo object:self];
+}
+
+- (void)_handleErrorDescription:(NSString *)theErrorDescription
+{
+	[errorDescription release];
+	errorDescription = [theErrorDescription copy];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidGetError object:self];
 }
 
 - (void)_handleLocalVideoFrame:(CVPixelBufferRef)pixelBuffer

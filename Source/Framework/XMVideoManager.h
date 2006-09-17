@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.17 2006/06/20 13:33:11 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.18 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,8 @@
 	CVOpenGLTextureRef remoteVideoTexture;
 	BOOL remoteVideoTextureDidChange;
 	CVDisplayLinkRef displayLink;
+	
+	NSString *errorDescription;
 }
 
 /**
@@ -241,6 +243,12 @@
  * dictionary specified
  **/
 - (void)setSettings:(NSDictionary *)settings;
+
+/**
+ * Returns an error description in case an error was
+ * encountered
+ **/
+- (NSString *)errorDescription;
 
 @end
 

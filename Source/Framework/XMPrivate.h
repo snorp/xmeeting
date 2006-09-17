@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.35 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.36 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -255,6 +255,7 @@ void _XMCheckCloseStatus();
 - (void)_handleVideoReceivingEnd;
 - (void)_handleVideoTransmittingStart:(NSNumber *)videoSize;
 - (void)_handleVideoTransmittingEnd;
+- (void)_handleErrorDescription:(NSString *)errorDescription;
 
 // runs NOT on the main thread!
 - (void)_handleLocalVideoFrame:(CVPixelBufferRef)frame;

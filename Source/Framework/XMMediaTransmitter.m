@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.46 2006/09/13 21:14:26 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.47 2006/09/17 10:22:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -529,9 +529,7 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 }
 
 - (void)_handleErrorReport:(NSArray *)report
-{
-	// BOGUS: Move Dialog outside of XMeeting framework
-	
+{	
 	NSNumber *indexNumber = [report objectAtIndex:0];
 	NSNumber *errorNumber = [report objectAtIndex:1];
 	NSNumber *hintNumber = [report objectAtIndex:2];
@@ -544,7 +542,7 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 	id<XMVideoInputModule> module = [(XMVideoInputModuleWrapper *)[videoInputModules objectAtIndex:index] _videoInputModule];
 	NSString *description = [module descriptionForErrorCode:errorCode hintCode:hintCode device:device];
 	
-	NSRunAlertPanel(NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @""), description, NSLocalizedString(@"OK", @""), nil, nil);
+	[_XMVideoManagerSharedInstance _handleErrorDescription:description];
 }
 
 - (void)_handleMediaTransmitterThreadDidExit
