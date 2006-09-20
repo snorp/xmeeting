@@ -141,6 +141,8 @@
 		D10B914E0A519B1C00003A33 /* XMAudioPreferencesModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D10B914C0A519B1C00003A33 /* XMAudioPreferencesModule.h */; };
 		D10B914F0A519B1C00003A33 /* XMAudioPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D10B914D0A519B1C00003A33 /* XMAudioPreferencesModule.m */; };
 		D10B91A00A51A10100003A33 /* Audio.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D10B919F0A51A10100003A33 /* Audio.tiff */; };
+		D10BD5320AC1C81E004320A8 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = D10BD5310AC1C81E004320A8 /* guid.h */; };
+		D10BD5340AC1C83B004320A8 /* guid.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D10BD5330AC1C83B004320A8 /* guid.cxx */; };
 		D10D49E4093CA220000DD61E /* XMWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = D10D49E2093CA220000DD61E /* XMWindow.h */; };
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
@@ -970,6 +972,8 @@
 		D10B914C0A519B1C00003A33 /* XMAudioPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAudioPreferencesModule.h; path = Source/GUI/XMAudioPreferencesModule.h; sourceTree = "<group>"; };
 		D10B914D0A519B1C00003A33 /* XMAudioPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAudioPreferencesModule.m; path = Source/GUI/XMAudioPreferencesModule.m; sourceTree = "<group>"; };
 		D10B919F0A51A10100003A33 /* Audio.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Audio.tiff; path = Resources/Images/Audio.tiff; sourceTree = "<group>"; };
+		D10BD5310AC1C81E004320A8 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
+		D10BD5330AC1C83B004320A8 /* guid.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cxx; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
 		D10E40160AAD8454009EA376 /* XMCallRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallRecorder.h; path = Source/Framework/XMCallRecorder.h; sourceTree = "<group>"; };
@@ -2161,6 +2165,7 @@
 		D1B6062E08F8F8410034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D10BD5310AC1C81E004320A8 /* guid.h */,
 				D1B6078608F8F86B0034B47F /* udp.h */,
 				D1B6062F08F8F8410034B47F /* asnber.h */,
 				D1B6063008F8F8410034B47F /* asner.h */,
@@ -2339,6 +2344,7 @@
 		D1B6075808F8F86B0034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D10BD5330AC1C83B004320A8 /* guid.cxx */,
 				D1887DEB0A27B67B00C938BB /* psasl.cxx */,
 				D1887D620A27A85500C938BB /* pssl.cxx */,
 				D1B6075A08F8F86B0034B47F /* asner.cxx */,
@@ -3214,6 +3220,7 @@
 				D1296DF509288A7A0077C77F /* psync.h in Headers */,
 				D1887E130A27BA2F00C938BB /* prop.h in Headers */,
 				D1887E140A27BA2F00C938BB /* sasl.h in Headers */,
+				D10BD5320AC1C81E004320A8 /* guid.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3757,6 +3764,7 @@
 				D1B6088008F8F86D0034B47F /* udll.cxx in Sources */,
 				D1B6088208F8F86D0034B47F /* uicmp.cxx in Sources */,
 				D1E9137E0A4833F7005CDF27 /* config.cxx in Sources */,
+				D10BD5340AC1C83B004320A8 /* guid.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
