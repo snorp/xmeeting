@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.h,v 1.11 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.12 2006/09/21 20:14:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,9 @@
 #import "XMMainWindowModule.h"
 
 @class XMFullScreenWindow;
+
+extern NSString *XMNotification_DidBeginFullScreenMode;
+extern NSString *XMNotification_DidEndFullScreenMode;
 
 /**
  * XMMainWindowController manages the content of the main
@@ -54,6 +57,12 @@
  * Returns whether we're showing full screen or not
  **/
 - (BOOL)isFullScreen;
+
+/**
+ * Returns the full screen window if in full screen mode.
+ * Else returns nil
+ **/
+- (NSWindow *)fullScreenWindow;
 
 /**
  * Sets the modules of the receiver

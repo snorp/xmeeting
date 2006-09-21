@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorderModule.h,v 1.1 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMCallRecorderModule.h,v 1.2 2006/09/21 20:14:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,8 @@
 	IBOutlet NSTextField *dataRateLimitField;
 	NSString *bwLimitString;
 	IBOutlet NSButton *lowPrioritySwitch;
+	
+	NSWindow *recorderWindow;
 
 }
 

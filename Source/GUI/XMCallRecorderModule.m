@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorderModule.m,v 1.1 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMCallRecorderModule.m,v 1.2 2006/09/21 20:14:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,8 @@
 
 #import "XMeeting.h"
 #import "XMCallRecorderModule.h"
+#import "XMMainWindowController.h"
+#import "XMWindow.h"
 
 NSString *XMKey_RecordAudio = @"XMeeting_RecordAudio";
 NSString *XMKey_RecordVideo = @"XMeeting_RecordVideo";
@@ -23,6 +25,13 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 - (void)_savePanelDidEnd:(NSSavePanel *)savePanel returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)_callRecorderDidEndRecording:(NSNotification *)notif;
 - (void)_displayRecording:(NSString *)filePath;
+- (void)_setupRecorderWindow;
+- (void)_showRecorderWindow;
+- (void)_hideRecorderWindow;
+- (void)_mainWindowDidResize:(NSNotification *)notif;
+- (void)_didBeginFullScreen:(NSNotification *)notif;
+- (void)_didEndFullScreen:(NSNotification *)notif;
+- (void)_adjustRecorderWindow;
 
 @end
 
@@ -33,6 +42,8 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 - (id)init
 {
 	self = [super init];
+	
+	recorderWindow = nil;
 	
 	return self;
 }
@@ -82,8 +93,15 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	
 	[self _validateGUI];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callRecorderDidEndRecording:)
-												 name:XMNotification_CallRecorderDidEndRecording object:nil];
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	[notificationCenter addObserver:self selector:@selector(_callRecorderDidEndRecording:)
+							   name:XMNotification_CallRecorderDidEndRecording object:nil];
+	[notificationCenter addObserver:self selector:@selector(_mainWindowDidResize:)
+							   name:NSWindowDidResizeNotification object:[[XMMainWindowController sharedInstance] window]];
+	[notificationCenter addObserver:self selector:@selector(_didBeginFullScreen:)
+							   name:XMNotification_DidBeginFullScreenMode object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEndFullScreen:)
+							   name:XMNotification_DidEndFullScreenMode object:nil];
 }
 
 - (void)dealloc
@@ -91,6 +109,7 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[bwLimitString release];
+	[recorderWindow release];
 	
 	[super dealloc];
 }
@@ -350,6 +369,7 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	[recordButton setTitle:NSLocalizedString(@"XM_CALL_RECORDER_MODULE_START_RECORDING", @"")];
 	[filePathTextField setStringValue:@""];
 	[self _validateGUI];
+	[self _hideRecorderWindow];
 }
 
 - (void)_displayRecording:(NSString *)filePath
@@ -357,6 +377,132 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	[recordButton setTitle:NSLocalizedString(@"XM_CALL_RECORDER_MODULE_STOP_RECORDING", @"")];
 	[filePathTextField setStringValue:filePath];
 	[self _validateGUI];
+	
+	if(recorderWindow == nil)
+	{
+		[self _setupRecorderWindow];
+	}
+	
+	[self _showRecorderWindow];
+}
+
+- (void)_setupRecorderWindow
+{
+	NSImageView *imageView = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 0, 12, 12)];
+	[imageView setImage:[NSImage imageNamed:@"recording.gif"]];
+	[imageView setImageFrameStyle:NSImageFrameNone];
+	[imageView setImageScaling:NSScaleToFit];
+	[imageView setEditable:NO];
+	[imageView setAnimates:YES];
+	
+	recorderWindow = [[XMChildWindow alloc] initWithContentRect:NSMakeRect(0, 0, 12, 12)
+													  styleMask:NSBorderlessWindowMask
+														backing:NSBackingStoreBuffered
+														  defer:NO];
+	[recorderWindow setOpaque:NO];
+	[recorderWindow setBackgroundColor:[NSColor clearColor]];
+	[recorderWindow setContentView:imageView];
+	[imageView release];
+}
+
+- (void)_showRecorderWindow
+{
+	[(NSImageView *)[recorderWindow contentView] setAnimates:YES];
+	
+	XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+	NSWindow *window;
+	if([mainWindowController isFullScreen])
+	{
+		window = [mainWindowController fullScreenWindow];
+	}
+	else
+	{
+		window = [mainWindowController window];
+	}
+	[self _adjustRecorderWindow];
+	[window addChildWindow:recorderWindow ordered:NSWindowAbove];
+	
+	[recorderWindow orderFront:self];
+}
+
+- (void)_hideRecorderWindow
+{
+	XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+	NSWindow *window;
+	if([mainWindowController isFullScreen])
+	{
+		window = [mainWindowController fullScreenWindow];
+	}
+	else
+	{
+		window = [mainWindowController window];
+	}
+	[window removeChildWindow:recorderWindow];
+	[recorderWindow orderOut:self];
+	
+	[(NSImageView *)[recorderWindow contentView] setAnimates:NO];
+}
+
+- (void)_mainWindowDidResize:(NSNotification *)notif
+{
+	if(recorderWindow != nil && [recorderWindow isVisible])
+	{
+		[self _adjustRecorderWindow];
+	}
+}
+
+- (void)_didBeginFullScreen:(NSNotification *)notif
+{
+	if(recorderWindow != nil && [recorderWindow isVisible])
+	{
+		XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+		NSWindow *mainWindow = [mainWindowController window];
+		NSWindow *fullScreenWindow = [mainWindowController fullScreenWindow];
+		
+		[mainWindow removeChildWindow:recorderWindow];
+		[self _adjustRecorderWindow];
+		[fullScreenWindow addChildWindow:recorderWindow ordered:NSWindowAbove];
+	}
+}
+
+- (void)_didEndFullScreen:(NSNotification *)notif
+{
+	if(recorderWindow != nil && [recorderWindow isVisible])
+	{
+		XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+		NSWindow *mainWindow = [mainWindowController window];
+		NSWindow *fullScreenWindow = [mainWindowController fullScreenWindow];
+		
+		[recorderWindow orderOut:self];
+		[fullScreenWindow removeChildWindow:recorderWindow];
+		
+		[mainWindow addChildWindow:recorderWindow ordered:NSWindowAbove];
+		[self _adjustRecorderWindow];
+		[recorderWindow orderFront:self];
+	}
+}
+
+- (void)_adjustRecorderWindow
+{
+	NSWindow *window;
+	XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
+	int offset;
+	if([mainWindowController isFullScreen])
+	{
+		window = [mainWindowController fullScreenWindow];
+		offset = 20;
+	}
+	else
+	{
+		window = [mainWindowController window];
+		offset = 7;
+	}
+	NSRect frame = [window frame];
+	frame.origin.x = frame.origin.x + frame.size.width - 12 - offset;
+	frame.origin.y = frame.origin.y + frame.size.height - 12 - offset;
+	frame.size.width = 12;
+	frame.size.height = 12;
+	[recorderWindow setFrame:frame display:NO];
 }
 
 @end

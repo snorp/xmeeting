@@ -1,5 +1,5 @@
 /*
- * $Id: XMMainWindowController.m,v 1.19 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMMainWindowController.m,v 1.20 2006/09/21 20:14:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,9 @@
 #import "XMLocalVideoView.h"
 
 NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
+
+NSString *XMNotification_DidBeginFullScreenMode = @"XMeeting_DidBeginFullScreenMode";
+NSString *XMNotification_DidEndFullScreenMode = @"XMeeting_DidEndFullScreenMode";
 
 @interface XMMainWindowController (PrivateMethods)
 
@@ -121,6 +124,11 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 - (BOOL)isFullScreen
 {
 	return isFullScreen;
+}
+
+- (NSWindow *)fullScreenWindow
+{
+	return fullScreenWindow;
 }
 
 #pragma mark Module Methods
@@ -338,9 +346,12 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 		}
 		
 		isFullScreen = YES;
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidBeginFullScreenMode object:self];
 	}
 	else
 	{
+		
 		[fullScreenWindow orderOut:self];
 		
 		unsigned i;
@@ -353,6 +364,8 @@ NSString *XMKey_MainWindowTopLeftCorner = @"XMeeting_MainWindowTopLeftCorner";
 		}
 		
 		isFullScreen = NO;
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_DidEndFullScreenMode object:self];
 	}
 }
 
