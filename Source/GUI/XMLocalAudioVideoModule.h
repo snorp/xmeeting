@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.12 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.13 2006/09/24 18:56:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,6 +33,9 @@
 	IBOutlet NSLevelIndicator *audioInputLevelIndicator;
 	IBOutlet NSTextField *videoDisabledFld;	
 	
+	IBOutlet NSButton *audioTestButton;
+	IBOutlet NSPopUpButton *audioTestDelayPopUp;
+	
 	IBOutlet NSPanel *videoDeviceSettingsPanel;
 	IBOutlet NSBox *videoDeviceSettingsBox;
 	IBOutlet XMLocalVideoView *videoDeviceSettingsView;
@@ -54,6 +57,9 @@
 - (IBAction)closeVideoDeviceSettingsPanel:(id)sender;
 
 - (IBAction)updateDeviceLists:(id)sender;
+
+- (IBAction)toggleAudioTest:(id)sender;
+- (IBAction)toggleAudioDelay:(id)sender;
 
 @end
 

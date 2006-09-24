@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.7 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.8 2006/09/24 18:56:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 
 #define checkStatus( err, location ) \
 if(err) {\
-	cout << "error: " << location << endl;\
+	PTRACE(1, "XMSoundChannelError: " << err << " (" << location << ")"); \
 }
 
 #define XM_MIN_INPUT_FILL 20

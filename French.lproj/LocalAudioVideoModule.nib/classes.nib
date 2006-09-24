@@ -14,6 +14,8 @@
                 closeVideoDeviceSettingsPanel = id; 
                 restoreDefaultSettings = id; 
                 showVideoDeviceSettings = id; 
+                toggleAudioDelay = id; 
+                toggleAudioTest = id; 
                 toggleMuteAudioInput = id; 
                 toggleMuteAudioOutput = id; 
                 updateDeviceLists = id; 
@@ -26,6 +28,8 @@
                 audioInputVolumeSlider = NSSlider; 
                 audioOutputDevicesPopUp = NSPopUpButton; 
                 audioOutputVolumeSlider = NSSlider; 
+                audioTestButton = NSButton; 
+                audioTestDelayPopUp = NSPopUpButton; 
                 contentView = NSView; 
                 localVideoView = XMLocalVideoView; 
                 muteAudioInputSwitch = NSButton; 

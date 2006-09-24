@@ -144,6 +144,10 @@
 		D10BD5320AC1C81E004320A8 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = D10BD5310AC1C81E004320A8 /* guid.h */; };
 		D10BD5340AC1C83B004320A8 /* guid.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D10BD5330AC1C83B004320A8 /* guid.cxx */; };
 		D10BD5470AC1D503004320A8 /* recording.gif in Resources */ = {isa = PBXBuildFile; fileRef = D10BD5460AC1D503004320A8 /* recording.gif */; };
+		D10BDA220AC456F7004320A8 /* AudioTestModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D10BDA200AC456F7004320A8 /* AudioTestModule.nib */; };
+		D10BDA4B0AC45832004320A8 /* XMAudioTester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D10BDA490AC45832004320A8 /* XMAudioTester.cpp */; };
+		D10BDA550AC4668C004320A8 /* XMAudioTester.h in Headers */ = {isa = PBXBuildFile; fileRef = D10BDA540AC4668C004320A8 /* XMAudioTester.h */; };
+		D10BDC7B0AC6FBFC004320A8 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = D10BD5310AC1C81E004320A8 /* guid.h */; };
 		D10D49E4093CA220000DD61E /* XMWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = D10D49E2093CA220000DD61E /* XMWindow.h */; };
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
 		D10DDC54090989D60058D3AB /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
@@ -976,6 +980,9 @@
 		D10BD5310AC1C81E004320A8 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
 		D10BD5330AC1C83B004320A8 /* guid.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cxx; sourceTree = "<group>"; };
 		D10BD5460AC1D503004320A8 /* recording.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = recording.gif; path = Resources/Images/recording.gif; sourceTree = "<group>"; };
+		D10BDA210AC456F7004320A8 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/AudioTestModule.nib; sourceTree = "<group>"; };
+		D10BDA490AC45832004320A8 /* XMAudioTester.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMAudioTester.cpp; path = Source/Framework/XMAudioTester.cpp; sourceTree = "<group>"; };
+		D10BDA540AC4668C004320A8 /* XMAudioTester.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAudioTester.h; path = Source/Framework/XMAudioTester.h; sourceTree = "<group>"; };
 		D10D49E2093CA220000DD61E /* XMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMWindow.h; sourceTree = "<group>"; };
 		D10D49E3093CA220000DD61E /* XMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMWindow.m; sourceTree = "<group>"; };
 		D10E40160AAD8454009EA376 /* XMCallRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallRecorder.h; path = Source/Framework/XMCallRecorder.h; sourceTree = "<group>"; };
@@ -1941,6 +1948,8 @@
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
 				D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */,
+				D10BDA540AC4668C004320A8 /* XMAudioTester.h */,
+				D10BDA490AC45832004320A8 /* XMAudioTester.cpp */,
 				D1971A5D08FA453F00295E05 /* XMMediaFormats.h */,
 				D1971A5E08FA453F00295E05 /* XMMediaFormats.cpp */,
 				D1971F0A08FAB3F400295E05 /* XMMediaStream.h */,
@@ -2807,6 +2816,7 @@
 				D1B4D0050833937200A444E1 /* ZeroConfModule.nib */,
 				D11C5E630A49ED950030633D /* IncomingCallAlert.nib */,
 				D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */,
+				D10BDA200AC456F7004320A8 /* AudioTestModule.nib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -3067,6 +3077,8 @@
 				D1BD63A40A950B6C007C8E46 /* XMURICommand.h in Headers */,
 				D10E40180AAD8454009EA376 /* XMCallRecorder.h in Headers */,
 				D10E45440AADEC40009EA376 /* XMCallRecorderModule.h in Headers */,
+				D10BDA550AC4668C004320A8 /* XMAudioTester.h in Headers */,
+				D10BDC7B0AC6FBFC004320A8 /* guid.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3572,6 +3584,7 @@
 				D1BD64420A951A2E007C8E46 /* uri.scriptSuite in Resources */,
 				D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */,
 				D10BD5470AC1D503004320A8 /* recording.gif in Resources */,
+				D10BDA220AC456F7004320A8 /* AudioTestModule.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3720,6 +3733,7 @@
 				D1BD63A50A950B6C007C8E46 /* XMURICommand.m in Sources */,
 				D10E40190AAD8454009EA376 /* XMCallRecorder.m in Sources */,
 				D10E45450AADEC40009EA376 /* XMCallRecorderModule.m in Sources */,
+				D10BDA4B0AC45832004320A8 /* XMAudioTester.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3933,6 +3947,14 @@
 				D10B8A9E0A50046300003A33 /* German */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		D10BDA200AC456F7004320A8 /* AudioTestModule.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D10BDA210AC456F7004320A8 /* English */,
+			);
+			name = AudioTestModule.nib;
 			sourceTree = "<group>";
 		};
 		D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */ = {

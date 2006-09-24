@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.24 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.25 2006/09/24 18:56:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,8 @@
 #import "XMMainWindowController.h"
 #import "XMLocalVideoView.h"
 
+NSString *XMKey_AudioTestDelay = @"XMeeting_AudioTestDelay";
+
 @interface XMLocalAudioVideoModule (PrivateMethods)
 
 - (void)_validateAudioControls;
@@ -26,6 +28,7 @@
 - (void)_didUpdateAudioDeviceLists:(NSNotification *)notif;
 - (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_activeLocationDidChange:(NSNotification *)notif;
+- (void)_didStopAudioTest:(NSNotification *)notif;
 
 @end
 
@@ -87,6 +90,11 @@
 	[self _didUpdateAudioDeviceLists:nil];
 	[self _validateAudioControls];
 	
+	// selecting the default audio test delay
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	unsigned audioDelay = [userDefaults integerForKey:XMKey_AudioTestDelay];
+	[audioTestDelayPopUp selectItemWithTag:audioDelay];
+	
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 
@@ -106,6 +114,8 @@
 							   name:XMNotification_AudioManagerDidUpdateDeviceLists object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateAudioInputLevel:)
 							   name:XMNotification_AudioManagerDidUpdateInputLevel object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didStopAudioTest:) 
+							   name:XMNotification_AudioManagerDidStopAudioTest object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
@@ -118,6 +128,7 @@
 	NSRect frame = [audioInputLevelIndicator frame];
 	frame.size.height = 8;
 	[audioInputLevelIndicator setFrame:frame];
+	[audioInputLevelIndicator setEnabled:NO];
 	
 }
 
@@ -297,6 +308,28 @@
 		int state = ([audioManager mutesOutput] == YES) ? NSOnState : NSOffState;
 		[muteAudioOutputSwitch setState:state];
 	}
+}
+
+- (IBAction)toggleAudioTest:(id)sender
+{
+	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+	if([audioManager doesRunAudioTest])
+	{
+		[audioManager stopAudioTest];
+	}
+	else
+	{
+		unsigned delay = [[audioTestDelayPopUp selectedItem] tag];
+		[audioManager startAudioTestWithDelay:delay];
+		[audioTestDelayPopUp setEnabled:NO];
+		[audioTestButton setTitle:NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_STOP_AUDIO_TEST", @"")];
+	}
+}
+
+- (IBAction)toggleAudioDelay:(id)sender
+{
+	int delay = [[audioTestDelayPopUp selectedItem] tag];
+	[[NSUserDefaults standardUserDefaults] setInteger:delay forKey:XMKey_AudioTestDelay];
 }
 
 - (IBAction)restoreDefaultSettings:(id)sender
@@ -490,6 +523,12 @@
 	double level = [audioManager inputLevel];
 	
 	[audioInputLevelIndicator setDoubleValue:(22.0 * level)];
+}
+
+- (void)_didStopAudioTest:(NSNotification *)notif
+{
+	[audioTestDelayPopUp setEnabled:YES];
+	[audioTestButton setTitle:NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_START_AUDIO_TEST", @"")];
 }
 
 @end
