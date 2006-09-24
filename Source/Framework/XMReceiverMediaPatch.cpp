@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.23 2006/08/26 08:20:42 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.24 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,8 @@
 #include "XMMediaFormats.h"
 #include "XMMediaStream.h"
 #include "XMCallbackBridge.h"
+
+#include "XMAudioTester.h"
 
 #define XM_PACKET_POOL_GRANULARITY 8
 #define XM_FRAME_BUFFER_SIZE 352*288*4
@@ -30,6 +32,9 @@ XMReceiverMediaPatch::~XMReceiverMediaPatch()
 
 void XMReceiverMediaPatch::Main()
 {
+	// quit any running audio test if needed
+	XMAudioTester::Stop();
+	
 	// Currently, audio is processed using the default OPAL facilities.
 	// Only video is processed using QuickTime
 	const OpalMediaFormat & mediaFormat = source.GetMediaFormat();

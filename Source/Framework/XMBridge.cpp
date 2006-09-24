@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.33 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.34 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #include "XMH323EndPoint.h"
 #include "XMSIPEndPoint.h"
 #include "XMSoundChannel.h"
+#include "XMAudioTester.h"
 #include "XMMediaFormats.h"
 #include "XMTransmitterMediaPatch.h"
 
@@ -149,6 +150,16 @@ void _XMSetAudioBufferSize(unsigned size)
 void _XMStopAudio()
 {
 	XMSoundChannel::StopChannels();
+}
+
+void _XMStartAudioTest(unsigned delay)
+{
+	XMAudioTester::Start(delay);
+}
+
+void _XMStopAudioTest()
+{
+	XMAudioTester::Stop();
 }
 
 #pragma mark -

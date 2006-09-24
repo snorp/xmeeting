@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.30 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.31 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,6 +112,9 @@ void _XMSetMeasureAudioSignalLevels(bool flag);
 
 void _XMSetAudioBufferSize(unsigned value);
 void _XMStopAudio();
+
+void _XMStartAudioTest(unsigned delay);
+void _XMStopAudioTest();
 
 #pragma mark Video Setup Functions
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.26 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.27 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -239,6 +239,12 @@ void _XMHandleAudioOutputLevel(double level)
 													withObject:number waitUntilDone:NO];
 	
 	[number release];
+}
+
+void _XMHandleAudioTestEnd()
+{
+	[_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioTestEnd)
+													withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark -

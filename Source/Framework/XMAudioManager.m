@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.11 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.12 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,6 +102,8 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 	inputLevel = 0.0;
 	outputLevel = 0.0;
 	
+	doesRunAudioTest = NO;
+	
 	[self _addVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	[self _addVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
 	
@@ -134,6 +136,8 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		[selectedOutputDevice release];
 		selectedOutputDevice = nil;
 	}
+	
+	[self stopAudioTest];
 	
 	[self _removeVolumePropertyListenerForDevice:selectedInputDeviceID direction:XM_INPUT_DIRECTION];
 	[self _removeVolumePropertyListenerForDevice:selectedOutputDeviceID direction:XM_OUTPUT_DIRECTION];
@@ -427,6 +431,44 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		return outputLevel;
 	}
 	return 0.0;
+}
+
+- (void)startAudioTestWithDelay:(unsigned)delay
+{
+	if(doesRunAudioTest == YES)
+	{
+		return;
+	}
+	
+	if(delay > 5)
+	{
+		delay = 5;
+	}
+	if(delay < 1)
+	{
+		delay = 1;
+	}
+	_XMStartAudioTest(delay);
+	
+	doesRunAudioTest = YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidStartAudioTest object:self];
+}
+
+- (void)stopAudioTest
+{
+	if(doesRunAudioTest == NO)
+	{
+		return;
+	}
+	// this method will block until the audio test thread finished.
+	// The state is is updated in the callback called by the underlying
+	// system
+	_XMStopAudioTest();
+}
+
+- (BOOL)doesRunAudioTest
+{
+	return doesRunAudioTest;
 }
 
 #pragma mark Private Methods
@@ -826,6 +868,12 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidUpdateOutputLevel
 															object:self];
 	}
+}
+
+- (void)_handleAudioTestEnd
+{
+	doesRunAudioTest = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_AudioManagerDidStopAudioTest object:self];
 }
 
 @end

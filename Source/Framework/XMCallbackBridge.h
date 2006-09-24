@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.29 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.30 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,6 +158,11 @@ void _XMHandleAudioInputLevel(double level);
  * Reports the audio level of the player stream
  **/
 void _XMHandleAudioOutputLevel(double level);
+
+/**
+ * Reports that the audio test stopped
+ **/
+void _XMHandleAudioTestEnd();
 
 #pragma mark -
 #pragma mark H.323 specific callbacks

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.24 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.25 2006/09/24 17:53:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,6 +65,8 @@ NSString *XMNotification_AudioManagerOutputVolumeDidChange = @"XMeetingAudioMana
 NSString *XMNotification_AudioManagerDidUpdateDeviceLists = @"XMeetingAudioManagerDidUpdateDeviceListsNotification";
 NSString *XMNotification_AudioManagerDidUpdateInputLevel = @"XMeetingAudioManagerDidUpdateInputLevelNotification";
 NSString *XMNotification_AudioManagerDidUpdateOutputLevel = @"XMeetingAudioManagerDidUpdateOutputLevelNotification";
+NSString *XMNotification_AudioManagerDidStartAudioTest = @"XMeetingAudioManagerDidStartAudioTest";
+NSString *XMNotification_AudioManagerDidStopAudioTest = @"XMeetingAudioManagerDidStopAudioTest";
 
 NSString *XMNotification_VideoManagerDidStartInputDeviceListUpdate = @"XMeetingVideoManagerDidStartInputDeviceListUpdateNotification";
 NSString *XMNotification_VideoManagerDidUpdateInputDeviceList = @"XMeetingVideoManagerDidUpdateInputDeviceListNotification";

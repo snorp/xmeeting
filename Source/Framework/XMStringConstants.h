@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.26 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.27 2006/09/24 17:53:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -215,6 +215,8 @@ extern NSString *XMNotification_AudioManagerOutputVolumeDidChange;
 extern NSString *XMNotification_AudioManagerDidUpdateDeviceLists;
 extern NSString *XMNotification_AudioManagerDidUpdateInputLevel;
 extern NSString *XMNotification_AudioManagerDidUpdateOutputLevel;
+extern NSString *XMNotification_AudioManagerDidStartAudioTest;
+extern NSString *XMNotification_AudioManagerDidStopAudioTest;
 
 #pragma mark XMVideoManager Notifications
 

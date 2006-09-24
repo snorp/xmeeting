@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.h,v 1.7 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.8 2006/09/24 17:53:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,6 +35,8 @@
 	BOOL doesMeasureSignalLevels;
 	double inputLevel;
 	double outputLevel;
+	
+	BOOL doesRunAudioTest;
 }
 
 /**
@@ -90,18 +92,18 @@
 - (double)inputLevel;
 - (double)outputLevel;
 
-@end
-
 /**
- * Methods that a delegate may implement
- * If a delegate implements these methods, the XMAudioManager
- * automatically registers the delegate as an observer for these
- * notifications
+ * Starting / stopping the audio test
+ * Note that this test is only available while not
+ * being in a call.
+ * Recorded audio will be delayed by 'delay' seconds
+ * before being outputted again.
+ * An audio test will be aborted automatically when
+ * a call is established.
  **/
-@protocol XMAudioManagerDelegate
-
-- (void)audioManagerInputVolumeDidChange:(NSNotification *)notif;
-- (void)audioManagerOutputVolumeDidChange:(NSNotification *)notif;
+- (void)startAudioTestWithDelay:(unsigned)delay;
+- (void)stopAudioTest;
+- (BOOL)doesRunAudioTest;
 
 @end
 
