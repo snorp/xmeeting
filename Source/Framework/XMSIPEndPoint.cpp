@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.14 2006/09/13 21:17:56 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.15 2006/09/28 21:17:47 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,11 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	
 	SetInitialBandwidth(UINT_MAX);
 	
-	SetUserAgent("XMeeting/0.3.1");
+	probingOptions.DisallowDeleteObjects();
+	
+	SetUserAgent("XMeeting/0.3.3");
+	
+	SetNATBindingRefreshMethod(EmptyRequest);
 }
 
 XMSIPEndPoint::~XMSIPEndPoint()
@@ -174,7 +178,13 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
-			BOOL result = Register(record.GetHost(), record.GetUsername(), record.GetAuthorizationUsername(), record.GetPassword());
+			BOOL result = XMTransmitSIPInfo(SIP_PDU::Method_REGISTER,
+											record.GetHost(), 
+											record.GetUsername(),
+											record.GetAuthorizationUsername(),
+											record.GetPassword(),
+											PString::Empty(),
+											GetRegistrarTimeToLive().GetSeconds());
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
 			{
 				record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
@@ -444,6 +454,320 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 	return new XMSIPConnection(call, *this, token, destination, transport);
 }
 
+/**
+ * Almost identical copy from SIPEndPoint::TransmitSIPInfo. The only difference is
+ * that special SIPInfo subclasses are used and that the method that creates
+ * the OpalTransport is different. If more methods were virtual, this would be much
+ * easier...
+ **/
+BOOL XMSIPEndPoint::XMTransmitSIPInfo(SIP_PDU::Methods m,
+									  const PString & host,
+									  const PString & username,
+									  const PString & authName,
+									  const PString & password,
+									  const PString & realm,
+									  const PString & body,
+									  int timeout)
+{
+	PSafePtr<SIPInfo> info = NULL;
+	OpalTransport *transport = NULL;
+	SIPURL hosturl = SIPURL(host);
+	
+	if(listeners.IsEmpty() || host.IsEmpty())
+	{
+		return FALSE;
+	}
+	
+	// Adjusted user name
+	PString adjustedUsername = username;
+	if(adjustedUsername.IsEmpty())
+	{
+		adjustedUsername = GetDefaultLocalPartyName();
+	}
+	if(adjustedUsername.Find('@') == P_MAX_INDEX)
+	{
+		adjustedUsername += '@' + host;
+	}
+	
+	// If we have a proxy, use it
+	PString hostname;
+	WORD port;
+	
+	if(proxy.IsEmpty()) {
+		hostname = hosturl.GetHostName();
+		port = hosturl.GetPort();
+	}
+	else
+	{
+		hostname = proxy.GetHostName();
+		port = proxy.GetPort();
+		if(port == 0)
+		{
+			port = defaultSignalPort;
+		}
+	}
+	
+	OpalTransportAddress transportAddress(hostname, port, "udp");
+	
+	// Create the SIPInfo structure
+	info = activeSIPInfo.FindSIPInfoByUrl(adjustedUsername, m, PSafeReadWrite);
+	
+	// if there is already a request with this URL and method, then update it with the new information
+	if (info != NULL) {
+		if (!password.IsEmpty())
+			info->SetPassword(password); // Adjust the password if required 
+		if (!realm.IsEmpty())
+			info->SetAuthRealm(realm);   // Adjust the realm if required 
+		if (!authName.IsEmpty())
+			info->SetAuthUser(authName); // Adjust the authUser if required 
+		if (!body.IsEmpty())
+			info->SetBody(body);         // Adjust the body if required 
+		info->SetExpire(timeout);      // Adjust the expire field
+	} 
+	
+	// otherwise create a new request with this method type
+	else {
+		switch (m) {
+			case SIP_PDU::Method_REGISTER:
+				info = new XMSIPRegisterInfo(*this, adjustedUsername, authName, password, timeout);
+				break;
+			case SIP_PDU::Method_SUBSCRIBE:
+				info = new SIPMWISubscribeInfo(*this, adjustedUsername, timeout);
+				break;
+			case SIP_PDU::Method_PING:
+				info = new SIPPingInfo(*this, adjustedUsername, timeout);
+				break;
+			case SIP_PDU::Method_MESSAGE:
+				info = new SIPMessageInfo(*this, adjustedUsername, body);
+				break;
+			default:
+				PTRACE(1, "SIP\tUnknown SIP request method " << m);
+				return FALSE;
+		}
+		activeSIPInfo.Append(info);
+	}
+	
+	if (!info->CreateTransport(transportAddress)) {
+		activeSIPInfo.Remove (info);
+		return FALSE;
+	}
+	
+	transport = info->GetTransport ();
+    
+	if (transport != NULL && !transport->WriteConnect(WriteSIPInfo, &*info)) {
+		PTRACE(1, "SIP\tCould not write to " << transportAddress << " - " << transport->GetErrorText());
+		activeSIPInfo.Remove (info);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+/**
+ * Creates a transport using the default OPAL facilities. Afterwards,
+ * an OPTIONS probing is done on each interface to determine which
+ * interface to use for subsequent REGISTER / INVITE operation.
+ * This is useful to avoid many potential problems arising when sending
+ * multiple INVITE / REGISTER out as these messages cause state changes
+ * on the remote side. OPTIONS don't alter state, in contrast.
+ **/
+OpalTransport * XMSIPEndPoint::XMCreateTransport(const OpalTransportAddress & addr)
+{
+	// create the transport
+	OpalTransport *transport = SIPEndPoint::CreateTransport(addr);
+	
+	// Sanity check
+	if(transport == NULL)
+	{
+		return NULL;
+	}
+	
+	PWaitAndSignal m(transportMutex); // Serializes the OPTIONS probing procedure to decrease resources used
+	
+	// Extract the host from the transport address. Unfortunately,
+	// there is no direct way to do this.
+	PINDEX start = addr.Find('$') + 1;
+	PINDEX end = addr.Find(':');
+	PString host = addr.Mid(start, (end-start));
+	
+	// Create a SIP OPTIONS transaction which is used to probe the interfaces
+	SIPURL url = SIPURL(host);
+	
+	// simple double-pointer to pass endpoint / url information to the
+	// WriteSIPOptions callback
+	void* data[2];
+	data[0] = (void *)this;
+	data[1] = (void *)&url;
+	
+	probingOptionsMutex.Wait(); // protect against race conditions
+	probingSuccessful = TRUE;
+	BOOL result = transport->WriteConnect(WriteSIPOptions, data);
+	probingOptionsMutex.Signal();
+	if(result == FALSE)
+	{
+		// something failed
+		delete transport;
+		return NULL;
+	}
+	
+	probingSyncPoint.Wait(); // wait until  probing completed
+	
+	if(probingSuccessful == FALSE)
+	{
+		// The registrar server was not found
+		delete transport;
+		return NULL;
+	}
+	
+	return transport;
+}
+
+/*
+ * Callback that gets called for each available interface to write out
+ * an OPTIONS probing request
+ */
+BOOL XMSIPEndPoint::WriteSIPOptions(OpalTransport & transport, void *data)
+{
+	void **theData = (void **)data;
+	XMSIPEndPoint *endPoint = (XMSIPEndPoint *)(theData[0]);
+	SIPURL *url = (SIPURL *)(theData[1]);
+	
+	SIPOptions *options = new XMSIPOptions(*endPoint, transport, *url);
+	if(!options->Start()) {
+		delete options;
+		return FALSE;
+	}
+	
+	endPoint->probingOptions.SetAt(options->GetTransactionID(), options);
+	
+	return TRUE;
+}
+
+/*
+ * Gets called every time a response is received.
+ * Filters out OPTIONS responses and processes them separately
+ */
+void XMSIPEndPoint::OnReceivedResponse(SIPTransaction & transaction, SIP_PDU & response)
+{
+	if(transaction.GetMethod() == SIP_PDU::Method_OPTIONS)
+	{
+	    // A response from an OPTIONS probing request was received.
+		probingOptionsMutex.Wait();
+		if(probingOptions.Contains(transaction.GetTransactionID()))
+		{ 
+			// ensures that only transactions belonging to this group are processsed
+			// In addition, ensure that the sync point gets signaled only once
+			OpalTransport & transport = transaction.GetTransport();
+			transport.EndConnect(transaction.GetLocalAddress());
+			probingOptions.RemoveAll();
+			probingSyncPoint.Signal();
+		}
+		probingOptionsMutex.Signal();
+		return;
+	}
+	SIPEndPoint::OnReceivedResponse(transaction, response);
+}
+
+/*
+ * Gets called by XMSIPOptions instances when their transaction
+ * times out. Needed to ensure that the OPTIONS probing fails
+ * after all OPTIONS transactions have timed out.
+ */
+void XMSIPEndPoint::OnOptionsTimeout(XMSIPOptions *options)
+{
+	probingOptionsMutex.Wait();
+	if(probingOptions.Contains(options->GetTransactionID()))
+	{
+		// Remove this transaction from the options dictionary.
+		// If the dictionary is empty after this operation,
+		// make probingSuccessful FALSE and signal the sync point
+		probingOptions.SetAt(options->GetTransactionID(), NULL);
+		
+		if(probingOptions.GetSize() == 0)
+		{
+			probingSuccessful = FALSE;
+			probingSyncPoint.Signal();
+		}
+	}
+	probingOptionsMutex.Signal();
+}
+
+/*
+ * Copy from SIPEndPoint::RegistrationRefresh() but uses sligthly different
+ * processing
+ */
+void XMSIPEndPoint::RegistrationRefresh(PTimer &timer, INT value)
+{
+	SIPTransaction *request = NULL;
+	OpalTransport *infoTransport = NULL;
+	
+	for(PINDEX i=0; i < activeSIPInfo.GetSize(); i++)
+	{
+		PSafePtr<SIPInfo> info = activeSIPInfo.GetAt(i);
+		
+		if(info->GetExpire() == -1) {
+			activeSIPInfo.Remove(info); // Was invalid the last time, delete it
+		}
+		else
+		{
+			// Need to refresh?
+			if(info->GetExpire() > 0 &&
+			   info->IsRegistered() &&
+			   info->GetTransport() != NULL &&
+			   info->GetMethod() != SIP_PDU::Method_MESSAGE)
+			{
+				BOOL refresh = FALSE;
+				if(info->HasExpired())
+				{
+					refresh = TRUE;
+				}
+				else if(info->GetMethod() == SIP_PDU::Method_REGISTER)
+				{
+					PSafePtr<XMSIPRegisterInfo> registerInfo = PSafePtrCast<SIPInfo, XMSIPRegisterInfo>(info);
+					if(registerInfo->WillExpireWithinTimeInterval(PTimeInterval(0, 30)))
+					{
+						refresh = TRUE;
+					}
+				}
+				if(refresh == TRUE)
+				{
+					infoTransport = info->GetTransport(); // Get current transport
+					OpalTransportAddress registrarAddress = infoTransport->GetRemoteAddress();
+					if (info->CreateTransport(registrarAddress))
+					{ 
+						infoTransport = info->GetTransport();
+						info->RemoveTransactions();
+						info->SetExpire(info->GetExpire()*10/9);
+						request = info->CreateTransaction(*infoTransport, FALSE); 
+						
+						if (request->Start()) 
+						{
+							info->AppendTransaction(request);
+						}
+						else 
+						{
+							delete request;
+							PTRACE(1, "SIP\tCould not start REGISTER/SUBSCRIBE for binding refresh");
+							info->SetExpire(-1); // Mark as Invalid
+						}
+					}
+					else 
+					{
+						PTRACE(1, "SIP\tCould not start REGISTER/SUBSCRIBE for binding refresh: Transport creation failed");
+						info->SetExpire(-1); // Mark as Invalid
+					}
+				}
+			}
+			else if (info->HasExpired())
+			{
+				info->SetExpire(-1); // Mark as Invalid
+			}
+		}
+	}
+	
+	activeSIPInfo.DeleteObjectsToBeRemoved();
+}
+
 #pragma mark -
 #pragma mark XMSIPRegistrarRecord methods
 
@@ -495,5 +819,98 @@ unsigned XMSIPRegistrarRecord::GetStatus() const
 void XMSIPRegistrarRecord::SetStatus(unsigned theStatus)
 {
 	status = theStatus;
+}
+
+#pragma mark -
+#pragma mark XMSIPRegisterInfo methods
+
+XMSIPRegisterInfo::XMSIPRegisterInfo(XMSIPEndPoint & ep, const PString & adjustedUsername, const PString & authName, 
+									 const PString & password, int expire)
+: SIPRegisterInfo(ep, adjustedUsername, authName, password, expire)
+{
+}
+
+XMSIPRegisterInfo::~XMSIPRegisterInfo()
+{
+}
+
+BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
+{
+	PWaitAndSignal m(transportMutex);
+	
+	registrarAddress = addr;
+	
+	if(registrarTransport == NULL)
+	{
+		XMSIPEndPoint & xmEP = (XMSIPEndPoint &)ep;
+		registrarTransport = xmEP.XMCreateTransport(registrarAddress);
+	}
+	
+	if(registrarTransport == NULL)
+	{
+		OnFailed(SIP_PDU::Failure_BadGateway);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+BOOL XMSIPRegisterInfo::WillExpireWithinTimeInterval(PTimeInterval interval)
+{	
+	if(registered == FALSE)
+	{
+		return FALSE;
+	}
+	
+	PTime currentTime = PTime();
+	
+	if((currentTime - registrationTime) >= PTimeInterval(0, expire))
+	{
+		// already expired
+		return FALSE;
+	}
+	PTimeInterval adjustedExpire = PTimeInterval(0, expire - interval.GetSeconds());
+	if((currentTime - registrationTime) >= adjustedExpire)
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+#pragma mark -
+#pragma mark XMSIPOptions methods
+
+XMSIPOptions::XMSIPOptions(SIPEndPoint & ep, OpalTransport & trans, const SIPURL & address)
+: SIPOptions(ep, trans, address)
+{
+}
+
+XMSIPOptions::~XMSIPOptions()
+{
+}
+
+void XMSIPOptions::OnTimeout(PTimer & timer, INT value)
+{
+	SIPOptions::OnTimeout(timer, value);
+	XMSIPEndPoint & xmEP = (XMSIPEndPoint &)endpoint;
+	xmEP.OnOptionsTimeout(this);
+	delete this;
+}
+
+void XMSIPOptions::SetTerminated(States newState)
+{
+	SIPOptions::SetTerminated(newState);
+	if(newState == Terminated_TransportError)
+	{
+		// This occurs when the retransmission timeout
+		// occurs but the underlying OpalTransport is not
+		// writable for the desired interface anymore.
+		// -> EndConnect() has already been called.
+		//
+		// Still set a timer that deletes this instance
+		// after a short timeout
+		completionTimer = PTimeInterval(0, 4); // delete after 4s
+	}
 }
 		
