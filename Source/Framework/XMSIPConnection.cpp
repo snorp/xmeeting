@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.10 2006/08/06 09:24:08 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.11 2006/09/29 21:21:45 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,6 +29,56 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 
 XMSIPConnection::~XMSIPConnection()
 {
+}
+
+/**
+ * This methods is mostly a copy from
+ * SIPConnection::SetUpConnection() with the only
+ * difference that a difference method is called
+ * for CreateConnection()
+ **/
+BOOL XMSIPConnection::SetUpConnection()
+{
+	SIPURL transportAddress = targetAddress;
+	
+	PTRACE(2, "SIP\tSetUpConnection: " << remotePartyAddress);
+	
+	// Do a DNS SRV lookup
+#if P_DNS
+    PIPSocketAddressAndPortVector addrs;
+    if (PDNS::LookupSRV(targetAddress.GetHostName(), "_sip._udp", targetAddress.GetPort(), addrs))
+	{
+		transportAddress.SetHostName(addrs[0].address.AsString());
+		transportAddress.SetPort(addrs [0].port);
+    }
+#endif
+	PStringList routeSet = GetRouteSet();
+	if (!routeSet.IsEmpty()) 
+	{
+		transportAddress = routeSet[0];
+	}
+	
+	originating = TRUE;
+	
+	delete transport;
+	XMSIPEndPoint & xmEP = (XMSIPEndPoint &)endpoint;
+	transport = xmEP.XMCreateTransport(transportAddress.GetHostAddress());
+	lastTransportAddress = transportAddress.GetHostAddress();
+	if (transport == NULL)
+	{
+		Release(EndedByTransportFail);
+		return FALSE;
+	}
+	
+	if (!transport->WriteConnect(WriteINVITE, this))
+	{
+		PTRACE(1, "SIP\tCould not write to " << targetAddress << " - " << transport->GetErrorText());
+		Release(EndedByTransportFail);
+		return FALSE;
+	}
+	
+	releaseMethod = ReleaseWithCANCEL;
+	return TRUE;
 }
 
 void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
