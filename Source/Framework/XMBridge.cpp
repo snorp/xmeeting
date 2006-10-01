@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.34 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.35 2006/10/01 15:32:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -292,13 +292,11 @@ unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty)
 
 void _XMAcceptIncomingCall(unsigned callID)
 {
-	//PString callToken = PString(callID);
 	callEndPoint->AcceptIncomingCall();
 }
 
 void _XMRejectIncomingCall(unsigned callID)
 {
-	//PString callToken = PString(callID);
 	callEndPoint->RejectIncomingCall();
 }
 
