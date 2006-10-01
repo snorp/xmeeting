@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.8 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.9 2006/10/01 15:33:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,6 +54,10 @@ public:
 	BOOL SendUserInputString(PString & callID, const PString & string);
 	BOOL StartCameraEvent(PString & callID, XMCameraEvent cameraEvent);	
 	void StopCameraEvent(PString & callID);
+	
+	// helper functions
+	static OpalConnection::CallEndReason GetCallRejectionReasonForCallProtocol(XMCallProtocol callProtocol);
+	static XMCallProtocol GetCallProtocolForCall(XMConnection & connection);
 
 private:
 		

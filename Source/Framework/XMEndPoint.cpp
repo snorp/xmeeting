@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.16 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.17 2006/10/01 15:33:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -163,18 +163,7 @@ void XMEndPoint::OnShowOutgoing(const XMConnection & connection)
 void XMEndPoint::OnShowIncoming(XMConnection & connection)
 {
 	unsigned callID = connection.GetCall().GetToken().AsUnsigned();
-	XMCallProtocol callProtocol = XMCallProtocol_UnknownProtocol;
-		
-	OpalEndPoint & endPoint = connection.GetCall().GetOtherPartyConnection(connection)->GetEndPoint();
-	
-	if(PIsDescendant(&endPoint, H323EndPoint))
-	{
-		callProtocol = XMCallProtocol_H323;
-	}
-	else if(PIsDescendant(&endPoint, SIPEndPoint))
-	{
-		callProtocol = XMCallProtocol_SIP;
-	}
+	XMCallProtocol callProtocol = GetCallProtocolForCall(connection);
 	
 	if(callProtocol == XMCallProtocol_UnknownProtocol)
 	{
@@ -225,7 +214,9 @@ void XMEndPoint::RejectIncomingCall()
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting", PSafeReadOnly);
 	if(connection != NULL)
 	{
-		connection->ClearCall(OpalConnection::EndedByNoAccept);
+		XMCallProtocol callProtocol = GetCallProtocolForCall(*connection);
+		OpalConnection::CallEndReason callEndReason = GetCallRejectionReasonForCallProtocol(callProtocol);
+		connection->ClearCall(callEndReason);
 	}
 }
 
@@ -367,4 +358,36 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 	}
 	
 	return h281Handler;
+}
+
+#pragma mark -
+#pragma mark Static Helper Functions
+
+OpalConnection::CallEndReason XMEndPoint::GetCallRejectionReasonForCallProtocol(XMCallProtocol callProtocol)
+{
+	switch(callProtocol)
+	{
+		case XMCallProtocol_SIP:
+			return OpalConnection::EndedByLocalBusy;
+		default:
+			return OpalConnection::EndedByNoAccept;
+	}
+}
+
+XMCallProtocol XMEndPoint::GetCallProtocolForCall(XMConnection & connection)
+{
+	XMCallProtocol theCallProtocol = XMCallProtocol_UnknownProtocol;
+	
+	OpalEndPoint & endPoint = connection.GetCall().GetOtherPartyConnection(connection)->GetEndPoint();
+	
+	if(PIsDescendant(&endPoint, H323EndPoint))
+	{
+		theCallProtocol = XMCallProtocol_H323;
+	}
+	else if(PIsDescendant(&endPoint, SIPEndPoint))
+	{
+		theCallProtocol = XMCallProtocol_SIP;
+	}
+	
+	return theCallProtocol;
 }
