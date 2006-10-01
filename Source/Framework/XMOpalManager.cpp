@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.38 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.39 2006/10/01 18:07:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -458,17 +458,30 @@ void XMOpalManager::SetVideoFunctionality(BOOL newEnableVideoTransmit, BOOL newE
 #pragma mark -
 #pragma mark Information about current Calls
 
-unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall()
+unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier)
 {
 	switch (callProtocol)
 	{
 		case XMCallProtocol_H323:
-			return 200;
+			return GetH323KeyFrameInterval(codecIdentifier);
 		case XMCallProtocol_SIP:
 			return 60;
 		default:
 			return 0;
 	}
+}
+
+unsigned XMOpalManager::GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifier)
+{
+	// Hack to enable certain endpoints to successfully decode XM H.263 streams
+	// If keyFrameInterval is zero, only I-frames are sent.
+	if(remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX &&
+	   codecIdentifier == XMCodecIdentifier_H263)
+	{
+		return 0;
+	}
+	
+	return 200;
 }
 
 #pragma mark -

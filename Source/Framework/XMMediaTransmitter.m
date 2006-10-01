@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.47 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.48 2006/10/01 18:07:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,7 +126,8 @@ void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon,
 UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
 void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame);
-void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
+void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame, unsigned frameNumber);
+BOOL _XMIsH263IFrame(UInt8* data);
 
 @implementation XMMediaTransmitter
 
@@ -343,6 +344,7 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 	
 	compressionSession = NULL;
 	compressionFrameOptions = NULL;
+	compressionSessionPreviousTimeStamp = 0;
 	
 	compressSequenceIsActive = NO;
 	compressSequence = 0;
@@ -351,6 +353,8 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 	compressSequenceFrameCounter = 0;
 	compressSequenceLastVideoBytesSent = 0;
 	compressSequenceNonKeyFrameCounter = 0;
+	dataRateUpdateTime.tv_sec = 0;
+	dataRateUpdateTime.tv_usec = 0;
 	
 	mediaPacketizer = NULL;
 	
@@ -876,8 +880,7 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 	}
 	
 	// ensuring correct keyframe interval
-	if(keyframeInterval == 0 ||
-	   keyframeInterval > 200)
+	if(keyframeInterval > 200)
 	{
 		keyframeInterval = 200;
 	}
@@ -1017,13 +1020,21 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 			compressSequenceFrameCounter = 1;
 		}
 		
+		struct timeval time;
+		gettimeofday(&time, NULL);
+		unsigned timeElapsed = 1000 * (time.tv_sec - dataRateUpdateTime.tv_sec);
+		timeElapsed += (time.tv_usec - dataRateUpdateTime.tv_usec) / 1000;
+		dataRateUpdateTime = time;
+		
+		unsigned avgFrameDuration = (unsigned)((double)timeElapsed/(double)compressSequenceFrameCounter);
+		
 		DataRateParams dataRateParams;
 		dataRateParams.dataRate = dataRateWanted;
 		dataRateParams.dataOverrun = overrun;
-		dataRateParams.frameDuration = 1000/compressSequenceFrameCounter;
+		dataRateParams.frameDuration = avgFrameDuration;
 		dataRateParams.keyFrameRate = 0;
-		dataRateParams.minSpatialQuality = codecNormalQuality;
-		dataRateParams.minTemporalQuality = codecNormalQuality;
+		dataRateParams.minSpatialQuality = codecMinQuality;
+		dataRateParams.minTemporalQuality = codecMinQuality;
 		
 		OSStatus err = noErr;
 		err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
@@ -1615,17 +1626,11 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 										codecHighQuality,
 										0,
 										NULL,
-										codecFlagUpdatePreviousComp,
+										0,
 										compressSequenceImageDescription);
 			if(err != noErr)
 			{
 				NSLog(@"CompressSequenceBegin failed: %d", err);
-			}
-			
-			err = SetCSequencePreferredPacketSize(compressSequence, 1420);
-			if(err != noErr)
-			{
-				NSLog(@"Setting packet size failed %d", err);
 			}
 			
 			long maxCompressionSize;
@@ -1651,10 +1656,10 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 			DataRateParams dataRateParams;
 			dataRateParams.dataRate = (bitrateToUse / 8);
 			dataRateParams.dataOverrun = 0;
-			dataRateParams.frameDuration = 34;
+			dataRateParams.frameDuration = 30;
 			dataRateParams.keyFrameRate = 0;
-			dataRateParams.minSpatialQuality = codecNormalQuality;
-			dataRateParams.minTemporalQuality = codecNormalQuality;
+			dataRateParams.minSpatialQuality = codecMinQuality;
+			dataRateParams.minTemporalQuality = codecMinQuality;
 			err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
 			if(err != noErr)
 			{
@@ -1664,12 +1669,15 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 			compressSequenceFrameCounter = 0;
 			compressSequenceLastVideoBytesSent = 0;
 			compressSequenceNonKeyFrameCounter = 0;
+			
+			gettimeofday(&dataRateUpdateTime, NULL);
 		}
 		
 		CodecFlags compressionFlags = (codecFlagUpdatePreviousComp | codecFlagLiveGrab);
 		
 		// send and I-frame every keyframeInterval frames
-		if(compressSequenceNonKeyFrameCounter == keyframeInterval)
+		if(compressSequenceNonKeyFrameCounter == keyframeInterval ||
+		   keyframeInterval == 0)
 		{
 			needsPictureUpdate = YES;
 		}
@@ -1695,7 +1703,7 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 				compressSequenceFrameNumber += numberOfFramesInBetween;
 			}
 		}
-	
+		
 		err = SetCSequenceFrameNumber(compressSequence,
 									  compressSequenceFrameNumber);
 		if(err != noErr)
@@ -1739,7 +1747,7 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 							   length:(UInt32)dataLength
 					 imageDescription:(ImageDescriptionHandle)imageDesc 
 							timeStamp:(UInt32)timeStamp
-{	
+{
 	OSErr err = noErr;
 	
 	sampleData.flags = 0;
@@ -1883,7 +1891,12 @@ void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame);
 	}
 	else if(codecType == kH263CodecType)
 	{
-		_XMAdjustH263Data(data, needsPictureUpdate);
+		if(keyframeInterval == 0 &&
+		   _XMIsH263IFrame(data) == NO)
+		{
+			return noErr;
+		}
+		_XMAdjustH263Data(data, needsPictureUpdate, (timeStamp/3003));
 	}
 	
 	sampleData.data = (const UInt8 *)data;
@@ -2582,10 +2595,22 @@ void _XMAdjustH261Data(UInt8 *h261Data, BOOL isINTRAFrame)
 	h261Data[dataIndex] |= mask;
 }
 
-void _XMAdjustH263Data(UInt8 *h263Data, BOOL isINTRAFrame)
+void _XMAdjustH263Data(UInt8 *h263Data, BOOL isINTRAFrame, unsigned frameNumber)
 {
-	if(isINTRAFrame)
+	if((h263Data[4] & 0x02) == 0) //isINTRAFrame)
 	{
 		h263Data[4] |= 0x20;
 	}
+	
+	// Ensure that the frame number corresponds with the
+	// RTP timestamp
+	UInt8 theFrameNumber = (UInt8)frameNumber;
+	h263Data[2] &= 0xfc;
+	h263Data[2] |= ((theFrameNumber >> 6) & 0x03);
+	h263Data[3] = (theFrameNumber << 2) | 0x02;
+}
+
+BOOL _XMIsH263IFrame(UInt8* data)
+{
+	return ((data[4] & 0x02) == 0);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.21 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.22 2006/10/01 18:07:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,13 +85,15 @@ public:
 	
 	/* getting /setting information about current call */
 	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
-	unsigned GetKeyFrameIntervalForCurrentCall();
+	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier);
 	
 	/* Debug log information */
 	static void LogMessage(const PString & message);
 	
 private:
 	BOOL IsOutgoingMedia(OpalMediaStream & stream);
+	
+	unsigned GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifier);
 	
 	unsigned callID;
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.22 2006/09/24 17:53:32 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.23 2006/10/01 18:07:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -134,7 +134,7 @@ void XMTransmitterMediaPatch::Resume()
 				return;
 			}
 			
-			unsigned keyframeInterval = XMOpalManager::GetManagerInstance()->GetKeyFrameIntervalForCurrentCall();
+			unsigned keyframeInterval = XMOpalManager::GetManagerInstance()->GetKeyFrameIntervalForCurrentCall(codecIdentifier);
 			_XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, keyframeInterval, flags);
 			
 			// adjusting the payload type afterwards, now that the packetization scheme has
