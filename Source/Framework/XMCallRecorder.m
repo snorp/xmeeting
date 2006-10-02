@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.m,v 1.3 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMCallRecorder.m,v 1.4 2006/10/02 21:22:03 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,12 +92,7 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 #pragma mark Class Methods
 
 + (XMCallRecorder *)sharedInstance
-{
-	if(_XMCallRecorderSharedInstance == nil)
-	{
-		NSLog(@"Attempt to access XMCallRecorder prior to initialization");
-	}
-	
+{	
 	return _XMCallRecorderSharedInstance;
 }
 

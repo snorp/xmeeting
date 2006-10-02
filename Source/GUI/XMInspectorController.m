@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.9 2006/09/03 21:39:29 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.10 2006/10/02 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -186,7 +186,11 @@ static XMInspectorController *contactsInstance;
 	else
 	{
 		[self _adjustWindowLevel];
-		[panel orderFront:self];
+		if([panel isVisible] == NO)
+		{
+			[activeModule becomeActiveModule];
+			[panel orderFront:self];
+		}
 	}
 }
 
@@ -207,6 +211,14 @@ static XMInspectorController *contactsInstance;
 - (void)close
 {
 	[panel orderOut:self];
+}
+
+#pragma mark -
+#pragma mark NSWindow delegate methods
+
+- (void)windowWillClose:(NSNotification *)notif
+{
+	[activeModule becomeInactiveModule];
 }
 
 #pragma mark -

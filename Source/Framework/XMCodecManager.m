@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.m,v 1.4 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCodecManager.m,v 1.5 2006/10/02 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,12 +16,7 @@
 #pragma mark Class Methods
 
 + (XMCodecManager *)sharedInstance
-{
-	if(_XMCodecManagerSharedInstance == nil)
-	{
-		NSLog(@"Attempt to access CodecManager prior to initialization");
-	}
-	
+{	
 	return _XMCodecManagerSharedInstance;
 }
 

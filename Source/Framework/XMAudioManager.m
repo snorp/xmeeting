@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioManager.m,v 1.12 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMAudioManager.m,v 1.13 2006/10/02 21:22:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,12 +56,7 @@ OSStatus XMAudioManagerVolumeChangePropertyListenerProc(AudioDeviceID device,
 #pragma mark Class Methods
 
 + (XMAudioManager *)sharedInstance
-{	
-	if(_XMAudioManagerSharedInstance == nil)
-	{
-		NSLog(@"Attempt to access XMAudioManager prior to initialization");
-	}
-	
+{
 	return _XMAudioManagerSharedInstance;
 }
 

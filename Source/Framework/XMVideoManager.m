@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.19 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.20 2006/10/02 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,11 +34,6 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 + (XMVideoManager *)sharedInstance
 {	
-	if(_XMVideoManagerSharedInstance == nil)
-	{
-		NSLog(@"Attempt to access VideoManager prior to initialization");
-	}
-	
 	return _XMVideoManagerSharedInstance;
 }
 

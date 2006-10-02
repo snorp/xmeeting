@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.28 2006/08/05 15:13:57 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.29 2006/10/02 21:22:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1235,6 +1235,9 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation
 														object:self];
 	
+	// Stop the audio test if needed
+	[_XMAudioManagerSharedInstance stopAudioTest];
+	
 	[XMOpalDispatcher _initiateCallToAddress:processedAddress protocol:callProtocol];
 	
 	[processedAddress release];
@@ -1269,6 +1272,9 @@
 	
 	callManagerStatus = XM_CALL_MANAGER_PREPARING_CALL;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation object:self];
+	
+	// Stop the audio test if needed
+	[_XMAudioManagerSharedInstance stopAudioTest];
 	
 	// change the subsystem and start calling afterwards
 	[XMOpalDispatcher _initiateSpecificCallToAddress:processedAddress

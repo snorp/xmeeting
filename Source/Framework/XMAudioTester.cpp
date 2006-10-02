@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioTester.cpp,v 1.1 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMAudioTester.cpp,v 1.2 2006/10/02 21:22:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #include "XMAudioTester.h"
 
 static XMAudioTester *audioTester = NULL;
+static PMutex audioTesterMutex;
 
 XMAudioTester::XMAudioTester(unsigned theDelay)
 : PThread(4096,
@@ -78,6 +79,8 @@ void XMAudioTester::Main()
 
 void XMAudioTester::Start(unsigned delay)
 {
+	PWaitAndSignal m(audioTesterMutex);
+	
 	if(audioTester == NULL)
 	{
 		audioTester = new XMAudioTester(delay);
@@ -88,6 +91,8 @@ void XMAudioTester::Start(unsigned delay)
 
 void XMAudioTester::Stop()
 {
+	PWaitAndSignal m(audioTesterMutex);
+	
 	if(audioTester != NULL)
 	{
 		audioTester->stop = TRUE;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.18 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.19 2006/10/02 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,11 +32,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 #pragma mark Class Methods
 
 + (XMUtils *)sharedInstance
-{	
-	if(_XMUtilsSharedInstance == nil)
-	{
-		NSLog(@"Attempt to access XMUtils prior to initialization");
-	}
+{
 	return _XMUtilsSharedInstance;
 }
 

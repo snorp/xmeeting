@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.25 2006/09/24 18:56:48 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.26 2006/10/02 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,8 @@ NSString *XMKey_AudioTestDelay = @"XMeeting_AudioTestDelay";
 - (void)_didUpdateAudioDeviceLists:(NSNotification *)notif;
 - (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_activeLocationDidChange:(NSNotification *)notif;
+- (void)_didEstablishCall:(NSNotification *)notif;
+- (void)_didClearCall:(NSNotification *)notif;
 - (void)_didStopAudioTest:(NSNotification *)notif;
 
 @end
@@ -114,6 +116,14 @@ NSString *XMKey_AudioTestDelay = @"XMeeting_AudioTestDelay";
 							   name:XMNotification_AudioManagerDidUpdateDeviceLists object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didUpdateAudioInputLevel:)
 							   name:XMNotification_AudioManagerDidUpdateInputLevel object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+								name:XMNotification_CallManagerDidStartCallInitiation object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
+							   name:XMNotification_CallManagerDidEstablishCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidClearCall object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didClearCall:)
+							   name:XMNotification_CallManagerDidNotStartCalling object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStopAudioTest:) 
 							   name:XMNotification_AudioManagerDidStopAudioTest object:nil];
 	
@@ -525,9 +535,26 @@ NSString *XMKey_AudioTestDelay = @"XMeeting_AudioTestDelay";
 	[audioInputLevelIndicator setDoubleValue:(22.0 * level)];
 }
 
+- (void)_didEstablishCall:(NSNotification *)notif
+{
+	[audioTestButton setEnabled:NO];
+	[audioTestDelayPopUp setEnabled:NO];
+}
+
+- (void)_didClearCall:(NSNotification *)notif
+{
+	if([[XMAudioManager sharedInstance] doesRunAudioTest] == NO)
+	{
+		[audioTestButton setEnabled:YES];
+	}
+}
+
 - (void)_didStopAudioTest:(NSNotification *)notif
 {
-	[audioTestDelayPopUp setEnabled:YES];
+	if(![[XMCallManager sharedInstance] isInCall])
+	{
+		[audioTestDelayPopUp setEnabled:YES];
+	}
 	[audioTestButton setTitle:NSLocalizedString(@"XM_AUDIO_VIDEO_MODULE_START_AUDIO_TEST", @"")];
 }
 
