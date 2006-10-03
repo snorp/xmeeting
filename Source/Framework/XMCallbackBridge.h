@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.30 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.31 2006/10/03 21:17:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -148,6 +148,11 @@ void _XMHandleH264PPSAtomData(void *data, unsigned length);
  * MediaTransmitter
  **/
 void _XMUpdatePicture();
+
+/**
+ * Adjusts the bandwidth limit to use
+ **/
+void _XMSetMaxVideoBitrate(unsigned maxVideoBitrate);
 
 /**
  * Reports the audio level of the recorder stream

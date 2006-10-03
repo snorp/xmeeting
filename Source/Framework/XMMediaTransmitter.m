@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.48 2006/10/01 18:07:07 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.49 2006/10/03 21:17:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,7 @@ typedef enum XMMediaTransmitterMessage
 	_XMMediaTransmitterMessage_StartTransmitting,
 	_XMMediaTransmitterMessage_StopTransmitting,
 	_XMMediaTransmitterMessage_UpdatePicture,
+	_XMMediaTransmitterMessage_SetMaxBitrate,
 	_XMMediaTransmitterMessage_SetVideoBytesSent,
 	
 	_XMMediaTransmitterMessage_SendSettingsToModule = 0x300
@@ -70,8 +71,11 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleStartTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleStopTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleUpdatePictureMessage;
+- (void)_handleSetMaxBitrateMessage:(NSArray *)messageComponents;
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)messageComponents;
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents;
+
+- (void)_adjustVideoBitrateLimit;
 
 - (void)_grabFrame:(NSTimer *)timer;
 
@@ -235,6 +239,19 @@ BOOL _XMIsH263IFrame(UInt8* data);
 + (void)_updatePicture
 {
 	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_UpdatePicture withComponents:nil];
+}
+
++ (void)_setMaxBitrate:(unsigned)bitrate
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:bitrate];
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:data, nil];
+	
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_SetMaxBitrate withComponents:components];
+	
+	[components release];
 }
 
 + (void)_setVideoBytesSent:(unsigned)videoBytesSent
@@ -633,6 +650,9 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		case _XMMediaTransmitterMessage_UpdatePicture:
 			[self _handleUpdatePictureMessage];
 			break;
+		case _XMMediaTransmitterMessage_SetMaxBitrate:
+			[self _handleSetMaxBitrateMessage:[portMessage components]];
+			break;
 		case _XMMediaTransmitterMessage_SetVideoBytesSent:
 			[self _handleSetVideoBytesSentMessage:[portMessage components]];
 			break;
@@ -860,24 +880,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	codecSpecificCallFlags = [number unsignedIntValue];
 	
-	// taking into account packetization overhead
-	bitrateToUse = (bitrateToUse * 0.95);
-	
-	// protection against codec hangups
-	if(bitrateToUse < 80000 && codecIdentifier == XMCodecIdentifier_H261)
-	{
-		bitrateToUse = 80000;
-	}
-	else if(bitrateToUse < 64000 && codecIdentifier == XMCodecIdentifier_H263)
-	{
-		bitrateToUse = 64000;
-	}
-	else if(bitrateToUse < 192000 && codecIdentifier == XMCodecIdentifier_H264)
-	{
-		// H.264 seems not to use the whole bandwidth allowed, so we're increasing
-		// the minimum bandwidth used
-		bitrateToUse = 192000;
-	}
+	[self _adjustVideoBitrateLimit];
 	
 	// ensuring correct keyframe interval
 	if(keyframeInterval > 200)
@@ -1002,6 +1005,15 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	needsPictureUpdate = YES;
 }
 
+- (void)_handleSetMaxBitrateMessage:(NSArray *)components
+{
+	NSData *data = (NSData *)[components objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	bitrateToUse = [number unsignedIntValue];
+
+	[self _adjustVideoBitrateLimit];
+}
+
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)components
 {
 	if(compressSequence != 0)
@@ -1058,6 +1070,28 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	NSData *settings = (NSData *)[messageComponents objectAtIndex:1];
 	
 	[module applyInternalSettings:settings];
+}
+
+- (void)_adjustVideoBitrateLimit
+{
+	// taking into account packetization overhead
+	bitrateToUse = (bitrateToUse * 0.95);
+	
+	// protection against codec hangups
+	if(bitrateToUse < 80000 && codecType == kH261CodecType)
+	{
+		bitrateToUse = 80000;
+	}
+	else if(bitrateToUse < 64000 && codecType == kH263CodecType)
+	{
+		bitrateToUse = 64000;
+	}
+	else if(bitrateToUse < 192000 && codecType == kH264CodecType)
+	{
+		// H.264 seems not to use the whole bandwidth allowed, so we're increasing
+		// the minimum bandwidth used
+		bitrateToUse = 192000;
+	}
 }
 
 #pragma mark XMVideoInputManager Methods

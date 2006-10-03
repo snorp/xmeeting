@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.21 2006/10/01 18:07:07 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.22 2006/10/03 21:17:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,6 +85,7 @@
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 
 + (void)_updatePicture;
++ (void)_setMaxBitrate:(unsigned)maxBitrate;
 
 + (void)_setVideoBytesSent:(unsigned)videoBytesSent;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.27 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.28 2006/10/03 21:17:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -218,6 +218,15 @@ void _XMUpdatePicture()
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
 	[XMMediaTransmitter _updatePicture];
+	
+	[autoreleasePool release];
+}
+
+void _XMSetMaxVideoBitrate(unsigned maxVideoBitrate)
+{
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[XMMediaTransmitter _setMaxBitrate:maxVideoBitrate];
 	
 	[autoreleasePool release];
 }

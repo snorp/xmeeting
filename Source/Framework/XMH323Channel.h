@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Channel.h,v 1.4 2006/09/03 21:37:34 hfriederich Exp $
+ * $Id: XMH323Channel.h,v 1.5 2006/10/03 21:17:46 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,8 @@ class XMH323Channel : public H323_RTPChannel
 	virtual BOOL OnSendingPDU(H245_H2250LogicalChannelParameters & param) const;
 	
 	virtual BOOL Start();
+	
+	virtual void OnFlowControl(long bitRateRestriction);
 };
 
 #endif // __XM_H323_CHANNEL_H__
