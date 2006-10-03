@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.30 2006/08/14 18:33:37 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.31 2006/10/03 05:07:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,6 +104,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_updateCallStatistics:(NSTimer *)timer;
 
 - (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address;
+- (NSString *)_adjustedAddress:(NSString *)address;
 
 @end
 
@@ -821,7 +822,10 @@ typedef enum _XMOpalDispatcherMessage
 		return;
 	}
 	
-	const char *addressString = [address cStringUsingEncoding:NSASCIIStringEncoding];
+	// adjust address if needed
+	NSString *adjustedAddress = [self _adjustedAddress:address];
+	
+	const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
 	callID = _XMInitiateCall(protocol, addressString);
 	
 	if(callID == 0)
@@ -889,7 +893,10 @@ typedef enum _XMOpalDispatcherMessage
 		return;
 	}
 	
-	const char *addressString = [address cStringUsingEncoding:NSASCIIStringEncoding];
+	// adjust address if needed
+	NSString *adjustedAddress = [self _adjustedAddress:address];
+	
+	const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
 	callID = _XMInitiateCall(callProtocol, addressString);
 	
 	if(callID == 0)
@@ -1855,6 +1862,27 @@ typedef enum _XMOpalDispatcherMessage
 												   withObject:info
 												waitUntilDone:NO];
 	[info release];
+}
+
+- (NSString *)_adjustedAddress:(NSString *)address
+{
+	// Try to do DNS lookups. This is needed to workaround problems with
+	// DNS addresses and Gatekeepers in recent versions of OPAL
+	NSHost *host = [NSHost hostWithName:address];
+	NSArray *addresses = [host addresses];
+	unsigned count = [addresses count];
+	unsigned i;
+	for(i = 0; i < count; i++)
+	{
+		NSString *resolvedAddress = [addresses objectAtIndex:i];
+		// at the moment only IPv4 addresses are accepted
+		if(XMIsIPAddress(resolvedAddress))
+		{
+			return resolvedAddress;
+		}
+	}
+	
+	return address;
 }
 
 @end
