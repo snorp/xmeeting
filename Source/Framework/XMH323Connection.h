@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.8 2006/05/16 21:32:36 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.9 2006/10/04 21:44:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,6 +49,8 @@ public:
 	virtual BOOL OnCreateLogicalChannel(const H323Capability & capability,
 										H323Channel::Directions dir,
 										unsigned & errorCode);
+	
+	virtual BOOL OnClosingLogicalChannel(H323Channel & channel);
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
 	

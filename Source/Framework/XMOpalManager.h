@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.22 2006/10/01 18:07:07 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.23 2006/10/04 21:44:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,8 @@
 #include "XMEndPoint.h"
 #include "XMH323EndPoint.h"
 #include "XMSIPEndPoint.h"
+
+#include "XMMediaFormats.h"
 
 class XMEndPoint;
 
@@ -86,6 +88,7 @@ public:
 	/* getting /setting information about current call */
 	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
 	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier);
+	BOOL IsValidCapabilityForSending(const XMH323VideoCapability & capability);
 	
 	/* Debug log information */
 	static void LogMessage(const PString & message);

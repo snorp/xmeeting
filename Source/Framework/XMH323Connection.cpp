@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.14 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.15 2006/10/04 21:44:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -151,6 +151,11 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 	{
 		XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
 		isValidCapability = videoCapability.IsValidCapabilityForSending();
+		if(isValidCapability)
+		{
+			XMOpalManager & manager = (XMOpalManager &)GetEndPoint().GetManager();
+			isValidCapability = manager.IsValidCapabilityForSending(videoCapability);
+		}
 	}
 	
 	if(isValidCapability == FALSE)
@@ -242,6 +247,13 @@ BOOL XMH323Connection::OnCreateLogicalChannel(const H323Capability & capability,
 	}
 	
 	return H323Connection::OnCreateLogicalChannel(capability, dir, errorCode);
+}
+
+BOOL XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
+{
+	RemoveMediaStream(channel.GetMediaStream());
+	channel.Close();
+	return TRUE;
 }
 
 BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)

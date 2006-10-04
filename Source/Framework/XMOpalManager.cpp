@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.39 2006/10/01 18:07:07 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.40 2006/10/04 21:44:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -469,6 +469,18 @@ unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier code
 		default:
 			return 0;
 	}
+}
+
+BOOL XMOpalManager::IsValidCapabilityForSending(const XMH323VideoCapability & capability)
+{
+	if(PIsDescendant(&capability, XM_H323_H263_Capability))
+	{
+		if(remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
 }
 
 unsigned XMOpalManager::GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifier)
