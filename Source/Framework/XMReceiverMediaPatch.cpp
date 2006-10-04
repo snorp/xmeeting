@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.25 2006/10/04 21:41:08 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.26 2006/10/04 22:27:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -168,7 +168,7 @@ void XMReceiverMediaPatch::Main()
 		do {
 			inUse.Wait();
 			
-			BOOL processingSuccesful = TRUE;
+			BOOL processingSuccessful = TRUE;
 			unsigned numberOfPacketsToRelease = 0;
 		
 			XMRTPPacket *packet = packets[packetIndex];
@@ -203,7 +203,8 @@ void XMReceiverMediaPatch::Main()
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;
-						processingSuccesful = FALSE;
+						processingSuccessful = FALSE;
+						PTRACE(1, "XMeetingReceiverMediaPatch\tDiscarding old packet group");
 						
 						// There are (packetIndex + 1) packets in the buffer, but only the last one
 						// ist still needed
@@ -329,12 +330,14 @@ void XMReceiverMediaPatch::Main()
 					result = _XMProcessFrame(sessionID, frameBuffer, frameBufferSize);
 					if(result == FALSE)
 					{
-						processingSuccesful = FALSE;
+						PTRACE(1, "XMeetingReceiverMediaPatch\tDecompression of the frame failed");
+						processingSuccessful = FALSE;
 					}
 				}
 				else
 				{
-					processingSuccesful = FALSE;
+					PTRACE(1, "XMeetingReceiverMediaPatch\tCould not copy packets into frame buffer");
+					processingSuccessful = FALSE;
 				}
 				firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 				firstPacketOfPacketGroup = NULL;
@@ -344,7 +347,7 @@ void XMReceiverMediaPatch::Main()
 				numberOfPacketsToRelease = packetIndex + 1;
 			}
 			
-			if(processingSuccesful == FALSE)
+			if(processingSuccessful == FALSE)
 			{
 				IssueVideoUpdatePictureCommand();
 			}
