@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.24 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.25 2006/10/04 21:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,7 @@
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
 {
+	packetReassembler = NULL;
 	notifierSet = FALSE;
 }
 
@@ -403,7 +404,10 @@ void XMReceiverMediaPatch::Main()
 	}
 	free(packets);
 	free(frameBuffer);
-	free(packetReassembler);
+	if(packetReassembler != NULL)
+	{
+		free(packetReassembler);
+	}
 }
 
 void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
