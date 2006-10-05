@@ -536,7 +536,6 @@
 		D1CEE19E08F9022B007E4ABE /* mcs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12508F9022B007E4ABE /* mcs.h */; };
 		D1CEE19F08F9022B007E4ABE /* t38.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12608F9022B007E4ABE /* t38.h */; };
 		D1CEE1A008F9022B007E4ABE /* x880.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12708F9022B007E4ABE /* x880.h */; };
-		D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12908F9022B007E4ABE /* allcodecs.h */; settings = {ATTRIBUTES = (); }; };
 		D1CEE1A208F9022B007E4ABE /* g711codec.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE12A08F9022B007E4ABE /* g711codec.h */; };
 		D1CEE1AA08F9022B007E4ABE /* opalwavfile.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE13208F9022B007E4ABE /* opalwavfile.h */; };
 		D1CEE1AB08F9022B007E4ABE /* rfc2833.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE13308F9022B007E4ABE /* rfc2833.h */; };
@@ -577,16 +576,8 @@
 		D1CEE1CF08F9022B007E4ABE /* sound.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15D08F9022B007E4ABE /* sound.h */; };
 		D1CEE1D008F9022B007E4ABE /* transmit.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15E08F9022B007E4ABE /* transmit.h */; };
 		D1CEE1D108F9022B007E4ABE /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE15F08F9022B007E4ABE /* version.h */; };
-		D1CEE1D208F9022B007E4ABE /* alllids.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16108F9022B007E4ABE /* alllids.h */; settings = {ATTRIBUTES = (); }; };
-		D1CEE1D308F9022B007E4ABE /* ixjDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16208F9022B007E4ABE /* ixjDefs.h */; };
-		D1CEE1D408F9022B007E4ABE /* ixjidb.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16308F9022B007E4ABE /* ixjidb.h */; };
-		D1CEE1D508F9022B007E4ABE /* ixjlid.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16408F9022B007E4ABE /* ixjlid.h */; };
 		D1CEE1D608F9022B007E4ABE /* lid.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16508F9022B007E4ABE /* lid.h */; };
 		D1CEE1D708F9022B007E4ABE /* lidep.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16608F9022B007E4ABE /* lidep.h */; };
-		D1CEE1D808F9022B007E4ABE /* QTIoctl.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16708F9022B007E4ABE /* QTIoctl.h */; };
-		D1CEE1D908F9022B007E4ABE /* vblasterlid.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16808F9022B007E4ABE /* vblasterlid.h */; };
-		D1CEE1DA08F9022B007E4ABE /* vpbapi.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16908F9022B007E4ABE /* vpbapi.h */; };
-		D1CEE1DB08F9022B007E4ABE /* vpblid.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16A08F9022B007E4ABE /* vpblid.h */; };
 		D1CEE1DC08F9022B007E4ABE /* buildopts.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16D08F9022B007E4ABE /* buildopts.h */; };
 		D1CEE1DD08F9022B007E4ABE /* call.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE16F08F9022B007E4ABE /* call.h */; };
 		D1CEE1DE08F9022B007E4ABE /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = D1CEE17008F9022B007E4ABE /* connection.h */; };
@@ -1425,7 +1416,6 @@
 		D1CEE12508F9022B007E4ABE /* mcs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = mcs.h; sourceTree = "<group>"; };
 		D1CEE12608F9022B007E4ABE /* t38.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = t38.h; sourceTree = "<group>"; };
 		D1CEE12708F9022B007E4ABE /* x880.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = x880.h; sourceTree = "<group>"; };
-		D1CEE12908F9022B007E4ABE /* allcodecs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = allcodecs.h; sourceTree = "<group>"; };
 		D1CEE12A08F9022B007E4ABE /* g711codec.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = g711codec.h; sourceTree = "<group>"; };
 		D1CEE13208F9022B007E4ABE /* opalwavfile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = opalwavfile.h; sourceTree = "<group>"; };
 		D1CEE13308F9022B007E4ABE /* rfc2833.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = rfc2833.h; sourceTree = "<group>"; };
@@ -1466,16 +1456,8 @@
 		D1CEE15D08F9022B007E4ABE /* sound.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
 		D1CEE15E08F9022B007E4ABE /* transmit.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = transmit.h; sourceTree = "<group>"; };
 		D1CEE15F08F9022B007E4ABE /* version.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
-		D1CEE16108F9022B007E4ABE /* alllids.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = alllids.h; sourceTree = "<group>"; };
-		D1CEE16208F9022B007E4ABE /* ixjDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ixjDefs.h; sourceTree = "<group>"; };
-		D1CEE16308F9022B007E4ABE /* ixjidb.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ixjidb.h; sourceTree = "<group>"; };
-		D1CEE16408F9022B007E4ABE /* ixjlid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ixjlid.h; sourceTree = "<group>"; };
 		D1CEE16508F9022B007E4ABE /* lid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = lid.h; sourceTree = "<group>"; };
 		D1CEE16608F9022B007E4ABE /* lidep.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = lidep.h; sourceTree = "<group>"; };
-		D1CEE16708F9022B007E4ABE /* QTIoctl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = QTIoctl.h; sourceTree = "<group>"; };
-		D1CEE16808F9022B007E4ABE /* vblasterlid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = vblasterlid.h; sourceTree = "<group>"; };
-		D1CEE16908F9022B007E4ABE /* vpbapi.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = vpbapi.h; sourceTree = "<group>"; };
-		D1CEE16A08F9022B007E4ABE /* vpblid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = vpblid.h; sourceTree = "<group>"; };
 		D1CEE16D08F9022B007E4ABE /* buildopts.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = buildopts.h; sourceTree = "<group>"; };
 		D1CEE16F08F9022B007E4ABE /* call.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = call.h; sourceTree = "<group>"; };
 		D1CEE17008F9022B007E4ABE /* connection.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = connection.h; sourceTree = "<group>"; };
@@ -2503,7 +2485,6 @@
 		D1CEE12808F9022B007E4ABE /* codec */ = {
 			isa = PBXGroup;
 			children = (
-				D1CEE12908F9022B007E4ABE /* allcodecs.h */,
 				D1F49D02097E50790010A324 /* echocancel.h */,
 				D1CEE12A08F9022B007E4ABE /* g711codec.h */,
 				D1CEE13208F9022B007E4ABE /* opalwavfile.h */,
@@ -2571,16 +2552,8 @@
 		D1CEE16008F9022B007E4ABE /* lids */ = {
 			isa = PBXGroup;
 			children = (
-				D1CEE16108F9022B007E4ABE /* alllids.h */,
-				D1CEE16208F9022B007E4ABE /* ixjDefs.h */,
-				D1CEE16308F9022B007E4ABE /* ixjidb.h */,
-				D1CEE16408F9022B007E4ABE /* ixjlid.h */,
 				D1CEE16508F9022B007E4ABE /* lid.h */,
 				D1CEE16608F9022B007E4ABE /* lidep.h */,
-				D1CEE16708F9022B007E4ABE /* QTIoctl.h */,
-				D1CEE16808F9022B007E4ABE /* vblasterlid.h */,
-				D1CEE16908F9022B007E4ABE /* vpbapi.h */,
-				D1CEE16A08F9022B007E4ABE /* vpblid.h */,
 			);
 			name = lids;
 			path = ../opal/include/lids;
@@ -3263,7 +3236,6 @@
 				D1CEE19E08F9022B007E4ABE /* mcs.h in Headers */,
 				D1CEE19F08F9022B007E4ABE /* t38.h in Headers */,
 				D1CEE1A008F9022B007E4ABE /* x880.h in Headers */,
-				D1CEE1A108F9022B007E4ABE /* allcodecs.h in Headers */,
 				D1CEE1A208F9022B007E4ABE /* g711codec.h in Headers */,
 				D1CEE1AA08F9022B007E4ABE /* opalwavfile.h in Headers */,
 				D1CEE1AB08F9022B007E4ABE /* rfc2833.h in Headers */,
@@ -3304,16 +3276,8 @@
 				D1CEE1CF08F9022B007E4ABE /* sound.h in Headers */,
 				D1CEE1D008F9022B007E4ABE /* transmit.h in Headers */,
 				D1CEE1D108F9022B007E4ABE /* version.h in Headers */,
-				D1CEE1D208F9022B007E4ABE /* alllids.h in Headers */,
-				D1CEE1D308F9022B007E4ABE /* ixjDefs.h in Headers */,
-				D1CEE1D408F9022B007E4ABE /* ixjidb.h in Headers */,
-				D1CEE1D508F9022B007E4ABE /* ixjlid.h in Headers */,
 				D1CEE1D608F9022B007E4ABE /* lid.h in Headers */,
 				D1CEE1D708F9022B007E4ABE /* lidep.h in Headers */,
-				D1CEE1D808F9022B007E4ABE /* QTIoctl.h in Headers */,
-				D1CEE1D908F9022B007E4ABE /* vblasterlid.h in Headers */,
-				D1CEE1DA08F9022B007E4ABE /* vpbapi.h in Headers */,
-				D1CEE1DB08F9022B007E4ABE /* vpblid.h in Headers */,
 				D1CEE1DC08F9022B007E4ABE /* buildopts.h in Headers */,
 				D1CEE1DD08F9022B007E4ABE /* call.h in Headers */,
 				D1CEE1DE08F9022B007E4ABE /* connection.h in Headers */,
@@ -3628,7 +3592,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"running configure not needed\";\nelse\necho \"running configure\";\ncd ../opal\n./configure\ncd ../XMeeting\nfi";
+			shellScript = "if [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"running configure not needed\";\nelse\necho \"running configure\";\ncd ../opal\n./configure --disable-lid\ncd ../XMeeting\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
