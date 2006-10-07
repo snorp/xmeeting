@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.7 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.8 2006/10/07 07:47:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,8 +26,6 @@
 - (id) initWithControllerView:(XMOnScreenControllerView *)view contentRect:(NSRect)contentRect
 {	
 	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
-	
-	[self setHidesOnDeactivate:YES];
 	[self setOpaque:NO];
 	[self setAlphaValue:0.0];
 	[self setBackgroundColor:[NSColor clearColor]];
