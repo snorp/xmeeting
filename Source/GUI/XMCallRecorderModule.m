@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorderModule.m,v 1.2 2006/09/21 20:14:23 hfriederich Exp $
+ * $Id: XMCallRecorderModule.m,v 1.3 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -116,6 +116,11 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 
 #pragma mark -
 #pragma mark Module Methods
+
+- (NSString *)identifier
+{
+	return @"Call Recorder";
+}
 
 - (NSString *)name
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.21 2006/08/16 05:50:28 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.22 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -108,6 +108,11 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 
 #pragma mark -
 #pragma mark XMInspectorModule Methods
+
+- (NSString *)identifier
+{
+	return @"AddressBook";
+}
 
 - (NSString *)name
 {

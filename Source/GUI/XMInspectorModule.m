@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorModule.m,v 1.1 2006/03/17 13:20:52 hfriederich Exp $
+ * $Id: XMInspectorModule.m,v 1.2 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,6 +50,11 @@
 
 #pragma mark -
 #pragma mark Methods for subclasses to override
+
+- (NSString *)identifier
+{
+	return nil;
+}
 
 - (NSString *)name
 {

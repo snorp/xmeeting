@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.24 2006/06/21 22:54:10 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.25 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -176,6 +176,14 @@
 	[recentCallsScrollView setDocumentView:recentCallsView];
 }
 
+#pragma mark -
+#pragma mark Module Methods
+
+- (NSString *)identifier
+{
+	return @"Call History";
+}
+
 - (NSString *)name
 {
 	return NSLocalizedString(@"XM_CALL_HISTORY_MODULE_NAME", @"");
@@ -230,6 +238,7 @@
 	return YES;
 }
 
+#pragma mark -
 #pragma mark Private Methods
 
 - (void)_activeLocationDidChange:(NSNotification *)notif

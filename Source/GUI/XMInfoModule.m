@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.18 2006/08/05 15:13:58 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.19 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,6 +175,11 @@
 
 #pragma mark -
 #pragma mark Protocol Methods
+
+- (NSString *)identifier
+{
+	return @"Info";
+}
 
 - (NSString *)name
 {

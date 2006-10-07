@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.26 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.27 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -143,6 +143,11 @@ NSString *XMKey_AudioTestDelay = @"XMeeting_AudioTestDelay";
 }
 
 #pragma mark Protocol Methods
+
+- (NSString *)identifier
+{
+	return @"LocalAudioVideo";
+}
 
 - (NSString *)name
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.14 2006/06/07 10:10:16 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.15 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,6 +61,11 @@
 }
 
 #pragma mark Protocol Methods
+
+- (NSString *)identifier
+{
+	return @"Statistics";
+}
 
 - (NSString *)name
 {

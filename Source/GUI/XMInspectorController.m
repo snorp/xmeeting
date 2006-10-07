@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorController.m,v 1.10 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMInspectorController.m,v 1.11 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,10 @@
 
 #import "XMInspectorController.h"
 #import "XMInspectorModule.h"
+
+#define XMKey_SelectedInspectorModule @"XMeeting_SelectedInspectorModule"
+#define XMKey_SelectedToolsModule @"XMeeting_SelectedToolsModule"
+#define XMKey_SelectedContactsModule @"XMeeting_SelectedContactsModule"
 
 @interface XMInspectorController (PrivateMethods)
 
@@ -19,6 +23,9 @@
 
 - (void)_setFullScreen:(BOOL)flag;
 - (void)_adjustWindowLevel;
+
+- (NSString *)_loadSelectedModuleFromPreferences;
+- (void)_storeSelectedModuleInPreferences:(NSString *)selectedModule;
 
 @end
 
@@ -246,6 +253,8 @@ static XMInspectorController *contactsInstance;
 	[activeModule becomeActiveModule];
 		
 	[self _setMaxAndMinSizes];
+	
+	[self _storeSelectedModuleInPreferences:[module identifier]];
 }
 
 - (void)_setupInterface
@@ -256,10 +265,18 @@ static XMInspectorController *contactsInstance;
 	int moduleCount = [modules count];
 	[pageController setSegmentCount:moduleCount];
 	
+	NSString *selectedModule = [self _loadSelectedModuleFromPreferences];
+	unsigned selectedModuleIndex = 0;
+	
 	int i;
 	for (i = 0; i < moduleCount; i++)
 	{
 		XMInspectorModule *curModule = (XMInspectorModule *)[modules objectAtIndex:i];
+		
+		if([[curModule identifier] isEqualToString:selectedModule])
+		{
+			selectedModuleIndex = i;
+		}
 		
 		[pageController setLabel:[curModule name] forSegment:i];
 		[pageController setImage:[curModule image] forSegment:i];
@@ -268,9 +285,8 @@ static XMInspectorController *contactsInstance;
 		[[pageController cell] setToolTip:[curModule name] forSegment:i];
 	}
 	
-	[pageController setSelectedSegment:0];
-	
-	[self _showModule:(XMInspectorModule *)[modules objectAtIndex:0]];
+	[pageController setSelectedSegment:selectedModuleIndex];
+	[self _showModule:(XMInspectorModule *)[modules objectAtIndex:selectedModuleIndex]];
 }
 
 - (void)_resizeView
@@ -330,6 +346,41 @@ static XMInspectorController *contactsInstance;
 	else
 	{
 		[panel setLevel:NSNormalWindowLevel];
+	}
+}
+
+- (NSString *)_loadSelectedModuleFromPreferences
+{
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	if(self == inspectorInstance)
+	{
+		return [userDefaults stringForKey:XMKey_SelectedInspectorModule];
+	}
+	else if(self == toolsInstance)
+	{
+		return [userDefaults stringForKey:XMKey_SelectedToolsModule];
+	}
+	else if(self == contactsInstance)
+	{
+		return [userDefaults stringForKey:XMKey_SelectedContactsModule];
+	}
+	return nil;
+}
+
+- (void)_storeSelectedModuleInPreferences:(NSString *)selectedModule
+{
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	if(self == inspectorInstance)
+	{
+		[userDefaults setObject:selectedModule forKey:XMKey_SelectedInspectorModule];
+	}
+	else if(self == toolsInstance)
+	{
+		[userDefaults setObject:selectedModule forKey:XMKey_SelectedToolsModule];
+	}
+	else if(self == contactsInstance)
+	{
+		[userDefaults setObject:selectedModule forKey:XMKey_SelectedContactsModule];
 	}
 }
 

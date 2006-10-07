@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorModule.h,v 1.2 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMInspectorModule.h,v 1.3 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,6 +52,13 @@
  * Method that subclasses can call to achieve correct resizing of the module
  **/
 - (void)resizeContentView;
+
+/**
+ * Unique identifier for this module. In contrast to -name
+ * not localized
+ * Subclasses must override this method
+ **/
+- (NSString *)identifier;
 
 /**
  * Returns the name of the module. This is used to identify

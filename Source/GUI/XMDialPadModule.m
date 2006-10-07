@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.13 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.14 2006/10/07 10:45:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -98,6 +98,14 @@
 	
 	[self _setDialPadButtonsEnabled:enableDialPadButtons];
 	[self _setFECCButtonsEnabled:enableFECCButtons];
+}
+
+#pragma mark -
+#pragma mark Module Methods
+
+- (NSString *)identifier
+{
+	return @"Dial Pad";
 }
 
 - (NSString *)name
