@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.40 2006/10/04 21:44:48 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.41 2006/10/10 16:48:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -415,7 +415,6 @@ void XMOpalManager::SetNATInformation(const PString & stunServer,
 				SetTranslationAddress(theTranslationAddress);
 				_XMHandleSTUNInformation(XMNATType_Error, "");
 				break;
-			case PSTUNClient::OpenNat:
 			case PSTUNClient::ConeNat:
 			case PSTUNClient::RestrictedNat:
 			case PSTUNClient::PortRestrictedNat:
@@ -434,6 +433,7 @@ void XMOpalManager::SetNATInformation(const PString & stunServer,
 			case PSTUNClient::SymmetricNat:
 			case PSTUNClient::SymmetricFirewall:
 			case PSTUNClient::PartialBlockedNat:
+			case PSTUNClient::OpenNat:
 			default:
 				PIPSocket::Address stunExternalAddress;
 				stun->GetExternalAddress(stunExternalAddress);

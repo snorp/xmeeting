@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Readme: XMeeting v0.3.2</title>
+<title>Readme: XMeeting v0.3.3</title>
 </head>
 
 <body>
@@ -20,7 +20,7 @@
 <br>
 <a href="#cre">Credits</a>
 <br>
-<a href="#rnt">Release Notes for Release 0.3.1</a>
+<a href="#rnt">Release Notes for Release 0.3.2</a>
 <br>
 <a href="#rno">Older Release Notes</a>
 <br>
@@ -55,7 +55,7 @@ Some functions will be disabled on machines with older and less powerful graphic
 
 <p>
 <a name="feat"><h3>Features</h3></a>
-This release of XMeeting (0.3.2) ships with the following key features:
+This release of XMeeting (0.3.3) ships with the following key features:
 </p>
 
 <p><b>Communication Protocols:</b>
@@ -90,6 +90,7 @@ Other codecs, such as Speex, are planned in future releases.
 <li>Advanced Address Book integration</li>
 <li>STUN</li>
 <li>H.224/H.281 Far End Camera Control</li>
+<li>Call Recording into QuickTime movies</li>
 </ul>
 
 <hr>
@@ -129,7 +130,7 @@ still appear in English. We will fix this in future releases.
 <hr>
 
 <a name="cre"><h3>Credits</h3></a>
-XMeeting release 0.3.2 by NET's XMeeting project team. The team consists of Hannes Friederich
+XMeeting release 0.3.3 by NET's XMeeting project team. The team consists of Hannes Friederich
 (software engineering), Thomas Rechsteiner (testing, gatekeeper & conferencing setup) and is 
 led by Dr Thomas Piendl. The NET XMeeting contribution
 is completely funded by NET <a href="http://www.net.ethz.ch/">http://www.net.ethz.ch/</a>, a
@@ -141,6 +142,8 @@ The new Graphical User Interface (GUI) is contributed by SWITCH
 <a href="http://www.switch.ch">http://www.switch.ch</a> by funding the work of Ivan Guajana
 (software engineering). SWITCH supports and fosters cross-platform video-conferencing 
 and therefore decided to contribute to the XMeeting project by offering a new user interface.
+In addition, SWITCH contributes regularly to the project by providing testing capabilities and
+support for testing with proprietary videoconferencing solutions.
 <br>
 <br>
 The Still Image &amp; Screen video input modules are contributed by Mark Fleming, Learning Technology Specialist
@@ -160,7 +163,34 @@ at Queen's University, Ontario, Canada.
 <hr>
 
 <p>
-<a name="rnt"><h3>Release Notes for Version 0.3.2</h3></a>
+<a name="rnt"><h3>Release Notes for Version 0.3.3</h3></a>
+New Features:
+<ul>
+<li>Call Recording Feature</li>
+<li>Local Audio echo test</li>
+<li>Slightly improved GUI</li>
+</ul>
+Fixed bugs:
+<ul>
+<li>Fixes a bug introduced in 0.3.2 that prevented calling certain phone numbers when using
+    H.323 with a Gatekeeper</li>
+<li>Fixes a bug introduced in 0.3.2 that made unregistering from a SIP registrar hang forever</li>
+<li>Fixes problems when using SIP and multiple network interfaces are present</li>
+<li>Fixes incorrect DTMF tones when using SIP</li>
+<li>Various STUN/NAT traversal improvements</li>
+<li>Fixes a bug introduced in 0.3.2 that occupied the microphone all the time even if not
+    needed. This attempts to increase bluetooth compatibility as well.</li>
+<li>Various H.323 stability improvements</li>
+<li>Improved compatibility with Polycom MGC 100</li>
+</ul>
+</p>
+
+<hr>
+
+<p>
+<a name="rno"><h3>Older Release Notes</h3></a>
+</p>
+<p><b>v0.3.2:</b><br>
 New Features:
 <ul>
 <li>Audio input volume metering</li>
@@ -179,11 +209,6 @@ In addition, the underlying PWLib/OPAL libraries have undergone several architec
 changes between XMeeting 0.3 and XMeeting 0.3.1.
 </p>
 
-<hr>
-
-<p>
-<a name="rno"><h3>Older Release Notes</h3></a>
-</p>
 <p><b>v0.3.1:</b><br>
 Fixed bugs:
 <ul>
@@ -217,6 +242,7 @@ Fixed bugs:
 <li>Removes duplicated log statements.</li>
 </ul>
 </p>
+
 <b>v0.2:</b><br>
 XMeeting 0.2 uses a slightly different preferences system than XMeeting 0.1.
 New is the use of Accounts for H.323 and SIP. This means that the H.323 gatekeeper settings
@@ -291,14 +317,22 @@ Hannes Friederich if you plan to use this feature.</li>
 <p>
 <a name="bug"><h3>Known Bugs</h3></a>
 <ul>
-<li>At the moment, XMeeting does not work with several Bluetooth Headsets</li>
-<li>H.263 does not work well with some Polycom devices</li>
+<li>There may be random crashes of XMeeting while launching it. Please report us if you
+    experience this problem often</li>
+<li>There may be random crashes of XMeeting while being registered at a Gatekeeper. Please report
+    us if you experience this problem often</li>
+<li>There have been reports about bluetooth headset not working properly. The implementation of
+    bluetooth devices in Mac OS X / Core Audio can still not considered be &quot;stable&quot;.
+    Our own tests using bluetooth headsets have so far worked well. Please report us if you
+    experience problems with bluetooth headsets often.</li>
+<li>The Still Image module may not always render images using the correct colors (e.g. switching
+    red and blue</li>
 <li>In some rare cases, calling a remote party seems to take long time without showing any 
-success.</li>
+    success.</li>
 <li>After some calls, XMeeting is no longer registered at a gatekeeper, even if indicating so.
-Terminating XMeeting may take a long time in this case.</li>
+    Terminating XMeeting may take a long time in this case.</li>
 <li>XMeeting may crash randomly and rarely when in a call. This is especially true when receiving
-H.264</li>
+    H.264</li>
 </ul>
 </p>
 
