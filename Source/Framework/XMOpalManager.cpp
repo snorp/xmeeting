@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.41 2006/10/10 16:48:25 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.42 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -60,6 +60,9 @@ XMOpalManager::XMOpalManager()
 	remoteNumber = "";
 	remoteAddress = "";
 	remoteApplication = "";
+	
+	OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
+	SetEchoCancelParams(params);
 }
 
 XMOpalManager::~XMOpalManager()

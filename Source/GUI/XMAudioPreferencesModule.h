@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioPreferencesModule.h,v 1.1 2006/06/27 18:06:48 hfriederich Exp $
+ * $Id: XMAudioPreferencesModule.h,v 1.2 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,10 +23,14 @@ extern NSString *XMKey_AudioPreferencesModuleIdentifier;
 	
 	IBOutlet NSPopUpButton *preferredOutputDevicePopUp;
 	IBOutlet NSPopUpButton *preferredInputDevicePopUp;
+	
+	IBOutlet NSButton *enableSilenceSuppressionSwitch;
+	IBOutlet NSButton *enableEchoCancellationSwitch;
 }
 
 - (IBAction)preferredOutputDeviceSelectionDidChange:(id)sender;
 - (IBAction)preferredInputDeviceSelectionDidChange:(id)sender;
+- (IBAction)defaultAction:(id)sender;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioPreferencesModule.m,v 1.1 2006/06/27 18:06:48 hfriederich Exp $
+ * $Id: XMAudioPreferencesModule.m,v 1.2 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,11 +95,19 @@ NSString *XMString_UseDefaultDevice = @"";
 
 - (void)loadPreferences
 {	
+	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+	
 	[preferredOutputDevicePopUp removeAllItems];
 	[preferredInputDevicePopUp removeAllItems];
 	
 	[self _buildOutputDeviceList];
 	[self _buildInputDeviceList];
+	
+	int state = ([prefManager enableSilenceSuppression] == YES) ? NSOnState : NSOffState;
+	[enableSilenceSuppressionSwitch setState:state];
+	
+	state = ([prefManager enableEchoCancellation] == YES) ? NSOnState : NSOffState;
+	[enableEchoCancellationSwitch setState:state];
 }
 
 - (void)savePreferences
@@ -120,6 +128,12 @@ NSString *XMString_UseDefaultDevice = @"";
 	
 	[prefManager setPreferredAudioOutputDevice:preferredOutputDevice];
 	[prefManager setPreferredAudioInputDevice:preferredInputDevice];
+	
+	BOOL flag = ([enableSilenceSuppressionSwitch state] == NSOnState) ? YES : NO;
+	[prefManager setEnableSilenceSuppression:flag];
+	
+	flag = ([enableEchoCancellationSwitch state] == NSOnState) ? YES : NO;
+	[prefManager setEnableEchoCancellation:flag];
 }
 
 #pragma mark -
@@ -127,10 +141,15 @@ NSString *XMString_UseDefaultDevice = @"";
 
 - (IBAction)preferredOutputDeviceSelectionDidChange:(id)sender
 {
-	[prefWindowController notePreferencesDidChange];
+	[self defaultAction:sender];
 }
 
 - (IBAction)preferredInputDeviceSelectionDidChange:(id)sender
+{
+	[self defaultAction:sender];
+}
+
+- (IBAction)defaultAction:(id)sender
 {
 	[prefWindowController notePreferencesDidChange];
 }

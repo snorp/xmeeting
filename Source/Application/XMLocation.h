@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.7 2006/05/16 21:30:06 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.8 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -91,9 +91,10 @@ typedef enum XMSIPProxyMode
 /**
  * Stores the information from the accounts in the data storage
  * provided by the XMPreferences superclass so that the subsystem
- * can be setup consistently
+ * can be setup consistently.
+ * Also stores other global information from the XMPreferences class
  **/
-- (void)storeAccountInformationsInSubsystem;
+- (void)storeGlobalInformationsInSubsystem;
 
 @end
 

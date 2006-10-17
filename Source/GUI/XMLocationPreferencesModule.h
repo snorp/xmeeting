@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.12 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.13 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -75,7 +75,6 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *sipProxyPasswordField;
 	
 	// Audio outlets
-	IBOutlet NSSlider *audioBufferSizeSlider;
 	IBOutlet NSTableView *audioCodecPreferenceOrderTableView;
 	IBOutlet NSButton *moveAudioCodecUpButton;
 	IBOutlet NSButton *moveAudioCodecDownButton;

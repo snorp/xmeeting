@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.27 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.28 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,8 @@ NSString *XMKey_PreferencesManagerAlertIncomingCalls = @"XMeeting_AlertIncomingC
 NSString *XMKey_PreferencesManagerIncomingCallAlertType = @"XMeeting_IncomingCallAlertType";
 NSString *XMKey_PreferencesManagerPreferredAudioOutputDevice = @"XMeeting_PreferredAudioOutputDevice";
 NSString *XMKey_PreferencesManagerPreferredAudioInputDevice = @"XMeeting_PreferredAudioInputDevice";
+NSString *XMKey_PreferencesManagerEnableSilenceSuppression = @"XMeeting_EnableSilenceSuppression";
+NSString *XMKey_PreferencesManagerEnableEchoCancellation = @"XMeeting_EnableEchoCancellation";
 NSString *XMKey_PreferencesManagerDisabledVideoModules = @"XMeeting_DisabledVideoModules";
 NSString *XMKey_PreferencesManagerPreferredVideoInputDevice = @"XMeeting_PreferredVideoInputDevice";
 NSString *XMKey_PreferencesManagerVideoManagerSettings = @"XMeeting_VideoManagerSettings";
@@ -167,6 +169,14 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	
 	number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMIncomingCallAlertType_Ringing];
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerIncomingCallAlertType];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:YES];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerEnableSilenceSuppression];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:YES];
+	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerEnableEchoCancellation];
 	[number release];
 	
 	NSArray *initialDisabledVideoModules = [[NSArray alloc] initWithObjects:@"XMStillImageVideoInputModule", @"XMScreenVideoInputModule", nil];
@@ -556,7 +566,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	if([callManager doesAllowModifications])
 	{
 		XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
-		[location storeAccountInformationsInSubsystem];
+		[location storeGlobalInformationsInSubsystem];
 		[callManager setActivePreferences:location];
 	}
 	else
@@ -618,7 +628,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 		if([callManager doesAllowModifications])
 		{
 			XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
-			[location storeAccountInformationsInSubsystem];
+			[location storeGlobalInformationsInSubsystem];
 			[callManager setActivePreferences:location];
 		}
 		else
@@ -894,6 +904,26 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	}
 }
 
+- (BOOL)enableSilenceSuppression
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerEnableSilenceSuppression];
+}
+
+- (void)setEnableSilenceSuppression:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerEnableSilenceSuppression];
+}
+
+- (BOOL)enableEchoCancellation
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerEnableEchoCancellation];
+}
+
+- (void)setEnableEchoCancellation:(BOOL)flag
+{
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:XMKey_PreferencesManagerEnableEchoCancellation];
+}
+
 - (NSArray *)disabledVideoModules
 {
 	NSArray *disabledVideoModules = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_PreferencesManagerDisabledVideoModules];
@@ -1053,7 +1083,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	if([callManager doesAllowModifications])
 	{
 		XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
-		[location storeAccountInformationsInSubsystem];
+		[location storeGlobalInformationsInSubsystem];
 		[callManager setActivePreferences:location];
 		
 		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

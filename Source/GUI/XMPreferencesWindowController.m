@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.10 2006/08/14 19:45:29 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.11 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,8 @@
 #import "XMPreferencesWindowController.h"
 #import "XMPreferencesManager.h"
 #import "XMPreferencesModule.h"
+
+#import "XMLocationPreferencesModule.h"
 
 NSString *XMKey_PreferencesNibName = @"Preferences";
 NSString *XMKey_PreferencesToolbar = @"XMeeting_PreferencesToolbar";
@@ -324,11 +326,23 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 	unsigned count = [modules count];
 	unsigned i;
 	
+	// Ensure that the locations module is the last one to store it's preferences
+	// to ensure location data integrity
+	id<XMPreferencesModule> locationsModule = nil;
+	
 	for(i = 0; i < count; i++)
 	{
 		id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
-		[module savePreferences];
+		if([[module identifier] isEqualToString:XMKey_LocationPreferencesModuleIdentifier])
+		{
+			locationsModule = module;
+		}
+		else
+		{
+			[module savePreferences];
+		}
 	}
+	[locationsModule savePreferences];
 	
 	[applyButton setEnabled:NO];
 	[[self window] setDocumentEdited:NO];

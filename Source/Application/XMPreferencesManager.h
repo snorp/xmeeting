@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.15 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.16 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,6 +34,8 @@ extern NSString *XMKey_PreferencesManagerAlertIncomingCalls;
 extern NSString *XMKey_PreferencesManagerIncomingCallAlertType;
 extern NSString *XMKey_PreferencesManagerPreferredAudioOutputDevice;
 extern NSString *XMKey_PreferencesManagerPreferredAudioInputDevice;
+extern NSString *XMKey_PreferencesManagerEnableSilenceSuppression;
+extern NSString *XMKey_PreferencesManagerEnableEchoCancellation;
 extern NSString *XMKey_PreferencesManagerDisabledVideoModules;
 extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
 extern NSString *XMKey_PreferencesManagerVideoManagerSettings;
@@ -301,6 +303,26 @@ typedef enum XMIncomingCallAlertType
  * Stores the name of the preferred audio input device.
  **/
 - (void)setPreferredAudioInputDevice:(NSString *)device;
+
+/**
+ * Returns whether silence suppression is enabled or not
+ **/
+- (BOOL)enableSilenceSuppression;
+
+/**
+ * Stores whether silence suppression is enabled or not
+ **/
+- (void)setEnableSilenceSuppression:(BOOL)flag;
+
+/**
+ * Returns whether echo cancellation is enabled or not
+ **/
+- (BOOL)enableEchoCancellation;
+
+/**
+ * Stores whether echo cancellation is enabled or not
+ **/
+- (void)setEnableEchoCancellation:(BOOL)flag;
 
 /**
  * Returns an array containing identifiers of the disabled video modules

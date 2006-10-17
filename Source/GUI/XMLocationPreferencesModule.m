@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.25 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.26 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -862,7 +862,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[self sipAccountSelected:self];
 	
 	// loading the Audio section
-	[audioBufferSizeSlider setIntValue:[currentLocation audioBufferSize]];
 	[audioCodecPreferenceOrderTableView reloadData];
 	
 	// loading the Video section
@@ -970,9 +969,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 		[currentLocation setSIPProxyUsername:username];
 		[currentLocation setSIPProxyPassword:password];
 	}
-	
-	// saving the audio section
-	[currentLocation setAudioBufferSize:[audioBufferSizeSlider intValue]];
 	
 	// saving the video section
 	flag = ([enableVideoSwitch state] == NSOnState) ? YES : NO;

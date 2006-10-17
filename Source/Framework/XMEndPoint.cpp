@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.17 2006/10/01 15:33:05 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.18 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,6 +27,9 @@ XMEndPoint::XMEndPoint(OpalManager & manager)
 : OpalEndPoint(manager, "xm", CanTerminateCall)
 {
 	isIncomingCall = FALSE;
+	enableSilenceSuppression = FALSE;
+	enableEchoCancellation = FALSE;
+	enableVideo = FALSE;
 }
 
 XMEndPoint::~XMEndPoint()
@@ -36,9 +39,29 @@ XMEndPoint::~XMEndPoint()
 #pragma mark -
 #pragma mark SetupMethods
 
+void XMEndPoint::SetAudioFunctionality(BOOL enableSilenceSuppressionFlag,
+									   BOOL enableEchoCancellationFlag)
+{
+	enableSilenceSuppression = enableSilenceSuppressionFlag;
+	enableEchoCancellation = enableEchoCancellationFlag;
+}
+
 void XMEndPoint::SetEnableVideo(BOOL flag)
 {
 	enableVideo = flag;
+}
+
+#pragma mark -
+#pragma mark Data
+
+BOOL XMEndPoint::EnableSilenceSuppression()
+{
+	return enableSilenceSuppression;
+}
+
+BOOL XMEndPoint::EnableEchoCancellation()
+{
+	return enableEchoCancellation;
 }
 
 #pragma mark -

@@ -75,6 +75,7 @@
         }, 
         {
             ACTIONS = {
+                defaultAction = id; 
                 preferredInputDeviceSelectionDidChange = id; 
                 preferredOutputDeviceSelectionDidChange = id; 
             }; 
@@ -82,6 +83,8 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 contentView = NSView; 
+                enableEchoCancellationSwitch = NSButton; 
+                enableSilenceSuppressionSwitch = NSButton; 
                 preferredInputDevicePopUp = NSPopUpButton; 
                 preferredOutputDevicePopUp = NSPopUpButton; 
             }; 
@@ -138,7 +141,6 @@
                 accountModule = XMAccountPreferencesModule; 
                 actionButton = NSButton; 
                 actionPopup = NSPopUpButton; 
-                audioBufferSizeSlider = NSSlider; 
                 audioCodecPreferenceOrderTableView = NSTableView; 
                 autoGetExternalAddressSwitch = NSButton; 
                 bandwidthLimitPopUp = NSPopUpButton; 

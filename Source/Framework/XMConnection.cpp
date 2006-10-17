@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.10 2006/08/14 18:46:30 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.11 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,7 +18,15 @@ XMConnection::XMConnection(OpalCall & call,
 						   const PString & token)
 : OpalConnection(call, theEndPoint, token),
   endpoint(theEndPoint)
-{	
+{
+	  if(theEndPoint.EnableSilenceSuppression())
+	  {
+		  silenceDetector = new OpalPCM16SilenceDetector;
+	  }
+	  if(theEndPoint.EnableEchoCancellation())
+	  {
+		  echoCanceler = new OpalEchoCanceler;
+	  }
 }
 
 XMConnection::~XMConnection()
@@ -167,17 +175,25 @@ BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 		OnEstablished();
 	}
 	
-	/*if(mediaStream.IsSource())
-	{    
-		OpalMediaPatch * patch = mediaStream.GetPatch();
-		if (patch != NULL && mediaStream.GetSessionID() == OpalMediaFormat::DefaultAudioSessionID) 
-		{
-			silenceDetector->SetParameters(GetEndPoint().GetManager().GetSilenceDetectParams());
-			patch->AddFilter(silenceDetector->GetReceiveHandler(), OpalPCM16);
-		}
-	}*/
-	
 	return TRUE;
+}
+
+void XMConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+{
+	if(patch.GetSource().GetSessionID() == OpalMediaFormat::DefaultAudioSessionID)
+	{
+		if(isSource && silenceDetector != NULL) {
+			silenceDetector->SetParameters(endpoint.GetManager().GetSilenceDetectParams());
+			patch.AddFilter(silenceDetector->GetReceiveHandler(), OpalPCM16);
+		}
+		if(echoCanceler != NULL)
+		{
+			int clockRate = patch.GetSource().GetMediaFormat().GetClockRate();
+			echoCanceler->SetParameters(endpoint.GetManager().GetEchoCancelParams());
+			echoCanceler->SetClockRate(clockRate);
+			patch.AddFilter(isSource ? echoCanceler->GetReceiveHandler() : echoCanceler->GetSendHandler(), OpalPCM16);
+		}
+	}
 }
 
 PSoundChannel * XMConnection::CreateSoundChannel(BOOL isSource)

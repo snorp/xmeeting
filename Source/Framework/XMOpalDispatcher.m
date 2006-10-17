@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.31 2006/10/03 05:07:12 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.32 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1454,7 +1454,8 @@ typedef enum _XMOpalDispatcherMessage
 	
 	// ***** Adjusting the Audio Preferences ***** //
 	
-	_XMSetAudioBufferSize([preferences audioBufferSize]);
+	_XMSetAudioFunctionality([preferences enableSilenceSuppression],
+							 [preferences enableEchoCancellation]);
 	
 	// ***** Adjusting the Video Preferences ***** //
 	BOOL enableVideo = [preferences enableVideo];

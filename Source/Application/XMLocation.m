@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.8 2006/05/16 21:30:06 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.9 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -144,6 +144,8 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	[dict removeObjectForKey:XMKey_PreferencesGatekeeperPassword];
 	[dict removeObjectForKey:XMKey_PreferencesRegistrarRecords];
 	[dict removeObjectForKey:XMKey_PreferencesSIPProxyPassword];
+	[dict removeObjectForKey:XMKey_PreferencesEnableSilenceSuppression];
+	[dict removeObjectForKey:XMKey_PreferencesEnableEchoCancellation];
 	
 	if(proxyMode != XMSIPProxyMode_CustomProxy)
 	{
@@ -261,7 +263,7 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 	proxyMode = sipProxyMode;
 }
 
-- (void)storeAccountInformationsInSubsystem
+- (void)storeGlobalInformationsInSubsystem
 {
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	
@@ -344,12 +346,16 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 			break;
 		default:
 			// don't change proxy host & username
-			password = [[XMPreferencesManager sharedInstance] passwordForServiceName:[self sipProxyHost] accountName:[self sipProxyUsername]];
+			password = [preferencesManager passwordForServiceName:[self sipProxyHost] accountName:[self sipProxyUsername]];
 			[self setSIPProxyPassword:password];
 			break;
 	}
+	
+	[self setEnableSilenceSuppression:[preferencesManager enableSilenceSuppression]];
+	[self setEnableEchoCancellation:[preferencesManager enableEchoCancellation]];
 }
 
+#pragma mark -
 #pragma mark overriding methods from XMPreferences
 
 - (BOOL)automaticallyAcceptIncomingCalls

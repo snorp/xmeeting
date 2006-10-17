@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.16 2006/06/05 22:24:08 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.17 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -154,7 +154,18 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesAudioBufferSize])
+	else if([key isEqualToString:XMKey_PreferencesEnableSilenceSuppression])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -358,8 +369,6 @@
 	udpPortBase = 5000;
 	udpPortMax = 5099;
 	
-	audioBufferSize = 2;
-	
 	unsigned audioCodecCount = [_XMCodecManagerSharedInstance audioCodecCount];
 	audioCodecList = [[NSMutableArray alloc] initWithCapacity:audioCodecCount];
 	unsigned i;
@@ -371,6 +380,9 @@
 		[audioCodecList addObject:record];
 		[record release];
 	}
+	
+	enableSilenceSuppression = NO;
+	enableEchoCancellation = NO;
 	
 	enableVideo = NO;
 	videoFramesPerSecond = 30;
@@ -477,12 +489,6 @@
 		[self setUDPPortMax:[(NSNumber *)obj unsignedIntValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesAudioBufferSize];
-	if(obj && [obj isKindOfClass:[NSNumber class]])
-	{
-		[self setAudioBufferSize:[(NSNumber *)obj unsignedIntValue]];
-	}
-	
 	obj = [dict objectForKey:XMKey_PreferencesAudioCodecList];
 	if(obj && [obj isKindOfClass:[NSArray class]])
 	{
@@ -511,6 +517,18 @@
 			
 			[record release];
 		}
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesEnableSilenceSuppression];
+	if(obj && [obj isKindOfClass:[NSNumber class]])
+	{
+		[self setEnableSilenceSuppression:[(NSNumber *)obj boolValue]];
+	}
+	
+	obj = [dict objectForKey:XMKey_PreferencesEnableEchoCancellation];
+	if(obj && [obj isKindOfClass:[NSNumber class]])
+	{
+		[self setEnableEchoCancellation:[(NSNumber *)obj boolValue]];
 	}
 	
 	obj = [dict objectForKey:XMKey_PreferencesEnableVideo];
@@ -656,8 +674,9 @@
 	[preferences setUDPPortBase:[self udpPortBase]];
 	[preferences setUDPPortMax:[self udpPortMax]];
 	
-	[preferences setAudioBufferSize:[self audioBufferSize]];
 	[preferences _setAudioCodecList:[self _audioCodecList]];
+	[preferences setEnableSilenceSuppression:[self enableSilenceSuppression]];
+	[preferences setEnableEchoCancellation:[self enableEchoCancellation]];
 	
 	[preferences setEnableVideo:[self enableVideo]];
 	[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
@@ -702,8 +721,6 @@
 		[self setUDPPortBase:[coder decodeIntForKey:XMKey_PreferencesUDPPortBase]];
 		[self setUDPPortMax:[coder decodeIntForKey:XMKey_PreferencesUDPPortMax]];
 		
-		[self setAudioBufferSize:[coder decodeIntForKey:XMKey_PreferencesAudioBufferSize]];
-		
 		array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesAudioCodecList];
 		count = [array count];
 		codecCount = [audioCodecList count];
@@ -725,6 +742,9 @@
 				}
 			}
 		}
+		
+		[self setEnableSilenceSuppression:[coder decodeBoolForKey:XMKey_PreferencesEnableSilenceSuppression]];
+		[self setEnableEchoCancellation:[coder decodeBoolForKey:XMKey_PreferencesEnableEchoCancellation]];
 		
 		[self setEnableVideo:[coder decodeBoolForKey:XMKey_PreferencesEnableVideo]];
 		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
@@ -794,8 +814,9 @@
 		[coder encodeInt:[self udpPortBase] forKey:XMKey_PreferencesUDPPortBase];
 		[coder encodeInt:[self udpPortMax] forKey:XMKey_PreferencesUDPPortMax];
 		
-		[coder encodeInt:[self audioBufferSize] forKey:XMKey_PreferencesAudioBufferSize];
 		[coder encodeObject:[self _audioCodecList] forKey:XMKey_PreferencesAudioCodecList];
+		[coder encodeBool:[self enableSilenceSuppression] forKey:XMKey_PreferencesEnableSilenceSuppression];
+		[coder encodeBool:[self enableEchoCancellation] forKey:XMKey_PreferencesEnableEchoCancellation];
 		
 		[coder encodeBool:[self enableVideo] forKey:XMKey_PreferencesEnableVideo];
 		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
@@ -880,8 +901,9 @@
 	   [otherPreferences udpPortBase] == [self udpPortBase] &&
 	   [otherPreferences udpPortMax] == [self udpPortMax] &&
 	   
-	   [otherPreferences audioBufferSize] == [self audioBufferSize] &&
 	   [[otherPreferences _audioCodecList] isEqual:[self _audioCodecList]] &&
+	   [otherPreferences enableSilenceSuppression] == [self enableSilenceSuppression] &&
+	   [otherPreferences enableEchoCancellation] == [self enableEchoCancellation] &&
 	   
 	   [otherPreferences enableVideo] == [self enableVideo] &&
 	   [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
@@ -985,14 +1007,6 @@
 		[number release];
 	}
 	
-	integer = [self audioBufferSize];
-	if(integer != 2)
-	{
-		number = [[NSNumber alloc] initWithUnsignedInt:integer];
-		[dict setObject:number forKey:XMKey_PreferencesAudioBufferSize];
-		[number release];
-	}
-	
 	integer = [audioCodecList count];
 	int i;
 	NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:integer];
@@ -1002,6 +1016,14 @@
 	}
 	[dict setObject:arr forKey:XMKey_PreferencesAudioCodecList];
 	[arr release];
+	
+	number = [[NSNumber alloc] initWithBool:[self enableSilenceSuppression]];
+	[dict setObject:number forKey:XMKey_PreferencesEnableSilenceSuppression];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithBool:[self enableEchoCancellation]];
+	[dict setObject:number forKey:XMKey_PreferencesEnableEchoCancellation];
+	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableVideo]];
 	[dict setObject:number forKey:XMKey_PreferencesEnableVideo];
@@ -1144,13 +1166,17 @@
 	{
 		return [NSNumber numberWithUnsignedInt:[self udpPortMax]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesAudioBufferSize])
-	{
-		return [NSNumber numberWithUnsignedInt:[self audioBufferSize]];
-	}
 	else if([key isEqualToString:XMKey_PreferencesAudioCodecList])
 	{
 		return [self audioCodecList];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableSilenceSuppression])
+	{
+		return [NSNumber numberWithBool:[self enableSilenceSuppression]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation])
+	{
+		return [NSNumber numberWithBool:[self enableEchoCancellation]];
 	}
 	else if([key isEqualToString:XMKey_PreferencesEnableVideo])
 	{
@@ -1345,11 +1371,22 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesAudioBufferSize])
+	else if([key isEqualToString:XMKey_PreferencesEnableSilenceSuppression])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
-			[self setAudioBufferSize:[(NSNumber *)value unsignedIntValue]];
+			[self setEnableSilenceSuppression:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setEnableEchoCancellation:[(NSNumber *)value boolValue]];
 		}
 		else
 		{
@@ -1660,16 +1697,6 @@
 #pragma mark -
 #pragma mark Audio-specific Methods
 
-- (unsigned)audioBufferSize
-{
-	return audioBufferSize;
-}
-
-- (void)setAudioBufferSize:(unsigned)size
-{
-	audioBufferSize = size;
-}
-
 - (NSArray *)audioCodecList
 {
 	return audioCodecList;
@@ -1688,6 +1715,26 @@
 - (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
 	[[self _audioCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
+}
+
+- (BOOL)enableSilenceSuppression
+{
+	return enableSilenceSuppression;
+}
+
+- (void)setEnableSilenceSuppression:(BOOL)flag
+{
+	enableSilenceSuppression = flag;
+}
+
+- (BOOL)enableEchoCancellation
+{
+	return enableEchoCancellation;
+}
+
+- (void)setEnableEchoCancellation:(BOOL)flag
+{
+	enableEchoCancellation = flag;
 }
 
 #pragma mark -

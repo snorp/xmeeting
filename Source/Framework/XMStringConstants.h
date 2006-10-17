@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.27 2006/09/24 17:53:32 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.28 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -308,8 +308,9 @@ extern NSString *XMKey_PreferencesUDPPortBase;
 extern NSString *XMKey_PreferencesUDPPortMax;
 
 // audio-specific keys
-extern NSString *XMKey_PreferencesAudioBufferSize;
 extern NSString *XMKey_PreferencesAudioCodecList;
+extern NSString *XMKey_PreferencesEnableSilenceSuppression;
+extern NSString *XMKey_PreferencesEnableEchoCancellation;
 
 // video-specific keys
 extern NSString *XMKey_PreferencesEnableVideo;

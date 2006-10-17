@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.9 2006/10/01 15:33:05 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.10 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,7 +27,12 @@ public:
 	~XMEndPoint();
 	
 	// Setup Methods
+	void SetAudioFunctionality(BOOL enableSilenceSuppression, BOOL enableEchoCancellation);
 	void SetEnableVideo(BOOL enableVideo);
+	
+	// Data
+	BOOL EnableSilenceSuppression();
+	BOOL EnableEchoCancellation();
 	
 	// Overriding OpalEndPoint methods
 	virtual BOOL MakeConnection(OpalCall & call,
@@ -64,6 +69,10 @@ private:
 	OpalH281Handler * GetH281Handler(PString & callID);
 	
 	BOOL isIncomingCall;
+	
+	BOOL enableSilenceSuppression;
+	BOOL enableEchoCancellation;
+	
 	BOOL enableVideo;
 };
 

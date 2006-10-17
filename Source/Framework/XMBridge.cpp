@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.35 2006/10/01 15:32:11 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.36 2006/10/17 21:07:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -141,10 +141,10 @@ void _XMSetMeasureAudioSignalLevels(bool flag)
 	XMSoundChannel::SetMeasureSignalLevels(flag);
 }
 
-void _XMSetAudioBufferSize(unsigned size)
+void _XMSetAudioFunctionality(bool enableSilenceSuppression,
+							  bool enableEchoCancellation)
 {
-	// currently not enabled
-	//callEndPoint->SetSoundChannelBufferDepth(size);
+	callEndPoint->SetAudioFunctionality(enableSilenceSuppression, enableEchoCancellation);
 }
 
 void _XMStopAudio()
