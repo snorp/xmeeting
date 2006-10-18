@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.h,v 1.6 2006/06/07 10:10:15 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.h,v 1.7 2006/10/18 21:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,8 @@
 	IBOutlet NSTextField *contrastField;
 	IBOutlet NSSlider *sharpnessSlider;
 	IBOutlet NSTextField *sharpnessField;
+	
+	OSErr openAndConfigureChannelErr;
 }
 
 - (id)_init;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.19 2006/09/03 21:40:24 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.20 2006/10/18 21:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,7 +59,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 
 - (void)_openAndConfigureSeqGrabComponent;
 - (void)_disposeSeqGrabComponent;
-- (OSErr)_openAndConfigureChannel;
+- (void)_openAndConfigureChannel;
 - (BOOL)_createDecompressionSession;
 - (BOOL)_disposeDecompressionSession;
 - (OSErr)_processGrabData:(Ptr)grabData length:(long)length time:(TimeValue)time;
@@ -185,7 +185,9 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	// to the lack of an attached video device, we'll try again here
 	if(videoChannel == NULL)
 	{
-		if([self _openAndConfigureChannel] != noErr)
+		openAndConfigureChannelErr = noErr;
+		[self performSelectorOnMainThread:@selector(_openAndConfigureChannel) withObject:nil waitUntilDone:YES];
+		if(openAndConfigureChannelErr != noErr)
 		{
 			videoChannel = NULL;
 		}
@@ -282,7 +284,9 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	if(videoChannel == NULL)
 	{
-		if((err = [self _openAndConfigureChannel]) != noErr)
+		openAndConfigureChannelErr = noErr;
+		[self performSelectorOnMainThread:@selector(_openAndConfigureChannel) withObject:nil waitUntilDone:YES];
+		if(openAndConfigureChannelErr != noErr)
 		{
 			hintCode = 0x004002;
 			goto bail;
@@ -919,24 +923,16 @@ bail:
 	}
 }
 
-- (OSErr)_openAndConfigureChannel
+- (void)_openAndConfigureChannel
 {
-	ComponentResult err = noErr;
-	
-	err = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
-	if(err != noErr)
+	openAndConfigureChannelErr = SGNewChannel(sequenceGrabber, VideoMediaType, &videoChannel);
+	if(openAndConfigureChannelErr != noErr)
 	{
 		// this indicates that probably no video input device is attached
-		return err;
+		return;
 	}
 	
-	err = SGSetChannelUsage(videoChannel, seqGrabRecord);
-	if(err != noErr)
-	{
-		return err;
-	}
-
-	return noErr;
+	openAndConfigureChannelErr = SGSetChannelUsage(videoChannel, seqGrabRecord);
 }
 
 - (BOOL)_createDecompressionSession
