@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.15 2006/09/28 21:17:47 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.16 2006/10/19 21:38:46 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,8 @@
 #include "XMOpalManager.h"
 #include "XMSIPConnection.h"
 #include "XMMediaFormats.h"
+
+#include <ptclib/enum.h>
 
 #define XM_SIP_REGISTRAR_STATUS_TO_REGISTER 0
 #define XM_SIP_REGISTRAR_STATUS_REGISTERED 1
@@ -494,8 +496,14 @@ BOOL XMSIPEndPoint::XMTransmitSIPInfo(SIP_PDU::Methods m,
 	WORD port;
 	
 	if(proxy.IsEmpty()) {
-		hostname = hosturl.GetHostName();
-		port = hosturl.GetPort();
+		PIPSocketAddressAndPortVector addrs;
+		if (PDNS::LookupSRV(hosturl.GetHostName(), "_sip._udp", hosturl.GetPort(), addrs)) {
+			hostname = addrs[0].address.AsString();
+			port = addrs [0].port;
+		} else { 
+			hostname = hosturl.GetHostName();
+			port = hosturl.GetPort();
+		}
 	}
 	else
 	{

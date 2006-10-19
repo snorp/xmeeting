@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.11 2006/09/29 21:21:45 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.12 2006/10/19 21:38:46 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 
 #include <opal/mediafmt.h>
 #include <sip/sipep.h>
+#include <ptclib/enum.h>
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 
