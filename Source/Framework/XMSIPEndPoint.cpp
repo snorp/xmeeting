@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.16 2006/10/19 21:38:46 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.17 2006/10/21 11:53:17 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -590,6 +590,16 @@ OpalTransport * XMSIPEndPoint::XMCreateTransport(const OpalTransportAddress & ad
 		return NULL;
 	}
 	
+	if(!PIsDescendant(transport, OpalTransportUDP)) {
+		return transport;
+	}
+	
+	OpalTransportUDP * udpTransport = (OpalTransportUDP *)transport;
+	if(udpTransport->NumberOfConnectSockets() <= 1)
+	{
+		return transport; // Don't do OPTIONS probing if there is only one transport
+	}
+	
 	PWaitAndSignal m(transportMutex); // Serializes the OPTIONS probing procedure to decrease resources used
 	
 	// Extract the host from the transport address. Unfortunately,
@@ -619,13 +629,6 @@ OpalTransport * XMSIPEndPoint::XMCreateTransport(const OpalTransportAddress & ad
 	}
 	
 	probingSyncPoint.Wait(); // wait until  probing completed
-	
-	if(probingSuccessful == FALSE)
-	{
-		// The registrar server was not found
-		delete transport;
-		return NULL;
-	}
 	
 	return transport;
 }
