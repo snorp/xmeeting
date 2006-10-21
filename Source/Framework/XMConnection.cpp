@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.12 2006/10/21 11:52:11 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.13 2006/10/21 13:00:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,7 +19,6 @@ XMConnection::XMConnection(OpalCall & call,
 : OpalConnection(call, theEndPoint, token),
   endpoint(theEndPoint)
 {
-	  cout << "XMConnection()" << endl;
 	  if(theEndPoint.EnableSilenceSuppression())
 	  {
 		  silenceDetector = new OpalPCM16SilenceDetector;
@@ -36,7 +35,6 @@ XMConnection::~XMConnection()
 
 BOOL XMConnection::SetUpConnection()
 {
-	cout << "SET UP : " << IsOriginating() << endl;
 	if(ownerCall.GetConnection(0) == this) {
 		// We are A-Party
 		phase = SetUpPhase;
