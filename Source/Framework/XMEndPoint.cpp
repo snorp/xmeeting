@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.18 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.19 2006/10/21 11:52:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -86,11 +86,6 @@ BOOL XMEndPoint::MakeConnection(OpalCall & call,
 	
 	// only ever one active connection
 	connectionsActive.SetAt(connection->GetToken(), connection);
-	
-	if(call.GetConnection(0) == connection)
-	{
-		connection->InitiateCall();
-	}
 	
 	return TRUE;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.11 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.12 2006/10/21 11:52:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,7 @@ XMConnection::XMConnection(OpalCall & call,
 : OpalConnection(call, theEndPoint, token),
   endpoint(theEndPoint)
 {
+	  cout << "XMConnection()" << endl;
 	  if(theEndPoint.EnableSilenceSuppression())
 	  {
 		  silenceDetector = new OpalPCM16SilenceDetector;
@@ -35,19 +36,41 @@ XMConnection::~XMConnection()
 
 BOOL XMConnection::SetUpConnection()
 {
-	if(phase < AlertingPhase) {
+	cout << "SET UP : " << IsOriginating() << endl;
+	if(ownerCall.GetConnection(0) == this) {
+		// We are A-Party
+		phase = SetUpPhase;
+		if(!OnIncomingConnection()) {
+			Release(EndedByCallerAbort);
+			return FALSE;
+		}
+		
+		if(!ownerCall.OnSetUp(*this)) {
+			Release(EndedByNoAccept);
+			return FALSE;
+		}
+		
+		return TRUE;
+	}
+	else
+	{
+		PSafePtr<OpalConnection> otherConnection = ownerCall.GetOtherPartyConnection(*this);
+		if(otherConnection == NULL) {
+			return FALSE;
+		}
+		
 		remotePartyName = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyName();
 		remotePartyAddress = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyAddress();
 		remoteApplication = ownerCall.GetOtherPartyConnection(*this)->GetRemoteApplication();
-	
-		phase = AlertingPhase;
-		endpoint.OnShowIncoming(*this);
-		OnAlerting();
-	
+		
+		if(phase < AlertingPhase)
+		{
+			phase = AlertingPhase;
+			endpoint.OnShowIncoming(*this);
+			OnAlerting();
+		}
 		return TRUE;
 	}
-	
-	return FALSE;
 }
 
 BOOL XMConnection::SetAlerting(const PString & calleeName,
@@ -77,22 +100,6 @@ BOOL XMConnection::SetConnected()
 OpalMediaFormatList XMConnection::GetMediaFormats() const
 {
 	return endpoint.GetMediaFormats();
-}
-
-void XMConnection::InitiateCall()
-{
-	phase = SetUpPhase;
-	if(!OnIncomingConnection())
-	{
-		Release(EndedByCallerAbort);
-	}
-	else
-	{
-		if(!ownerCall.OnSetUp(*this))
-		{
-			Release(EndedByTransportFail);
-		}
-	}
 }
 
 void XMConnection::AcceptIncoming()

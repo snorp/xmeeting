@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.5 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.6 2006/10/21 11:52:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,6 @@ public:
 	virtual OpalMediaFormatList GetMediaFormats() const;
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
 	
-	void InitiateCall();
 	void AcceptIncoming();
 	PSoundChannel * CreateSoundChannel(BOOL isSource);
 	
