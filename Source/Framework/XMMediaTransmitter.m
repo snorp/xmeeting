@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.49 2006/10/03 21:17:46 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.50 2006/10/21 13:02:35 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1045,8 +1045,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		dataRateParams.dataOverrun = overrun;
 		dataRateParams.frameDuration = avgFrameDuration;
 		dataRateParams.keyFrameRate = 0;
-		dataRateParams.minSpatialQuality = codecMinQuality;
-		dataRateParams.minTemporalQuality = codecMinQuality;
+		dataRateParams.minSpatialQuality = codecNormalQuality;
+		dataRateParams.minTemporalQuality = codecNormalQuality;
 		
 		OSStatus err = noErr;
 		err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
@@ -1692,8 +1692,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 			dataRateParams.dataOverrun = 0;
 			dataRateParams.frameDuration = 30;
 			dataRateParams.keyFrameRate = 0;
-			dataRateParams.minSpatialQuality = codecMinQuality;
-			dataRateParams.minTemporalQuality = codecMinQuality;
+			dataRateParams.minSpatialQuality = codecNormalQuality;
+			dataRateParams.minTemporalQuality = codecNormalQuality;
 			err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
 			if(err != noErr)
 			{
