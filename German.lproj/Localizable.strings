@@ -185,7 +185,7 @@
 "XM_CALL_INFO_VIEW_ADDRESS" = "Adresse der Gegenseite: %@";
 "XM_CALL_INFO_VIEW_APPLICATION" = "Applikation der Gegenseite: %@";
 "XM_CALL_INFO_VIEW_SENT" = "%@ gesendet mit Codec <%@>";
-"XM_CALL_INFO_VIEW_RECV" = "%@ gesendet mit Codec <%@>";
+"XM_CALL_INFO_VIEW_RECV" = "%@ empfangen mit Codec <%@>";
 "XM_CALL_INFO_VIEW_LOCAL_ADDRESS" = "Lokale Adresse: %@ (%@)";
 
 /* Preferences Window */
