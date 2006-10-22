@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.50 2006/10/21 13:02:35 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.51 2006/10/22 08:53:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -2536,6 +2536,28 @@ BOOL XMCopyImageIntoPixelBuffer(void *srcImage, CVPixelBufferRef dstPixelBuffer,
 	CVPixelBufferUnlockBaseAddress(dstPixelBuffer, 0);
 	
 	return YES;
+}
+
+void XMRGBA2ARGB(void *buf, unsigned width, unsigned height, unsigned bytesPerRow)
+{
+	UInt8 *buffer = (UInt8 *)buf;
+	int i, j;
+	
+	for(i = 0; i < height; i++) 
+	{
+		for(j = 0; j < width; j++)
+		{
+			UInt8 r = buffer[4*j];
+			UInt8 g = buffer[4*j + 1];
+			UInt8 b = buffer[4*j + 2];
+			UInt8 a = buffer[4*j + 3];
+			buffer[4*j] = a;
+			buffer[4*j + 1] = r;
+			buffer[4*j + 2] = g;
+			buffer[4*j + 3] = b;
+		}
+		buffer += bytesPerRow;
+	}
 }
 
 void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon, 

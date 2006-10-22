@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.14 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.15 2006/10/22 08:53:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -416,6 +416,8 @@ void XMDisposeImageCopyContext(void *imageCopyContext);
  **/
 BOOL XMCopyImageIntoPixelBuffer(void *src, CVPixelBufferRef dstPixelBuffer,
 								void *imageCopyContext);
+
+void XMRGBA2ARGB(void *buffer, unsigned width, unsigned height, unsigned bytesPerRow);
 
 #endif // __XM_VIDEO_INPUT_MODULE_H__
 

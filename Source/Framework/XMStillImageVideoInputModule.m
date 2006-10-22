@@ -1,5 +1,5 @@
 /*
- * $Id: XMStillImageVideoInputModule.m,v 1.3 2006/09/13 21:20:12 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.m,v 1.4 2006/10/22 08:53:10 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -186,6 +186,13 @@
 				break;
 			default:
 				pixelFormat = k32ARGBPixelFormat;
+				unsigned bitmapFormat = [bitmapImageRep bitmapFormat];
+				if((bitmapFormat & NSAlphaFirstBitmapFormat) == 0)
+				{
+					// need to convert from RGBA to ARGB
+					XMRGBA2ARGB(bitmapData, width, height, bytesPerRow);
+				}
+				break;
 		}
 		
 		pixelBuffer = XMCreatePixelBuffer(videoSize);
