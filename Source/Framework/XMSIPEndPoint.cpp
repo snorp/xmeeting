@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.17 2006/10/21 11:53:17 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.18 2006/10/22 10:37:26 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -185,6 +185,7 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 											record.GetUsername(),
 											record.GetAuthorizationUsername(),
 											record.GetPassword(),
+											PString::Empty(),
 											PString::Empty(),
 											GetRegistrarTimeToLive().GetSeconds());
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
