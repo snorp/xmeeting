@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.5 2006/09/28 21:17:47 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.6 2006/10/22 21:05:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -150,6 +150,8 @@ class XMSIPOptions : public SIPOptions
 public:
 	XMSIPOptions(SIPEndPoint & ep, OpalTransport & trans, const SIPURL & address);
 	~XMSIPOptions();
+	
+	BOOL Start();
 	
 	virtual void OnTimeout(PTimer & timer, INT value);
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.18 2006/10/22 10:37:26 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.19 2006/10/22 21:05:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -644,7 +644,7 @@ BOOL XMSIPEndPoint::WriteSIPOptions(OpalTransport & transport, void *data)
 	XMSIPEndPoint *endPoint = (XMSIPEndPoint *)(theData[0]);
 	SIPURL *url = (SIPURL *)(theData[1]);
 	
-	SIPOptions *options = new XMSIPOptions(*endPoint, transport, *url);
+	XMSIPOptions *options = new XMSIPOptions(*endPoint, transport, *url);
 	if(!options->Start()) {
 		delete options;
 		return FALSE;
@@ -848,22 +848,37 @@ XMSIPRegisterInfo::~XMSIPRegisterInfo()
 
 BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
 {
-	PWaitAndSignal m(transportMutex);
+	transportMutex.Wait();
 	
 	registrarAddress = addr;
 	
 	if(registrarTransport == NULL)
 	{
+		// Since the XMCreateTransport method may take some time until it completes,
+		// and since this might involve timeouts, there is a race condition between
+		// this operation and the NAT binding refresh operation, which locks the
+		// transportMutex as well. Therefore, it is required to release the mutex lock
+		// in between.
+		transportMutex.Signal();
+		OpalTransport *transport;
 		XMSIPEndPoint & xmEP = (XMSIPEndPoint &)ep;
-		registrarTransport = xmEP.XMCreateTransport(registrarAddress);
+		transport = xmEP.XMCreateTransport(registrarAddress);
+		transportMutex.Wait();
+		if(registrarTransport != NULL) { // should not have happened, but one never knows...
+			delete transport;
+		} else {
+			registrarTransport = transport;
+		}
 	}
 	
 	if(registrarTransport == NULL)
 	{
 		OnFailed(SIP_PDU::Failure_BadGateway);
+		transportMutex.Signal();
 		return FALSE;
 	}
 	
+	transportMutex.Signal();
 	return TRUE;
 }
 
@@ -900,6 +915,18 @@ XMSIPOptions::XMSIPOptions(SIPEndPoint & ep, OpalTransport & trans, const SIPURL
 
 XMSIPOptions::~XMSIPOptions()
 {
+}
+
+BOOL XMSIPOptions::Start()
+{
+	BOOL result = SIPOptions::Start();
+	if(result == TRUE)
+	{
+		// override the default timeot to avoid two complete timeouts passing when trying
+		// to REGISTER and the remote host doesn't answer
+		completionTimer = PTimeInterval(0, 5);
+	}
+	return result;
 }
 
 void XMSIPOptions::OnTimeout(PTimer & timer, INT value)
