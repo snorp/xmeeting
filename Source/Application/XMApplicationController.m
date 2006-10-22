@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.45 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.46 2006/10/22 21:31:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -315,6 +315,13 @@
 	XMCloseFramework();
 	
 	[[XMPreferencesManager sharedInstance] synchronize];
+	
+	// Prevents the Application from waiting infinitely if the framework hangs somewhere
+	NSTimer *timer = [NSTimer timerWithTimeInterval:10.0 target:self selector:@selector(_frameworkDidClose:)
+										   userInfo:nil repeats:NO];
+	// need to use this run loop mode since at the moment this method is called, the application
+	// is no longer in the default run loop mode
+	[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
 	
 	// wait for the FrameworkDidClose notification before terminating.
 	return NSTerminateLater;
