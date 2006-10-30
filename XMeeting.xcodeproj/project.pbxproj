@@ -715,6 +715,7 @@
 		D1FC2F1709F52A83009C69EE /* h281.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78109DC4834005D0464 /* h281.cxx */; };
 		D1FC2F1809F52A83009C69EE /* h323h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B7C509DC50E5005D0464 /* h323h224.cxx */; };
 		D1FC2F1909F52A84009C69EE /* q922.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78209DC4835005D0464 /* q922.cxx */; };
+		D1FCF77D0AF69B660020DD04 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887E1B0A27BB1600C938BB /* libresolv.dylib */; };
 		D1FD475709B650D500EB517B /* XMSIPEndPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FD475509B650D500EB517B /* XMSIPEndPoint.h */; };
 		D1FD475809B650D500EB517B /* XMSIPEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */; };
 		D1FD47CF09B6544B00EB517B /* sdp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FD47CB09B6544B00EB517B /* sdp.cxx */; };
@@ -1651,6 +1652,7 @@
 				D1E2DB8908F4720A00BE224E /* QuartzCore.framework in Frameworks */,
 				D197152E08F921F900295E05 /* opal.dylib in Frameworks */,
 				D1E9134A0A30F65300AEABA5 /* libcrypto.dylib in Frameworks */,
+				D1FCF77D0AF69B660020DD04 /* libresolv.dylib in Frameworks */,
 				D1E913310A30F60700AEABA5 /* libssl.dylib in Frameworks */,
 				D197153308F922C400295E05 /* pwlib.dylib in Frameworks */,
 				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
