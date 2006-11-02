@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.26 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.27 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -249,6 +249,16 @@ typedef enum XMVideoSize
 	XMVideoSize_Custom,
 	XMVideoSizeCount
 } XMVideoSize;
+
+/**
+ * Defines the UserInput modes that can be sent
+ **/
+typedef enum XMUserInputMode
+{
+	XMUserInputMode_ProtocolDefault = 0,
+	XMUserInputMode_StringTone,
+	XMUserInputMode_RFC2833
+} XMUserInputMode;
 
 /**
  * Defines the various camera events that can be sent

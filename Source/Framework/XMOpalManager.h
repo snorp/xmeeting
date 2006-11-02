@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.23 2006/10/04 21:44:48 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.24 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -89,6 +89,9 @@ public:
 	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
 	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier);
 	BOOL IsValidCapabilityForSending(const XMH323VideoCapability & capability);
+	
+	/* User input mode information */
+	BOOL SetUserInputMode(XMUserInputMode userInputMode);
 	
 	/* Debug log information */
 	static void LogMessage(const PString & message);

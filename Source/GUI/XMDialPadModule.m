@@ -1,5 +1,5 @@
 /*
- * $Id: XMDialPadModule.m,v 1.14 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.15 2006/11/02 22:30:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 #import "XMeeting.h"
 #import "XMMainWindowController.h"
 #import "XMInstantActionButton.h"
+
+#define XMKey_UserInputMode @"XMeeting_UserInputMode"
 
 @interface XMDialPadModule (PrivateMethods)
 
@@ -98,6 +100,10 @@
 	
 	[self _setDialPadButtonsEnabled:enableDialPadButtons];
 	[self _setFECCButtonsEnabled:enableFECCButtons];
+	
+	XMUserInputMode inputMode = (XMUserInputMode)[[NSUserDefaults standardUserDefaults] integerForKey:XMKey_UserInputMode];
+	[userInputModePopUp selectItemWithTag:inputMode];
+	[self userInputModeChanged:nil];
 }
 
 #pragma mark -
@@ -211,6 +217,13 @@
 	{
 		[callManager sendUserInputTone:tone];
 	}
+}
+
+- (IBAction)userInputModeChanged:(id)sender
+{
+	XMUserInputMode mode = (XMUserInputMode)[[userInputModePopUp selectedItem] tag];
+	[[XMCallManager sharedInstance] setUserInputMode:mode];
+	[[NSUserDefaults standardUserDefaults] setInteger:mode forKey:XMKey_UserInputMode];
 }
 
 - (void)_startUp:(id)sender

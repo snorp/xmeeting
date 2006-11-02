@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.32 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.33 2006/11/02 22:27:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -218,6 +218,7 @@ void _XMGetCallStatistics(unsigned callID,
 
 #pragma mark InCall Functions
 
+bool _XMSetUserInputMode(XMUserInputMode userInputMode);
 bool _XMSendUserInputTone(unsigned callID, const char tone);
 bool _XMSendUserInputString(unsigned callID, const char *string);
 bool _XMStartCameraEvent(unsigned callID, XMCameraEvent cameraEvent);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.32 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.33 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,7 +45,8 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_FECCChannelOpened,
 	
 	// InCall messages
-	_XMOpalDispatcherMessage_SendUserInputTone = 0x400,
+	_XMOpalDispatcherMessage_SetUserInputMode = 0x400,
+	_XMOpalDispatcherMessage_SendUserInputTone,
 	_XMOpalDispatcherMessage_SendUserInputString,
 	_XMOpalDispatcherMessage_StartCameraEvent,
 	_XMOpalDispatcherMessage_StopCameraEvent
@@ -85,6 +86,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleVideoStreamClosedMessage:(NSArray *)messageComponents;
 - (void)_handleFECCChannelOpenedMessage;
 
+- (void)_handleSetUserInputModeMessage:(NSArray *)messageComponents;
 - (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents;
 - (void)_handleSendUserInputStringMessage:(NSArray *)messageComponents;
 - (void)_handleStartCameraEventMessage:(NSArray *)messageComponents;
@@ -435,6 +437,19 @@ typedef enum _XMOpalDispatcherMessage
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_FECCChannelOpened withComponents:nil];
 }
 
++ (void)_setUserInputMode:(XMUserInputMode)userInputMode
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:userInputMode];
+	NSData *modeData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:modeData, nil];
+	
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SetUserInputMode withComponents:components];
+	
+	[components release];
+}
+
 + (void)_sendUserInputToneForCall:(unsigned)callID tone:(char)tone
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
@@ -662,6 +677,9 @@ typedef enum _XMOpalDispatcherMessage
 			break;
 		case _XMOpalDispatcherMessage_FECCChannelOpened:
 			[self _handleFECCChannelOpenedMessage];
+			break;
+		case _XMOpalDispatcherMessage_SetUserInputMode:
+			[self _handleSetUserInputModeMessage:[portMessage components]];
 			break;
 		case _XMOpalDispatcherMessage_SendUserInputTone:
 			[self _handleSendUserInputToneMessage:[portMessage components]];
@@ -1329,6 +1347,15 @@ typedef enum _XMOpalDispatcherMessage
 {
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleFECCChannelOpened)
 												   withObject:nil waitUntilDone:NO];
+}
+
+- (void)_handleSetUserInputModeMessage:(NSArray *)messageComponents
+{
+	NSData *modeData = (NSData *)[messageComponents objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:modeData];
+	XMUserInputMode mode = (XMUserInputMode)[number unsignedIntValue];
+	
+	_XMSetUserInputMode(mode);
 }
 
 - (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents

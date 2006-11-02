@@ -2,7 +2,7 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {userInputToneButtonPressed = id; }; 
+            ACTIONS = {userInputModeChanged = id; userInputToneButtonPressed = id; }; 
             CLASS = XMDialPadModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -23,6 +23,7 @@
                 leftButton = XMInstantActionButton; 
                 rightButton = XMInstantActionButton; 
                 upButton = XMInstantActionButton; 
+                userInputModePopUp = NSPopUpButton; 
                 zoomInButton = XMInstantActionButton; 
                 zoomOutButton = XMInstantActionButton; 
             }; 

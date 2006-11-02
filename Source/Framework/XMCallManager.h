@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.23 2006/06/08 15:31:51 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.24 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -256,6 +256,11 @@
 - (void)retrySIPRegistrations;
 
 #pragma mark InCall functionality
+
+/**
+ * Defines which UserInputMode to send
+ **/
+- (void)setUserInputMode:(XMUserInputMode)mode;
 
 /**
  * Sends character as a DTMF user input tone

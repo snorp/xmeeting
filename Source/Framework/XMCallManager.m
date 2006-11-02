@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.29 2006/10/02 21:22:03 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.30 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -562,6 +562,11 @@
 
 #pragma mark -
 #pragma mark InCall Methods
+
+- (void)setUserInputMode:(XMUserInputMode) userInputMode
+{
+	[XMOpalDispatcher _setUserInputMode:userInputMode];
+}
 
 - (void)sendUserInputTone:(char)tone
 {

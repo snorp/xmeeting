@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.19 2006/10/21 11:52:11 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.20 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -252,18 +252,39 @@ void XMEndPoint::OnEstablished(OpalConnection & connection)
 #pragma mark -
 #pragma mark InCall Methods
 
-BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
+void XMEndPoint::SetSendUserInputMode(OpalConnection::SendUserInputModes mode)
 {
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
 	if(connection == NULL)
 	{
-		return FALSE;
+		return;
 	}
 	
 	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
-	if(otherConnection == NULL)
+	if(otherConnection != NULL)
 	{
-		return FALSE;
+		otherConnection->SetSendUserInputMode(mode);
+	}
+}
+
+BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
+{	
+	OpalConnection *otherConnection;
+	// Send the user input tone while the connection isn't locked
+	// to prevent deadlock/timeout problems when using the SIP INFO method
+	{
+		PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
+		if(connection == NULL)
+		{
+			return FALSE;
+		}
+		
+		PSafePtr<OpalConnection> theConnection = connection->GetCall().GetOtherPartyConnection(*connection);
+		if(theConnection == NULL)
+		{
+			return FALSE;
+		}
+		otherConnection = theConnection;
 	}
 	
 	return otherConnection->SendUserInputTone(tone);
@@ -271,16 +292,21 @@ BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
 
 BOOL XMEndPoint::SendUserInputString(PString & callID, const PString & string)
 {
-	PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
-	if(connection == NULL)
+	OpalConnection *otherConnection;
+	// Send the user input string while the connection isn't locked
+	// to prevent deadlock/timeout problems when using the SIP INFO method
 	{
-		return FALSE;
-	}
+		PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
+		if(connection == NULL)
+		{
+			return FALSE;
+		}
 	
-	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
-	if(otherConnection == NULL)
-	{
-		return FALSE;
+		PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
+		if(otherConnection == NULL)
+		{
+			return FALSE;
+		}
 	}
 	
 	return otherConnection->SendUserInputString(string);

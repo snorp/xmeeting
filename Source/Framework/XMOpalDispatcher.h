@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.15 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.16 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,6 +76,7 @@
 
 + (void)_feccChannelOpened;
 
++ (void)_setUserInputMode:(XMUserInputMode)userInputMode;
 + (void)_sendUserInputToneForCall:(unsigned)callID
 							 tone:(char)tone;
 + (void)_sendUserInputStringForCall:(unsigned)callID

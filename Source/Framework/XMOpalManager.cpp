@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.42 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.43 2006/11/02 22:28:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -497,6 +497,34 @@ unsigned XMOpalManager::GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifie
 	}
 	
 	return 200;
+}
+
+#pragma mark -
+#pragma mark UserInput methods
+
+BOOL XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
+{
+	OpalConnection::SendUserInputModes mode;
+	
+	switch(userInputMode) {
+		case XMUserInputMode_ProtocolDefault:
+			mode = OpalConnection::SendUserInputAsProtocolDefault;
+			break;
+		case XMUserInputMode_StringTone:
+			mode = OpalConnection::SendUserInputAsTone;
+			break;
+		case XMUserInputMode_RFC2833:
+			mode = OpalConnection::SendUserInputAsInlineRFC2833;
+			break;
+		default:
+			return FALSE;
+	}
+	
+	h323EndPoint->SetSendUserInputMode(mode);
+	sipEndPoint->SetSendUserInputMode(mode);
+	callEndPoint->SetSendUserInputMode(mode);
+	
+	return TRUE;
 }
 
 #pragma mark -
