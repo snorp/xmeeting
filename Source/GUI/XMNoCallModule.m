@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.41 2006/08/05 22:11:42 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.42 2006/11/04 11:32:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -649,7 +649,8 @@
 	XMCallInfo *callInfo = [[XMCallManager sharedInstance] recentCallAtIndex:0];
 	XMCallEndReason callEndReason = [callInfo callEndReason];
 	NSString *idleString = nil;
-	if([callInfo isOutgoingCall] && callEndReason != XMCallEndReason_EndedByLocalUser)
+	if(callEndReason != XMCallEndReason_EndedByLocalUser &&
+	   callEndReason != XMCallEndReason_EndedByLocalBusy)
 	{
 		idleString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_NO_CALL_IDLE_WITH_REASON", @""), XMCallEndReasonString(callEndReason)];
 	}
