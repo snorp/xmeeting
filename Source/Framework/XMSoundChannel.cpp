@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.9 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.10 2006/11/05 21:04:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -131,10 +131,7 @@ void XMSoundChannel::SetRecordDevice(unsigned int device)
 	{
 		recordDeviceID = deviceID;
 		
-		if(recordDevice)
-		{
-			recordDevice->Restart(recordDeviceID);
-		}
+		recordDevice->Restart(recordDeviceID, FALSE);
 	}
 	
 	recordDeviceIsMuted = FALSE;
@@ -933,9 +930,11 @@ void XMSoundChannel::Stop()
 	StopAudioConversion();
 }
 
-void XMSoundChannel::Restart(AudioDeviceID deviceID)
+void XMSoundChannel::Restart(AudioDeviceID deviceID, BOOL startIfNeeded)
 {
 	PWaitAndSignal m(editMutex);
+	
+	int currentState = state;
 	
 	PINDEX size;
 	PINDEX count;
@@ -950,7 +949,11 @@ void XMSoundChannel::Restart(AudioDeviceID deviceID)
 	// Resequencing the restart using the new device ID
 	OpenDevice(deviceID, numChannels, sampleRate, bitsPerSample);
 	SetBuffers(size, count);
-	StartAudioConversion();
+	
+	if(currentState == running_ || startIfNeeded == TRUE)
+	{
+		StartAudioConversion();
+	}
 }
 
 OSStatus XMSoundChannel::StartAudioConversion()

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.h,v 1.5 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.6 2006/11/05 21:04:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -154,7 +154,7 @@ private:
 	void SetDeviceMuted(BOOL muteFlag);
 	void Start();
 	void Stop();
-	void Restart(AudioDeviceID deviceID);
+	void Restart(AudioDeviceID deviceID, BOOL startIfNeeded = TRUE);
 	OSStatus StartAudioConversion();
 	OSStatus StopAudioConversion();
 	OSStatus SetupInputUnit();
