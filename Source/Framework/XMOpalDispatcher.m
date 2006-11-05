@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.33 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.34 2006/11/05 20:16:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1447,7 +1447,19 @@ typedef enum _XMOpalDispatcherMessage
 		_XMSetUserName(userName);
 	}
 	
+	// Set bandwidth information
 	_XMSetBandwidthLimit([preferences bandwidthLimit]);
+	
+	// Set which ports to use. Note that this has to be done
+	// before setting the STUN information, or STUN would
+	// use a different port range than the desired one
+	// when launching the first time
+	_XMSetPortRanges([preferences udpPortBase],
+					 [preferences udpPortMax],
+					 [preferences tcpPortBase],
+					 [preferences tcpPortMax],
+					 [preferences udpPortBase],
+					 [preferences udpPortMax]);
 	
 	const char *stunServer = NULL;
 	const char *translationAddress = NULL;
@@ -1470,14 +1482,8 @@ typedef enum _XMOpalDispatcherMessage
 	if(translationAddress == NULL) {
 		translationAddress = [suppliedExternalAddress cStringUsingEncoding:NSASCIIStringEncoding];
 	}
-	_XMSetNATInformation(stunServer, translationAddress);
 	
-	_XMSetPortRanges([preferences udpPortBase],
-					 [preferences udpPortMax],
-					 [preferences tcpPortBase],
-					 [preferences tcpPortMax],
-					 [preferences udpPortBase],
-					 [preferences udpPortMax]);
+	_XMSetNATInformation(stunServer, translationAddress);
 	
 	// ***** Adjusting the Audio Preferences ***** //
 	
