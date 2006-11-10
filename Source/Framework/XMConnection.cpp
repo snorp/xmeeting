@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.13 2006/10/21 13:00:25 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.14 2006/11/10 23:22:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -204,4 +204,10 @@ void XMConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 PSoundChannel * XMConnection::CreateSoundChannel(BOOL isSource)
 {
 	return endpoint.CreateSoundChannel(*this, isSource);
+}
+
+BOOL XMConnection::SendUserInputString(const PString & value)
+{
+	// add handler here
+	return TRUE;
 }

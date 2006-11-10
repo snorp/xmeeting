@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.6 2006/10/21 11:52:11 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.7 2006/11/10 23:22:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,6 +41,8 @@ public:
 												unsigned sessionID,
 												BOOL isSource);
 	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+	
+	BOOL SendUserInputString(const PString & value);
 	
 private:
 	XMEndPoint & endpoint;
