@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.43 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.44 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,6 +50,12 @@ void XMOpalManager::CloseOpal()
 XMOpalManager::XMOpalManager()
 {
 	managerInstance = this;
+	
+	defaultAudioPacketTime = 0;
+	currentAudioPacketTime = 0;
+	
+	enableVideoTransmit = FALSE;
+	enableVideoReceive = FALSE;
 	
 	callEndPoint = NULL;
 	h323EndPoint = NULL;
@@ -232,6 +238,9 @@ void XMOpalManager::OnClearedCall(OpalCall & call)
 	unsigned callID = call.GetToken().AsUnsigned();
 	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
 	OpalManager::OnClearedCall(call);
+	
+	// reset any packet time information
+	currentAudioPacketTime = 0;
 }
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
@@ -252,6 +261,9 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
 		}
 	}
 	OpalManager::OnReleased(connection);
+	
+	// reset any packet time information
+	currentAudioPacketTime = 0;
 }
 
 BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)
@@ -447,6 +459,32 @@ void XMOpalManager::SetNATInformation(const PString & stunServer,
 				break;
 		}
 	}
+}
+
+#pragma mark -
+#pragma mark Audio Setup Methods
+
+void XMOpalManager::SetAudioPacketTime(unsigned audioPacketTime)
+{
+	defaultAudioPacketTime = audioPacketTime;
+}
+
+void XMOpalManager::SetCurrentAudioPacketTime(unsigned audioPacketTime)
+{
+	currentAudioPacketTime = audioPacketTime;
+}
+
+unsigned XMOpalManager::GetCurrentAudioPacketTime()
+{
+	if(currentAudioPacketTime != 0) // remote party signaled special value
+	{
+		return currentAudioPacketTime;
+	}
+	if(defaultAudioPacketTime != 0) // user defined special value
+	{
+		return defaultAudioPacketTime;
+	}
+	return 0; // use default value
 }
 
 #pragma mark -

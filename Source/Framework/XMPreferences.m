@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.17 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.18 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -166,6 +166,17 @@
 		}
 	}
 	else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			result = XM_VALID_VALUE;
+		}
+		else
+		{
+			result = XM_INVALID_VALUE_TYPE;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioPacketTime])
 	{
 		if([value isKindOfClass:[NSNumber class]])
 		{
@@ -383,6 +394,7 @@
 	
 	enableSilenceSuppression = NO;
 	enableEchoCancellation = NO;
+	audioPacketTime = 0;
 	
 	enableVideo = NO;
 	videoFramesPerSecond = 30;
@@ -531,6 +543,12 @@
 		[self setEnableEchoCancellation:[(NSNumber *)obj boolValue]];
 	}
 	
+	obj = [dict objectForKey:XMKey_PreferencesAudioPacketTime];
+	if(obj && [obj isKindOfClass:[NSNumber class]])
+	{
+		[self setAudioPacketTime:[(NSNumber *)obj unsignedIntValue]];
+	}
+	
 	obj = [dict objectForKey:XMKey_PreferencesEnableVideo];
 	if(obj && [obj isKindOfClass:[NSNumber class]])
 	{
@@ -677,6 +695,7 @@
 	[preferences _setAudioCodecList:[self _audioCodecList]];
 	[preferences setEnableSilenceSuppression:[self enableSilenceSuppression]];
 	[preferences setEnableEchoCancellation:[self enableEchoCancellation]];
+	[preferences setAudioPacketTime:[self audioPacketTime]];
 	
 	[preferences setEnableVideo:[self enableVideo]];
 	[preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
@@ -745,6 +764,7 @@
 		
 		[self setEnableSilenceSuppression:[coder decodeBoolForKey:XMKey_PreferencesEnableSilenceSuppression]];
 		[self setEnableEchoCancellation:[coder decodeBoolForKey:XMKey_PreferencesEnableEchoCancellation]];
+		[self setAudioPacketTime:[coder decodeIntForKey:XMKey_PreferencesAudioPacketTime]];
 		
 		[self setEnableVideo:[coder decodeBoolForKey:XMKey_PreferencesEnableVideo]];
 		[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
@@ -817,6 +837,7 @@
 		[coder encodeObject:[self _audioCodecList] forKey:XMKey_PreferencesAudioCodecList];
 		[coder encodeBool:[self enableSilenceSuppression] forKey:XMKey_PreferencesEnableSilenceSuppression];
 		[coder encodeBool:[self enableEchoCancellation] forKey:XMKey_PreferencesEnableEchoCancellation];
+		[coder encodeInt:[self audioPacketTime] forKey:XMKey_PreferencesAudioPacketTime];
 		
 		[coder encodeBool:[self enableVideo] forKey:XMKey_PreferencesEnableVideo];
 		[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
@@ -904,6 +925,7 @@
 	   [[otherPreferences _audioCodecList] isEqual:[self _audioCodecList]] &&
 	   [otherPreferences enableSilenceSuppression] == [self enableSilenceSuppression] &&
 	   [otherPreferences enableEchoCancellation] == [self enableEchoCancellation] &&
+	   [otherPreferences audioPacketTime] == [self audioPacketTime] &&
 	   
 	   [otherPreferences enableVideo] == [self enableVideo] &&
 	   [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
@@ -1023,6 +1045,10 @@
 	
 	number = [[NSNumber alloc] initWithBool:[self enableEchoCancellation]];
 	[dict setObject:number forKey:XMKey_PreferencesEnableEchoCancellation];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:[self audioPacketTime]];
+	[dict setObject:number forKey:XMKey_PreferencesAudioPacketTime];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithBool:[self enableVideo]];
@@ -1177,6 +1203,10 @@
 	else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation])
 	{
 		return [NSNumber numberWithBool:[self enableEchoCancellation]];
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioPacketTime])
+	{
+		return [NSNumber numberWithUnsignedInt:[self audioPacketTime]];
 	}
 	else if([key isEqualToString:XMKey_PreferencesEnableVideo])
 	{
@@ -1387,6 +1417,17 @@
 		if([value isKindOfClass:[NSNumber class]])
 		{
 			[self setEnableEchoCancellation:[(NSNumber *)value boolValue]];
+		}
+		else
+		{
+			correctType = NO;
+		}
+	}
+	else if([key isEqualToString:XMKey_PreferencesAudioPacketTime])
+	{
+		if([value isKindOfClass:[NSNumber class]])
+		{
+			[self setAudioPacketTime:[(NSNumber *)value unsignedIntValue]];
 		}
 		else
 		{
@@ -1735,6 +1776,16 @@
 - (void)setEnableEchoCancellation:(BOOL)flag
 {
 	enableEchoCancellation = flag;
+}
+
+- (unsigned)audioPacketTime
+{
+	return audioPacketTime;
+}
+
+- (void)setAudioPacketTime:(unsigned)value
+{
+	audioPacketTime = value;
 }
 
 #pragma mark -

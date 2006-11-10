@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.33 2006/11/02 22:27:06 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.34 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -110,7 +110,7 @@ void _XMSetMuteAudioOutputDevice(bool muteFlag);
 
 void _XMSetMeasureAudioSignalLevels(bool flag);
 
-void _XMSetAudioFunctionality(bool enableSilenceSuppression, bool enableEchoCancellation);
+void _XMSetAudioFunctionality(bool enableSilenceSuppression, bool enableEchoCancellation, unsigned packetTime);
 void _XMStopAudio();
 
 void _XMStartAudioTest(unsigned delay);

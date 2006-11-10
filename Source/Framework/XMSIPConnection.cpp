@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.12 2006/10/19 21:38:46 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.13 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -441,6 +441,7 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 			}
 		}
 	}
+
 	return SIPConnection::OnReceivedSDPMediaDescription(sdp, mediaType, sessionID);
 }
 
@@ -483,6 +484,22 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 													unsigned sessionID,
 													 BOOL isSource)
 {
+	// First, adjust some audio parameters if needed
+	const SDPMediaDescriptionList & mediaDescriptionList = remoteSDP.GetMediaDescriptions();
+	for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
+	{
+		SDPMediaDescription & description = mediaDescriptionList[i];
+		if(description.GetMediaType() == SDPMediaDescription::Audio)
+		{
+			PINDEX packetTime = description.GetPacketTime();
+			if(packetTime != 0)
+			{
+				XMOpalManager::GetManagerInstance()->SetCurrentAudioPacketTime(packetTime);
+			}
+			break;
+		}
+	}
+	
 	if(sessionID == 2)
 	{
 		if(mediaFormat == XM_MEDIA_FORMAT_H261)

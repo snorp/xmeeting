@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.26 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.27 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,6 +125,7 @@ NSString *XMKey_PreferencesUDPPortMax = @"XMeeting_UDPPortMax";
 NSString *XMKey_PreferencesAudioCodecList = @"XMeeting_AudioCodecList";
 NSString *XMKey_PreferencesEnableSilenceSuppression = @"XMeeting_EnableSilenceSuppression";
 NSString *XMKey_PreferencesEnableEchoCancellation = @"XMeeting_EnableEchoCancellation";
+NSString *XMKey_PreferencesAudioPacketTime = @"XMeeting_AudioPacketTime";
 
 NSString *XMKey_PreferencesEnableVideo = @"XMeeting_EnableVideo";
 NSString *XMKey_PreferencesVideoFramesPerSecond = @"XMeeting_VideoFramesPerSecond";

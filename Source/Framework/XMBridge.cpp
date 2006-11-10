@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.37 2006/11/02 22:27:06 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.38 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -142,9 +142,11 @@ void _XMSetMeasureAudioSignalLevels(bool flag)
 }
 
 void _XMSetAudioFunctionality(bool enableSilenceSuppression,
-							  bool enableEchoCancellation)
+							  bool enableEchoCancellation,
+							  unsigned packetTime)
 {
 	callEndPoint->SetAudioFunctionality(enableSilenceSuppression, enableEchoCancellation);
+	theManager->SetAudioPacketTime(packetTime);
 }
 
 void _XMStopAudio()

@@ -142,6 +142,7 @@
                 actionButton = NSButton; 
                 actionPopup = NSPopUpButton; 
                 audioCodecPreferenceOrderTableView = NSTableView; 
+                audioPacketTimePopUp = NSPopUpButton; 
                 autoGetExternalAddressSwitch = NSButton; 
                 bandwidthLimitPopUp = NSPopUpButton; 
                 contentView = NSView; 

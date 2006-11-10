@@ -1,5 +1,5 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.23 2006/10/01 18:07:07 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.24 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,6 +158,34 @@ void XMTransmitterMediaPatch::Resume()
 	}
 	else
 	{
+		// Adjust the number of samples per packet if needed
+		inUse.Wait();
+		
+		if(sinks.GetSize() == 0)
+		{
+			return; // should not happen!
+		}
+		BOOL isStreamedTranscoder = FALSE;
+		Sink & sink = sinks[0];
+		if(PIsDescendant(sink.primaryCodec, OpalStreamedTranscoder))
+		{
+			isStreamedTranscoder = TRUE;
+		}
+		if(isStreamedTranscoder == TRUE)
+		{
+			unsigned packetTime = XMOpalManager::GetManagerInstance()->GetCurrentAudioPacketTime();
+			if(packetTime != 0)
+			{
+				OpalMediaFormat mediaFormat = source.GetMediaFormat();
+				PINDEX size = mediaFormat.GetTimeUnits() * packetTime;
+				source.SetDataSize(2*size); // implicitely assuming PCM-16
+				mediaFormat = sink.stream->GetMediaFormat();
+				size = mediaFormat.GetTimeUnits() * packetTime;
+				sink.stream->SetDataSize(size); // implicitely assuming PCMA / PCMU
+			}
+		}
+		inUse.Signal();
+			
 		// behave as normally
 		OpalMediaPatch::Resume();
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.24 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.25 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,6 +82,11 @@ public:
 	void SetNATInformation(const PString & stunServer,
 						   const PString & translationAddress);
 	
+	/* Audio setup methods */
+	void SetAudioPacketTime(unsigned audioPacketTime);
+	void SetCurrentAudioPacketTime(unsigned audioPacketTime);
+	unsigned GetCurrentAudioPacketTime();
+	
 	/* Video setup methods */
 	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);
 	
@@ -102,6 +107,9 @@ private:
 	unsigned GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifier);
 	
 	unsigned callID;
+	
+	unsigned defaultAudioPacketTime;
+	unsigned currentAudioPacketTime;
 	
 	BOOL enableVideoTransmit;
 	BOOL enableVideoReceive;

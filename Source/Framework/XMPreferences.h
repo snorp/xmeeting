@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.14 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.15 2006/11/10 21:43:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,6 +51,7 @@
 	NSMutableArray *audioCodecList;				// An array containing XMCodecListRecord instances.
 	BOOL         enableSilenceSuppression;      // Flag to indicate whether silence suppression is enabled or not
 	BOOL         enableEchoCancellation;        // Flag to indicate whether echo cancellation is enabled or not
+	unsigned	 audioPacketTime;				// time (in ms) of audio per packet
 
 	/* video settings */
 	BOOL		 enableVideo;					// Enables/disables video
@@ -161,6 +162,9 @@
 
 - (BOOL)enableEchoCancellation;
 - (void)setEnableEchoCancellation:(BOOL)flag;
+
+- (unsigned)audioPacketTime;
+- (void)setAudioPacketTime:(unsigned)audioPacketTime;
 
 #pragma mark Video-specific Methods
 
