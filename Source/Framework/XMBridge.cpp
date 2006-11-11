@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.38 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.39 2006/11/11 08:37:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -187,7 +187,7 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	PStringArray disabledCodecsArray = PStringArray(disabledCodecCount, disabledCodecs, TRUE);
 	
 	// these codecs are currently disabled by default
-	disabledCodecsArray.AppendString("DUMMY");
+	//disabledCodecsArray.AppendString("DUMMY");
 	
 	theManager->SetMediaFormatMask(disabledCodecsArray);
 	theManager->SetMediaFormatOrder(orderedCodecsArray);
