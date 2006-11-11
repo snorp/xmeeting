@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.15 2006/10/04 21:44:48 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.16 2006/11/11 09:42:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include "XMH323Connection.h"
 
 #include <asn/h245.h>
+#include <codec/rfc2833.h>
 
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
@@ -163,7 +164,12 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 		return FALSE;
 	}
 	
-	return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
+	BOOL result = H323Connection::OpenLogicalChannel(capability, sessionID, dir);
+	if(result == TRUE)
+	{
+		InitRFC2833Handler();
+	}
+	return result;
 }
 
 H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability & capability,
@@ -287,4 +293,29 @@ unsigned XMH323Connection::GetBandwidthUsed() const
 BOOL XMH323Connection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
 {
 	return TRUE;
+}
+
+void XMH323Connection::InitRFC2833Handler()
+{
+	cout << "INIT RFC2833" << endl;
+	if(rfc2833Handler != NULL)
+	{
+		cout << "NOT NULL" << endl;
+		for(int i = 0; i < mediaStreams.GetSize(); i++)
+		{
+			OpalMediaStream & mediaStream = mediaStreams[i];
+			if(mediaStream.GetSessionID() == OpalMediaFormat::DefaultAudioSessionID)
+			{
+				cout << "AUDIO" << endl;
+				if(mediaStream.IsSource()) 
+				{
+					mediaStream.AddFilter(rfc2833Handler->GetReceiveHandler(), mediaStream.GetMediaFormat());
+				} 
+				else 
+				{
+					mediaStream.AddFilter(rfc2833Handler->GetTransmitHandler(), mediaStream.GetMediaFormat());
+				}
+			}
+		}
+	}
 }

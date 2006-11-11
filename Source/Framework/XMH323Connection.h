@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.9 2006/10/04 21:44:48 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.10 2006/11/11 09:42:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -60,6 +60,9 @@ public:
 	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
 	
 private:
+		
+	void InitRFC2833Handler();
+	
 	BOOL hasSetLocalCapabilities;
 	BOOL hasSentLocalCapabilities;
 };
