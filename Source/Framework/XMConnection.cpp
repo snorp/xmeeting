@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.14 2006/11/10 23:22:30 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.15 2006/11/11 08:37:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -210,4 +210,16 @@ BOOL XMConnection::SendUserInputString(const PString & value)
 {
 	// add handler here
 	return TRUE;
+}
+
+BOOL XMConnection::GetMediaInformation(unsigned sessionID, MediaInformation & info) const
+{
+	if(sessionID == OpalMediaFormat::DefaultAudioSessionID)
+	{
+		// add RFC2833 payload code, using 101 as usual
+		info.rfc2833 = (RTP_DataFrame::PayloadTypes)101;
+		return TRUE;
+	}
+	
+	return FALSE;
 }
