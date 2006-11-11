@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.13 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.14 2006/11/11 13:23:57 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,8 +11,10 @@
 #include <opal/mediafmt.h>
 #include <sip/sipep.h>
 #include <ptclib/enum.h>
+#include <codec/rfc2833.h>
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
+#include "XMRFC2833Handler.h"
 
 XMSIPConnection::XMSIPConnection(OpalCall & call,
 								 SIPEndPoint & endpoint,
@@ -26,6 +28,9 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
   h264VideoFormat(_XMMediaFormat_H264, (RTP_DataFrame::PayloadTypes)97, _XMMediaFormatEncoding_H264, 352, 288, 30, _XMGetMaxH264BitRate())
 {
 	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
+	  
+	delete rfc2833Handler;
+	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 }
 
 XMSIPConnection::~XMSIPConnection()

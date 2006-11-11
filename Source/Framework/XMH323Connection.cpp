@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.18 2006/11/11 12:35:08 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.19 2006/11/11 13:23:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #include "XMTransmitterMediaPatch.h"
 #include "XMH323Channel.h"
 #include "XMBridge.h"
+#include "XMRFC2833Handler.h"
 
 XMH323Connection::XMH323Connection(OpalCall & call,
 								   H323EndPoint & endPoint,
@@ -30,6 +31,9 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 	
 	// setting correct initial bandwidth
 	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
+	
+	delete rfc2833Handler;
+	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 }
 
 XMH323Connection::~XMH323Connection()
