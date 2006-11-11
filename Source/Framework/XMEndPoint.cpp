@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.20 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.21 2006/11/11 08:38:19 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -287,7 +287,7 @@ BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
 		otherConnection = theConnection;
 	}
 	
-	return otherConnection->SendUserInputTone(tone);
+	return otherConnection->SendUserInputTone(tone, 180);
 }
 
 BOOL XMEndPoint::SendUserInputString(PString & callID, const PString & string)
