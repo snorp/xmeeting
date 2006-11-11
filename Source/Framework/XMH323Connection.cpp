@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.17 2006/11/11 09:45:03 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.18 2006/11/11 12:35:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,10 +165,6 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 	}
 	
 	BOOL result = H323Connection::OpenLogicalChannel(capability, sessionID, dir);
-	if(result == TRUE)
-	{
-		InitRFC2833Handler();
-	}
 	return result;
 }
 
@@ -293,26 +289,4 @@ unsigned XMH323Connection::GetBandwidthUsed() const
 BOOL XMH323Connection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
 {
 	return TRUE;
-}
-
-void XMH323Connection::InitRFC2833Handler()
-{
-	if(rfc2833Handler != NULL)
-	{
-		for(int i = 0; i < mediaStreams.GetSize(); i++)
-		{
-			OpalMediaStream & mediaStream = mediaStreams[i];
-			if(mediaStream.GetSessionID() == OpalMediaFormat::DefaultAudioSessionID)
-			{
-				if(mediaStream.IsSource()) 
-				{
-					mediaStream.AddFilter(rfc2833Handler->GetReceiveHandler(), mediaStream.GetMediaFormat());
-				} 
-				else 
-				{
-					mediaStream.AddFilter(rfc2833Handler->GetTransmitHandler(), mediaStream.GetMediaFormat());
-				}
-			}
-		}
-	}
 }
