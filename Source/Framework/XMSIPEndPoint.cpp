@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.19 2006/10/22 21:05:40 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.20 2006/11/12 20:25:32 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -780,6 +780,35 @@ void XMSIPEndPoint::RegistrationRefresh(PTimer &timer, INT value)
 	activeSIPInfo.DeleteObjectsToBeRemoved();
 }
 
+SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
+{
+	// If using a proxy, use the proxy user name and domain name
+	SIPURL proxyURL = GetProxy();
+	if(!proxyURL.IsEmpty())
+	{
+		return proxyURL;
+	}
+	
+	// Get the superclass's implementation
+	SIPURL url = SIPEndPoint::GetDefaultRegisteredPartyName();
+
+	// If the superclass returns IP "0.0.0.0", make the
+	// OpalTransportAddress empty. This in turn indicates
+	// to the callers that they should use the current
+	// transport's local address
+	OpalTransportAddress address = url.GetHostAddress();
+	PIPSocket::Address ip;
+	if(!address.GetIpAddress(ip))
+	{
+		return url;
+	}
+	if(ip.IsAny())
+	{
+		url = SIPURL(GetDefaultLocalPartyName(), OpalTransportAddress());
+	}
+	return url;
+}
+
 #pragma mark -
 #pragma mark XMSIPRegistrarRecord methods
 
@@ -909,8 +938,49 @@ BOOL XMSIPRegisterInfo::WillExpireWithinTimeInterval(PTimeInterval interval)
 #pragma mark XMSIPOptions methods
 
 XMSIPOptions::XMSIPOptions(SIPEndPoint & ep, OpalTransport & trans, const SIPURL & address)
-: SIPOptions(ep, trans, address)
+: SIPTransaction(ep, trans)
 {
+	OpalTransportAddress transportAddress = trans.GetLocalAddress();
+	PIPSocket::Address addr;
+	WORD port;
+	transportAddress.GetIpAndPort(addr, port);
+	PString requestURI;
+	PString hosturl;
+	PString id = OpalGloballyUniqueID().AsString() + "@" + PIPSocket::GetHostName();
+	OpalTransportAddress viaAddress = ep.GetLocalURL(transport).GetHostAddress();
+	
+	// Build the From field
+	PString displayName = ep.GetDefaultDisplayName();
+	SIPURL registeredPartyAddress = ep.GetRegisteredPartyName(address.GetHostName());
+	PString localName = registeredPartyAddress.GetUserName();
+	PString domain = registeredPartyAddress.GetHostName();
+	
+	// if no domain, use the local domain as default
+	if(domain.IsEmpty()) {
+		domain = addr.AsString();
+		if(port != endpoint.GetDefaultSignalPort())
+		{
+			domain += psprintf(":%d", port);
+		}
+	}
+	if(localName.IsEmpty())
+	{
+		localName = ep.GetDefaultLocalPartyName();
+	}
+	
+	SIPURL myAddress("\"" + displayName + "\" <" + localName + "@" + domain + ">");
+	
+	requestURI = "sip:" + address.AsQuotedString();
+	
+	SIP_PDU::Construct(Method_OPTIONS,
+					   requestURI,
+					   address.AsQuotedString(),
+					   myAddress.AsQuotedString() + ";tag=" + OpalGloballyUniqueID().AsString(),
+					   id,
+					   endpoint.GetNextCSeq(),
+					   viaAddress);
+	mime.SetAccept("application/sdp");
+	
 }
 
 XMSIPOptions::~XMSIPOptions()
@@ -919,7 +989,7 @@ XMSIPOptions::~XMSIPOptions()
 
 BOOL XMSIPOptions::Start()
 {
-	BOOL result = SIPOptions::Start();
+	BOOL result = SIPTransaction::Start();
 	if(result == TRUE)
 	{
 		// override the default timeot to avoid two complete timeouts passing when trying
@@ -931,7 +1001,7 @@ BOOL XMSIPOptions::Start()
 
 void XMSIPOptions::OnTimeout(PTimer & timer, INT value)
 {
-	SIPOptions::OnTimeout(timer, value);
+	SIPTransaction::OnTimeout(timer, value);
 	XMSIPEndPoint & xmEP = (XMSIPEndPoint &)endpoint;
 	xmEP.OnOptionsTimeout(this);
 	delete this;
@@ -939,7 +1009,7 @@ void XMSIPOptions::OnTimeout(PTimer & timer, INT value)
 
 void XMSIPOptions::SetTerminated(States newState)
 {
-	SIPOptions::SetTerminated(newState);
+	SIPTransaction::SetTerminated(newState);
 	if(newState == Terminated_TransportError)
 	{
 		// This occurs when the retransmission timeout
