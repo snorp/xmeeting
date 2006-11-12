@@ -1,5 +1,5 @@
 /*
- * $Id: XMInBandDTMFHandler.h,v 1.1 2006/11/12 00:19:10 hfriederich Exp $
+ * $Id: XMInBandDTMFHandler.h,v 1.2 2006/11/12 11:11:59 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,7 @@ protected:
 	
 private:
 	PMutex mutex;
-	PDTMFEncoder * tones;
+	PTones * tones;
 	unsigned startTimestamp;
 	
 };
