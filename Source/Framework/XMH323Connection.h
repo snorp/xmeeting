@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.11 2006/11/11 12:35:08 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.12 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #include <h323/h323con.h>
 
 #include <h323/h323neg.h>
+
+#include "XMInBandDTMFHandler.h"
 
 class XMH323Connection : public H323Connection
 {
@@ -53,15 +55,20 @@ public:
 	virtual BOOL OnClosingLogicalChannel(H323Channel & channel);
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
+	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	
 	// improved bandwidth management
 	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
 	virtual unsigned GetBandwidthUsed() const;
 	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
 	
+	virtual BOOL SendUserInputTone(char tone, unsigned duration);
+	
 private:
 	BOOL hasSetLocalCapabilities;
 	BOOL hasSentLocalCapabilities;
+	
+	XMInBandDTMFHandler * inBandDTMFHandler;
 };
 
 #endif // __XM_H323_CONNECTION_H__

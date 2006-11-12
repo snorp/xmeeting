@@ -200,8 +200,12 @@
 		D147D6080970342B005DE11C /* XMRTPPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147D6060970342B005DE11C /* XMRTPPacket.cpp */; };
 		D147D9DB0973A83E005DE11C /* XMPacketReassemblers.h in Headers */ = {isa = PBXBuildFile; fileRef = D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */; };
 		D147DA1E0973ABEE005DE11C /* XMPacketReassemblers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */; };
-		D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */; };
+		D14B04150B06020B001AB527 /* XMRFC2833Handler.h in Headers */ = {isa = PBXBuildFile; fileRef = D14B04130B06020B001AB527 /* XMRFC2833Handler.h */; };
+		D14B04160B06020B001AB527 /* XMRFC2833Handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */; };
+		D14B04C40B0606DA001AB527 /* XMInBandDTMFHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */; };
+		D14B04C50B0606DA001AB527 /* XMInBandDTMFHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
+		D15C639C0B069E5E00C24799 /* XMH323Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D15F84440A24874400FB2EDB /* h4601.h in Headers */ = {isa = PBXBuildFile; fileRef = D15F84430A24874400FB2EDB /* h4601.h */; };
 		D15F84480A24878400FB2EDB /* h4601.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F84470A24878400FB2EDB /* h4601.cxx */; };
@@ -1027,10 +1031,14 @@
 		D147D6060970342B005DE11C /* XMRTPPacket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMRTPPacket.cpp; path = Source/Framework/XMRTPPacket.cpp; sourceTree = "<group>"; };
 		D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPacketReassemblers.h; path = Source/Framework/XMPacketReassemblers.h; sourceTree = "<group>"; };
 		D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMPacketReassemblers.cpp; path = Source/Framework/XMPacketReassemblers.cpp; sourceTree = "<group>"; };
+		D14B04130B06020B001AB527 /* XMRFC2833Handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRFC2833Handler.h; path = Source/Framework/XMRFC2833Handler.h; sourceTree = "<group>"; };
+		D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMRFC2833Handler.cpp; path = Source/Framework/XMRFC2833Handler.cpp; sourceTree = "<group>"; };
+		D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMInBandDTMFHandler.cpp; path = Source/Framework/XMInBandDTMFHandler.cpp; sourceTree = "<group>"; };
+		D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMInBandDTMFHandler.h; path = Source/Framework/XMInBandDTMFHandler.h; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
-		D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
+		D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
 		D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationFunctions.h; path = Source/Application/XMApplicationFunctions.h; sourceTree = "<group>"; };
 		D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationFunctions.m; path = Source/Application/XMApplicationFunctions.m; sourceTree = "<group>"; };
 		D15F84430A24874400FB2EDB /* h4601.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h4601.h; sourceTree = "<group>"; };
@@ -1919,13 +1927,17 @@
 				D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */,
 				D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */,
 				D14F9A390914C673002486B2 /* XMH323Connection.h */,
-				D14F9A3A0914C673002486B2 /* XMH323Connection.cpp */,
+				D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */,
 				D1EEDEB50992514A000BF113 /* XMH323Channel.h */,
 				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
 				D1FD475509B650D500EB517B /* XMSIPEndPoint.h */,
 				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
 				D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */,
 				D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */,
+				D14B04130B06020B001AB527 /* XMRFC2833Handler.h */,
+				D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */,
+				D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */,
+				D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */,
 				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
@@ -3051,6 +3063,8 @@
 				D10E45440AADEC40009EA376 /* XMCallRecorderModule.h in Headers */,
 				D10BDA550AC4668C004320A8 /* XMAudioTester.h in Headers */,
 				D10BDC7B0AC6FBFC004320A8 /* guid.h in Headers */,
+				D14B04150B06020B001AB527 /* XMRFC2833Handler.h in Headers */,
+				D14B04C50B0606DA001AB527 /* XMInBandDTMFHandler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3654,7 +3668,6 @@
 				D19729B308FBF8A000295E05 /* XMTransmitterMediaPatch.cpp in Sources */,
 				D1972B0308FC529C00295E05 /* XMPacketBuilder.c in Sources */,
 				D14587EF09013DD4004A1EDF /* XMCallStatistics.m in Sources */,
-				D14F9A3B0914C673002486B2 /* XMH323Connection.cpp in Sources */,
 				D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */,
 				D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */,
 				D134B974093B88190090271F /* XMVideoManager.m in Sources */,
@@ -3696,6 +3709,9 @@
 				D10E40190AAD8454009EA376 /* XMCallRecorder.m in Sources */,
 				D10E45450AADEC40009EA376 /* XMCallRecorderModule.m in Sources */,
 				D10BDA4B0AC45832004320A8 /* XMAudioTester.cpp in Sources */,
+				D14B04160B06020B001AB527 /* XMRFC2833Handler.cpp in Sources */,
+				D14B04C40B0606DA001AB527 /* XMInBandDTMFHandler.cpp in Sources */,
+				D15C639C0B069E5E00C24799 /* XMH323Connection.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

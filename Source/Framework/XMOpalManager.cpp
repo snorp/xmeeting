@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.44 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.45 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -553,6 +553,11 @@ BOOL XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
 			break;
 		case XMUserInputMode_RFC2833:
 			mode = OpalConnection::SendUserInputAsInlineRFC2833;
+			break;
+		case XMUserInputMode_InBand:
+			// Separate RFC 2833 is not implemented and is therefore used
+			// to signal InBand DTMF
+			mode = OpalConnection::SendUserInputAsSeparateRFC2833;
 			break;
 		default:
 			return FALSE;

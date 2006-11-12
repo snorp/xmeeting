@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.6 2006/09/29 21:21:45 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.7 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,8 @@
 #include <ptlib.h>
 #include <sip/sipcon.h>
 #include <sip/sippdu.h>
+
+#include "XMInBandDTMFHandler.h"
 
 class XMSIPConnection : public SIPConnection
 {
@@ -48,6 +50,8 @@ public:
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
 	
+	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+	
 	virtual void OnReceivedACK(SIP_PDU & pdu);
 	
 	virtual void OnReceivedAuthenticationRequired(SIPTransaction & transaction,
@@ -57,6 +61,8 @@ public:
 	virtual unsigned GetBandwidthUsed() const;
 	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
 	
+	virtual BOOL SendUserInputTone(char tone, unsigned duration);
+	
 private:
 	
 	static void AdjustSessionDescription(SDPSessionDescription & sdp);
@@ -65,6 +71,8 @@ private:
 	OpalVideoFormat h263VideoFormat;
 	OpalVideoFormat h263PlusVideoFormat;
 	OpalVideoFormat h264VideoFormat;
+	
+	XMInBandDTMFHandler *inBandDTMFHandler;
 };
 
 #endif // __XM_SIP_CONNECTION_H__

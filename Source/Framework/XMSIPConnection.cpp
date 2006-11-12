@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.14 2006/11/11 13:23:57 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.15 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include "XMSIPConnection.h"
 
 #include <opal/mediafmt.h>
+#include <opal/patch.h>
 #include <sip/sipep.h>
 #include <ptclib/enum.h>
 #include <codec/rfc2833.h>
@@ -31,10 +32,16 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 	  
 	delete rfc2833Handler;
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
+	
+	inBandDTMFHandler = NULL;
 }
 
 XMSIPConnection::~XMSIPConnection()
 {
+	if(inBandDTMFHandler != NULL)
+	{
+		delete inBandDTMFHandler;
+	}
 }
 
 /**
@@ -591,6 +598,20 @@ BOOL XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 	return TRUE;
 }
 
+void XMSIPConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+{
+	SIPConnection::OnPatchMediaStream(isSource, patch);
+	
+	if(!isSource)
+	{
+		if(inBandDTMFHandler == NULL)
+		{
+			inBandDTMFHandler = new XMInBandDTMFHandler();
+		}
+		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+	}
+}
+
 void XMSIPConnection::OnReceivedACK(SIP_PDU & pdu)
 {
 	SIPConnection::OnReceivedACK(pdu);
@@ -712,4 +733,16 @@ unsigned XMSIPConnection::GetBandwidthUsed() const
 BOOL XMSIPConnection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
 {
 	return TRUE;
+}
+
+BOOL XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
+{
+	if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 &&
+	   inBandDTMFHandler != NULL)
+	{
+		inBandDTMFHandler->SendTone(tone, duration);
+		return TRUE;
+	}
+	
+	return SIPConnection::SendUserInputTone(tone, duration);
 }

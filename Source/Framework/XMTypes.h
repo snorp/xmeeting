@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.27 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.28 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -257,7 +257,8 @@ typedef enum XMUserInputMode
 {
 	XMUserInputMode_ProtocolDefault = 0,
 	XMUserInputMode_StringTone,
-	XMUserInputMode_RFC2833
+	XMUserInputMode_RFC2833,
+	XMUserInputMode_InBand
 } XMUserInputMode;
 
 /**

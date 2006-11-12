@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.15 2006/11/11 08:37:47 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.16 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -199,6 +199,8 @@ void XMConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 			patch.AddFilter(isSource ? echoCanceler->GetReceiveHandler() : echoCanceler->GetSendHandler(), OpalPCM16);
 		}
 	}
+	
+	OpalConnection::OnPatchMediaStream(isSource, patch);
 }
 
 PSoundChannel * XMConnection::CreateSoundChannel(BOOL isSource)

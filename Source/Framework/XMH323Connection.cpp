@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.19 2006/11/11 13:23:57 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.20 2006/11/12 00:17:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 
 #include <asn/h245.h>
 #include <codec/rfc2833.h>
+#include <opal/patch.h>
 
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
@@ -34,10 +35,16 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 	
 	delete rfc2833Handler;
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
+	
+	inBandDTMFHandler = NULL;
 }
 
 XMH323Connection::~XMH323Connection()
 {
+	if(inBandDTMFHandler != NULL)
+	{
+		delete inBandDTMFHandler;
+	}
 }
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
@@ -278,6 +285,20 @@ BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 	return TRUE;
 }
 
+void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+{
+	H323Connection::OnPatchMediaStream(isSource, patch);
+	
+	if(!isSource)
+	{
+		if(inBandDTMFHandler == NULL)
+		{
+			inBandDTMFHandler = new XMInBandDTMFHandler();
+		}
+		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+	}	
+}
+
 BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
 {
 	bandwidthAvailable = newBandwidth;
@@ -293,4 +314,16 @@ unsigned XMH323Connection::GetBandwidthUsed() const
 BOOL XMH323Connection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
 {
 	return TRUE;
+}
+
+BOOL XMH323Connection::SendUserInputTone(char tone, unsigned duration)
+{
+	if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 &&
+	   inBandDTMFHandler != NULL)
+	{
+		inBandDTMFHandler->SendTone(tone, duration);
+		return TRUE;
+	}
+	
+	return H323Connection::SendUserInputTone(tone, duration);
 }
