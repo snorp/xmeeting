@@ -1,5 +1,5 @@
 /*
- * $Id: XMInBandDTMFHandler.cpp,v 1.2 2006/11/12 11:11:59 hfriederich Exp $
+ * $Id: XMInBandDTMFHandler.cpp,v 1.3 2006/11/12 20:31:41 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,6 +72,11 @@ BOOL XMInBandDTMFHandler::SendTone(char tone, unsigned duration)
 	else
 	{
 		return FALSE;
+	}
+	
+	if(duration < 400)
+	{
+		duration = 400; // send at least 400ms tones
 	}
 	
 	// Generate the tone
