@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.20 2006/10/18 21:56:04 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.21 2006/11/13 20:27:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -308,7 +308,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(err != noErr)
 	{
 		hintCode = 0x004004;
-		goto bail;
+		NSLog(@"XMeeting SequenceGrabber module: SGSetChannelDevice() failed (Error code %d). Still continuing", err);
 	}
 	
 	// now we can set the actual input device by its index
