@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.9 2006/05/17 11:48:38 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.10 2006/11/13 20:36:40 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,6 +92,11 @@ BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	return TRUE;
 }
 
+BOOL XMH261RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+{
+	return FALSE;
+}
+
 BOOL XMH263RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
 	// The first packet is always Mode A and starts with a picture start code
@@ -179,6 +184,11 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	*outFrameLength = frameLength;
 	
 	return TRUE;
+}
+
+BOOL XMH263RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+{
+	return FALSE;
 }
 
 BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
@@ -323,6 +333,11 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 	
 	*outFrameLength = frameLength;
 	return TRUE;
+}
+
+BOOL XMH263PlusRTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+{
+	return FALSE;
 }
 
 BOOL XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
@@ -479,6 +494,11 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	*outFrameLength = frameLength;
 	
 	return TRUE;
+}
+
+BOOL XMH264RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+{
+	return FALSE;
 }
 
 int _XMDetermineH263PacketizationScheme(const BYTE *data, PINDEX length)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.26 2006/10/04 22:27:07 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.27 2006/11/13 20:36:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -199,12 +199,22 @@ void XMReceiverMediaPatch::Main()
 				{
 					if(firstPacketOfPacketGroup != NULL)
 					{
-						// Discarding the old packet group since incomplete
+						// Try to process the old packet although not complete
+						BOOL result = TRUE;
+						PINDEX frameBufferSize = 0;
+						
+						result = packetReassembler->CopyIncompletePacketsIntoFrameBuffer(firstPacketOfPacketGroup, frameBuffer, &frameBufferSize);
+						
+						if(result == TRUE)
+						{
+							_XMProcessFrame(sessionID, frameBuffer, frameBufferSize);
+						}
+						
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;
 						processingSuccessful = FALSE;
-						PTRACE(1, "XMeetingReceiverMediaPatch\tDiscarding old packet group");
+						PTRACE(1, "XMeetingReceiverMediaPatch\tIncomplete old packet group");
 						
 						// There are (packetIndex + 1) packets in the buffer, but only the last one
 						// ist still needed
