@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Readme: XMeeting v0.3.3</title>
+<title>Readme: XMeeting v0.3.4</title>
 </head>
 
 <body>
@@ -20,7 +20,7 @@
 <br>
 <a href="#cre">Credits</a>
 <br>
-<a href="#rnt">Release Notes for Release 0.3.3</a>
+<a href="#rnt">Release Notes for Release 0.3.4</a>
 <br>
 <a href="#rno">Older Release Notes</a>
 <br>
@@ -55,7 +55,7 @@ Some functions will be disabled on machines with older and less powerful graphic
 
 <p>
 <a name="feat"><h3>Features</h3></a>
-This release of XMeeting (0.3.3) ships with the following key features:
+This release of XMeeting (0.3.4) ships with the following key features:
 </p>
 
 <p><b>Communication Protocols:</b>
@@ -130,7 +130,7 @@ still appear in English. We will fix this in future releases.
 <hr>
 
 <a name="cre"><h3>Credits</h3></a>
-XMeeting release 0.3.3 by NET's XMeeting project team. The team consists of Hannes Friederich
+XMeeting release 0.3.4 by NET's XMeeting project team. The team consists of Hannes Friederich
 (software engineering), Thomas Rechsteiner (testing, gatekeeper & conferencing setup) and is 
 led by Dr Thomas Piendl. The NET XMeeting contribution
 is completely funded by NET <a href="http://www.net.ethz.ch/">http://www.net.ethz.ch/</a>, a
@@ -163,7 +163,32 @@ at Queen's University, Ontario, Canada.
 <hr>
 
 <p>
-<a name="rnt"><h3>Release Notes for Version 0.3.3</h3></a>
+<a name="rnt"><h3>Release Notes for Version 0.3.4</h3></a>
+New Features:
+<ul>
+<li>Silence Suppression and Software Echo Cancellation.<br>Note: 
+    The software echo cancellation is <b>not</b> the iSight built-in 
+    echo cancellation, and there will be quality differences. Also,
+    the echo cancellation does only help the <b>remote</b> side. If you're
+    hearing echo, the remote party does not have echo cancellation in place.</li>
+<li>More call recording video options</li>
+<li>More options for sending DTMF</li>
+</ul>
+Fixed bugs:
+<ul>
+<li>Fixes problems when receiving calls and multiple network interfaces are present</li>
+<li>Fixes problems with some SIP endpoints / media formats</li>
+<li>Various other bugfixes</li>
+<li>Fixes incorrect color rendering in the StillImage video input module</li>
+</ul>
+</p>
+
+<hr>
+
+<p>
+<a name="rno"><h3>Older Release Notes</h3></a>
+</p>
+<p><b>v0.3.3</b><br>
 New Features:
 <ul>
 <li>Call Recording Feature</li>
@@ -185,11 +210,6 @@ Fixed bugs:
 </ul>
 </p>
 
-<hr>
-
-<p>
-<a name="rno"><h3>Older Release Notes</h3></a>
-</p>
 <p><b>v0.3.2:</b><br>
 New Features:
 <ul>
@@ -325,8 +345,6 @@ Hannes Friederich if you plan to use this feature.</li>
     bluetooth devices in Mac OS X / Core Audio can still not considered be &quot;stable&quot;.
     Our own tests using bluetooth headsets have so far worked well. Please report us if you
     experience problems with bluetooth headsets often.</li>
-<li>The Still Image module may not always render images using the correct colors (e.g. switching
-    red and blue</li>
 <li>In some rare cases, calling a remote party seems to take long time without showing any 
     success.</li>
 <li>After some calls, XMeeting is no longer registered at a gatekeeper, even if indicating so.

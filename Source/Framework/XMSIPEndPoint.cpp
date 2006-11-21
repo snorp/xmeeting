@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.20 2006/11/12 20:25:32 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.21 2006/11/21 13:09:54 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,7 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	
 	probingOptions.DisallowDeleteObjects();
 	
-	SetUserAgent("XMeeting/0.3.3");
+	SetUserAgent("XMeeting/0.3.4");
 	
 	SetNATBindingRefreshMethod(EmptyRequest);
 }
