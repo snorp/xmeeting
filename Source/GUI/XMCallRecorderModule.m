@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorderModule.m,v 1.3 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMCallRecorderModule.m,v 1.4 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,11 +13,21 @@
 
 NSString *XMKey_RecordAudio = @"XMeeting_RecordAudio";
 NSString *XMKey_RecordVideo = @"XMeeting_RecordVideo";
+NSString *XMKey_RecordVideoMode = @"XMeeting_RecordVideoMode";
+NSString *XMKey_RecordVideoSource = @"XMeeting_RecordVideoSource";
 NSString *XMKey_RecordVideoCodec = @"XMeeting_RecordVideoCodec";
 NSString *XMKey_RecordVideoQuality = @"XMeeting_RecordVideoQuality";
 NSString *XMKey_RecordVideoEnableBandwidthLimit = @"XMeeting_RecordVideoEnableBandwidthLimit";
 NSString *XMKey_RecordVideoBandwidthLimit = @"XMeeting_RecordVideoBandwidthLimit";
 NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
+
+#define XM_MIXED_MODE 0
+#define XM_REMOTE_ONLY_MODE 1
+#define XM_LOCAL_ONLY_MODE 2
+
+#define XM_BOTH_SOURCES 0
+#define XM_REMOTE_SOURCE 1
+#define XM_LOCAL_SOURCE 2
 
 @interface XMCallRecorderModule (PrivateMethods)
 
@@ -31,6 +41,7 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 - (void)_mainWindowDidResize:(NSNotification *)notif;
 - (void)_didBeginFullScreen:(NSNotification *)notif;
 - (void)_didEndFullScreen:(NSNotification *)notif;
+- (void)_preferencesDidChange:(NSNotification *)notif;
 - (void)_adjustRecorderWindow;
 
 @end
@@ -55,6 +66,8 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	BOOL enableAudio = [userDefaults boolForKey:XMKey_RecordAudio];
 	BOOL enableVideo = [userDefaults boolForKey:XMKey_RecordVideo];
+	unsigned videoMode = [userDefaults integerForKey:XMKey_RecordVideoMode];
+	unsigned videoSourceMode = [userDefaults integerForKey:XMKey_RecordVideoSource];
 	XMCodecIdentifier codecIdentifier = (XMCodecIdentifier)[userDefaults integerForKey:XMKey_RecordVideoCodec];
 	unsigned videoQuality = (unsigned)[userDefaults integerForKey:XMKey_RecordVideoQuality];
 	BOOL enableBWLimit = [userDefaults boolForKey:XMKey_RecordVideoEnableBandwidthLimit];
@@ -73,6 +86,10 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	[recordAudioSwitch setState:state];
 	state = (enableVideo == YES) ? NSOnState : NSOffState;
 	[recordVideoSwitch setState:state];
+	
+	[videoModePopUp selectItemWithTag:videoMode];
+	
+	[videoSourceMatrix selectCellWithTag:videoSourceMode];
 	
 	[videoCodecPopUp selectItemWithTag:(int)codecIdentifier];
 	
@@ -192,6 +209,39 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	[self _validateGUI];
 }
 
+- (IBAction)videoModeSelected:(id)sender
+{
+	int tag = [[videoModePopUp selectedItem] tag];
+	[[NSUserDefaults standardUserDefaults] setInteger:tag forKey:XMKey_RecordVideoMode];
+	[self _validateGUI];
+}
+
+- (IBAction)videoSourceSelected:(id)sender
+{
+	int tag = [[videoSourceMatrix selectedCell] tag];
+	[[NSUserDefaults standardUserDefaults] setInteger:tag forKey:XMKey_RecordVideoSource];
+	[self _validateGUI];
+	
+	BOOL recordLocalVideo = NO;
+	BOOL recordRemoteVideo = NO;
+	
+	if(tag == XM_BOTH_SOURCES)
+	{
+		recordLocalVideo = YES;
+		recordRemoteVideo = YES;
+	}
+	else if(tag == XM_REMOTE_SOURCE)
+	{
+		recordRemoteVideo = YES;
+	}
+	else
+	{
+		recordLocalVideo = YES;
+	}
+	
+	[[XMCallRecorder sharedInstance] setRecordLocalVideo:recordLocalVideo recordRemoteVideo:recordRemoteVideo];
+}
+
 - (IBAction)videoCodecSelected:(id)sender
 {
 	int tag = [[videoCodecPopUp selectedItem] tag];
@@ -245,34 +295,55 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 {
 	BOOL enableRecordButton = YES;
 	BOOL enableAudioVideoSwitches = NO;
-	BOOL enableVideoControls = NO;
+	BOOL enableVideoModePopUp = NO;
+	BOOL enableSourceMatrix = NO;
+	BOOL enableLowPrioritySwitch = NO;
+	BOOL enableVideoDetails = NO;
 	BOOL enableBWSwitch = NO;
 	BOOL enableBWTextField = NO;
 	
-	if([recordAudioSwitch state] == NSOffState && [recordVideoSwitch state] == NSOffState)
+	BOOL isRecording = [[XMCallRecorder sharedInstance] isRecording];
+	int recordAudioSwitchState = [recordAudioSwitch state];
+	int recordVideoSwitchState = [recordVideoSwitch state];
+	int videoModeTag = [[videoModePopUp selectedItem] tag];
+	
+	if(recordAudioSwitchState == NSOffState && recordVideoSwitchState == NSOffState)
 	{
 		enableRecordButton = NO;
 	}
 	
-	if([[XMCallRecorder sharedInstance] isRecording] == NO)
+	if(isRecording == NO)
 	{
 		enableAudioVideoSwitches = YES;
 	
-		int state = [recordVideoSwitch state];
-		if(state == NSOnState)
+		if(recordVideoSwitchState == NSOnState)
 		{
-			enableVideoControls = YES;
+			enableVideoModePopUp = YES;
 			int tag = [[videoCodecPopUp selectedItem] tag];
-			if([[XMCallRecorder sharedInstance] videoCodecSupportsDataRateControl:(XMCodecIdentifier)tag])
+			
+			if(videoModeTag == XM_MIXED_MODE)
 			{
-				enableBWSwitch = YES;
-				state = [dataRateLimitSwitch state];
-				if(state == NSOnState)
+				enableLowPrioritySwitch = YES;
+			}
+			if(videoModeTag != XM_REMOTE_ONLY_MODE)
+			{
+				enableVideoDetails = YES;
+				if([[XMCallRecorder sharedInstance] videoCodecSupportsDataRateControl:(XMCodecIdentifier)tag])
 				{
-					enableBWTextField = YES;
+					enableBWSwitch = YES;
+					int state = [dataRateLimitSwitch state];
+					if(state == NSOnState)
+					{
+						enableBWTextField = YES;
+					}
 				}
 			}
 		}
+	}
+	
+	if(recordVideoSwitchState == NSOnState && videoModeTag == XM_MIXED_MODE)
+	{
+		enableSourceMatrix = YES;
 	}
 	
 	[recordButton setEnabled:enableRecordButton];
@@ -280,9 +351,11 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 	[recordAudioSwitch setEnabled:enableAudioVideoSwitches];
 	[recordVideoSwitch setEnabled:enableAudioVideoSwitches];
 	
-	[videoCodecPopUp setEnabled:enableVideoControls];
-	[videoQualitySlider setEnabled:enableVideoControls];
-	[lowPrioritySwitch setEnabled:enableVideoControls];
+	[videoModePopUp setEnabled:enableVideoModePopUp];
+	[videoSourceMatrix setEnabled:enableSourceMatrix];
+	[videoCodecPopUp setEnabled:enableVideoDetails];
+	[videoQualitySlider setEnabled:enableVideoDetails];
+	[lowPrioritySwitch setEnabled:enableLowPrioritySwitch];
 	
 	[dataRateLimitSwitch setEnabled:enableBWSwitch];
 	
@@ -303,6 +376,10 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 		XMCodecIdentifier videoCodec = XMCodecIdentifier_UnknownCodec;
 		if([recordVideoSwitch state] == NSOnState) 
 		{
+			int videoMode = [[videoModePopUp selectedItem] tag];
+			
+			int videoSource = [[videoSourceMatrix selectedCell] tag];
+			
 			videoCodec = (XMCodecIdentifier)[[videoCodecPopUp selectedItem] tag];
 			int quality = [videoQualitySlider intValue];
 			XMCodecQuality codecQuality;
@@ -346,12 +423,46 @@ NSString *XMKey_RecordVideoLowPriority = @"XMeeting_RecordVideoLowPriority";
 				lowPriorityRecording = YES;
 			}
 			
-			BOOL result = [[XMCallRecorder sharedInstance] startRecordingInRecompressionModeToFile:filePath
-																			  videoCodecIdentifier:videoCodec
-																				 videoCodecQuality:codecQuality
-																					 videoDataRate:dataRateLimit
-																			  audioCodecIdentifier:audioCodec
-																			  lowPriorityRecording:lowPriorityRecording];
+			BOOL result;
+			if(videoMode == XM_MIXED_MODE)
+			{
+				BOOL recordLocalVideo = NO;
+				BOOL recordRemoteVideo = NO;
+				if(videoSource == XM_BOTH_SOURCES)
+				{
+					recordLocalVideo = YES;
+					recordRemoteVideo = YES;
+				}
+				else if(videoSource == XM_LOCAL_SOURCE)
+				{
+					recordLocalVideo = YES;
+				}
+				else
+				{
+					recordRemoteVideo = YES;
+				}
+				result = [[XMCallRecorder sharedInstance] startRecordingInRecompressionModeToFile:filePath
+																			 videoCodecIdentifier:videoCodec
+																				videoCodecQuality:codecQuality
+																					videoDataRate:dataRateLimit
+																				 recordLocalVideo:recordLocalVideo
+																				recordRemoteVideo:recordRemoteVideo
+																			 audioCodecIdentifier:audioCodec
+																			 lowPriorityRecording:lowPriorityRecording];
+			}
+			else if(videoMode == XM_LOCAL_ONLY_MODE)
+			{
+				result = [[XMCallRecorder sharedInstance] startRecordingInLocalVideoModeToFile:filePath
+																		  videoCodecIdentifier:videoCodec
+																			 videoCodecQuality:codecQuality
+																				 videoDataRate:dataRateLimit
+																		  audioCodecIdentifier:audioCodec];
+			}
+			else
+			{
+				result = [[XMCallRecorder sharedInstance] startRecordingInRemoteVideoModeToFile:filePath
+																		   audioCodecIdentifier:audioCodec];
+			}
 			if(result == YES)
 			{
 				[self _displayRecording:filePath];

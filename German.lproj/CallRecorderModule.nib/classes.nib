@@ -9,7 +9,9 @@
                 toggleRecordVideo = id; 
                 toggleRecording = id; 
                 videoCodecSelected = id; 
+                videoModeSelected = id; 
                 videoQualitySelected = id; 
+                videoSourceSelected = id; 
             }; 
             CLASS = XMCallRecorderModule; 
             LANGUAGE = ObjC; 
@@ -23,7 +25,9 @@
                 recordButton = NSButton; 
                 recordVideoSwitch = NSButton; 
                 videoCodecPopUp = NSPopUpButton; 
+                videoModePopUp = NSPopUpButton; 
                 videoQualitySlider = NSSlider; 
+                videoSourceMatrix = NSMatrix; 
             }; 
             SUPERCLASS = XMInspectorModule; 
         }, 

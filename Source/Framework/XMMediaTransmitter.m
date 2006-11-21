@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.51 2006/10/22 08:53:10 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.52 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,8 @@ typedef enum XMMediaTransmitterMessage
 	_XMMediaTransmitterMessage_UpdatePicture,
 	_XMMediaTransmitterMessage_SetMaxBitrate,
 	_XMMediaTransmitterMessage_SetVideoBytesSent,
+	_XMMediaTransmitterMessage_StartRecording,
+	_XMMediaTransmitterMessage_StopRecording,
 	
 	_XMMediaTransmitterMessage_SendSettingsToModule = 0x300
 	
@@ -60,6 +62,8 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleMediaTransmitterThreadDidExit;
 
 - (void)_runMediaTransmitThread;
+- (BOOL)_isTransmitting;
+- (BOOL)_isRecording;
 - (void)handlePortMessage:(NSPortMessage *)portMessage;
 
 - (void)_handleShutdownMessage;
@@ -73,6 +77,9 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleUpdatePictureMessage;
 - (void)_handleSetMaxBitrateMessage:(NSArray *)messageComponents;
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)messageComponents;
+- (void)_handleStartRecordingMessage:(NSArray *)messageComponents;
+- (void)_handleStopRecordingMessage;
+
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents;
 
 - (void)_adjustVideoBitrateLimit;
@@ -267,6 +274,39 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[components release];
 }
 
++ (void)_startRecordingWithCodec:(XMCodecIdentifier)codecIdentifier
+					   videoSize:(XMVideoSize)videoSize
+					codecQuality:(XMCodecQuality)codecQuality
+					  maxBitrate:(unsigned)maxBitrate
+{
+	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:codecIdentifier];
+	NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:videoSize];
+	NSData *sizeData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:codecQuality];
+	NSData *qualityData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	number = [[NSNumber alloc] initWithUnsignedInt:maxBitrate];
+	NSData *bitrateData = [NSKeyedArchiver archivedDataWithRootObject:number];
+	[number release];
+	
+	NSArray *components = [[NSArray alloc] initWithObjects:codecData, sizeData, qualityData, bitrateData, nil];
+	
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartRecording withComponents:components];
+	
+	[components release];
+}
+
++ (void)_stopRecording
+{
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopRecording withComponents:nil];
+}
+
 + (void)_sendSettings:(NSData *)settings toModule:(id<XMVideoInputModule>)module
 {
 	NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)module];
@@ -349,6 +389,12 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	codecType = 0;
 	codecSpecificCallFlags = 0;
 	bitrateToUse = 0;
+	
+	isRecording = NO;
+	recordingSize = XMVideoSize_CIF;
+	recordingCodec = 0;
+	recordingQuality = XMCodecQuality_Max;
+	recordingBitrate = 0;
 	
 	needsPictureUpdate = NO;
 	
@@ -615,6 +661,16 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	// we kill the associated thread after having cleaned up
 }
 
+- (BOOL)_isTransmitting
+{
+	return isTransmitting;
+}
+
+- (BOOL)_isRecording
+{
+	return isRecording;
+}
+
 #pragma mark Message handling methods
 
 - (void)handlePortMessage:(NSPortMessage *)portMessage
@@ -656,6 +712,12 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		case _XMMediaTransmitterMessage_SetVideoBytesSent:
 			[self _handleSetVideoBytesSentMessage:[portMessage components]];
 			break;
+		case _XMMediaTransmitterMessage_StartRecording:
+			[self _handleStartRecordingMessage:[portMessage components]];
+			break;
+		case _XMMediaTransmitterMessage_StopRecording:
+			[self _handleStopRecordingMessage];
+			break;
 		case _XMMediaTransmitterMessage_SendSettingsToModule:
 			[self _handleSendSettingsToModuleMessage:[portMessage components]];
 			break;
@@ -668,6 +730,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 - (void)_handleShutdownMessage
 {
 	[self _handleStopTransmittingMessage:nil];
+	[self _handleStopRecordingMessage];
 	[self _handleStopGrabbingMessage];
 	
 	unsigned i;
@@ -853,6 +916,14 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		return;
 	}
 	
+	if(isRecording == YES)
+	{
+		// stop the already running compression session to
+		// create a fresh instance with different codec
+		// parameters
+		[self _stopCompressionSession];
+	}
+	
 	XMCodecIdentifier codecIdentifier;
 	XMVideoSize requiredVideoSize;
 	
@@ -933,6 +1004,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		[activeModule setFrameGrabRate:transmitFrameGrabRate];
 	}
 	
+	isTransmitting = YES;
+	
 	// start grabbing, just to be sure
 	[self _handleStartGrabbingMessage];
 	
@@ -947,7 +1020,6 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
 	previousTimeStamp = 0;
 	
-	isTransmitting = YES;
 	transmitFrameCounter = 0;
 	
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoTransmittingStart:)
@@ -998,6 +1070,12 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
 	[_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleVideoTransmittingEnd)
 													withObject:nil waitUntilDone:NO];
+	
+	if(isRecording == YES)
+	{
+		useCompressionSessionAPI = YES;
+		[self _startCompressionSession];
+	}
 }
 
 - (void)_handleUpdatePictureMessage
@@ -1060,6 +1138,86 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
 }
 
+- (void)_handleStartRecordingMessage:(NSArray *)components
+{
+	if(isRecording == YES)
+	{
+		return;
+	}
+	
+	XMCodecIdentifier recordingCodecIdentifier;
+	NSData *data = (NSData *)[components objectAtIndex:0];
+	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	recordingCodecIdentifier = [number unsignedIntValue];
+	
+	data = (NSData *)[components objectAtIndex:1];
+	NSNumber *videoSizeNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	recordingSize = (XMVideoSize)[videoSizeNumber unsignedIntValue];
+	
+	data = (NSData *)[components objectAtIndex:2];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	recordingQuality = (XMCodecQuality)[number unsignedIntValue];
+	
+	data = (NSData *)[components objectAtIndex:3];
+	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+	recordingBitrate = [number unsignedIntValue];
+	
+	switch(recordingCodecIdentifier)
+	{
+		case XMCodecIdentifier_H261:
+			recordingCodec = kH261CodecType;
+			break;
+		case XMCodecIdentifier_H263:
+			recordingCodec = kH263CodecType;
+			break;
+		case XMCodecIdentifier_H264:
+			recordingCodec = kH264CodecType;
+			break;
+		case XMCodecIdentifier_MPEG4:
+			recordingCodec = kMPEG4VisualCodecType;
+			break;
+		case XMCodecIdentifier_Motion_JPEG_A:
+			recordingCodec = kMotionJPEGACodecType;
+			break;
+		case XMCodecIdentifier_Motion_JPEG_B:
+			recordingCodec = kMotionJPEGBCodecType;
+			break;
+			
+		default:
+			recordingCodec = 0;
+			// no valid codec means an error
+			// should be reported here
+			return;
+	}
+	
+	isRecording = YES;
+	
+	if(isTransmitting == NO)
+	{
+		useCompressionSessionAPI = YES;
+		[self _startCompressionSession];
+	}
+	
+	needsPictureUpdate = YES; // make complete picture at the beginning of the recording
+}
+
+- (void)_handleStopRecordingMessage
+{
+	if(isRecording == NO)
+	{
+		return;
+	}
+	
+	isRecording = NO;
+	
+	if(isTransmitting == NO)
+	{
+		[self _stopCompressionSession];
+	}
+	
+	[_XMCallRecorderSharedInstance performSelectorOnMainThread:@selector(_handleLocalVideoRecordingDidEnd) withObject:nil waitUntilDone:NO];
+}
+
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents
 {
 	NSData *data = (NSData *)[messageComponents objectAtIndex:0];
@@ -1094,6 +1252,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
 }
 
+#pragma mark -
 #pragma mark XMVideoInputManager Methods
 
 - (void)handleGrabbedFrame:(CVPixelBufferRef)frame
@@ -1111,7 +1270,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
 	
 	// compress and transmit the frame if needed
-	if(isTransmitting == YES)
+	if(isTransmitting == YES || isRecording == YES)
 	{
 		TimeValue timeStamp;
 		
@@ -1311,10 +1470,13 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		NSLog(@"allow frame reordering failed: %d", (int)err);
 	}	
 	
-	err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, keyframeInterval);
-	if(err != noErr)
+	if(isTransmitting == YES)
 	{
-		NSLog(@"set max keyFrameInterval failed: %d", (int)err);
+		err = ICMCompressionSessionOptionsSetMaxKeyFrameInterval(sessionOptions, keyframeInterval);
+		if(err != noErr)
+		{
+			NSLog(@"set max keyFrameInterval failed: %d", (int)err);
+		}
 	}
 	
 	err = ICMCompressionSessionOptionsSetAllowFrameTimeChanges(sessionOptions, false);
@@ -1331,14 +1493,21 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
 	// averageDataRate is in bytes/s
 	SInt32 averageDataRate = bitrateToUse/8;
-	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
-												  kQTPropertyClass_ICMCompressionSessionOptions,
-												  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
-												  sizeof(averageDataRate),
-												  &averageDataRate);
-	if(err != noErr)
+	if(isTransmitting == NO)
 	{
-		NSLog(@"SetAverageDataRate failed: %d", (int)err);
+		averageDataRate = recordingBitrate/8;
+	}
+	if(averageDataRate != 0)
+	{
+		err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
+													  kQTPropertyClass_ICMCompressionSessionOptions,
+													  kICMCompressionSessionOptionsPropertyID_AverageDataRate,
+													  sizeof(averageDataRate),
+													  &averageDataRate);
+		if(err != noErr)
+		{
+			NSLog(@"SetAverageDataRate failed: %d", (int)err);
+		}
 	}
 	
 	SInt32 maxFrameDelayCount = 0;
@@ -1353,6 +1522,10 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
 	
 	CodecQ codecQuality = codecMaxQuality;
+	if(isTransmitting == NO)
+	{
+		codecQuality = recordingQuality;
+	}
 	err = ICMCompressionSessionOptionsSetProperty(sessionOptions,
 												  kQTPropertyClass_ICMCompressionSessionOptions,
 												  kICMCompressionSessionOptionsPropertyID_Quality,
@@ -1363,10 +1536,17 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		NSLog(@"SetCodecQuality failed: %d", (int)err);
 	}
 	
+	CodecType codecTypeToUse = codecType;
+	OSType codecManufacturerToUse = codecManufacturer;
+	if(isTransmitting == NO)
+	{
+		codecTypeToUse = recordingCodec;
+		codecManufacturerToUse = 0;
+	}
 	ComponentDescription componentDescription;
 	componentDescription.componentType = FOUR_CHAR_CODE('imco');
-	componentDescription.componentSubType = codecType;
-	componentDescription.componentManufacturer = codecManufacturer;
+	componentDescription.componentSubType = codecTypeToUse;
+	componentDescription.componentManufacturer = codecManufacturerToUse;
 	componentDescription.componentFlags = 0;
 	componentDescription.componentFlagsMask = 0;
 	
@@ -1382,7 +1562,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		NSLog(@"Opening the component failed");
 	}
 	
-	if(codecType == FOUR_CHAR_CODE('avc1'))
+	if(codecType == FOUR_CHAR_CODE('avc1') && isTransmitting == YES)
 	{
 		// Profile is currently fixed to Baseline
 		// The level is adjusted by the use of the
@@ -1461,8 +1641,13 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	encodedFrameOutputRecord.encodedFrameOutputRefCon = (void *)self;
 	encodedFrameOutputRecord.frameDataAllocator = NULL;
 	
-	NSSize frameDimensions = XMGetVideoFrameDimensions(videoSize);
-	err = ICMCompressionSessionCreate(NULL, frameDimensions.width, frameDimensions.height, codecType,
+	XMVideoSize theVideoSize = videoSize;
+	if(isTransmitting == NO)
+	{
+		theVideoSize = recordingSize;
+	}
+	NSSize frameDimensions = XMGetVideoFrameDimensions(theVideoSize);
+	err = ICMCompressionSessionCreate(NULL, frameDimensions.width, frameDimensions.height, codecTypeToUse,
 									  (TimeScale)90000, sessionOptions, NULL, &encodedFrameOutputRecord,
 									  &compressionSession);
 	if(err != noErr)
@@ -1764,10 +1949,21 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		
 		UInt8 *compressedData = (UInt8 *)compressSequenceCompressedFrame;
 		
-		[self _packetizeCompressedFrame:compressedData
-								 length:dataLength
-					   imageDescription:compressSequenceImageDescription
-							  timeStamp:timeStamp];
+		if(isTransmitting == YES)
+		{
+			[self _packetizeCompressedFrame:compressedData
+									 length:dataLength
+						   imageDescription:compressSequenceImageDescription
+								  timeStamp:timeStamp];
+		}
+		
+		if(isRecording == YES)
+		{
+			// record the frame if needed
+			[_XMCallRecorderSharedInstance _handleCompressedLocalVideoFrame:compressedData
+																	 length:dataLength
+														   imageDescription:compressSequenceImageDescription];
+		}
 		
 		compressSequenceFrameCounter += 1;
 		
@@ -2121,7 +2317,16 @@ OSStatus XMPacketizeCompressedFrameProc(void*						encodedFrameOutputRefCon,
 		{
 			NSLog(@"ICMEncodedFrameGetImageDescription failed: %d", err);
 		}
-		err = [mediaTransmitter _packetizeCompressedFrame:data length:dataLength imageDescription:imageDesc timeStamp:timeStamp];
+		if([mediaTransmitter _isTransmitting])
+		{
+			err = [mediaTransmitter _packetizeCompressedFrame:data length:dataLength imageDescription:imageDesc timeStamp:timeStamp];
+		}
+		if([mediaTransmitter _isRecording])
+		{
+			[_XMCallRecorderSharedInstance _handleCompressedLocalVideoFrame:data
+																	 length:dataLength
+														   imageDescription:imageDesc];
+		}
 	}
 	
 	return err;

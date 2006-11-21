@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.37 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.38 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -278,6 +278,13 @@ void _XMCheckCloseStatus();
 
 - (void)_handleUncompressedLocalVideoFrame:(CVPixelBufferRef)localVideoFrame;
 - (void)_handleUncompressedRemoteVideoFrame:(CVPixelBufferRef)remoteVideoFrame;
+- (void)_handleCompressedLocalVideoFrame:(UInt8 *)encodedFrame
+								  length:(UInt32)length
+						imageDescription:(ImageDescriptionHandle)imageDesc;
+- (BOOL)_handleCompressedRemoteVideoFrame:(UInt8 *)encodedFrame
+								   length:(UInt32)length
+						 imageDescription:(ImageDescriptionHandle)imageDesc;
+- (void)_handleLocalVideoRecordingDidEnd;
 
 @end
 

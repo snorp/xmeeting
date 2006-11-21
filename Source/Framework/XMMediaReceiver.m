@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.23 2006/06/08 11:57:32 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.24 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,6 +95,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	videoDecompressionSession = NULL;
 	videoCodecIdentifier = XMCodecIdentifier_UnknownCodec;
+	videoImageDescription = NULL;
 	
 	return self;
 }
@@ -166,7 +167,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	
 	if(videoDecompressionSession == NULL)
 	{
-		ImageDescriptionHandle imageDesc;
 		CodecType codecType;
 		char *codecName;
 		
@@ -208,25 +208,25 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			return NO;
 		}
 		
-		imageDesc = (ImageDescriptionHandle)NewHandleClear(sizeof(**imageDesc)+4);
-		(**imageDesc).idSize = sizeof( **imageDesc)+4;
-		(**imageDesc).cType = codecType;
-		(**imageDesc).resvd1 = 0;
-		(**imageDesc).resvd2 = 0;
-		(**imageDesc).dataRefIndex = 0;
-		(**imageDesc).version = 1;
-		(**imageDesc).revisionLevel = 1;
-		(**imageDesc).vendor = 'XMet';
-		(**imageDesc).temporalQuality = codecNormalQuality;
-		(**imageDesc).spatialQuality = codecNormalQuality;
-		(**imageDesc).width = (short)videoDimensions.width;
-		(**imageDesc).height = (short)videoDimensions.height;
-		(**imageDesc).hRes = Long2Fix(72);
-		(**imageDesc).vRes = Long2Fix(72);
-		(**imageDesc).dataSize = 0;
-		(**imageDesc).frameCount = 1;
-		(**imageDesc).depth = 24;
-		(**imageDesc).clutID = -1;
+		videoImageDescription = (ImageDescriptionHandle)NewHandleClear(sizeof(**videoImageDescription)+4);
+		(**videoImageDescription).idSize = sizeof( **videoImageDescription)+4;
+		(**videoImageDescription).cType = codecType;
+		(**videoImageDescription).resvd1 = 0;
+		(**videoImageDescription).resvd2 = 0;
+		(**videoImageDescription).dataRefIndex = 0;
+		(**videoImageDescription).version = 1;
+		(**videoImageDescription).revisionLevel = 1;
+		(**videoImageDescription).vendor = 'XMet';
+		(**videoImageDescription).temporalQuality = codecNormalQuality;
+		(**videoImageDescription).spatialQuality = codecNormalQuality;
+		(**videoImageDescription).width = (short)videoDimensions.width;
+		(**videoImageDescription).height = (short)videoDimensions.height;
+		(**videoImageDescription).hRes = Long2Fix(72);
+		(**videoImageDescription).vRes = Long2Fix(72);
+		(**videoImageDescription).dataSize = 0;
+		(**videoImageDescription).frameCount = 1;
+		(**videoImageDescription).depth = 24;
+		(**videoImageDescription).clutID = -1;
 		
 		if(codecType == kH264CodecType)
 		{
@@ -235,7 +235,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 			Handle avccHandle = NewHandleClear(avccLength);
 			[self _createH264AVCCAtomInBuffer:(UInt8 *)*avccHandle];
 			
-			err = AddImageDescriptionExtension(imageDesc, avccHandle, 'avcC');
+			err = AddImageDescriptionExtension(videoImageDescription, avccHandle, 'avcC');
 			
 			DisposeHandle(avccHandle);
 		}
@@ -267,7 +267,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		[pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferPixelFormatTypeKey];
 		[number release];
 		
-		err = ICMDecompressionSessionCreate(NULL, imageDesc, sessionOptions,
+		err = ICMDecompressionSessionCreate(NULL, videoImageDescription, sessionOptions,
 											(CFDictionaryRef)pixelBufferAttributes,
 											&trackingCallbackRecord, &videoDecompressionSession);
 		if(err != noErr)
@@ -277,8 +277,6 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		
 		[pixelBufferAttributes release];
 		ICMDecompressionSessionOptionsRelease(sessionOptions);
-		
-		DisposeHandle((Handle)imageDesc);
 		
 		NSNumber *sizeNumber = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoMediaSize];
 		NSNumber *widthNumber = [[NSNumber alloc] initWithUnsignedInt:(unsigned)videoDimensions.width];
@@ -300,7 +298,13 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 											 data, length,
 											 NULL, NULL,
 											 (void *)self);
-	if(err != noErr)
+	// before responding to any errors received,
+	// handle the frame recording
+	BOOL needsIFrame = [_XMCallRecorderSharedInstance _handleCompressedRemoteVideoFrame:data
+																				 length:length
+																	   imageDescription:videoImageDescription];
+	
+	if(err != noErr || needsIFrame == YES)
 	{
 		if(err == qErr && videoCodecIdentifier == XMCodecIdentifier_H263)
 		{
@@ -760,6 +764,11 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	{
 		ICMDecompressionSessionRelease(videoDecompressionSession);
 		videoDecompressionSession = NULL;
+	}
+	
+	if(videoImageDescription != NULL) {
+		DisposeHandle((Handle)videoImageDescription);
+		videoImageDescription = NULL;
 	}
 }
 

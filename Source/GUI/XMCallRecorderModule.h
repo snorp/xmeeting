@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorderModule.h,v 1.2 2006/09/21 20:14:23 hfriederich Exp $
+ * $Id: XMCallRecorderModule.h,v 1.3 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,6 +22,8 @@
 	
 	IBOutlet NSButton *recordAudioSwitch;
 	IBOutlet NSButton *recordVideoSwitch;
+	IBOutlet NSPopUpButton *videoModePopUp;
+	IBOutlet NSMatrix *videoSourceMatrix;
 	IBOutlet NSPopUpButton *videoCodecPopUp;
 	IBOutlet NSSlider *videoQualitySlider;
 	IBOutlet NSButton *dataRateLimitSwitch;
@@ -37,6 +39,8 @@
 
 - (IBAction)toggleRecordAudio:(id)sender;
 - (IBAction)toggleRecordVideo:(id)sender;
+- (IBAction)videoModeSelected:(id)sender;
+- (IBAction)videoSourceSelected:(id)sender;
 - (IBAction)videoCodecSelected:(id)sender;
 - (IBAction)videoQualitySelected:(id)sender;
 - (IBAction)toggleEnableVideoBandwidthLimit:(id)sender;

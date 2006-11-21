@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.h,v 1.3 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMCallRecorder.h,v 1.4 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,8 @@
 	NSTimer *recordTimer;
 	unsigned videoTrackOffset;
 	TimeValue64 previousTimestamp;
+	BOOL recordLocalVideo;
+	BOOL recordRemoteVideo;
 	int lockingMode;
 	BOOL quitRecording;
 	BOOL frameOccupied;
@@ -63,12 +65,30 @@
  * use the videoCodecQuality constant to express how good the quality of video will be.
  * If lowPriorityRecording is set, the transmit/receive frame pipelines are blocked for an as short time as possible,
  * resulting in a maximum throughput videoDevice->codec->packetizer->network and network->reassembler->codec->display
- * However, the framerate of the recorded video may be significantly lower than is the flag is not set.
+ * However, the framerate of the recorded video may be significantly lower if the flag is not set.
  **/
 - (BOOL)startRecordingInRecompressionModeToFile:(NSString *)file videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier 
 							  videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
+							   recordLocalVideo:(BOOL)recordLocalVideo recordRemoteVideo:(BOOL)recordRemoteVideo
 						   audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier
 						   lowPriorityRecording:(BOOL)lowPriorityRecording;
+
+/**
+ * Starts a recording session, recording only the local video source.
+ * The specified video codec and desired data rate does only apply if
+ * recording while not in a video call, if in a video call, the codec
+ * used for recording is the same one used for transmission.
+ **/
+- (BOOL)startRecordingInLocalVideoModeToFile:(NSString *)file videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier
+						   videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
+						audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier;
+
+/**
+ * Starts a recording session, recording only the remote video source.
+ * video codec used cannot be specified, as it is the one sent from the
+ * remote party. (Performance considerations)
+ **/
+- (BOOL)startRecordingInRemoteVideoModeToFile:(NSString *)file audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier;
 
 /**
  * Starts an audio only recording session. Currently, only XMCodecIdentifier_LinearPCM is supported
@@ -78,6 +98,16 @@
 - (void)stopRecording;
 
 - (BOOL)isRecording;
+
+- (BOOL)doesRecordLocalVideo;
+- (BOOL)doesRecordRemoteVideo;
+
+/**
+ * Sets which video sources to record, only valid for recompression mode.
+ * This method does nothing if the current recording mode isn't
+ * the recompression mode or both flags are NO.
+ **/
+- (void)setRecordLocalVideo:(BOOL)recordLocal recordRemoteVideo:(BOOL)recordRemote;
 
 /**
  * Returns which codecs can control the data rate to compress. the videoBandwidthLimit parameter

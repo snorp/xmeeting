@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.m,v 1.4 2006/10/02 21:22:03 hfriederich Exp $
+ * $Id: XMCallRecorder.m,v 1.5 2006/11/21 10:08:11 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #import "XMCallRecorder.h"
 #import "XMPrivate.h"
 #import "XMStringConstants.h"
+#import "XMMediaTransmitter.h"
 
 // Defining the QuickTime Movie Player's application type
 #define XM_SIG_MOVIE_PLAYER 'TVOD'
@@ -28,6 +29,8 @@
 #define XM_UNKNOWN_RECORDING_MODE 0
 #define XM_AUDIO_ONLY_RECORDING_MODE 1
 #define XM_RECOMPRESSION_RECORDING_MODE 2
+#define XM_LOCAL_VIDEO_RECORDING_MODE 3
+#define XM_REMOTE_VIDEO_RECORDING_MODE 4
 #define XM_CLOSING_MODE 0xff
 
 @interface XMCallRecorder (PrivateMethods)
@@ -36,6 +39,7 @@
 - (BOOL)_createMovie:(NSString *)filePath;
 - (BOOL)_prepareAudioRecording:(XMCodecIdentifier)codec;
 - (BOOL)_prepareVideoRecordingInRecompressionMode:(XMCodecIdentifier)codec quality:(XMCodecQuality)quality bandwidthLimit:(unsigned)bandwidthLimit;
+- (BOOL)_prepareVideoRecordingInLocalOrRemoteMode:(XMCodecIdentifier)codec quality:(XMCodecQuality)quality bandwidthLimit:(unsigned)bandwidthLimit;
 - (void)_finishAudioRecording;
 - (void)_finishVideoRecording;
 - (void)_finishMovie;
@@ -163,7 +167,8 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 - (void)_close
 {
 	BOOL hasSeparateThreadRunning = NO;
-	if(isRecording == YES && recordingMode == XM_RECOMPRESSION_RECORDING_MODE)
+	if(isRecording == YES && 
+	   (recordingMode == XM_RECOMPRESSION_RECORDING_MODE || recordingMode == XM_LOCAL_VIDEO_RECORDING_MODE))
 	{
 		hasSeparateThreadRunning = YES;
 	}
@@ -185,6 +190,8 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 						   videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier 
 							  videoCodecQuality:(XMCodecQuality)videoCodecQuality
 								  videoDataRate:(unsigned)videoDataRate
+							   recordLocalVideo:(BOOL)doRecordLocalVideo
+							  recordRemoteVideo:(BOOL)doRecordRemoteVideo
 						   audioCodecIdentifier:(XMCodecIdentifier)theAudioCodecIdentifier
 						   lowPriorityRecording:(BOOL)lowPriorityRecording;
 {
@@ -263,8 +270,158 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 		isAudioRecording = YES;
 	}
 	
+	recordLocalVideo = doRecordLocalVideo;
+	recordRemoteVideo = doRecordRemoteVideo;
+	
 	// Start the video thread
 	[NSThread detachNewThreadSelector:@selector(_runRecompressionThread) toTarget:self withObject:nil];
+	
+	return TRUE;
+}
+
+- (BOOL)startRecordingInLocalVideoModeToFile:(NSString *)file videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier
+						   videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
+						audioCodecIdentifier:(XMCodecIdentifier)theAudioCodecIdentifier
+{
+	// some validity checks first
+	if(isRecording == YES)
+	{
+		return NO;
+	}
+	
+	[self _resetErrorCodes];
+	
+	if(videoCodecIdentifier < XMCodecIdentifier_H261)
+	{
+		errorCode = 3;
+		locationCode = 0x0001;
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	// at the moment, only Linear PCM is supported
+	if(theAudioCodecIdentifier != XMCodecIdentifier_UnknownCodec &&
+	   theAudioCodecIdentifier != XMCodecIdentifier_LinearPCM)
+	{
+		errorCode = 3;
+		locationCode = 0x0002;
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	// prepare the needed resources
+	BOOL result = [self _createMovie:file];
+	if(result == NO)
+	{
+		[self _cleanupMovie];
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	result = [self _prepareAudioRecording:theAudioCodecIdentifier];
+	if(result == NO)
+	{
+		[self _cleanupMovie];
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	recordingMode = XM_LOCAL_VIDEO_RECORDING_MODE;
+	[self _prepareVideoRecordingInLocalOrRemoteMode:videoCodecIdentifier
+											quality:videoCodecQuality
+									 bandwidthLimit:videoDataRate];
+	if(result == NO)
+	{
+		recordingMode = XM_UNKNOWN_RECORDING_MODE;
+		[self _cleanupMovie];
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	videoTrackOffset = 0;
+	previousTimestamp = 0;
+	
+	// validity checks succeded.
+	isRecording = YES;
+	quitRecording = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallRecorderDidStartRecording object:self];
+	
+	// get start time
+	gettimeofday(&startTime, NULL);
+	
+	// switch to green for audio recording
+	if(theAudioCodecIdentifier != XMCodecIdentifier_UnknownCodec)
+	{
+		isAudioRecording = YES;
+	}
+	
+	return TRUE;
+}
+
+- (BOOL)startRecordingInRemoteVideoModeToFile:(NSString *)file audioCodecIdentifier:(XMCodecIdentifier)theAudioCodecIdentifier
+{
+	if(isRecording == YES)
+	{
+		return NO;
+	}
+	
+	[self _resetErrorCodes];
+	
+	// at the moment, only Linear PCM is supported
+	if(theAudioCodecIdentifier != XMCodecIdentifier_UnknownCodec &&
+	   theAudioCodecIdentifier != XMCodecIdentifier_LinearPCM)
+	{
+		errorCode = 4;
+		locationCode = 0x0002;
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	// prepare the needed resources
+	BOOL result = [self _createMovie:file];
+	if(result == NO)
+	{
+		[self _cleanupMovie];
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	result = [self _prepareAudioRecording:theAudioCodecIdentifier];
+	if(result == NO)
+	{
+		[self _cleanupMovie];
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	recordingMode = XM_REMOTE_VIDEO_RECORDING_MODE;
+	[self _prepareVideoRecordingInLocalOrRemoteMode:XMCodecIdentifier_H261
+											quality:XMCodecQuality_Max
+									 bandwidthLimit:0];
+	if(result == NO)
+	{
+		recordingMode = XM_UNKNOWN_RECORDING_MODE;
+		[self _cleanupMovie];
+		[self _handleErrorReport];
+		return NO;
+	}
+	
+	videoTrackOffset = 0;
+	previousTimestamp = 0;
+	
+	// validity checks succeded.
+	isRecording = YES;
+	quitRecording = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallRecorderDidStartRecording object:self];
+	
+	// get start time
+	gettimeofday(&startTime, NULL);
+	
+	// switch to green for audio recording
+	if(theAudioCodecIdentifier != XMCodecIdentifier_UnknownCodec)
+	{
+		isAudioRecording = YES;
+	}
 	
 	return TRUE;
 }
@@ -353,12 +510,118 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 		[self _finishAudioRecording];
 		
 		// handling the rest once the recompression thread did finish
+	} 
+	else if(recordingMode == XM_LOCAL_VIDEO_RECORDING_MODE)
+	{
+		[XMMediaTransmitter _stopRecording]; // stop recording
+		
+		// aquire lock to switch back to avoid race conditions
+		[audioLock lock];
+		isAudioRecording = NO;
+		[audioLock unlock];
+		
+		[self _finishAudioRecording];
+		
+		// handling the rest once the transmitter stopped recording
+	}
+	else
+	{
+		// aquire lock to switch back to avoid race conditions
+		[audioLock lock];
+		isAudioRecording = NO;
+		[audioLock unlock];
+		
+		[self _finishAudioRecording];
+		
+		[videoLock lock];
+		
+		recordingMode = XM_UNKNOWN_RECORDING_MODE;
+		
+		[videoLock unlock];
+		
+		[self _finishVideoRecording];
+		
+		[self _finishMovie];
+		[self _cleanupMovie];
+		
+		isRecording = NO;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallRecorderDidEndRecording object:self];	
 	}
 }
 
 - (BOOL)isRecording
 {
 	return isRecording;
+}
+
+- (BOOL)doesRecordLocalVideo
+{
+	if(isRecording == NO)
+	{
+		return NO;
+	}
+	if(recordingMode == XM_LOCAL_VIDEO_RECORDING_MODE)
+	{
+		return YES;
+	}
+	if(recordingMode == XM_RECOMPRESSION_RECORDING_MODE)
+	{
+		return recordLocalVideo;
+	}
+	return NO;
+}
+
+- (BOOL)doesRecordRemoteVideo
+{
+	if(isRecording == NO)
+	{
+		return NO;
+	}
+	if(recordingMode == XM_REMOTE_VIDEO_RECORDING_MODE)
+	{
+		return YES;
+	}
+	if(recordingMode == XM_RECOMPRESSION_RECORDING_MODE)
+	{
+		return recordRemoteVideo;
+	}
+	return NO;
+}
+
+- (void)setRecordLocalVideo:(BOOL)doRecordLocalVideo recordRemoteVideo:(BOOL)doRecordRemoteVideo
+{
+	if(isRecording == NO || recordingMode != XM_RECOMPRESSION_RECORDING_MODE)
+	{
+		return;
+	}
+	if(doRecordLocalVideo == NO && doRecordRemoteVideo == NO)
+	{
+		return;
+	}
+	
+	[videoLock lock];
+	
+	BOOL needsClearing = NO;
+	if(recordLocalVideo != doRecordLocalVideo || recordRemoteVideo != doRecordRemoteVideo)
+	{
+		needsClearing = YES;
+	}
+	
+	recordLocalVideo = doRecordLocalVideo;
+	recordRemoteVideo = doRecordRemoteVideo;
+	
+	if(needsClearing == YES && recompressionBuffer != NULL)
+	{
+		CVPixelBufferLockBaseAddress(recompressionBuffer, 0);
+		size_t bytesPerRow = CVPixelBufferGetBytesPerRow(recompressionBuffer);
+		size_t height = CVPixelBufferGetHeight(recompressionBuffer);
+		void *ptr = CVPixelBufferGetBaseAddress(recompressionBuffer);
+		bzero(ptr, bytesPerRow*height);
+		
+		CVPixelBufferUnlockBaseAddress(recompressionBuffer, 0);
+	}
+	
+	[videoLock unlock];
 }
 
 - (BOOL)videoCodecSupportsDataRateControl:(XMCodecIdentifier)codecIdentifier
@@ -659,6 +922,49 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 			locationCode = 0x030f;
 			return NO;
 		}
+		
+		// calculate the video track offset in case this method is called at a later time
+		struct timeval currentTime;
+		gettimeofday(&currentTime, NULL);
+		videoTrackOffset = (currentTime.tv_sec - startTime.tv_sec)*600; // converting to time base 600
+		videoTrackOffset += (currentTime.tv_usec - startTime.tv_usec)/1667;
+	}
+	
+	return YES;
+}
+
+- (BOOL)_prepareVideoRecordingInLocalOrRemoteMode:(XMCodecIdentifier)codec 
+										  quality:(XMCodecQuality)quality 
+								   bandwidthLimit:(unsigned)bandwidthLimit;
+{
+	ComponentResult err = noErr;
+	
+	if(codec != XMCodecIdentifier_UnknownCodec)
+	{
+		videoTrack = NewMovieTrack(movie, Long2Fix(352), Long2Fix(288), 0);
+		err = GetMoviesError();
+		checkErr(0x0600);
+		
+		videoMedia = NewTrackMedia(videoTrack, VideoMediaType, XM_VIDEO_TIME_SCALE, NULL, 0);
+		err = GetMoviesError();
+		checkErr(0x0601);
+		
+		err = BeginMediaEdits(videoMedia);
+		checkErr(0x0302);
+		
+		// calculate the video track offset in case this method is called at a later time
+		struct timeval currentTime;
+		gettimeofday(&currentTime, NULL);
+		videoTrackOffset = (currentTime.tv_sec - startTime.tv_sec)*600; // converting to time base 600
+		videoTrackOffset += (currentTime.tv_usec - startTime.tv_usec)/1667;
+		
+		if(recordingMode == XM_LOCAL_VIDEO_RECORDING_MODE)
+		{
+			[XMMediaTransmitter _startRecordingWithCodec:codec
+											   videoSize:XMVideoSize_CIF
+										    codecQuality:quality
+											  maxBitrate:bandwidthLimit];
+		}
 	}
 	
 	return YES;
@@ -706,6 +1012,9 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 		EndMediaEdits(videoMedia);
 		InsertMediaIntoTrack(videoTrack, videoTrackOffset, 0, GetMediaDuration(videoMedia), fixed1);
 	}
+	
+	// resetting the track offset - just in case
+	videoTrackOffset = 0;
 }
 
 - (void)_finishMovie
@@ -801,14 +1110,14 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 
 - (void)_handleUncompressedLocalVideoFrame:(CVPixelBufferRef)pixelBuffer
 {
-	if(recompressionBuffer == NULL)
+	if(recompressionBuffer == NULL || recordLocalVideo == NO)
 	{
 		return;
 	}
 	
 	[videoLock lock];
 	
-	if(recompressionBuffer != NULL)
+	if(recompressionBuffer != NULL && recordLocalVideo == YES)
 	{
 		if(frameOccupied == NO)
 		{
@@ -822,11 +1131,22 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 			size_t dstBytesPerRow = CVPixelBufferGetBytesPerRow(recompressionBuffer);
 			void *dstPtr = CVPixelBufferGetBaseAddress(recompressionBuffer);
 		
-			// local video is displayed on the left side
-			// xOffset is 2px + amount necessary to center local video
-			// yOffset is 2px + amount necessary to center local video
-			size_t xOffset = 2 + ((352-srcWidth)/2);
-			size_t yOffset = 2 + ((288-srcHeight)/2);
+			size_t xOffset;
+			size_t yOffset;
+			if(recordRemoteVideo == YES)
+			{
+				// local video is displayed on the left side
+				// xOffset is 2px + amount necessary to center local video
+				// yOffset is 2px + amount necessary to center local video
+				xOffset = 2 + ((352-srcWidth)/2);
+				yOffset = 2 + ((288-srcHeight)/2);
+			}
+			else
+			{
+				// display it centered
+				xOffset = (((2*352+8)-srcWidth)/2);
+				yOffset = 2 + ((288-srcHeight)/2);
+			}
 			dstPtr += yOffset*dstBytesPerRow + 4*xOffset; // 32-bit samples (xOffset)!
 		
 			unsigned i;
@@ -848,14 +1168,14 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 
 - (void)_handleUncompressedRemoteVideoFrame:(CVPixelBufferRef)pixelBuffer
 {
-	if(recompressionBuffer == NULL)
+	if(recompressionBuffer == NULL || recordRemoteVideo == NO)
 	{
 		return;
 	}
 	
 	[videoLock lock];
 	
-	if(recompressionBuffer != NULL)
+	if(recompressionBuffer != NULL && recordRemoteVideo == YES)
 	{
 		if(frameOccupied == NO)
 		{
@@ -879,11 +1199,22 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 			size_t dstBytesPerRow = CVPixelBufferGetBytesPerRow(recompressionBuffer);
 			void *dstPtr = CVPixelBufferGetBaseAddress(recompressionBuffer);
 			
-			// remote video is displayed on the right side
-			// xOffset is 2px + 352px + 2px + amount necessary to center remote video
-			// yOffset is 2px + amount necessary to center remote video
-			size_t xOffset = 2 + 352 + 2 + ((352-srcWidth)/2);
-			size_t yOffset = 2 + ((288-srcHeight)/2);
+			size_t xOffset;
+			size_t yOffset;
+			if(recordLocalVideo == YES)
+			{
+				// remote video is displayed on the right side
+				// xOffset is 2px + 352px + 2px + amount necessary to center remote video
+				// yOffset is 2px + amount necessary to center remote video
+				xOffset = 2 + 352 + 2 + ((352-srcWidth)/2);
+				yOffset = 2 + ((288-srcHeight)/2);
+			}
+			else
+			{
+				// display it centered
+				xOffset = (((2*352+8)-srcWidth)/2);
+				yOffset = 2 + ((288-srcHeight)/2);
+			}
 			dstPtr += yOffset*dstBytesPerRow + 4*xOffset; // 32-bit samples (xOffset)!
 		
 			unsigned i;
@@ -901,6 +1232,104 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 	}
 	
 	[videoLock unlock];
+}
+
+- (void)_handleCompressedLocalVideoFrame:(UInt8 *)encodedFrame
+								  length:(UInt32)length
+						imageDescription:(ImageDescriptionHandle)imageDesc
+{
+	if(recordingMode != XM_LOCAL_VIDEO_RECORDING_MODE)
+	{
+		return;
+	}
+	
+	OSErr err = noErr;
+	TimeValue64 timestamp;
+	TimeValue64 duration;
+	
+	struct timeval theTime;
+	gettimeofday(&theTime, NULL);
+	
+	// calculating the timestamp with time base 600
+	int timestamp1 = (theTime.tv_sec - startTime.tv_sec)*600;
+	int timestamp2 = (theTime.tv_usec - startTime.tv_usec)/1666;
+	timestamp = ((TimeValue64)timestamp1 + (TimeValue64)timestamp2);
+	duration = timestamp - previousTimestamp;
+	previousTimestamp = timestamp;
+	
+	UInt8 *dataPtr = encodedFrame;
+	Handle dataHandle = (Handle)&dataPtr;
+	err = AddMediaSample(videoMedia, dataHandle, 0, length, duration, (SampleDescriptionHandle)imageDesc, 1, 0, NULL);
+	if(err != noErr)
+	{
+		NSLog(@"AddMediaSample failed: %d", err);
+	}
+}
+
+- (BOOL)_handleCompressedRemoteVideoFrame:(UInt8 *)encodedFrame
+								   length:(UInt32)length
+						 imageDescription:(ImageDescriptionHandle)imageDesc
+{
+	if(recordingMode != XM_REMOTE_VIDEO_RECORDING_MODE)
+	{
+		return YES;
+	}
+	
+	[videoLock lock];
+	
+	BOOL needsIFrame = NO;
+	
+	if(recordingMode == XM_REMOTE_VIDEO_RECORDING_MODE)
+	{
+	
+		OSErr err = noErr;
+		TimeValue64 timestamp;
+		TimeValue64 duration;
+		
+		if(previousTimestamp == 0)
+		{
+			needsIFrame = YES;
+		}
+	
+		struct timeval theTime;
+		gettimeofday(&theTime, NULL);
+	
+		// calculating the timestamp with time base 600
+		int timestamp1 = (theTime.tv_sec - startTime.tv_sec)*600;
+		int timestamp2 = (theTime.tv_usec - startTime.tv_usec)/1666;
+		timestamp = ((TimeValue64)timestamp1 + (TimeValue64)timestamp2);
+		duration = timestamp - previousTimestamp;
+		previousTimestamp = timestamp;
+	
+		UInt8 *dataPtr = encodedFrame;
+		Handle dataHandle = (Handle)&dataPtr;
+		err = AddMediaSample(videoMedia, dataHandle, 0, length, duration, (SampleDescriptionHandle)imageDesc, 1, 0, NULL);
+		if(err != noErr)
+		{
+			NSLog(@"AddMediaSample failed: %d", err);
+		}
+	}
+	
+	[videoLock unlock];
+	
+	return needsIFrame;
+}
+
+
+- (void)_handleLocalVideoRecordingDidEnd
+{
+	[self _finishVideoRecording];
+	
+	[self _finishMovie];
+	[self _cleanupMovie];
+	
+	isRecording = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallRecorderDidEndRecording object:self];
+	
+	if(recordingMode == XM_CLOSING_MODE)
+	{
+		_XMThreadExit();
+	}
 }
 
 #pragma mark -
@@ -1466,6 +1895,11 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 {	
 	if(frameUpdated == NO)
 	{
+		// terminate timer if needed
+		if(quitRecording == YES)
+		{
+			[timer invalidate];
+		}
 		return;
 	}
 	
@@ -1509,7 +1943,6 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 			}
 		}
 	}
-	
 	previousTimestamp = timestamp;
 	
 	// compressing the frame. The encoded frame is handled in the callback
