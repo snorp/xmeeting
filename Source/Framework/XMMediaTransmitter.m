@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.52 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.53 2006/11/21 11:02:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -621,6 +621,13 @@ BOOL _XMIsH263IFrame(UInt8* data);
 
 - (void)_runMediaTransmitterThread
 {	
+	// Use a higher thread priority
+	BOOL result = [NSThread setThreadPriority:0.8];
+	if(result == NO)
+	{
+		_XMLogMessage("Could not adjust media transmitter thread priority");
+	}
+	
 	EnterMoviesOnThread(kQTEnterMoviesFlagDontSetComponentsThreadMode);
 	XMRegisterPacketBuilder();
 	XMRegisterRTPH263Packetizer();
