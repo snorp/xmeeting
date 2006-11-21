@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.10 2006/11/05 21:04:38 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.11 2006/11/21 10:42:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,7 @@ static AudioDeviceID activePlayDeviceID = kAudioDeviceUnknown;
 static BOOL activePlayDeviceIsMuted = FALSE; 
 static XMSoundChannel *recordDevice = NULL;
 static BOOL runInputDevice = FALSE;
+static BOOL recordAudio = FALSE;
 static AudioDeviceID recordDeviceID = kAudioDeviceUnknown;
 static BOOL recordDeviceIsMuted = FALSE;
 static BOOL measureSignalLevels = FALSE;
@@ -158,11 +159,28 @@ void XMSoundChannel::SetMeasureSignalLevels(BOOL flag)
 	deviceEditMutex.Wait();
 	
 	measureSignalLevels = flag;
-	if(flag == TRUE)
+	if(measureSignalLevels == TRUE)
 	{
 		recordDevice->Start();
 	}
-	else if(runInputDevice == FALSE)
+	else if(runInputDevice == FALSE && recordAudio == FALSE)
+	{
+		recordDevice->Stop();
+	}
+	
+	deviceEditMutex.Signal();
+}
+
+void XMSoundChannel::SetRecordAudio(BOOL flag)
+{
+	deviceEditMutex.Wait();
+	
+	recordAudio = flag;
+	if(recordAudio == TRUE)
+	{
+		recordDevice->Start();
+	}
+	else if(runInputDevice == FALSE && measureSignalLevels == FALSE)
 	{
 		recordDevice->Stop();
 	}
@@ -209,7 +227,7 @@ XMSoundChannel::~XMSoundChannel()
 	else if(isInputProxy == TRUE)
 	{
 		runInputDevice = FALSE;
-		if(measureSignalLevels == FALSE)
+		if(measureSignalLevels == FALSE && recordAudio == FALSE)
 		{
 			recordDevice->Stop();
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.m,v 1.5 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMCallRecorder.m,v 1.6 2006/11/21 10:42:25 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMPrivate.h"
 #import "XMStringConstants.h"
 #import "XMMediaTransmitter.h"
+#import "XMBridge.h"
 
 // Defining the QuickTime Movie Player's application type
 #define XM_SIG_MOVIE_PLAYER 'TVOD'
@@ -766,6 +767,8 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 		
 		err = BeginMediaEdits(audioMedia);
 		checkErr(0x0203);
+		
+		_XMSetRecordAudio(true);
 	}
 	
 	return YES;
@@ -974,6 +977,8 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 {
 	if(audioMedia != NULL)
 	{
+		_XMSetRecordAudio(false);
+		
 		// complete the last sample if needed
 		unsigned numberOfFramesPerBuffer = 4096;
 		if(audioCodecIdentifier == XMCodecIdentifier_LinearPCM)
@@ -1306,7 +1311,7 @@ inline void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *sr
 		err = AddMediaSample(videoMedia, dataHandle, 0, length, duration, (SampleDescriptionHandle)imageDesc, 1, 0, NULL);
 		if(err != noErr)
 		{
-			NSLog(@"AddMediaSample failed: %d", err);
+			needsIFrame = YES;
 		}
 	}
 	

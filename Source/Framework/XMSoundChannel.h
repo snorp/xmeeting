@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.h,v 1.6 2006/11/05 21:04:37 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.7 2006/11/21 10:42:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,6 +58,11 @@ public:
 	 * Signal level metering
 	 **/
 	static void SetMeasureSignalLevels(BOOL flag);
+	
+	/**
+	 * Audio Recording
+	 **/
+	static void SetRecordAudio(BOOL flag);
 	
 	/**
 	 * Instructs both play and record channel to immediately stop playing.

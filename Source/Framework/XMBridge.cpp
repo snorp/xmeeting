@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.39 2006/11/11 08:37:04 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.40 2006/11/21 10:42:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -139,6 +139,11 @@ void _XMSetMuteAudioOutputDevice(bool muteFlag)
 void _XMSetMeasureAudioSignalLevels(bool flag)
 {
 	XMSoundChannel::SetMeasureSignalLevels(flag);
+}
+
+void _XMSetRecordAudio(bool flag)
+{
+	XMSoundChannel::SetRecordAudio(flag);
 }
 
 void _XMSetAudioFunctionality(bool enableSilenceSuppression,
