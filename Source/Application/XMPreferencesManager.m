@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.28 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.29 2006/11/21 12:40:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,7 +175,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerEnableSilenceSuppression];
 	[number release];
 	
-	number = [[NSNumber alloc] initWithBool:YES];
+	number = [[NSNumber alloc] initWithBool:NO];
 	[defaultsDict setObject:number forKey:XMKey_PreferencesManagerEnableEchoCancellation];
 	[number release];
 	
