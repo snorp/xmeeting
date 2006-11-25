@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.7 2006/11/12 20:25:32 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.8 2006/11/25 10:05:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,13 +26,17 @@ public:
 	XMSIPRegistrarRecord(const PString & host,
 						 const PString & username,
 						 const PString & authorizationUsername,
-						 const PString & password);
+						 const PString & password,
+						 const PString & adjustedHost,
+						 const PString & adjustedUsername);
 	~XMSIPRegistrarRecord();
 	
 	const PString & GetHost() const;
 	const PString & GetUsername() const;
 	const PString & GetAuthorizationUsername() const;
 	const PString & GetPassword() const;
+	const PString & GetAdjustedHost() const;
+	const PString & GetAdjustedUsername() const;
 	void SetPassword(const PString & password);
 	unsigned GetStatus() const;
 	void SetStatus(unsigned status);
@@ -43,6 +47,8 @@ private:
 	PString username;
 	PString authorizationUsername;
 	PString password;
+	PString adjustedHost;
+	PString adjustedUsername;
 	unsigned status;
 };
 

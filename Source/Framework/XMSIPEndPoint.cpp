@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.21 2006/11/21 13:09:54 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.22 2006/11/25 10:05:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -129,8 +129,8 @@ void XMSIPEndPoint::UseRegistrar(const PString & host,
 	{
 		XMSIPRegistrarRecord & record = activeRegistrars[i];
 		
-		if(record.GetHost() == adjustedHost &&
-		   record.GetUsername() == adjustedUsername)
+		if(record.GetHost() == host &&
+		   record.GetUsername() == username)
 		{
 			if(record.GetPassword() != password)
 			{
@@ -150,7 +150,7 @@ void XMSIPEndPoint::UseRegistrar(const PString & host,
 		}
 	}
 	
-	XMSIPRegistrarRecord *record = new XMSIPRegistrarRecord(host, username, authorizationUsername, password);
+	XMSIPRegistrarRecord *record = new XMSIPRegistrarRecord(host, username, authorizationUsername, password, adjustedHost, adjustedUsername);
 	record->SetStatus(XM_SIP_REGISTRAR_STATUS_TO_REGISTER);
 	activeRegistrars.Append(record);
 }
@@ -311,15 +311,8 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 	{
 		XMSIPRegistrarRecord & record = activeRegistrars[i];
 		
-		PString theHost = record.GetHost();
-		PString theUsername = record.GetUsername();
-		
-		PINDEX atLocation = theUsername.Find('@');
-		if(atLocation != P_MAX_INDEX)
-		{
-			theHost = theUsername.Mid(atLocation+1);
-			theUsername = theUsername.Left(atLocation);
-		}
+		PString theHost = record.GetAdjustedHost();
+		PString theUsername = record.GetAdjustedUsername();
 		
 		if(theHost == host &&
 		  theUsername == username)
@@ -371,15 +364,8 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 		// if the user entered username in the form username@registrar.net
 		// both username and registrar.net will be used as username / host
 		// respectively. This circumstance is taken into account here
-		PString theHost = record.GetHost();
-		PString theUsername = record.GetUsername();
-		
-		PINDEX atLocation = theUsername.Find('@');
-		if(atLocation != P_MAX_INDEX)
-		{
-			theHost = theUsername.Mid(atLocation+1);
-			theUsername = theUsername.Left(atLocation);
-		}
+		PString theHost = record.GetAdjustedHost();
+		PString theUsername = record.GetAdjustedUsername();
 		
 		if(theHost == host &&
 		   theUsername == username)
@@ -815,12 +801,16 @@ SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 XMSIPRegistrarRecord::XMSIPRegistrarRecord(const PString & theHost,
 										   const PString & theUsername,
 										   const PString & theAuthorizationUsername,
-										   const PString & thePassword)
+										   const PString & thePassword,
+										   const PString & theAdjustedHost,
+										   const PString & theAdjustedUsername)
 {
 	host = theHost;
 	username = theUsername;
 	authorizationUsername = theAuthorizationUsername;
 	password = thePassword;
+	adjustedHost = theAdjustedHost;
+	adjustedUsername = theAdjustedUsername;
 }
 
 XMSIPRegistrarRecord::~XMSIPRegistrarRecord()
@@ -845,6 +835,16 @@ const PString & XMSIPRegistrarRecord::GetAuthorizationUsername() const
 const PString & XMSIPRegistrarRecord::GetPassword() const
 {
 	return password;
+}
+
+const PString & XMSIPRegistrarRecord::GetAdjustedHost() const
+{
+	return adjustedHost;
+}
+
+const PString & XMSIPRegistrarRecord::GetAdjustedUsername() const
+{
+	return adjustedUsername;
 }
 
 void XMSIPRegistrarRecord::SetPassword(const PString & thePassword)
