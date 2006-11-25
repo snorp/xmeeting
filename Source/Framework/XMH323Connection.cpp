@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.20 2006/11/12 00:17:06 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.21 2006/11/25 10:03:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,6 +64,11 @@ void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 		{
 			XMH323VideoCapability & videoCap = (XMH323VideoCapability &)h323Capability;
 			videoCap.OnSendingTerminalCapabilitySet(pdu);
+		}
+		else if(PIsDescendant(&h323Capability, H323AudioCapability)) 
+		{
+			H323AudioCapability & audioCap = (H323AudioCapability &)h323Capability;
+			audioCap.SetTxFramesInPacket(30);
 		}
 	}
 	
