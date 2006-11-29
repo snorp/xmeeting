@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookManager.m,v 1.9 2006/06/20 20:14:39 hfriederich Exp $
+ * $Id: XMAddressBookManager.m,v 1.10 2006/11/29 22:38:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -529,11 +529,11 @@ NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1 = @"XMeeting_HumanR
 				
 				for(j = 0; j < phoneNumberCount; j++)
 				{
-					NSString *value = [phoneNumberMultiValue valueAtIndex:i];
+					NSString *value = [phoneNumberMultiValue valueAtIndex:j];
 					
 					if([value hasPrefixCaseInsensitive:searchString])
 					{
-						XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(i | XM_PHONE_NUMBER_MASK)
+						XMAddressBookRecord *addressBookRecord = [[XMAddressBookRecord alloc] _initWithPerson:record index:(j | XM_PHONE_NUMBER_MASK)
 																								propertyMatch:XMAddressBookRecordPropertyMatch_PhoneNumberMatch];
 						[searchMatches addObject:addressBookRecord];
 						[addressBookRecord release];
