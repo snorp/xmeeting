@@ -240,7 +240,7 @@
 "XM_EXTERNAL_ADDRESS_NOT_AVAILABLE" = "<Pas disponible>";
 
 /* Misc */
-"XM_UNKNOWN_REASON" = "Raison inconnue";
+"XM_UNKNOWN_REASON" = "Raison inconnue (%d)";
 "XM_UNKNOWN" = "<Inconnu>";
 "XM_DATE_FORMAT_STRING" = "%d-%m-%Y %H:%M:%S";
 "XM_EXTERNAL_ADDRESS_SUFFIX" = " (Externe)";
