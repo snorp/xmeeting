@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.22 2006/11/25 10:05:58 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.23 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMSIPEndPoint.h"
@@ -12,7 +12,9 @@
 #include "XMOpalManager.h"
 #include "XMSIPConnection.h"
 #include "XMMediaFormats.h"
+#include "XMNetworkConfiguration.h"
 
+#include <ptlib/ipsock.h>
 #include <ptclib/enum.h>
 
 #define XM_SIP_REGISTRAR_STATUS_TO_REGISTER 0
@@ -180,14 +182,14 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
-			BOOL result = XMTransmitSIPInfo(SIP_PDU::Method_REGISTER,
-											record.GetHost(), 
-											record.GetUsername(),
-											record.GetAuthorizationUsername(),
-											record.GetPassword(),
-											PString::Empty(),
-											PString::Empty(),
-											GetRegistrarTimeToLive().GetSeconds());
+			BOOL result = TransmitSIPInfo(SIP_PDU::Method_REGISTER,
+										  record.GetHost(), 
+										  record.GetUsername(),
+										  record.GetAuthorizationUsername(),
+										  record.GetPassword(),
+										  PString::Empty(),
+										  PString::Empty(),
+										  GetRegistrarTimeToLive().GetSeconds());
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
 			{
 				record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
@@ -214,6 +216,10 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 	{
 		_XMHandleRegistrarSetupCompleted();
 	}
+}
+
+void XMSIPEndPoint::HandleNetworkStatusChange()
+{
 }
 
 void XMSIPEndPoint::UseProxy(const PString & hostname,
@@ -443,119 +449,53 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 	return new XMSIPConnection(call, *this, token, destination, transport);
 }
 
-/**
- * Almost identical copy from SIPEndPoint::TransmitSIPInfo. The only difference is
- * that special SIPInfo subclasses are used and that the method that creates
- * the OpalTransport is different. If more methods were virtual, this would be much
- * easier...
- **/
-BOOL XMSIPEndPoint::XMTransmitSIPInfo(SIP_PDU::Methods m,
-									  const PString & host,
-									  const PString & username,
-									  const PString & authName,
-									  const PString & password,
-									  const PString & realm,
-									  const PString & body,
-									  int timeout)
+BOOL XMSIPEndPoint::AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
+										 PIPSocket::InterfaceTable & interfaceTable)
 {
-	PSafePtr<SIPInfo> info = NULL;
-	OpalTransport *transport = NULL;
-	SIPURL hosturl = SIPURL(host);
-	
-	if(listeners.IsEmpty() || host.IsEmpty())
-	{
-		return FALSE;
-	}
-	
-	// Adjusted user name
-	PString adjustedUsername = username;
-	if(adjustedUsername.IsEmpty())
-	{
-		adjustedUsername = GetDefaultLocalPartyName();
-	}
-	if(adjustedUsername.Find('@') == P_MAX_INDEX)
-	{
-		adjustedUsername += '@' + host;
-	}
-	
-	// If we have a proxy, use it
-	PString hostname;
-	WORD port;
-	
-	if(proxy.IsEmpty()) {
-		PIPSocketAddressAndPortVector addrs;
-		if (PDNS::LookupSRV(hosturl.GetHostName(), "_sip._udp", hosturl.GetPort(), addrs)) {
-			hostname = addrs[0].address.AsString();
-			port = addrs [0].port;
-		} else { 
-			hostname = hosturl.GetHostName();
-			port = hosturl.GetPort();
+	for(int i = interfaceTable.GetSize()-1; i >= 0; i--) {
+		PIPSocket::InterfaceEntry & interface = interfaceTable[i];
+		
+		PIPSocket::Address localAddress = interface.GetAddress();
+		
+		// Remove loopback interface
+		if(localAddress.IsLoopback()) {
+			interfaceTable.RemoveAt(i);
+			continue;
+		}
+		
+		// remove non-RFC1918 interface if destination is RFC1918
+		if(remoteAddress.IsRFC1918() && !localAddress.IsRFC1918()) {
+			interfaceTable.RemoveAt(i);
+			continue;
+		}
+		
+		in_addr localAddr = interface.GetAddress();
+		in_addr remoteAddr = remoteAddress;
+		
+		int result = XMGetReachabilityStatusForAddresses(&localAddr, &remoteAddr);
+		if(result == XM_NOT_REACHABLE) {
+			interfaceTable.RemoveAt(i);
+		} else if(result == XM_DIRECT_REACHABLE) {
+			interfaceTable.DisallowDeleteObjects();
+			interfaceTable.RemoveAt(i);
+			interfaceTable.AllowDeleteObjects();
+			interfaceTable.RemoveAll();
+			interfaceTable.Append(&interface);
+			break;
 		}
 	}
-	else
-	{
-		hostname = proxy.GetHostName();
-		port = proxy.GetPort();
-		if(port == 0)
-		{
-			port = defaultSignalPort;
-		}
-	}
-	
-	OpalTransportAddress transportAddress(hostname, port, "udp");
-	
-	// Create the SIPInfo structure
-	info = activeSIPInfo.FindSIPInfoByUrl(adjustedUsername, m, PSafeReadWrite);
-	
-	// if there is already a request with this URL and method, then update it with the new information
-	if (info != NULL) {
-		if (!password.IsEmpty())
-			info->SetPassword(password); // Adjust the password if required 
-		if (!realm.IsEmpty())
-			info->SetAuthRealm(realm);   // Adjust the realm if required 
-		if (!authName.IsEmpty())
-			info->SetAuthUser(authName); // Adjust the authUser if required 
-		if (!body.IsEmpty())
-			info->SetBody(body);         // Adjust the body if required 
-		info->SetExpire(timeout);      // Adjust the expire field
-	} 
-	
-	// otherwise create a new request with this method type
-	else {
-		switch (m) {
-			case SIP_PDU::Method_REGISTER:
-				info = new XMSIPRegisterInfo(*this, adjustedUsername, authName, password, timeout);
-				break;
-			case SIP_PDU::Method_SUBSCRIBE:
-				info = new SIPMWISubscribeInfo(*this, adjustedUsername, timeout);
-				break;
-			case SIP_PDU::Method_PING:
-				info = new SIPPingInfo(*this, adjustedUsername, timeout);
-				break;
-			case SIP_PDU::Method_MESSAGE:
-				info = new SIPMessageInfo(*this, adjustedUsername, body);
-				break;
-			default:
-				PTRACE(1, "SIP\tUnknown SIP request method " << m);
-				return FALSE;
-		}
-		activeSIPInfo.Append(info);
-	}
-	
-	if (!info->CreateTransport(transportAddress)) {
-		activeSIPInfo.Remove (info);
-		return FALSE;
-	}
-	
-	transport = info->GetTransport ();
-    
-	if (transport != NULL && !transport->WriteConnect(WriteSIPInfo, &*info)) {
-		PTRACE(1, "SIP\tCould not write to " << transportAddress << " - " << transport->GetErrorText());
-		activeSIPInfo.Remove (info);
-		return FALSE;
-	}
-	
 	return TRUE;
+}
+
+SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost,
+									  			    const PString & adjustedUsername, 
+												    const PString & authName, 
+												    const PString & password, 
+												    int timeout, 
+												    const PTimeInterval & minRetryTime, 
+												    const PTimeInterval & maxRetryTime)
+{
+	return new XMSIPRegisterInfo(*this, originalHost, adjustedUsername, authName, password, timeout, minRetryTime, maxRetryTime);
 }
 
 /**
@@ -865,9 +805,15 @@ void XMSIPRegistrarRecord::SetStatus(unsigned theStatus)
 #pragma mark -
 #pragma mark XMSIPRegisterInfo methods
 
-XMSIPRegisterInfo::XMSIPRegisterInfo(XMSIPEndPoint & ep, const PString & adjustedUsername, const PString & authName, 
-									 const PString & password, int expire)
-: SIPRegisterInfo(ep, adjustedUsername, authName, password, expire)
+XMSIPRegisterInfo::XMSIPRegisterInfo(XMSIPEndPoint & ep, 
+									 const PString & originalHost,
+									 const PString & adjustedUsername, 
+									 const PString & authName, 
+									 const PString & password, 
+									 int expire,
+									 const PTimeInterval & minRetryTime,
+									 const PTimeInterval & maxRetryTime)
+: SIPRegisterInfo(ep, originalHost, adjustedUsername, authName, password, expire, minRetryTime, maxRetryTime)
 {
 }
 
@@ -893,7 +839,7 @@ BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
 		XMSIPEndPoint & xmEP = (XMSIPEndPoint &)ep;
 		transport = xmEP.XMCreateTransport(registrarAddress);
 		transportMutex.Wait();
-		if(registrarTransport != NULL) { // should not have happened, but one never knows...
+		if(registrarTransport != NULL) {
 			delete transport;
 		} else {
 			registrarTransport = transport;

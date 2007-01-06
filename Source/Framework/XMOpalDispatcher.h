@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.16 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.17 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_OPAL_DISPATCHER_H__
@@ -36,6 +36,7 @@
 + (void)_retryGatekeeperRegistration:(XMPreferences *)preferences;
 + (void)_retryEnableSIP:(XMPreferences *)preferences;
 + (void)_retrySIPRegistrations:(XMPreferences *)preferences;
++ (void)_handleNetworkStatusChange;
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
 + (void)_initiateSpecificCallToAddress:(NSString *)address 

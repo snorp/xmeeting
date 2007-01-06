@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.12 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.13 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_H323_END_POINT_H__
@@ -30,6 +30,7 @@ public:
 													 const PString & phoneNumber,
 													 const PString & password);
 	void CheckGatekeeperRegistration();
+	void HandleNetworkStatusChange();
 	
 	// obtaining call statistics
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);

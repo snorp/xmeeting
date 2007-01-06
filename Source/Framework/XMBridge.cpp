@@ -1,9 +1,9 @@
 /*
- * $Id: XMBridge.cpp,v 1.40 2006/11/21 10:42:25 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.41 2007/01/06 20:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
- * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * All rights reserved
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMBridge.h"
@@ -111,6 +111,12 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 	theManager->SetUDPPorts(udpPortMin, udpPortMax);
 	theManager->SetTCPPorts(tcpPortMin, tcpPortMax);
 	theManager->SetRtpIpPorts(rtpPortMin, rtpPortMax);
+}
+
+void _XMHandleNetworkStatusChange()
+{
+	h323EndPoint->HandleNetworkStatusChange();
+	sipEndPoint->HandleNetworkStatusChange();
 }
 
 #pragma mark -

@@ -1,9 +1,9 @@
 /*
- * $Id: XMEndPoint.h,v 1.11 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.12 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_END_POINT_H__
@@ -37,7 +37,8 @@ public:
 	// Overriding OpalEndPoint methods
 	virtual BOOL MakeConnection(OpalCall & call,
 								const PString & party,
-								void *userData = NULL);
+								void *userData = NULL,
+								unsigned int options = 0);
 	virtual OpalMediaFormatList GetMediaFormats() const;
 	virtual XMConnection * CreateConnection(OpalCall & call, PString & token);
 	virtual PSoundChannel * CreateSoundChannel(const XMConnection & connection, BOOL isSource);

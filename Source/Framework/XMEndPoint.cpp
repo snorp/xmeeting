@@ -1,9 +1,9 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.22 2006/11/12 20:31:05 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.23 2007/01/06 20:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMEndPoint.h"
@@ -69,7 +69,8 @@ BOOL XMEndPoint::EnableEchoCancellation()
 
 BOOL XMEndPoint::MakeConnection(OpalCall & call,
 							const PString & remoteParty,
-							void *userData)
+							void *userData,
+							unsigned int options)
 {
 	PString token = "XMeeting";
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(token);

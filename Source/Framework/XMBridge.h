@@ -1,9 +1,9 @@
 /*
- * $Id: XMBridge.h,v 1.35 2006/11/21 10:42:25 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.36 2007/01/06 20:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 /**
@@ -93,6 +93,12 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 					  unsigned int tcpPortMax,
 					  unsigned int rtpPortMin,
 					  unsigned int rtpPortMax);
+
+/**
+ * Called when the available network interfaces change,
+ * allowing it to re-do registrations etc
+ **/
+void _XMHandleNetworkStatusChange();
 
 #pragma mark Audio Functions
 

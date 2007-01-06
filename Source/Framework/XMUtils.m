@@ -1,9 +1,9 @@
 /*
- * $Id: XMUtils.m,v 1.19 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.20 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import <SystemConfiguration/SystemConfiguration.h>
@@ -619,4 +619,5 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 {
 	[_XMUtilsSharedInstance _getLocalAddresses];
 	[_XMUtilsSharedInstance updateSTUNInformation];
+	[XMOpalDispatcher _handleNetworkStatusChange];
 }

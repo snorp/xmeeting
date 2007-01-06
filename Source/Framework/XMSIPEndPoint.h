@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.8 2006/11/25 10:05:58 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.9 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SIP_END_POINT_H__
@@ -70,6 +70,8 @@ public:
 					  const PString & password);
 	void FinishRegistrarSetup();
 	
+	void HandleNetworkStatusChange();
+	
 	void UseProxy(const PString & hostname,
 				  const PString & username,
 				  const PString & password);
@@ -94,23 +96,28 @@ public:
 											 OpalTransport * transport,
 											 SIP_PDU * invite);
 	
+	virtual BOOL AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
+									  PIPSocket::InterfaceTable & interfaceTable);
+	
 	// These methods are mostly copies of the existing methods
 	// of the SIPEndPoint class. The main purpose is to establish the
 	// following properties:
 	// - Instead of sending out multiple REGISTER / INVITE to find out the
-	//   correct interface to use, send OPTIONS requests first, freeze the
+	//   correct interface to use, send OPTIONS requests first, lock on the
 	//   interface and send the REGISTER / INVITEs afterwards. 
 	// - Should the available interfaces change, re-REGISTER all registrations
 	// - Should a refreshed REGISTER fail due to host not reachable, do a clean
     //   REGISTER refresh
 	// - Ensure that a registration is refreshed before it expired. If the registration
 	//   expired, do a clean refresh
-	BOOL XMTransmitSIPInfo(SIP_PDU::Methods method, const PString & host,
-						   const PString & username, const PString & authName = PString::Empty(),
-						   const PString & password = PString::Empty(),
-						   const PString & authRealm = PString::Empty(),
-						   const PString & body = PString::Empty(),
-						   int timeout = 0);
+	virtual SIPRegisterInfo * CreateRegisterInfo(const PString & originalHost,
+												 const PString & adjustedUsername, 
+												 const PString & authName, 
+												 const PString & password, 
+												 int expire, 
+												 const PTimeInterval & minRetryTime, 
+												 const PTimeInterval & maxRetryTime
+												 );
 	OpalTransport * XMCreateTransport(const OpalTransportAddress & addr);
 	static BOOL WriteSIPOptions(OpalTransport & transport, void * data);
 	virtual void OnReceivedResponse(SIPTransaction & transaction, SIP_PDU & response);
@@ -143,8 +150,14 @@ class XMSIPRegisterInfo : public SIPRegisterInfo
 	PCLASSINFO(XMSIPRegisterInfo, SIPRegisterInfo);
 	
 public:
-	XMSIPRegisterInfo(XMSIPEndPoint & ep, const PString & adjustedUsername, const PString & authName, 
-					  const PString & password, int expire);
+	XMSIPRegisterInfo(XMSIPEndPoint & ep, 
+					  const PString & originalHost,
+					  const PString & adjustedUsername, 
+					  const PString & authName, 
+					  const PString & password, 
+					  int expire,
+					  const PTimeInterval & minRetryTime,
+					  const PTimeInterval & maxRetryTime);
 	~XMSIPRegisterInfo();
 	
 	virtual BOOL CreateTransport(OpalTransportAddress & addr);

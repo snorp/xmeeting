@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.20 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.21 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMH323EndPoint.h"
@@ -191,6 +191,10 @@ void XMH323EndPoint::CheckGatekeeperRegistration()
 	{
 		_XMHandleGatekeeperUnregistration();
 	}
+}
+
+void XMH323EndPoint::HandleNetworkStatusChange()
+{
 }
 
 #pragma mark Getting call statistics

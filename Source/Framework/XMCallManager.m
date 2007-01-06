@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallManager.m,v 1.30 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.31 2007/01/06 20:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMTypes.h"
@@ -1229,10 +1229,17 @@
 		address = [addressResource address];
 	}
 	
-	// remove any white spaces in the address
+	// remove any white spaces in the address, replace any preceding + with the international prefix
 	NSMutableString *processedAddress = [[NSMutableString alloc] initWithCapacity:[address length]];
 	[processedAddress setString:address];
 	[processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
+	if([processedAddress length] > 1)
+	{
+		if([processedAddress characterAtIndex:0] == '+')
+		{
+			[processedAddress replaceCharactersInRange:NSMakeRange(0, 1) withString:@"00"];
+		}
+	}
 	
 	// validity check is done within XMOpalDispatcher
 	

@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.35 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.36 2007/01/06 20:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMOpalDispatcher.h"
@@ -24,6 +24,7 @@ typedef enum _XMOpalDispatcherMessage
 	_XMOpalDispatcherMessage_RetryGatekeeperRegistration,
 	_XMOpalDispatcherMessage_RetryEnableSIP,
 	_XMOpalDispatcherMessage_RetrySIPRegistrations,
+	_XMOpalDispatcherMessage_HandleNetworkStatusChange,
 	
 	// Call Management messages
 	_XMOpalDispatcherMessage_InitiateCall = 0x0200,
@@ -68,6 +69,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleRetryGatekeeperRegistrationMessage:(NSArray *)messageComponents;
 - (void)_handleRetryEnableSIPMessage:(NSArray *)messageComponents;
 - (void)_handleRetrySIPRegistrationsMessage:(NSArray *)messageComponents;
+- (void)_handleNetworkStatusChangeMessage;
 
 - (void)_handleInitiateCallMessage:(NSArray *)messageComponents;
 - (void)_handleInitiateSpecificCallMessage:(NSArray *)messageComponents;
@@ -173,6 +175,11 @@ typedef enum _XMOpalDispatcherMessage
 	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetrySIPRegistrations withComponents:components];
 	
 	[components release];
+}
+
++ (void)_handleNetworkStatusChange
+{
+	[XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_HandleNetworkStatusChange withComponents:nil];
 }
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
@@ -633,6 +640,9 @@ typedef enum _XMOpalDispatcherMessage
 		case _XMOpalDispatcherMessage_RetrySIPRegistrations:
 			[self _handleRetrySIPRegistrationsMessage:[portMessage components]];
 			break;
+		case _XMOpalDispatcherMessage_HandleNetworkStatusChange:
+			[self _handleNetworkStatusChangeMessage];
+			break;
 		case _XMOpalDispatcherMessage_InitiateCall:
 			[self _handleInitiateCallMessage:[portMessage components]];
 			break;
@@ -799,6 +809,11 @@ typedef enum _XMOpalDispatcherMessage
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
 												   withObject:nil
 												waitUntilDone:NO];
+}
+
+- (void)_handleNetworkStatusChangeMessage
+{
+	_XMHandleNetworkStatusChange();
 }
 
 - (void)_handleInitiateCallMessage:(NSArray *)components
