@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.15 2006/11/12 00:17:06 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.16 2007/01/07 14:27:29 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMSIPConnection.h"
@@ -21,8 +21,10 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 								 SIPEndPoint & endpoint,
 								 const PString & token,
 								 const SIPURL & address,
-								 OpalTransport * transport)
-: SIPConnection(call, endpoint, token, address, transport),
+								 OpalTransport * transport,
+								 unsigned int options)
+
+: SIPConnection(call, endpoint, token, address, transport, options),
   h261VideoFormat(_XMMediaFormat_H261, RTP_DataFrame::H261, _XMMediaFormatEncoding_H261, 352, 288, 30, _XMGetMaxH261BitRate()),
   h263VideoFormat(_XMMediaFormat_H263, RTP_DataFrame::H263, _XMMediaFormatEncoding_H263, 352, 288, 30, _XMGetMaxH263BitRate()),
   h263PlusVideoFormat(_XMMediaFormat_H263Plus, (RTP_DataFrame::PayloadTypes)96, _XMMediaFormatEncoding_H263Plus, 352, 288, 30, _XMGetMaxH263BitRate()),

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.23 2007/01/06 20:41:17 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.24 2007/01/07 14:27:29 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -444,9 +444,16 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 												void * userData,
 												const SIPURL & destination,
 												OpalTransport * transport,
-												SIP_PDU * invite)
+												SIP_PDU * invite,
+												unsigned int options)
 {
-	return new XMSIPConnection(call, *this, token, destination, transport);
+	XMSIPConnection *conn = new XMSIPConnection(call, *this, token, destination, transport, options);
+	
+	if(conn != NULL)
+	{
+		OnNewConnection(call, *conn);
+	}
+	return conn;
 }
 
 BOOL XMSIPEndPoint::AdjustInterfaceTable(PIPSocket::Address & remoteAddress,

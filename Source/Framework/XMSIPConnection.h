@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPConnection.h,v 1.7 2006/11/12 00:17:06 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.8 2007/01/07 14:27:29 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SIP_CONNECTION_H__
@@ -25,7 +25,8 @@ public:
 					SIPEndPoint & endpoint,
 					const PString & token,
 					const SIPURL & address,
-					OpalTransport * transport);
+					OpalTransport * transport,
+					unsigned int options = 0);
 	
 	~XMSIPConnection();
 	
