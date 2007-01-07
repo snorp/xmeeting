@@ -167,6 +167,8 @@
 		D11C5E520A49EC730030633D /* XMIncomingCallAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */; };
 		D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */; };
 		D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = D11C5E630A49ED950030633D /* IncomingCallAlert.nib */; };
+		D11DDF8F0B20A989006086D5 /* XMNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */; };
+		D11DDF900B20A989006086D5 /* XMNetworkConfiguration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */; };
 		D1205AF909F986A000179B6C /* down_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF709F986A000179B6C /* down_arrow_down.tif */; };
 		D1205AFA09F986A000179B6C /* down_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF809F986A000179B6C /* down_arrow.tif */; };
 		D1205B0A09F9899600179B6C /* left_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205B0609F9899600179B6C /* left_arrow_down.tif */; };
@@ -996,6 +998,8 @@
 		D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMIncomingCallAlert.m; sourceTree = "<group>"; };
 		D11C5E640A49ED950030633D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
 		D11C5F230A49F9F90030633D /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
+		D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMNetworkConfiguration.h; path = Source/Framework/XMNetworkConfiguration.h; sourceTree = "<group>"; };
+		D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMNetworkConfiguration.cpp; path = Source/Framework/XMNetworkConfiguration.cpp; sourceTree = "<group>"; };
 		D1205AF709F986A000179B6C /* down_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow_down.tif; path = Resources/Images/down_arrow_down.tif; sourceTree = "<group>"; };
 		D1205AF809F986A000179B6C /* down_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow.tif; path = Resources/Images/down_arrow.tif; sourceTree = "<group>"; };
 		D1205B0609F9899600179B6C /* left_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = left_arrow_down.tif; path = Resources/Images/left_arrow_down.tif; sourceTree = "<group>"; };
@@ -1956,6 +1960,8 @@
 				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
 				D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */,
 				D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */,
+				D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */,
+				D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */,
 				D163364E07A456C4003FD9C0 /* XMProcess.h */,
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
 				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
@@ -3065,6 +3071,7 @@
 				D10BDC7B0AC6FBFC004320A8 /* guid.h in Headers */,
 				D14B04150B06020B001AB527 /* XMRFC2833Handler.h in Headers */,
 				D14B04C50B0606DA001AB527 /* XMInBandDTMFHandler.h in Headers */,
+				D11DDF8F0B20A989006086D5 /* XMNetworkConfiguration.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3712,6 +3719,7 @@
 				D14B04160B06020B001AB527 /* XMRFC2833Handler.cpp in Sources */,
 				D14B04C40B0606DA001AB527 /* XMInBandDTMFHandler.cpp in Sources */,
 				D15C639C0B069E5E00C24799 /* XMH323Connection.cpp in Sources */,
+				D11DDF900B20A989006086D5 /* XMNetworkConfiguration.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
