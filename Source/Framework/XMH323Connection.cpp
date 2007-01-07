@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.21 2006/11/25 10:03:46 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.22 2007/01/07 14:26:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,6 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 : H323Connection(call, endPoint, token, alias, address, options)
 {
 	hasSetLocalCapabilities = FALSE;
-	hasSentLocalCapabilities = FALSE;
 	
 	// setting correct initial bandwidth
 	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
@@ -71,8 +70,6 @@ void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 			audioCap.SetTxFramesInPacket(30);
 		}
 	}
-	
-	hasSentLocalCapabilities = TRUE;
 }
 
 BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCaps,

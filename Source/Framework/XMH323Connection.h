@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.12 2006/11/12 00:17:06 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.13 2007/01/07 14:26:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -66,7 +66,6 @@ public:
 	
 private:
 	BOOL hasSetLocalCapabilities;
-	BOOL hasSentLocalCapabilities;
 	
 	XMInBandDTMFHandler * inBandDTMFHandler;
 };
