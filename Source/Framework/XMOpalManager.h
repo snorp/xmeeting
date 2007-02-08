@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.26 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.27 2007/02/08 23:09:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,15 +32,13 @@ public:
 	XMOpalManager();
 	~XMOpalManager();
 	
-	void Initialise();
-	
 	/* Getting access to the OPAL manager */
-	static XMOpalManager * GetManagerInstance();
+	static XMOpalManager * GetManager();
 	
 	/* Getting access to the endpoints */
-	XMH323EndPoint * H323EndPoint();
-	XMSIPEndPoint * SIPEndPoint();
-	XMEndPoint * CallEndPoint();
+	static XMH323EndPoint * GetH323EndPoint();
+	static XMSIPEndPoint * GetSIPEndPoint();
+	static XMEndPoint * GetCallEndPoint();
 	
 	/* getting/setting call information */
 	void GetCallInformation(PString & remoteName,
@@ -58,13 +56,13 @@ public:
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	
 	/* overriding some callbacks */
-	virtual BOOL OnIncomingConnection(OpalConnection & connection);
 	virtual void OnEstablishedCall(OpalCall & call);
 	virtual void OnClearedCall(OpalCall & call);
 	virtual void OnReleased(OpalConnection & connection);
-	virtual BOOL OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream);
-	virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread = TRUE);
+    
+    void OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
+    void OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
 	
 	/* General setup methods */
 	void SetUserName(const PString & name);
@@ -85,9 +83,6 @@ public:
 	void SetCurrentAudioPacketTime(unsigned audioPacketTime);
 	unsigned GetCurrentAudioPacketTime();
 	
-	/* Video setup methods */
-	void SetVideoFunctionality(BOOL enableVideoTransmit, BOOL enableVideoReceive);
-	
 	/* getting /setting information about current call */
 	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
 	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier);
@@ -100,21 +95,11 @@ public:
 	static void LogMessage(const PString & message);
 	
 private:
-	BOOL IsOutgoingMedia(OpalMediaStream & stream);
 	
 	unsigned GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifier);
 	
-	unsigned callID;
-	
 	unsigned defaultAudioPacketTime;
 	unsigned currentAudioPacketTime;
-	
-	BOOL enableVideoTransmit;
-	BOOL enableVideoReceive;
-	
-	XMEndPoint *callEndPoint;
-	XMH323EndPoint *h323EndPoint;
-	XMSIPEndPoint *sipEndPoint;
 	
 	PString connectionToken;
 	PString remoteName;

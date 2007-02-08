@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.42 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.43 2007/02/08 23:09:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -21,50 +21,14 @@
 
 using namespace std;
 
-// reference to the active OPAL manager.
-static XMOpalManager *theManager = NULL;
-
-// reference to the XMEndpoint
-static XMEndPoint *callEndPoint = NULL;
-
-// reference to the H.323 Endpoint
-static XMH323EndPoint *h323EndPoint = NULL;
-
-// reference to the SIP Endpoint
-static XMSIPEndPoint *sipEndPoint = NULL;
-
 void _XMInitSubsystem(const char *pTracePath)
 {
-	if(theManager == NULL)
-	{
-		XMOpalManager::InitOpal(pTracePath);
-		
-		theManager = new XMOpalManager;
-		theManager->Initialise();
-		
-		callEndPoint = theManager->CallEndPoint();
-		h323EndPoint = theManager->H323EndPoint();
-		sipEndPoint = theManager->SIPEndPoint();
-		
-		XMSoundChannel::Init();
-	}
+    XMOpalManager::InitOpal(pTracePath);
 }
 
 void _XMCloseSubsystem()
 {
-	if(theManager != NULL)
-	{
-		XMOpalManager::CloseOpal();
-		
-		XMSoundChannel::DoClose();
-		
-		callEndPoint = NULL;
-		h323EndPoint = NULL;
-		sipEndPoint = NULL;
-		
-		//delete theManager; // doesn't work, would crash XMeeting :-(
-		theManager = NULL;
-	}
+    XMOpalManager::CloseOpal();
 }
 
 #pragma mark -
@@ -72,12 +36,12 @@ void _XMCloseSubsystem()
 
 void _XMSetUserName(const char *string)
 {
-	theManager->SetUserName(string);
+    XMOpalManager::GetManager()->SetUserName(string);
 }
 
 const char *_XMGetUserName()
 {
-	return theManager->GetDefaultUserName();
+	return XMOpalManager::GetManager()->GetDefaultUserName();
 }
 
 #pragma mark -
@@ -98,7 +62,7 @@ void _XMSetNATInformation(const char *stunServer,
 {
 	PString server = stunServer;
 	PString address = translationAddress;
-	theManager->SetNATInformation(stunServer, translationAddress);
+    XMOpalManager::GetManager()->SetNATInformation(stunServer, translationAddress);
 }
 
 void _XMSetPortRanges(unsigned int udpPortMin, 
@@ -108,6 +72,7 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 					  unsigned int rtpPortMin,
 					  unsigned int rtpPortMax)
 {
+    XMOpalManager *theManager = XMOpalManager::GetManager();
 	theManager->SetUDPPorts(udpPortMin, udpPortMax);
 	theManager->SetTCPPorts(tcpPortMin, tcpPortMax);
 	theManager->SetRtpIpPorts(rtpPortMin, rtpPortMax);
@@ -115,8 +80,8 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 
 void _XMHandleNetworkStatusChange()
 {
-	h323EndPoint->HandleNetworkStatusChange();
-	sipEndPoint->HandleNetworkStatusChange();
+    XMOpalManager::GetH323EndPoint()->HandleNetworkStatusChange();
+    XMOpalManager::GetSIPEndPoint()->HandleNetworkStatusChange();
 }
 
 #pragma mark -
@@ -156,8 +121,8 @@ void _XMSetAudioFunctionality(bool enableSilenceSuppression,
 							  bool enableEchoCancellation,
 							  unsigned packetTime)
 {
-	callEndPoint->SetAudioFunctionality(enableSilenceSuppression, enableEchoCancellation);
-	theManager->SetAudioPacketTime(packetTime);
+    XMOpalManager::GetCallEndPoint()->SetAudioFunctionality(enableSilenceSuppression, enableEchoCancellation);
+    XMOpalManager::GetManager()->SetAudioPacketTime(packetTime);
 }
 
 void _XMStopAudio()
@@ -180,7 +145,7 @@ void _XMStopAudioTest()
 
 void _XMSetEnableVideo(bool enableVideo)
 {
-	callEndPoint->SetEnableVideo(enableVideo);
+    XMOpalManager::GetCallEndPoint()->SetEnableVideo(enableVideo);
 }
 
 void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode)
@@ -197,9 +162,7 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 	PStringArray orderedCodecsArray = PStringArray(orderedCodecCount, orderedCodecs, TRUE);
 	PStringArray disabledCodecsArray = PStringArray(disabledCodecCount, disabledCodecs, TRUE);
 	
-	// these codecs are currently disabled by default
-	//disabledCodecsArray.AppendString("DUMMY");
-	
+    XMOpalManager *theManager = XMOpalManager::GetManager();
 	theManager->SetMediaFormatMask(disabledCodecsArray);
 	theManager->SetMediaFormatOrder(orderedCodecsArray);
 }
@@ -209,16 +172,17 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 
 bool _XMEnableH323Listeners(bool flag)
 {
-	return h323EndPoint->EnableListeners(flag);
+	return XMOpalManager::GetH323EndPoint()->EnableListeners(flag);
 }
 
 bool _XMIsH323Enabled()
 {
-	return h323EndPoint->IsListening();
+	return XMOpalManager::GetH323EndPoint()->IsListening();
 }
 
 void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 {
+    XMH323EndPoint *h323EndPoint = XMOpalManager::GetH323EndPoint();
 	h323EndPoint->DisableFastStart(!enableFastStart);
 	h323EndPoint->DisableH245Tunneling(!enableH245Tunnel);
 }
@@ -228,17 +192,17 @@ XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address,
 													const char *phoneNumber,
 													const char *password)
 {
-	return h323EndPoint->SetGatekeeper(address, gkUsername, phoneNumber, password);
+	return XMOpalManager::GetH323EndPoint()->SetGatekeeper(address, gkUsername, phoneNumber, password);
 }
 
 bool _XMIsRegisteredAtGatekeeper()
 {
-	return h323EndPoint->IsRegisteredWithGatekeeper();
+	return XMOpalManager::GetH323EndPoint()->IsRegisteredWithGatekeeper();
 }
 
 void _XMCheckGatekeeperRegistration()
 {
-	h323EndPoint->CheckGatekeeperRegistration();
+    XMOpalManager::GetH323EndPoint()->CheckGatekeeperRegistration();
 }
 
 #pragma mark -
@@ -246,24 +210,24 @@ void _XMCheckGatekeeperRegistration()
 
 bool _XMEnableSIPListeners(bool flag)
 {
-	return sipEndPoint->EnableListeners(flag);
+	return XMOpalManager::GetSIPEndPoint()->EnableListeners(flag);
 }
 
 bool _XMIsSIPEnabled()
 {
-	return sipEndPoint->IsListening();
+	return XMOpalManager::GetSIPEndPoint()->IsListening();
 }
 
 void _XMSetSIPProxy(const char *host,
 					const char *username,
 					const char *password)
 {
-	sipEndPoint->UseProxy(host, username, password);
+	XMOpalManager::GetSIPEndPoint()->UseProxy(host, username, password);
 }
 
 void _XMPrepareRegistrarSetup()
 {
-	sipEndPoint->PrepareRegistrarSetup();
+	XMOpalManager::GetSIPEndPoint()->PrepareRegistrarSetup();
 }
 
 void _XMUseRegistrar(const char *host,
@@ -271,17 +235,17 @@ void _XMUseRegistrar(const char *host,
 					 const char *authorizationUsername,
 					 const char *password)
 {
-	sipEndPoint->UseRegistrar(host, username, authorizationUsername, password);
+	XMOpalManager::GetSIPEndPoint()->UseRegistrar(host, username, authorizationUsername, password);
 }
 
 void _XMFinishRegistrarSetup()
 {
-	sipEndPoint->FinishRegistrarSetup();
+	XMOpalManager::GetSIPEndPoint()->FinishRegistrarSetup();
 }
 
 bool _XMIsSIPRegistered()
 {
-	return (sipEndPoint->GetRegistrationsCount() != 0);
+	return (XMOpalManager::GetSIPEndPoint()->GetRegistrationsCount() != 0);
 }
 
 #pragma mark -
@@ -291,7 +255,7 @@ unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty)
 {	
 	PString token;
 	
-	BOOL returnValue = callEndPoint->StartCall(protocol, remoteParty, token);
+	BOOL returnValue = XMOpalManager::GetCallEndPoint()->StartCall(protocol, remoteParty, token);
 	
 	if(returnValue == TRUE)
 	{
@@ -305,18 +269,18 @@ unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty)
 
 void _XMAcceptIncomingCall(unsigned callID)
 {
-	callEndPoint->AcceptIncomingCall();
+    XMOpalManager::GetCallEndPoint()->AcceptIncomingCall();
 }
 
 void _XMRejectIncomingCall(unsigned callID)
 {
-	callEndPoint->RejectIncomingCall();
+	XMOpalManager::GetCallEndPoint()->RejectIncomingCall();
 }
 
 void _XMClearCall(unsigned callID)
 {
 	PString callToken = PString(callID);
-	callEndPoint->ClearCall(callToken);
+	XMOpalManager::GetCallEndPoint()->ClearCall(callToken);
 }
 
 void _XMGetCallInformation(unsigned callID,
@@ -330,7 +294,7 @@ void _XMGetCallInformation(unsigned callID,
 	PString addressStr;
 	PString appStr;
 	
-	theManager->GetCallInformation(nameStr, numberStr, addressStr, appStr);
+    XMOpalManager::GetManager()->GetCallInformation(nameStr, numberStr, addressStr, appStr);
 	
 	*remoteName = nameStr;
 	*remoteNumber = numberStr;
@@ -341,7 +305,7 @@ void _XMGetCallInformation(unsigned callID,
 void _XMGetCallStatistics(unsigned callID,
 						  XMCallStatisticsRecord *callStatistics)
 {
-	theManager->GetCallStatistics(callStatistics);
+	XMOpalManager::GetManager()->GetCallStatistics(callStatistics);
 }
 
 #pragma mark -
@@ -349,31 +313,31 @@ void _XMGetCallStatistics(unsigned callID,
 
 bool _XMSetUserInputMode(XMUserInputMode userInputMode)
 {
-	return theManager->SetUserInputMode(userInputMode);
+	return XMOpalManager::GetManager()->SetUserInputMode(userInputMode);
 }
 
 bool _XMSendUserInputTone(unsigned callID, const char tone)
 {
 	PString callIDString = PString(callID);
-	return callEndPoint->SendUserInputTone(callIDString, tone);
+	return XMOpalManager::GetCallEndPoint()->SendUserInputTone(callIDString, tone);
 }
 
 bool _XMSendUserInputString(unsigned callID, const char *string)
 {
 	PString callIDString = PString(callID);
-	return callEndPoint->SendUserInputString(callIDString, string);
+	return XMOpalManager::GetCallEndPoint()->SendUserInputString(callIDString, string);
 }
 
 bool _XMStartCameraEvent(unsigned callID, XMCameraEvent cameraEvent)
 {
 	PString callIDString = PString(callID);
-	return callEndPoint->StartCameraEvent(callIDString, cameraEvent);
+	return XMOpalManager::GetCallEndPoint()->StartCameraEvent(callIDString, cameraEvent);
 }
 
 void _XMStopCameraEvent(unsigned callID)
 {
 	PString callIDString = PString(callID);
-	return callEndPoint->StopCameraEvent(callIDString);
+	return XMOpalManager::GetCallEndPoint()->StopCameraEvent(callIDString);
 }
 
 #pragma mark -

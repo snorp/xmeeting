@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.46 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.47 2007/02/08 23:09:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,12 +25,14 @@ using namespace std;
 
 #pragma mark Init & Deallocation
 
+static XMProcess *theProcess = NULL;
 static XMOpalManager * managerInstance = NULL;
+static XMEndPoint *callEndPointInstance = NULL;
+static XMH323EndPoint *h323EndPointInstance = NULL;
+static XMSIPEndPoint *sipEndPointInstance = NULL;
 
 void XMOpalManager::InitOpal(const PString & pTracePath)
-{
-	static XMProcess *theProcess = NULL;
-	
+{	
 	if(theProcess == NULL)
 	{
 		PProcess::PreInitialise(0, 0, 0);
@@ -40,26 +42,34 @@ void XMOpalManager::InitOpal(const PString & pTracePath)
 		{
 			PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
 		}
+        
+        managerInstance = new XMOpalManager();
+        callEndPointInstance = new XMEndPoint(*managerInstance);
+        h323EndPointInstance = new XMH323EndPoint(*managerInstance);
+        sipEndPointInstance = new XMSIPEndPoint(*managerInstance);
+        
+        XMSoundChannel::Init();
 	}
 }
 
 void XMOpalManager::CloseOpal()
 {
+    delete managerInstance;
+    managerInstance = NULL;
+    // The endpoints are deleted when the manager is deleted
+    callEndPointInstance = NULL;
+    h323EndPointInstance = NULL;
+    sipEndPointInstance = NULL;
+    delete theProcess;
+    theProcess = NULL;
+    
+    XMSoundChannel::DoClose();
 }
 
 XMOpalManager::XMOpalManager()
-{
-	managerInstance = this;
-	
+{	
 	defaultAudioPacketTime = 0;
 	currentAudioPacketTime = 0;
-	
-	enableVideoTransmit = FALSE;
-	enableVideoReceive = FALSE;
-	
-	callEndPoint = NULL;
-	h323EndPoint = NULL;
-	sipEndPoint = NULL;
 	
 	connectionToken = "";
 	remoteName = "";
@@ -69,52 +79,41 @@ XMOpalManager::XMOpalManager()
 	
 	OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
 	SetEchoCancelParams(params);
+    
+    SetAutoStartTransmitVideo(TRUE);
+    SetAutoStartReceiveVideo(TRUE);
+    
+    AddRouteEntry("xm:.*   = h323:<da>");
+	AddRouteEntry("h323:.* = xm:<da>");
+	AddRouteEntry("xm:.*   = sip:<da>");
+	AddRouteEntry("sip:.*  = xm:<da>");
 }
 
 XMOpalManager::~XMOpalManager()
 {
-	delete callEndPoint;
-	delete h323EndPoint;
-	delete sipEndPoint;
-}
-
-void XMOpalManager::Initialise()
-{
-	callEndPoint = new XMEndPoint(*this);
-	h323EndPoint = new XMH323EndPoint(*this);
-	sipEndPoint = new XMSIPEndPoint(*this);
-	AddRouteEntry("xm:.*   = h323:<da>");
-	AddRouteEntry("h323:.* = xm:<da>");
-	AddRouteEntry("xm:.*   = sip:<da>");
-	AddRouteEntry("sip:.*  = xm:<da>");
-	
-	SetAutoStartTransmitVideo(TRUE);
-	SetAutoStartReceiveVideo(TRUE);
 }
 
 #pragma mark -
-#pragma mark Accessing the manager
+#pragma mark Accessing the manager and endpoints
 
-XMOpalManager * XMOpalManager::GetManagerInstance()
+XMOpalManager * XMOpalManager::GetManager()
 {
 	return managerInstance;
 }
 
-#pragma mark Access to Endpoints
-
-XMEndPoint * XMOpalManager::CallEndPoint()
+XMEndPoint * XMOpalManager::GetCallEndPoint()
 {
-	return callEndPoint;
+    return callEndPointInstance;
 }
 
-XMH323EndPoint * XMOpalManager::H323EndPoint()
+XMH323EndPoint * XMOpalManager::GetH323EndPoint()
 {
-	return h323EndPoint;
+    return h323EndPointInstance;
 }
 
-XMSIPEndPoint * XMOpalManager::SIPEndPoint()
+XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 {
-	return sipEndPoint;
+    return sipEndPointInstance;
 }
 
 #pragma mark Getting / Setting Call Information
@@ -139,18 +138,18 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 {
 	BOOL isValid = FALSE;
 	
-	if(connectionToken == "")
+	if(connectionToken == "") // current connection token is empty
 	{
 		connectionToken = theConnectionToken;
 		callProtocol = theCallProtocol;
 		isValid = TRUE;
 	}
-	else if(connectionToken == theConnectionToken)
+	else if(connectionToken == theConnectionToken) // same connection token
 	{
 		isValid = TRUE;
 	}
 	
-	if(isValid == TRUE)
+	if(isValid == TRUE) // if valid, update information
 	{
 		remoteName = theRemoteName;
 		remoteNumber = theRemoteNumber;
@@ -160,7 +159,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 		if(remoteName == "" &&
 		   remoteNumber == "" &&
 		   remoteAddress == "" &&
-		   remoteApplication == "")
+		   remoteApplication == "") // empty information, clear connection token / call protocol
 		{
 			connectionToken = "";
 			callProtocol = XMCallProtocol_UnknownProtocol;
@@ -172,36 +171,30 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 
 void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 {
+    // The endpoints (either H.323 or SIP) contain the RTP statistics.
+    // Find out which endpoint to ask
 	switch(callProtocol)
 	{
 		case XMCallProtocol_H323:
-			h323EndPoint->GetCallStatistics(callStatistics);
+			GetH323EndPoint()->GetCallStatistics(callStatistics);
 			return;
 		case XMCallProtocol_SIP:
-			sipEndPoint->GetCallStatistics(callStatistics);
+			GetSIPEndPoint()->GetCallStatistics(callStatistics);
 			return;
-		default:
+		default: // should not happen actually
 			return;
 	}
 }
 
 #pragma mark overriding some callbacks
 
-BOOL XMOpalManager::OnIncomingConnection(OpalConnection & connection)
-{
-	// Make sure that one connection is accepted only once.
-	// This is especially important in case there are several INVITEs arriving,
-	// probably sent over different interfaces by the remote client
-	return OpalManager::OnIncomingConnection(connection);
-}
-
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {
 	unsigned callID = call.GetToken().AsUnsigned();
 	
-	// determine the direction of the call by the fact which endpoint is
-	// connected with the first connection
-	// Is there a better way to determine this?
+    // Determine if we were originating the call or not, by looking at
+    // the class of the endpoint associated with the first connection
+    // in the call dictionary.
 	BOOL isIncomingCall = TRUE;
 	OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
 	if(PIsDescendant(&endPoint, XMEndPoint))
@@ -209,7 +202,8 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 		isIncomingCall = FALSE;
 	}
 	
-	// Determine the IP address this call is running on
+	// Determine the IP address this call is running on.
+    // We need to have the other connection as the local XMConnection instance
 	PSafePtr<OpalConnection> connection;
 	if(isIncomingCall)
 	{
@@ -245,6 +239,9 @@ void XMOpalManager::OnClearedCall(OpalCall & call)
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
+    // XMOpalManager::OnClearedCall() gets only called if the call was actually
+    // established. This callback gets also called if the connection is released
+    // before the call is established.
 	if(!PIsDescendant(&connection, XMConnection))
 	{
 		PIPSocket::Address address(0);
@@ -254,80 +251,27 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
 			transportAddress.GetIpAddress(address);
 		}
 		
+        unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 		if(address.IsValid())
 		{
-			unsigned callID = connection.GetCall().GetToken().AsUnsigned();
 			_XMHandleCallReleased(callID, address.AsString());
 		}
+        else
+        {
+            _XMHandleCallReleased(callID, "");
+        }
 	}
+    
 	OpalManager::OnReleased(connection);
 	
 	// reset any packet time information
 	currentAudioPacketTime = 0;
 }
 
-BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStream & stream)
-{	
-	BOOL result = OpalManager::OnOpenMediaStream(connection, stream);
-	
-	if(result == TRUE)
-	{
-        // We're not interested in the streams opened on the internal XMConnection instance
-        if (!PIsDescendant(&connection, XMConnection))
-		{
-			callID = connection.GetCall().GetToken().AsUnsigned();
-			
-            OpalMediaFormat mediaFormat = stream.GetMediaFormat();
-            const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-			if(mediaType == OpalDefaultVideoMediaType)
-			{
-                // The incoming video stream is treated as being open as soon the
-                // first data is decoded and the exact parameters of the stream are
-                // known.
-				if(stream.IsSink())
-				{
-					XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-					const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
-					
-					_XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, false, 0, 0);
-				}
-			}
-			else if(mediaType == OpalDefaultAudioMediaType)
-			{
-				_XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
-			}
-		}
-	}
-	
-	return result;
-}
-
-void XMOpalManager::OnClosedMediaStream(const OpalMediaStream & stream)
-{
-	// We're not interested in descendants of XMMediaStream
-    if(PIsDescendant(&stream, XMMediaStream)) {
-        return;
-    }
-    
-    // Also, we're not interested in OpalPCM16 streams
-	OpalMediaFormat mediaFormat = stream.GetMediaFormat();
-	if(!(mediaFormat == OpalPCM16))
-	{
-		if(_XMIsVideoMediaFormat(mediaFormat))
-		{
-			_XMHandleVideoStreamClosed(callID, stream.IsSource());
-		}
-		else
-		{
-			_XMHandleAudioStreamClosed(callID, stream.IsSource());
-		}
-	}
-	
-	OpalManager::OnClosedMediaStream(stream);
-}
-
 OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread)
 {
+    // Incoming video streams are treated using a special patch instance.
+    // The other streams have the default OpalMediaPatch / OpalPassiveMediaPatch instance
     if (requiresPatchThread == TRUE && source.GetMediaFormat().GetMediaType() == OpalDefaultVideoMediaType) {
         return new XMReceiverMediaPatch(source);
     }
@@ -335,13 +279,60 @@ OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, BOOL 
     return OpalManager::CreateMediaPatch(source, requiresPatchThread);
 }
 
+void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream)
+{
+    // Called when an RTP stream is opened.
+    // The main purpose of this callback is to forward this information to the Obj-C world
+    
+    unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+    OpalMediaFormat mediaFormat = stream.GetMediaFormat();
+    const OpalMediaType & mediaType = mediaFormat.GetMediaType();
+    if(mediaType == OpalDefaultVideoMediaType)
+    {
+        // The incoming video stream (source for OPAL) is treated as being open as soon the
+        // first data is decoded and the exact parameters of the stream are
+        // known.
+        if(stream.IsSink())
+        {
+            XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+            const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
+            
+            _XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, false, 0, 0);
+        }
+    }
+    else if(mediaType == OpalDefaultAudioMediaType)
+    {
+        _XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
+    }
+}
+
+void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream)
+{
+    // Called when an RTP stream is closed.
+    // The main purpose of this callback is to forward this information to the Obj-C world
+    
+    unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+    OpalMediaFormat mediaFormat = stream.GetMediaFormat();
+    const OpalMediaType & mediaType = mediaFormat.GetMediaType();
+    if(mediaType == OpalDefaultVideoMediaType) 
+    {
+        _XMHandleVideoStreamClosed(callID, stream.IsSource());
+    }
+    else if(mediaType == OpalDefaultAudioMediaType)
+    {
+        _XMHandleAudioStreamClosed(callID, stream.IsSource());
+    }
+}
+
 #pragma mark General Setup Methods
 
 void XMOpalManager::SetUserName(const PString & username)
 {
+    // Forwards this information to the endpoints.
+    
 	OpalManager::SetDefaultUserName(username);
-	h323EndPoint->SetDefaultDisplayName(username);
-	sipEndPoint->SetDefaultDisplayName(username);
+	GetH323EndPoint()->SetDefaultDisplayName(username);
+	GetSIPEndPoint()->SetDefaultDisplayName(username);
 }
 
 #pragma mark Network Setup Methods
@@ -481,15 +472,6 @@ unsigned XMOpalManager::GetCurrentAudioPacketTime()
 }
 
 #pragma mark -
-#pragma mark Video Setup Methods
-
-void XMOpalManager::SetVideoFunctionality(BOOL newEnableVideoTransmit, BOOL newEnableVideoReceive)
-{
-	enableVideoTransmit = newEnableVideoTransmit;
-	enableVideoReceive = newEnableVideoReceive;
-}
-
-#pragma mark -
 #pragma mark Information about current Calls
 
 unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier)
@@ -549,16 +531,16 @@ BOOL XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
 			break;
 		case XMUserInputMode_InBand:
 			// Separate RFC 2833 is not implemented and is therefore used
-			// to signal InBand DTMF
+			// to signal InBand DTMF. HACK HACK
 			mode = OpalConnection::SendUserInputAsSeparateRFC2833;
 			break;
 		default:
 			return FALSE;
 	}
 	
-	h323EndPoint->SetSendUserInputMode(mode);
-	sipEndPoint->SetSendUserInputMode(mode);
-	callEndPoint->SetSendUserInputMode(mode);
+	GetH323EndPoint()->SetSendUserInputMode(mode);
+	GetSIPEndPoint()->SetSendUserInputMode(mode);
+	GetCallEndPoint()->SetSendUserInputMode(mode);
 	
 	return TRUE;
 }
@@ -568,22 +550,9 @@ BOOL XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
 
 void XMOpalManager::LogMessage(const PString & message)
 {
+    // Logs the message using the default PTRACE facility.
+    
 	PTRACE(1, message);
 }
 
-#pragma mark -
-#pragma mark Private Methods
-
-BOOL XMOpalManager::IsOutgoingMedia(OpalMediaStream & stream)
-{
-	OpalMediaFormat mediaFormat = stream.GetMediaFormat();
-	OpalMediaFormatList outgoingMediaFormats = callEndPoint->GetMediaFormats();
-	
-	if(outgoingMediaFormats.FindFormat(mediaFormat) != P_MAX_INDEX)
-	{
-		return TRUE;
-	}
-	
-	return FALSE;
-}
 	

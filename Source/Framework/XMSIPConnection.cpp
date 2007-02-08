@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.17 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.18 2007/02/08 23:09:14 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -506,7 +506,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 			PINDEX packetTime = description.GetPacketTime();
 			if(packetTime != 0)
 			{
-				XMOpalManager::GetManagerInstance()->SetCurrentAudioPacketTime(packetTime);
+				XMOpalManager::GetManager()->SetCurrentAudioPacketTime(packetTime);
 			}
 			break;
 		}
@@ -594,8 +594,16 @@ BOOL XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 		SetPhase(EstablishedPhase);
 		OnEstablished();
 	}
+    
+    XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	
 	return TRUE;
+}
+
+void XMSIPConnection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
+{
+    SIPConnection::OnClosedMediaStream(mediaStream);
+    XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, mediaStream);
 }
 
 void XMSIPConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)

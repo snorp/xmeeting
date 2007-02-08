@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.9 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.10 2007/02/08 23:09:14 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,7 @@ public:
 												BOOL isSource);
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
+    virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	
 	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	

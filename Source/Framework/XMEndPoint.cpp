@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.24 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.25 2007/02/08 23:09:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,7 +180,7 @@ BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty,
 	
 	partyB += remoteParty;
 	
-	XMOpalManager::GetManagerInstance()->SetCallProtocol(protocol);
+	XMOpalManager::GetManager()->SetCallProtocol(protocol);
 	
 	return GetManager().SetUpCall(partyA, partyB, token);
 }

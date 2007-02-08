@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.23 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.24 2007/02/08 23:09:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -286,8 +286,16 @@ BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 		SetPhase(EstablishedPhase);
 		OnEstablished();
 	}
+    
+    XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	
 	return TRUE;
+}
+
+void XMH323Connection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
+{
+    H323Connection::OnClosedMediaStream(mediaStream);
+    XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, mediaStream);
 }
 
 void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)

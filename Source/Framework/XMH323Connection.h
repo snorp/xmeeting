@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.14 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.15 2007/02/08 23:09:13 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,7 @@ public:
 	virtual BOOL OnClosingLogicalChannel(H323Channel & channel);
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
+    virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	
 	// improved bandwidth management
