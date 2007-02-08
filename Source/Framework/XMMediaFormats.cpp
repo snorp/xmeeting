@@ -1,9 +1,9 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.22 2006/08/26 08:18:19 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.23 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include <asn/h245.h>
@@ -11,7 +11,6 @@
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 #include "XMBridge.h"
-#include "XMTransmitterMediaPatch.h"
 
 #define XM_CIF_WIDTH PVideoDevice::CIFWidth
 #define XM_CIF_HEIGHT PVideoDevice::CIFHeight
@@ -43,6 +42,7 @@
 
 const char *_XMMediaFormatIdentifier_G711_uLaw = "*g.711-ulaw*";
 const char *_XMMediaFormatIdentifier_G711_ALaw = "*g.711-alaw*";
+const char *_XMMediaFormatIdentifier_Speex = "*speex*";
 
 // Video MediaFormats
 
@@ -50,7 +50,7 @@ const char *_XMMediaFormatIdentifier_H261 = "*xm-h.261*";
 const char *_XMMediaFormatIdentifier_H263 = "*xm-h.263*";
 const char *_XMMediaFormatIdentifier_H264 = "*xm-h.264*";
 
-const char *_XMMediaFormat_Video = "XM-Video";
+//const char *_XMMediaFormat_Video = "XM-Video";
 const char *_XMMediaFormat_H261 = "XM-H.261";
 const char *_XMMediaFormat_H263 = "XM-H.263";
 const char *_XMMediaFormat_H263Plus = "XM-H.263-Plus";
@@ -63,7 +63,8 @@ const char *_XMMediaFormatName_H264 = "H.264";
 const char *_XMMediaFormatEncoding_H261 = "H261";
 const char *_XMMediaFormatEncoding_H263 = "H263";
 const char *_XMMediaFormatEncoding_H263Plus = "H263-1998";
-const char *_XMMediaFormatEncoding_H264 = "H264";
+//const char *_XMMediaFormatEncoding_H264 = "H264";
+const char *_XMMediaFormatEncoding_H264 = NULL;
 
 static BOOL isReceivingRFC2429 = FALSE;
 static unsigned h264Profile = XM_H264_PROFILE_BASELINE;
@@ -73,18 +74,6 @@ static BOOL h264EnableLimitedMode = FALSE;
 
 #pragma mark -
 #pragma mark MediaFormat Definitions
-
-const OpalVideoFormat & XMGetMediaFormat_Video()
-{
-	static const OpalVideoFormat XMMediaFormat_Video(_XMMediaFormat_Video,
-													 RTP_DataFrame::MaxPayloadType,
-													 _XMMediaFormat_Video,
-													 XM_MAX_FRAME_WIDTH,
-													 XM_MAX_FRAME_HEIGHT,
-													 XM_MAX_FRAME_RATE,
-													 32*XM_MAX_FRAME_WIDTH*XM_MAX_FRAME_HEIGHT*XM_MAX_FRAME_RATE);
-	return XMMediaFormat_Video;
-}
 
 const OpalVideoFormat & XMGetMediaFormat_H261()
 {
@@ -223,6 +212,8 @@ const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 			return _XMMediaFormatIdentifier_G711_uLaw;
 		case XMCodecIdentifier_G711_ALaw:
 			return _XMMediaFormatIdentifier_G711_ALaw;
+		case XMCodecIdentifier_Speex:
+			return _XMMediaFormatIdentifier_Speex;
 		case XMCodecIdentifier_H261:
 			return _XMMediaFormatIdentifier_H261;
 		case XMCodecIdentifier_H263:
@@ -232,124 +223,6 @@ const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 		default:
 			return NULL;
 	}
-}
-
-#pragma mark -
-#pragma mark XMVideoTranscoder methods
-
-XMVideoTranscoder::XMVideoTranscoder(const OpalVideoFormat & src, const OpalVideoFormat & dst)
-: OpalVideoTranscoder(src, dst)
-{
-}
-
-XMVideoTranscoder::~XMVideoTranscoder()
-{
-}
-
-PINDEX XMVideoTranscoder::GetOptimalDataFrameSize(BOOL input) const
-{
-	return RTP_DataFrame::MaxEthernetPayloadSize;
-}
-
-BOOL XMVideoTranscoder::ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst)
-{
-	return TRUE;
-}
-
-#pragma mark -
-#pragma mark XM_H261_VIDEO methods
-
-XM_H261_VIDEO::XM_H261_VIDEO()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_H261, XM_MEDIA_FORMAT_VIDEO)
-{
-}
-
-XM_H261_VIDEO::~XM_H261_VIDEO()
-{
-}
-
-#pragma mark -
-#pragma mark XM_H263_VIDEO methods
-
-XM_H263_VIDEO::XM_H263_VIDEO()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_H263, XM_MEDIA_FORMAT_VIDEO)
-{
-}
-
-XM_H263_VIDEO::~XM_H263_VIDEO()
-{
-}
-
-#pragma mark -
-#pragma mark XM_H263PLUS_VIDEO methods
-
-XM_H263PLUS_VIDEO::XM_H263PLUS_VIDEO()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_H263PLUS, XM_MEDIA_FORMAT_VIDEO)
-{
-}
-
-XM_H263PLUS_VIDEO::~XM_H263PLUS_VIDEO()
-{
-}
-
-#pragma mark -
-#pragma mark XM_H264_VIDEO methods
-
-XM_H264_VIDEO::XM_H264_VIDEO()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_H264, XM_MEDIA_FORMAT_VIDEO)
-{
-}
-
-XM_H264_VIDEO::~XM_H264_VIDEO()
-{
-}
-
-#pragma mark -
-#pragma mark XM_VIDEO_H261 methods
-
-XM_VIDEO_H261::XM_VIDEO_H261()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H261)
-{
-}
-
-XM_VIDEO_H261::~XM_VIDEO_H261()
-{
-}
-
-#pragma mark -
-#pragma mark XM_VIDEO_H263 methods
-
-XM_VIDEO_H263::XM_VIDEO_H263()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263)
-{
-}
-
-XM_VIDEO_H263::~XM_VIDEO_H263()
-{
-}
-
-#pragma mark -
-#pragma mark XM_VIDEO_H263PLUS methods
-
-XM_VIDEO_H263PLUS::XM_VIDEO_H263PLUS()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263PLUS)
-{
-}
-
-XM_VIDEO_H263PLUS::~XM_VIDEO_H263PLUS()
-{
-}
-
-#pragma mark -
-#pragma mark XM_VIDEO_H264 methods
-
-XM_VIDEO_H264::XM_VIDEO_H264()
-: XMVideoTranscoder(XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H264)
-{
-}
-
-XM_VIDEO_H264::~XM_VIDEO_H264()
-{
 }
 
 #pragma mark -

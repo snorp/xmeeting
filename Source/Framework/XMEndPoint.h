@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.12 2007/01/06 20:41:17 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.13 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@
 #include "XMBridge.h"
 
 class XMConnection;
+class OpalH281Handler;
 
 class XMEndPoint : public OpalEndPoint
 {
@@ -39,6 +40,9 @@ public:
 								const PString & party,
 								void *userData = NULL,
 								unsigned int options = 0);
+    virtual BOOL OnIncomingConnection(OpalConnection & connection,
+                                      unsigned options,
+                                      OpalConnection::StringOptions * stringOptions);
 	virtual OpalMediaFormatList GetMediaFormats() const;
 	virtual XMConnection * CreateConnection(OpalCall & call, PString & token);
 	virtual PSoundChannel * CreateSoundChannel(const XMConnection & connection, BOOL isSource);

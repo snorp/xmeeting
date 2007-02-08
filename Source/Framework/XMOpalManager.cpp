@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.45 2006/11/12 00:17:06 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.46 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMOpalManager.h"
@@ -11,8 +11,8 @@
 #include "XMTypes.h"
 #include "XMCallbackBridge.h"
 #include "XMMediaFormats.h"
+#include "XMMediaStream.h"
 #include "XMSoundChannel.h"
-#include "XMTransmitterMediaPatch.h"
 #include "XMReceiverMediaPatch.h"
 #include "XMProcess.h"
 #include "XMConnection.h"
@@ -272,18 +272,19 @@ BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStre
 	
 	if(result == TRUE)
 	{
-		// first, we want to find out whether we are interested in this media stream or not
-		// We are only interested in the external codecs and not the internal PCM-16 format
-		// and XM_MEDIA_FORMAT_VIDEO
-		OpalMediaFormat mediaFormat = stream.GetMediaFormat();
-		if(!(mediaFormat == OpalPCM16 ||
-			 mediaFormat == XM_MEDIA_FORMAT_VIDEO))
+        // We're not interested in the streams opened on the internal XMConnection instance
+        if (!PIsDescendant(&connection, XMConnection))
 		{
 			callID = connection.GetCall().GetToken().AsUnsigned();
 			
-			if(_XMIsVideoMediaFormat(mediaFormat))
+            OpalMediaFormat mediaFormat = stream.GetMediaFormat();
+            const OpalMediaType & mediaType = mediaFormat.GetMediaType();
+			if(mediaType == OpalDefaultVideoMediaType)
 			{
-				if(!stream.IsSource())
+                // The incoming video stream is treated as being open as soon the
+                // first data is decoded and the exact parameters of the stream are
+                // known.
+				if(stream.IsSink())
 				{
 					XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
 					const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
@@ -291,7 +292,7 @@ BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStre
 					_XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, false, 0, 0);
 				}
 			}
-			else
+			else if(mediaType == OpalDefaultAudioMediaType)
 			{
 				_XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
 			}
@@ -303,14 +304,15 @@ BOOL XMOpalManager::OnOpenMediaStream(OpalConnection & connection, OpalMediaStre
 
 void XMOpalManager::OnClosedMediaStream(const OpalMediaStream & stream)
 {
-	// first, we want to find out whether we are interested in this media stream or not
-	// We are only interested in the external codecs and not the internal PCM-16 format
-	// and XM_MEDIA_FORMAT_VIDEO
+	// We're not interested in descendants of XMMediaStream
+    if(PIsDescendant(&stream, XMMediaStream)) {
+        return;
+    }
+    
+    // Also, we're not interested in OpalPCM16 streams
 	OpalMediaFormat mediaFormat = stream.GetMediaFormat();
-	if(!(mediaFormat == OpalPCM16 ||
-		 mediaFormat == XM_MEDIA_FORMAT_VIDEO))
+	if(!(mediaFormat == OpalPCM16))
 	{
-		
 		if(_XMIsVideoMediaFormat(mediaFormat))
 		{
 			_XMHandleVideoStreamClosed(callID, stream.IsSource());
@@ -324,22 +326,13 @@ void XMOpalManager::OnClosedMediaStream(const OpalMediaStream & stream)
 	OpalManager::OnClosedMediaStream(stream);
 }
 
-OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source)
+OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread)
 {
-	if(IsOutgoingMedia(source))
-	{
-		return new XMTransmitterMediaPatch(source);
-	}
-	else
-	{
-		return new XMReceiverMediaPatch(source);
-	}
-}
-
-OpalH281Handler * XMOpalManager::CreateH281ProtocolHandler(OpalH224Handler & handler) const
-{
-	_XMHandleFECCChannelOpened();
-	return OpalManager::CreateH281ProtocolHandler(handler);
+    if (requiresPatchThread == TRUE && source.GetMediaFormat().GetMediaType() == OpalDefaultVideoMediaType) {
+        return new XMReceiverMediaPatch(source);
+    }
+    
+    return OpalManager::CreateMediaPatch(source, requiresPatchThread);
 }
 
 #pragma mark General Setup Methods

@@ -1,9 +1,9 @@
 /*
- * $Id: XMMediaFormats.h,v 1.15 2006/07/27 21:13:21 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.16 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_MEDIA_FORMATS_H__
@@ -31,7 +31,6 @@ extern const char *_XMMediaFormatIdentifier_H261;
 extern const char *_XMMediaFormatIdentifier_H263;
 extern const char *_XMMediaFormatIdentifier_H264;
 
-extern const char *_XMMediaFormat_Video;
 extern const char *_XMMediaFormat_H261;
 extern const char *_XMMediaFormat_H263;
 extern const char *_XMMediaFormat_H263Plus;
@@ -45,13 +44,11 @@ extern const char *_XMMediaFormatEncoding_H264;
 
 #pragma mark XMeeting Video Formats
 
-extern const OpalVideoFormat & XMGetMediaFormat_Video();
 extern const OpalVideoFormat & XMGetMediaFormat_H261();
 extern const OpalVideoFormat & XMGetMediaFormat_H263();
 extern const OpalVideoFormat & XMGetMediaFormat_H263Plus();
 extern const OpalVideoFormat & XMGetMediaFormat_H264();
 
-#define XM_MEDIA_FORMAT_VIDEO XMGetMediaFormat_Video()
 #define XM_MEDIA_FORMAT_H261 XMGetMediaFormat_H261()
 #define XM_MEDIA_FORMAT_H263 XMGetMediaFormat_H263()
 #define XM_MEDIA_FORMAT_H263PLUS XMGetMediaFormat_H263Plus()
@@ -79,93 +76,6 @@ BOOL _XMIsVideoMediaFormat(const OpalMediaFormat & mediaFormat);
 XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat);
 XMVideoSize _XMGetMediaFormatSize(const OpalMediaFormat & mediaFormat);
 const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat);
-
-#pragma mark -
-#pragma mark Transcoder classes
-
-class XMVideoTranscoder : public OpalVideoTranscoder
-{
-	PCLASSINFO(XMVideoTranscoder, OpalVideoTranscoder);
-	
-public:
-	
-	XMVideoTranscoder(const OpalVideoFormat & src, const OpalVideoFormat & dst);
-	~XMVideoTranscoder();
-	virtual PINDEX GetOptimalDataFrameSize(BOOL input) const;
-	virtual BOOL ConvertFrames(const RTP_DataFrame & src, RTP_DataFrameList & dst);
-	
-	RTP_DataFrame::PayloadMapType GetPayloadMap() const { return payloadTypeMap; }
-};
-
-class XM_H261_VIDEO : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_H261_VIDEO, XMVideoTranscoder);
-	
-public:
-	XM_H261_VIDEO();
-	~XM_H261_VIDEO();
-};
-
-class XM_H263_VIDEO : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_H263_VIDEO, XMVideoTranscoder);
-public:
-	XM_H263_VIDEO();
-	~XM_H263_VIDEO();
-};
-
-class XM_H263PLUS_VIDEO : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_H263PLUS_VIDEO, XMVideoTranscoder);
-	
-public:
-	XM_H263PLUS_VIDEO();
-	~XM_H263PLUS_VIDEO();
-};
-
-class XM_H264_VIDEO : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_H264_VIDEO, XMVideoTranscoder);
-public:
-	XM_H264_VIDEO();
-	~XM_H264_VIDEO();
-};
-
-class XM_VIDEO_H261 : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_VIDEO_H261, XMVideoTranscoder);
-	
-public:
-	XM_VIDEO_H261();
-	~XM_VIDEO_H261();
-};
-
-class XM_VIDEO_H263 : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_VIDEO_H263, XMVideoTranscoder);
-	
-public:
-	XM_VIDEO_H263();
-	~XM_VIDEO_H263();
-};
-
-class XM_VIDEO_H263PLUS : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_VIDEO_H263PLUS, XMVideoTranscoder);
-	
-public:
-	XM_VIDEO_H263PLUS();
-	~XM_VIDEO_H263PLUS();
-};
-
-class XM_VIDEO_H264 : public XMVideoTranscoder
-{
-	PCLASSINFO(XM_VIDEO_H264, XMVideoTranscoder);
-	
-public:
-	XM_VIDEO_H264();
-	~XM_VIDEO_H264();
-};
 
 #pragma mark -
 #pragma mark H.323 Capabilities
@@ -339,13 +249,13 @@ void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
     static H323CapabilityFactory::Worker<XM_H323_H263_Capability> h263Factory(XM_MEDIA_FORMAT_H263, true); \
     static H323CapabilityFactory::Worker<XM_H323_H263PLUS_Capability> h263PlusFactory(XM_MEDIA_FORMAT_H263PLUS, true); \
     static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
-	OPAL_REGISTER_TRANSCODER(XM_H261_VIDEO, XM_MEDIA_FORMAT_H261, XM_MEDIA_FORMAT_VIDEO); \
-	OPAL_REGISTER_TRANSCODER(XM_H263_VIDEO, XM_MEDIA_FORMAT_H263, XM_MEDIA_FORMAT_VIDEO); \
-	OPAL_REGISTER_TRANSCODER(XM_H263PLUS_VIDEO, XM_MEDIA_FORMAT_H263PLUS, XM_MEDIA_FORMAT_VIDEO); \
-	OPAL_REGISTER_TRANSCODER(XM_H264_VIDEO, XM_MEDIA_FORMAT_H264, XM_MEDIA_FORMAT_VIDEO); \
-	OPAL_REGISTER_TRANSCODER(XM_VIDEO_H261, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H261); \
-	OPAL_REGISTER_TRANSCODER(XM_VIDEO_H263, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263); \
-	OPAL_REGISTER_TRANSCODER(XM_VIDEO_H263PLUS, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263PLUS); \
-	OPAL_REGISTER_TRANSCODER(XM_VIDEO_H264, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H264)
+	//OPAL_REGISTER_TRANSCODER(XM_H261_VIDEO, XM_MEDIA_FORMAT_H261, XM_MEDIA_FORMAT_VIDEO); \
+	//OPAL_REGISTER_TRANSCODER(XM_H263_VIDEO, XM_MEDIA_FORMAT_H263, XM_MEDIA_FORMAT_VIDEO); \
+	//OPAL_REGISTER_TRANSCODER(XM_H263PLUS_VIDEO, XM_MEDIA_FORMAT_H263PLUS, XM_MEDIA_FORMAT_VIDEO); \
+	//OPAL_REGISTER_TRANSCODER(XM_H264_VIDEO, XM_MEDIA_FORMAT_H264, XM_MEDIA_FORMAT_VIDEO); \
+	//OPAL_REGISTER_TRANSCODER(XM_VIDEO_H261, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H261); \
+	//OPAL_REGISTER_TRANSCODER(XM_VIDEO_H263, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263); \
+	//OPAL_REGISTER_TRANSCODER(XM_VIDEO_H263PLUS, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H263PLUS); \
+	//OPAL_REGISTER_TRANSCODER(XM_VIDEO_H264, XM_MEDIA_FORMAT_VIDEO, XM_MEDIA_FORMAT_H264)
 
 #endif // __XM_MEDIA_FORMATS_H__

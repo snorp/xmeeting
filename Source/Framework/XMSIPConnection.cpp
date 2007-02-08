@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.16 2007/01/07 14:27:29 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.17 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,9 +22,10 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 								 const PString & token,
 								 const SIPURL & address,
 								 OpalTransport * transport,
-								 unsigned int options)
+								 unsigned int options,
+                                 OpalConnection::StringOptions * stringOptions)
 
-: SIPConnection(call, endpoint, token, address, transport, options),
+: SIPConnection(call, endpoint, token, address, transport, options, stringOptions),
   h261VideoFormat(_XMMediaFormat_H261, RTP_DataFrame::H261, _XMMediaFormatEncoding_H261, 352, 288, 30, _XMGetMaxH261BitRate()),
   h263VideoFormat(_XMMediaFormat_H263, RTP_DataFrame::H263, _XMMediaFormatEncoding_H263, 352, 288, 30, _XMGetMaxH263BitRate()),
   h263PlusVideoFormat(_XMMediaFormat_H263Plus, (RTP_DataFrame::PayloadTypes)96, _XMMediaFormatEncoding_H263Plus, 352, 288, 30, _XMGetMaxH263BitRate()),
@@ -105,8 +106,7 @@ void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
 }
 
 BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
-												SDPMediaDescription::MediaType mediaType,
-												unsigned sessionID,
+												const OpalMediaType & mediaType,
 												SDPSessionDescription & sdpOut)
 {
 	// adjusting bandwidth information,
@@ -127,9 +127,9 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 	}
 	sdpOut.SetBandwidthValue(bandwidthAvailable/10);
 	
-	if(mediaType != SDPMediaDescription::Video)
+	if(mediaType != OpalDefaultVideoMediaType)
 	{
-		return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sessionID, sdpOut);
+		return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);
 	}
 	else
 	{
@@ -156,7 +156,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 		for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 		{
 			SDPMediaDescription & description = mediaDescriptionList[i];
-			if(description.GetMediaType() == SDPMediaDescription::Video)
+			if(description.GetMediaType() == OpalDefaultVideoMediaType)
 			{
 				const SDPMediaFormatList & videoMediaFormatList = description.GetSDPMediaFormats();
 			
@@ -260,7 +260,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 		}
 
 		// calling super class implementation
-		BOOL result = SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sessionID, sdpOut);
+		BOOL result = SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);
 		
 		// adjust FMTP information on the SDP list sent
 		SDPMediaDescriptionList outMediaDescriptionList = sdpOut.GetMediaDescriptions();
@@ -268,7 +268,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 		for(PINDEX i = 0; i < outMediaDescriptionList.GetSize(); i++)
 		{
 			SDPMediaDescription & description = outMediaDescriptionList[i];
-			if(description.GetMediaType() == SDPMediaDescription::Video)
+			if(description.GetMediaType() == OpalDefaultVideoMediaType)
 			{
 				const SDPMediaFormatList & videoMediaFormatList = description.GetSDPMediaFormats();
 			
@@ -340,10 +340,9 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 }
 
 BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
-													SDPMediaDescription::MediaType mediaType,
-													unsigned sessionID)
+													const OpalMediaType & mediaType)
 {
-	if(mediaType == SDPMediaDescription::Video)
+	if(mediaType == OpalDefaultVideoMediaType)
 	{
 		// Resetting media formats to default values
 		h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, _XMGetMaxH261BitRate());
@@ -367,7 +366,7 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 		for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 		{
 			SDPMediaDescription & description = mediaDescriptionList[i];
-			if(description.GetMediaType() == SDPMediaDescription::Video)
+			if(description.GetMediaType() == OpalDefaultVideoMediaType)
 			{
 				const SDPMediaFormatList & videoMediaFormatList = description.GetSDPMediaFormats();
 			
@@ -456,7 +455,7 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 		}
 	}
 
-	return SIPConnection::OnReceivedSDPMediaDescription(sdp, mediaType, sessionID);
+	return SIPConnection::OnReceivedSDPMediaDescription(sdp, mediaType);
 }
 
 OpalMediaFormatList XMSIPConnection::GetMediaFormats() const
@@ -495,7 +494,6 @@ void XMSIPConnection::AdjustMediaFormats(OpalMediaFormatList & mediaFormats) con
 }
 
 OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
-													unsigned sessionID,
 													 BOOL isSource)
 {
 	// First, adjust some audio parameters if needed
@@ -503,7 +501,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 	for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 	{
 		SDPMediaDescription & description = mediaDescriptionList[i];
-		if(description.GetMediaType() == SDPMediaDescription::Audio)
+		if(description.GetMediaType() == OpalDefaultAudioMediaType)
 		{
 			PINDEX packetTime = description.GetPacketTime();
 			if(packetTime != 0)
@@ -514,16 +512,16 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		}
 	}
 	
-	if(sessionID == 2)
+	if(mediaFormat.GetMediaType() == OpalDefaultVideoMediaType)
 	{
 		if(mediaFormat == XM_MEDIA_FORMAT_H261)
 		{
-			return SIPConnection::CreateMediaStream(h261VideoFormat, sessionID, isSource);
+			return SIPConnection::CreateMediaStream(h261VideoFormat, isSource);
 		}
 		else if(mediaFormat == XM_MEDIA_FORMAT_H263)
 		{
 			_XMSetIsReceivingRFC2429(FALSE); // prevent XMMediaTransmitter from assuming RFC2429
-			return SIPConnection::CreateMediaStream(h263VideoFormat, sessionID, isSource);
+			return SIPConnection::CreateMediaStream(h263VideoFormat, isSource);
 		}
 		/*else if(mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
 		{
@@ -535,7 +533,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		}*/
 	}
 	
-	return SIPConnection::CreateMediaStream(mediaFormat, sessionID, isSource);
+	return SIPConnection::CreateMediaStream(mediaFormat, isSource);
 }
 
 void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
@@ -550,7 +548,7 @@ void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
 	{
 
 		SDPMediaDescription & description = mediaDescriptionList[i];
-		if(description.GetMediaType() == SDPMediaDescription::Video)
+		if(description.GetMediaType() == OpalDefaultVideoMediaType)
 		{
 			const SDPMediaFormatList & videoMediaFormats = description.GetSDPMediaFormats();
 	

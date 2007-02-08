@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.14 2007/01/07 08:28:00 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.15 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,7 +49,8 @@ public:
 											  const PString & alias,
 											  const H323TransportAddress & address,
 											  H323SignalPDU * setupPDU,
-											  unsigned options = 0);
+											  unsigned options = 0,
+                                              OpalConnection::StringOptions * stringOptions = NULL);
 	
 	// H.460 support
 	virtual BOOL OnSendFeatureSet(unsigned, H225_FeatureSet &);

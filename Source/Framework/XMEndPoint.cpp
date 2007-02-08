@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.23 2007/01/06 20:41:16 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.24 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 
 #include <h323/h323ep.h>
 #include <sip/sipep.h>
+#include <h224/h224mediafmt.h>
 #include <h224/h281.h>
 #include <h224/h224handler.h>
 #include <h224/h281handler.h>
@@ -91,6 +92,13 @@ BOOL XMEndPoint::MakeConnection(OpalCall & call,
 	return TRUE;
 }
 
+BOOL XMEndPoint::OnIncomingConnection(OpalConnection & connection,
+                                      unsigned options,
+                                      OpalConnection::StringOptions * stringOptions)
+{
+    return manager.OnIncomingConnection(connection, options, stringOptions);
+}
+
 OpalMediaFormatList XMEndPoint::GetMediaFormats() const
 {
 	OpalMediaFormatList mediaFormats;
@@ -99,8 +107,13 @@ OpalMediaFormatList XMEndPoint::GetMediaFormats() const
 	
 	if(enableVideo == TRUE)
 	{
-		mediaFormats += XM_MEDIA_FORMAT_VIDEO;
+		mediaFormats += XM_MEDIA_FORMAT_H261;
+        mediaFormats += XM_MEDIA_FORMAT_H263;
+        mediaFormats += XM_MEDIA_FORMAT_H263PLUS;
+        mediaFormats += XM_MEDIA_FORMAT_H264;
 	}
+	
+	mediaFormats += OpalH224;
 	
 	return mediaFormats;
 }
@@ -382,27 +395,7 @@ OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
 		return NULL;
 	}
 	
-	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
-	if(otherConnection == NULL)
-	{
-		return NULL;
-	}
-	
-	OpalH224Handler * h224Handler = otherConnection->GetH224Handler();
-	
-	if(h224Handler == NULL)
-	{
-		return NULL;
-	}
-	
-	OpalH281Handler *h281Handler = h224Handler->GetH281Handler();
-	
-	if(h281Handler == NULL)
-	{
-		return NULL;
-	}
-	
-	return h281Handler;
+	return connection->GetH281Handler();
 }
 
 #pragma mark -

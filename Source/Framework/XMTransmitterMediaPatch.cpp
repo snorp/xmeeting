@@ -1,9 +1,9 @@
 /*
- * $Id: XMTransmitterMediaPatch.cpp,v 1.24 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.cpp,v 1.25 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMTransmitterMediaPatch.h"
@@ -34,23 +34,7 @@ XMTransmitterMediaPatch::~XMTransmitterMediaPatch()
 {
 }
 
-BOOL XMTransmitterMediaPatch::IsTerminated() const
-{
-	if(doesRunOwnThread == TRUE)
-	{
-		return OpalMediaPatch::IsTerminated();
-	}
-	else
-	{
-		// since we don't run our own thread, the IsTerminated()
-		// method must return whether the MediaTransmitter is still
-		// transmitting media or not. This is required so that
-		// WaitForTermination() does behave correctly
-		return isTerminated;
-	}
-}
-
-void XMTransmitterMediaPatch::Resume()
+void XMTransmitterMediaPatch::Start()
 {
 	XMAudioTester::Stop();
 	
@@ -66,7 +50,6 @@ void XMTransmitterMediaPatch::Resume()
 		// tell the MediaTransmitter to start transmitting
 		// the desired media
 		doesRunOwnThread = FALSE;
-		isTerminated = FALSE;
 		videoTransmitterPatch = this;
 		
 		PINDEX i = sinks.GetSize();
@@ -187,7 +170,7 @@ void XMTransmitterMediaPatch::Resume()
 		inUse.Signal();
 			
 		// behave as normally
-		OpalMediaPatch::Resume();
+		OpalMediaPatch::Start();
 	}
 }
 
@@ -202,9 +185,9 @@ void XMTransmitterMediaPatch::Close()
 	
 	// Waiting until the MediaTransmitter suspended the
 	// transmission of media
-	while(!IsTerminated())
+	while(doesRunOwnThread == FALSE && isTerminated == FALSE)
 	{
-		Sleep(10);
+		PThread::Sleep(10);
 	}
 }
 

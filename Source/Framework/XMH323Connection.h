@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323Connection.h,v 1.13 2007/01/07 14:26:21 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.14 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_H323_CONNECTION_H__
@@ -27,7 +27,8 @@ public:
 					 const PString & token,
 					 const PString & alias,
 					 const H323TransportAddress & address,
-					 unsigned options = 0);
+					 unsigned options = 0,
+                     OpalConnection::StringOptions * stringOptions = NULL);
 	~XMH323Connection();
 	
 	virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
@@ -37,7 +38,7 @@ public:
 	
 	virtual void OnSetLocalCapabilities();
 
-	virtual void SelectDefaultLogicalChannel(unsigned sessionID);
+	virtual void SelectDefaultLogicalChannel(const OpalMediaType & mediaType);
 	
 	virtual BOOL OpenLogicalChannel(const H323Capability & capability,
 									unsigned sessionID,

@@ -1,9 +1,9 @@
 /*
- * $Id: XMTransmitterMediaPatch.h,v 1.9 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMTransmitterMediaPatch.h,v 1.10 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_TRANSMITTER_MEDIA_PATCH__
@@ -27,8 +27,7 @@ public:
 	XMTransmitterMediaPatch(OpalMediaStream & source);
 	~XMTransmitterMediaPatch();
 	
-	virtual BOOL IsTerminated() const;
-	virtual void Resume();
+	virtual void Start();
 	void Close();
 	
 	virtual BOOL ExecuteCommand(const OpalMediaCommand & command,
@@ -48,7 +47,7 @@ public:
 private:
 
 	BOOL doesRunOwnThread;
-	BOOL isTerminated;
+    BOOL isTerminated;
 	RTP_DataFrame *dataFrame;
 	RTP_DataFrame::PayloadTypes payloadType;
 	XMCodecIdentifier codecIdentifier;

@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323Channel.cpp,v 1.5 2006/10/03 21:17:46 hfriederich Exp $
+ * $Id: XMH323Channel.cpp,v 1.6 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMH323Channel.h"
@@ -14,15 +14,15 @@
 
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
-#include "XMTransmitterMediaPatch.h"
 #include "XMReceiverMediaPatch.h"
 #include "XMCallbackBridge.h"
 
 XMH323Channel::XMH323Channel(H323Connection & connection,
 							 const H323Capability & capability,
 							 Directions direction,
-							 RTP_Session & rtp)
-: H323_RTPChannel(connection, capability, direction, rtp)
+							 RTP_Session & rtp,
+                             unsigned sessionID)
+: H323_RTPChannel(connection, capability, direction, rtp, sessionID)
 {
 }
 

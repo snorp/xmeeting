@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.41 2007/01/06 20:41:16 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.42 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -17,7 +17,7 @@
 #include "XMSoundChannel.h"
 #include "XMAudioTester.h"
 #include "XMMediaFormats.h"
-#include "XMTransmitterMediaPatch.h"
+#include "XMMediaStream.h"
 
 using namespace std;
 
@@ -381,22 +381,22 @@ void _XMStopCameraEvent(unsigned callID)
 
 void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp)
 {
-	XMTransmitterMediaPatch::SetTimeStamp(sessionID, timeStamp);
+	XMMediaStream::SetTimeStamp(sessionID, timeStamp);
 }
 
 void _XMAppendData(unsigned sessionID, void *data, unsigned length)
 {
-	XMTransmitterMediaPatch::AppendData(sessionID, data, length);
+	XMMediaStream::AppendData(sessionID, data, length);
 }
 
 void _XMSendPacket(unsigned sessionID, bool setMarkerBit)
 {
-	XMTransmitterMediaPatch::SendPacket(sessionID, setMarkerBit);
+	XMMediaStream::SendPacket(sessionID, setMarkerBit);
 }
 
 void _XMDidStopTransmitting(unsigned sessionID)
 {
-	XMTransmitterMediaPatch::HandleDidStopTransmitting(sessionID);
+	XMMediaStream::HandleDidStopTransmitting(sessionID);
 }
 
 #pragma mark -

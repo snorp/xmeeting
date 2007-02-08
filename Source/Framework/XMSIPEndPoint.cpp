@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.24 2007/01/07 14:27:29 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.25 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -251,7 +251,7 @@ void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 		callStatistics->roundTripDelay = UINT_MAX;
 		
 		//fetching the audio statistics
-		RTP_Session *session = connection->GetSession(OpalMediaFormat::DefaultAudioSessionID);
+		RTP_Session *session = connection->GetSession(OpalDefaultAudioMediaType);
 		
 		if(session != NULL)
 		{
@@ -272,8 +272,8 @@ void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 			callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
 		}
 		
-		//fetching the audio statistics
-		session = connection->GetSession(OpalMediaFormat::DefaultVideoSessionID);
+		//fetching the video statistics
+		session = connection->GetSession(OpalDefaultVideoMediaType);
 		
 		if(session != NULL)
 		{
@@ -445,9 +445,10 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 												const SIPURL & destination,
 												OpalTransport * transport,
 												SIP_PDU * invite,
-												unsigned int options)
+												unsigned int options,
+                                                OpalConnection::StringOptions * stringOptions)
 {
-	XMSIPConnection *conn = new XMSIPConnection(call, *this, token, destination, transport, options);
+	XMSIPConnection *conn = new XMSIPConnection(call, *this, token, destination, transport, options, stringOptions);
 	
 	if(conn != NULL)
 	{

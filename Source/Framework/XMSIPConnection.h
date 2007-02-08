@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.8 2007/01/07 14:27:29 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.9 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,7 +26,8 @@ public:
 					const PString & token,
 					const SIPURL & address,
 					OpalTransport * transport,
-					unsigned int options = 0);
+					unsigned int options = 0,
+                    OpalConnection::StringOptions * stringOptions = NULL);
 	
 	~XMSIPConnection();
 	
@@ -35,18 +36,15 @@ public:
 	virtual void OnCreatingINVITE(SIP_PDU & invite);
 	
 	virtual BOOL OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
-										   SDPMediaDescription::MediaType mediaType,
-										   unsigned sessionID,
+										   const OpalMediaType & opalMediaType,
 										   SDPSessionDescription & sdpOut);
 	virtual BOOL OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
-											   SDPMediaDescription::MediaType mediaType,
-											   unsigned sessionID);
+											   const OpalMediaType & opalMediaType);
 	
 	virtual OpalMediaFormatList GetMediaFormats() const;
 	virtual void AdjustMediaFormats(OpalMediaFormatList & mediaFormats) const;
 	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
-												unsigned sessionID,
 												BOOL isSource);
 	
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);

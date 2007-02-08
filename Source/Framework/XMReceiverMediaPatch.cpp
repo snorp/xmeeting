@@ -1,9 +1,9 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.27 2006/11/13 20:36:40 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.28 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMReceiverMediaPatch.h"
@@ -23,27 +23,42 @@
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
 {
-	packetReassembler = NULL;
 	notifierSet = FALSE;
+	packetReassembler = NULL;
 }
 
 XMReceiverMediaPatch::~XMReceiverMediaPatch()
 {
 }
 
-void XMReceiverMediaPatch::Main()
+void XMReceiverMediaPatch::Start()
 {
 	// quit any running audio test if needed
 	XMAudioTester::Stop();
 	
-	// Currently, audio is processed using the default OPAL facilities.
-	// Only video is processed using QuickTime
+	OpalMediaPatch::Start();
+}
+
+void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
+											  BOOL fromSink)
+{
+	if(fromSink == FALSE)
+	{
+		notifier = theNotifier;
+		notifierSet = TRUE;
+	}
+	OpalMediaPatch::SetCommandNotifier(theNotifier, fromSink);
+}
+
+void XMReceiverMediaPatch::Main()
+{
 	const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
 	if(_XMIsVideoMediaFormat(mediaFormat) == FALSE)
 	{
 		OpalMediaPatch::Main();
 		return;
 	}
+	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// The receiving algorithm tries to achieve best-possible data integrity and builds upon
@@ -101,12 +116,13 @@ void XMReceiverMediaPatch::Main()
 	
 	// Read the first packet
 	BOOL firstReadSuccesful = source.ReadPacket(*(packets[0]));
-
+	
 	if(firstReadSuccesful == TRUE)
 	{
 		// Tell the media receiver to prepare processing packets
 		XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
-		unsigned sessionID = source.GetSessionID();
+		//unsigned sessionID = source.GetSessionID();
+        unsigned sessionID = 2;
 		RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
 		
 		// initialize the packet processing variables
@@ -170,7 +186,7 @@ void XMReceiverMediaPatch::Main()
 			
 			BOOL processingSuccessful = TRUE;
 			unsigned numberOfPacketsToRelease = 0;
-		
+			
 			XMRTPPacket *packet = packets[packetIndex];
 			
 			packet->next = NULL;
@@ -220,7 +236,7 @@ void XMReceiverMediaPatch::Main()
 						// ist still needed
 						numberOfPacketsToRelease = packetIndex;
 					}
-				
+					
 					currentTimestamp = timestamp;
 				}
 				
@@ -395,9 +411,9 @@ void XMReceiverMediaPatch::Main()
 			
 			// check for loop termination conditions
 			PINDEX len = sinks.GetSize();
-		
+			
 			inUse.Signal();
-
+			
 			if(len == 0)
 			{
 				break;
@@ -421,17 +437,6 @@ void XMReceiverMediaPatch::Main()
 	{
 		free(packetReassembler);
 	}
-}
-
-void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
-											  BOOL fromSink)
-{
-	if(fromSink == FALSE)
-	{
-		notifier = theNotifier;
-		notifierSet = TRUE;
-	}
-	OpalMediaPatch::SetCommandNotifier(theNotifier, fromSink);
 }
 
 void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()

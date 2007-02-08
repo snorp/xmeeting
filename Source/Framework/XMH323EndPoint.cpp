@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.22 2007/01/07 08:28:00 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.23 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,7 +41,7 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	
 	SetInitialBandwidth(UINT_MAX);
 	
-	SetIsH224Enabled(TRUE);
+	autoStartReceiveData = autoStartTransmitData = TRUE;
 	
 	// Workaround to register the H.460 plugins
 	/*PString serviceName = "H460_FeatureStd18";
@@ -209,7 +209,7 @@ void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 		callStatistics->roundTripDelay = roundTripDelay;
 		
 		//fetching the audio statistics
-		RTP_Session *session = connection->GetSession(OpalMediaFormat::DefaultAudioSessionID);
+		RTP_Session *session = connection->GetSession(OpalDefaultAudioMediaType);
 		
 		if(session != NULL)
 		{
@@ -230,8 +230,8 @@ void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 			callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
 		}
 		
-		//fetching the audio statistics
-		session = connection->GetSession(OpalMediaFormat::DefaultVideoSessionID);
+		//fetching the video statistics
+		session = connection->GetSession(OpalDefaultVideoMediaType);
 		
 		if(session != NULL)
 		{
@@ -311,9 +311,10 @@ H323Connection * XMH323EndPoint::CreateConnection(OpalCall & call,
 												  const PString & alias,
 												  const H323TransportAddress & address,
 												  H323SignalPDU * setupPDU,
-												  unsigned options)
+												  unsigned options,
+                                                  OpalConnection::StringOptions * stringOptions)
 {
-	XMH323Connection *conn = new XMH323Connection(call, *this, token, alias, address, options);
+	XMH323Connection *conn = new XMH323Connection(call, *this, token, alias, address, options, stringOptions);
 	if(conn != NULL)
 	{
 		OnNewConnection(call, *conn);

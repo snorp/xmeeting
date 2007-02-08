@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.22 2007/01/07 14:26:21 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.23 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #include "XMH323Connection.h"
@@ -14,7 +14,6 @@
 
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
-#include "XMTransmitterMediaPatch.h"
 #include "XMH323Channel.h"
 #include "XMBridge.h"
 #include "XMRFC2833Handler.h"
@@ -24,8 +23,9 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 								   const PString & token,
 								   const PString & alias,
 								   const H323TransportAddress & address,
-								   unsigned options)
-: H323Connection(call, endPoint, token, alias, address, options)
+								   unsigned options,
+                                   OpalConnection::StringOptions * stringOptions)
+: H323Connection(call, endPoint, token, alias, address, options, stringOptions)
 {
 	hasSetLocalCapabilities = FALSE;
 	
@@ -36,6 +36,8 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
 	inBandDTMFHandler = NULL;
+	
+	startT120 = FALSE;
 }
 
 XMH323Connection::~XMH323Connection()
@@ -105,17 +107,17 @@ void XMH323Connection::OnSetLocalCapabilities()
 	}
 }
 
-void XMH323Connection::SelectDefaultLogicalChannel(unsigned sessionID)
+void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaType)
 {
-	// overridden to achieve better capability select behaviour
+	// overridden to achieve better capability select behaviour for the video capabilities
 	
-	if(sessionID == OpalMediaFormat::DefaultAudioSessionID)
+	if(mediaType != OpalDefaultVideoMediaType)
 	{
-		H323Connection::SelectDefaultLogicalChannel(sessionID);
+		H323Connection::SelectDefaultLogicalChannel(mediaType);
 		return;
 	}
 	
-	if(FindChannel(sessionID, FALSE))
+	if(FindChannel(mediaType, FALSE))
 	{
 		return;
 	}
@@ -123,7 +125,7 @@ void XMH323Connection::SelectDefaultLogicalChannel(unsigned sessionID)
 	for(PINDEX i = 0; i < localCapabilities.GetSize(); i++)
 	{
 		H323Capability & localCapability = localCapabilities[i];
-		if(localCapability.GetDefaultSessionID() == sessionID)
+		if(localCapability.GetMediaFormat().GetMediaType() == mediaType)
 		{
 			if(PIsDescendant(&localCapability, XMH323VideoCapability))
 			{
@@ -147,6 +149,7 @@ void XMH323Connection::SelectDefaultLogicalChannel(unsigned sessionID)
 					}
 				}
 			
+                unsigned sessionID = GetRTPSessionIDForMediaType(mediaType);
 				if(chosenCapability != NULL && OpenLogicalChannel(*chosenCapability, sessionID, H323Channel::IsTransmitter))
 				{
 					break;
@@ -208,7 +211,7 @@ H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability
 			sessionID = param->m_sessionID;
 		}
 		
-		session = UseSession(GetControlChannel(), sessionID, rtpqos);
+		session = UseSession(GetControlChannel(), capability.GetMediaFormat().GetMediaType(), rtpqos);
 		if (session == NULL)
 		{
 			return NULL;
@@ -216,7 +219,7 @@ H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability
 		
 		((RTP_UDP *) session)->Reopen(dir == H323Channel::IsReceiver);
 		
-		XMH323Channel *theChannel = new XMH323Channel(*this, capability, dir, *session);
+		XMH323Channel *theChannel = new XMH323Channel(*this, capability, dir, *session, sessionID);
 		
 		if(PIsDescendant(&capability, XM_H323_H263_Capability))
 		{

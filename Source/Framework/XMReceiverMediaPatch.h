@@ -1,9 +1,9 @@
 /*
- * $Id: XMReceiverMediaPatch.h,v 1.8 2006/04/17 17:51:22 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.h,v 1.9 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_RECEIVER_MEDIA_PATCH__
@@ -23,18 +23,22 @@ public:
 	XMReceiverMediaPatch(OpalMediaStream & source);
 	~XMReceiverMediaPatch();
 	
-	virtual void Main();
+	virtual void Start();
 	virtual void SetCommandNotifier(const PNotifier & notifier,
 									BOOL fromSink);
+	
+protected:
+		
+		// Overrides from OpalMediaPatch
+		virtual void Main();
 	
 private:
 		
 	void IssueVideoUpdatePictureCommand();
 	
-	XMRTPPacketReassembler *packetReassembler;
-	
 	PNotifier notifier;
 	BOOL notifierSet;
+	XMRTPPacketReassembler * packetReassembler;
 };
 
 #endif // __XM_RECEIVER_MEDIA_PATCH__

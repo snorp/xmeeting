@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.10 2007/01/07 14:27:29 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.11 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,7 +95,8 @@ public:
 											 const SIPURL & destination,
 											 OpalTransport * transport,
 											 SIP_PDU * invite,
-											 unsigned int options = 0);
+											 unsigned int options = 0,
+                                             OpalConnection::StringOptions * stringOptions = NULL);
 	
 	virtual BOOL AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
 									  PIPSocket::InterfaceTable & interfaceTable);

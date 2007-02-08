@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.29 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.30 2007/02/08 08:43:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -202,20 +202,21 @@ typedef enum XMCodecIdentifier
 	
 	// Audio Codecs
 	XMCodecIdentifier_G711_uLaw = 1,
-	XMCodecIdentifier_G711_ALaw,
+	XMCodecIdentifier_G711_ALaw = 2,
+	XMCodecIdentifier_Speex = 3,
 	
 	// Audio Recording Codecs
-	XMCodecIdentifier_LinearPCM,
+	XMCodecIdentifier_LinearPCM = 50,
 	
 	// Video Codecs
 	XMCodecIdentifier_H261 = 100,
-	XMCodecIdentifier_H263,
-	XMCodecIdentifier_H264,
+	XMCodecIdentifier_H263 = 101,
+	XMCodecIdentifier_H264 = 102,
 	
 	// Video Recording Codecs
 	XMCodecIdentifier_MPEG4 = 150,
-	XMCodecIdentifier_Motion_JPEG_A,
-	XMCodecIdentifier_Motion_JPEG_B,
+	XMCodecIdentifier_Motion_JPEG_A = 151,
+	XMCodecIdentifier_Motion_JPEG_B = 152,
 	
 } XMCodecIdentifier;
 

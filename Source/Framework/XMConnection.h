@@ -1,9 +1,9 @@
 /*
- * $Id: XMConnection.h,v 1.8 2006/11/11 08:37:47 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.9 2007/02/08 08:43:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CONNECTION_H__
@@ -14,6 +14,8 @@
 #include "XMBridge.h"
 
 class XMEndPoint;
+class OpalH224Handler;
+class OpalH281Handler;
 
 class XMConnection : public OpalConnection
 {
@@ -25,6 +27,7 @@ public:
 				 const PString & token);
 	~XMConnection();
 	
+    virtual BOOL OnIncomingConnection(unsigned int options, OpalConnection::StringOptions * stringOptions);
 	virtual BOOL SetUpConnection();
 	virtual BOOL SetAlerting(const PString & calleeName,
 							 BOOL withMedia);
@@ -35,18 +38,24 @@ public:
 	void AcceptIncoming();
 	PSoundChannel * CreateSoundChannel(BOOL isSource);
 	
-	virtual BOOL IsMediaBypassPossible(unsigned sessionID) const;
+	virtual BOOL IsMediaBypassPossible(const OpalMediaType & mediaType) const;
 	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
-												unsigned sessionID,
 												BOOL isSource);
 	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	
 	BOOL SendUserInputString(const PString & value);
-	virtual BOOL GetMediaInformation(unsigned sessionID,  MediaInformation & info) const;
+	virtual BOOL GetMediaInformation(const OpalMediaType & mediaType,  MediaInformation & info) const;
+	
+	OpalH281Handler * GetH281Handler();
 	
 private:
+		
+	OpalH224Handler * GetH224Handler();
+	
 	XMEndPoint & endpoint;
+	OpalH224Handler *h224Handler;
+	OpalH281Handler *h281Handler;
 };
 
 #endif // __XM_CONNECTION_H__
