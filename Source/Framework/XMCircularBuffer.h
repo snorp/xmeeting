@@ -1,9 +1,9 @@
 /*
- * $Id: XMCircularBuffer.h,v 1.2 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCircularBuffer.h,v 1.3 2007/02/13 11:52:11 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Andreas Fenkart, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Andreas Fenkart, Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CIRCULAR_BUFFER_H__
@@ -65,8 +65,8 @@ public:
 	 * written to the buffer. If lock is true, this function blocks
 	 * until all bytes have been written (or the buffer was *stopped*)
      **/
-	PINDEX Fill(const char* inbuf, PINDEX len, Boolean lock = true, 
-				Boolean overwrite = false);
+	PINDEX Fill(const char* inbuf, PINDEX len, BOOL lock = true, 
+				BOOL overwrite = false);
 
 
 	/** 
@@ -76,7 +76,7 @@ public:
 	 * is set, this method may return a number smaller than len if the
 	 * buffer was *stopped* in the meantime
 	 **/
-	PINDEX Drain(char* outbuf, PINDEX len, Boolean lock = true);
+	PINDEX Drain(char* outbuf, PINDEX len, BOOL lock = true);
 	
 	/**
 	 * *Starts* / *Stops* the buffer as desired
@@ -93,7 +93,7 @@ public:
    char* buffer;
    const PINDEX capacity;
    PINDEX head, tail;
-   Boolean running;
+   BOOL running;
 
    pthread_mutex_t mutex;
    pthread_cond_t cond;

@@ -1,9 +1,9 @@
 /*
- * $Id: XMCircularBuffer.cpp,v 1.3 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCircularBuffer.cpp,v 1.4 2007/02/13 11:52:11 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Andreas Fenkart, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Andreas Fenkart, Hannes Friederich. All rights reserved.
  */
 
 #include "XMCircularBuffer.h"
@@ -101,7 +101,7 @@ inline void XMCircularBuffer::increment_tail(PINDEX inc)
 	increment_index(tail, inc);
 }
 
-int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, Boolean lock, Boolean overwrite)
+int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwrite)
 {
    int done = 0, todo = 0;
 
@@ -181,7 +181,7 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, Boolean lock, Boolean 
 }
 
 
-PINDEX XMCircularBuffer::Drain(char *outbuf, PINDEX len, Boolean lock) 
+PINDEX XMCircularBuffer::Drain(char *outbuf, PINDEX len, BOOL lock) 
 {
    PINDEX done = 0, todo = 0;
 
