@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.8 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.9 2007/02/13 12:57:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,8 @@
 
 #include <codec/vidcodec.h>
 #include <opal/patch.h>
+
+#define XM_MAX_FPS 30
 
 static XMMediaStream *videoTransmitterStream = NULL;
 
@@ -34,18 +36,26 @@ void XMMediaStream::OnPatchStart()
         // Adjust the local media format
         mediaFormat = mediaPatch->GetSinkFormat();
         
-        unsigned maxFramesPerSecond = UINT_MAX;
-        unsigned maxBitrate = XMOpalManager::GetManager()->GetVideoBandwidthLimit();
-        
         RTP_DataFrame::PayloadTypes payloadType = mediaFormat.GetPayloadType();
         
         unsigned frameTime = mediaFormat.GetFrameTime();
-        unsigned framesPerSecond = (unsigned)round(90000.0 / (double)frameTime);
-        unsigned bitrate = mediaFormat.GetBandwidth()*100;
+        unsigned framesPerSecond = (unsigned)round((double)OpalMediaFormat::VideoClockRate / (double)frameTime);
+        framesPerSecond = std::min((unsigned)XM_MAX_FPS, framesPerSecond);
+        
+        unsigned bitrate = mediaFormat.GetBandwidth();
+        bitrate = std::min(bitrate, XMOpalManager::GetManager()->GetVideoBandwidthLimit());
+        
         unsigned flags = 0;
         
         XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
         XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+        
+        if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
+           videoSize == XMVideoSize_NoVideo) 
+        {
+            // Shouldn't actually happen
+            return;
+        }
         
         if(codecIdentifier == XMCodecIdentifier_H263)
         {
@@ -77,22 +87,6 @@ void XMMediaStream::OnPatchStart()
             
             flags = (_XMGetH264PacketizationMode(mediaFormat) << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
         }
-        // adjusting the maxFramesPerSecond / maxBitrate parameters
-        if(framesPerSecond < maxFramesPerSecond)
-        {
-            maxFramesPerSecond = framesPerSecond;
-        }
-        
-        if(bitrate < maxBitrate)
-        {
-            maxBitrate = bitrate;
-        }
-        
-        if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
-           videoSize == XMVideoSize_NoVideo)
-        {
-            return;
-        }
         
         // adjusting the payload type afterwards, now that the packetization scheme has
         // been determined
@@ -120,7 +114,7 @@ void XMMediaStream::OnPatchStart()
         dataFrame.SetPayloadType(payloadType);
         
         unsigned keyframeInterval = XMOpalManager::GetManager()->GetKeyFrameIntervalForCurrentCall(codecIdentifier);
-        _XMStartMediaTransmit(2, codecIdentifier, videoSize, maxFramesPerSecond, maxBitrate, keyframeInterval, flags);
+        _XMStartMediaTransmit(2, codecIdentifier, videoSize, framesPerSecond, bitrate, keyframeInterval, flags);
     }
 }
 

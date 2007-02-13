@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.18 2007/02/13 11:56:08 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.19 2007/02/13 12:57:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,7 @@ XMConnection::XMConnection(OpalCall & call,
     h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH263BandwidthLimit());
     h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH263BandwidthLimit());
     h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH264BandwidthLimit());
+    _XMSetEnableH264LimitedMode(h264VideoFormat, XMOpalManager::GetManager()->GetEnableH264LimitedMode());
 }
 
 XMConnection::~XMConnection()
@@ -159,6 +160,8 @@ void XMConnection::AdjustMediaFormatOptions(OpalMediaFormat & mediaFormat) const
         mediaFormat.Merge(h263PlusVideoFormat);
     } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
         mediaFormat.Merge(h264VideoFormat);
+        BOOL enableH264LimitedMode = _XMGetEnableH264LimitedMode(h264VideoFormat);
+        _XMSetEnableH264LimitedMode(mediaFormat, enableH264LimitedMode);
     }
 }
 

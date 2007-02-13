@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.17 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.18 2007/02/13 12:57:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -159,7 +159,7 @@ public:
 	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
     virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
     virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
-    virtual BOOL HasMediaPacketizationParameters() const { return TRUE; }
+    virtual BOOL HasMediaPacketizationParameters() const { return IsH263PlusCapability(); }
 	virtual void OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const;
 	virtual void OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization);
 	

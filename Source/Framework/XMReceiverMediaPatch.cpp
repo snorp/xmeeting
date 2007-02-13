@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.29 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.30 2007/02/13 12:57:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,8 +104,8 @@ void XMReceiverMediaPatch::Main()
 	{
 		// Tell the media receiver to prepare processing packets
 		XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
-		//unsigned sessionID = source.GetSessionID();
         unsigned sessionID = 2;
+        
 		RTP_DataFrame::PayloadTypes payloadType = packets[0]->GetPayloadType();
 		
 		// initialize the packet processing variables
@@ -131,6 +131,7 @@ void XMReceiverMediaPatch::Main()
 					
 					if(result == 0)
 					{
+                        // cannot determine. Last hope is to look at the payload code
 						if(payloadType == RTP_DataFrame::H263)
 						{
 							cout << "Receiving RFC2190" << endl;

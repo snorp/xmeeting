@@ -1,15 +1,10 @@
 /*
- * $Id: XMOpalManager.h,v 1.28 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.29 2007/02/13 12:57:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
-
-/**
- * Due to problems with the C++ runtime system and especially dynamic_cast
- * when using ZeroLink, all C++ code is now directly linked with Opal.
- **/
 
 #ifndef __XM_OPAL_MANAGER_H__
 #define __XM_OPAL_MANAGER_H__

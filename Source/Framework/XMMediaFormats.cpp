@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.24 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.25 2007/02/13 12:57:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -351,7 +351,7 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	}
 	
     maxBitRate = std::min(maxBitRate, (unsigned)h261.m_maxBitRate);
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
 
 	return TRUE;
 }
@@ -763,7 +763,7 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	maxBitRate = std::min(maxBitRate, (unsigned)h263.m_maxBitRate);
 
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
 	
 	return TRUE;
 }
@@ -1251,7 +1251,7 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, width);
 	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, height);
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
 
 	return TRUE;
 }
