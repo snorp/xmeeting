@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.5 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.6 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,7 @@ public:
     static void SendPacket(unsigned mediaID, BOOL setMarker);
     static void HandleDidStopTransmitting(unsigned mediaID);
     
-    virtual BOOL ExecuteCommand(const OpalMediaCommand & command) { return TRUE; }
+    virtual BOOL ExecuteCommand(const OpalMediaCommand & command, BOOL isEndOfChain = FALSE);
     
 private:
     RTP_DataFrame dataFrame;

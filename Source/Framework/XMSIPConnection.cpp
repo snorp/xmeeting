@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.18 2007/02/08 23:09:14 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.19 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,8 +31,9 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
   h263PlusVideoFormat(_XMMediaFormat_H263Plus, (RTP_DataFrame::PayloadTypes)96, _XMMediaFormatEncoding_H263Plus, 352, 288, 30, _XMGetMaxH263BitRate()),
   h264VideoFormat(_XMMediaFormat_H264, (RTP_DataFrame::PayloadTypes)97, _XMMediaFormatEncoding_H264, 352, 288, 30, _XMGetMaxH264BitRate())
 {
-	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
-	  
+	bandwidthAvailable = (XMOpalManager::GetManager()->GetBandwidthLimit() / 100);
+    
+    // Delete the default RFC2833 handler and replace it with our own implementation
 	delete rfc2833Handler;
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
@@ -101,7 +102,9 @@ void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
 {
 	if(invite.HasSDP()) {
 		SDPSessionDescription & sdp = invite.GetSDP();
-		AdjustSessionDescription(sdp);
+		unsigned bandwidth = XMOpalManager::GetManager()->GetBandwidthLimit() / 1000; // FIXME
+        sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
+        sdp.SetBandwidthValue(bandwidth);
 	}
 }
 
@@ -458,41 +461,6 @@ BOOL XMSIPConnection::OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 	return SIPConnection::OnReceivedSDPMediaDescription(sdp, mediaType);
 }
 
-OpalMediaFormatList XMSIPConnection::GetMediaFormats() const
-{
-	OpalMediaFormatList mediaFormats = SIPConnection::GetMediaFormats();
-	
-	// At the moment, neither H.263+ and H.264 are supported for SIP.
-	// H.263+ will probably never come unless QuickTime can actually handle
-	// H.263+ (PLUSPTYPE)
-	PINDEX index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H263PLUS);
-	if(index != P_MAX_INDEX)
-	{
-		mediaFormats.RemoveAt(index);
-	}
-	index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H264);
-	if(index != P_MAX_INDEX)
-	{
-		mediaFormats.RemoveAt(index);
-	}
-	return mediaFormats;
-}
-
-void XMSIPConnection::AdjustMediaFormats(OpalMediaFormatList & mediaFormats) const
-{
-	PINDEX index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H263PLUS);
-	if(index != P_MAX_INDEX)
-	{
-		mediaFormats.RemoveAt(index);
-	}
-	index = mediaFormats.FindFormat(XM_MEDIA_FORMAT_H264);
-	if(index != P_MAX_INDEX)
-	{
-		mediaFormats.RemoveAt(index);
-	}
-	SIPConnection::AdjustMediaFormats(mediaFormats);
-}
-
 OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
 													 BOOL isSource)
 {
@@ -520,7 +488,7 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		}
 		else if(mediaFormat == XM_MEDIA_FORMAT_H263)
 		{
-			_XMSetIsReceivingRFC2429(FALSE); // prevent XMMediaTransmitter from assuming RFC2429
+			//_XMSetIsReceivingRFC2429(FALSE); // prevent XMMediaTransmitter from assuming RFC2429
 			return SIPConnection::CreateMediaStream(h263VideoFormat, isSource);
 		}
 		/*else if(mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
@@ -536,63 +504,11 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 	return SIPConnection::CreateMediaStream(mediaFormat, isSource);
 }
 
-void XMSIPConnection::AdjustSessionDescription(SDPSessionDescription & sdp)
-{
-	unsigned bandwidth = XMOpalManager::GetAvailableBandwidth() / 1000;
-	sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
-	sdp.SetBandwidthValue(bandwidth);
-	
-	const SDPMediaDescriptionList & mediaDescriptionList = sdp.GetMediaDescriptions();
-
-	for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
-	{
-
-		SDPMediaDescription & description = mediaDescriptionList[i];
-		if(description.GetMediaType() == OpalDefaultVideoMediaType)
-		{
-			const SDPMediaFormatList & videoMediaFormats = description.GetSDPMediaFormats();
-	
-			unsigned j;
-			unsigned count = videoMediaFormats.GetSize();
-	
-			for(j = 0; j < count; j++)
-			{
-				SDPMediaFormat & videoMediaFormat = videoMediaFormats[j];
-				
-				RTP_DataFrame::PayloadTypes payloadType = videoMediaFormat.GetPayloadType();
-				
-				if(payloadType == RTP_DataFrame::H261)
-				{
-					videoMediaFormat.SetFMTP(_XMGetFMTP_H261());
-				}
-				else if(payloadType == RTP_DataFrame::H263)
-				{
-					videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
-				}
-				/*else if(payloadType == (RTP_DataFrame::PayloadTypes)96)
-				{
-					videoMediaFormat.SetFMTP(_XMGetFMTP_H263());
-				}
-				else if(payloadType == (RTP_DataFrame::PayloadTypes)97)
-				{
-					videoMediaFormat.SetFMTP(_XMGetFMTP_H264());
-				}*/
-			}
-		}
-	}
-}
-
 BOOL XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
 	if(!SIPConnection::OnOpenMediaStream(mediaStream))
 	{
 		return FALSE;
-	}
-	
-	if(phase == ConnectedPhase)
-	{
-		SetPhase(EstablishedPhase);
-		OnEstablished();
 	}
     
     XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
@@ -606,130 +522,10 @@ void XMSIPConnection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
     XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, mediaStream);
 }
 
-void XMSIPConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
-{
-	SIPConnection::OnPatchMediaStream(isSource, patch);
-	
-	if(!isSource)
-	{
-		if(inBandDTMFHandler == NULL)
-		{
-			inBandDTMFHandler = new XMInBandDTMFHandler();
-		}
-		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
-	}
-}
-
-void XMSIPConnection::OnReceivedACK(SIP_PDU & pdu)
-{
-	SIPConnection::OnReceivedACK(pdu);
-	if(phase == EstablishedPhase)
-	{
-		releaseMethod = ReleaseWithBYE;
-	}
-}
-
-void XMSIPConnection::OnReceivedAuthenticationRequired(SIPTransaction & transaction,
-													   SIP_PDU & response)
-{
-	BOOL isProxy = response.GetStatusCode() == SIP_PDU::Failure_ProxyAuthenticationRequired;
-	SIPURL proxy;
-	SIPAuthentication auth;
-	PString lastUsername;
-	PString lastNonce;
-	
-	if (transaction.GetMethod() != SIP_PDU::Method_INVITE)
-	{
-		return;
-	}
-	
-	// Received authentication required response, try to find authentication
-	// for the given realm if no proxy
-	if (!auth.Parse(response.GetMIME()(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate"),isProxy)) 
-	{
-		Release(EndedBySecurityDenial);
-		return;
-	}
-	
-	// Save the username, realm and nonce
-	lastUsername = auth.GetUsername();
-	lastNonce = auth.GetNonce();
-	
-	// Try to find authentication parameters for the given realm,
-	// if not, use the proxy authentication parameters (if any)
-	if (!endpoint.GetAuthentication(auth.GetAuthRealm(), authentication))
-	{
-		if (!endpoint.GetProxy().IsEmpty())
-		{
-			authentication.SetUsername(endpoint.GetProxy().GetUserName());
-			authentication.SetPassword(endpoint.GetProxy().GetPassword());
-		}
-		else
-		{
-			Release(EndedBySecurityDenial);
-			return;
-		}
-	}
-	
-	if (!authentication.Parse(response.GetMIME()(isProxy ? "Proxy-Authenticate": "WWW-Authenticate"), isProxy))
-	{
-		Release(EndedBySecurityDenial);
-		return;
-	}
-	
-	if (!authentication.IsValid() || (authentication.IsValid() && lastUsername == authentication.GetUsername () 
-									  && lastNonce    == authentication.GetNonce ())) 
-	{
-		Release(EndedBySecurityDenial);
-		return;
-	}
-	
-	// Restart the transaction with new authentication info
-	// and start with a fresh To tag
-	// Section 8.1.3.5 of RFC3261 tells that the authenticated
-	// request SHOULD have the same value of the Call-ID, To and From.
-	PINDEX j;
-	if ((j = remotePartyAddress.Find (';')) != P_MAX_INDEX)
-	{
-		remotePartyAddress = remotePartyAddress.Left(j);
-	}
-	
-	if (proxy.IsEmpty())
-	{
-		proxy = endpoint.GetProxy();
-	}
-	
-	// Default routeSet if there is a proxy
-	if (!proxy.IsEmpty() && routeSet.GetSize() == 0)
-	{
-		routeSet += "sip:" + proxy.GetHostName() + ':' + PString(proxy.GetPort()) + ";lr";
-	}
-	
-	SIPTransaction * invite = new SIPInvite(*this, *transport);
-	
-	if(invite->HasSDP() == FALSE)
-	{
-		// should not happen. Simply ignore
-		delete invite;
-		return;
-	}
-	
-	AdjustSessionDescription(invite->GetSDP());
-	
-	if (invite->Start())
-	{
-		invitations.Append(invite);
-	}
-	else 
-	{
-		delete invite;
-	}
-}
-
 BOOL XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
 {
 	bandwidthAvailable = newBandwidth;
-	XMOpalManager::SetAvailableBandwidth(100*newBandwidth);
+	//XMOpalManager::GetManager()->SetAvailableBandwidth(100*newBandwidth); FIXME
 	return TRUE;
 }
 
@@ -745,6 +541,8 @@ BOOL XMSIPConnection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requ
 
 BOOL XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
 {
+    // Separate RFC2833 is not implemented. Therefore it is used within
+    // XMeeting to signal in-band DTMF
 	if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 &&
 	   inBandDTMFHandler != NULL)
 	{
@@ -753,4 +551,19 @@ BOOL XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
 	}
 	
 	return SIPConnection::SendUserInputTone(tone, duration);
+}
+
+void XMSIPConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+{
+	SIPConnection::OnPatchMediaStream(isSource, patch);
+	
+    // Add the in-band DTMF handler if this is an audio sending stream
+	if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
+	{
+		if(inBandDTMFHandler == NULL)
+		{
+			inBandDTMFHandler = new XMInBandDTMFHandler();
+		}
+		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+	}
 }

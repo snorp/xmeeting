@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.24 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.25 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -300,9 +300,9 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 											 (void *)self);
 	// before responding to any errors received,
 	// handle the frame recording
-	BOOL needsIFrame = [_XMCallRecorderSharedInstance _handleCompressedRemoteVideoFrame:data
-																				 length:length
-																	   imageDescription:videoImageDescription];
+	BOOL needsIFrame = ![_XMCallRecorderSharedInstance _handleCompressedRemoteVideoFrame:data
+                                                                                  length:length
+                                                                        imageDescription:videoImageDescription];
 	
 	if(err != noErr || needsIFrame == YES)
 	{

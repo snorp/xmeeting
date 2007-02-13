@@ -1,11 +1,12 @@
 /*
- * $Id: XMConnection.cpp,v 1.17 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.18 2007/02/13 11:56:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
+#include "XMopalManager.h"
 #include "XMConnection.h"
 #include "XMEndPoint.h"
 #include "XMMediaFormats.h"
@@ -20,19 +21,33 @@ XMConnection::XMConnection(OpalCall & call,
 						   XMEndPoint & theEndPoint,
 						   const PString & token)
 : OpalConnection(call, theEndPoint, token),
-  endpoint(theEndPoint)
+  endpoint(theEndPoint),
+  h261VideoFormat(XM_MEDIA_FORMAT_H261),
+  h263VideoFormat(XM_MEDIA_FORMAT_H263),
+  h263PlusVideoFormat(XM_MEDIA_FORMAT_H263PLUS),
+  h264VideoFormat(XM_MEDIA_FORMAT_H264)
 {
-	  if(theEndPoint.EnableSilenceSuppression())
-	  {
-		  silenceDetector = new OpalPCM16SilenceDetector;
-	  }
-	  if(theEndPoint.EnableEchoCancellation())
-	  {
-		  echoCanceler = new OpalEchoCanceler;
-	  }
-	  
-	  h224Handler = NULL;
-	  h281Handler = NULL;
+    if(theEndPoint.GetEnableSilenceSuppression())
+    {
+        silenceDetector = new OpalPCM16SilenceDetector;
+    }
+    
+    if(theEndPoint.GetEnableEchoCancellation())
+    {
+        echoCanceler = new OpalEchoCanceler;
+    }
+    enableVideo = theEndPoint.GetEnableVideo();
+    
+    h224Handler = NULL;
+    h281Handler = NULL;
+    
+    // Update the video media format options.
+    // At the moment, only bandwidth is actively propagated
+    bandwidthAvailable = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
+    h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH261BandwidthLimit());
+    h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH263BandwidthLimit());
+    h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH263BandwidthLimit());
+    h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH264BandwidthLimit());
 }
 
 XMConnection::~XMConnection()
@@ -57,7 +72,8 @@ BOOL XMConnection::SetUpConnection()
 	if(ownerCall.GetConnection(0) == this) {
 		// We are A-Party
 		phase = SetUpPhase;
-		if(!OnIncomingConnection(0, NULL)) {
+        unsigned options = OpalConnection::AdjustMediaFormatOptionsEnable;
+		if(!OnIncomingConnection(options, NULL)) {
 			Release(EndedByCallerAbort);
 			return FALSE;
 		}
@@ -116,7 +132,47 @@ BOOL XMConnection::SetConnected()
 
 OpalMediaFormatList XMConnection::GetMediaFormats() const
 {
-	return endpoint.GetMediaFormats();
+	OpalMediaFormatList mediaFormats;
+	
+	mediaFormats += OpalPCM16;
+	
+	if(enableVideo == TRUE)
+	{
+		mediaFormats += XM_MEDIA_FORMAT_H261;
+        mediaFormats += XM_MEDIA_FORMAT_H263;
+        mediaFormats += XM_MEDIA_FORMAT_H263PLUS;
+        mediaFormats += XM_MEDIA_FORMAT_H264;
+	}
+	
+	mediaFormats += OpalH224;
+	
+	return mediaFormats;
+}
+
+void XMConnection::AdjustMediaFormatOptions(OpalMediaFormat & mediaFormat) const
+{
+    if (mediaFormat == XM_MEDIA_FORMAT_H261) {
+        mediaFormat.Merge(h261VideoFormat);
+    } else if (mediaFormat == XM_MEDIA_FORMAT_H263) {
+        mediaFormat.Merge(h263VideoFormat);
+    } else if (mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
+        mediaFormat.Merge(h263PlusVideoFormat);
+    } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
+        mediaFormat.Merge(h264VideoFormat);
+    }
+}
+
+BOOL XMConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
+{
+    bandwidthAvailable = std::min(XMOpalManager::GetManager()->GetBandwidthLimit(), newBandwidth);
+    
+    // Also adjust the bandwidth limits of the video formats
+    unsigned videoLimit = (100*bandwidthAvailable - 64000);
+    h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH261BandwidthLimit()));
+    h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
+    h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
+    h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH264BandwidthLimit()));
+    return TRUE;
 }
 
 void XMConnection::AcceptIncoming()
@@ -156,16 +212,10 @@ void XMConnection::AcceptIncoming()
 	OnEstablished();
 }
 
-BOOL XMConnection::IsMediaBypassPossible(const OpalMediaType & mediaType) const
-{
-	return OpalConnection::IsMediaBypassPossible(mediaType);
-}
-
 OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
 												  BOOL isSource)
 {
-	// check for "XMeeting" formats
-	if(_XMIsVideoMediaFormat(mediaFormat))
+	if(mediaFormat.GetMediaType() == OpalDefaultVideoMediaType)
 	{
 		return new XMMediaStream(mediaFormat, isSource);
 	}

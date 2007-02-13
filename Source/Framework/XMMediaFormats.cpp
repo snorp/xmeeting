@@ -1,14 +1,15 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.23 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.24 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
+#include <ptlib.h>
+#include <ptlib/videoio.h>
 #include <asn/h245.h>
 
-#include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 #include "XMBridge.h"
 
@@ -23,9 +24,9 @@
 #define XM_MAX_FRAME_HEIGHT XM_CIF_HEIGHT
 #define XM_MAX_FRAME_RATE 30
 
-#define XM_MAX_H261_BITRATE 9600
-#define XM_MAX_H263_BITRATE 9600
-#define XM_MAX_H264_BITRATE 7680
+#define XM_MAX_H261_BITRATE 960000
+#define XM_MAX_H263_BITRATE 960000
+#define XM_MAX_H264_BITRATE 768000
 
 #define XM_H264_PROFILE_CODE_BASELINE 64
 #define XM_H264_PROFILE_CODE_MAIN 32
@@ -50,10 +51,9 @@ const char *_XMMediaFormatIdentifier_H261 = "*xm-h.261*";
 const char *_XMMediaFormatIdentifier_H263 = "*xm-h.263*";
 const char *_XMMediaFormatIdentifier_H264 = "*xm-h.264*";
 
-//const char *_XMMediaFormat_Video = "XM-Video";
 const char *_XMMediaFormat_H261 = "XM-H.261";
-const char *_XMMediaFormat_H263 = "XM-H.263";
-const char *_XMMediaFormat_H263Plus = "XM-H.263-Plus";
+const char *_XMMediaFormat_H263 = "XM-H.263-1996";
+const char *_XMMediaFormat_H263Plus = "XM-H.263-1998";
 const char *_XMMediaFormat_H264 = "XM-H.264";
 
 const char *_XMMediaFormatName_H261 = "H.261";
@@ -62,15 +62,17 @@ const char *_XMMediaFormatName_H264 = "H.264";
 
 const char *_XMMediaFormatEncoding_H261 = "H261";
 const char *_XMMediaFormatEncoding_H263 = "H263";
-const char *_XMMediaFormatEncoding_H263Plus = "H263-1998";
+//const char *_XMMediaFormatEncoding_H263Plus = "H263-1998";
 //const char *_XMMediaFormatEncoding_H264 = "H264";
+const char *_XMMediaFormatEncoding_H263Plus = NULL;
 const char *_XMMediaFormatEncoding_H264 = NULL;
 
-static BOOL isReceivingRFC2429 = FALSE;
-static unsigned h264Profile = XM_H264_PROFILE_BASELINE;
-static unsigned h264Level = XM_H264_LEVEL_1_3;
-static unsigned h264PacketizationMode = XM_H264_PACKETIZATION_MODE_SINGLE_NAL;
-static BOOL h264EnableLimitedMode = FALSE;
+const char * const CanRFC2429Option = "CanRFC2429";
+const char * const IsRFC2429Option = "IsRFC2429";
+const char * const ProfileOption = "Profile";
+const char * const LevelOption = "Level";
+const char * const PacketizationOption = "Packetization";
+const char * const H264LimitedModeOption = "H264LimitedMode";
 
 #pragma mark -
 #pragma mark MediaFormat Definitions
@@ -102,7 +104,7 @@ const OpalVideoFormat & XMGetMediaFormat_H263()
 const OpalVideoFormat & XMGetMediaFormat_H263Plus()
 {
 	static const OpalVideoFormat XMMediaFormat_H263Plus(_XMMediaFormat_H263Plus,
-														(RTP_DataFrame::PayloadTypes)96,
+														(RTP_DataFrame::PayloadTypes)98,
 														_XMMediaFormatEncoding_H263Plus,
 														XM_MAX_FRAME_WIDTH,
 														XM_MAX_FRAME_HEIGHT,
@@ -125,19 +127,6 @@ const OpalVideoFormat & XMGetMediaFormat_H264()
 
 #pragma mark -
 #pragma mark Identifying MediaFormats
-
-BOOL _XMIsVideoMediaFormat(const OpalMediaFormat & mediaFormat)
-{
-	if(mediaFormat == XM_MEDIA_FORMAT_H261 ||
-	   mediaFormat == XM_MEDIA_FORMAT_H263 ||
-	   mediaFormat == XM_MEDIA_FORMAT_H263PLUS ||
-	   mediaFormat == XM_MEDIA_FORMAT_H264)
-	{
-		return TRUE;
-	}
-	
-	return FALSE;
-}
 
 XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat)
 {
@@ -175,7 +164,10 @@ XMVideoSize _XMGetMediaFormatSize(const OpalMediaFormat & mediaFormat)
 	{
 		return XMVideoSize_SQCIF;
 	}
-	else
+	else if (width != 0 && height != 0) {
+        return XMVideoSize_Custom;
+    }
+    else
 	{
 		return XMVideoSize_NoVideo;
 	}
@@ -199,6 +191,21 @@ const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat)
 	
 	// if nothing found, simply return the media format string itself
 	return mediaFormat;
+}
+
+unsigned _XMGetMaxH261Bitrate()
+{
+    return XM_MAX_H261_BITRATE;
+}
+
+unsigned _XMGetMaxH263Bitrate()
+{
+    return XM_MAX_H263_BITRATE;
+}
+
+unsigned _XMGetMaxH264Bitrate()
+{
+    return XM_MAX_H264_BITRATE;
 }
 
 #pragma mark -
@@ -232,8 +239,9 @@ XM_H323_H261_Capability::XM_H323_H261_Capability()
 {
 	qcifMPI = 1;
 	cifMPI = 1;
-	
-	maxBitRate = _XMGetMaxH261BitRate();
+	maxBitRate = XM_MAX_H261_BITRATE/100;
+    
+    SetPayloadType(XM_MEDIA_FORMAT_H261.GetPayloadType());
 }
 
 PObject * XM_H323_H261_Capability::Clone() const
@@ -270,7 +278,7 @@ unsigned XM_H323_H261_Capability::GetSubType() const
 
 PString XM_H323_H261_Capability::GetFormatName() const
 {
-	return _XMMediaFormat_H261;
+	return XM_MEDIA_FORMAT_H261;
 }
 
 BOOL XM_H323_H261_Capability::OnSendingPDU(H245_VideoCapability & cap) const
@@ -342,43 +350,13 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		cifMPI = 0;
 	}
 	
-	maxBitRate = h261.m_maxBitRate;
-	if(maxBitRate > XM_MAX_H261_BITRATE)
-	{
-		maxBitRate = XM_MAX_H261_BITRATE;
-	}
+    maxBitRate = std::min(maxBitRate, (unsigned)h261.m_maxBitRate);
 	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 
 	return TRUE;
 }
 
-BOOL XM_H323_H261_Capability::OnSendingTerminalCapabilitySet(H245_TerminalCapabilitySet & terminalCapabilitySet) const
-{
-	return TRUE;
-}
-
-BOOL XM_H323_H261_Capability::OnReceivedTerminalCapabilitySet(const H245_H2250Capability & h2250Capability)
-{
-	return TRUE;
-}
-
-BOOL XM_H323_H261_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters & param) const
-{
-	param.RemoveOptionalField(H245_H2250LogicalChannelParameters::e_silenceSuppression);
-	return TRUE;
-}
-
-BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParameters & param)
-{
-	return TRUE;
-}
-
 BOOL XM_H323_H261_Capability::IsValidCapabilityForSending() const
-{
-	return TRUE;
-}
-
-BOOL XM_H323_H261_Capability::IsValidCapabilityForReceiving() const
 {
 	return TRUE;
 }
@@ -422,6 +400,27 @@ PObject::Comparison XM_H323_H261_Capability::CompareTo(const XMH323VideoCapabili
 	return LessThan;
 }
 
+void XM_H323_H261_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
+{
+    qcifMPI = 0;
+    cifMPI = 0;
+    
+    XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
+    
+    if(videoSize >= XMVideoSize_QCIF) {
+        qcifMPI = mpi;
+    }
+    if(videoSize >= XMVideoSize_CIF) {
+        cifMPI = mpi;
+    }
+    
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    
+    SetPayloadType(mediaFormat.GetPayloadType());
+}
+
 #pragma mark -
 #pragma mark XM_H323_H263_Capability methods
 
@@ -430,10 +429,10 @@ XM_H323_H263_Capability::XM_H323_H263_Capability()
 	sqcifMPI = 1;
 	qcifMPI = 1;
 	cifMPI = 1;
-	cif4MPI = 0;
-	cif16MPI = 0;
+	cif4MPI = 1;
+	cif16MPI = 1;
 	
-	maxBitRate = _XMGetMaxH263BitRate();
+	maxBitRate = XM_MAX_H263_BITRATE/100;
 	
 	slowSqcifMPI = 0;
 	slowQcifMPI = 0;
@@ -442,6 +441,10 @@ XM_H323_H263_Capability::XM_H323_H263_Capability()
 	slowCif16MPI = 0;
 	
 	isH263PlusCapability = FALSE;
+    canRFC2429 = FALSE;
+    isRFC2429 = FALSE;
+    
+    SetPayloadType(XM_MEDIA_FORMAT_H263.GetPayloadType());
 }
 
 XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
@@ -452,7 +455,7 @@ XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
 	cif4MPI = 0;
 	cif16MPI = 0;
 	
-	maxBitRate = _XMGetMaxH263BitRate();
+	maxBitRate = XM_MAX_H263_BITRATE/100;
 	
 	slowSqcifMPI = 0;
 	slowQcifMPI = 0;
@@ -461,6 +464,13 @@ XM_H323_H263_Capability::XM_H323_H263_Capability(BOOL theIsH263PlusCapability)
 	slowCif16MPI = 0;
 	
 	isH263PlusCapability = theIsH263PlusCapability;
+    canRFC2429 = theIsH263PlusCapability;
+    isRFC2429 = theIsH263PlusCapability;
+    
+    SetPayloadType(XM_MEDIA_FORMAT_H263.GetPayloadType());
+    if(theIsH263PlusCapability == TRUE) {
+        SetPayloadType(XM_MEDIA_FORMAT_H263PLUS.GetPayloadType());
+    }
 }
 
 PObject * XM_H323_H263_Capability::Clone() const
@@ -632,13 +642,24 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	if(h263.HasOptionalField(H245_H263VideoCapability::e_h263Options))
 	{
 		isH263PlusCapability = TRUE;
+        SetPayloadType(XM_MEDIA_FORMAT_H263PLUS.GetPayloadType());
 	}
 	else
 	{
 		isH263PlusCapability = FALSE;
+        SetPayloadType(XM_MEDIA_FORMAT_H263.GetPayloadType());
 	}
 	
 	OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
+    
+    
+    // "Reset" the media format
+    if(isH263PlusCapability == TRUE) {
+        mediaFormat = XM_MEDIA_FORMAT_H263PLUS;
+    } else {
+        mediaFormat = XM_MEDIA_FORMAT_H263;
+    }
+    SetCanRFC2429(canRFC2429);
 	
 	if(h263.HasOptionalField(H245_H263VideoCapability::e_sqcifMPI))
 	{
@@ -740,26 +761,18 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		slowCif16MPI = 0;
 	}
 	
-	maxBitRate = h263.m_maxBitRate;
-	if(maxBitRate > XM_MAX_H263_BITRATE)
-	{
-		maxBitRate = XM_MAX_H263_BITRATE;
-	}
+	maxBitRate = std::min(maxBitRate, (unsigned)h263.m_maxBitRate);
 
 	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate);
 	
 	return TRUE;
 }
 
-BOOL XM_H323_H263_Capability::OnSendingTerminalCapabilitySet(H245_TerminalCapabilitySet & terminalCapabilitySet) const
+void XM_H323_H263_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
 {
 	if(isH263PlusCapability)
 	{
 		// Enter RFC2429 media packetization information
-		H245_MultiplexCapability & multiplexCapability = terminalCapabilitySet.m_multiplexCapability;
-		H245_H2250Capability & h2250Capability = (H245_H2250Capability &)multiplexCapability;
-		H245_MediaPacketizationCapability & mediaPacketizationCapability = h2250Capability.m_mediaPacketizationCapability;
-		
 		BOOL alreadyPresent = FALSE;
 		if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
 		{
@@ -789,27 +802,33 @@ BOOL XM_H323_H263_Capability::OnSendingTerminalCapabilitySet(H245_TerminalCapabi
 		PASN_Integer & h263Integer = (PASN_Integer &)h263Descriptor;
 		h263Integer.SetValue(2429);
 	}
-	
-	return TRUE;
 }
 
-BOOL XM_H323_H263_Capability::OnReceivedTerminalCapabilitySet(const H245_H2250Capability & h2250Capability)
+void XM_H323_H263_Capability::OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability)
 {
-	isReceivingRFC2429 = FALSE;
-	
-	return TRUE;
+    if (mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
+    {
+        const H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
+        
+        for(PINDEX i = 0; i < arrayOfRTPPayloadType.GetSize(); i++) {
+            const H245_RTPPayloadType & payloadType = arrayOfRTPPayloadType[i];
+            const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = payloadType.m_payloadDescriptor;
+            if (payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_rfc_number);
+            {
+                const PASN_Integer & integer = payloadDescriptor;
+                if(integer.GetValue() == 2429) {
+                    SetCanRFC2429(TRUE);
+                    return;
+                }
+            }
+        }
+    }
 }
 
-BOOL XM_H323_H263_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters & param) const
-{
-	param.RemoveOptionalField(H245_H2250LogicalChannelParameters::e_silenceSuppression);
-	
+void XM_H323_H263_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const
+{	
 	if(isH263PlusCapability)
 	{
-		param.IncludeOptionalField(H245_H2250LogicalChannelParameters::e_mediaPacketization);
-		H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization = 
-			param.m_mediaPacketization;
-		
 		mediaPacketization.SetTag(H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType);
 		
 		H245_RTPPayloadType & rtpPayloadType = mediaPacketization;
@@ -821,25 +840,15 @@ BOOL XM_H323_H263_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters & 
 		rfcValue.SetValue(2429);
 		
 		rtpPayloadType.IncludeOptionalField(H245_RTPPayloadType::e_payloadType);
-		rtpPayloadType.m_payloadType = 96;
+		rtpPayloadType.m_payloadType = GetPayloadType();
 	}
-	
-	return TRUE;
 }
 
-BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParameters & param)
-{	
-	if(!param.HasOptionalField(H245_H2250LogicalChannelParameters::e_mediaPacketization))
-	{
-		return TRUE;
-	}
-	
-	const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization = 
-		param.m_mediaPacketization;
-	
+void XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization)
+{		
 	if(mediaPacketization.GetTag() != H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType)
 	{
-		return TRUE;
+		return;
 	}
 	
 	const H245_RTPPayloadType & rtpPayloadType = mediaPacketization;
@@ -847,25 +856,23 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParame
 	
 	if(payloadDescriptor.GetTag() != H245_RTPPayloadType_payloadDescriptor::e_rfc_number)
 	{
-		return TRUE;
+		return;
 	}
 	
 	const PASN_Integer & rfcValue = payloadDescriptor;
 	
 	if(rfcValue.GetValue() == 2429)
 	{
-		isReceivingRFC2429 = TRUE;
+        SetIsRFC2429(TRUE);
 	}
-	
-	return TRUE;
+    
+    if(rtpPayloadType.HasOptionalField(H245_RTPPayloadType::e_payloadType)) {
+        unsigned payloadType = rtpPayloadType.m_payloadType;
+        SetPayloadType((RTP_DataFrame::PayloadTypes)payloadType);
+    }
 }
 
 BOOL XM_H323_H263_Capability::IsValidCapabilityForSending() const
-{
-	return TRUE;
-}
-
-BOOL XM_H323_H263_Capability::IsValidCapabilityForReceiving() const
 {
 	return TRUE;
 }
@@ -973,9 +980,55 @@ PObject::Comparison XM_H323_H263_Capability::CompareTo(const XMH323VideoCapabili
 	return LessThan;
 }
 
-BOOL XM_H323_H263_Capability::IsH263PlusCapability() const
+void XM_H323_H263_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
 {
-	return isH263PlusCapability;
+    sqcifMPI = 0;
+    qcifMPI = 0;
+    cifMPI = 0;
+    cif4MPI = 0;
+    cif16MPI = 0;
+    
+    slowSqcifMPI = 0;
+    slowQcifMPI = 0;
+    slowCifMPI = 0;
+    slowCif4MPI = 0;
+    slowCif16MPI = 0;
+    
+    XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
+    
+    if(videoSize >= XMVideoSize_SQCIF) {
+        sqcifMPI = mpi;
+    }
+    if(videoSize >= XMVideoSize_QCIF) {
+        qcifMPI = mpi;
+    }
+    if(videoSize >= XMVideoSize_CIF) {
+        cifMPI = mpi;
+    }
+    if(videoSize >= XMVideoSize_4CIF) {
+        cif4MPI = mpi;
+    }
+    if(videoSize >= XMVideoSize_16CIF) {
+        cif16MPI = mpi;
+    }
+    
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    
+    SetPayloadType(mediaFormat.GetPayloadType());
+}
+
+void XM_H323_H263_Capability::SetCanRFC2429(BOOL _canRFC2429)
+{
+    canRFC2429 = _canRFC2429;
+    _XMSetCanRFC2429(GetWritableMediaFormat(), canRFC2429);
+}
+
+void XM_H323_H263_Capability::SetIsRFC2429(BOOL _isRFC2429)
+{
+    isRFC2429 = _isRFC2429;
+    _XMSetIsRFC2429(GetWritableMediaFormat(), isRFC2429);
 }
 
 #pragma mark -
@@ -991,10 +1044,15 @@ XM_H323_H263PLUS_Capability::XM_H323_H263PLUS_Capability()
 
 XM_H323_H264_Capability::XM_H323_H264_Capability()
 {
-	maxBitRate = _XMGetMaxH264BitRate();
+	maxBitRate = XM_MAX_H264_BITRATE/100;
 	
 	profile = XM_H264_PROFILE_CODE_BASELINE;
 	level = XM_H264_LEVEL_CODE_2;
+    
+    packetizationMode = XM_H264_PACKETIZATION_MODE_SINGLE_NAL;
+    h264LimitedMode = FALSE;
+    
+    SetPayloadType(XM_MEDIA_FORMAT_H264.GetPayloadType());
 }
 
 PObject * XM_H323_H264_Capability::Clone() const
@@ -1021,7 +1079,7 @@ unsigned XM_H323_H264_Capability::GetSubType() const
 
 PString XM_H323_H264_Capability::GetFormatName() const
 {
-	return _XMMediaFormat_H264;
+	return XM_MEDIA_FORMAT_H264;
 }
 
 BOOL XM_H323_H264_Capability::OnSendingPDU(H245_VideoCapability & cap) const
@@ -1097,11 +1155,7 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	{
 		return FALSE;
 	}
-	maxBitRate = h264.m_maxBitRate;
-	if(maxBitRate > XM_MAX_H264_BITRATE)
-	{
-		maxBitRate = XM_MAX_H264_BITRATE;
-	}
+	maxBitRate = std::min(maxBitRate, (unsigned)h264.m_maxBitRate);
 	
 	if(!h264.HasOptionalField(H245_GenericCapability::e_collapsing))
 	{
@@ -1131,14 +1185,14 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 				if(parameterValue.GetTag() == H245_ParameterValue::e_booleanArray)
 				{
 					const PASN_Integer & profileValueInteger = parameterValue;
-					profile = profileValueInteger;
+					SetProfile(profileValueInteger);
 				}
 				break;
 			case 42:
-				if(parameterValue.GetTag() ==H245_ParameterValue::e_unsignedMin)
+				if(parameterValue.GetTag() == H245_ParameterValue::e_unsignedMin)
 				{
 					const PASN_Integer & levelValueInteger = parameterValue;
-					level = levelValueInteger;
+					SetLevel(levelValueInteger);
 				}
 				break;
 			default:
@@ -1202,13 +1256,9 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	return TRUE;
 }
 
-BOOL XM_H323_H264_Capability::OnSendingTerminalCapabilitySet(H245_TerminalCapabilitySet & terminalCapabilitySet) const
+void XM_H323_H264_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
 {
 	// Signal H.264 packetization modes understood by this endpoint
-	H245_MultiplexCapability & multiplexCapability = terminalCapabilitySet.m_multiplexCapability;
-	H245_H2250Capability & h2250Capability = (H245_H2250Capability &)multiplexCapability;
-	H245_MediaPacketizationCapability & mediaPacketizationCapability = h2250Capability.m_mediaPacketizationCapability;
-	
 	BOOL alreadyPresent = FALSE;
 	if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
 	{
@@ -1225,12 +1275,9 @@ BOOL XM_H323_H264_Capability::OnSendingTerminalCapabilitySet(H245_TerminalCapabi
 	if(alreadyPresent == TRUE)
 	{
 		index = arrayOfRTPPayloadType.GetSize();
-		arrayOfRTPPayloadType.SetSize(index + 2);
-	}
-	else
-	{
-		arrayOfRTPPayloadType.SetSize(2);
-	}
+    }
+	
+	arrayOfRTPPayloadType.SetSize(index + 2);
 	
 	H245_RTPPayloadType & h264PayloadTypeSingleNAL = arrayOfRTPPayloadType[index];
 	H245_RTPPayloadType_payloadDescriptor & h264DescriptorSingleNAL = h264PayloadTypeSingleNAL.m_payloadDescriptor;
@@ -1243,15 +1290,11 @@ BOOL XM_H323_H264_Capability::OnSendingTerminalCapabilitySet(H245_TerminalCapabi
 	h264DescriptorNonInterleaved.SetTag(H245_RTPPayloadType_payloadDescriptor::e_oid);
 	PASN_ObjectId & h264ObjectIdNonInterleaved = (PASN_ObjectId &)h264DescriptorNonInterleaved;
 	h264ObjectIdNonInterleaved.SetValue("0.0.8.241.0.0.0.1");
-	
-	return TRUE;
 }
 
-BOOL XM_H323_H264_Capability::OnReceivedTerminalCapabilitySet(const H245_H2250Capability & h2250Capability)
+void XM_H323_H264_Capability::OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability)
 {
-	h264PacketizationMode = XM_H264_PACKETIZATION_MODE_SINGLE_NAL;
-	
-	const H245_MediaPacketizationCapability & mediaPacketizationCapability = h2250Capability.m_mediaPacketizationCapability;
+	SetPacketizationMode(XM_H264_PACKETIZATION_MODE_SINGLE_NAL);
 	
 	if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
 	{
@@ -1268,29 +1311,19 @@ BOOL XM_H323_H264_Capability::OnReceivedTerminalCapabilitySet(const H245_H2250Ca
 				const PASN_ObjectId & objectId = payloadDescriptor;
 				if(objectId == "0.0.8.241.0.0.0.1")
 				{
-					h264PacketizationMode = XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED;
+					SetPacketizationMode(XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED);
+                    break;
 				}
 			}
 		}
 	}
-	
-	return TRUE;
 }
 
-BOOL XM_H323_H264_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters & param) const
-{
-	param.RemoveOptionalField(H245_H2250LogicalChannelParameters::e_silenceSuppression);
-	
+void XM_H323_H264_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const
+{	
 	// Sending H.264, need to make sure which provile/level to use
-	h264Profile = GetProfile();
-	h264Level = GetLevel();
-	
-	return TRUE;
-}
-
-BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParameters & param)
-{
-	return TRUE;
+	//h264Profile = GetProfile();
+	//h264Level = GetLevel();
 }
 
 BOOL XM_H323_H264_Capability::IsValidCapabilityForSending() const
@@ -1298,8 +1331,8 @@ BOOL XM_H323_H264_Capability::IsValidCapabilityForSending() const
 	if(((profile & XM_H264_PROFILE_CODE_BASELINE) != 0) &&
 	   (level <= XM_H264_LEVEL_CODE_2))
 	{
-		if(h264EnableLimitedMode == FALSE && 
-		   h264PacketizationMode != XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED)
+		if(h264LimitedMode == FALSE && 
+		   packetizationMode != XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED)
 		{
 			return FALSE;
 		}
@@ -1308,7 +1341,7 @@ BOOL XM_H323_H264_Capability::IsValidCapabilityForSending() const
 	return FALSE;
 }
 
-BOOL XM_H323_H264_Capability::IsValidCapabilityForReceiving() const
+/*BOOL XM_H323_H264_Capability::IsValidCapabilityForReceiving() const
 {
 	if(profile <= (XM_H264_PROFILE_CODE_MAIN | XM_H264_PROFILE_CODE_BASELINE) &&
 	   level <= XM_H264_LEVEL_CODE_2)
@@ -1316,7 +1349,7 @@ BOOL XM_H323_H264_Capability::IsValidCapabilityForReceiving() const
 		return TRUE;
 	}
 	return FALSE;
-}
+}*/
 
 PObject::Comparison XM_H323_H264_Capability::CompareTo(const XMH323VideoCapability & obj) const
 {
@@ -1354,6 +1387,15 @@ PObject::Comparison XM_H323_H264_Capability::CompareTo(const XMH323VideoCapabili
 	return LessThan;
 }
 
+void XM_H323_H264_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
+{
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    
+    h264LimitedMode = _XMGetEnableH264LimitedMode(mediaFormat);
+    
+    SetPayloadType(mediaFormat.GetPayloadType());
+}
+
 unsigned XM_H323_H264_Capability::GetProfile() const
 {	
 	return XM_H264_PROFILE_BASELINE;
@@ -1385,37 +1427,147 @@ unsigned XM_H323_H264_Capability::GetLevel() const
 	return XM_H264_LEVEL_2;
 }
 
+void XM_H323_H264_Capability::SetProfile(WORD _profile)
+{
+    profile = _profile;
+    _XMSetH264Profile(GetWritableMediaFormat(), GetProfile());
+}
+
+void XM_H323_H264_Capability::SetLevel(unsigned _level)
+{
+    level = _level;
+    _XMSetH264Level(GetWritableMediaFormat(), GetLevel());
+}
+
+void XM_H323_H264_Capability::SetPacketizationMode(unsigned _packetizationMode)
+{
+    packetizationMode = _packetizationMode;
+    _XMSetH264PacketizationMode(GetWritableMediaFormat(), packetizationMode);
+}
+
 #pragma mark -
-#pragma mark Packetization Functions
+#pragma mark XM_SDP_H261_Capability methods
 
-BOOL _XMIsReceivingRFC2429()
+BOOL XM_SDP_H261_Capability::OnSendingSDP(const OpalMediaFormat & mediaFormat, SDPMediaFormat & sdpMediaFormat) const
 {
-	return isReceivingRFC2429;
+    sdpMediaFormat.SetFMTP(_XMGetFMTP_H261());
+    return TRUE;
 }
 
-void _XMSetIsReceivingRFC2429(BOOL flag)
+BOOL XM_SDP_H261_Capability::OnReceivingSDP(OpalMediaFormat & mediaFormat, const SDPMediaFormat & sdpMediaFormat) const
 {
-	isReceivingRFC2429 = flag;
+    return TRUE;
 }
 
-unsigned _XMGetH264Profile()
+#pragma mark -
+#pragma mark Packetization and Codec Option Functions
+
+BOOL _XMGetCanRFC2429(const OpalMediaFormat & mediaFormat)
 {
-	return h264Profile;
+    BOOL canRFC2429 = FALSE;
+    if(mediaFormat.HasOption(CanRFC2429Option)) {
+        canRFC2429 = mediaFormat.GetOptionBoolean(CanRFC2429Option);
+    }
+    return canRFC2429;
 }
 
-unsigned _XMGetH264Level()
+void _XMSetCanRFC2429(OpalMediaFormat & mediaFormat, BOOL canRFC2429)
 {
-	return h264Level;
+    if(mediaFormat.HasOption(CanRFC2429Option)) {
+        mediaFormat.SetOptionBoolean(CanRFC2429Option, canRFC2429);
+    } else {
+        mediaFormat.AddOption(new OpalMediaOptionBoolean(CanRFC2429Option, false, OpalMediaOption::AlwaysMerge, canRFC2429));
+    }
 }
 
-unsigned _XMGetH264PacketizationMode()
+BOOL _XMGetIsRFC2429(const OpalMediaFormat & mediaFormat)
 {
-	return h264PacketizationMode;
+    BOOL isRFC2429 = FALSE;
+    if(mediaFormat.HasOption(IsRFC2429Option)) {
+        isRFC2429 = mediaFormat.GetOptionBoolean(IsRFC2429Option);
+    }
+    return isRFC2429;
 }
 
-void _XMSetH264EnableLimitedMode(BOOL flag)
+void _XMSetIsRFC2429(OpalMediaFormat & mediaFormat, BOOL isRFC2429)
 {
-	h264EnableLimitedMode = flag;
+    if(mediaFormat.HasOption(IsRFC2429Option)) {
+        mediaFormat.SetOptionBoolean(IsRFC2429Option, isRFC2429);
+    } else {
+        mediaFormat.AddOption(new OpalMediaOptionBoolean(IsRFC2429Option, false, OpalMediaOption::AlwaysMerge, isRFC2429));
+    }
+}
+
+unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat)
+{
+    unsigned profile = XM_H264_PROFILE_BASELINE;
+    if(mediaFormat.HasOption(ProfileOption)) {
+        profile = mediaFormat.GetOptionInteger(ProfileOption);
+    }
+    return profile;
+}
+
+void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile)
+{
+    if(mediaFormat.HasOption(ProfileOption)) {
+        mediaFormat.SetOptionInteger(ProfileOption, profile);
+    } else {
+        mediaFormat.AddOption(new OpalMediaOptionInteger(ProfileOption, false, OpalMediaOption::AlwaysMerge, profile));
+    }
+}
+
+unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat)
+{
+    unsigned level = XM_H264_LEVEL_1;
+    if(mediaFormat.HasOption(LevelOption)) {
+        level = mediaFormat.GetOptionInteger(LevelOption);
+    }
+    return level;
+}
+
+void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level)
+{
+    if(mediaFormat.HasOption(LevelOption)) {
+        mediaFormat.SetOptionInteger(LevelOption, level);
+    } else {
+        mediaFormat.AddOption(new OpalMediaOptionInteger(LevelOption, false, OpalMediaOption::AlwaysMerge, level));
+    }
+}
+
+unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat)
+{
+    unsigned packetizationMode = XM_H264_PACKETIZATION_MODE_SINGLE_NAL;
+    if(mediaFormat.HasOption(PacketizationOption)) {
+        packetizationMode = mediaFormat.GetOptionInteger(PacketizationOption);
+    }
+    return packetizationMode;
+}
+
+void _XMSetH264PacketizationMode(OpalMediaFormat & mediaFormat, unsigned packetizationMode)
+{
+    if(mediaFormat.HasOption(PacketizationOption)) {
+        mediaFormat.SetOptionInteger(PacketizationOption, packetizationMode);
+    } else {
+         mediaFormat.AddOption(new OpalMediaOptionInteger(PacketizationOption, false, OpalMediaOption::AlwaysMerge, packetizationMode));
+    }
+}
+
+BOOL _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat)
+{
+    BOOL enableLimitedMode = FALSE;
+    if(mediaFormat.HasOption(H264LimitedModeOption)) {
+        enableLimitedMode = mediaFormat.GetOptionBoolean(H264LimitedModeOption);
+    }
+    return enableLimitedMode;
+}
+
+void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, BOOL enableH264LimitedMode)
+{
+    if(mediaFormat.HasOption(H264LimitedModeOption)) {
+        mediaFormat.SetOptionBoolean(H264LimitedModeOption, enableH264LimitedMode);
+    } else {
+        mediaFormat.AddOption(new OpalMediaOptionBoolean(H264LimitedModeOption, false, OpalMediaOption::AlwaysMerge, enableH264LimitedMode));
+    }
 }
 
 #pragma mark -
@@ -1423,26 +1575,27 @@ void _XMSetH264EnableLimitedMode(BOOL flag)
 
 unsigned _XMGetMaxH261BitRate()
 {
-	unsigned maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H261_BITRATE)
+	/*unsigned maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
+	if(maxBitRate > XM_MAX_H261_BITRATE/100)
 	{
-		maxBitRate = XM_MAX_H261_BITRATE;
+		maxBitRate = XM_MAX_H261_BITRATE/100;
 	}
 	
-	return maxBitRate;
+	return maxBitRate;*/
+    return XM_MAX_H261_BITRATE/100;
 }
 
 PString _XMGetFMTP_H261(unsigned maxBitRate,
 						XMVideoSize videoSize,
 						unsigned mpi)
 {
-	if(maxBitRate == UINT_MAX)
+	/*if(maxBitRate == UINT_MAX)
 	{
-		maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100; // SDP uses bitrate units of 100bits/s
-	}
-	if(maxBitRate > XM_MAX_H261_BITRATE)
+		maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100; // SDP uses bitrate units of 100bits/s
+	}*/
+	if(maxBitRate > XM_MAX_H261_BITRATE/100)
 	{
-		maxBitRate = XM_MAX_H261_BITRATE;
+		maxBitRate = XM_MAX_H261_BITRATE/100;
 	}
 	
 	if(videoSize == XMVideoSize_NoVideo)
@@ -1513,26 +1666,27 @@ void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 
 unsigned _XMGetMaxH263BitRate()
 {
-	unsigned maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H263_BITRATE)
+	/*unsigned maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
+	if(maxBitRate > XM_MAX_H263_BITRATE/100)
 	{
-		maxBitRate = XM_MAX_H263_BITRATE;
+		maxBitRate = XM_MAX_H263_BITRATE/100;
 	}
 	
-	return maxBitRate;
+	return maxBitRate;*/
+    return XM_MAX_H263_BITRATE/100;
 }
 
 PString _XMGetFMTP_H263(unsigned maxBitRate,
 						XMVideoSize videoSize,
 						unsigned mpi)
 {
-	if(maxBitRate == UINT_MAX)
+	/*if(maxBitRate == UINT_MAX)
 	{
-		maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
-	}
-	if(maxBitRate > XM_MAX_H263_BITRATE)
+		maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
+	}*/
+	if(maxBitRate > XM_MAX_H263_BITRATE/100)
 	{
-		maxBitRate = XM_MAX_H263_BITRATE;
+		maxBitRate = XM_MAX_H263_BITRATE/100;
 	}
 	
 	if(videoSize == XMVideoSize_NoVideo)
@@ -1617,13 +1771,14 @@ void _XMParseFMTP_H263(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
 
 unsigned _XMGetMaxH264BitRate()
 {
-	unsigned maxBitRate = XMOpalManager::GetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H264_BITRATE)
+	/*unsigned maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
+	if(maxBitRate > XM_MAX_H264_BITRATE/100)
 	{
-		maxBitRate = XM_MAX_H264_BITRATE;
+		maxBitRate = XM_MAX_H264_BITRATE/100;
 	}
 	
-	return maxBitRate;
+	return maxBitRate;*/
+    return XM_MAX_H264_BITRATE/100;
 }
 
 PString _XMGetFMTP_H264(unsigned maxBitRate,

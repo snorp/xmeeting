@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.15 2007/02/08 23:09:13 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.16 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,42 +32,34 @@ public:
 	~XMH323Connection();
 	
 	virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
-	virtual BOOL OnReceivedCapabilitySet(const H323Capabilities & remoteCaps,
-										 const H245_MultiplexCapability *muxCap,
-										 H245_TerminalCapabilitySetReject & reject);
-	
-	virtual void OnSetLocalCapabilities();
 
 	virtual void SelectDefaultLogicalChannel(const OpalMediaType & mediaType);
 	
 	virtual BOOL OpenLogicalChannel(const H323Capability & capability,
 									unsigned sessionID,
 									H323Channel::Directions dir);
-	virtual H323Channel * CreateRealTimeLogicalChannel(const H323Capability & capability,
-													   H323Channel::Directions dir,
-													   unsigned sessionID,
-													   const H245_H2250LogicalChannelParameters * param,
-													   RTP_QOS * rtpqos = NULL);
-	
-	virtual BOOL OnCreateLogicalChannel(const H323Capability & capability,
-										H323Channel::Directions dir,
-										unsigned & errorCode);
+    
+	virtual H323_RTPChannel * CreateRTPChannel(const H323Capability & capability,
+                                               H323Channel::Directions dir,
+                                               RTP_Session & rtp,
+                                               unsigned sessionID);
 	
 	virtual BOOL OnClosingLogicalChannel(H323Channel & channel);
 	
+    // Propagate opening / closing of media streams to the Obj-C world
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
     virtual void OnClosedMediaStream(const OpalMediaStream & stream);
-	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	
-	// improved bandwidth management
+	// Overridden to circumvent the default Opal bandwidth management
 	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
-	virtual unsigned GetBandwidthUsed() const;
-	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
+	virtual unsigned GetBandwidthUsed() const { return 0; }
+	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return TRUE; }
 	
+    // Overridden to being able to send in-band DTMF
 	virtual BOOL SendUserInputTone(char tone, unsigned duration);
+    virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	
 private:
-	BOOL hasSetLocalCapabilities;
 	
 	XMInBandDTMFHandler * inBandDTMFHandler;
 };

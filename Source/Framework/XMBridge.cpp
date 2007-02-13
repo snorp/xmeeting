@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.43 2007/02/08 23:09:13 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.44 2007/02/13 11:56:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -49,12 +49,7 @@ const char *_XMGetUserName()
 
 void _XMSetBandwidthLimit(unsigned limit)
 {
-	XMOpalManager::SetBandwidthLimit(limit);
-}
-
-void _XMResetAvailableBandwidth()
-{
-	XMOpalManager::ResetAvailableBandwidth();
+	XMOpalManager::GetManager()->SetBandwidthLimit(limit);
 }
 
 void _XMSetNATInformation(const char *stunServer,
@@ -121,7 +116,8 @@ void _XMSetAudioFunctionality(bool enableSilenceSuppression,
 							  bool enableEchoCancellation,
 							  unsigned packetTime)
 {
-    XMOpalManager::GetCallEndPoint()->SetAudioFunctionality(enableSilenceSuppression, enableEchoCancellation);
+    XMOpalManager::GetCallEndPoint()->SetEnableSilenceSuppression(enableSilenceSuppression);
+    XMOpalManager::GetCallEndPoint()->SetEnableEchoCancellation(enableEchoCancellation);
     XMOpalManager::GetManager()->SetAudioPacketTime(packetTime);
 }
 
@@ -150,7 +146,7 @@ void _XMSetEnableVideo(bool enableVideo)
 
 void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode)
 {
-	_XMSetH264EnableLimitedMode(enableH264LimitedMode);
+    XMOpalManager::GetManager()->SetEnableH264LimitedMode(enableH264LimitedMode);
 }
 
 #pragma mark -

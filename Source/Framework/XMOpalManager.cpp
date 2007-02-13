@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.47 2007/02/08 23:09:14 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.48 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,6 +68,8 @@ void XMOpalManager::CloseOpal()
 
 XMOpalManager::XMOpalManager()
 {	
+    bandwidthLimit = XM_MAX_BANDWIDTH;
+    
 	defaultAudioPacketTime = 0;
 	currentAudioPacketTime = 0;
 	
@@ -337,48 +339,6 @@ void XMOpalManager::SetUserName(const PString & username)
 
 #pragma mark Network Setup Methods
 
-static unsigned bandwidthLimit = XM_MAX_BANDWIDTH;
-static unsigned availableBandwidth = XM_MAX_BANDWIDTH;
-
-void XMOpalManager::SetBandwidthLimit(unsigned limit)
-{
-	if(limit == 0 || limit > XM_MAX_BANDWIDTH)
-	{
-		limit = XM_MAX_BANDWIDTH;
-	}
-	
-	bandwidthLimit = limit;
-}
-
-unsigned XMOpalManager::GetBandwidthLimit()
-{
-	return bandwidthLimit;
-}
-
-unsigned XMOpalManager::GetVideoBandwidthLimit()
-{
-	// taking away 64kbit/s for audio
-	return XMOpalManager::GetAvailableBandwidth() - 64000;
-}
-
-unsigned XMOpalManager::GetAvailableBandwidth()
-{
-	return availableBandwidth;
-}
-
-void XMOpalManager::SetAvailableBandwidth(unsigned bandwidth)
-{
-	if(availableBandwidth > bandwidth)
-	{
-		availableBandwidth = bandwidth;
-	}
-}
-
-void XMOpalManager::ResetAvailableBandwidth()
-{
-	availableBandwidth = XM_MAX_BANDWIDTH;
-}
-
 void XMOpalManager::SetNATInformation(const PString & stunServer,
 									  const PString & theTranslationAddress)
 {
@@ -386,8 +346,7 @@ void XMOpalManager::SetNATInformation(const PString & stunServer,
 	// In case STUN works as expected, use it. In case of failures,
 	// SymmetricNAT, SymmetricFirewall, PartialBlockedNAT, dont' use
 	// STUN but rather rely on the translationAddress feature only.
-	// This has the advantage that in case of STUN problems, connections
-	// may still work...
+	// In case of STUN problems, connections may still work this way.
 	//
 	if(stun != NULL) {
 		delete stun;
@@ -474,42 +433,39 @@ unsigned XMOpalManager::GetCurrentAudioPacketTime()
 #pragma mark -
 #pragma mark Information about current Calls
 
-unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier)
+unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier) const
 {
+    // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. If at all, only I-frames should be
+    // sent.
+    if(codecIdentifier == XMCodecIdentifier_H263 && remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
+    {
+        // zero key frame interval means sending only I-frames
+        return 0;
+    }
+    
 	switch (callProtocol)
 	{
 		case XMCallProtocol_H323:
-			return GetH323KeyFrameInterval(codecIdentifier);
+            return 200;
 		case XMCallProtocol_SIP:
-			return 60;
+			return 60; // SIP currently lacks the possibility to send videoFastUpdate requests
 		default:
 			return 0;
 	}
 }
 
-BOOL XMOpalManager::IsValidCapabilityForSending(const XMH323VideoCapability & capability)
+BOOL XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const
 {
-	if(PIsDescendant(&capability, XM_H323_H263_Capability))
-	{
-		if(remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
-		{
-			return FALSE;
-		}
-	}
-	return TRUE;
-}
-
-unsigned XMOpalManager::GetH323KeyFrameInterval(XMCodecIdentifier codecIdentifier)
-{
-	// Hack to enable certain endpoints to successfully decode XM H.263 streams
-	// If keyFrameInterval is zero, only I-frames are sent.
-	if(remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX &&
-	   codecIdentifier == XMCodecIdentifier_H263)
-	{
-		return 0;
-	}
-	
-	return 200;
+    if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
+    {
+        // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. Disable sending
+        // H.263 to this MGC for now.
+        if (remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
+        {
+            return FALSE;
+        }
+    }
+    return TRUE;
 }
 
 #pragma mark -
@@ -555,4 +511,20 @@ void XMOpalManager::LogMessage(const PString & message)
 	PTRACE(1, message);
 }
 
-	
+#pragma mark -
+#pragma mark Convenience Functions
+
+unsigned XMOpalManager::GetH261BandwidthLimit()
+{
+    return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH261Bitrate());
+}
+
+unsigned XMOpalManager::GetH263BandwidthLimit()
+{
+    return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH263Bitrate());
+}
+
+unsigned XMOpalManager::GetH264BandwidthLimit()
+{
+    return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH264Bitrate());
+}

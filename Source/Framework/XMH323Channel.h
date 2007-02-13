@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323Channel.h,v 1.6 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMH323Channel.h,v 1.7 2007/02/13 11:56:09 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_H323_CHANNEL_H__
@@ -21,11 +21,6 @@ class XMH323Channel : public H323_RTPChannel
 				  Directions direction,
 				  RTP_Session & rtp,
                   unsigned sessionID);
-	
-	virtual BOOL OnReceivedPDU(const H245_H2250LogicalChannelParameters & param, unsigned & errorCode);
-	virtual BOOL OnSendingPDU(H245_H2250LogicalChannelParameters & param) const;
-	
-	virtual BOOL Start();
 	
 	virtual void OnFlowControl(long bitRateRestriction);
 };

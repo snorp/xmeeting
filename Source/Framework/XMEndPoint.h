@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.13 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.14 2007/02/13 11:56:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,10 +12,10 @@
 #include <ptlib.h>
 #include <opal/endpoint.h>
 
-#include "XMOpalManager.h"
 #include "XMTypes.h"
 #include "XMBridge.h"
 
+class XMOpalManager;
 class XMConnection;
 class OpalH281Handler;
 
@@ -24,18 +24,22 @@ class XMEndPoint : public OpalEndPoint
 	PCLASSINFO(XMEndPoint, OpalEndPoint);
 
 public:
-	XMEndPoint(OpalManager & manager);
+	XMEndPoint(XMOpalManager & manager);
 	~XMEndPoint();
 	
 	// Setup Methods
-	void SetAudioFunctionality(BOOL enableSilenceSuppression, BOOL enableEchoCancellation);
-	void SetEnableVideo(BOOL enableVideo);
-	
-	// Data
-	BOOL EnableSilenceSuppression();
-	BOOL EnableEchoCancellation();
+	BOOL GetEnableSilenceSuppression() const { return enableSilenceSuppression; }
+    void SetEnableSilenceSuppression(BOOL _enableSilenceSuppression) { enableSilenceSuppression = _enableSilenceSuppression; }
+    
+	BOOL GetEnableEchoCancellation() { return enableEchoCancellation; }
+    void SetEnableEchoCancellation(BOOL _enableEchoCancellation) { enableEchoCancellation = _enableEchoCancellation; }
+    
+    BOOL GetEnableVideo() const { return enableVideo; }
+	void SetEnableVideo(BOOL _enableVideo) { enableVideo = _enableVideo; }
 	
 	// Overriding OpalEndPoint methods
+    virtual OpalMediaFormatList GetMediaFormats() const { return OpalMediaFormatList(); }
+    
 	virtual BOOL MakeConnection(OpalCall & call,
 								const PString & party,
 								void *userData = NULL,
@@ -43,7 +47,6 @@ public:
     virtual BOOL OnIncomingConnection(OpalConnection & connection,
                                       unsigned options,
                                       OpalConnection::StringOptions * stringOptions);
-	virtual OpalMediaFormatList GetMediaFormats() const;
 	virtual XMConnection * CreateConnection(OpalCall & call, PString & token);
 	virtual PSoundChannel * CreateSoundChannel(const XMConnection & connection, BOOL isSource);
 	PSafePtr<XMConnection> GetXMConnectionWithLock(const PString & token,
@@ -72,14 +75,13 @@ public:
 	
 
 private:
-		
+        
 	OpalH281Handler * GetH281Handler(PString & callID);
 	
 	BOOL isIncomingCall;
 	
 	BOOL enableSilenceSuppression;
 	BOOL enableEchoCancellation;
-	
 	BOOL enableVideo;
 };
 

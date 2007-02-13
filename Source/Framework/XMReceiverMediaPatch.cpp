@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.28 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.29 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,6 @@
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
 {
-	notifierSet = FALSE;
 	packetReassembler = NULL;
 }
 
@@ -39,27 +38,8 @@ void XMReceiverMediaPatch::Start()
 	OpalMediaPatch::Start();
 }
 
-void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & theNotifier,
-											  BOOL fromSink)
-{
-	if(fromSink == FALSE)
-	{
-		notifier = theNotifier;
-		notifierSet = TRUE;
-	}
-	OpalMediaPatch::SetCommandNotifier(theNotifier, fromSink);
-}
-
 void XMReceiverMediaPatch::Main()
 {
-	const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
-	if(_XMIsVideoMediaFormat(mediaFormat) == FALSE)
-	{
-		OpalMediaPatch::Main();
-		return;
-	}
-	
-	
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// The receiving algorithm tries to achieve best-possible data integrity and builds upon
 	// the following assumptions:
@@ -116,6 +96,9 @@ void XMReceiverMediaPatch::Main()
 	
 	// Read the first packet
 	BOOL firstReadSuccesful = source.ReadPacket(*(packets[0]));
+    
+    // Access the media format
+    const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
 	
 	if(firstReadSuccesful == TRUE)
 	{
@@ -137,7 +120,7 @@ void XMReceiverMediaPatch::Main()
 				packetReassembler = new XMH261RTPPacketReassembler();
 				break;
 			case XMCodecIdentifier_H263:
-				if(_XMIsReceivingRFC2429() || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
+				if(_XMGetIsRFC2429(mediaFormat) || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
 				{
 					cout << "Receiving RFC2429" << endl;
 					packetReassembler = new XMH263PlusRTPPacketReassembler();
@@ -372,10 +355,11 @@ void XMReceiverMediaPatch::Main()
 				// Release all packets in the pool
 				numberOfPacketsToRelease = packetIndex + 1;
 			}
-			
+
 			if(processingSuccessful == FALSE)
 			{
 				IssueVideoUpdatePictureCommand();
+                processingSuccessful = TRUE;
 			}
 			
 			// Of not all packets can be released, the remaining packets are
@@ -442,9 +426,6 @@ void XMReceiverMediaPatch::Main()
 void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
 {
 	OpalVideoUpdatePicture command = OpalVideoUpdatePicture(-1, -1, -1);
-	
-	if(notifierSet == TRUE)
-	{
-		notifier(command, 0);
-	}
+    
+    sinks[0].stream->ExecuteCommand(command);
 }

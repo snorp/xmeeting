@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.7 2007/02/08 23:09:13 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.8 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #include "XMCallbackBridge.h"
 
 #include <codec/vidcodec.h>
+#include <opal/patch.h>
 
 static XMMediaStream *videoTransmitterStream = NULL;
 
@@ -28,9 +29,13 @@ XMMediaStream::~XMMediaStream()
 
 void XMMediaStream::OnPatchStart()
 {
-    if (isSource == TRUE) {
+    if (IsSource()) {
+        
+        // Adjust the local media format
+        mediaFormat = mediaPatch->GetSinkFormat();
+        
         unsigned maxFramesPerSecond = UINT_MAX;
-        unsigned maxBitrate = XMOpalManager::GetVideoBandwidthLimit();
+        unsigned maxBitrate = XMOpalManager::GetManager()->GetVideoBandwidthLimit();
         
         RTP_DataFrame::PayloadTypes payloadType = mediaFormat.GetPayloadType();
         
@@ -60,7 +65,7 @@ void XMMediaStream::OnPatchStart()
         }
         else if(codecIdentifier == XMCodecIdentifier_H264)
         {
-            if(_XMGetH264PacketizationMode() == XM_H264_PACKETIZATION_MODE_SINGLE_NAL)
+            if(_XMGetH264PacketizationMode(mediaFormat) == XM_H264_PACKETIZATION_MODE_SINGLE_NAL)
             {
                 // We send only at a limited bitrate to avoid too many
                 // NAL units which are TOO big to fit
@@ -70,7 +75,7 @@ void XMMediaStream::OnPatchStart()
                 }
             }
             
-            flags = (_XMGetH264PacketizationMode() << 8) + (_XMGetH264Profile() << 4) + _XMGetH264Level();
+            flags = (_XMGetH264PacketizationMode(mediaFormat) << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
         }
         // adjusting the maxFramesPerSecond / maxBitrate parameters
         if(framesPerSecond < maxFramesPerSecond)
@@ -196,4 +201,16 @@ void XMMediaStream::HandleDidStopTransmitting(unsigned mediaID)
     
     videoTransmitterStream->isTerminated = TRUE;
     videoTransmitterStream = NULL;
+}
+
+BOOL XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
+                                   BOOL isEndOfChain)
+{
+    if(isEndOfChain == TRUE) {
+        if(PIsDescendant(&command, OpalVideoUpdatePicture)) {
+            _XMUpdatePicture();
+        }
+        return TRUE;
+    }
+    return OpalMediaStream::ExecuteCommand(command, isEndOfChain);
 }

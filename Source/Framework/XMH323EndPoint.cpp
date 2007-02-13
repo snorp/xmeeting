@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.23 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.24 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,8 +15,7 @@
 #include <ptclib/url.h>
 #include <ptclib/pils.h>
 
-#include <h224/q922.h>
-
+#include <h224/h323h224.h>
 //#include <h323/h46018.h>
 
 #include "XMCallbackBridge.h"
@@ -28,6 +27,8 @@
 #pragma mark Init & Deallocation
 
 //static H460PluginServiceDescriptor<H460_FeatureStd18> H460_FeatureStd18_descriptor;
+
+OPAL_REGISTER_H224_CAPABILITY();
 
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager)

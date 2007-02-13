@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Channel.cpp,v 1.6 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMH323Channel.cpp,v 1.7 2007/02/13 11:56:08 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,48 +24,11 @@ XMH323Channel::XMH323Channel(H323Connection & connection,
                              unsigned sessionID)
 : H323_RTPChannel(connection, capability, direction, rtp, sessionID)
 {
-}
-
-BOOL XMH323Channel::OnReceivedPDU(const H245_H2250LogicalChannelParameters & param, unsigned & errorCode)
-{
-	if(PIsDescendant(capability, XMH323VideoCapability))
-	{
-		XMH323VideoCapability *videoCap = (XMH323VideoCapability *)capability;
-		
-		videoCap->OnReceivedPDU(param);
-	}
-	
-	return H323_RTPChannel::OnReceivedPDU(param, errorCode);
-}
-
-BOOL XMH323Channel::OnSendingPDU(H245_H2250LogicalChannelParameters & param) const
-{
-	BOOL result = H323_RTPChannel::OnSendingPDU(param);
-	
-	if(result == FALSE)
-	{
-		return FALSE;
-	}
-	
-	if(PIsDescendant(capability, XMH323VideoCapability))
-	{
-		XMH323VideoCapability * videoCap = (XMH323VideoCapability *)capability;
-		
-		videoCap->OnSendingPDU(param);
-	}
-	
-	return TRUE;
-}
-
-BOOL XMH323Channel::Start() 
-{
-	BOOL result = H323_RTPChannel::Start();
-	if(result == TRUE) 
-	{
-		mediaStream->SetCommandNotifier(PCREATE_NOTIFIER(OnMediaCommand));
-	}
-	
-	return result;
+    // Ensure the dynamic payload type is set if needed.
+    RTP_DataFrame::PayloadTypes payloadType = capability.GetPayloadType();
+    if(payloadType >= RTP_DataFrame::DynamicBase) {
+        SetDynamicRTPPayloadType(payloadType);
+    }
 }
 
 void XMH323Channel::OnFlowControl(long bitRateRestriction)
@@ -73,7 +36,7 @@ void XMH323Channel::OnFlowControl(long bitRateRestriction)
 	if(PIsDescendant(capability, XMH323VideoCapability))
 	{
 		unsigned requestedLimit = bitRateRestriction*100;
-		long videoBandwidthLimit = XMOpalManager::GetVideoBandwidthLimit();
+		long videoBandwidthLimit = XMOpalManager::GetManager()->GetVideoBandwidthLimit();
 		if(requestedLimit > videoBandwidthLimit)
 		{
 			requestedLimit = videoBandwidthLimit;

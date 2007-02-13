@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.36 2007/01/06 20:41:16 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.37 2007/02/13 11:56:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,12 +70,6 @@ const char *_XMGetUserName();
  * sets the bandwidth limit to the value as specified
  **/
 void _XMSetBandwidthLimit(unsigned limit);
-
-/**
- * Resets the available bandwidth to the default value
- * after a call has finished
- **/
-void _XMResetAvailableBandwidth();
 
 /**
  * Sets the NAT information to use to establish

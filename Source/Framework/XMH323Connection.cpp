@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.24 2007/02/08 23:09:13 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.25 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,11 +26,9 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 								   unsigned options,
                                    OpalConnection::StringOptions * stringOptions)
 : H323Connection(call, endPoint, token, alias, address, options, stringOptions)
-{
-	hasSetLocalCapabilities = FALSE;
-	
+{	
 	// setting correct initial bandwidth
-	SetBandwidthAvailable(XMOpalManager::GetBandwidthLimit() / 100);
+    bandwidthAvailable = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
 	
 	delete rfc2833Handler;
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
@@ -42,10 +40,7 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 
 XMH323Connection::~XMH323Connection()
 {
-	if(inBandDTMFHandler != NULL)
-	{
-		delete inBandDTMFHandler;
-	}
+    delete inBandDTMFHandler;
 }
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
@@ -53,57 +48,17 @@ void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 	H323Connection::OnSendCapabilitySet(pdu);
 	
 	const H323Capabilities & localCaps = GetLocalCapabilities();
-	
-	PINDEX i;
-	PINDEX count = localCaps.GetSize();
-	
-	for(i = 0; i < count; i++)
+
+	for(PINDEX i = 0; i < localCaps.GetSize(); i++)
 	{
 		H323Capability & h323Capability = localCaps[i];
 		
-		if(PIsDescendant(&h323Capability, XMH323VideoCapability))
-		{
-			XMH323VideoCapability & videoCap = (XMH323VideoCapability &)h323Capability;
-			videoCap.OnSendingTerminalCapabilitySet(pdu);
-		}
-		else if(PIsDescendant(&h323Capability, H323AudioCapability)) 
+        // Override default Opal behaviour to obtain better NetMeeting compatibility
+		if(PIsDescendant(&h323Capability, H323AudioCapability)) 
 		{
 			H323AudioCapability & audioCap = (H323AudioCapability &)h323Capability;
 			audioCap.SetTxFramesInPacket(30);
 		}
-	}
-}
-
-BOOL XMH323Connection::OnReceivedCapabilitySet(const H323Capabilities & remoteCaps,
-											   const H245_MultiplexCapability *muxCap,
-											   H245_TerminalCapabilitySetReject & reject)
-{
-	BOOL result = H323Connection::OnReceivedCapabilitySet(remoteCaps, muxCap, reject);
-	
-	unsigned i;
-	unsigned count = remoteCaps.GetSize();
-	for(i = 0; i < count; i++)
-	{
-		H323Capability & h323Capability = remoteCaps[i];
-		
-		if(PIsDescendant(&h323Capability, XMH323VideoCapability))
-		{
-			XMH323VideoCapability & videoCap = (XMH323VideoCapability &)h323Capability;
-			const H245_H2250Capability & h2250Capability = (const H245_H2250Capability &)*muxCap;
-			videoCap.OnReceivedTerminalCapabilitySet(h2250Capability);
-		}
-	}
-
-	return result;
-}
-
-void XMH323Connection::OnSetLocalCapabilities()
-{	
-	// Only call OnSetLocalCapabilities if not already done
-	if(hasSetLocalCapabilities == FALSE)
-	{
-		H323Connection::OnSetLocalCapabilities();
-		hasSetLocalCapabilities = TRUE;
 	}
 }
 
@@ -113,49 +68,54 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
 	
 	if(mediaType != OpalDefaultVideoMediaType)
 	{
+        // Use default capability selection
 		H323Connection::SelectDefaultLogicalChannel(mediaType);
 		return;
 	}
 	
 	if(FindChannel(mediaType, FALSE))
 	{
+        // There exists already a channel for this media type
 		return;
 	}
-		
+    
+    // Go through the list of local capabilities and search for matching remote capabilities.
+    // Among these, pick the one that is ranked highest according to the CompareTo() implementation
 	for(PINDEX i = 0; i < localCapabilities.GetSize(); i++)
 	{
 		H323Capability & localCapability = localCapabilities[i];
-		if(localCapability.GetMediaFormat().GetMediaType() == mediaType)
-		{
-			if(PIsDescendant(&localCapability, XMH323VideoCapability))
-			{
-				XMH323VideoCapability & localVideoCapability = (XMH323VideoCapability &)localCapability;
-				XMH323VideoCapability *chosenCapability = NULL;
-				for(PINDEX j = 0; j < remoteCapabilities.GetSize(); j++)
-				{
-					H323Capability & remoteCapability = remoteCapabilities[j];
-					if(localVideoCapability == remoteCapability || 
-					   (PIsDescendant(&localVideoCapability, XM_H323_H263_Capability) && PIsDescendant(&remoteCapability, XM_H323_H263_Capability)))
-					{
-						XMH323VideoCapability & remoteVideoCapability = (XMH323VideoCapability &)remoteCapability;
-						if(chosenCapability == NULL)
-						{
-							chosenCapability = &remoteVideoCapability;
-						}
-						else if(remoteVideoCapability.CompareTo(*chosenCapability) == PObject::GreaterThan)
-						{
-							chosenCapability = &remoteVideoCapability;
-						}
-					}
-				}
-			
-                unsigned sessionID = GetRTPSessionIDForMediaType(mediaType);
-				if(chosenCapability != NULL && OpenLogicalChannel(*chosenCapability, sessionID, H323Channel::IsTransmitter))
-				{
-					break;
-				}
-			}
-		}
+        if(PIsDescendant(&localCapability, XMH323VideoCapability)) // Should always be true
+        {
+            XMH323VideoCapability & localVideoCapability = (XMH323VideoCapability &)localCapability;
+            XMH323VideoCapability *chosenCapability = NULL;
+            for(PINDEX j = 0; j < remoteCapabilities.GetSize(); j++)
+            {
+                H323Capability & remoteCapability = remoteCapabilities[j];
+                // The two capabilities must be equal (Compare() must return EqualTo)
+                // However, The two H.263 capabilities don't return EqualTo when comparing to a H.263 capability
+                // of the other flavour. Else, merging of capabilities might not work correctly.
+                // To correctly handle all kinds of remote capability sets, they are still treated as compatible
+                // capabilities
+                if(localVideoCapability == remoteCapability || 
+                    (PIsDescendant(&localVideoCapability, XM_H323_H263_Capability) && PIsDescendant(&remoteCapability, XM_H323_H263_Capability)))
+                {
+                    // Pick the "highest" available capability
+                    XMH323VideoCapability & remoteVideoCapability = (XMH323VideoCapability &)remoteCapability;
+                    if(chosenCapability == NULL ||
+                       remoteVideoCapability.CompareTo(*chosenCapability) == PObject::GreaterThan)
+                    {
+                        chosenCapability = &remoteVideoCapability;
+                    }
+                }
+            }
+        
+            // Try to open a channel for the capability. If successful, we're done
+            unsigned sessionID = GetRTPSessionIDForMediaType(mediaType);
+            if(chosenCapability != NULL && OpenLogicalChannel(*chosenCapability, sessionID, H323Channel::IsTransmitter))
+            {
+                break;
+            }
+        }
 	}
 }
 
@@ -163,6 +123,9 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 										  unsigned sessionID,
 										  H323Channel::Directions dir)
 {
+    // Override default behaviour to add additional checks if the format is valid for
+    // sending. Both the capability and the manager have to agree that it is possible
+    // to send the media format described in the capability.
 	BOOL isValidCapability = TRUE;
 	if(PIsDescendant(&capability, XMH323VideoCapability))
 	{
@@ -170,8 +133,7 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 		isValidCapability = videoCapability.IsValidCapabilityForSending();
 		if(isValidCapability)
 		{
-			XMOpalManager & manager = (XMOpalManager &)GetEndPoint().GetManager();
-			isValidCapability = manager.IsValidCapabilityForSending(videoCapability);
+			isValidCapability = XMOpalManager::GetManager()->IsValidFormatForSending(videoCapability.GetMediaFormat());
 		}
 	}
 	
@@ -180,95 +142,28 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 		return FALSE;
 	}
 	
-	BOOL result = H323Connection::OpenLogicalChannel(capability, sessionID, dir);
-	return result;
+	return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
 }
 
-H323Channel *XMH323Connection::CreateRealTimeLogicalChannel(const H323Capability & capability,
-															H323Channel::Directions dir,
-															unsigned sessionID,
-															const H245_H2250LogicalChannelParameters * param,
-															RTP_QOS * rtpqos)
+H323_RTPChannel * XMH323Connection::CreateRTPChannel(const H323Capability & capability,
+                                                     H323Channel::Directions dir,
+                                                     RTP_Session & rtp,
+                                                     unsigned sessionID)
 {
-	if(PIsDescendant(&capability, XMH323VideoCapability))
-	{
-		RTP_Session * session;
-		
-		if (param != NULL) 
-		{
-			// We only support unicast IP at this time.
-			if (param->m_mediaControlChannel.GetTag() != H245_TransportAddress::e_unicastAddress)
-			{
-				return NULL;
-			}
-			
-			const H245_UnicastAddress & uaddr = param->m_mediaControlChannel;
-			if (uaddr.GetTag() != H245_UnicastAddress::e_iPAddress)
-			{
-				return NULL;
-			}
-			
-			sessionID = param->m_sessionID;
-		}
-		
-		session = UseSession(GetControlChannel(), capability.GetMediaFormat().GetMediaType(), rtpqos);
-		if (session == NULL)
-		{
-			return NULL;
-		}
-		
-		((RTP_UDP *) session)->Reopen(dir == H323Channel::IsReceiver);
-		
-		XMH323Channel *theChannel = new XMH323Channel(*this, capability, dir, *session, sessionID);
-		
-		if(PIsDescendant(&capability, XM_H323_H263_Capability))
-		{
-			XM_H323_H263_Capability & h323Cap = (XM_H323_H263_Capability &)capability;
-			if(h323Cap.IsH263PlusCapability())
-			{
-				theChannel->SetDynamicRTPPayloadType(96);
-			}
-		}
-		else if(PIsDescendant(&capability, XM_H323_H264_Capability))
-		{
-			theChannel->SetDynamicRTPPayloadType(97);
-		}
-		
-		return theChannel;
-	}
-	
-	H323Channel *channel = H323Connection::CreateRealTimeLogicalChannel(capability,
-																		dir,
-																		sessionID,
-																		param,
-																		rtpqos);
-	return channel;
-}
-
-BOOL XMH323Connection::OnCreateLogicalChannel(const H323Capability & capability,
-											  H323Channel::Directions dir,
-											  unsigned & errorCode)
-{
-	BOOL isValidCapability = TRUE;
-	
-	if(PIsDescendant(&capability, XMH323VideoCapability))
-	{
-		XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
-		
-		isValidCapability = videoCapability.IsValidCapabilityForReceiving();
-	}
-	
-	if(isValidCapability == FALSE)
-	{
-		errorCode = H245_OpenLogicalChannelReject_cause::e_dataTypeALCombinationNotSupported;
-		return FALSE;
-	}
-	
-	return H323Connection::OnCreateLogicalChannel(capability, dir, errorCode);
+    if(capability.GetMediaFormat().GetMediaType() != OpalDefaultVideoMediaType)
+    {
+        return H323Connection::CreateRTPChannel(capability, dir, rtp, sessionID);
+    }
+    
+    XMH323Channel * channel = new XMH323Channel(*this, capability, dir, rtp, sessionID);
+    return channel;
 }
 
 BOOL XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
 {
+    // Called if the remote party requests to close the channel.
+    // In contrast to the default Opal implementation, we actually
+    // DO close the channel. Don't know if this is a bug in Opal or not.
 	RemoveMediaStream(channel.GetMediaStream());
 	channel.Close();
 	return TRUE;
@@ -279,12 +174,6 @@ BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 	if(!H323Connection::OnOpenMediaStream(mediaStream))
 	{
 		return FALSE;
-	}
-	
-	if(phase == ConnectedPhase)
-	{
-		SetPhase(EstablishedPhase);
-		OnEstablished();
 	}
     
     XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
@@ -298,39 +187,17 @@ void XMH323Connection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
     XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, mediaStream);
 }
 
-void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
-{
-	H323Connection::OnPatchMediaStream(isSource, patch);
-	
-	if(!isSource)
-	{
-		if(inBandDTMFHandler == NULL)
-		{
-			inBandDTMFHandler = new XMInBandDTMFHandler();
-		}
-		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
-	}	
-}
-
 BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
 {
-	bandwidthAvailable = newBandwidth;
-	XMOpalManager::SetAvailableBandwidth(100*newBandwidth);
-	return TRUE;
-}
-
-unsigned XMH323Connection::GetBandwidthUsed() const
-{
-	return 0;
-}
-
-BOOL XMH323Connection::SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth)
-{
+	bandwidthAvailable = std::min(XMOpalManager::GetManager()->GetBandwidthLimit()/100, newBandwidth);
+    GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
 	return TRUE;
 }
 
 BOOL XMH323Connection::SendUserInputTone(char tone, unsigned duration)
 {
+    // Separate RFC2833 is not implemented. Therefore it is used within
+    // XMeeting to signal in-band DTMF
 	if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 &&
 	   inBandDTMFHandler != NULL)
 	{
@@ -339,4 +206,19 @@ BOOL XMH323Connection::SendUserInputTone(char tone, unsigned duration)
 	}
 	
 	return H323Connection::SendUserInputTone(tone, duration);
+}
+
+void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+{
+	H323Connection::OnPatchMediaStream(isSource, patch);
+	
+    // Add the in-band DTMF handler if this is an audio sending stream
+	if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
+	{
+		if(inBandDTMFHandler == NULL)
+		{
+			inBandDTMFHandler = new XMInBandDTMFHandler();
+		}
+		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+	}	
 }

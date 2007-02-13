@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.36 2007/01/06 20:41:17 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.37 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1157,7 +1157,6 @@ typedef enum _XMOpalDispatcherMessage
 	}
 	
 	_XMStopAudio();
-	_XMResetAvailableBandwidth();
 	
 	NSData *callEndReasonData = (NSData *)[messageComponents objectAtIndex:1];
 	NSNumber *callEndReason = [NSKeyedUnarchiver unarchiveObjectWithData:callEndReasonData];

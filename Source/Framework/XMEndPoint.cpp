@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.25 2007/02/08 23:09:13 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.26 2007/02/13 11:56:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,7 @@
 #include <h224/h224handler.h>
 #include <h224/h281handler.h>
 
+#include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
 #include "XMConnection.h"
 #include "XMMediaFormats.h"
@@ -24,7 +25,7 @@ XM_REGISTER_FORMATS();
 
 #pragma mark Constructor & Destructor
 
-XMEndPoint::XMEndPoint(OpalManager & manager)
+XMEndPoint::XMEndPoint(XMOpalManager & manager)
 : OpalEndPoint(manager, "xm", CanTerminateCall)
 {
 	isIncomingCall = FALSE;
@@ -38,40 +39,12 @@ XMEndPoint::~XMEndPoint()
 }
 
 #pragma mark -
-#pragma mark SetupMethods
-
-void XMEndPoint::SetAudioFunctionality(BOOL enableSilenceSuppressionFlag,
-									   BOOL enableEchoCancellationFlag)
-{
-	enableSilenceSuppression = enableSilenceSuppressionFlag;
-	enableEchoCancellation = enableEchoCancellationFlag;
-}
-
-void XMEndPoint::SetEnableVideo(BOOL flag)
-{
-	enableVideo = flag;
-}
-
-#pragma mark -
-#pragma mark Data
-
-BOOL XMEndPoint::EnableSilenceSuppression()
-{
-	return enableSilenceSuppression;
-}
-
-BOOL XMEndPoint::EnableEchoCancellation()
-{
-	return enableEchoCancellation;
-}
-
-#pragma mark -
 #pragma mark Overriding OpalEndPoint Methods
 
 BOOL XMEndPoint::MakeConnection(OpalCall & call,
-							const PString & remoteParty,
-							void *userData,
-							unsigned int options)
+                                const PString & remoteParty,
+                                void *userData,
+                                unsigned int options)
 {
 	PString token = "XMeeting";
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(token);
@@ -97,25 +70,6 @@ BOOL XMEndPoint::OnIncomingConnection(OpalConnection & connection,
                                       OpalConnection::StringOptions * stringOptions)
 {
     return manager.OnIncomingConnection(connection, options, stringOptions);
-}
-
-OpalMediaFormatList XMEndPoint::GetMediaFormats() const
-{
-	OpalMediaFormatList mediaFormats;
-	
-	mediaFormats += OpalPCM16;
-	
-	if(enableVideo == TRUE)
-	{
-		mediaFormats += XM_MEDIA_FORMAT_H261;
-        mediaFormats += XM_MEDIA_FORMAT_H263;
-        mediaFormats += XM_MEDIA_FORMAT_H263PLUS;
-        mediaFormats += XM_MEDIA_FORMAT_H264;
-	}
-	
-	mediaFormats += OpalH224;
-	
-	return mediaFormats;
 }
 
 PSafePtr<XMConnection> XMEndPoint::GetXMConnectionWithLock(const PString & token,

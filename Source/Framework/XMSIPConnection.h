@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.10 2007/02/08 23:09:14 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.11 2007/02/13 11:56:09 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,31 +41,23 @@ public:
 	virtual BOOL OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
 											   const OpalMediaType & opalMediaType);
 	
-	virtual OpalMediaFormatList GetMediaFormats() const;
-	virtual void AdjustMediaFormats(OpalMediaFormatList & mediaFormats) const;
-	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
 												BOOL isSource);
 	
+    // Propagate opening / closing of media streams to the Obj-C world
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
     virtual void OnClosedMediaStream(const OpalMediaStream & stream);
-	
-	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
-	
-	virtual void OnReceivedACK(SIP_PDU & pdu);
-	
-	virtual void OnReceivedAuthenticationRequired(SIPTransaction & transaction,
-												  SIP_PDU & response);
-	
+		
+    // Overridden to circumvent the default Opal bandwidth management
 	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
 	virtual unsigned GetBandwidthUsed() const;
 	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
 	
+    // Overridden to being able to send in-band DTMF
 	virtual BOOL SendUserInputTone(char tone, unsigned duration);
+    virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
 	
 private:
-	
-	static void AdjustSessionDescription(SDPSessionDescription & sdp);
 	
 	OpalVideoFormat h261VideoFormat;
 	OpalVideoFormat h263VideoFormat;
