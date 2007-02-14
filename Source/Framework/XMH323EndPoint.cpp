@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.24 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.25 2007/02/14 21:55:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -208,50 +208,8 @@ void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 	{
 		unsigned roundTripDelay = connection->GetRoundTripDelay().GetMilliSeconds();
 		callStatistics->roundTripDelay = roundTripDelay;
-		
-		//fetching the audio statistics
-		RTP_Session *session = connection->GetSession(OpalDefaultAudioMediaType);
-		
-		if(session != NULL)
-		{
-			callStatistics->audioPacketsSent = session->GetPacketsSent();
-			callStatistics->audioBytesSent = session->GetOctetsSent();
-			callStatistics->audioMinimumSendTime = session->GetMinimumSendTime();
-			callStatistics->audioAverageSendTime = session->GetAverageSendTime();
-			callStatistics->audioMaximumSendTime = session->GetMaximumSendTime();
-			
-			callStatistics->audioPacketsReceived = session->GetPacketsReceived();
-			callStatistics->audioBytesReceived = session->GetOctetsReceived();
-			callStatistics->audioMinimumReceiveTime = session->GetMinimumReceiveTime();
-			callStatistics->audioAverageReceiveTime = session->GetAverageReceiveTime();
-			callStatistics->audioMaximumReceiveTime = session->GetMaximumReceiveTime();
-			
-			callStatistics->audioPacketsLost = session->GetPacketsLost();
-			callStatistics->audioPacketsOutOfOrder = session->GetPacketsOutOfOrder();
-			callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
-		}
-		
-		//fetching the video statistics
-		session = connection->GetSession(OpalDefaultVideoMediaType);
-		
-		if(session != NULL)
-		{
-			callStatistics->videoPacketsSent = session->GetPacketsSent();
-			callStatistics->videoBytesSent = session->GetOctetsSent();
-			callStatistics->videoMinimumSendTime = session->GetMinimumSendTime();
-			callStatistics->videoAverageSendTime = session->GetAverageSendTime();
-			callStatistics->videoMaximumSendTime = session->GetMaximumSendTime();
-			
-			callStatistics->videoPacketsReceived = session->GetPacketsReceived();
-			callStatistics->videoBytesReceived = session->GetOctetsReceived();
-			callStatistics->videoMinimumReceiveTime = session->GetMinimumReceiveTime();
-			callStatistics->videoAverageReceiveTime = session->GetAverageReceiveTime();
-			callStatistics->videoMaximumReceiveTime = session->GetMaximumReceiveTime();
-			
-			callStatistics->videoPacketsLost = session->GetPacketsLost();
-			callStatistics->videoPacketsOutOfOrder = session->GetPacketsOutOfOrder();
-			callStatistics->videoPacketsTooLate = session->GetPacketsTooLate();
-		}
+        
+        XMOpalManager::ExtractCallStatistics(*connection, callStatistics);
 	}
 }
 

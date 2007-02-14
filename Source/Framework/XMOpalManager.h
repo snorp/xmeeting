@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.29 2007/02/13 12:57:52 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.30 2007/02/14 21:55:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,6 +54,8 @@ public:
 	
 	/* getting call statistics */
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
+    static void ExtractCallStatistics(const OpalConnection & connection,
+                                      XMCallStatisticsRecord *callStatistics);
 	
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.30 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.31 2007/02/14 21:55:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -332,6 +332,9 @@ typedef struct XMCallStatisticsRecord
 	unsigned audioPacketsLost;
 	unsigned audioPacketsOutOfOrder;
 	unsigned audioPacketsTooLate;
+    unsigned audioAverageJitterTime;
+    unsigned audioMaximumJitterTime;
+    unsigned audioJitterBufferSize;
 	unsigned videoPacketsSent;
 	unsigned videoBytesSent;
 	unsigned videoMinimumSendTime;
@@ -345,6 +348,8 @@ typedef struct XMCallStatisticsRecord
 	unsigned videoPacketsLost;
 	unsigned videoPacketsOutOfOrder;
 	unsigned videoPacketsTooLate;
+    unsigned videoAverageJitterTime;
+    unsigned videoMaximumJitterTime;
 } XMCallStatisticsRecord;
 
 #endif // __XM_TYPES_H__

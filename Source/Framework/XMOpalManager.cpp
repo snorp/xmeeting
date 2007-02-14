@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.48 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.49 2007/02/14 21:55:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -179,13 +179,141 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 	{
 		case XMCallProtocol_H323:
 			GetH323EndPoint()->GetCallStatistics(callStatistics);
-			return;
+            break;
 		case XMCallProtocol_SIP:
 			GetSIPEndPoint()->GetCallStatistics(callStatistics);
-			return;
+			break;
 		default: // should not happen actually
 			return;
 	}
+    
+    PTRACE(3, "XMeeting Call Statistics:" <<
+           "\nroundTripDelay:          " << callStatistics->roundTripDelay <<
+           "\naudioPacketsSent:        " << callStatistics->audioPacketsSent <<
+           "\naudioBytesSent:          " << callStatistics->audioBytesSent <<
+           "\naudioMininumSendTime:    " << callStatistics->audioMinimumSendTime <<
+           "\naudioAverageSendTime:    " << callStatistics->audioAverageSendTime <<
+           "\naudioMaximumSendTime:    " << callStatistics->audioMaximumSendTime <<
+           "\naudioPacketsReceived:    " << callStatistics->audioPacketsReceived <<
+           "\naudioBytesReceived:      " << callStatistics->audioBytesReceived <<
+           "\naudioMinimumReceiveTime: " << callStatistics->audioMinimumReceiveTime <<
+           "\naudioAverageReceiveTime: " << callStatistics->audioAverageReceiveTime <<
+           "\naudioMaximumReceiveTime: " << callStatistics->audioMaximumReceiveTime <<
+           "\naudioPacketsLost:        " << callStatistics->audioPacketsLost <<
+           "\naudioPacketsOutOfOrder:  " << callStatistics->audioPacketsOutOfOrder <<
+           "\naudioPaketsTooLate:      " << callStatistics->audioPacketsTooLate <<
+           "\naudioAverageJitterTime:  " << callStatistics->audioAverageJitterTime <<
+           "\naudioMaximumJitterTime:  " << callStatistics->audioMaximumJitterTime <<
+           "\naudioJitterBufferSize:   " << callStatistics->audioJitterBufferSize <<
+           "\nvideoPacketsSent:        " << callStatistics->videoPacketsSent <<
+           "\nvideoBytesSent:          " << callStatistics->videoBytesSent <<
+           "\nvideoMininumSendTime:    " << callStatistics->videoMinimumSendTime <<
+           "\nvideoAverageSendTime:    " << callStatistics->videoAverageSendTime <<
+           "\nvideoMaximumSendTime:    " << callStatistics->videoMaximumSendTime <<
+           "\nvideoPacketsReceived:    " << callStatistics->videoPacketsReceived <<
+           "\nvideoBytesReceived:      " << callStatistics->videoBytesReceived <<
+           "\nvideoMinimumReceiveTime: " << callStatistics->videoMinimumReceiveTime <<
+           "\nvideoAverageReceiveTime: " << callStatistics->videoAverageReceiveTime <<
+           "\nvideoMaximumReceiveTime: " << callStatistics->videoMaximumReceiveTime <<
+           "\nvideoPacketsLost:        " << callStatistics->videoPacketsLost <<
+           "\nvideoPacketsOutOfOrder:  " << callStatistics->videoPacketsOutOfOrder <<
+           "\nvideoPaketsTooLate:      " << callStatistics->videoPacketsTooLate <<
+           "\nvideoAverageJitterTime:  " << callStatistics->videoAverageJitterTime <<
+           "\nvideoMaximumJitterTime:  " << callStatistics->videoMaximumJitterTime);
+}
+
+void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
+                                          XMCallStatisticsRecord *callStatistics)
+{
+    RTP_Session *session = connection.GetSession(OpalDefaultAudioMediaType);
+    if (session != NULL)
+    {
+        callStatistics->audioPacketsSent = session->GetPacketsSent();
+        callStatistics->audioBytesSent = session->GetOctetsSent();
+        callStatistics->audioMinimumSendTime = session->GetMinimumSendTime();
+        callStatistics->audioAverageSendTime = session->GetAverageSendTime();
+        callStatistics->audioMaximumSendTime = session->GetMaximumSendTime();
+        
+        callStatistics->audioPacketsReceived = session->GetPacketsReceived();
+        callStatistics->audioBytesReceived = session->GetOctetsReceived();
+        callStatistics->audioMinimumReceiveTime = session->GetMinimumReceiveTime();
+        callStatistics->audioAverageReceiveTime = session->GetAverageReceiveTime();
+        callStatistics->audioMaximumReceiveTime = session->GetMaximumReceiveTime();
+        
+        callStatistics->audioPacketsLost = session->GetPacketsLost();
+        callStatistics->audioPacketsOutOfOrder = session->GetPacketsOutOfOrder();
+        callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
+        
+        callStatistics->audioAverageJitterTime = session->GetAvgJitterTime();
+        callStatistics->audioMaximumJitterTime = session->GetMaxJitterTime();
+        callStatistics->audioJitterBufferSize = session->GetJitterBufferSize();
+    } 
+    else 
+    {
+        callStatistics->audioPacketsSent = UINT_MAX;
+        callStatistics->audioBytesSent = UINT_MAX;
+        callStatistics->audioMinimumSendTime = UINT_MAX;
+        callStatistics->audioAverageSendTime = UINT_MAX;
+        callStatistics->audioMaximumSendTime = UINT_MAX;
+        
+        callStatistics->audioPacketsReceived = UINT_MAX;
+        callStatistics->audioBytesReceived = UINT_MAX;
+        callStatistics->audioMinimumReceiveTime = UINT_MAX;
+        callStatistics->audioAverageReceiveTime = UINT_MAX;
+        callStatistics->audioMaximumReceiveTime = UINT_MAX;
+        
+        callStatistics->audioPacketsLost = UINT_MAX;
+        callStatistics->audioPacketsOutOfOrder = UINT_MAX;
+        callStatistics->audioPacketsTooLate = UINT_MAX;
+        
+        callStatistics->audioAverageJitterTime = UINT_MAX;
+        callStatistics->audioMaximumJitterTime = UINT_MAX;
+        callStatistics->audioJitterBufferSize = UINT_MAX;
+    }
+    
+    session = connection.GetSession(OpalDefaultVideoMediaType);
+    if(session != NULL)
+    {
+        callStatistics->videoPacketsSent = session->GetPacketsSent();
+        callStatistics->videoBytesSent = session->GetOctetsSent();
+        callStatistics->videoMinimumSendTime = session->GetMinimumSendTime();
+        callStatistics->videoAverageSendTime = session->GetAverageSendTime();
+        callStatistics->videoMaximumSendTime = session->GetMaximumSendTime();
+        
+        callStatistics->videoPacketsReceived = session->GetPacketsReceived();
+        callStatistics->videoBytesReceived = session->GetOctetsReceived();
+        callStatistics->videoMinimumReceiveTime = session->GetMinimumReceiveTime();
+        callStatistics->videoAverageReceiveTime = session->GetAverageReceiveTime();
+        callStatistics->videoMaximumReceiveTime = session->GetMaximumReceiveTime();
+        
+        callStatistics->videoPacketsLost = session->GetPacketsLost();
+        callStatistics->videoPacketsOutOfOrder = session->GetPacketsOutOfOrder();
+        callStatistics->videoPacketsTooLate = session->GetPacketsTooLate();
+        
+        callStatistics->videoAverageJitterTime = session->GetAvgJitterTime();
+        callStatistics->videoMaximumJitterTime = session->GetMaxJitterTime();
+    }
+    else
+    {
+        callStatistics->videoPacketsSent = UINT_MAX;
+        callStatistics->videoBytesSent = UINT_MAX;
+        callStatistics->videoMinimumSendTime = UINT_MAX;
+        callStatistics->videoAverageSendTime = UINT_MAX;
+        callStatistics->videoMaximumSendTime = UINT_MAX;
+        
+        callStatistics->videoPacketsReceived = UINT_MAX;
+        callStatistics->videoBytesReceived = UINT_MAX;
+        callStatistics->videoMinimumReceiveTime = UINT_MAX;
+        callStatistics->videoAverageReceiveTime = UINT_MAX;
+        callStatistics->videoMaximumReceiveTime = UINT_MAX;
+    
+        callStatistics->videoPacketsLost = UINT_MAX;
+        callStatistics->videoPacketsOutOfOrder = UINT_MAX;
+        callStatistics->videoPacketsTooLate = UINT_MAX;
+        
+        callStatistics->videoAverageJitterTime = UINT_MAX;
+        callStatistics->videoMaximumJitterTime = UINT_MAX;
+    }
 }
 
 #pragma mark overriding some callbacks
