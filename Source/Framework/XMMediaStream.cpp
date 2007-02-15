@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.9 2007/02/13 12:57:52 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.10 2007/02/15 11:06:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,7 +22,8 @@ XMMediaStream::XMMediaStream(const OpalMediaFormat & mediaFormat,
 : OpalMediaStream(mediaFormat, isSource),
   dataFrame((isSource ? 3000 : 0))
 {
-      isTerminated = FALSE;
+    hasStarted = FALSE;
+    isTerminated = FALSE;
 }
 
 XMMediaStream::~XMMediaStream()
@@ -32,6 +33,12 @@ XMMediaStream::~XMMediaStream()
 void XMMediaStream::OnPatchStart()
 {
     if (IsSource()) {
+        
+        // Ensure the code below runs just once
+        if(hasStarted == TRUE) {
+            return;
+        }
+        hasStarted = TRUE;
         
         // Adjust the local media format
         mediaFormat = mediaPatch->GetSinkFormat();

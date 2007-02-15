@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.6 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.7 2007/02/15 11:06:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,7 @@ public:
     
 private:
     RTP_DataFrame dataFrame;
+    BOOL hasStarted;
     BOOL isTerminated;
 };
 
