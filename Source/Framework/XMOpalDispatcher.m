@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.37 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.38 2007/02/15 09:33:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1589,10 +1589,7 @@ typedef enum _XMOpalDispatcherMessage
 	{
 		if(_XMEnableH323Listeners(YES) == YES)
 		{
-			//_XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
-			// Currently, fastStart has to be disabled as long as the Capability management system is not
-			// FastStart-Ready
-			_XMSetH323Functionality(NO, NO);
+			_XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
 			
 			// setting up the gatekeeper
 			[self _doGatekeeperSetup:preferences verbose:verbose];
