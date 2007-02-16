@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.26 2007/02/14 21:55:05 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.27 2007/02/16 11:03:20 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -472,10 +472,10 @@ SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost
  * multiple INVITE / REGISTER out as these messages cause state changes
  * on the remote side. OPTIONS don't alter state, in contrast.
  **/
-OpalTransport * XMSIPEndPoint::XMCreateTransport(const OpalTransportAddress & addr)
+OpalTransport * XMSIPEndPoint::CreateTransport(const OpalTransportAddress & addr, BOOL isLocalAddress)
 {
 	// create the transport
-	OpalTransport *transport = SIPEndPoint::CreateTransport(addr);
+	OpalTransport *transport = SIPEndPoint::CreateTransport(addr, isLocalAddress);
 	
 	// Sanity check
 	if(transport == NULL)
@@ -802,8 +802,7 @@ BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
 		// in between.
 		transportMutex.Signal();
 		OpalTransport *transport;
-		XMSIPEndPoint & xmEP = (XMSIPEndPoint &)ep;
-		transport = xmEP.XMCreateTransport(registrarAddress);
+		transport = ep.CreateTransport(registrarAddress);
 		transportMutex.Wait();
 		if(registrarTransport != NULL) {
 			delete transport;

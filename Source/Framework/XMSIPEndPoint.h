@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.11 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.12 2007/02/16 11:03:20 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -120,7 +120,7 @@ public:
 												 const PTimeInterval & minRetryTime, 
 												 const PTimeInterval & maxRetryTime
 												 );
-	OpalTransport * XMCreateTransport(const OpalTransportAddress & addr);
+	virtual OpalTransport * CreateTransport(const OpalTransportAddress & addr, BOOL isLocalAddress = FALSE);
 	static BOOL WriteSIPOptions(OpalTransport & transport, void * data);
 	virtual void OnReceivedResponse(SIPTransaction & transaction, SIP_PDU & response);
 	virtual void OnOptionsTimeout(XMSIPOptions *options);

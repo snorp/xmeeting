@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.11 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.12 2007/02/16 11:03:20 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,15 +31,11 @@ public:
 	
 	~XMSIPConnection();
 	
-	virtual BOOL SetUpConnection();
-	
 	virtual void OnCreatingINVITE(SIP_PDU & invite);
-	
-	virtual BOOL OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
-										   const OpalMediaType & opalMediaType,
-										   SDPSessionDescription & sdpOut);
-	virtual BOOL OnReceivedSDPMediaDescription(SDPSessionDescription & sdp,
-											   const OpalMediaType & opalMediaType);
+    
+    virtual BOOL OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
+                                           const OpalMediaType & mediaType,
+                                           SDPSessionDescription & sdpOut);
 	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
 												BOOL isSource);
@@ -50,8 +46,8 @@ public:
 		
     // Overridden to circumvent the default Opal bandwidth management
 	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
-	virtual unsigned GetBandwidthUsed() const;
-	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth);
+	virtual unsigned GetBandwidthUsed() const { return 0; }
+	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return TRUE; }
 	
     // Overridden to being able to send in-band DTMF
 	virtual BOOL SendUserInputTone(char tone, unsigned duration);
@@ -59,11 +55,7 @@ public:
 	
 private:
 	
-	OpalVideoFormat h261VideoFormat;
-	OpalVideoFormat h263VideoFormat;
-	OpalVideoFormat h263PlusVideoFormat;
-	OpalVideoFormat h264VideoFormat;
-	
+    unsigned initialBandwidth;
 	XMInBandDTMFHandler *inBandDTMFHandler;
 };
 
