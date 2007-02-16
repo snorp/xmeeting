@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.30 2007/02/13 12:57:52 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.31 2007/02/16 14:13:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -426,6 +426,10 @@ void XMReceiverMediaPatch::Main()
 
 void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
 {
+    if(sinks.GetSize() == 0) {
+        return;
+    }
+    
 	OpalVideoUpdatePicture command = OpalVideoUpdatePicture(-1, -1, -1);
     
     sinks[0].stream->ExecuteCommand(command);
