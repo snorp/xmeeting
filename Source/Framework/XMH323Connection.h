@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.16 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.17 2007/02/16 11:02:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,6 +61,7 @@ public:
 	
 private:
 	
+    unsigned initialBandwidth;
 	XMInBandDTMFHandler * inBandDTMFHandler;
 };
 

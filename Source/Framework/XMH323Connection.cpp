@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.25 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.26 2007/02/16 11:02:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,8 +28,10 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 : H323Connection(call, endPoint, token, alias, address, options, stringOptions)
 {	
 	// setting correct initial bandwidth
-    bandwidthAvailable = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
+    initialBandwidth = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
+    bandwidthAvailable = initialBandwidth;
 	
+    // Delete the default RFC2833 handler and replace it with our own implementation
 	delete rfc2833Handler;
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
@@ -189,7 +191,7 @@ void XMH323Connection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
 
 BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
 {
-	bandwidthAvailable = std::min(XMOpalManager::GetManager()->GetBandwidthLimit()/100, newBandwidth);
+	bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
     GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
 	return TRUE;
 }
