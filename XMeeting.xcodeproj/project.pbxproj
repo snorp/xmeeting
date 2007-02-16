@@ -703,7 +703,6 @@
 		D1CEE48408F90263007E4ABE /* call.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34808F90263007E4ABE /* call.cxx */; };
 		D1CEE48508F90263007E4ABE /* connection.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34908F90263007E4ABE /* connection.cxx */; };
 		D1CEE48608F90263007E4ABE /* endpoint.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34A08F90263007E4ABE /* endpoint.cxx */; };
-		D1CEE48708F90263007E4ABE /* guid.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34B08F90263007E4ABE /* guid.cxx */; };
 		D1CEE48808F90263007E4ABE /* ivr.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34C08F90263007E4ABE /* ivr.cxx */; };
 		D1CEE48908F90263007E4ABE /* manager.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34D08F90263007E4ABE /* manager.cxx */; };
 		D1CEE48A08F90263007E4ABE /* mediafmt.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34E08F90263007E4ABE /* mediafmt.cxx */; };
@@ -813,7 +812,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D1CEE10A08F901F0007E4ABE /* opal */;
+			remoteGlobalIDString = D1CEE10A08F901F0007E4ABE;
 			remoteInfo = opal;
 		};
 		D1CEE10C08F901F8007E4ABE /* PBXContainerItemProxy */ = {
@@ -4178,7 +4177,6 @@
 				D1CEE48408F90263007E4ABE /* call.cxx in Sources */,
 				D1CEE48508F90263007E4ABE /* connection.cxx in Sources */,
 				D1CEE48608F90263007E4ABE /* endpoint.cxx in Sources */,
-				D1CEE48708F90263007E4ABE /* guid.cxx in Sources */,
 				D1CEE48808F90263007E4ABE /* ivr.cxx in Sources */,
 				D1CEE48908F90263007E4ABE /* manager.cxx in Sources */,
 				D1CEE48A08F90263007E4ABE /* mediafmt.cxx in Sources */,
