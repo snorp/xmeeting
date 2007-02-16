@@ -1,9 +1,9 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.53 2006/11/21 11:02:15 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.54 2007/02/16 10:57:56 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMMediaTransmitter.h"
@@ -82,7 +82,7 @@ typedef enum XMMediaTransmitterMessage
 
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents;
 
-- (void)_adjustVideoBitrateLimit;
+- (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrateLimit forCodec:(CodecType)codecType;
 
 - (void)_grabFrame:(NSTimer *)timer;
 
@@ -958,8 +958,6 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	codecSpecificCallFlags = [number unsignedIntValue];
 	
-	[self _adjustVideoBitrateLimit];
-	
 	// ensuring correct keyframe interval
 	if(keyframeInterval > 200)
 	{
@@ -989,6 +987,10 @@ BOOL _XMIsH263IFrame(UInt8* data);
 			// should be reported here
 			return;
 	}
+    
+    bitrateToUse = [self _adjustVideoBitrateLimit:bitrateToUse forCodec:codecType];
+    
+    NSLog(@"Using bitrate: %d", bitrateToUse);
 	
 	if(videoSize != requiredVideoSize)
 	{
@@ -1096,7 +1098,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
 	bitrateToUse = [number unsignedIntValue];
 
-	[self _adjustVideoBitrateLimit];
+	bitrateToUse = [self _adjustVideoBitrateLimit:bitrateToUse forCodec:codecType];
 }
 
 - (void)_handleSetVideoBytesSentMessage:(NSArray *)components
@@ -1237,26 +1239,27 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[module applyInternalSettings:settings];
 }
 
-- (void)_adjustVideoBitrateLimit
+- (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrate forCodec:(CodecType)codec
 {
 	// taking into account packetization overhead
-	bitrateToUse = (bitrateToUse * 0.95);
+	bitrate = (bitrate * 0.95);
 	
 	// protection against codec hangups
-	if(bitrateToUse < 80000 && codecType == kH261CodecType)
+	if(bitrate < 80000 && codec == kH261CodecType)
 	{
-		bitrateToUse = 80000;
+		bitrate = 80000;
 	}
-	else if(bitrateToUse < 64000 && codecType == kH263CodecType)
+	else if(bitrate < 64000 && codec == kH263CodecType)
 	{
-		bitrateToUse = 64000;
+		bitrate = 64000;
 	}
-	else if(bitrateToUse < 192000 && codecType == kH264CodecType)
+	else if(bitrate < 192000 && codec == kH264CodecType)
 	{
 		// H.264 seems not to use the whole bandwidth allowed, so we're increasing
 		// the minimum bandwidth used
-		bitrateToUse = 192000;
+		bitrate = 192000;
 	}
+    return bitrate;
 }
 
 #pragma mark -
