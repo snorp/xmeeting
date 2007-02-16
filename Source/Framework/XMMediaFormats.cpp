@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.25 2007/02/13 12:57:52 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.26 2007/02/16 10:59:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,6 +27,7 @@
 #define XM_MAX_H261_BITRATE 960000
 #define XM_MAX_H263_BITRATE 960000
 #define XM_MAX_H264_BITRATE 768000
+#define XM_DEFAULT_SIP_VIDEO_BITRATE 320000
 
 #define XM_H264_PROFILE_CODE_BASELINE 64
 #define XM_H264_PROFILE_CODE_MAIN 32
@@ -1319,13 +1320,6 @@ void XM_H323_H264_Capability::OnReceivedPDU(const H245_MediaPacketizationCapabil
 	}
 }
 
-void XM_H323_H264_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const
-{	
-	// Sending H.264, need to make sure which provile/level to use
-	//h264Profile = GetProfile();
-	//h264Level = GetLevel();
-}
-
 BOOL XM_H323_H264_Capability::IsValidCapabilityForSending() const
 {
 	if(((profile & XM_H264_PROFILE_CODE_BASELINE) != 0) &&
@@ -1340,16 +1334,6 @@ BOOL XM_H323_H264_Capability::IsValidCapabilityForSending() const
 	}
 	return FALSE;
 }
-
-/*BOOL XM_H323_H264_Capability::IsValidCapabilityForReceiving() const
-{
-	if(profile <= (XM_H264_PROFILE_CODE_MAIN | XM_H264_PROFILE_CODE_BASELINE) &&
-	   level <= XM_H264_LEVEL_CODE_2)
-	{
-		return TRUE;
-	}
-	return FALSE;
-}*/
 
 PObject::Comparison XM_H323_H264_Capability::CompareTo(const XMH323VideoCapability & obj) const
 {
@@ -1448,14 +1432,209 @@ void XM_H323_H264_Capability::SetPacketizationMode(unsigned _packetizationMode)
 #pragma mark -
 #pragma mark XM_SDP_H261_Capability methods
 
-BOOL XM_SDP_H261_Capability::OnSendingSDP(const OpalMediaFormat & mediaFormat, SDPMediaFormat & sdpMediaFormat) const
+BOOL XM_SDP_H261_Capability::OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const
 {
-    sdpMediaFormat.SetFMTP(_XMGetFMTP_H261());
+    // Produces an RFC 4587 compliant FMTP string
+    // In addition to that, also an MaxBR option is included to signal maximum bandwidth
+    
+    unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
+	
+	if(videoSize >= XMVideoSize_CIF)
+	{
+		sdpMediaFormat.SetFMTP(psprintf("CIF=%d;QCIF=%d;MaxBR=%d", mpi, mpi, maxBitRate));
+	}
+	else if(videoSize >= XMVideoSize_QCIF)
+	{
+		sdpMediaFormat.SetFMTP(psprintf("QCIF=%d;MaxBR=%d", mpi, maxBitRate));
+	}
+    else
+    {
+        return FALSE;
+    }
+    
     return TRUE;
 }
 
-BOOL XM_SDP_H261_Capability::OnReceivingSDP(OpalMediaFormat & mediaFormat, const SDPMediaFormat & sdpMediaFormat) const
+BOOL XM_SDP_H261_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
+                                           const SDPMediaDescription & mediaDescription,
+                                           const SDPSessionDescription & sessionDescription)
 {
+    const PString & fmtp = sdpMediaFormat.GetFMTP();
+	const PStringArray tokens = fmtp.Tokenise(" ;");
+	
+    unsigned cifMPI = 0;
+    unsigned qcifMPI = 0;
+    unsigned bitrate = 0;
+    
+	unsigned i;
+	unsigned count = tokens.GetSize();
+	for(i = 0; i < count; i++)
+	{
+		const PString & str = tokens[i];
+		
+		if(str.Left(4) == "CIF=")
+		{
+			PString mpiStr = str(4, 1000);
+			cifMPI = mpiStr.AsUnsigned();
+		}
+		else if(str.Left(5) == "QCIF=")
+		{
+            PString mpiStr = str(5, 1000);
+            qcifMPI = mpiStr.AsUnsigned();
+		}
+		else if(str.Left(6) == "MaxBR=")
+		{
+			PString brStr = str(6, 1000);
+			bitrate = brStr.AsUnsigned() * 100;
+		}
+	}
+	
+    if(cifMPI != 0) 
+    {
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+    }
+    else if(qcifMPI != 0)
+    {
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_QCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_QCIF_HEIGHT);
+    }
+    else
+    {
+        // Assuming 30fps CIF
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+    }
+    
+    if(bitrate == 0)
+    {
+        bitrate = sessionDescription.GetBandwidthValue() * 1000;
+        if (bitrate == 0) {
+            bitrate = XM_DEFAULT_SIP_VIDEO_BITRATE;
+        }
+    }
+    bitrate = std::min(mediaFormat.GetBandwidth(), bitrate);
+    mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, bitrate);
+    
+    return TRUE;
+}
+
+#pragma mark -
+#pragma mark XM_SDP_H263_Capability methods
+
+BOOL XM_SDP_H263_Capability::OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const
+{
+    // Produces an RFC 4629 compliant FMTP string, although this doesn't apply for
+    // RFC2190 encoding
+    // In addition to that, also an MaxBR option is included to signal maximum bandwidth
+    
+    unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
+	
+	if(videoSize >= XMVideoSize_CIF)
+	{
+		sdpMediaFormat.SetFMTP(psprintf("CIF=%d;QCIF=%d;SQCIF=%d;MaxBR=%d", mpi, mpi, mpi, maxBitRate));
+	}
+	else if(videoSize >= XMVideoSize_QCIF)
+	{
+		sdpMediaFormat.SetFMTP(psprintf("QCIF=%d;SQCIF=%d;MaxBR=%d", mpi, mpi, maxBitRate));
+	}
+    else if(videoSize >= XMVideoSize_SQCIF)
+    {
+        sdpMediaFormat.SetFMTP(psprintf("SQCIF=%d;MaxBR=%d", mpi, maxBitRate));
+    }
+    else
+    {
+        return FALSE;
+    }
+    
+    return TRUE;
+}
+
+BOOL XM_SDP_H263_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
+                                           const SDPMediaDescription & mediaDescription,
+                                           const SDPSessionDescription & sessionDescription)
+{
+    const PString & fmtp = sdpMediaFormat.GetFMTP();
+	const PStringArray tokens = fmtp.Tokenise(" ;");
+	
+    unsigned cifMPI = 0;
+    unsigned qcifMPI = 0;
+    unsigned sqcifMPI = 0;
+    unsigned bitrate = 0;
+    
+	unsigned i;
+	unsigned count = tokens.GetSize();
+	for(i = 0; i < count; i++)
+	{
+		const PString & str = tokens[i];
+		
+		if(str.Left(4) == "CIF=")
+		{
+			PString mpiStr = str(4, 1000);
+			cifMPI = mpiStr.AsUnsigned();
+		}
+		else if(str.Left(5) == "QCIF=")
+		{
+            PString mpiStr = str(5, 1000);
+            qcifMPI = mpiStr.AsUnsigned();
+		}
+        else if(str.Left(6) == "SQCIF=")
+        {
+            PString mpiStr = str(6, 1000);
+            sqcifMPI = mpiStr.AsUnsigned();
+        }
+		else if(str.Left(6) == "MaxBR=")
+		{
+			PString brStr = str(6, 1000);
+			bitrate = brStr.AsUnsigned() * 100;
+		}
+	}
+	
+    if(cifMPI != 0) 
+    {
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+    }
+    else if(qcifMPI != 0)
+    {
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_QCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_QCIF_HEIGHT);
+    }
+    else if (sqcifMPI != 0)
+    {
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*sqcifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_SQCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_SQCIF_HEIGHT);
+    }
+    else
+    {
+        // Assuming 30fps CIF
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+    }
+    
+    if(bitrate == 0)
+    {
+        bitrate = sessionDescription.GetBandwidthValue() * 1000;
+        if (bitrate == 0) {
+            bitrate = XM_DEFAULT_SIP_VIDEO_BITRATE;
+        }
+    }
+    bitrate = std::min(mediaFormat.GetBandwidth(), bitrate);
+    mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, bitrate);
+    
     return TRUE;
 }
 
@@ -1568,226 +1747,4 @@ void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, BOOL enableH264L
     } else {
         mediaFormat.AddOption(new OpalMediaOptionBoolean(H264LimitedModeOption, false, OpalMediaOption::AlwaysMerge, enableH264LimitedMode));
     }
-}
-
-#pragma mark -
-#pragma mark SDP Functions
-
-unsigned _XMGetMaxH261BitRate()
-{
-	/*unsigned maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H261_BITRATE/100)
-	{
-		maxBitRate = XM_MAX_H261_BITRATE/100;
-	}
-	
-	return maxBitRate;*/
-    return XM_MAX_H261_BITRATE/100;
-}
-
-PString _XMGetFMTP_H261(unsigned maxBitRate,
-						XMVideoSize videoSize,
-						unsigned mpi)
-{
-	/*if(maxBitRate == UINT_MAX)
-	{
-		maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100; // SDP uses bitrate units of 100bits/s
-	}*/
-	if(maxBitRate > XM_MAX_H261_BITRATE/100)
-	{
-		maxBitRate = XM_MAX_H261_BITRATE/100;
-	}
-	
-	if(videoSize == XMVideoSize_NoVideo)
-	{
-		return psprintf("CIF=%d QCIF=%d MaxBR=%d", mpi, mpi, maxBitRate);
-	}
-	else if(videoSize == XMVideoSize_CIF)
-	{
-		return psprintf("CIF=%d MaxBR=%d", mpi, maxBitRate);
-	}
-	else
-	{
-		return psprintf("QCIF=%d MaxBR=%d", mpi, maxBitRate);
-	}
-}
-
-void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi)
-{
-	maxBitRate = _XMGetMaxH261BitRate();
-	videoSize = XMVideoSize_NoVideo;
-	mpi = 1;
-	
-	const PStringArray tokens = fmtp.Tokenise(" ;");
-	
-	unsigned i;
-	unsigned count = tokens.GetSize();
-	
-	for(i = 0; i < count; i++)
-	{
-		const PString & str = tokens[i];
-		
-		if(str.Left(4) == "CIF=")
-		{
-			PString mpiStr = str(4, 1000);
-			mpi = mpiStr.AsUnsigned();
-			videoSize = XMVideoSize_CIF;
-		}
-		else if(str.Left(5) == "QCIF=")
-		{
-			if(videoSize != XMVideoSize_CIF)
-			{
-				PString mpiStr = str(5, 1000);
-				mpi = mpiStr.AsUnsigned();
-				videoSize = XMVideoSize_QCIF;
-			}
-		}
-		else if(str.Left(6) == "MaxBR=")
-		{
-			PString brStr = str(6, 1000);
-			unsigned bitRate = brStr.AsUnsigned();
-			if(bitRate < maxBitRate)
-			{
-				maxBitRate = bitRate;
-			}
-		}
-	}
-	
-	if(videoSize == XMVideoSize_NoVideo)
-	{
-		videoSize = XMVideoSize_CIF;
-	}
-	
-	if(mpi == 0)
-	{
-		mpi = 1;
-	}
-}
-
-unsigned _XMGetMaxH263BitRate()
-{
-	/*unsigned maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H263_BITRATE/100)
-	{
-		maxBitRate = XM_MAX_H263_BITRATE/100;
-	}
-	
-	return maxBitRate;*/
-    return XM_MAX_H263_BITRATE/100;
-}
-
-PString _XMGetFMTP_H263(unsigned maxBitRate,
-						XMVideoSize videoSize,
-						unsigned mpi)
-{
-	/*if(maxBitRate == UINT_MAX)
-	{
-		maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
-	}*/
-	if(maxBitRate > XM_MAX_H263_BITRATE/100)
-	{
-		maxBitRate = XM_MAX_H263_BITRATE/100;
-	}
-	
-	if(videoSize == XMVideoSize_NoVideo)
-	{
-		return psprintf("CIF=%d QCIF=%d SQCIF=%d MaxBR=%d", mpi, mpi, mpi, maxBitRate);
-	}
-	else if(videoSize == XMVideoSize_CIF)
-	{
-		return psprintf("CIF=%d MaxBR=%d", mpi, maxBitRate);
-	}
-	else if(videoSize == XMVideoSize_QCIF)
-	{
-		return psprintf("QCIF=%d MaxBR=%d", mpi, maxBitRate);
-	}
-	else
-	{
-		return psprintf("SQCIF=%d MaxBR=%d", mpi, maxBitRate);
-	}
-}
-
-void _XMParseFMTP_H263(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi)
-{
-	maxBitRate = _XMGetMaxH263BitRate();
-	videoSize = XMVideoSize_NoVideo;
-	mpi = 1;
-	
-	const PStringArray tokens = fmtp.Tokenise(" ;");
-	
-	unsigned i;
-	unsigned count = tokens.GetSize();
-	
-	for(i = 0; i < count; i++)
-	{
-		const PString & str = tokens[i];
-		
-		if(str.Left(4) == "CIF=")
-		{
-			PString mpiStr = str(4, 1000);
-			mpi = mpiStr.AsUnsigned();
-			videoSize = XMVideoSize_CIF;
-		}
-		else if(str.Left(5) == "QCIF=")
-		{
-			if(videoSize != XMVideoSize_CIF)
-			{
-				PString mpiStr = str(5, 1000);
-				mpi = mpiStr.AsUnsigned();
-				videoSize = XMVideoSize_QCIF;
-			}
-		}
-		else if(str.Left(6) == "SQCIF=")
-		{
-			if(videoSize != XMVideoSize_CIF &&
-			   videoSize != XMVideoSize_QCIF)
-			{
-				PString mpiStr = str(6, 1000);
-				mpi = mpiStr.AsUnsigned();
-				videoSize = XMVideoSize_SQCIF;
-			}
-		}
-		else if(str.Left(6) == "MaxBR=")
-		{
-			PString brStr = str(6, 1000);
-			unsigned bitRate = brStr.AsUnsigned();
-			if(bitRate < maxBitRate)
-			{
-				maxBitRate = bitRate;
-			}
-		}
-	}
-	
-	if(videoSize == XMVideoSize_NoVideo)
-	{
-		videoSize = XMVideoSize_CIF;
-	}
-	
-	if(mpi == 0)
-	{
-		mpi = 1;
-	}
-}
-
-unsigned _XMGetMaxH264BitRate()
-{
-	/*unsigned maxBitRate = XMOpalManager::GetManager()->GetVideoBandwidthLimit() / 100;
-	if(maxBitRate > XM_MAX_H264_BITRATE/100)
-	{
-		maxBitRate = XM_MAX_H264_BITRATE/100;
-	}
-	
-	return maxBitRate;*/
-    return XM_MAX_H264_BITRATE/100;
-}
-
-PString _XMGetFMTP_H264(unsigned maxBitRate,
-						XMVideoSize videoSize,
-						unsigned mpi)
-{
-	return "";
-}
-
-void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi)
-{
 }

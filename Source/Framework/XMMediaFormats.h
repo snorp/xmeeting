@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.18 2007/02/13 12:57:52 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.19 2007/02/16 10:59:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -221,8 +221,6 @@ public:
 	
 	virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
 	virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
-    virtual BOOL HasMediaPacketizationParameters() const { return FALSE; }
-	virtual void OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const;
 	
 	virtual BOOL IsValidCapabilityForSending() const;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
@@ -254,8 +252,22 @@ class XM_SDP_H261_Capability : public SDPCapability
     
 public:
     
-    virtual BOOL OnSendingSDP(const OpalMediaFormat & mediaFormat, SDPMediaFormat & sdpMediaFormat) const;
-    virtual BOOL OnReceivingSDP(OpalMediaFormat & mediaFormat, const SDPMediaFormat & sdpMediaFormat) const;
+    virtual BOOL OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
+    virtual BOOL OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
+                               const SDPMediaDescription & mediaDescription,
+                               const SDPSessionDescription & sessionDescription);
+};
+
+class XM_SDP_H263_Capability : public SDPCapability
+{
+    PCLASSINFO(XM_SDP_H263_Capability, SDPCapability);
+    
+public:
+    
+    virtual BOOL OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
+    virtual BOOL OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
+                               const SDPMediaDescription & mediaDescription,
+                               const SDPSessionDescription & sessionDescription);
 };
 
 #pragma mark -
@@ -276,27 +288,6 @@ BOOL _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat);
 void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, BOOL enableH264LimitedMode);
 
 #pragma mark -
-#pragma mark SDP Functions
-
-unsigned _XMGetMaxH261BitRate();
-PString _XMGetFMTP_H261(unsigned maxBitRate = UINT_MAX, 
-						XMVideoSize videoSize = XMVideoSize_NoVideo,
-						unsigned mpi = 1);
-void _XMParseFMTP_H261(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi);
-
-unsigned _XMGetMaxH263BitRate();
-PString _XMGetFMTP_H263(unsigned maxBitRate = UINT_MAX,
-						XMVideoSize videoSize = XMVideoSize_NoVideo,
-						unsigned mpi = 1);
-void _XMParseFMTP_H263(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi);
-
-unsigned _XMGetMaxH264BitRate();
-PString _XMGetFMTP_H264(unsigned maxBitRate = UINT_MAX,
-						XMVideoSize videoSize = XMVideoSize_NoVideo,
-						unsigned mpi = 1);
-void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize & videoSize, unsigned & mpi);
-
-#pragma mark -
 #pragma mark Macros
 
 #define XM_REGISTER_FORMATS() \
@@ -305,5 +296,6 @@ void _XMParseFMTP_H264(const PString & fmtp, unsigned & maxBitRate, XMVideoSize 
     static H323CapabilityFactory::Worker<XM_H323_H263PLUS_Capability> h263PlusFactory(XM_MEDIA_FORMAT_H263PLUS, true); \
     static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
     SDP_REGISTER_CAPABILITY(XM_SDP_H261_Capability, XM_MEDIA_FORMAT_H261); \
+    SDP_REGISTER_CAPABILITY(XM_SDP_H263_Capability, XM_MEDIA_FORMAT_H263); \
 
 #endif // __XM_MEDIA_FORMATS_H__
