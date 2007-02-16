@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.19 2007/02/16 10:59:18 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.20 2007/02/16 14:12:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -270,6 +270,11 @@ public:
                                const SDPSessionDescription & sessionDescription);
 };
 
+class XM_SDP_H263PLUS_Capability : public XM_SDP_H263_Capability
+{
+    PCLASSINFO(XM_SDP_H263PLUS_Capability, XM_SDP_H263_Capability);
+};
+
 #pragma mark -
 #pragma mark Packetization and Codec Option Functions
 
@@ -297,5 +302,6 @@ void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, BOOL enableH264L
     static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
     SDP_REGISTER_CAPABILITY(XM_SDP_H261_Capability, XM_MEDIA_FORMAT_H261); \
     SDP_REGISTER_CAPABILITY(XM_SDP_H263_Capability, XM_MEDIA_FORMAT_H263); \
+    SDP_REGISTER_CAPABILITY(XM_SDP_H263PLUS_Capability, XM_MEDIA_FORMAT_H263PLUS); \
 
 #endif // __XM_MEDIA_FORMATS_H__

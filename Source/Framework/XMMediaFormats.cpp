@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.26 2007/02/16 10:59:18 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.27 2007/02/16 14:12:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,9 +63,8 @@ const char *_XMMediaFormatName_H264 = "H.264";
 
 const char *_XMMediaFormatEncoding_H261 = "H261";
 const char *_XMMediaFormatEncoding_H263 = "H263";
-//const char *_XMMediaFormatEncoding_H263Plus = "H263-1998";
+const char *_XMMediaFormatEncoding_H263Plus = "H263-1998";
 //const char *_XMMediaFormatEncoding_H264 = "H264";
-const char *_XMMediaFormatEncoding_H263Plus = NULL;
 const char *_XMMediaFormatEncoding_H264 = NULL;
 
 const char * const CanRFC2429Option = "CanRFC2429";
@@ -110,7 +109,7 @@ const OpalVideoFormat & XMGetMediaFormat_H263Plus()
 														XM_MAX_FRAME_WIDTH,
 														XM_MAX_FRAME_HEIGHT,
 														XM_MAX_FRAME_RATE,
-														XM_MAX_H264_BITRATE);
+														XM_MAX_H263_BITRATE);
 	return XMMediaFormat_H263Plus;
 }
 
