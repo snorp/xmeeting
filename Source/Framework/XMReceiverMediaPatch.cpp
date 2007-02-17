@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.31 2007/02/16 14:13:51 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.32 2007/02/17 19:41:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,6 +19,8 @@
 
 #define XM_PACKET_POOL_GRANULARITY 8
 #define XM_FRAME_BUFFER_SIZE 352*288*4
+
+#define XM_RTP_DATA_SIZE 2000
 
 XMReceiverMediaPatch::XMReceiverMediaPatch(OpalMediaStream & src)
 : OpalMediaPatch(src)
@@ -85,7 +87,7 @@ void XMReceiverMediaPatch::Main()
 	unsigned packetIndex = 0;
 	for(unsigned i = 0; i < allocatedPackets; i++)
 	{
-		packets[i] = new XMRTPPacket(source.GetDataSize());
+		packets[i] = new XMRTPPacket(XM_RTP_DATA_SIZE);
 	}
 	
 	// make sure the RTP session does NOT ignore out of order packets
@@ -389,7 +391,7 @@ void XMReceiverMediaPatch::Main()
 						packets = (XMRTPPacket **)realloc(packets, (allocatedPackets + XM_PACKET_POOL_GRANULARITY) * sizeof(XMRTPPacket *));
 					}
 					
-					packets[packetIndex] = new XMRTPPacket(source.GetDataSize());
+					packets[packetIndex] = new XMRTPPacket(XM_RTP_DATA_SIZE);
 					allocatedPackets++;
 				}
 			}
