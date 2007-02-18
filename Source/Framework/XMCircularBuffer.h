@@ -1,5 +1,5 @@
 /*
- * $Id: XMCircularBuffer.h,v 1.3 2007/02/13 11:52:11 hfriederich Exp $
+ * $Id: XMCircularBuffer.h,v 1.4 2007/02/18 19:02:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,11 +28,11 @@
  *
  * This buffer does also offer the chance to *stop* the buffer from being used
  * through calling Stop(). After that, any bytes sent to Fill() will just be
- * ignored and Drain returns 0 bytes constantly. This method also unblocks any
- * thread locked when calling Fill() or Drain(). So, Stop() allows a third
+ * ignored and Drain returns a zero-filled buffer. This method also unblocks any
+ * thread locked when calling Fill() or Drain(). So, Stop() allows a third party
  * to interfere with the buffer behaviour and to remove any deadlocks.
  * The call to Restart() will undo the operation above and *start* the buffer
- * again. However, the buffer is considered empty after Restart()
+ * again. However, the buffer is considered empty after Restart().
  **/
 
 class XMCircularBuffer
@@ -41,23 +41,7 @@ public:
 
 	explicit XMCircularBuffer(PINDEX len);
 	~XMCircularBuffer();
- 
-	/**
-	 * Returns whether the buffer is full/empty or not 
-	 **/
-	BOOL Full();
-	BOOL Empty();
-
-	/**
-	 * Returns the Size (in bytes) for this buffer
-	 **/
-	PINDEX Size();
-	
-	/**
-	 * Returns the number of free bytes for this buffer
-	 **/
-	PINDEX Free();
-
+    
 	/** 
 	 * Fill inserts data into the circular buffer. 
      * Remind that lock and overwrite are mutually exclusive. If you set lock,
@@ -72,9 +56,8 @@ public:
 	/** 
 	 * See also Fill.
 	 * Returns the amount of bytes read from the buffer. If lock is true,
-	 * blocks until all bytes have been obtained. Note that even if lock
-	 * is set, this method may return a number smaller than len if the
-	 * buffer was *stopped* in the meantime
+	 * blocks until all bytes have been obtained. If the buffer is stopped,
+     * all remaining bytes are set to zero.
 	 **/
 	PINDEX Drain(char* outbuf, PINDEX len, BOOL lock = true);
 	
@@ -83,20 +66,46 @@ public:
 	 **/
 	void Stop();
 	void Restart();
+    
+    /**
+     * Returns if the buffer is currently full
+     **/
+    BOOL Full();
+    
+    /**
+     * Returns if the buffer is currently empty
+     **/
+    BOOL Empty();
+    
+    /**
+     * Returns the number of bytes currently in the buffer
+     **/
+    PINDEX Size();
 
  private:
-	inline PINDEX head_next();
-	inline void increment_index(PINDEX &index, PINDEX inc);
-	inline void increment_head(PINDEX inc);    
+    inline BOOL full(PINDEX _head, PINDEX _tail) const;
+    inline BOOL empty(PINDEX _head, PINDEX _tail) const;
+    inline PINDEX size(PINDEX _head, PINDEX _tail) const;
+    inline PINDEX free(PINDEX _head, PINDEX _tail) const;
+    
+	inline void increment_head(PINDEX currentHead, PINDEX inc);    
 	inline void increment_tail(PINDEX inc);
+    
+    inline int mutex_lock();
+    inline int mutex_unlock();
+    inline int cond_wait();
+    inline int cond_signal();
+    inline int cond_broadcast();
 	
-   char* buffer;
-   const PINDEX capacity;
-   PINDEX head, tail;
-   BOOL running;
+    char* buffer;
+    const PINDEX capacity;
+    volatile PINDEX head;
+    volatile PINDEX tail;
+    BOOL running;
+    BOOL error;
 
-   pthread_mutex_t mutex;
-   pthread_cond_t cond;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
 };
 
 #endif // __XM_CIRCULAR_BUFFER_H__
