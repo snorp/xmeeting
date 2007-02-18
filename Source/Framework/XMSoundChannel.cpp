@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.11 2006/11/21 10:42:25 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.12 2007/02/18 19:00:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1007,7 +1007,7 @@ OSStatus XMSoundChannel::StopAudioConversion()
 	{
 		return noErr;
 	}
-	
+
 	if(mCircularBuffer != NULL)
 	{
 		mCircularBuffer->Stop();
@@ -1473,7 +1473,7 @@ OSStatus XMSoundChannel::PlayRenderProc(void *inRefCon,
 	OSStatus err = noErr;
 	XMSoundChannel*This = static_cast<XMSoundChannel *>(inRefCon);
 	
-	if( This->state != running_  || This->mCircularBuffer->Empty() ) {
+	if( This->state != running_) {
 		return noErr;
 	}
 	
