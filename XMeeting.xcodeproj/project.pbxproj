@@ -189,6 +189,7 @@
 		D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639464083E1A0F00F7FD83 /* XMStatisticsModule.m */; };
 		D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */; };
 		D16394C3083E23D600F7FD83 /* CallHistoryModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */; };
+		D168FE220BA56912000202F0 /* zrtp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D168FE210BA56912000202F0 /* zrtp.cxx */; };
 		D170A8440B75DF1F0060A9D1 /* sdpcaps.h in Headers */ = {isa = PBXBuildFile; fileRef = D170A8430B75DF1F0060A9D1 /* sdpcaps.h */; };
 		D170A8530B75E0D90060A9D1 /* sdpcaps.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D170A8520B75E0D90060A9D1 /* sdpcaps.cxx */; };
 		D1887CC50A2713E200C938BB /* h460.h in Headers */ = {isa = PBXBuildFile; fileRef = D1887CC40A2713E200C938BB /* h460.h */; };
@@ -713,6 +714,8 @@
 		D1CEE48F08F90263007E4ABE /* transcoders.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35308F90263007E4ABE /* transcoders.cxx */; };
 		D1CEE49208F90263007E4ABE /* jitter.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35708F90263007E4ABE /* jitter.cxx */; };
 		D1CEE49308F90263007E4ABE /* rtp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35808F90263007E4ABE /* rtp.cxx */; };
+		D1D6F9BE0BA2A57A005CAA26 /* srtp.h in Headers */ = {isa = PBXBuildFile; fileRef = D1D6F9BD0BA2A57A005CAA26 /* srtp.h */; };
+		D1D6F9EE0BA2A85C005CAA26 /* srtp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1D6F9ED0BA2A85C005CAA26 /* srtp.cxx */; };
 		D1E2DA1008F470D700BE224E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D1E2DB8908F4720A00BE224E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DB8808F4720A00BE224E /* QuartzCore.framework */; };
 		D1E314CA0B52AB3700385072 /* speexcodec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1E314860B529FA200385072 /* speexcodec.cxx */; };
@@ -1144,6 +1147,7 @@
 		D16395600841B4E100F7FD83 /* XMCalltoURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCalltoURL.h; path = Source/Framework/XMCalltoURL.h; sourceTree = "<group>"; };
 		D16395610841B4E100F7FD83 /* XMCalltoURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCalltoURL.m; path = Source/Framework/XMCalltoURL.m; sourceTree = "<group>"; };
 		D166CD6407B2312300BC27A6 /* XMVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoView.h; path = Source/Framework/XMVideoView.h; sourceTree = "<group>"; };
+		D168FE210BA56912000202F0 /* zrtp.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = zrtp.cxx; sourceTree = "<group>"; };
 		D170A8430B75DF1F0060A9D1 /* sdpcaps.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sdpcaps.h; sourceTree = "<group>"; };
 		D170A8520B75E0D90060A9D1 /* sdpcaps.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sdpcaps.cxx; sourceTree = "<group>"; };
 		D177D79F07B62C9500BD0172 /* XMCallInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallInfo.h; path = Source/Framework/XMCallInfo.h; sourceTree = "<group>"; };
@@ -1628,6 +1632,8 @@
 		D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMVideoManager.m; path = Source/Framework/XMVideoManager.m; sourceTree = "<group>"; };
 		D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCodecManager.h; path = Source/Framework/XMCodecManager.h; sourceTree = "<group>"; };
 		D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCodecManager.m; path = Source/Framework/XMCodecManager.m; sourceTree = "<group>"; };
+		D1D6F9BD0BA2A57A005CAA26 /* srtp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = srtp.h; sourceTree = "<group>"; };
+		D1D6F9ED0BA2A85C005CAA26 /* srtp.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = srtp.cxx; sourceTree = "<group>"; };
 		D1D9A46C08519C9200445833 /* XMStringConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMStringConstants.m; path = Source/Framework/XMStringConstants.m; sourceTree = "<group>"; };
 		D1D9A7220851DE8F00445833 /* XMStringConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMStringConstants.h; path = Source/Framework/XMStringConstants.h; sourceTree = "<group>"; };
 		D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323EndPoint.h; path = Source/Framework/XMH323EndPoint.h; sourceTree = "<group>"; };
@@ -2779,6 +2785,7 @@
 			children = (
 				D1CEE17E08F9022B007E4ABE /* jitter.h */,
 				D1CEE17F08F9022B007E4ABE /* rtp.h */,
+				D1D6F9BD0BA2A57A005CAA26 /* srtp.h */,
 			);
 			name = rtp;
 			path = ../opal/include/rtp;
@@ -2955,6 +2962,8 @@
 			children = (
 				D1CEE35708F90263007E4ABE /* jitter.cxx */,
 				D1CEE35808F90263007E4ABE /* rtp.cxx */,
+				D1D6F9ED0BA2A85C005CAA26 /* srtp.cxx */,
+				D168FE210BA56912000202F0 /* zrtp.cxx */,
 			);
 			name = rtp;
 			path = ../opal/src/rtp;
@@ -3660,6 +3669,7 @@
 				D1887CC50A2713E200C938BB /* h460.h in Headers */,
 				D1FB20320B56540300E374C0 /* h224mediafmt.h in Headers */,
 				D170A8440B75DF1F0060A9D1 /* sdpcaps.h in Headers */,
+				D1D6F9BE0BA2A57A005CAA26 /* srtp.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4212,6 +4222,8 @@
 				D10FD6A50A7D4B7300935B10 /* smallft.c in Sources */,
 				D1FB205E0B565AC700E374C0 /* h224mediafmt.cxx in Sources */,
 				D170A8530B75E0D90060A9D1 /* sdpcaps.cxx in Sources */,
+				D1D6F9EE0BA2A85C005CAA26 /* srtp.cxx in Sources */,
+				D168FE220BA56912000202F0 /* zrtp.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
