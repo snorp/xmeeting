@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.26 2007/02/13 11:56:08 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.27 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@
 
 #include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
+#include "XMH323EndPoint.h"
+#include "XMSIPEndPoint.h"
 #include "XMConnection.h"
 #include "XMMediaFormats.h"
 #include "XMSoundChannel.h"

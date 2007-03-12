@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.27 2007/02/16 11:03:20 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.28 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -699,6 +699,10 @@ SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 		url = SIPURL(GetDefaultLocalPartyName(), OpalTransportAddress());
 	}
 	return url;
+}
+
+void XMSIPEndPoint::CleanUp()
+{
 }
 
 #pragma mark -

@@ -1,10 +1,12 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.49 2007/02/14 21:55:05 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.50 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
+
+#include <ptlib.h>
 
 #include "XMOpalManager.h"
 
@@ -15,9 +17,10 @@
 #include "XMSoundChannel.h"
 #include "XMReceiverMediaPatch.h"
 #include "XMProcess.h"
+#include "XMEndPoint.h"
 #include "XMConnection.h"
-
-#include <ptlib.h>
+#include "XMH323EndPoint.h"
+#include "XMSIPEndPoint.h"
 
 #define XM_MAX_BANDWIDTH 1100000
 
@@ -93,6 +96,8 @@ XMOpalManager::XMOpalManager()
 
 XMOpalManager::~XMOpalManager()
 {
+    h323EndPointInstance->CleanUp();
+    sipEndPointInstance->CleanUp();
 }
 
 #pragma mark -

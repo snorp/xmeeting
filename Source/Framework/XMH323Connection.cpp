@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.26 2007/02/16 11:02:15 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.27 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
+#include "XMH323EndPoint.h"
 #include "XMH323Channel.h"
 #include "XMBridge.h"
 #include "XMRFC2833Handler.h"
@@ -223,4 +224,22 @@ void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 		}
 		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
 	}	
+}
+
+void XMH323Connection::CleanUp()
+{
+    // The normal timeout for the endSession command is 10s, which is acceptable
+    // in the normal case. However, if the framework is to be closed, we don't
+    // want to wait that long
+    endSessionReceived.Signal();
+}
+
+void XMH323Connection::CleanUpOnCallEnd()
+{
+    // Since CleanUpOnCallEnd() may block for a while, we're storing
+    // a reference to this connection in the end point.
+    XMH323EndPoint * h323EndPoint = XMOpalManager::GetH323EndPoint();
+    h323EndPoint->AddReleasingConnection(this);
+    H323Connection::CleanUpOnCallEnd();
+    h323EndPoint->RemoveReleasingConnection(this);
 }

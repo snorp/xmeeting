@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.12 2007/02/16 11:03:20 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.13 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -127,6 +127,8 @@ public:
 	void RegistrationRefresh(PTimer &timer, INT value);
 	
 	virtual SIPURL GetDefaultRegisteredPartyName();
+    
+    void CleanUp();
 	
 private:
 	BOOL isListening;

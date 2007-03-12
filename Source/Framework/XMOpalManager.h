@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.30 2007/02/14 21:55:05 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.31 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,13 +13,12 @@
 #include <opal/manager.h>
 
 #include "XMTypes.h"
-#include "XMEndPoint.h"
-#include "XMH323EndPoint.h"
-#include "XMSIPEndPoint.h"
 
 #include "XMMediaFormats.h"
 
 class XMEndPoint;
+class XMH323EndPoint;
+class XMSIPEndPoint;
 
 class XMOpalManager : public OpalManager
 {

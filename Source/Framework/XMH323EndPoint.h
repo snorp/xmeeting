@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.15 2007/02/08 08:43:34 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.16 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #include <h323/h323ep.h>
 
 #include "XMTypes.h"
+
+class XMH323Connection;
 
 class XMH323EndPoint : public H323EndPoint
 {
@@ -55,11 +57,19 @@ public:
 	// H.460 support
 	virtual BOOL OnSendFeatureSet(unsigned, H225_FeatureSet &);
     virtual void OnReceiveFeatureSet(unsigned, const H225_FeatureSet &);
+    
+    // Called when the framework is closing
+    void CleanUp();
+    void AddReleasingConnection(XMH323Connection * connection);
+    void RemoveReleasingConnection(XMH323Connection * connection);
 	
 private:
 	BOOL isListening;
 	BOOL didRegisterAtGatekeeper;
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
+    
+    PMutex releasingConnectionsMutex;
+    PList<XMH323Connection> releasingConnections;
 	
 	PString connectionToken;
 };

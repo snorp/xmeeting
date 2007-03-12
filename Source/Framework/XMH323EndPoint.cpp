@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.25 2007/02/14 21:55:05 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.26 2007/03/12 10:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,6 +48,8 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 	/*PString serviceName = "H460_FeatureStd18";
 	PString serviceType = "H460_Feature";
 	PPluginManager::GetPluginManager().RegisterService(serviceName, serviceType, &H460_FeatureStd18_descriptor);*/
+    
+    releasingConnections.DisallowDeleteObjects();
 }
 
 XMH323EndPoint::~XMH323EndPoint()
@@ -292,4 +294,31 @@ BOOL XMH323EndPoint::OnSendFeatureSet(unsigned id, H225_FeatureSet & message)
 void XMH323EndPoint::OnReceiveFeatureSet(unsigned id, const H225_FeatureSet & message)
 {
 	features.ReceiveFeature(id, message);
+}
+
+#pragma mark -
+#pragma mark Clean Up
+
+void XMH323EndPoint::CleanUp()
+{
+    PWaitAndSignal m(releasingConnectionsMutex);
+    
+    for (PINDEX i = 0; i < releasingConnections.GetSize(); i++)
+    {
+        releasingConnections[i].CleanUp();
+    }
+}
+
+void XMH323EndPoint::AddReleasingConnection(XMH323Connection * connection)
+{
+    PWaitAndSignal m(releasingConnectionsMutex);
+    
+    releasingConnections.Append(connection);
+}
+
+void XMH323EndPoint::RemoveReleasingConnection(XMH323Connection * connection)
+{
+    PWaitAndSignal m(releasingConnectionsMutex);
+    
+    releasingConnections.Remove(connection);
 }
