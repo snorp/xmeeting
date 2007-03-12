@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.25 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.26 2007/03/12 13:33:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -495,12 +495,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(bit == 0)
 	{
 		*size = XMVideoSize_QCIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_QCIF);
+		return XMVideoSizeToDimensions(XMVideoSize_QCIF);
 	}
 	else
 	{
 		*size = XMVideoSize_CIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_CIF);
+		return XMVideoSizeToDimensions(XMVideoSize_CIF);
 	}
 }
 
@@ -562,17 +562,17 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(size == 1)
 	{
 		*videoSize = XMVideoSize_SQCIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_SQCIF);
+		return XMVideoSizeToDimensions(XMVideoSize_SQCIF);
 	}
 	else if(size == 2)
 	{
 		*videoSize = XMVideoSize_QCIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_QCIF);
+		return XMVideoSizeToDimensions(XMVideoSize_QCIF);
 	}
 	else if(size == 3)
 	{
 		*videoSize = XMVideoSize_CIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_CIF);
+		return XMVideoSizeToDimensions(XMVideoSize_CIF);
 	}
 	else
 	{
@@ -654,12 +654,12 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(picWidthMinus1 == 21 && picHeightMinus1 == 17)
 	{
 		*size = XMVideoSize_CIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_CIF);
+		return XMVideoSizeToDimensions(XMVideoSize_CIF);
 	}
 	else if(picWidthMinus1 == 10 && picHeightMinus1 == 8)
 	{
 		*size = XMVideoSize_QCIF;
-		return XMGetVideoFrameDimensions(XMVideoSize_QCIF);
+		return XMVideoSizeToDimensions(XMVideoSize_QCIF);
 	}
 	
 	// Return XMVideoSize_Custom and the actual size

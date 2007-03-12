@@ -1,14 +1,15 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.21 2006/11/13 20:27:49 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.22 2007/03/12 13:33:50 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMSequenceGrabberVideoInputModule.h"
 
 #import "XMUtils.h"
+#import "XMDummyVideoInputModule.h"
 
 #define XM_GRAB_WIDTH 352
 #define XM_GRAB_HEIGHT 288
@@ -17,6 +18,9 @@
 #define XM_CALLBACK_NOT_CALLED 1
 #define XM_CALLBACK_CALLED 2
 #define XM_CALLBACK_ERROR_REPORTED 4
+
+#define XM_MAX_CALLBACK_NOT_CALLED 10
+#define XM_MAX_CALLBACK_NEVER_CALLED 100
 
 // Data Proc that is called whenever the SequenceGrabber
 // did grab a frame
@@ -487,6 +491,9 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	[theSaturationNumber release];	
 	[theContrastNumber release];
 	[theSharpnessNumber release];
+    
+    callbackStatus = XM_CALLBACK_NEVER_CALLED;
+    callbackMissCounter = 0;
 	
 	return YES;
 	
@@ -537,7 +544,7 @@ bail:
 
 - (BOOL)setInputFrameSize:(XMVideoSize)videoSize
 {
-	frameSize = XMGetVideoFrameDimensions(videoSize);
+	frameSize = XMVideoSizeToDimensions(videoSize);
 	
 	if(isGrabbing == YES)
 	{
@@ -575,22 +582,38 @@ bail:
 	// process after some time running
 	if(callbackStatus != XM_CALLBACK_NEVER_CALLED)
 	{
-		callbackStatus = XM_CALLBACK_NOT_CALLED;
+		callbackStatus = XM_CALLBACK_NOT_CALLED; // Reset the test condition
 	}
 	err = SGIdle(sequenceGrabber);
-	if(callbackStatus == XM_CALLBACK_NOT_CALLED)
+	if(callbackStatus == XM_CALLBACK_NEVER_CALLED || callbackStatus == XM_CALLBACK_NOT_CALLED)
 	{
-		// incrementing the counter and check for 10 subsequent misses
+		// incrementing the counter and check for XM_MAX_CALLBACK_MISSES subsequent misses
 		callbackMissCounter++;
-		if(callbackMissCounter == 10)
+		if((callbackStatus == XM_CALLBACK_NEVER_CALLED && callbackMissCounter == XM_MAX_CALLBACK_NEVER_CALLED) ||
+           (callbackStatus == XM_CALLBACK_NOT_CALLED && callbackMissCounter == XM_MAX_CALLBACK_NOT_CALLED))
 		{
-			//NSLog(@"Callback not called 10 times, restarting the grabbing process");
 			NSString *device = [selectedDevice retain];
 			[self closeInputDevice];
 			[self _disposeSeqGrabComponent];
 			[self _openAndConfigureSeqGrabComponent];
 			[self openInputDevice:device];
 			[device release];
+            
+            callbackStatus = XM_CALLBACK_NOT_CALLED;
+            callbackMissCounter = 0;
+            
+            // Send a dummy picture to keep the data flowing
+            CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:XMDimensionsToVideoSize(frameSize)];
+            if(dummyPicture != NULL)
+            {
+                [inputManager handleGrabbedFrame:dummyPicture];
+            }
+            else
+            {
+                hintCode = 0x005002;
+                [inputManager handleErrorWithCode:1 hintCode:hintCode];
+                return NO;
+            }
 		}
 	}
 	else if(callbackStatus == XM_CALLBACK_CALLED)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.20 2007/01/06 20:41:17 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.21 2007/03/12 13:33:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -551,7 +551,7 @@ BOOL XMIsIPAddress(NSString *address)
 	return isIPAddress;
 }
 
-NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
+NSSize XMVideoSizeToDimensions(XMVideoSize videoSize)
 {
 	switch (videoSize)
 	{
@@ -568,6 +568,22 @@ NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize)
 		default:
 			return NSMakeSize(0, 0);
 	}
+}
+
+XMVideoSize XMDimensionsToVideoSize(NSSize size)
+{
+    if (size.width == 128 && size.height == 96)
+        return XMVideoSize_SQCIF;
+    if (size.width == 176 && size.height == 144)
+        return XMVideoSize_QCIF;
+    if (size.width == 352 && size.height == 288)
+        return XMVideoSize_CIF;
+    if (size.width == 704 && size.height == 576)
+        return XMVideoSize_4CIF;
+    if (size.width == 1408 && size.height == 1152)
+        return XMVideoSize_16CIF;
+    
+    return XMVideoSize_NoVideo;
 }
 
 float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize)

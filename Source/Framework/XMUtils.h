@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.19 2006/06/07 21:45:52 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.20 2007/03/12 13:33:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -138,7 +138,14 @@ BOOL XMIsIPAddress(NSString *address);
  * Returns an NSSize containing the width and height
  * of the specified video size
  **/
-NSSize XMGetVideoFrameDimensions(XMVideoSize videoSize);
+NSSize XMVideoSizeToDimensions(XMVideoSize videoSize);
+
+/**
+ * Returns the video size corresponding to the size argument.
+ * Returns XMVideoSize_NoVideo in case size does not correspond
+ * to a "valid" video size
+ **/
+XMVideoSize XMDimensionsToVideoSize(NSSize dimensions);
 
 /**
  * calculates the other dimension from the given dimension.

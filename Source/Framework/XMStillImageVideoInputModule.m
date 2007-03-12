@@ -1,13 +1,14 @@
 /*
- * $Id: XMStillImageVideoInputModule.m,v 1.4 2006/10/22 08:53:10 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.m,v 1.5 2007/03/12 13:33:51 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Mark Fleming. All rights reserved.
+ * Copyright (c) 2006-2007 Mark Fleming, Hannes Friederich. All rights reserved.
  */
 
 #import "XMStillImageVideoInputModule.h"
 
+#import "XMDummyVideoInputModule.h"
 
 @interface XMStillImageVideoInputModule (PrivateMethods)
 
@@ -147,8 +148,17 @@
 		XMImageScaleOperation scaleOperation = actualScaleType;
 		if(theImagePath == nil)
 		{
-			theImagePath = [[NSBundle mainBundle] pathForResource:@"DummyImage" ofType:@"gif"];
-			scaleOperation = XMImageScaleOperation_NoScaling;
+            CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:videoSize];
+            if (dummyPicture != NULL)
+            {
+                [inputManager handleGrabbedFrame:dummyPicture];
+                return YES;
+            }
+            else
+            {
+                [inputManager handleErrorWithCode:2 hintCode:1];
+                return NO;
+            }
 		}
 		NSData *data = [[NSData alloc] initWithContentsOfFile:theImagePath];
 		NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
@@ -156,12 +166,17 @@
 		
 		if(bitmapImageRep == nil)
 		{
-			[inputManager handleErrorWithCode:1 hintCode:0];
-			theImagePath = [[NSBundle mainBundle] pathForResource:@"DummyImage" ofType:@"gif"];
-			data = [[NSData alloc] initWithContentsOfFile:theImagePath];
-			bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
-			[data release];
-			scaleOperation = XMImageScaleOperation_NoScaling;
+            CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:videoSize];
+            if (dummyPicture != NULL)
+            {
+                [inputManager handleGrabbedFrame:dummyPicture];
+                return YES;
+            }
+            else
+            {
+                [inputManager handleErrorWithCode:2 hintCode:2];
+                return NO;
+            }
 		}
 		
 		UInt8 *bitmapData = (UInt8 *)[bitmapImageRep bitmapData];
