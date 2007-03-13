@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.54 2007/02/16 10:57:56 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.55 2007/03/13 10:50:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -989,8 +989,6 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
     
     bitrateToUse = [self _adjustVideoBitrateLimit:bitrateToUse forCodec:codecType];
-    
-    NSLog(@"Using bitrate: %d", bitrateToUse);
 	
 	if(videoSize != requiredVideoSize)
 	{
@@ -1270,7 +1268,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	// checking whether frame has correct dimensions
 	unsigned width = CVPixelBufferGetWidth(frame);
 	unsigned height = CVPixelBufferGetHeight(frame);
-	NSSize desiredSize = XMGetVideoFrameDimensions(videoSize);
+	NSSize desiredSize = XMVideoSizeToDimensions(videoSize);
 	
 	if((unsigned)desiredSize.width != width ||
 	   (unsigned)desiredSize.height != height)
@@ -1656,7 +1654,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	{
 		theVideoSize = recordingSize;
 	}
-	NSSize frameDimensions = XMGetVideoFrameDimensions(theVideoSize);
+	NSSize frameDimensions = XMVideoSizeToDimensions(theVideoSize);
 	err = ICMCompressionSessionCreate(NULL, frameDimensions.width, frameDimensions.height, codecTypeToUse,
 									  (TimeScale)90000, sessionOptions, NULL, &encodedFrameOutputRecord,
 									  &compressionSession);
@@ -2369,7 +2367,7 @@ typedef struct XMImageCopyContext
 
 CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize)
 {
-	NSSize size = XMGetVideoFrameDimensions(videoSize);
+	NSSize size = XMVideoSizeToDimensions(videoSize);
 	
 	unsigned width = size.width;
 	unsigned height = size.height;

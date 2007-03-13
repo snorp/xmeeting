@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.10 2007/02/15 11:06:28 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.11 2007/03/13 10:50:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,26 +95,6 @@ void XMMediaStream::OnPatchStart()
             flags = (_XMGetH264PacketizationMode(mediaFormat) << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
         }
         
-        // adjusting the payload type afterwards, now that the packetization scheme has
-        // been determined
-        
-        //FIXME
-        /*OpalTranscoder * transcoder = sinks[0].primaryCodec;
-        if(PIsDescendant(transcoder, XMVideoTranscoder))
-        {
-            XMVideoTranscoder *t = (XMVideoTranscoder *)transcoder;
-            RTP_DataFrame::PayloadMapType map = t->GetPayloadMap();
-            
-            if(map.size() != 0)
-            {
-                RTP_DataFrame::PayloadMapType::iterator r = map.find(mediaFormat.GetPayloadType());
-                if(r != map.end())
-                {
-                    payloadType = r->second;
-                }
-            }
-        }*/
-        
         videoTransmitterStream = this;
         
         dataFrame.SetPayloadSize(0);
@@ -153,7 +133,7 @@ BOOL XMMediaStream::WritePacket(RTP_DataFrame & packet)
 void XMMediaStream::SetTimeStamp(unsigned mediaID, unsigned timeStamp)
 {
     if (videoTransmitterStream == NULL) {
-        FALSE;
+        return;
     }
     
     RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
