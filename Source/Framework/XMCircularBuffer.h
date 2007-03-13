@@ -1,5 +1,5 @@
 /*
- * $Id: XMCircularBuffer.h,v 1.4 2007/02/18 19:02:47 hfriederich Exp $
+ * $Id: XMCircularBuffer.h,v 1.5 2007/03/13 01:15:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,8 +58,14 @@ public:
 	 * Returns the amount of bytes read from the buffer. If lock is true,
 	 * blocks until all bytes have been obtained. If the buffer is stopped,
      * all remaining bytes are set to zero.
-	 **/
-	PINDEX Drain(char* outbuf, PINDEX len, BOOL lock = true);
+     * If maxWaitTime is smaller than UINT_MAX, the buffer will wait at most
+     * maxWaitTime milliseconds for data before the buffer enters a "self-filling"
+     * state which lasts until the next call to Fill(). In the self-filling
+     * state, Drain() always zero-fills the buffer in the desired length.
+     * This is to avoid deadlock-like situations if the source thread does not
+     * fill the buffer over a longer period.
+     **/
+	PINDEX Drain(char* outbuf, PINDEX len, BOOL lock = true, unsigned maxWaitTime = UINT_MAX);
 	
 	/**
 	 * *Starts* / *Stops* the buffer as desired
@@ -81,19 +87,25 @@ public:
      * Returns the number of bytes currently in the buffer
      **/
     PINDEX Size();
+    
+    /**
+     * Sets the data rate (in bytes/s) for this buffer. Needed for the selfFilling state
+     **/
+    void SetDataRate(unsigned _dataRate) { dataRate = _dataRate; }
 
  private:
-    inline BOOL full(PINDEX _head, PINDEX _tail) const;
-    inline BOOL empty(PINDEX _head, PINDEX _tail) const;
-    inline PINDEX size(PINDEX _head, PINDEX _tail) const;
-    inline PINDEX free(PINDEX _head, PINDEX _tail) const;
+    inline BOOL full() const;
+    inline BOOL empty() const;
+    inline PINDEX size() const;
+    inline PINDEX free() const;
     
-	inline void increment_head(PINDEX currentHead, PINDEX inc);    
+	inline void increment_head(PINDEX inc);    
 	inline void increment_tail(PINDEX inc);
     
     inline int mutex_lock();
     inline int mutex_unlock();
     inline int cond_wait();
+    inline int cond_timedwait(unsigned waitTime);
     inline int cond_signal();
     inline int cond_broadcast();
 	
@@ -103,6 +115,11 @@ public:
     volatile PINDEX tail;
     BOOL running;
     BOOL error;
+    BOOL selfFilling;
+    unsigned selfFillingBytesRead;
+    struct timeval selfFillingStartTime;
+    
+    unsigned dataRate;
 
     pthread_mutex_t mutex;
     pthread_cond_t cond;

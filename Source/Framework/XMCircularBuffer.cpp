@@ -1,5 +1,5 @@
 /*
- * $Id: XMCircularBuffer.cpp,v 1.5 2007/02/18 19:02:47 hfriederich Exp $
+ * $Id: XMCircularBuffer.cpp,v 1.6 2007/03/13 01:15:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,6 +51,9 @@ tail(0)
 		error = TRUE;
         running = FALSE;
 	}
+    
+    selfFilling = FALSE;
+    dataRate = 0;
 }
 
 XMCircularBuffer::~XMCircularBuffer()
@@ -79,6 +82,8 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwr
 {
     int done = 0, todo = 0;
     int rval;
+    
+    selfFilling = FALSE; // reset the self-filling condition
 
     if(inbuf== NULL || error == TRUE || len == 0) // no valid buffer specified or an error has occurred
     {
@@ -90,40 +95,35 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwr
         // we discard any samples but return len to act as if we stored all bytes
         return len;
     }
-    
-    // Copy values to local variables
-    PINDEX _head = head;
-    PINDEX _tail = tail;
 
-    while(done != len && !full(_head, _tail)) 
+    while(done != len && !full()) 
     {
-        if(_head >= _tail) 
+        if(head >= tail) 
         {
             // head unwrapped, fill from head till end of buffer
-            if(_tail == 0) /* buffer[capacity] == sentinel */
+            if(tail == 0) /* buffer[capacity] == sentinel */
             {
-                todo = MIN(capacity - 1 /*sentinel*/ - _head, len - done);
+                todo = MIN(capacity - 1 /*sentinel*/ - head, len - done);
             }
             else
             {
-                todo = MIN(capacity - _head, len - done);
+                todo = MIN(capacity - head, len - done);
             }
         } 
         else 
         {
             // fill from head till tail 
-            todo = MIN(_tail - 1 /*sentinel*/ - _head, len - done);
+            todo = MIN(tail - 1 /*sentinel*/ - head, len - done);
         }
-        memcpy(buffer + _head, inbuf + done, todo);
+        memcpy(buffer + head, inbuf + done, todo);
         done += todo;
         
-        increment_head(_head, todo);
-        _head = head;
+        increment_head(todo);
     }
 
     // What to do if buffer is full and more bytes
     // need to be copied ?  
-    if(full(_head, _tail) && done != len && (overwrite || lock)) 
+    if(full() && done != len && (overwrite || lock)) 
     {
         if(lock) 
         {
@@ -134,7 +134,7 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwr
 		   
             // wait until buffer is available. Do the necessary check again before
             // going to sleep
-            while(running == TRUE && full(head, tail))
+            while (running == TRUE && full())
             {
                 rval = cond_wait();
                 if(rval != 0) {
@@ -154,10 +154,14 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwr
         else if(overwrite)
         {
             rval = mutex_lock();
-            if(rval != 0 || running == FALSE) {
+            if(rval != 0) {
+                return done; // error
+            }
+            if(running == FALSE) {
+                mutex_unlock();
                 return done;
             }
-            if(full(head, tail))
+            if(full())
             {
                 tail += len - done; // also shifts sentinel
                 tail %= capacity; // wrap around
@@ -171,7 +175,7 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwr
     }
 
     // wake up read thread if necessary
-    if(!empty(head, tail))
+    if(!empty())
     {
         cond_signal();
     }
@@ -180,12 +184,12 @@ int XMCircularBuffer::Fill(const char *inbuf, PINDEX len, BOOL lock, BOOL overwr
 }
 
 
-PINDEX XMCircularBuffer::Drain(char *outbuf, PINDEX len, BOOL lock) 
+PINDEX XMCircularBuffer::Drain(char *outbuf, PINDEX len, BOOL lock, unsigned maxWaitTime) 
 {
     PINDEX done = 0, todo = 0;
     int rval;
 
-    /* Early abort criteria */
+    // Early abort criteria
 	if(outbuf == NULL || error == TRUE || len == 0) {
         return 0;
     }
@@ -197,13 +201,31 @@ PINDEX XMCircularBuffer::Drain(char *outbuf, PINDEX len, BOOL lock)
         return 0; // Treat as an error
     }
     
-    if (running == FALSE) { // Fill buffer with zeros and return
-        memset(outbuf, 0, len);
+    if (running == FALSE || selfFilling == TRUE) { // Fill buffer with zeros and return
+        bzero(outbuf, len);
         mutex_unlock();
+        
+        if(dataRate != 0)
+        {
+            // Determine how long to sleep.
+            // This is required to obtain the correct target data rate
+            struct timeval currentTime;
+            gettimeofday(&currentTime, NULL);
+            selfFillingBytesRead += len;
+            unsigned millisecondsSinceStart = (unsigned)(float(selfFillingBytesRead) * 1000 /(float)dataRate);
+            unsigned timeElapsed = ((currentTime.tv_sec - selfFillingStartTime.tv_sec) * 1000) +
+                                   ((currentTime.tv_usec - selfFillingStartTime.tv_usec) / 1000);
+            int timeToWait = millisecondsSinceStart - timeElapsed;
+            
+            if (timeToWait > 0) {
+                // Sleep the desired amount
+                usleep(1000 * timeToWait);
+            }
+        }
         return len;
     }
 
-	while(done != len && !empty(head, tail)) 
+	while(done != len && !empty()) 
 	{
 		if(head >= tail) 
 		{
@@ -217,36 +239,53 @@ PINDEX XMCircularBuffer::Drain(char *outbuf, PINDEX len, BOOL lock)
 		}        
 		memcpy(outbuf + done, buffer + tail, todo);
 		done += todo;
-		increment_tail(todo);
+    
+        increment_tail(todo);
 	}
 
 	// what to do if not as many bytes are available as
 	// requested ? If lock is true, we block until more data
 	// is available and then try again
-	if(done != len && (lock)) /* && Empty() */
+	if(done != len && (lock))
 	{
-		if (lock)
-		{
-			while(running == TRUE && !full(head, tail))
-			{
-				rval = cond_wait();
-                if(rval != 0) { // Treat as an error - return
+        if (maxWaitTime == UINT_MAX)
+        {
+            while (running == TRUE && empty())
+            {
+                rval = cond_wait();
+                if (rval != 0) { // Treat as an error - return
                     mutex_unlock();
                     return done;
                 }
-			}
+            }
+        } 
+        else
+        {
+            while (running == TRUE && empty())
+            {
+                rval = cond_timedwait(maxWaitTime);
+                if (rval == ETIMEDOUT) {
+                    selfFilling = TRUE; // Enter self-filling state
+                    selfFillingBytesRead = 0;
+                    gettimeofday(&selfFillingStartTime, NULL);
+                    break;
+                } else if (rval != 0) { // Treat as an error - return
+                    mutex_unlock();
+                    return done;
+                }
+            }
+        }
             
-            mutex_unlock(); // race with write thread
+        mutex_unlock(); // race with write thread
             
-            // The case (running==FALSE) is handled in this
-            // nested call to Drain()
-            done += Drain(outbuf + done, len - done, lock);
-			return done;
-		}
+        // The case (running==FALSE) is handled in this
+        // nested call to Drain()
+        done += Drain(outbuf + done, len - done, lock);
+        return done;
 	}
     
     // It might be that the writing thread is waiting for a non-full buffer
-    BOOL signal = (done != 0 || !full(head, tail));
+    BOOL signal = !full();
 
 	mutex_unlock();
 
@@ -270,6 +309,8 @@ void XMCircularBuffer::Stop()
     mutex_lock();
     needsSignaling = (running == TRUE);
 	running = FALSE;
+    selfFillingBytesRead = 0;
+    gettimeofday(&selfFillingStartTime, NULL);
 	mutex_unlock();
 	
     // Wake up any threads that are waiting on the condition variable.
@@ -307,7 +348,7 @@ BOOL XMCircularBuffer::Full()
     if (rval != 0) {
         return FALSE;
     }
-    BOOL is_full = (running == TRUE && full(head, tail));
+    BOOL is_full = (running == TRUE && full());
     mutex_unlock();
     return is_full;
 }
@@ -318,7 +359,7 @@ BOOL XMCircularBuffer::Empty()
     if (rval != 0) {
         return TRUE;
     }
-    BOOL is_empty = (running == FALSE || empty(head, tail));
+    BOOL is_empty = (running == FALSE || empty());
     mutex_unlock();
     return is_empty;
 }
@@ -329,43 +370,39 @@ PINDEX XMCircularBuffer::Size()
     if (rval != 0) {
         return 0;
     }
-    PINDEX current_size = (running == TRUE) ? size(head, tail) : 0;
+    PINDEX current_size = (running == TRUE) ? size() : 0;
     mutex_unlock();
     return current_size;
 }
 
-inline BOOL XMCircularBuffer::full(PINDEX _head, PINDEX _tail) const
+inline BOOL XMCircularBuffer::full() const
 {
 	/* head + 1 == tail */
-    PINDEX head_next = ((_head + 1) % capacity);
-	return (head_next == _tail);
+    PINDEX head_next = ((head + 1) % capacity);
+	return (head_next == tail);
 }
 
-inline BOOL XMCircularBuffer::empty(PINDEX _head, PINDEX _tail) const
+inline BOOL XMCircularBuffer::empty() const
 {
-	return (_head == _tail);
+	return (head == tail);
 }
 
-inline PINDEX XMCircularBuffer::size(PINDEX _head, PINDEX _tail) const
+inline PINDEX XMCircularBuffer::size() const
 {
 	/* sentinel is outside of occupied area */
-	return (_head < _tail ) ? _head + capacity - _tail : _head - _tail; 
+	return (head < tail ) ? head + capacity - tail : head - tail; 
 }
 
-inline PINDEX XMCircularBuffer::free(PINDEX _head, PINDEX _tail) const
+inline PINDEX XMCircularBuffer::free() const
 {
-    return (capacity - size(_head, _tail) - 1 /*sentinel */);
+    return (capacity - size() - 1 /*sentinel */);
 }
 
 // increments the head
-inline void XMCircularBuffer::increment_head(PINDEX currentHead, PINDEX inc)
+inline void XMCircularBuffer::increment_head(PINDEX inc)
 {
-    // calculate new head index
-    PINDEX newHead = currentHead + inc;
-    newHead %= capacity;
-    
-    // write into member variable
-    head = newHead;
+    head += inc;
+    head %= capacity;
 }     
 
 // increments the tail
@@ -398,6 +435,22 @@ inline int XMCircularBuffer::cond_wait()
     int rval = pthread_cond_wait(&cond, &mutex);
     if (rval != 0) {
         PTRACE(3, "pthread_cond_wait() failed with rval " << rval);
+    }
+    return rval;
+}
+
+inline int XMCircularBuffer::cond_timedwait(unsigned waitTime)
+{
+    struct timeval currentTime;
+    struct timespec wakeupTime;
+    gettimeofday(&currentTime, NULL);
+    
+    wakeupTime.tv_sec = currentTime.tv_sec;
+    wakeupTime.tv_nsec = (currentTime.tv_usec * 1000 ) + (waitTime * 1000 * 1000);
+    
+    int rval = pthread_cond_timedwait(&cond, &mutex, &wakeupTime);
+    if (rval == EINVAL) {
+        PTRACE(3, "pthread_cond_timedwait() failed");
     }
     return rval;
 }

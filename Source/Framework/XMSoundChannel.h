@@ -1,9 +1,9 @@
 /*
- * $Id: XMSoundChannel.h,v 1.7 2006/11/21 10:42:25 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.8 2007/03/13 01:15:49 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Andreas Fenkart, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Andreas Fenkart, Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SOUND_CHANNEL_H__
@@ -193,6 +193,7 @@ private:
 							   UInt32 inNumberFrames,
 							   AudioBufferList *ioData);
 	
+#pragma mark -
 #pragma mark Instance Variables
 	
 	enum State{
@@ -204,6 +205,9 @@ private:
 	};
 	
 	// Instance variables
+    PMutex editMutex;
+    BOOL isInputProxy;
+    
 	Directions direction;
 	State state;
 	BOOL isMuted;
@@ -218,6 +222,9 @@ private:
 	
 	PINDEX bufferSizeBytes;
 	PINDEX bufferCount;
+    
+    unsigned muteBytesRead;
+    struct timeval muteStartTime;
 	
 	/*
 	 * Buffer to hold data that are passed to the converter.
@@ -233,14 +240,9 @@ private:
 	/** Buffers to capture raw data from the microphone */
 	XMCircularBuffer* mInputCircularBuffer;
 	AudioBufferList* mInputBufferList;
-	UInt32 mRecordInputBufferSize;
 	
 	AudioBufferList *mOutputBufferList;
 	UInt32 mRecordOutputBufferSize;
-	
-	BOOL isInputProxy;
-	
-	PMutex editMutex;
 	
 };
 
