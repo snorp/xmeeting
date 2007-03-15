@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.42 2006/11/04 11:32:48 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.43 2007/03/15 22:15:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -284,6 +284,9 @@
 	{
 		doesShowSelfView = YES;
 		[[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
+        
+        [selfView setDrawsBorder:YES];
+        [selfView display];
 		
 		[self _setupVideoDisplay];
 	}
@@ -291,6 +294,7 @@
 	{
 		[selfView stopDisplayingLocalVideo];
 		[selfView stopDisplayingNoVideo];
+        [selfView setDrawsBorder:NO];
 		
 		contentViewSizeWithSelfViewShown = [contentView bounds].size;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.20 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.21 2007/03/15 22:15:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,6 +55,7 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	inputDevices = nil;
 	selectedInputDevice = nil;
 	
+    isDoingVideoDisplay = FALSE;
 	localVideoSize = XMVideoSize_NoVideo;
 	remoteVideoSize = XMVideoSize_NoVideo;
 	remoteVideoDimensions = NSMakeSize(0, 0);
@@ -210,37 +211,9 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	return [_XMMediaTransmitterSharedInstance _videoModuleAtIndex:index];
 }
 
-- (void)startGrabbing
+- (BOOL)isDoingVideoDisplay
 {
-	[XMMediaTransmitter _startGrabbing];
-	
-	if(displayLink == NULL)
-	{
-		CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
-		CVDisplayLinkSetOutputCallback(displayLink, &_XMDisplayLinkCallback, NULL);
-		CVDisplayLinkStart(displayLink);
-	}
-	
-	isGrabbing = YES;
-}
-
-- (void)stopGrabbing
-{
-	[XMMediaTransmitter _stopGrabbing];
-	
-	if(displayLink != NULL)
-	{
-		CVDisplayLinkStop(displayLink);
-		CVDisplayLinkRelease(displayLink);
-		displayLink = NULL;
-	}
-	
-	isGrabbing = NO;
-}
-
-- (BOOL)isGrabbing
-{
-	return isGrabbing;
+	return isDoingVideoDisplay;
 }
 
 - (BOOL)isSendingVideo
@@ -270,24 +243,68 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 - (void)addVideoView:(id<XMVideoView>)videoView
 {
+    BOOL doesStart = NO;
+    
 	[videoLock lock];
+    
+    if ([videoViews count] == 0)
+    {
+        doesStart = YES;
+    }
 	
 	[videoViews addObject:videoView];
-	
+    
 	[videoView renderLocalVideo:localVideoTexture didChange:YES 
 					remoteVideo:remoteVideoTexture didChange:YES
 					   isForced:YES];
 	
 	[videoLock unlock];
+    
+    if (doesStart == YES)
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidStartSelectedInputDeviceChange object:self];
+        
+        [XMMediaTransmitter _startVideoDisplay];
+        
+        if (displayLink == NULL)
+        {
+            CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
+            CVDisplayLinkSetOutputCallback(displayLink, &_XMDisplayLinkCallback, NULL);
+            CVDisplayLinkStart(displayLink);
+        }
+        
+        isDoingVideoDisplay = YES;
+    }
 }
 
 - (void)removeVideoView:(id<XMVideoView>)videoView
 {
+    BOOL doesStop = NO;
+    
 	[videoLock lock];
 	
 	[videoViews removeObject:videoView];
+    
+    if ([videoViews count] == 0)
+    {
+        doesStop = YES;
+    }
 	
 	[videoLock unlock];
+    
+    if (doesStop == YES)
+    {
+        [XMMediaTransmitter _stopVideoDisplay];
+    
+        if(displayLink != NULL)
+        {
+            CVDisplayLinkStop(displayLink);
+            CVDisplayLinkRelease(displayLink);
+            displayLink = NULL;
+        }
+        
+        isDoingVideoDisplay = NO;
+    }
 }
 
 - (NSOpenGLPixelFormat *)openGLPixelFormat
@@ -421,9 +438,12 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 		[selectedInputDevice release];
 		selectedInputDevice = [device retain];
 	}
-	
-	[selectedVideoModule release];
-	selectedVideoModule = [videoModule retain];
+    
+    if (![videoModule isEqual:[NSNull null]])
+    {
+        [selectedVideoModule release];
+        selectedVideoModule = [videoModule retain];
+    }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_VideoManagerDidChangeSelectedInputDevice object:self];
 }

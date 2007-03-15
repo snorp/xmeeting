@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.23 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.24 2007/03/15 22:15:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,11 +24,12 @@
 	id<XMVideoInputModule> activeModule;
 	NSString *selectedDevice;
 	
-	NSTimer *frameGrabTimer;
-	
 	BOOL isGrabbing;
+    NSTimer *frameGrabTimer;
 	unsigned previewFrameGrabRate;
 	unsigned frameGrabRate;
+    
+    BOOL isDoingVideoDisplay;
 	
 	BOOL isTransmitting;
 	unsigned transmitFrameCounter;
@@ -78,8 +79,8 @@
 
 + (void)_setFrameGrabRate:(unsigned)frameGrabRate;
 
-+ (void)_startGrabbing;
-+ (void)_stopGrabbing;
++ (void)_startVideoDisplay;
++ (void)_stopVideoDisplay;
 
 + (void)_startTransmittingForSession:(unsigned)sessionID
 						   withCodec:(XMCodecIdentifier)codecIdentifier

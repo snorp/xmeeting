@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.55 2007/03/13 10:50:05 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.56 2007/03/15 22:15:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,8 +35,8 @@ typedef enum XMMediaTransmitterMessage
 	_XMMediaTransmitterMessage_SetFrameGrabRate,
 	
 	// "action" messages
-	_XMMediaTransmitterMessage_StartGrabbing = 0x0200,
-	_XMMediaTransmitterMessage_StopGrabbing,
+	_XMMediaTransmitterMessage_StartVideoDisplay = 0x0200,
+	_XMMediaTransmitterMessage_StopVideoDisplay,
 	_XMMediaTransmitterMessage_StartTransmitting,
 	_XMMediaTransmitterMessage_StopTransmitting,
 	_XMMediaTransmitterMessage_UpdatePicture,
@@ -70,8 +70,8 @@ typedef enum XMMediaTransmitterMessage
 - (void)_handleGetDeviceListMessage;
 - (void)_handleSetDeviceMessage:(NSArray *)messageComponents;
 - (void)_handleSetFrameGrabRateMessage:(NSArray *)messageComponents;
-- (void)_handleStartGrabbingMessage;
-- (void)_handleStopGrabbingMessage;
+- (void)_handleStartVideoDisplayMessage;
+- (void)_handleStopVideoDisplayMessage;
 - (void)_handleStartTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleStopTransmittingMessage:(NSArray *)messageComponents;
 - (void)_handleUpdatePictureMessage;
@@ -82,11 +82,12 @@ typedef enum XMMediaTransmitterMessage
 
 - (void)_handleSendSettingsToModuleMessage:(NSArray *)messageComponents;
 
-- (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrateLimit forCodec:(CodecType)codecType;
-
+- (void)_updateGrabStatus;
 - (void)_grabFrame:(NSTimer *)timer;
 
 - (void)_updateDeviceListAndSelectDummy;
+
+- (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrateLimit forCodec:(CodecType)codecType;
 
 - (void)_startCompressionSession;
 - (void)_stopCompressionSession;
@@ -140,8 +141,11 @@ void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame);
 void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame, unsigned frameNumber);
 BOOL _XMIsH263IFrame(UInt8* data);
 
+#pragma mark -
+
 @implementation XMMediaTransmitter
 
+#pragma mark -
 #pragma mark Class Methods
 
 + (void)_getDeviceList
@@ -176,14 +180,14 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[components release];
 }
 
-+ (void)_startGrabbing
++ (void)_startVideoDisplay
 {
-	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartGrabbing withComponents:nil];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StartVideoDisplay withComponents:nil];
 }
 
-+ (void)_stopGrabbing
++ (void)_stopVideoDisplay
 {
-	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopGrabbing withComponents:nil];
+	[XMMediaTransmitter _sendMessage:_XMMediaTransmitterMessage_StopVideoDisplay withComponents:nil];
 }
 
 + (void)_startTransmittingForSession:(unsigned)sessionID
@@ -337,6 +341,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[portMessage release];
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -376,12 +381,13 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
 	activeModule = nil;
 	selectedDevice = nil;
-	
-	frameGrabTimer = nil;
-	
+    
 	isGrabbing = NO;
+    frameGrabTimer = nil;
 	previewFrameGrabRate = 30;
 	frameGrabRate = 30;
+    
+    isDoingVideoDisplay = NO;
 	
 	isTransmitting = NO;
 	transmitFrameGrabRate = UINT_MAX;
@@ -438,6 +444,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark MainThread methods
 
 - (NSPort *)_receivePort
@@ -617,6 +624,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	_XMThreadExit();
 }
 
+#pragma mark -
 #pragma mark MediaTransmitterThread methods
 
 - (void)_runMediaTransmitterThread
@@ -698,11 +706,11 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		case _XMMediaTransmitterMessage_SetFrameGrabRate:
 			[self _handleSetFrameGrabRateMessage:[portMessage components]];
 			break;
-		case _XMMediaTransmitterMessage_StartGrabbing:
-			[self _handleStartGrabbingMessage];
+		case _XMMediaTransmitterMessage_StartVideoDisplay:
+			[self _handleStartVideoDisplayMessage];
 			break;
-		case _XMMediaTransmitterMessage_StopGrabbing:
-			[self _handleStopGrabbingMessage];
+		case _XMMediaTransmitterMessage_StopVideoDisplay:
+			[self _handleStopVideoDisplayMessage];
 			break;
 		case _XMMediaTransmitterMessage_StartTransmitting:
 			[self _handleStartTransmittingMessage:[portMessage components]];
@@ -738,7 +746,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 {
 	[self _handleStopTransmittingMessage:nil];
 	[self _handleStopRecordingMessage];
-	[self _handleStopGrabbingMessage];
+	[self _handleStopVideoDisplayMessage];
 	
 	unsigned i;
 	unsigned count = [videoInputModules count];
@@ -862,58 +870,33 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[activeModule setFrameGrabRate:frameGrabRate];
 }
 
-- (void)_handleStartGrabbingMessage
+- (void)_handleStartVideoDisplayMessage
 {
-	if(isGrabbing == YES)
+	if(isDoingVideoDisplay == YES)
 	{
 		return;
 	}
-	
-	BOOL result = [activeModule setInputFrameSize:videoSize];
-	if(result == NO)
-	{
-		activeModule = nil;
-		[self _updateDeviceListAndSelectDummy];
-	}
-	[activeModule setFrameGrabRate:frameGrabRate];
-	
-	result = [activeModule openInputDevice:selectedDevice];
-	if(result == NO)
-	{
-		activeModule = nil;
-		[self _updateDeviceListAndSelectDummy];
-	}
-	
-	isGrabbing = YES;
-	
-	// starting the timer and grabbing the first frame
-	
-	NSTimeInterval desiredTimeInterval = 1.0/frameGrabRate;
-	frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
-													 selector:@selector(_grabFrame:) userInfo:nil
-													  repeats:YES] retain];
-	[self _grabFrame:nil];
+    
+    isDoingVideoDisplay = YES;
+    
+    [self _updateGrabStatus];
+    
+    NSArray *info = [[NSArray alloc] initWithObjects:selectedDevice, [NSNull null], nil];
+    [_XMVideoManagerSharedInstance performSelectorOnMainThread:@selector(_handleInputDeviceChangeComplete:)
+                                                    withObject:info waitUntilDone:NO];
+    [info release];
 }
 
-- (void)_handleStopGrabbingMessage
+- (void)_handleStopVideoDisplayMessage
 {
-	if(isGrabbing == NO)
+	if(isDoingVideoDisplay == NO)
 	{
 		return;
 	}
-	
-	isGrabbing = NO;
-	
-	BOOL result = [activeModule closeInputDevice];
-	
-	if(result == NO)
-	{
-		NSLog(@"Closing the device failed");
-	}
-	
-	[frameGrabTimer invalidate];
-	[frameGrabTimer release];
-	frameGrabTimer = nil;
+    
+    isDoingVideoDisplay = NO;
+    
+    [self _updateGrabStatus];
 }
 
 - (void)_handleStartTransmittingMessage:(NSArray *)components
@@ -1013,8 +996,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
 	isTransmitting = YES;
 	
-	// start grabbing, just to be sure
-	[self _handleStartGrabbingMessage];
+    // Ensure that we're indeed grabbing frames
+	[self _updateGrabStatus];
 	
 	if(useCompressionSessionAPI == YES)
 	{
@@ -1083,6 +1066,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 		useCompressionSessionAPI = YES;
 		[self _startCompressionSession];
 	}
+    
+    [self _updateGrabStatus];
 }
 
 - (void)_handleUpdatePictureMessage
@@ -1198,6 +1183,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
 	
 	isRecording = YES;
+    
+    [self _updateGrabStatus];
 	
 	if(isTransmitting == NO)
 	{
@@ -1216,6 +1203,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	}
 	
 	isRecording = NO;
+    
+    [self _updateGrabStatus];
 	
 	if(isTransmitting == NO)
 	{
@@ -1235,29 +1224,6 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	NSData *settings = (NSData *)[messageComponents objectAtIndex:1];
 	
 	[module applyInternalSettings:settings];
-}
-
-- (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrate forCodec:(CodecType)codec
-{
-	// taking into account packetization overhead
-	bitrate = (bitrate * 0.95);
-	
-	// protection against codec hangups
-	if(bitrate < 80000 && codec == kH261CodecType)
-	{
-		bitrate = 80000;
-	}
-	else if(bitrate < 64000 && codec == kH263CodecType)
-	{
-		bitrate = 64000;
-	}
-	else if(bitrate < 192000 && codec == kH264CodecType)
-	{
-		// H.264 seems not to use the whole bandwidth allowed, so we're increasing
-		// the minimum bandwidth used
-		bitrate = 192000;
-	}
-    return bitrate;
 }
 
 #pragma mark -
@@ -1402,7 +1368,66 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[hintCodeNumber release];
 }
 
+#pragma mark -
 #pragma mark Private Methods
+
+- (void)_updateGrabStatus
+{
+    BOOL needsGrabbing = NO;
+    if (isDoingVideoDisplay == YES || isTransmitting == YES || isRecording == YES)
+    {
+        needsGrabbing = YES;
+    }
+    
+    if (needsGrabbing == isGrabbing)
+    {
+        return;
+    }
+    
+    if (needsGrabbing == YES)
+    {
+        BOOL result = [activeModule setInputFrameSize:videoSize];
+        if(result == NO)
+        {
+            activeModule = nil;
+            [self _updateDeviceListAndSelectDummy];
+        }
+        [activeModule setFrameGrabRate:frameGrabRate];
+        
+        result = [activeModule openInputDevice:selectedDevice];
+        if(result == NO)
+        {
+            activeModule = nil;
+            [self _updateDeviceListAndSelectDummy];
+        }
+        
+        isGrabbing = YES;
+        
+        // starting the timer and grabbing the first frame
+        
+        NSTimeInterval desiredTimeInterval = 1.0/frameGrabRate;
+        frameGrabTimer = [[NSTimer scheduledTimerWithTimeInterval:desiredTimeInterval target:self 
+                                                         selector:@selector(_grabFrame:) userInfo:nil
+                                                          repeats:YES] retain];
+        [self _grabFrame:nil];
+    }
+    else
+    {
+        isGrabbing = NO;
+        
+        BOOL result = [activeModule closeInputDevice];
+        
+        if(result == NO)
+        {
+            NSLog(@"Closing the device failed");
+        }
+        
+        [frameGrabTimer invalidate];
+        [frameGrabTimer release];
+        frameGrabTimer = nil;
+    }
+    
+}
 
 - (void)_grabFrame:(NSTimer *)timer
 {
@@ -1452,6 +1477,29 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[self _handleGetDeviceListMessage];
 	
 	[activeModule openInputDevice:selectedDevice];
+}
+
+- (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrate forCodec:(CodecType)codec
+{
+	// taking into account packetization overhead
+	bitrate = (bitrate * 0.95);
+	
+	// protection against codec hangups
+	if(bitrate < 80000 && codec == kH261CodecType)
+	{
+		bitrate = 80000;
+	}
+	else if(bitrate < 64000 && codec == kH263CodecType)
+	{
+		bitrate = 64000;
+	}
+	else if(bitrate < 192000 && codec == kH264CodecType)
+	{
+		// H.264 seems not to use the whole bandwidth allowed, so we're increasing
+		// the minimum bandwidth used
+		bitrate = 192000;
+	}
+    return bitrate;
 }
 
 - (void)_startCompressionSession
@@ -2165,8 +2213,11 @@ BOOL _XMIsH263IFrame(UInt8* data);
 
 @end
 
+#pragma mark -
+
 @implementation XMVideoInputModuleWrapper
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -2193,6 +2244,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Internal Methods
 
 - (id<XMVideoInputModule>)_videoInputModule
@@ -2237,6 +2289,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	[videoInputModule setDefaultSettingsForDevice:device];
 }
 
+#pragma mark -
 #pragma mark XMVideoModule Methods
 
 - (NSString *)identifier

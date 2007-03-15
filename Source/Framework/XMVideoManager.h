@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.h,v 1.18 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.19 2007/03/15 22:15:57 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,7 +42,7 @@
 	NSString *selectedInputDevice;
 	id<XMVideoModule> selectedVideoModule;
 	
-	BOOL isGrabbing;
+	BOOL isDoingVideoDisplay;
 	XMVideoSize localVideoSize;
 	XMVideoSize remoteVideoSize;
 	NSSize remoteVideoDimensions;
@@ -129,21 +129,10 @@
 - (id<XMVideoModule>)videoModuleAtIndex:(unsigned)index;
 
 /**
- * Starts the grabbing process
+ * Returns whether the video display process is running or not. The display
+ * process does only run when there is at least one video view attached
  **/
-- (void)startGrabbing;
-
-/**
- * Stops the grabbing process. Calling this method
- * will raise an exception if called while a transmission
- * is ongoing
- **/
-- (void)stopGrabbing;
-
-/**
- * Returns whether the grabbing process is running or not
- **/
-- (BOOL)isGrabbing;
+- (BOOL)isDoingVideoDisplay;
 
 /**
  * Returns whether the manager is sending video or not

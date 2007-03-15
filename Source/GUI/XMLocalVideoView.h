@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.h,v 1.3 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMLocalVideoView.h,v 1.4 2007/03/15 22:15:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,9 @@
 	// mirror local video
 	BOOL doMirror;
 	BOOL isLocalVideoMirrored;
+    
+    // Only used when the video displayed is empty
+    BOOL drawsBorder;
 }
 
 /**
@@ -51,6 +54,8 @@
 - (BOOL)doesDisplayLocalVideo;
 - (BOOL)isLocalVideoMirrored;
 - (void)setLocalVideoMirrored:(BOOL)flag;
+- (BOOL)drawsBorder;
+- (void)setDrawsBorder:(BOOL)flag;
 
 - (void)startDisplayingNoVideo;
 - (void)stopDisplayingNoVideo;

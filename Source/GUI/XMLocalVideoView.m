@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.m,v 1.3 2006/03/25 10:41:57 hfriederich Exp $
+ * $Id: XMLocalVideoView.m,v 1.4 2007/03/15 22:15:58 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -75,6 +75,8 @@
 	
 	doMirror = NO;
 	isLocalVideoMirrored = NO;
+    
+    drawsBorder = NO;
 }
 
 - (void)dealloc
@@ -111,6 +113,11 @@
 	else
 	{
 		NSDrawWindowBackground(rect);
+        
+        if (drawsBorder == YES)
+        {
+            NSFrameRect([self bounds]);
+        }
 	}
 }
 
@@ -179,6 +186,16 @@
 	isLocalVideoMirrored = flag;
 	
 	[self _checkNeedsMirroring];
+}
+
+- (BOOL)drawsBorder
+{
+    return drawsBorder;
+}
+
+- (void)setDrawsBorder:(BOOL)flag
+{
+    drawsBorder = flag;
 }
 
 - (void)startDisplayingNoVideo

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.46 2006/10/22 21:31:11 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.47 2007/03/15 22:15:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,7 +46,6 @@
 @interface XMApplicationController (PrivateMethods)
 
 // preferences management
-- (void)_activeLocationDidChange:(NSNotification *)notif;
 - (void)_preferencesDidChange:(NSNotification *)notif;
 
 // Call management
@@ -117,8 +116,6 @@
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	
-	[notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
-							   name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
 	[notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
 							   name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
@@ -329,21 +326,6 @@
 
 #pragma mark -
 #pragma mark Notification Methods
-
-- (void)_activeLocationDidChange:(NSNotification *)notif
-{
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	XMVideoManager *videoManager = [XMVideoManager sharedInstance];
-	
-	if([[preferencesManager activeLocation] enableVideo] == YES)
-	{
-		[videoManager startGrabbing];
-	}
-	else
-	{
-		[videoManager stopGrabbing];
-	}
-}
 
 - (void)_preferencesDidChange:(NSNotification *)notif
 {
@@ -704,6 +686,11 @@
 {
 	activeAlert = [[NSAlert alloc] init];
 	NSString *errorDescription = [[XMVideoManager sharedInstance] errorDescription];
+    
+    if (errorDescription == nil)
+    {
+        errorDescription = @"";
+    }
 	
 	[(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @"")];
 	[(NSAlert *)activeAlert setInformativeText:errorDescription];
@@ -884,9 +871,6 @@
 	// show the main window
 	[[XMMainWindowController sharedInstance] showMainWindow];
 	[[XMMainWindowController sharedInstance] showModule:noCallModule fullScreen:NO];
-	
-	// start grabbing from the video sources if needed
-	[self _activeLocationDidChange:nil];
 	
 	activeAlert = nil;
 	incomingCallSound = nil;

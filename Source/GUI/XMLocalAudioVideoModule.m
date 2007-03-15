@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalAudioVideoModule.m,v 1.27 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.m,v 1.28 2007/03/15 22:15:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -139,7 +139,8 @@ NSString *XMKey_AudioTestDelay = @"XMeeting_AudioTestDelay";
 	frame.size.height = 8;
 	[audioInputLevelIndicator setFrame:frame];
 	[audioInputLevelIndicator setEnabled:NO];
-	
+    
+    [localVideoView setDrawsBorder:YES];
 }
 
 #pragma mark Protocol Methods
