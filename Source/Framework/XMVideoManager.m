@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoManager.m,v 1.21 2007/03/15 22:15:57 hfriederich Exp $
+ * $Id: XMVideoManager.m,v 1.22 2007/03/16 09:32:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -499,6 +499,11 @@ static CVReturn _XMDisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 - (void)_handleErrorDescription:(NSString *)theErrorDescription
 {
+    if(theErrorDescription == nil)
+    {
+        return;
+    }
+    
 	[errorDescription release];
 	errorDescription = [theErrorDescription copy];
 	

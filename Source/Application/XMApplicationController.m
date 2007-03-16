@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.47 2007/03/15 22:15:56 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.48 2007/03/16 09:32:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -684,13 +684,13 @@
 
 - (void)_displayVideoManagerErrorAlert
 {
-	activeAlert = [[NSAlert alloc] init];
-	NSString *errorDescription = [[XMVideoManager sharedInstance] errorDescription];
-    
+    NSString *errorDescription = [[XMVideoManager sharedInstance] errorDescription];
     if (errorDescription == nil)
     {
         errorDescription = @"";
     }
+    
+	activeAlert = [[NSAlert alloc] init];
 	
 	[(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @"")];
 	[(NSAlert *)activeAlert setInformativeText:errorDescription];

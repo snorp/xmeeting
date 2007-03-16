@@ -255,6 +255,7 @@
 "XM_FRAMEWORK_UNKNOWN_DEVICE" = "Unknown Audio Device";
 "XM_FRAMEWORK_SEQ_GRAB_MODULE_NAME" = "Live Camera Module";
 "XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA" = "Could not grab frames from the camera. Is the camera still attached to the computer?\nError: (%d, %x)\tDevice: %@";
+"XM_FRAMEWORK_SEQ_GRAB_CAMERA_BUSY" = "Could not activate the device %@\nThat device is probably used by another application.";
 "XM_FRAMEWORK_SEQ_GRAB_INTERNAL" = "An internal error occured in the Live Camera Module.\nError Codes: (%d, %x)\t Device: %@\nPlease report this problem to hfriederich@users.sourceforge.net";
 "XM_FRAMEWORK_STILL_MODULE_NAME" = "Still Image Module";
 "XM_FRAMEWORK_STILL_MODULE_ERROR" = "Cannot open selected image";

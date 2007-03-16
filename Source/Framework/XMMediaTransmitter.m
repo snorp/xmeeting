@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.56 2007/03/15 22:15:57 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.57 2007/03/16 09:32:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1476,6 +1476,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	// updating the device list
 	[self _handleGetDeviceListMessage];
 	
+    [activeModule setInputFrameSize:videoSize];
+    [activeModule setFrameGrabRate:frameGrabRate];
 	[activeModule openInputDevice:selectedDevice];
 }
 

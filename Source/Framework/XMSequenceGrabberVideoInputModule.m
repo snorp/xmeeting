@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.22 2007/03/12 13:33:50 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.23 2007/03/16 09:32:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -292,6 +292,7 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 		[self performSelectorOnMainThread:@selector(_openAndConfigureChannel) withObject:nil waitUntilDone:YES];
 		if(openAndConfigureChannelErr != noErr)
 		{
+            err = openAndConfigureChannelErr;
 			hintCode = 0x004002;
 			goto bail;
 		}
@@ -312,6 +313,11 @@ static void XMSGProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
 	if(err != noErr)
 	{
 		hintCode = 0x004004;
+        if (err == qErr)
+        {
+            // The device is probably used by another application
+            goto bail;
+        }
 		NSLog(@"XMeeting SequenceGrabber module: SGSetChannelDevice() failed (Error code %d). Still continuing", err);
 	}
 	
@@ -640,11 +646,17 @@ bail:
 {
 	NSString *formatString;
 	
-	if(hintCode == 0x005001)
+	if (hintCode == 0x005001)
 	{
 		formatString = NSLocalizedString(@"XM_FRAMEWORK_SEQ_GRAB_NO_CAMERA", @"");
 	}
-	else
+	else if ((hintCode == 0x004002 && errorCode == couldntGetRequiredComponent) ||
+             (hintCode == 0x004004 && errorCode == qErr))
+    {
+        formatString = NSLocalizedString(@"XM_FRAMEWORK_SEQ_GRAB_CAMERA_BUSY", @"");
+        return [NSString stringWithFormat:formatString, device];
+    }
+    else
 	{
 		formatString = NSLocalizedString(@"XM_FRAMEWORK_SEQ_GRAB_INTERNAL", @"");
 	}
