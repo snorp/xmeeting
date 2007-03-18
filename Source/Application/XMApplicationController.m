@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationController.m,v 1.48 2007/03/16 09:32:47 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.49 2007/03/18 17:14:50 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMApplicationController.h"
@@ -297,7 +297,12 @@
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)flag
 {
-	[[XMMainWindowController sharedInstance] showMainWindow];
+    XMSetupAssistantManager *manager = [XMSetupAssistantManager sharedInstance];
+    
+    if (![manager isWindowLoaded] || ![[manager window] isVisible])
+    {
+        [[XMMainWindowController sharedInstance] showMainWindow];
+    }
 	return YES;
 }
 
