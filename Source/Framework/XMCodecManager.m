@@ -1,18 +1,20 @@
 /*
- * $Id: XMCodecManager.m,v 1.5 2006/10/02 21:22:04 hfriederich Exp $
+ * $Id: XMCodecManager.m,v 1.6 2007/03/19 10:07:27 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCodecManager.h"
 
 #import "XMStringConstants.h"
 #import "XMPrivate.h"
+#import "XMBridge.h"
 
 @implementation XMCodecManager
 
+#pragma mark -
 #pragma mark Class Methods
 
 + (XMCodecManager *)sharedInstance
@@ -20,6 +22,7 @@
 	return _XMCodecManagerSharedInstance;
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation methods
 
 - (id)init
@@ -65,7 +68,12 @@
 		NSDictionary *descDict = (NSDictionary *)[arr objectAtIndex:i];
 		
 		XMCodec *codec = [[XMCodec alloc] _initWithDictionary:descDict];
-		[audioCodecs addObject:codec];
+        
+        if (_XMHasCodecInstalled([codec identifier]))
+        {
+            [audioCodecs addObject:codec];
+        }
+        
 		[codec release];
 	}
 	
@@ -80,7 +88,12 @@
 		NSDictionary *descDict = (NSDictionary *)[arr objectAtIndex:i];
 
 		XMCodec *codec = [[XMCodec alloc] _initWithDictionary:descDict];
-		[videoCodecs addObject:codec];
+        
+        if (_XMHasCodecInstalled([codec identifier]))
+        {
+            [videoCodecs addObject:codec];
+        }
+        
 		[codec release];
 	}
 	
@@ -108,6 +121,7 @@
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Methods for Accessing Codec Descriptors
 
 - (XMCodec *)codecForIdentifier:(XMCodecIdentifier)identifier

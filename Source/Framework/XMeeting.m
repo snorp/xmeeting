@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.14 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.15 2007/03/19 10:07:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,8 +14,10 @@
 #import "XMStringConstants.h"
 
 #define XM_FRAMEWORK_NOT_INITIALIZED 0
-#define XM_FRAMEWORK_INITIALIZED 1
-#define XM_FRAMEWORK_CLOSE_CALLED 2
+#define XM_FRAMEWORK_INITIALIZING 1
+#define XM_FRAMEWORK_INITIALIZED 2
+#define XM_FRAMEWORK_CLOSE_CALLED 3
+
 #define XM_FRAMEWORK_SEPARATE_THREADS 3
 
 #define XM_FRAMEWORK_ALL_THREADS_CLOSED XM_FRAMEWORK_CLOSE_CALLED + XM_FRAMEWORK_SEPARATE_THREADS
@@ -33,24 +35,26 @@ XMCallRecorder *_XMCallRecorderSharedInstance = nil;
 
 void XMInitFramework(NSString *pTracePath)
 {
-	// Set the PWLIBPLUGINDIR environment variable to the plugins directory of XMeeting, or PWLib
+    if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZING ||
+       _XMInitializedStatus == XM_FRAMEWORK_INITIALIZED)
+	{
+		// The Framework is already initialized
+		return;
+	}
+    
+    _XMInitializedStatus = XM_FRAMEWORK_INITIALIZING;
+    
+    // Set the PWLIBPLUGINDIR environment variable to the plugins directory of XMeeting, or PWLib
 	// will search the entire filesystem for pugins before starting up...
 	NSBundle *bundle = [NSBundle bundleForClass:[XMCallManager class]];
 	NSString *pluginsPath = [[bundle resourcePath] stringByAppendingPathComponent:@"Plugins"];
 	const char *string = [pluginsPath cStringUsingEncoding:NSUTF8StringEncoding];
 	setenv("PWLIBPLUGINDIR", string, 1);
 	
-	if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZED)
-	{
-		// The Framework is already initialized
-		return;
-	}
-	
 	// Entering QuickTime
 	EnterMovies();
 	
 	_XMUtilsSharedInstance = [[XMUtils alloc] _init];
-	_XMCodecManagerSharedInstance = [[XMCodecManager alloc] _init];
 	_XMCallManagerSharedInstance = [[XMCallManager alloc] _init];
 	_XMAudioManagerSharedInstance = [[XMAudioManager alloc] _init];
 	_XMVideoManagerSharedInstance = [[XMVideoManager alloc] _init];
@@ -64,8 +68,15 @@ void XMInitFramework(NSString *pTracePath)
 	
 	// starting the MediaTransmitter Thread
 	[NSThread detachNewThreadSelector:@selector(_runMediaTransmitterThread) toTarget:_XMMediaTransmitterSharedInstance withObject:nil];
-	
-	_XMInitializedStatus = XM_FRAMEWORK_INITIALIZED;
+    
+    while (_XMInitializedStatus != XM_FRAMEWORK_INITIALIZED)
+    {
+        usleep(10000);
+    }
+    
+    // This has to be done after the framework has initialized since the list of available codecs
+    // has to be determined
+    _XMCodecManagerSharedInstance = [[XMCodecManager alloc] _init];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_FrameworkDidInitialize object:nil];
 }
@@ -93,6 +104,11 @@ void XMCloseFramework()
 	[_XMMediaTransmitterSharedInstance _close];
 	[_XMMediaReceiverSharedInstance _close];
 	[_XMCallRecorderSharedInstance _close];
+}
+
+void _XMSubsystemInitialized()
+{
+    _XMInitializedStatus = XM_FRAMEWORK_INITIALIZED;
 }
 
 void _XMThreadExit() {

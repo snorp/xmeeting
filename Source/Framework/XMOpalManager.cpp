@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.50 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.51 2007/03/19 10:07:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,6 +26,7 @@
 
 using namespace std;
 
+#pragma mark -
 #pragma mark Init & Deallocation
 
 static XMProcess *theProcess = NULL;
@@ -123,6 +124,7 @@ XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
     return sipEndPointInstance;
 }
 
+#pragma mark -
 #pragma mark Getting / Setting Call Information
 
 void XMOpalManager::GetCallInformation(PString & theRemoteName,
@@ -174,6 +176,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 	}
 }
 
+#pragma mark -
 #pragma mark Getting Call Statistics
 
 void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
@@ -321,6 +324,7 @@ void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
     }
 }
 
+#pragma mark -
 #pragma mark overriding some callbacks
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
@@ -459,6 +463,7 @@ void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, co
     }
 }
 
+#pragma mark -
 #pragma mark General Setup Methods
 
 void XMOpalManager::SetUserName(const PString & username)
@@ -470,6 +475,7 @@ void XMOpalManager::SetUserName(const PString & username)
 	GetSIPEndPoint()->SetDefaultDisplayName(username);
 }
 
+#pragma mark -
 #pragma mark Network Setup Methods
 
 void XMOpalManager::SetNATInformation(const PString & stunServer,

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.37 2007/02/13 11:56:08 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.38 2007/03/19 10:07:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -238,10 +238,8 @@ void _XMLogMessage(const char *message);
 
 #pragma mark MediaFormat Functions
 
-unsigned _XMMaxMediaFormatsPerCodecIdentifier();
+bool _XMHasCodecInstalled(XMCodecIdentifier codecIdentifier);
 const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier);
-const char *_XMMediaFormatForCodecIdentifierWithVideoSize(XMCodecIdentifier codecIdentifier,
-														  XMVideoSize videoSize);
 
 #pragma mark Constants
 

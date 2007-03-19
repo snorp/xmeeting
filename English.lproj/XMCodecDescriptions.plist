@@ -28,6 +28,30 @@
 			<key>XMeeting_Quality</key>
 			<string>Good</string>
 		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>?? kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<true/>
+			<key>XMeeting_Identifier</key>
+			<integer>3</integer>
+			<key>XMeeting_Name</key>
+			<string>Speex</string>
+			<key>XMeeting_Quality</key>
+			<string>??</string>
+		</dict>
+		<dict>
+			<key>XMeeting_Bandwidth</key>
+			<string>?? kbit/s</string>
+			<key>XMeeting_CanDisable</key>
+			<true/>
+			<key>XMeeting_Identifier</key>
+			<integer>4</integer>
+			<key>XMeeting_Name</key>
+			<string>GSM</string>
+			<key>XMeeting_Quality</key>
+			<string>??</string>
+		</dict>
 	</array>
 	<key>XMeeting_VideoCodecs</key>
 	<array>

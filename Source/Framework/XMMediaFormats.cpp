@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.27 2007/02/16 14:12:36 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.28 2007/03/19 10:07:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,8 @@
 
 const char *_XMMediaFormatIdentifier_G711_uLaw = "*g.711-ulaw*";
 const char *_XMMediaFormatIdentifier_G711_ALaw = "*g.711-alaw*";
-const char *_XMMediaFormatIdentifier_Speex = "*speex*";
+const char *_XMMediaFormatIdentifier_Speex = "*Speex*";
+const char *_XMMediaFormatIdentifier_GSM = "*GSM*";
 
 // Video MediaFormats
 
@@ -211,6 +212,18 @@ unsigned _XMGetMaxH264Bitrate()
 #pragma mark -
 #pragma mark XMBridge Functions
 
+bool _XMHasCodecInstalled(XMCodecIdentifier codecIdentifier)
+{
+    const char *formatString = _XMMediaFormatForCodecIdentifier(codecIdentifier);
+    
+    if (formatString == NULL)
+    {
+        return false;
+    }
+    
+    return OpalMediaFormat::GetAllRegisteredMediaFormats().HasFormat(formatString);
+}
+
 const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 {
 	switch(codecIdentifier)
@@ -221,6 +234,8 @@ const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 			return _XMMediaFormatIdentifier_G711_ALaw;
 		case XMCodecIdentifier_Speex:
 			return _XMMediaFormatIdentifier_Speex;
+        case XMCodecIdentifier_GSM:
+            return _XMMediaFormatIdentifier_GSM;
 		case XMCodecIdentifier_H261:
 			return _XMMediaFormatIdentifier_H261;
 		case XMCodecIdentifier_H263:

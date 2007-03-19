@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.38 2007/02/15 09:33:49 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.39 2007/03/19 10:07:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -604,6 +604,9 @@ typedef enum _XMOpalDispatcherMessage
 	// Initiating the OPAL subsystem
 	const char *pathString = [pTracePath cStringUsingEncoding:NSASCIIStringEncoding];
 	_XMInitSubsystem(pathString);
+    
+    // Signaling that the subsystem has initialized
+    _XMSubsystemInitialized();
 	
 	// running the run loop
 	[[NSRunLoop currentRunLoop] run];

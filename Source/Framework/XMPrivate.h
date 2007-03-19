@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.38 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.39 2007/03/19 10:07:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,7 @@ extern XMMediaTransmitter *_XMMediaTransmitterSharedInstance;
 extern XMMediaReceiver *_XMMediaReceiverSharedInstance;
 extern XMCallRecorder *_XMCallRecorderSharedInstance;
 
+void _XMSubsystemInitialized();
 void _XMThreadExit();
 void _XMCheckCloseStatus();
 

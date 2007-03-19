@@ -123,6 +123,23 @@
 		D104D9A20A0E60D6000898F2 /* zoom_out.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D99E0A0E60D6000898F2 /* zoom_out.tif */; };
 		D104D9C10A0E9947000898F2 /* DefaultURL_H323.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9BF0A0E9947000898F2 /* DefaultURL_H323.tif */; };
 		D104D9C20A0E9947000898F2 /* DefaultURL_SIP.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9C00A0E9947000898F2 /* DefaultURL_SIP.tif */; };
+		D10973CB0BADCABB007E8087 /* opalpluginmgr.h in Headers */ = {isa = PBXBuildFile; fileRef = D10973CA0BADCABB007E8087 /* opalpluginmgr.h */; };
+		D10973D00BADCB1E007E8087 /* opalplugin.h in Headers */ = {isa = PBXBuildFile; fileRef = D10973CF0BADCB1E007E8087 /* opalplugin.h */; };
+		D109752A0BAE74D9007E8087 /* gsm06_10_codec.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975290BAE74D9007E8087 /* gsm06_10_codec.c */; };
+		D109753B0BAE7565007E8087 /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = D109752D0BAE7565007E8087 /* add.c */; };
+		D109753C0BAE7565007E8087 /* code.c in Sources */ = {isa = PBXBuildFile; fileRef = D109752E0BAE7565007E8087 /* code.c */; };
+		D109753D0BAE7565007E8087 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = D109752F0BAE7565007E8087 /* decode.c */; };
+		D109753E0BAE7565007E8087 /* gsm_create.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975300BAE7565007E8087 /* gsm_create.c */; };
+		D109753F0BAE7565007E8087 /* gsm_decode.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975310BAE7565007E8087 /* gsm_decode.c */; };
+		D10975400BAE7565007E8087 /* gsm_destroy.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975320BAE7565007E8087 /* gsm_destroy.c */; };
+		D10975410BAE7565007E8087 /* gsm_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975330BAE7565007E8087 /* gsm_encode.c */; };
+		D10975420BAE7565007E8087 /* gsm_lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975340BAE7565007E8087 /* gsm_lpc.c */; };
+		D10975430BAE7565007E8087 /* gsm_option.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975350BAE7565007E8087 /* gsm_option.c */; };
+		D10975440BAE7565007E8087 /* long_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975360BAE7565007E8087 /* long_term.c */; };
+		D10975450BAE7565007E8087 /* preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975370BAE7565007E8087 /* preprocess.c */; };
+		D10975460BAE7565007E8087 /* rpe.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975380BAE7565007E8087 /* rpe.c */; };
+		D10975470BAE7565007E8087 /* short_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975390BAE7565007E8087 /* short_term.c */; };
+		D10975480BAE7565007E8087 /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = D109753A0BAE7565007E8087 /* table.c */; };
 		D10B8E070A512F3400003A33 /* manual.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DFD0A512E7500003A33 /* manual.html */; };
 		D10B8E0A0A512F5D00003A33 /* ab_gatekeeper.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DF80A512E7500003A33 /* ab_gatekeeper.png */; };
 		D10B8E0B0A512F5D00003A33 /* locations.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DF90A512E7500003A33 /* locations.png */; };
@@ -1003,6 +1020,24 @@
 		D104D99E0A0E60D6000898F2 /* zoom_out.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = zoom_out.tif; path = Resources/Images/zoom_out.tif; sourceTree = "<group>"; };
 		D104D9BF0A0E9947000898F2 /* DefaultURL_H323.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL_H323.tif; path = Resources/Images/DefaultURL_H323.tif; sourceTree = "<group>"; };
 		D104D9C00A0E9947000898F2 /* DefaultURL_SIP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DefaultURL_SIP.tif; path = Resources/Images/DefaultURL_SIP.tif; sourceTree = "<group>"; };
+		D10973CA0BADCABB007E8087 /* opalpluginmgr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = opalpluginmgr.h; sourceTree = "<group>"; };
+		D10973CF0BADCB1E007E8087 /* opalplugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = opalplugin.h; sourceTree = "<group>"; };
+		D10975240BAE73F4007E8087 /* gsm_pwplugin.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = gsm_pwplugin.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		D10975290BAE74D9007E8087 /* gsm06_10_codec.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm06_10_codec.c; path = ../opal/plugins/audio/GSM0610/gsm06_10_codec.c; sourceTree = SOURCE_ROOT; };
+		D109752D0BAE7565007E8087 /* add.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = add.c; path = ../opal/plugins/audio/GSM0610/src/add.c; sourceTree = SOURCE_ROOT; };
+		D109752E0BAE7565007E8087 /* code.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = code.c; path = ../opal/plugins/audio/GSM0610/src/code.c; sourceTree = SOURCE_ROOT; };
+		D109752F0BAE7565007E8087 /* decode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = decode.c; path = ../opal/plugins/audio/GSM0610/src/decode.c; sourceTree = SOURCE_ROOT; };
+		D10975300BAE7565007E8087 /* gsm_create.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm_create.c; path = ../opal/plugins/audio/GSM0610/src/gsm_create.c; sourceTree = SOURCE_ROOT; };
+		D10975310BAE7565007E8087 /* gsm_decode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm_decode.c; path = ../opal/plugins/audio/GSM0610/src/gsm_decode.c; sourceTree = SOURCE_ROOT; };
+		D10975320BAE7565007E8087 /* gsm_destroy.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm_destroy.c; path = ../opal/plugins/audio/GSM0610/src/gsm_destroy.c; sourceTree = SOURCE_ROOT; };
+		D10975330BAE7565007E8087 /* gsm_encode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm_encode.c; path = ../opal/plugins/audio/GSM0610/src/gsm_encode.c; sourceTree = SOURCE_ROOT; };
+		D10975340BAE7565007E8087 /* gsm_lpc.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm_lpc.c; path = ../opal/plugins/audio/GSM0610/src/gsm_lpc.c; sourceTree = SOURCE_ROOT; };
+		D10975350BAE7565007E8087 /* gsm_option.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = gsm_option.c; path = ../opal/plugins/audio/GSM0610/src/gsm_option.c; sourceTree = SOURCE_ROOT; };
+		D10975360BAE7565007E8087 /* long_term.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = long_term.c; path = ../opal/plugins/audio/GSM0610/src/long_term.c; sourceTree = SOURCE_ROOT; };
+		D10975370BAE7565007E8087 /* preprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = preprocess.c; path = ../opal/plugins/audio/GSM0610/src/preprocess.c; sourceTree = SOURCE_ROOT; };
+		D10975380BAE7565007E8087 /* rpe.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = rpe.c; path = ../opal/plugins/audio/GSM0610/src/rpe.c; sourceTree = SOURCE_ROOT; };
+		D10975390BAE7565007E8087 /* short_term.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = short_term.c; path = ../opal/plugins/audio/GSM0610/src/short_term.c; sourceTree = SOURCE_ROOT; };
+		D109753A0BAE7565007E8087 /* table.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = table.c; path = ../opal/plugins/audio/GSM0610/src/table.c; sourceTree = SOURCE_ROOT; };
 		D10AFE9407B3771F00BBC8EA /* XMCallManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallManager.h; path = Source/Framework/XMCallManager.h; sourceTree = "<group>"; };
 		D10AFE9507B3771F00BBC8EA /* XMCallManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallManager.m; path = Source/Framework/XMCallManager.m; sourceTree = "<group>"; };
 		D10AFEB207B3781700BBC8EA /* XMUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMUtils.h; path = Source/Framework/XMUtils.h; sourceTree = "<group>"; };
@@ -1849,6 +1884,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D109751E0BAE73F4007E8087 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D1B6057008F8F7740034B47F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1930,6 +1972,7 @@
 				D1CEE10B08F901F0007E4ABE /* opal.dylib */,
 				D1B6057208F8F7740034B47F /* pwlib.dylib */,
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
+				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2147,6 +2190,36 @@
 				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
 			);
 			name = OPAL;
+			sourceTree = "<group>";
+		};
+		D10974CE0BAE73AD007E8087 /* GSM */ = {
+			isa = PBXGroup;
+			children = (
+				D10975290BAE74D9007E8087 /* gsm06_10_codec.c */,
+				D109754B0BAE7589007E8087 /* src */,
+			);
+			name = GSM;
+			sourceTree = "<group>";
+		};
+		D109754B0BAE7589007E8087 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D109752D0BAE7565007E8087 /* add.c */,
+				D109752E0BAE7565007E8087 /* code.c */,
+				D109752F0BAE7565007E8087 /* decode.c */,
+				D10975300BAE7565007E8087 /* gsm_create.c */,
+				D10975310BAE7565007E8087 /* gsm_decode.c */,
+				D10975320BAE7565007E8087 /* gsm_destroy.c */,
+				D10975330BAE7565007E8087 /* gsm_encode.c */,
+				D10975340BAE7565007E8087 /* gsm_lpc.c */,
+				D10975350BAE7565007E8087 /* gsm_option.c */,
+				D10975360BAE7565007E8087 /* long_term.c */,
+				D10975370BAE7565007E8087 /* preprocess.c */,
+				D10975380BAE7565007E8087 /* rpe.c */,
+				D10975390BAE7565007E8087 /* short_term.c */,
+				D109753A0BAE7565007E8087 /* table.c */,
+			);
+			name = src;
 			sourceTree = "<group>";
 		};
 		D10B8DF60A512E7500003A33 /* Manual (English) */ = {
@@ -2683,6 +2756,8 @@
 		D1CEE12808F9022B007E4ABE /* codec */ = {
 			isa = PBXGroup;
 			children = (
+				D10973CF0BADCB1E007E8087 /* opalplugin.h */,
+				D10973CA0BADCABB007E8087 /* opalpluginmgr.h */,
 				D1F49D02097E50790010A324 /* echocancel.h */,
 				D1CEE12A08F9022B007E4ABE /* g711codec.h */,
 				D1CEE13208F9022B007E4ABE /* opalwavfile.h */,
@@ -2973,6 +3048,7 @@
 			isa = PBXGroup;
 			children = (
 				D1E314120B529FA200385072 /* Speex */,
+				D10974CE0BAE73AD007E8087 /* GSM */,
 			);
 			name = "Codec Plugins";
 			sourceTree = "<group>";
@@ -3305,6 +3381,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		D10974F40BAE73F4007E8087 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D19628BD0924B6BF004892D0 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3670,6 +3753,8 @@
 				D1FB20320B56540300E374C0 /* h224mediafmt.h in Headers */,
 				D170A8440B75DF1F0060A9D1 /* sdpcaps.h in Headers */,
 				D1D6F9BE0BA2A57A005CAA26 /* srtp.h in Headers */,
+				D10973CB0BADCABB007E8087 /* opalpluginmgr.h in Headers */,
+				D10973D00BADCB1E007E8087 /* opalplugin.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3708,6 +3793,23 @@
 			productName = XMeeting;
 			productReference = 8D1107320486CEB800E47090 /* XMeeting.app */;
 			productType = "com.apple.product-type.application";
+		};
+		D10974F30BAE73F4007E8087 /* gsm */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D109751F0BAE73F4007E8087 /* Build configuration list for PBXNativeTarget "gsm" */;
+			buildPhases = (
+				D10974F40BAE73F4007E8087 /* Headers */,
+				D10974F50BAE73F4007E8087 /* Sources */,
+				D109751E0BAE73F4007E8087 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = gsm;
+			productName = Speex;
+			productReference = D10975240BAE73F4007E8087 /* gsm_pwplugin.so */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 		D1B6057108F8F7740034B47F /* pwlib */ = {
 			isa = PBXNativeTarget;
@@ -3784,6 +3886,7 @@
 				D1CEE10A08F901F0007E4ABE /* opal */,
 				D1B6057108F8F7740034B47F /* pwlib */,
 				D1E314C10B52AA6900385072 /* speex */,
+				D10974F30BAE73F4007E8087 /* gsm */,
 			);
 		};
 /* End PBXProject section */
@@ -4081,6 +4184,28 @@
 				D18913660B81B21600B32CCD /* XMAudioTester.cpp in Sources */,
 				D18913670B81B21600B32CCD /* XMAudioManager.m in Sources */,
 				D18913690B81B21700B32CCD /* XMAddressResource.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D10974F50BAE73F4007E8087 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D109752A0BAE74D9007E8087 /* gsm06_10_codec.c in Sources */,
+				D109753B0BAE7565007E8087 /* add.c in Sources */,
+				D109753C0BAE7565007E8087 /* code.c in Sources */,
+				D109753D0BAE7565007E8087 /* decode.c in Sources */,
+				D109753E0BAE7565007E8087 /* gsm_create.c in Sources */,
+				D109753F0BAE7565007E8087 /* gsm_decode.c in Sources */,
+				D10975400BAE7565007E8087 /* gsm_destroy.c in Sources */,
+				D10975410BAE7565007E8087 /* gsm_encode.c in Sources */,
+				D10975420BAE7565007E8087 /* gsm_lpc.c in Sources */,
+				D10975430BAE7565007E8087 /* gsm_option.c in Sources */,
+				D10975440BAE7565007E8087 /* long_term.c in Sources */,
+				D10975450BAE7565007E8087 /* preprocess.c in Sources */,
+				D10975460BAE7565007E8087 /* rpe.c in Sources */,
+				D10975470BAE7565007E8087 /* short_term.c in Sources */,
+				D10975480BAE7565007E8087 /* table.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4535,6 +4660,78 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		D10975200BAE73F4007E8087 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../opal/include;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				PREBINDING = NO;
+				PRODUCT_NAME = gsm_pwplugin;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		D10975210BAE73F4007E8087 /* Development_PPC */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = ../opal/include;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				PREBINDING = NO;
+				PRODUCT_NAME = gsm_pwplugin;
+				ZERO_LINK = YES;
+			};
+			name = Development_PPC;
+		};
+		D10975220BAE73F4007E8087 /* DevelopmentRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = ../opal/include;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				PREBINDING = NO;
+				PRODUCT_NAME = gsm_pwplugin;
+				ZERO_LINK = YES;
+			};
+			name = DevelopmentRelease;
+		};
+		D10975230BAE73F4007E8087 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = ../opal/include;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = gsm_pwplugin;
+				SKIP_INSTALL = NO;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
 		D10FD6460A7D449200935B10 /* DevelopmentRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -5244,6 +5441,17 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D109751F0BAE73F4007E8087 /* Build configuration list for PBXNativeTarget "gsm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D10975200BAE73F4007E8087 /* Development */,
+				D10975210BAE73F4007E8087 /* Development_PPC */,
+				D10975220BAE73F4007E8087 /* DevelopmentRelease */,
+				D10975230BAE73F4007E8087 /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
 		D11E93F108589A9200154C02 /* Build configuration list for PBXNativeTarget "XMeeting" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
