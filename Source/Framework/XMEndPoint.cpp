@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.27 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.28 2007/03/21 13:18:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,7 +46,8 @@ XMEndPoint::~XMEndPoint()
 BOOL XMEndPoint::MakeConnection(OpalCall & call,
                                 const PString & remoteParty,
                                 void *userData,
-                                unsigned int options)
+                                unsigned int options,
+                                OpalConnection::StringOptions * stringOptions)
 {
 	PString token = "XMeeting";
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(token);

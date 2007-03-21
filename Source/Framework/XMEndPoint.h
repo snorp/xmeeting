@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.14 2007/02/13 11:56:08 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.15 2007/03/21 13:18:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,7 +43,8 @@ public:
 	virtual BOOL MakeConnection(OpalCall & call,
 								const PString & party,
 								void *userData = NULL,
-								unsigned int options = 0);
+								unsigned int options = 0,
+                                OpalConnection::StringOptions * stringOptions = NULL);
     virtual BOOL OnIncomingConnection(OpalConnection & connection,
                                       unsigned options,
                                       OpalConnection::StringOptions * stringOptions);
