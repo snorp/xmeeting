@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.27 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.28 2007/03/21 13:19:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,8 +37,6 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
 	inBandDTMFHandler = NULL;
-	
-	startT120 = FALSE;
 }
 
 XMH323Connection::~XMH323Connection()

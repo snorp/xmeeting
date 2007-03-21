@@ -4075,7 +4075,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"running configure not needed\";\nelse\necho \"running configure\";\ncd ../opal\n./configure --disable-lid\ncd ../XMeeting\nfi";
+			shellScript = "if [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"running configure not needed\";\nelse\necho \"running configure\";\ncd ../opal\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax\ncd ../XMeeting\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 

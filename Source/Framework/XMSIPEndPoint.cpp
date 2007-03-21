@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.28 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.29 2007/03/21 13:19:37 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,6 +37,7 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	SetUserAgent("XMeeting/0.3.4");
 	
 	SetNATBindingRefreshMethod(EmptyRequest);
+    SetReuseTransports(TRUE);
 }
 
 XMSIPEndPoint::~XMSIPEndPoint()
@@ -472,10 +473,10 @@ SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost
  * multiple INVITE / REGISTER out as these messages cause state changes
  * on the remote side. OPTIONS don't alter state, in contrast.
  **/
-OpalTransport * XMSIPEndPoint::CreateTransport(const OpalTransportAddress & addr, BOOL isLocalAddress)
+OpalTransport * XMSIPEndPoint::CreateTransport(const OpalTransportAddress & addr, const OpalTransport * originalTransport)
 {
 	// create the transport
-	OpalTransport *transport = SIPEndPoint::CreateTransport(addr, isLocalAddress);
+	OpalTransport *transport = SIPEndPoint::CreateTransport(addr, originalTransport);
 	
 	// Sanity check
 	if(transport == NULL)
@@ -600,7 +601,7 @@ void XMSIPEndPoint::OnOptionsTimeout(XMSIPOptions *options)
  * Copy from SIPEndPoint::RegistrationRefresh() but uses sligthly different
  * processing
  */
-void XMSIPEndPoint::RegistrationRefresh(PTimer &timer, INT value)
+/*void XMSIPEndPoint::RegistrationRefresh(PTimer &timer, INT value)
 {
 	SIPTransaction *request = NULL;
 	OpalTransport *infoTransport = NULL;
@@ -670,7 +671,7 @@ void XMSIPEndPoint::RegistrationRefresh(PTimer &timer, INT value)
 	}
 	
 	activeSIPInfo.DeleteObjectsToBeRemoved();
-}
+}*/
 
 SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 {
