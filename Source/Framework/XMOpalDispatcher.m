@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.39 2007/03/19 10:07:27 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.40 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -107,6 +107,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_checkGatekeeperRegistration:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
 
+- (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
 - (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address;
 - (NSString *)_adjustedAddress:(NSString *)address;
 
@@ -721,6 +722,7 @@ typedef enum _XMOpalDispatcherMessage
 		callID = UINT_MAX;
 		return;
 	}
+    
 	// By using the default XMPreferences instance,
 	// we shutdown the subsystem
 	XMPreferences *preferences = [[XMPreferences alloc] init];
@@ -835,76 +837,12 @@ typedef enum _XMOpalDispatcherMessage
 		[self _sendCallStartFailReason:XMCallStartFailReason_AlreadyInCall address:address];
 		return;
 	}
-	
-	if((protocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
-	{
-		// Trying to make a H.323 call but H.323 isn't enabled
-		[self _sendCallStartFailReason:XMCallStartFailReason_H323NotEnabled address:address];
-		return;
-	}
-	if((protocol == XMCallProtocol_H323) && XMIsPhoneNumber(address) && (_XMIsRegisteredAtGatekeeper() == NO))
-	{
-		[self _sendCallStartFailReason:XMCallStartFailReason_GatekeeperRequired address:address];
-		return;
-	}
-	if((protocol == XMCallProtocol_SIP) && (_XMIsSIPEnabled() == NO))
-	{
-		[self _sendCallStartFailReason:XMCallStartFailReason_SIPNotEnabled address:address];
-		return;
-	}
-	if((protocol == XMCallProtocol_SIP) && XMIsPhoneNumber(address) && (_XMIsSIPRegistered() == NO))
-	{
-		[self _sendCallStartFailReason:XMCallStartFailReason_SIPRegistrarRequired address:address];
-		return;
-	}
-	
-	// adjust address if needed
-	NSString *adjustedAddress = [self _adjustedAddress:address];
-	
-	const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
-	callID = _XMInitiateCall(protocol, addressString);
-	
-	if(callID == 0)
-	{
-		// Initiating the call failed
-		[self _sendCallStartFailReason:XMCallStartFailReason_UnknownFailure address:address];
-	}
-	else
-	{
-		XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
-														  protocol:protocol
-														remoteName:nil
-													  remoteNumber:nil
-													 remoteAddress:nil
-												 remoteApplication:nil
-													   callAddress:address
-													  localAddress:nil
-														callStatus:XMCallStatus_Calling];
-		
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiated:)
-													   withObject:callInfo
-													waitUntilDone:nil];
-		
-		[callInfo release];
-	}
+    
+    [self _initiateCallToAddress:address protocol:protocol];
 }
 
 - (void)_handleInitiateSpecificCallMessage:(NSArray *)messageComponents
-{
-	if(callID != 0)
-	{
-		// This probably indicates that an incoming call arrived at exactly the same time than
-		// the user tried to initiate this call. Since the incoming call arrived first,
-		// we cannot call anyone at the moment
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_AlreadyInCall];
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:) 
-													   withObject:number
-													waitUntilDone:NO];
-		[number release];
-		
-		return;
-	}
-	
+{	
 	NSData *addressData = (NSData *)[messageComponents objectAtIndex:0];
 	NSData *protocolData = (NSData *)[messageComponents objectAtIndex:1];
 	NSData *preferencesData = (NSData *)[messageComponents objectAtIndex:2];
@@ -915,53 +853,19 @@ typedef enum _XMOpalDispatcherMessage
 	XMCallProtocol callProtocol = (XMCallProtocol)[number unsignedIntValue];
 	XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
 	NSString *externalAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:externalAddressData];
-	
-	[self _doPreferencesSetup:preferences externalAddress:externalAddress verbose:NO];
-	
-	if((callProtocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
+    
+    if(callID != 0)
 	{
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_H323NotEnabled];
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:)
-													   withObject:number
-													waitUntilDone:NO];
-		[number release];
-		
+		// This probably indicates that an incoming call arrived at exactly the same time than
+		// the user tried to initiate this call. Since the incoming call arrived first,
+		// we cannot call anyone at the moment
+		[self _sendCallStartFailReason:XMCallStartFailReason_AlreadyInCall address:address];
 		return;
 	}
 	
-	// adjust address if needed
-	NSString *adjustedAddress = [self _adjustedAddress:address];
+	[self _doPreferencesSetup:preferences externalAddress:externalAddress verbose:NO];
 	
-	const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
-	callID = _XMInitiateCall(callProtocol, addressString);
-	
-	if(callID == 0)
-	{
-		// Initiating the call failed
-		NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMCallStartFailReason_UnknownFailure];
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiationFailed:)
-													   withObject:number
-													waitUntilDone:NO];
-		[number release];
-	}
-	else
-	{
-		XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
-														  protocol:callProtocol
-														remoteName:nil
-													  remoteNumber:nil
-													 remoteAddress:nil
-												 remoteApplication:nil
-													   callAddress:address
-													  localAddress:nil
-														callStatus:XMCallStatus_Calling];
-		
-		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiated:)
-													   withObject:callInfo
-													waitUntilDone:nil];
-		
-		[callInfo release];
-	}	
+	[self _initiateCallToAddress:address protocol:callProtocol];	
 }
 
 - (void)_handleCallIsAlertingMessage:(NSArray *)messageComponents
@@ -1900,6 +1804,68 @@ typedef enum _XMOpalDispatcherMessage
 
 #pragma mark -
 #pragma mark Private Helper Methods
+
+- (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
+{
+    if((protocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
+	{
+		// Trying to make a H.323 call but H.323 isn't enabled
+		[self _sendCallStartFailReason:XMCallStartFailReason_H323NotEnabled address:address];
+		return;
+	}
+	if((protocol == XMCallProtocol_H323) && XMIsPhoneNumber(address) && (_XMIsRegisteredAtGatekeeper() == NO))
+	{
+		[self _sendCallStartFailReason:XMCallStartFailReason_GatekeeperRequired address:address];
+		return;
+	}
+	if((protocol == XMCallProtocol_SIP) && (_XMIsSIPEnabled() == NO))
+	{
+		[self _sendCallStartFailReason:XMCallStartFailReason_SIPNotEnabled address:address];
+		return;
+	}
+	if((protocol == XMCallProtocol_SIP) && XMIsPhoneNumber(address) && (_XMIsSIPRegistered() == NO))
+	{
+		[self _sendCallStartFailReason:XMCallStartFailReason_SIPRegistrarRequired address:address];
+		return;
+	}
+	
+	// adjust address if needed
+	NSString *adjustedAddress = [self _adjustedAddress:address];
+	
+	const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
+    XMCallEndReason endReason;
+	callID = _XMInitiateCall(protocol, addressString, &endReason);
+	
+	if(callID == 0)
+	{
+        XMCallStartFailReason failReason = XMCallStartFailReason_UnknownFailure;
+        if (endReason == XMCallEndReason_EndedByTransportFail)
+        {
+            failReason = XMCallStartFailReason_TransportFail;
+        }
+        
+		// Initiating the call failed
+		[self _sendCallStartFailReason:failReason address:address];
+	}
+	else
+	{
+		XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
+														  protocol:protocol
+														remoteName:nil
+													  remoteNumber:nil
+													 remoteAddress:nil
+												 remoteApplication:nil
+													   callAddress:address
+													  localAddress:nil
+														callStatus:XMCallStatus_Calling];
+		
+		[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiated:)
+													   withObject:callInfo
+													waitUntilDone:nil];
+		
+		[callInfo release];
+	}
+}
 
 - (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address
 {

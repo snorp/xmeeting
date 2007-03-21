@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.49 2007/03/18 17:14:50 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.50 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -521,8 +521,11 @@
 		case XMCallStartFailReason_AlreadyInCall:
 			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_ALREADY_IN_CALL", @"");
 			break;
+        case XMCallStartFailReason_TransportFail:
+            failReasonText = NSLocalizedString(@"XM_CALL_FAILED_TRANSPORT_FAIL", @"");
+            break;
 		default:
-			failReasonText = NSLocalizedString(@"XM_UNKNOWN_REASON", @"");
+			failReasonText = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), failReason];
 			break;
 	}
 	

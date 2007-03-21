@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.51 2007/03/19 10:07:27 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.52 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,6 +82,8 @@ XMOpalManager::XMOpalManager()
 	remoteNumber = "";
 	remoteAddress = "";
 	remoteApplication = "";
+    
+    callEndReason = NULL;
 	
 	OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
 	SetEchoCancelParams(params);
@@ -122,6 +124,35 @@ XMH323EndPoint * XMOpalManager::GetH323EndPoint()
 XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 {
     return sipEndPointInstance;
+}
+
+#pragma mark -
+#pragma mark Initiating a call
+
+unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol, 
+                                     const char * remoteParty, 
+                                     XMCallEndReason * _callEndReason)
+{
+    PString token;
+    unsigned callID = 0;
+
+    callEndReason = _callEndReason;
+    BOOL returnValue = GetCallEndPoint()->StartCall(protocol, remoteParty, token);
+    callEndReason = NULL;
+    
+    if (returnValue == TRUE)
+    {
+        callID = token.AsUnsigned();
+    }
+    
+    return returnValue;
+}
+
+void XMOpalManager::HandleCallInitiationFailed(XMCallEndReason endReason)
+{
+    if (callEndReason != NULL) {
+        *callEndReason = endReason;
+    }
 }
 
 #pragma mark -
@@ -369,7 +400,9 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 void XMOpalManager::OnClearedCall(OpalCall & call)
 {	
 	unsigned callID = call.GetToken().AsUnsigned();
-	_XMHandleCallCleared(callID, (XMCallEndReason)call.GetCallEndReason());
+    XMCallEndReason endReason = (XMCallEndReason)call.GetCallEndReason();
+
+	_XMHandleCallCleared(callID, endReason);
 	OpalManager::OnClearedCall(call);
 	
 	// reset any packet time information

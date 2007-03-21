@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.19 2007/02/13 12:57:52 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.20 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -80,7 +80,16 @@ BOOL XMConnection::SetUpConnection()
 		}
 		
 		if(!ownerCall.OnSetUp(*this)) {
-			Release(EndedByNoAccept);
+            PSafePtr<OpalConnection> otherConnection = ownerCall.GetOtherPartyConnection(*this);
+            OpalConnection::CallEndReason callEndReason = NumCallEndReasons;
+            if (otherConnection != NULL) {
+                callEndReason = otherConnection->GetCallEndReason();
+            }
+            if (callEndReason == NumCallEndReasons) {
+                callEndReason = EndedByLocalUser;
+            }
+			Release(callEndReason);
+            XMOpalManager::GetManager()->HandleCallInitiationFailed((XMCallEndReason)callEndReason);
 			return FALSE;
 		}
 		

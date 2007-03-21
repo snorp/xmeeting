@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.13 2006/12/03 19:01:22 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.14 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -144,7 +144,7 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
 			failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_REJECTED", @"");
 			break;
 		default:
-			failReasonString = NSLocalizedString(@"XM_UNKNOWN_REASON", @"");
+			failReasonString = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), failReason];
 			break;
 	}
 	
@@ -329,7 +329,7 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
 			break;
 			
 		default:
-			statusCodeString = NSLocalizedString(@"XM_UNKNOWN_REASON", @"");
+			statusCodeString = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), statusCode];
 	}
 	
 	return statusCodeString;

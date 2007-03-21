@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.32 2007/03/19 10:07:27 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.33 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,7 @@ typedef enum XMCallStartFailReason
 	XMCallStartFailReason_GatekeeperRequired,
 	XMCallStartFailReason_SIPNotEnabled,
 	XMCallStartFailReason_SIPRegistrarRequired,
+    XMCallStartFailReason_TransportFail,
 	XMCallStartFailReasonCount
 } XMCallStartFailReason;
 

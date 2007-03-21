@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.38 2007/03/19 10:07:27 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.39 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,6 +51,7 @@ void _XMInitSubsystem(const char *pTracePath);
  **/
 void _XMCloseSubsystem();
 
+#pragma mark -
 #pragma mark General Setup Functions
 
 /**
@@ -64,6 +65,7 @@ void _XMSetUserName(const char *string);
  **/
 const char *_XMGetUserName();
 
+#pragma mark -
 #pragma mark Network setup functions
 
 /**
@@ -94,6 +96,7 @@ void _XMSetPortRanges(unsigned int udpPortMin,
  **/
 void _XMHandleNetworkStatusChange();
 
+#pragma mark -
 #pragma mark Audio Functions
 
 // The underlying system is call-by-reference
@@ -117,12 +120,14 @@ void _XMStopAudio();
 void _XMStartAudioTest(unsigned delay);
 void _XMStopAudioTest();
 
+#pragma mark -
 #pragma mark Video Setup Functions
 
 void _XMSetEnableVideo(bool enableVideo);
 
 void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode);
 
+#pragma mark -
 #pragma mark Codec Functions
 
 /**
@@ -131,6 +136,7 @@ void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode);
 void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount,
 				  const char * const * disabledCodecs, unsigned disabledCodecCount);
 
+#pragma mark -
 #pragma mark H.323 Setup Functions
 
 /**
@@ -166,6 +172,7 @@ bool _XMIsRegisteredAtGatekeeper();
  **/
 void _XMCheckGatekeeperRegistration();
 
+#pragma mark -
 #pragma mark SIP Setup Functions
 
 bool _XMEnableSIPListeners(bool enable);
@@ -185,16 +192,19 @@ void _XMFinishRegistrarSetup();
 
 bool _XMIsSIPRegistered();
 
+#pragma mark -
 #pragma mark Call Management functions
 
- // This function causes the OPAL system to call the specified
- // remote party, using the specified protocol.
- // The return value is the callID for this call, or zero if the call
- // failed. A non-zero return value does not mean that the call was 
- // successful in itself, only that the attempt to call the remote
- // party was successful. The result of the call will then be reported
- // back through callbacks.
-unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty);
+// This function causes the OPAL system to call the specified
+// remote party, using the specified protocol.
+// The return value is the callID for this call, or zero if the call
+// failed. A non-zero return value does not mean that the call was 
+// successful in itself, only that the attempt to call the remote
+// party was successful. The result of the call will then be reported
+// back through callbacks.
+// In case the initiation of the call failed, the reason will be passed
+// back through failReason
+unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, XMCallEndReason *failReason);
 
 // Causes the OPAL system to accept the incoming call
 void _XMAcceptIncomingCall(unsigned callID);
@@ -217,6 +227,7 @@ void _XMGetCallInformation(unsigned callID,
 void _XMGetCallStatistics(unsigned callID,
 						  XMCallStatisticsRecord *callStatistics);
 
+#pragma mark -
 #pragma mark InCall Functions
 
 bool _XMSetUserInputMode(XMUserInputMode userInputMode);
@@ -225,6 +236,7 @@ bool _XMSendUserInputString(unsigned callID, const char *string);
 bool _XMStartCameraEvent(unsigned callID, XMCameraEvent cameraEvent);
 void _XMStopCameraEvent(unsigned callID);
 
+#pragma mark -
 #pragma mark MediaTransmitter Functions
 
 void _XMSetTimeStamp(unsigned sessionID, unsigned timeStamp);
@@ -232,15 +244,18 @@ void _XMAppendData(unsigned sessionID, void *data, unsigned length);
 void _XMSendPacket(unsigned sessionID, bool setMarkerBit);
 void _XMDidStopTransmitting(unsigned sessionID);
 
+#pragma mark -
 #pragma mark Message Logging
 
 void _XMLogMessage(const char *message);
 
+#pragma mark -
 #pragma mark MediaFormat Functions
 
 bool _XMHasCodecInstalled(XMCodecIdentifier codecIdentifier);
 const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier);
 
+#pragma mark -
 #pragma mark Constants
 
 /**

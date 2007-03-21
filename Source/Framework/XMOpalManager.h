@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.31 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.32 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,10 @@ public:
 	static XMH323EndPoint * GetH323EndPoint();
 	static XMSIPEndPoint * GetSIPEndPoint();
 	static XMEndPoint * GetCallEndPoint();
+    
+    /* Initiating a call */
+    unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, XMCallEndReason * callEndReason);
+    void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
 	/* getting/setting call information */
 	void GetCallInformation(PString & remoteName,
@@ -117,6 +121,8 @@ private:
 	PString remoteAddress;
 	PString remoteApplication;
 	XMCallProtocol callProtocol;
+    
+    XMCallEndReason *callEndReason;
 };
 
 #endif // __XM_OPAL_MANAGER_H__

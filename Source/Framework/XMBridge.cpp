@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.44 2007/02/13 11:56:08 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.45 2007/03/21 18:03:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -247,20 +247,9 @@ bool _XMIsSIPRegistered()
 #pragma mark -
 #pragma mark Call Management functions
 
-unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty)
+unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, XMCallEndReason *endReason)
 {	
-	PString token;
-	
-	BOOL returnValue = XMOpalManager::GetCallEndPoint()->StartCall(protocol, remoteParty, token);
-	
-	if(returnValue == TRUE)
-	{
-		return token.AsUnsigned();
-	}
-	else
-	{
-		return 0;
-	}
+    return XMOpalManager::GetManager()->InitiateCall(protocol, remoteParty, endReason);
 }
 
 void _XMAcceptIncomingCall(unsigned callID)
