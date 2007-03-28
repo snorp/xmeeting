@@ -137,7 +137,6 @@
 		D10B91A00A51A10100003A33 /* Audio.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D10B919F0A51A10100003A33 /* Audio.tiff */; };
 		D10BD5470AC1D503004320A8 /* recording.gif in Resources */ = {isa = PBXBuildFile; fileRef = D10BD5460AC1D503004320A8 /* recording.gif */; };
 		D10D49E5093CA220000DD61E /* XMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = D10D49E3093CA220000DD61E /* XMWindow.m */; };
-		D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CEE0E908F90111007E4ABE /* LDAP.framework */; };
 		D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */; };
 		D10E45450AADEC40009EA376 /* XMCallRecorderModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D10E45430AADEC40009EA376 /* XMCallRecorderModule.m */; };
 		D11C5E530A49EC730030633D /* XMIncomingCallAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */; };
@@ -282,12 +281,15 @@
 		D126F5910BB1755F00044885 /* pwavfile.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6077B08F8F86B0034B47F /* pwavfile.cxx */; };
 		D126F5920BB1755F00044885 /* qchannel.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6077F08F8F86B0034B47F /* qchannel.cxx */; };
 		D126F5930BB1755F00044885 /* random.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6078008F8F86B0034B47F /* random.cxx */; };
-		D126F5950BB1764D00044885 /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887E190A27BAF300C938BB /* libsasl2.dylib */; };
 		D12E63AA0999503F004EF9F8 /* XMVideoPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E63A80999503F004EF9F8 /* XMVideoPreferencesModule.m */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13274F008C6F2BB00298F25 /* XMCallInfoView.m */; };
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
+		D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED450BBA382D008B3CBA /* libsasl2.dylib */; };
+		D13AED4B0BBA3854008B3CBA /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4A0BBA3854008B3CBA /* libssl.dylib */; };
+		D13AED4E0BBA38D4008B3CBA /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */; };
+		D13AED510BBA3931008B3CBA /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED500BBA3931008B3CBA /* libresolv.dylib */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
@@ -302,9 +304,6 @@
 		D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */; };
 		D16394C3083E23D600F7FD83 /* CallHistoryModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */; };
 		D1887E770A283DEA00C938BB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1887E750A283DEA00C938BB /* Localizable.strings */; };
-		D18912F50B81B14B00B32CCD /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DDC0A27B1E200C938BB /* libcrypto.dylib */; };
-		D18912F60B81B14B00B32CCD /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887E1B0A27BB1600C938BB /* libresolv.dylib */; };
-		D18912F70B81B14B00B32CCD /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1887DCD0A27AEF300C938BB /* libssl.dylib */; };
 		D18913000B81B1C600B32CCD /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
 		D18913030B81B1C800B32CCD /* XMUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFEB307B3781700BBC8EA /* XMUtils.m */; };
 		D18913060B81B1C900B32CCD /* XMStringConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D9A46C08519C9200445833 /* XMStringConstants.m */; };
@@ -755,6 +754,10 @@
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
 		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		D13AED450BBA382D008B3CBA /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = /usr/lib/libsasl2.dylib; sourceTree = "<absolute>"; };
+		D13AED4A0BBA3854008B3CBA /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
+		D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		D13AED500BBA3931008B3CBA /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
 		D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMOpalPatches.cpp; path = Source/Framework/XMOpalPatches.cpp; sourceTree = "<group>"; };
 		D14587ED09013DD4004A1EDF /* XMCallStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallStatistics.h; path = Source/Framework/XMCallStatistics.h; sourceTree = "<group>"; };
 		D14587EE09013DD4004A1EDF /* XMCallStatistics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallStatistics.m; path = Source/Framework/XMCallStatistics.m; sourceTree = "<group>"; };
@@ -817,13 +820,9 @@
 		D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMDummyVideoInputModule.m; path = Source/Framework/XMDummyVideoInputModule.m; sourceTree = "<group>"; };
 		D1887CC40A2713E200C938BB /* h460.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h460.h; sourceTree = "<group>"; };
 		D1887D620A27A85500C938BB /* pssl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pssl.cxx; sourceTree = "<group>"; };
-		D1887DCD0A27AEF300C938BB /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
-		D1887DDC0A27B1E200C938BB /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		D1887DEB0A27B67B00C938BB /* psasl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = psasl.cxx; sourceTree = "<group>"; };
 		D1887E110A27BA2F00C938BB /* prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = prop.h; path = Source/Framework/prop.h; sourceTree = "<group>"; };
 		D1887E120A27BA2F00C938BB /* sasl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sasl.h; path = Source/Framework/sasl.h; sourceTree = "<group>"; };
-		D1887E190A27BAF300C938BB /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = /usr/lib/libsasl2.dylib; sourceTree = "<absolute>"; };
-		D1887E1B0A27BB1600C938BB /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
 		D1887E760A283DEA00C938BB /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D1897F7C0823EEF2007CD286 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = English; path = English.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
 		D189805108241F11007CD286 /* XMBooleanCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMBooleanCell.h; sourceTree = "<group>"; };
@@ -1130,7 +1129,6 @@
 		D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookModule.m; path = Source/GUI/XMAddressBookModule.m; sourceTree = "<group>"; };
 		D1CE4B68083CDF3900B66B5D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/AddressBook.nib; sourceTree = "<group>"; };
 		D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = /System/Library/Frameworks/AddressBook.framework; sourceTree = "<absolute>"; };
-		D1CEE0E908F90111007E4ABE /* LDAP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDAP.framework; path = /System/Library/Frameworks/LDAP.framework; sourceTree = "<absolute>"; };
 		D1CEE11308F9022B007E4ABE /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		D1CEE11408F9022B007E4ABE /* gcc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = gcc.h; sourceTree = "<group>"; };
 		D1CEE11508F9022B007E4ABE /* h225.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h225.h; sourceTree = "<group>"; };
@@ -1494,14 +1492,13 @@
 				D18913920B81B48200B32CCD /* QuickTime.framework in Frameworks */,
 				D134B910093B79020090271F /* OpenGL.framework in Frameworks */,
 				1A348FF10984E57F0033FA95 /* GLUT.framework in Frameworks */,
-				D10DDC97090999EB0058D3AB /* LDAP.framework in Frameworks */,
 				D19628150924B4C1004892D0 /* Security.framework in Frameworks */,
 				D1C1E316099B8BEA00815263 /* SystemConfiguration.framework in Frameworks */,
 				D120649A09FE56C600179B6C /* Accelerate.framework in Frameworks */,
-				D18912F50B81B14B00B32CCD /* libcrypto.dylib in Frameworks */,
-				D18912F60B81B14B00B32CCD /* libresolv.dylib in Frameworks */,
-				D18912F70B81B14B00B32CCD /* libssl.dylib in Frameworks */,
-				D126F5950BB1764D00044885 /* libsasl2.dylib in Frameworks */,
+				D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */,
+				D13AED4B0BBA3854008B3CBA /* libssl.dylib in Frameworks */,
+				D13AED4E0BBA38D4008B3CBA /* libcrypto.dylib in Frameworks */,
+				D13AED510BBA3931008B3CBA /* libresolv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1539,6 +1536,10 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D13AED450BBA382D008B3CBA /* libsasl2.dylib */,
+				D13AED4A0BBA3854008B3CBA /* libssl.dylib */,
+				D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */,
+				D13AED500BBA3931008B3CBA /* libresolv.dylib */,
 				D1E2DA0F08F470D700BE224E /* Cocoa.framework */,
 				D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */,
 				D19628140924B4C1004892D0 /* Security.framework */,
@@ -1997,7 +1998,6 @@
 			children = (
 				D1B6062B08F8F8200034B47F /* Headers */,
 				D1B6058A08F8F7E30034B47F /* Source */,
-				D1CEE0E808F9009E007E4ABE /* Linked Libraries */,
 			);
 			name = pwlib;
 			sourceTree = "<group>";
@@ -2296,18 +2296,6 @@
 				D1BD61CE0A9104B2007C8E46 /* osd.png */,
 			);
 			path = images;
-			sourceTree = "<group>";
-		};
-		D1CEE0E808F9009E007E4ABE /* Linked Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				D1887E1B0A27BB1600C938BB /* libresolv.dylib */,
-				D1887DCD0A27AEF300C938BB /* libssl.dylib */,
-				D1887DDC0A27B1E200C938BB /* libcrypto.dylib */,
-				D1887E190A27BAF300C938BB /* libsasl2.dylib */,
-				D1CEE0E908F90111007E4ABE /* LDAP.framework */,
-			);
-			name = "Linked Libraries";
 			sourceTree = "<group>";
 		};
 		D1CEE10608F901DB007E4ABE /* opal */ = {
