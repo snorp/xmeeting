@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.20 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.21 2007/03/28 07:25:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -287,6 +287,12 @@ void XMConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 	}
 	
 	OpalConnection::OnPatchMediaStream(isSource, patch);
+}
+
+void XMConnection::OnClosedMediaStream(const OpalMediaStream & stream)
+{
+    OpalConnection::OnClosedMediaStream(stream);
+    XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, stream);
 }
 
 PSoundChannel * XMConnection::CreateSoundChannel(BOOL isSource)

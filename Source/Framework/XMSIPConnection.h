@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.12 2007/02/16 11:03:20 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.13 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,9 +40,8 @@ public:
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
 												BOOL isSource);
 	
-    // Propagate opening / closing of media streams to the Obj-C world
+    // Propagate opening of media streams to the Obj-C world
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
-    virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 		
     // Overridden to circumvent the default Opal bandwidth management
 	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);

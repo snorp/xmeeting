@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.16 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.17 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,7 +42,7 @@ public:
 	virtual void OnRegistrationReject();
 	
 	virtual void OnEstablished(OpalConnection & connection);
-	virtual void OnReleased(OpalConnection & connection);
+    virtual void OnReleased(OpalConnection & connection);
 	
 	virtual H323Connection * CreateConnection(OpalCall & call,
 											  const PString & token,

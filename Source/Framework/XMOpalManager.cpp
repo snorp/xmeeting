@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.52 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.53 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -145,7 +145,7 @@ unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol,
         callID = token.AsUnsigned();
     }
     
-    return returnValue;
+    return callID;
 }
 
 void XMOpalManager::HandleCallInitiationFailed(XMCallEndReason endReason)
@@ -397,47 +397,59 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 	OpalManager::OnEstablishedCall(call);
 }
 
-void XMOpalManager::OnClearedCall(OpalCall & call)
-{	
-	unsigned callID = call.GetToken().AsUnsigned();
-    XMCallEndReason endReason = (XMCallEndReason)call.GetCallEndReason();
-
-	_XMHandleCallCleared(callID, endReason);
-	OpalManager::OnClearedCall(call);
-	
-	// reset any packet time information
-	currentAudioPacketTime = 0;
-}
-
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
-    // XMOpalManager::OnClearedCall() gets only called if the call was actually
-    // established. This callback gets also called if the connection is released
-    // before the call is established.
-	if(!PIsDescendant(&connection, XMConnection))
-	{
-		PIPSocket::Address address(0);
-		OpalTransport *transport = &(connection.GetTransport());
-		if(transport != NULL) {
-			OpalTransportAddress transportAddress = transport->GetLocalAddress();
-			transportAddress.GetIpAddress(address);
-		}
-		
-        unsigned callID = connection.GetCall().GetToken().AsUnsigned();
-		if(address.IsValid())
-		{
-			_XMHandleCallReleased(callID, address.AsString());
-		}
-        else
-        {
-            _XMHandleCallReleased(callID, "");
-        }
-	}
+    unsigned callID = connection.GetCall().GetToken().AsUnsigned();
     
-	OpalManager::OnReleased(connection);
-	
-	// reset any packet time information
-	currentAudioPacketTime = 0;
+    if (PIsDescendant(&connection, XMConnection)) {
+        
+        // If the other connection still exists, determine which local address was used
+        PSafePtr<OpalConnection> otherConnection = connection.GetCall().GetOtherPartyConnection(connection);
+        if (otherConnection != NULL) {
+            OpalTransport *transport = &(otherConnection->GetTransport());
+            if (transport != NULL) {
+                PIPSocket::Address address(0);
+                OpalTransportAddress transportAddress = transport->GetLocalAddress();
+                transportAddress.GetIpAddress(address);
+                if (address.IsValid()) {
+                    _XMHandleLocalAddress(callID, address.AsString());
+                } else {
+                    _XMHandleLocalAddress(callID, "");
+                }
+            }
+        }
+        
+        XMCallEndReason endReason = (XMCallEndReason)connection.GetCallEndReason();
+        
+        OpalManager::OnReleased(connection);
+        
+        // Notifying the obj-c world that the call has ended
+        _XMHandleCallCleared(callID, endReason);
+        currentAudioPacketTime = 0;
+        
+    } else {
+        
+        PSafePtr<OpalConnection> otherConnection = connection.GetCall().GetOtherPartyConnection(connection);
+        
+        // If the XMConnection instance still exists, this connection is released first.
+        // Determine which local address was used, as this cannot be done when the other connection is released,
+        // since then this connection has already been removed
+        if (otherConnection != NULL) {
+            OpalTransport *transport = &(connection.GetTransport());
+            if (transport != NULL) {
+                PIPSocket::Address address(0);
+                OpalTransportAddress transportAddress = transport->GetLocalAddress();
+                transportAddress.GetIpAddress(address);
+                if (address.IsValid()) {
+                    _XMHandleLocalAddress(callID, address.AsString());
+                } else {
+                    _XMHandleLocalAddress(callID, "");
+                }
+            }
+        }
+        
+        OpalManager::OnReleased(connection);
+    }
 }
 
 OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread)

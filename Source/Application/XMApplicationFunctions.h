@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationFunctions.h,v 1.8 2006/06/06 16:38:48 hfriederich Exp $
+ * $Id: XMApplicationFunctions.h,v 1.9 2007/03/28 07:25:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_APPLICATION_FUNCTIONS_H__

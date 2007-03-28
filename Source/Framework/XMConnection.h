@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.10 2007/02/13 11:56:08 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.11 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,6 +45,7 @@ public:
 												BOOL isSource);
     virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
 	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+    virtual void OnClosedMediaStream(const OpalMediaStream & stream);
     PSoundChannel * CreateSoundChannel(BOOL isSource);
 	
 	BOOL SendUserInputString(const PString & value);

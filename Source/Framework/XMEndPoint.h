@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.15 2007/03/21 13:18:17 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.16 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -60,7 +60,6 @@ public:
 	void AcceptIncomingCall();
 	void RejectIncomingCall();
 	
-	virtual void OnReleased(OpalConnection & connection);
 	virtual void OnEstablished(OpalConnection & connection);
 	
 	// InCall Methods

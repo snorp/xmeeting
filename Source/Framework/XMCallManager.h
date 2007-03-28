@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallManager.h,v 1.24 2006/11/02 22:28:54 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.25 2007/03/28 07:25:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_MANAGER_H__

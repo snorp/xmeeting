@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.32 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.33 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -62,7 +62,6 @@ public:
 	
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
-	virtual void OnClearedCall(OpalCall & call);
 	virtual void OnReleased(OpalConnection & connection);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread = TRUE);
     

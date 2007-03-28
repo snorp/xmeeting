@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.28 2007/03/21 13:18:17 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.29 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -207,11 +207,6 @@ void XMEndPoint::RejectIncomingCall()
 		OpalConnection::CallEndReason callEndReason = GetCallRejectionReasonForCallProtocol(callProtocol);
 		connection->ClearCall(callEndReason);
 	}
-}
-
-void XMEndPoint::OnReleased(OpalConnection & connection)
-{
-	OpalEndPoint::OnReleased(connection);
 }
 
 void XMEndPoint::OnEstablished(OpalConnection & connection)

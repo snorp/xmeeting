@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.18 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.19 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,9 +46,8 @@ public:
 	
 	virtual BOOL OnClosingLogicalChannel(H323Channel & channel);
 	
-    // Propagate opening / closing of media streams to the Obj-C world
+    // Propagate opening of media streams to the Obj-C world
 	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
-    virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	
 	// Overridden to circumvent the default Opal bandwidth management
 	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);

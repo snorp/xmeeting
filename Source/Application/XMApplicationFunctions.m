@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.14 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.15 2007/03/28 07:25:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMApplicationFunctions.h"
@@ -82,7 +82,7 @@ NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
 			reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_ABORT", @"");
 			break;
 		case XMCallEndReason_EndedByTransportFail:
-		case XMCallEndReason_EndedByConnectFail:
+        case XMCallEndReason_EndedByConnectFail:
 			reasonString = NSLocalizedString(@"XM_CALL_END_INTERNAL_FAILURE", @"");
 			break;
 		case XMCallEndReason_EndedByGatekeeper:

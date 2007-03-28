@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.20 2007/02/16 11:03:20 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.21 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -110,12 +110,6 @@ BOOL XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
     XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	
 	return TRUE;
-}
-
-void XMSIPConnection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
-{
-    SIPConnection::OnClosedMediaStream(mediaStream);
-    XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, mediaStream);
 }
 
 BOOL XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)

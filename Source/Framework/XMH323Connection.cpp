@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.28 2007/03/21 13:19:37 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.29 2007/03/28 07:25:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,12 +180,6 @@ BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
     XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	
 	return TRUE;
-}
-
-void XMH323Connection::OnClosedMediaStream(const OpalMediaStream & mediaStream)
-{
-    H323Connection::OnClosedMediaStream(mediaStream);
-    XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, mediaStream);
 }
 
 BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)

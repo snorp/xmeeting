@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.31 2007/01/06 20:41:16 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.32 2007/03/28 07:25:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -822,6 +822,12 @@
 	
 	XMCallEndReason reason = (XMCallEndReason)[callEndReason unsignedIntValue];
 	[activeCall _setCallStatus:XMCallStatus_Ended];
+    
+    // Adjust some misleading call end reason values
+    if (reason == XMCallEndReason_EndedByConnectFail && [activeCall protocol] == XMCallProtocol_SIP) {
+        reason = XMCallEndReason_EndedByUnreachable;
+    }
+    
 	[activeCall _setCallEndReason:reason];
 	
 	if(needsSubsystemSetupAfterCallEnd == YES)
