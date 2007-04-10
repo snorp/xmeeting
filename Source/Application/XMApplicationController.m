@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.50 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.51 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -418,7 +418,7 @@
 }
 
 - (void)_frameworkDidClose:(NSNotification *)notif
-{	
+{
 	// Now it's time to terminate the application
 	[NSApp replyToApplicationShouldTerminate:YES];
 }

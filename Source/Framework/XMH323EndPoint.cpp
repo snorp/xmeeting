@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.26 2007/03/12 10:54:40 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.27 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -275,12 +275,7 @@ H323Connection * XMH323EndPoint::CreateConnection(OpalCall & call,
 												  unsigned options,
                                                   OpalConnection::StringOptions * stringOptions)
 {
-	XMH323Connection *conn = new XMH323Connection(call, *this, token, alias, address, options, stringOptions);
-	if(conn != NULL)
-	{
-		OnNewConnection(call, *conn);
-	}
-	return conn;
+	return new XMH323Connection(call, *this, token, alias, address, options, stringOptions);
 }
 
 #pragma mark -

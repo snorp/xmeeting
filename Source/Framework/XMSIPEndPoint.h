@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.14 2007/03/21 13:19:37 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.15 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #include "XMTypes.h"
 
 class XMSIPOptions;
+class XMSIPConnection;
 
 class XMSIPRegistrarRecord : public PObject
 {
@@ -128,7 +129,10 @@ public:
 	
 	virtual SIPURL GetDefaultRegisteredPartyName();
     
+    // Called when framework is closing
     void CleanUp();
+    void AddReleasingConnection(XMSIPConnection * connection);
+    void RemoveReleasingConnection(XMSIPConnection * connection);
 	
 private:
 	BOOL isListening;
@@ -147,6 +151,9 @@ private:
 	PSyncPoint probingSyncPoint;
 	SIPTransactionDict probingOptions;
 	BOOL probingSuccessful;
+    
+    PList<XMSIPConnection> releasingConnections;
+    PMutex releasingConnectionsMutex;
 };
 
 class XMSIPRegisterInfo : public SIPRegisterInfo
@@ -165,7 +172,7 @@ public:
 	~XMSIPRegisterInfo();
 	
 	virtual BOOL CreateTransport(OpalTransportAddress & addr);
-	BOOL WillExpireWithinTimeInterval(PTimeInterval interval);
+	//BOOL WillExpireWithinTimeInterval(PTimeInterval interval);
 };
 
 class XMSIPOptions : public SIPTransaction

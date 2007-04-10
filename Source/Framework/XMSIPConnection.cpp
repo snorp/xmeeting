@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.21 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.22 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
 #include "XMRFC2833Handler.h"
+#include "XMSIPEndPoint.h"
 
 XMSIPConnection::XMSIPConnection(OpalCall & call,
 								 SIPEndPoint & endpoint,
@@ -146,4 +147,22 @@ void XMSIPConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 		}
 		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
 	}
+}
+
+void XMSIPConnection::CleanUp()
+{
+    // Abort all pending transactions
+    PWaitAndSignal m(jobProcessingMutex);
+    for (PINDEX i = transactions.GetSize(); i > 0; i--) {
+        const PString & key = transactions.GetKeyAt(i-1);
+        transactions[key].Abort();
+    }
+}
+
+void XMSIPConnection::OnReleased()
+{
+    XMSIPEndPoint * sipEndPoint = XMOpalManager::GetSIPEndPoint();
+    sipEndPoint->AddReleasingConnection(this);
+    SIPConnection::OnReleased();
+    sipEndPoint->RemoveReleasingConnection(this);
 }

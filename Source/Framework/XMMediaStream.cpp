@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.11 2007/03/13 10:50:05 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.12 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include "XMMediaStream.h"
 #include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
+#include "XMConnection.h"
 
 #include <codec/vidcodec.h>
 #include <opal/patch.h>
@@ -17,9 +18,10 @@
 
 static XMMediaStream *videoTransmitterStream = NULL;
 
-XMMediaStream::XMMediaStream(const OpalMediaFormat & mediaFormat,
-										   BOOL isSource)
-: OpalMediaStream(mediaFormat, isSource),
+XMMediaStream::XMMediaStream(XMConnection & conn,
+                             const OpalMediaFormat & mediaFormat,
+                             BOOL isSource)
+: OpalMediaStream(conn, mediaFormat, isSource),
   dataFrame((isSource ? 3000 : 0))
 {
     hasStarted = FALSE;

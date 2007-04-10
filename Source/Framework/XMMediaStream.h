@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.7 2007/02/15 11:06:28 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.8 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,12 +13,15 @@
 #include <opal/mediastrm.h>
 #include <rtp/rtp.h>
 
+class XMConnection;
+
 class XMMediaStream : public OpalMediaStream
 {
 	PCLASSINFO(XMMediaStream, OpalMediaStream);
 	
 public:
-	XMMediaStream(const OpalMediaFormat & mediaFormat,
+	XMMediaStream(XMConnection & conn,
+                  const OpalMediaFormat & mediaFormat,
                   BOOL isSource);
 	~XMMediaStream();
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.29 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.30 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,7 +49,7 @@ BOOL XMEndPoint::MakeConnection(OpalCall & call,
                                 unsigned int options,
                                 OpalConnection::StringOptions * stringOptions)
 {
-	PString token = "XMeeting";
+	PString token = "XMeeting"; // Only ever one active connection
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(token);
 	if(connection != NULL)
 	{
@@ -57,13 +57,10 @@ BOOL XMEndPoint::MakeConnection(OpalCall & call,
 	}
 	
 	connection = CreateConnection(call, token);
-	if(connection == NULL)
+	if(!AddConnection(connection))
 	{
 		return FALSE;
 	}
-	
-	// only ever one active connection
-	connectionsActive.SetAt(connection->GetToken(), connection);
 	
 	return TRUE;
 }

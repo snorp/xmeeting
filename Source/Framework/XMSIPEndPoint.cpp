@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.29 2007/03/21 13:19:37 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.30 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,7 +37,9 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 	SetUserAgent("XMeeting/0.3.4");
 	
 	SetNATBindingRefreshMethod(EmptyRequest);
-    SetReuseTransports(TRUE);
+    //SetReuseTransports(TRUE);
+    
+    releasingConnections.DisallowDeleteObjects();
 }
 
 XMSIPEndPoint::~XMSIPEndPoint()
@@ -183,14 +185,11 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 		}
 		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
 		{
-			BOOL result = TransmitSIPInfo(SIP_PDU::Method_REGISTER,
-										  record.GetHost(), 
-										  record.GetUsername(),
-										  record.GetAuthorizationUsername(),
-										  record.GetPassword(),
-										  PString::Empty(),
-										  PString::Empty(),
-										  GetRegistrarTimeToLive().GetSeconds());
+            BOOL result = Register(record.GetHost(),
+                                   record.GetUsername(),
+                                   record.GetAuthorizationUsername(),
+                                   record.GetPassword());
+            
 			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
 			{
 				record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
@@ -407,13 +406,7 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 												unsigned int options,
                                                 OpalConnection::StringOptions * stringOptions)
 {
-	XMSIPConnection *conn = new XMSIPConnection(call, *this, token, destination, transport, options, stringOptions);
-	
-	if(conn != NULL)
-	{
-		OnNewConnection(call, *conn);
-	}
-	return conn;
+	return new XMSIPConnection(call, *this, token, destination, transport, options, stringOptions);
 }
 
 BOOL XMSIPEndPoint::AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
@@ -597,82 +590,6 @@ void XMSIPEndPoint::OnOptionsTimeout(XMSIPOptions *options)
 	probingOptionsMutex.Signal();
 }
 
-/*
- * Copy from SIPEndPoint::RegistrationRefresh() but uses sligthly different
- * processing
- */
-/*void XMSIPEndPoint::RegistrationRefresh(PTimer &timer, INT value)
-{
-	SIPTransaction *request = NULL;
-	OpalTransport *infoTransport = NULL;
-	
-	for(PINDEX i=0; i < activeSIPInfo.GetSize(); i++)
-	{
-		PSafePtr<SIPInfo> info = activeSIPInfo.GetAt(i);
-		
-		if(info->GetExpire() == -1) {
-			activeSIPInfo.Remove(info); // Was invalid the last time, delete it
-		}
-		else
-		{
-			// Need to refresh?
-			if(info->GetExpire() > 0 &&
-			   info->IsRegistered() &&
-			   info->GetTransport() != NULL &&
-			   info->GetMethod() != SIP_PDU::Method_MESSAGE)
-			{
-				BOOL refresh = FALSE;
-				if(info->HasExpired())
-				{
-					refresh = TRUE;
-				}
-				else if(info->GetMethod() == SIP_PDU::Method_REGISTER)
-				{
-					PSafePtr<XMSIPRegisterInfo> registerInfo = PSafePtrCast<SIPInfo, XMSIPRegisterInfo>(info);
-					if(registerInfo->WillExpireWithinTimeInterval(PTimeInterval(0, 30)))
-					{
-						refresh = TRUE;
-					}
-				}
-				if(refresh == TRUE)
-				{
-					infoTransport = info->GetTransport(); // Get current transport
-					OpalTransportAddress registrarAddress = infoTransport->GetRemoteAddress();
-					if (info->CreateTransport(registrarAddress))
-					{ 
-						infoTransport = info->GetTransport();
-						info->RemoveTransactions();
-						info->SetExpire(info->GetExpire()*10/9);
-						request = info->CreateTransaction(*infoTransport, FALSE); 
-						
-						if (request->Start()) 
-						{
-							info->AppendTransaction(request);
-						}
-						else 
-						{
-							delete request;
-							PTRACE(1, "SIP\tCould not start REGISTER/SUBSCRIBE for binding refresh");
-							info->SetExpire(-1); // Mark as Invalid
-						}
-					}
-					else 
-					{
-						PTRACE(1, "SIP\tCould not start REGISTER/SUBSCRIBE for binding refresh: Transport creation failed");
-						info->SetExpire(-1); // Mark as Invalid
-					}
-				}
-			}
-			else if (info->HasExpired())
-			{
-				info->SetExpire(-1); // Mark as Invalid
-			}
-		}
-	}
-	
-	activeSIPInfo.DeleteObjectsToBeRemoved();
-}*/
-
 SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 {
 	// If using a proxy, use the proxy user name and domain name
@@ -704,6 +621,28 @@ SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 
 void XMSIPEndPoint::CleanUp()
 {
+    // Clean up all connections
+    {
+        PWaitAndSignal m(releasingConnectionsMutex);
+        for (PINDEX i = 0; i < releasingConnections.GetSize(); i++)
+        {
+            releasingConnections[i].CleanUp();
+        }
+    }
+}
+
+void XMSIPEndPoint::AddReleasingConnection(XMSIPConnection * connection)
+{
+    PWaitAndSignal m(releasingConnectionsMutex);
+    
+    releasingConnections.Append(connection);
+}
+
+void XMSIPEndPoint::RemoveReleasingConnection(XMSIPConnection * connection)
+{
+    PWaitAndSignal m(releasingConnectionsMutex);
+    
+    releasingConnections.Remove(connection);
 }
 
 #pragma mark -
@@ -827,7 +766,7 @@ BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
 	return TRUE;
 }
 
-BOOL XMSIPRegisterInfo::WillExpireWithinTimeInterval(PTimeInterval interval)
+/*BOOL XMSIPRegisterInfo::WillExpireWithinTimeInterval(PTimeInterval interval)
 {	
 	if(registered == FALSE)
 	{
@@ -848,7 +787,7 @@ BOOL XMSIPRegisterInfo::WillExpireWithinTimeInterval(PTimeInterval interval)
 	}
 	
 	return FALSE;
-}
+}*/
 
 #pragma mark -
 #pragma mark XMSIPOptions methods

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.13 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.14 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,6 +51,9 @@ public:
     // Overridden to being able to send in-band DTMF
 	virtual BOOL SendUserInputTone(char tone, unsigned duration);
     virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+    
+    void CleanUp();
+    virtual void OnReleased();
 	
 private:
 	

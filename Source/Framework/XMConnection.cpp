@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.21 2007/03/28 07:25:17 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.22 2007/04/10 19:04:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -229,13 +229,13 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 {
 	if(mediaFormat.GetMediaType() == OpalDefaultVideoMediaType)
 	{
-		return new XMMediaStream(mediaFormat, isSource);
+		return new XMMediaStream(*this, mediaFormat, isSource);
 	}
 	
 	if(mediaFormat == OpalH224)
 	{
 		OpalH224Handler *h224Handler = GetH224Handler();
-		return new OpalH224MediaStream(*h224Handler, mediaFormat, isSource);
+		return new OpalH224MediaStream(*this, *h224Handler, mediaFormat, isSource);
 	}
 	
 	// if not audio, use the default handling
@@ -250,7 +250,7 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 	{
 		return NULL;
 	}
-	return new OpalAudioMediaStream(mediaFormat, isSource, 2, soundChannel);
+	return new OpalAudioMediaStream(*this, mediaFormat, isSource, 2, soundChannel);
 }
 
 BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
