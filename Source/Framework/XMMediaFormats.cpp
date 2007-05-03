@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.28 2007/03/19 10:07:27 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.29 2007/05/03 10:40:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -150,8 +150,8 @@ XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat)
 
 XMVideoSize _XMGetMediaFormatSize(const OpalMediaFormat & mediaFormat)
 {
-	unsigned width = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption);
-	unsigned height = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameHeightOption);
+	unsigned width = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption());
+	unsigned height = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameHeightOption());
 	
 	if(width == XM_CIF_WIDTH && height == XM_CIF_HEIGHT)
 	{
@@ -345,9 +345,9 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	if (h261.HasOptionalField(H245_H261VideoCapability::e_qcifMPI))
 	{
 		qcifMPI = h261.m_qcifMPI;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_QCIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_QCIF_HEIGHT);
+		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
 	}
 	else
 	{
@@ -356,9 +356,9 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	if (h261.HasOptionalField(H245_H261VideoCapability::e_cifMPI)) {
 		cifMPI = h261.m_cifMPI;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
 	}
 	else
 	{
@@ -366,7 +366,7 @@ BOOL XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	}
 	
     maxBitRate = std::min(maxBitRate, (unsigned)h261.m_maxBitRate);
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
 
 	return TRUE;
 }
@@ -421,7 +421,7 @@ void XM_H323_H261_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
     cifMPI = 0;
     
     XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
     
     if(videoSize >= XMVideoSize_QCIF) {
@@ -431,7 +431,7 @@ void XM_H323_H261_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
         cifMPI = mpi;
     }
     
-    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
     
     SetPayloadType(mediaFormat.GetPayloadType());
 }
@@ -680,16 +680,16 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	{
 		sqcifMPI = h263.m_sqcifMPI;
 		slowSqcifMPI = 0;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*sqcifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*sqcifMPI/2997);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), 128);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::SQCIFHeight);
 	}
 	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowSqcifMPI))
 	{
 		sqcifMPI = 0;
 		slowSqcifMPI = h263.m_slowSqcifMPI;
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, 128);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::SQCIFHeight);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), 128);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::SQCIFHeight);
 	}
 	else
 	{
@@ -700,16 +700,16 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	{
 		qcifMPI = h263.m_qcifMPI;
 		slowQcifMPI = 0;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), PVideoDevice::QCIFWidth);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::QCIFHeight);
 	}
 	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowQcifMPI))
 	{
 		qcifMPI = 0;
 		slowQcifMPI = h263.m_slowQcifMPI;
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::QCIFWidth);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::QCIFHeight);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), PVideoDevice::QCIFWidth);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::QCIFHeight);
 	}
 	else
 	{
@@ -719,16 +719,16 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	if(h263.HasOptionalField(H245_H263VideoCapability::e_cifMPI))
 	{
 		cifMPI = h263.m_cifMPI;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), PVideoDevice::CIFWidth);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::CIFHeight);
 	}
 	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowCifMPI))
 	{
 		cifMPI = 0;
 		slowCifMPI = h263.m_slowCifMPI;
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIFWidth);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIFHeight);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), PVideoDevice::CIFWidth);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::CIFHeight);
 	}
 	else
 	{
@@ -778,7 +778,7 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	maxBitRate = std::min(maxBitRate, (unsigned)h263.m_maxBitRate);
 
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
 	
 	return TRUE;
 }
@@ -1010,7 +1010,7 @@ void XM_H323_H263_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
     slowCif16MPI = 0;
     
     XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
     
     if(videoSize >= XMVideoSize_SQCIF) {
@@ -1029,7 +1029,7 @@ void XM_H323_H263_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
         cif16MPI = mpi;
     }
     
-    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
     
     SetPayloadType(mediaFormat.GetPayloadType());
 }
@@ -1264,9 +1264,9 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		}
 	}
 	
-	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, width);
-	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, height);
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, maxBitRate*100);
+	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), width);
+	mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), height);
+	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
 
 	return TRUE;
 }
@@ -1387,7 +1387,7 @@ PObject::Comparison XM_H323_H264_Capability::CompareTo(const XMH323VideoCapabili
 
 void XM_H323_H264_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
 {
-    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
     
     h264LimitedMode = _XMGetEnableH264LimitedMode(mediaFormat);
     
@@ -1451,9 +1451,9 @@ BOOL XM_SDP_H261_Capability::OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const
     // Produces an RFC 4587 compliant FMTP string
     // In addition to that, also an MaxBR option is included to signal maximum bandwidth
     
-    unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
     XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
 	
 	if(videoSize >= XMVideoSize_CIF)
@@ -1508,22 +1508,22 @@ BOOL XM_SDP_H261_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
 	
     if(cifMPI != 0) 
     {
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
     else if(qcifMPI != 0)
     {
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_QCIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_QCIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
     }
     else
     {
         // Assuming 30fps CIF
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
     
     if(bitrate == 0)
@@ -1534,7 +1534,7 @@ BOOL XM_SDP_H261_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
         }
     }
     bitrate = std::min(mediaFormat.GetBandwidth(), bitrate);
-    mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, bitrate);
+    mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), bitrate);
     
     return TRUE;
 }
@@ -1548,9 +1548,9 @@ BOOL XM_SDP_H263_Capability::OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const
     // RFC2190 encoding
     // In addition to that, also an MaxBR option is included to signal maximum bandwidth
     
-    unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption) / 100;
+    unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
     XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption);
+    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
 	
 	if(videoSize >= XMVideoSize_CIF)
@@ -1615,28 +1615,28 @@ BOOL XM_SDP_H263_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
 	
     if(cifMPI != 0) 
     {
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
     else if(qcifMPI != 0)
     {
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_QCIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_QCIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
     }
     else if (sqcifMPI != 0)
     {
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100*sqcifMPI/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_SQCIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_SQCIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*sqcifMPI/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_SQCIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_SQCIF_HEIGHT);
     }
     else
     {
         // Assuming 30fps CIF
-        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption, OpalMediaFormat::VideoClockRate*100/2997);
-        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, XM_CIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, XM_CIF_HEIGHT);
+        mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100/2997);
+        mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
     
     if(bitrate == 0)
@@ -1647,7 +1647,7 @@ BOOL XM_SDP_H263_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
         }
     }
     bitrate = std::min(mediaFormat.GetBandwidth(), bitrate);
-    mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, bitrate);
+    mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), bitrate);
     
     return TRUE;
 }

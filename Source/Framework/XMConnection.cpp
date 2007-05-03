@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.22 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.23 2007/05/03 10:40:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,10 +44,10 @@ XMConnection::XMConnection(OpalCall & call,
     // Update the video media format options.
     // At the moment, only bandwidth is actively propagated
     bandwidthAvailable = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
-    h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH261BandwidthLimit());
-    h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH263BandwidthLimit());
-    h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH263BandwidthLimit());
-    h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, XMOpalManager::GetH264BandwidthLimit());
+    h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH261BandwidthLimit());
+    h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH263BandwidthLimit());
+    h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH263BandwidthLimit());
+    h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH264BandwidthLimit());
     _XMSetEnableH264LimitedMode(h264VideoFormat, XMOpalManager::GetManager()->GetEnableH264LimitedMode());
 }
 
@@ -180,10 +180,10 @@ BOOL XMConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
     
     // Also adjust the bandwidth limits of the video formats
     unsigned videoLimit = (100*bandwidthAvailable - 64000);
-    h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH261BandwidthLimit()));
-    h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
-    h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
-    h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption, std::min(videoLimit, XMOpalManager::GetH264BandwidthLimit()));
+    h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH261BandwidthLimit()));
+    h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
+    h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
+    h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH264BandwidthLimit()));
     return TRUE;
 }
 

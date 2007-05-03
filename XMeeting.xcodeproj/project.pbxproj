@@ -303,6 +303,7 @@
 		D1639465083E1A0F00F7FD83 /* XMStatisticsModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639464083E1A0F00F7FD83 /* XMStatisticsModule.m */; };
 		D163947A083E234D00F7FD83 /* XMCallHistoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1639479083E234D00F7FD83 /* XMCallHistoryModule.m */; };
 		D16394C3083E23D600F7FD83 /* CallHistoryModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D16394C1083E23D600F7FD83 /* CallHistoryModule.nib */; };
+		D1885E150BE9F296007E7B2E /* delaychan.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1885E140BE9F296007E7B2E /* delaychan.cxx */; };
 		D1887E770A283DEA00C938BB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1887E750A283DEA00C938BB /* Localizable.strings */; };
 		D18913000B81B1C600B32CCD /* XMVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */; };
 		D18913030B81B1C800B32CCD /* XMUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D10AFEB307B3781700BBC8EA /* XMUtils.m */; };
@@ -818,6 +819,7 @@
 		D177D7A007B62C9500BD0172 /* XMCallInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallInfo.m; path = Source/Framework/XMCallInfo.m; sourceTree = "<group>"; };
 		D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMDummyVideoInputModule.h; path = Source/Framework/XMDummyVideoInputModule.h; sourceTree = "<group>"; };
 		D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMDummyVideoInputModule.m; path = Source/Framework/XMDummyVideoInputModule.m; sourceTree = "<group>"; };
+		D1885E140BE9F296007E7B2E /* delaychan.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = delaychan.cxx; sourceTree = "<group>"; };
 		D1887CC40A2713E200C938BB /* h460.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h460.h; sourceTree = "<group>"; };
 		D1887D620A27A85500C938BB /* pssl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pssl.cxx; sourceTree = "<group>"; };
 		D1887DEB0A27B67B00C938BB /* psasl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = psasl.cxx; sourceTree = "<group>"; };
@@ -2205,6 +2207,7 @@
 		D1B6075808F8F86B0034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D1885E140BE9F296007E7B2E /* delaychan.cxx */,
 				D10BD5330AC1C83B004320A8 /* guid.cxx */,
 				D1887DEB0A27B67B00C938BB /* psasl.cxx */,
 				D1887D620A27A85500C938BB /* pssl.cxx */,
@@ -3474,6 +3477,7 @@
 				D18913660B81B21600B32CCD /* XMAudioTester.cpp in Sources */,
 				D18913670B81B21600B32CCD /* XMAudioManager.m in Sources */,
 				D18913690B81B21700B32CCD /* XMAddressResource.m in Sources */,
+				D1885E150BE9F296007E7B2E /* delaychan.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
