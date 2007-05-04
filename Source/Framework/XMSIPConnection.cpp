@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.22 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.23 2007/05/04 09:53:15 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,7 +49,7 @@ void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
 	if(invite.HasSDP()) {
 		SDPSessionDescription & sdp = invite.GetSDP();
 		unsigned bandwidth = bandwidthAvailable / 10;
-        sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier);
+        sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier());
         sdp.SetBandwidthValue(bandwidth);
 	}
 }
@@ -64,7 +64,7 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 	PString bandwidthModifier = sdpIn.GetBandwidthModifier();
 	if(bandwidthModifier.IsEmpty())
 	{
-		bandwidthModifier = SDPSessionDescription::ConferenceTotalBandwidthModifier;
+		bandwidthModifier = SDPSessionDescription::ConferenceTotalBandwidthModifier();
 	}
 	sdpOut.SetBandwidthModifier(bandwidthModifier);
 	
