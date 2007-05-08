@@ -1,9 +1,9 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.15 2006/10/22 08:53:10 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.16 2007/05/08 15:17:13 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_VIDEO_INPUT_MODULE_H__
@@ -339,6 +339,14 @@
 CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize);
 
 /*!
+    @function   XMClearPixelBuffer(CVPixelBufferRef pixelBuffer);
+    @discussion Clears the pixel buffer (zeros out the data)
+ 
+    @param      CVPixelBuffer pixelBuffer   The pixel buffer to clear
+ **/
+void XMClearPixelBuffer(CVPixelBufferRef pixelBuffer);
+
+/*!
 	@function	XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 										 unsigned bytesPerRow, OSType srcPixelFormat,
 										 CVPixelBufferRef dstPixelBuffer,
@@ -348,9 +356,10 @@ CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize);
 				for the desired operation. This context has to be used when calling
 				XMCopyImageIntoPixelBuffer().
  
-	@param	void *		src			A pointer to the source buffer containing the image(s).
 	@param	unsigned	srcWidth	The width (in pixels) of the source image
 	@param	unsigned	srcHeight	The height (in pixels) of the source image
+    @param  unsigned    xOffset     Offset (in pixels) in x-direction into the original image
+    @param  unsigned    yOffset     Offset (in pixels) in y-direction into the original image
 	@param	unsigned	bytesPerRow	The number of bytes per row.
 	@param	OSType		srcPixelFormat	The pixel format of the source. Currently supported
 										pixel formats are:
@@ -387,7 +396,8 @@ CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize);
  
 	@result	void*	The freshly created image copy context
  **/
-void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
+void *XMCreateImageCopyContext(unsigned srcWidth, unsigned srcHeight,
+                               unsigned xOffset, unsigned yOffset,
 							   unsigned bytesPerRow, OSType srcPixelFormat,
 							   CGDirectPaletteRef colorPalette,
 							   CVPixelBufferRef dstPixelBuffer,
