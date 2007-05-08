@@ -1,0 +1,27 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = XMAreaSelectionView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            CLASS = XMScreenSelectionView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = XMAreaSelectionView; 
+        }, 
+        {
+            CLASS = XMScreenVideoInputModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                inputManager = id; 
+                selectionView = XMScreenSelectionView; 
+                settingsView = NSView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
