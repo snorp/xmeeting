@@ -286,6 +286,9 @@
 		D13274F108C6F2BB00298F25 /* XMCallInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D13274F008C6F2BB00298F25 /* XMCallInfoView.m */; };
 		D132750808C6F38000298F25 /* XMRecentCallsView.m in Sources */ = {isa = PBXBuildFile; fileRef = D132750708C6F38000298F25 /* XMRecentCallsView.m */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
+		D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */; };
+		D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */; };
+		D1395EF30BEF76A700C76EFD /* XMAreaSelectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */; };
 		D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED450BBA382D008B3CBA /* libsasl2.dylib */; };
 		D13AED4B0BBA3854008B3CBA /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4A0BBA3854008B3CBA /* libssl.dylib */; };
 		D13AED4E0BBA38D4008B3CBA /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */; };
@@ -478,6 +481,7 @@
 			dstSubfolderSpec = 7;
 			files = (
 				D10B8E070A512F3400003A33 /* manual.html in CopyFiles */,
+				D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -755,6 +759,9 @@
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
 		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		D1395D0C0BEF380300C76EFD /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/ScreenSettings.nib; sourceTree = "<group>"; };
+		D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAreaSelectionView.h; path = Source/Framework/XMAreaSelectionView.h; sourceTree = "<group>"; };
+		D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMAreaSelectionView.m; path = Source/Framework/XMAreaSelectionView.m; sourceTree = "<group>"; };
 		D13AED450BBA382D008B3CBA /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = /usr/lib/libsasl2.dylib; sourceTree = "<absolute>"; };
 		D13AED4A0BBA3854008B3CBA /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
 		D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
@@ -1713,6 +1720,8 @@
 				D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */,
 				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
 				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
+				D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */,
+				D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */,
 				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
 				D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */,
 				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
@@ -2770,6 +2779,7 @@
 				D1ECCD2E083491EB008EBAE3 /* NoCallModule.nib */,
 				D1A02B24081E96D30018BD11 /* Preferences.nib */,
 				1AE62985099B7B4300793794 /* SequenceGrabberSettings.nib */,
+				D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */,
 				D1EF07510918B212008A8974 /* SetupAssistant.nib */,
 				D1C8FCD10A4407E600EF1A8C /* StillImageSettings.nib */,
 				D163945D083E19E300F7FD83 /* StatisticsModule.nib */,
@@ -3208,6 +3218,7 @@
 				D1BD64420A951A2E007C8E46 /* uri.scriptSuite in Resources */,
 				D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */,
 				D10BD5470AC1D503004320A8 /* recording.gif in Resources */,
+				D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3478,6 +3489,7 @@
 				D18913670B81B21600B32CCD /* XMAudioManager.m in Sources */,
 				D18913690B81B21700B32CCD /* XMAddressResource.m in Sources */,
 				D1885E150BE9F296007E7B2E /* delaychan.cxx in Sources */,
+				D1395EF30BEF76A700C76EFD /* XMAreaSelectionView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3628,6 +3640,14 @@
 				D10B8AA90A50048B00003A33 /* Italian */,
 			);
 			name = IncomingCallAlert.nib;
+			sourceTree = "<group>";
+		};
+		D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D1395D0C0BEF380300C76EFD /* English */,
+			);
+			name = ScreenSettings.nib;
 			sourceTree = "<group>";
 		};
 		D1639415083E17A500F7FD83 /* DialPadModule.nib */ = {
