@@ -1,5 +1,5 @@
 /*
- * $Id: XMAreaSelectionView.m,v 1.1 2007/05/08 10:49:54 hfriederich Exp $
+ * $Id: XMAreaSelectionView.m,v 1.2 2007/05/08 13:40:41 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,17 +84,48 @@
     NSCursor * crosshair = [NSCursor crosshairCursor];
     NSCursor * leftRight = [NSCursor resizeLeftRightCursor];
     NSCursor * upDown = [NSCursor resizeUpDownCursor];
+    NSRect rect;
     
-    [self addCursorRect:OUTER_BOTTOM_RECT cursor:crosshair];
-    [self addCursorRect:OUTER_TOP_RECT cursor:crosshair];
-    [self addCursorRect:OUTER_LEFT_RECT cursor:crosshair];
-    [self addCursorRect:OUTER_RIGHT_RECT cursor:crosshair];
+    rect = OUTER_BOTTOM_RECT;
+    if (rect.size.width > 0 && rect.size.height > 0) {
+        [self addCursorRect:rect cursor:crosshair];
+    }
+    rect = OUTER_TOP_RECT;
+    if (rect.size.width > 0 && rect.size.height > 0) {
+        [self addCursorRect:rect cursor:crosshair];
+    }
+    rect = OUTER_LEFT_RECT;
+    if (rect.size.width > 0 && rect.size.height > 0) {
+        [self addCursorRect:rect cursor:crosshair];
+    }
+    rect = OUTER_RIGHT_RECT;
+    if (rect.size.width > 0 && rect.size.height > 0) {
+        [self addCursorRect:rect cursor:crosshair];
+    }
     
-    [self addCursorRect:LEFT_RECT(0) cursor:leftRight];
-    [self addCursorRect:RIGHT_RECT(0) cursor:leftRight];
+    rect = LEFT_RECT(0);
+    if (rect.origin.x < 0) {
+        rect.size.width += rect.origin.x;
+        rect.origin.x -= rect.origin.x;
+    }
+    [self addCursorRect:rect cursor:leftRight];
+    rect = RIGHT_RECT(0);
+    if (rect.origin.x + rect.size.width > bounds.size.width) {
+        rect.size.width = bounds.size.width - rect.origin.x;
+    }
+    [self addCursorRect:rect cursor:leftRight];
     
-    [self addCursorRect:BOTTOM_RECT(0) cursor:upDown];
-    [self addCursorRect:TOP_RECT(0) cursor:upDown];
+    rect = BOTTOM_RECT(0);
+    if (rect.origin.y < 0) {
+        rect.size.height += rect.origin.y;
+        rect.origin.y -= rect.origin.y;
+    }
+    [self addCursorRect:rect cursor:upDown];
+    rect = TOP_RECT(0);
+    if (rect.origin.y + rect.size.height > bounds.size.height) {
+        rect.size.height = bounds.size.height - rect.origin.y;
+    }
+    [self addCursorRect:rect cursor:upDown];
     
     [self addCursorRect:MOVE_RECT(0) cursor:[NSCursor openHandCursor]];
 }
