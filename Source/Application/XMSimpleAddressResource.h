@@ -1,9 +1,9 @@
 /*
- * $Id: XMSimpleAddressResource.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMSimpleAddressResource.h,v 1.4 2007/05/08 15:18:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SIMPLE_ADDRESS_RESOURCE_H__
@@ -30,6 +30,18 @@
 
 - (XMCallProtocol)callProtocol;
 - (void)setCallProtocol:(XMCallProtocol)callProtocol;
+
+@end
+
+/**
+ * Simple class that wraps another address resource and implements
+ * the XMCallAddress interface
+ **/
+@interface XMSimpleAddressResourceWrapper : NSObject <XMCallAddress> {
+    XMAddressResource *addressResource;
+}
+
+- (id)initWithAddressResource:(XMAddressResource *)addressResource;
 
 @end
 

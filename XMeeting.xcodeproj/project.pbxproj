@@ -289,6 +289,10 @@
 		D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */; };
 		D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */; };
 		D1395EF30BEF76A700C76EFD /* XMAreaSelectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */; };
+		D13962170BF0BA2F00C76EFD /* XMH323URL.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D13962150BF0BA2F00C76EFD /* XMH323URL.h */; };
+		D13962180BF0BA2F00C76EFD /* XMH323URL.m in Sources */ = {isa = PBXBuildFile; fileRef = D13962160BF0BA2F00C76EFD /* XMH323URL.m */; };
+		D13962B70BF0C9F100C76EFD /* XMSIPURL.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D13962B50BF0C9F100C76EFD /* XMSIPURL.h */; };
+		D13962B80BF0C9F100C76EFD /* XMSIPURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D13962B60BF0C9F100C76EFD /* XMSIPURL.m */; };
 		D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED450BBA382D008B3CBA /* libsasl2.dylib */; };
 		D13AED4B0BBA3854008B3CBA /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4A0BBA3854008B3CBA /* libssl.dylib */; };
 		D13AED4E0BBA38D4008B3CBA /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */; };
@@ -482,6 +486,8 @@
 			files = (
 				D10B8E070A512F3400003A33 /* manual.html in CopyFiles */,
 				D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */,
+				D13962170BF0BA2F00C76EFD /* XMH323URL.h in CopyFiles */,
+				D13962B70BF0C9F100C76EFD /* XMSIPURL.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -762,6 +768,10 @@
 		D1395D0C0BEF380300C76EFD /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/ScreenSettings.nib; sourceTree = "<group>"; };
 		D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAreaSelectionView.h; path = Source/Framework/XMAreaSelectionView.h; sourceTree = "<group>"; };
 		D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMAreaSelectionView.m; path = Source/Framework/XMAreaSelectionView.m; sourceTree = "<group>"; };
+		D13962150BF0BA2F00C76EFD /* XMH323URL.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMH323URL.h; path = Source/Framework/XMH323URL.h; sourceTree = "<group>"; };
+		D13962160BF0BA2F00C76EFD /* XMH323URL.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMH323URL.m; path = Source/Framework/XMH323URL.m; sourceTree = "<group>"; };
+		D13962B50BF0C9F100C76EFD /* XMSIPURL.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMSIPURL.h; path = Source/Framework/XMSIPURL.h; sourceTree = "<group>"; };
+		D13962B60BF0C9F100C76EFD /* XMSIPURL.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMSIPURL.m; path = Source/Framework/XMSIPURL.m; sourceTree = "<group>"; };
 		D13AED450BBA382D008B3CBA /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = /usr/lib/libsasl2.dylib; sourceTree = "<absolute>"; };
 		D13AED4A0BBA3854008B3CBA /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
 		D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
@@ -1703,6 +1713,10 @@
 				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
 				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
 				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */,
+				D13962150BF0BA2F00C76EFD /* XMH323URL.h */,
+				D13962160BF0BA2F00C76EFD /* XMH323URL.m */,
+				D13962B50BF0C9F100C76EFD /* XMSIPURL.h */,
+				D13962B60BF0C9F100C76EFD /* XMSIPURL.m */,
 				D16395600841B4E100F7FD83 /* XMCalltoURL.h */,
 				D16395610841B4E100F7FD83 /* XMCalltoURL.m */,
 				D197179308F94A6000295E05 /* XMOpalDispatcher.h */,
@@ -3490,6 +3504,8 @@
 				D18913690B81B21700B32CCD /* XMAddressResource.m in Sources */,
 				D1885E150BE9F296007E7B2E /* delaychan.cxx in Sources */,
 				D1395EF30BEF76A700C76EFD /* XMAreaSelectionView.m in Sources */,
+				D13962180BF0BA2F00C76EFD /* XMH323URL.m in Sources */,
+				D13962B80BF0C9F100C76EFD /* XMSIPURL.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,9 +1,9 @@
 /*
- * $Id: XMNoCallModule.m,v 1.43 2007/03/15 22:15:58 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.44 2007/05/08 15:18:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMeeting.h"
@@ -603,6 +603,10 @@
 	// user cannot clear the call
 	
 	id<XMCallAddress> activeCallAddress = [[XMCallAddressManager sharedInstance] activeCallAddress];
+    if ([activeCallAddress displayImage] == nil)
+    {
+        [self _setCallProtocol:[[activeCallAddress addressResource] callProtocol]];
+    }
 	[callAddressField setRepresentedObject:activeCallAddress];
 	[locationsPopUpButton setEnabled:NO];
 	[callButton setEnabled:NO];

@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.9 2006/08/05 22:11:42 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.10 2007/05/08 15:18:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallHistoryCallAddressProvider.h"
