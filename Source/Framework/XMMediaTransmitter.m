@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.57 2007/03/16 09:32:47 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.58 2007/05/08 10:49:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -2409,6 +2409,7 @@ typedef struct XMImageCopyContext
 	size_t srcHeight;
 	size_t srcBytesPerRow;
 	size_t srcBytesPerPixel;
+    unsigned srcByteOffset;
 	size_t dstWidth;
 	size_t dstHeight;
 	size_t dstBytesPerRow;
@@ -2448,7 +2449,22 @@ CVPixelBufferRef XMCreatePixelBuffer(XMVideoSize videoSize)
 	return pixelBuffer;
 }
 
-void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
+void XMClearPixelBuffer(CVPixelBufferRef pixelBuffer)
+{
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    
+    void *buf = CVPixelBufferGetBaseAddress(pixelBuffer);
+    
+    unsigned bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+    unsigned height = CVPixelBufferGetHeight(pixelBuffer);
+    
+    bzero(buf, bytesPerRow*height);
+    
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+}
+
+void *XMCreateImageCopyContext(unsigned srcWidth, unsigned srcHeight,
+                               unsigned srcXOffset, unsigned srcYOffset,
 							   unsigned srcBytesPerRow, OSType srcPixelFormat,
 							   CGDirectPaletteRef colorPalette,
 							   CVPixelBufferRef dstPixelBuffer,
@@ -2493,6 +2509,8 @@ void *XMCreateImageCopyContext(void *src, unsigned srcWidth, unsigned srcHeight,
 			context->conversionMode = UINT_MAX;
 			break;
 	}
+    
+    context->srcByteOffset = (srcYOffset * srcBytesPerRow) + (srcXOffset * context->srcBytesPerPixel);
 	
 	// determining whether scale or copy operation is needed
 	if(context->srcWidth != context->dstWidth ||
@@ -2639,8 +2657,8 @@ BOOL XMCopyImageIntoPixelBuffer(void *srcImage, CVPixelBufferRef dstPixelBuffer,
 	XMImageCopyContext *context = (XMImageCopyContext *)imageCopyContext;
 	void *targetBuffer = CVPixelBufferGetBaseAddress(dstPixelBuffer);
 	
-	void *srcBuffer = srcImage;
-	void *dstBuffer = srcImage;
+	void *srcBuffer = (srcImage + context->srcByteOffset);
+	void *dstBuffer = srcBuffer;
 	unsigned srcBytesPerRow = context->srcBytesPerRow;
 	unsigned dstBytesPerRow = srcBytesPerRow;
 

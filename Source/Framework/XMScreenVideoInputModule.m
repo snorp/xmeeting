@@ -1,9 +1,9 @@
 /*
- * $Id: XMScreenVideoInputModule.m,v 1.16 2006/05/27 12:27:20 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.m,v 1.17 2007/05/08 10:49:54 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Mark Fleming. All rights reserved.
+ * Copyright (c) 2006-2007 Mark Fleming, Hannes Friederich. All rights reserved.
  */
 
 #import "XMScreenVideoInputModule.h"
@@ -17,10 +17,11 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 
 - (void)_setNeedsUpdate:(BOOL)flag;
 - (void)_doScreenCopy;
-- (void)_disposeBuffers;
 - (void)_handleUpdatedScreenRects:(const CGRect *)rectArray count:(CGRectCount)count;
 - (void)_handleScreenReconfigurationForDisplay:(CGDirectDisplayID)display 
 								   changeFlags:(CGDisplayChangeSummaryFlags)flags;
+- (void)_handleAreaSelectionChange;
+- (void)_drawScreenImage:(NSRect)rect doesChangeSelection:(BOOL)doesChangeSelection;
 
 @end
 
@@ -41,23 +42,17 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 	
 	inputManager = nil;
 	
+    int i;
 	NSString *deviceName = NSLocalizedString(@"XM_FRAMEWORK_SCREEN_DEVICE_NAME", @"");
-	int i;
 	NSArray *screens = [NSScreen screens];	// array of NSScreen objects representing all of the screens available on the system.
-	
+	// TODO: Update screenNames list when screens are added / removed
 	// When the display configuration is changed, NSApplicationDidChangeScreenParametersNotification is sent by the default notification center.
-
 	// The first screen in the screens array is always the "zero" screen. To obtain the menu bar screen use [[NSScreen screens] objectAtIndex:0]
 	// (after checking that the screens array is not empty).
-
 	screenNames = [[NSMutableArray alloc] initWithObjects: nil];
-
 	for (i = 0; i < [screens count]; i++) 
 	{
 		[screenNames addObject: [NSString stringWithFormat:deviceName, i]];	// one device for each screen.
-		
-		NSScreen *aScreen = [[NSScreen screens] objectAtIndex:i];
-		NSDictionary *deviceDescription = [aScreen deviceDescription];
 	}
 	
 	displayID = NULL;
@@ -67,10 +62,9 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 	topLine = 0;
 	bottomLine = 0;
 	screenPixelFormat = 0;
+    screenAreaRect = NSMakeRect(0, 0, 1, 1);
 	
 	updateLock = [[NSLock alloc] init];
-	
-	frameRect = NSMakeRect(0, 0, 0, 0);
 	
 	videoSize = XMVideoSize_NoVideo;
 	
@@ -82,8 +76,21 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 	
 	locked = NO;
 	needsDisposing = NO;
+    
+    settingsView = nil;
+    selectionView = nil;
+    overviewBuffer = NULL;
+    overviewCopyContext = NULL;
+    overviewImageRep = nil;
+    updateSelectionView = NO;
+    overviewCounter = 0;
 	
 	return self;
+}
+
+- (void)awakeFromNib
+{
+    [selectionView setInputModule:self];
 }
 
 - (void)dealloc
@@ -111,6 +118,18 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 	{
 		free(imageBuffer);
 	}
+    if (overviewCopyContext != NULL)
+    {
+        XMDisposeImageCopyContext(overviewCopyContext);
+    }
+    if (overviewBuffer != NULL)
+    {
+        CVPixelBufferRelease(overviewBuffer);
+    }
+    if (overviewImageRep != nil)
+    {
+        [overviewImageRep release];
+    }
 	
 	[super dealloc];
 }
@@ -153,6 +172,11 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 		CVPixelBufferRelease(pixelBuffer);
 		pixelBuffer = NULL;
 	}
+    if (imageCopyContext != NULL)
+    {
+        XMDisposeImageCopyContext(imageCopyContext);
+        imageCopyContext = NULL;
+    }
 	
 	return YES;
 }
@@ -165,8 +189,9 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 // locate screen with this device... Screen 0, Screen 2, etc...
 - (BOOL)openInputDevice:(NSString *)device
 {	
-	int i;
+	displayID = NULL;
 
+    int i;
 	for (i = 0; i < [screenNames count]; i++)
 	{
 		if ([device isEqualToString:[screenNames objectAtIndex:i]]) 
@@ -176,7 +201,7 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 			NSScreen *aScreen;
 			NSDictionary *deviceDescription;
 			NSNumber *aNum;
-			if (i + 1 > [screens count]) 
+			if (i >= [screens count]) 
 			{
 				// screen no longer available
 				return NO;
@@ -184,64 +209,27 @@ void XMScreenModuleReconfigurationCallback(CGDirectDisplayID display,
 		
 			aScreen = [[NSScreen screens] objectAtIndex:i];
 			screenRect = [aScreen frame];
-			//[self setFrameRect: &aRect];	
+    
 			deviceDescription = [aScreen deviceDescription];
 			//  	@"NSScreenNumber"	An NSNumber that contains the CGDirectDisplayID for the screen device. This key is only valid for the device description dictionary for an NSScreen.
 			aNum = [deviceDescription objectForKey: @"NSScreenNumber"];
 			displayID = (CGDirectDisplayID)[aNum intValue];
-			
-/* 
-	2006-02-08 17:29:39.566 XMeeting[3348] screen {
-    NSDeviceBitsPerSample = 8; 
-    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
-    NSDeviceIsScreen = YES; 
-    NSDeviceResolution = <42900000 42900000 >; 
-    NSDeviceSize = <44a00000 44400000 >; 
-    NSScreenNumber = 1535231424; 
-}
-
-1024 x 768 - Millons:
-2006-02-08 17:31:29.909 XMeeting[3373] screen {
-    NSDeviceBitsPerSample = 8; 
-    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
-    NSDeviceIsScreen = YES; 
-    NSDeviceResolution = <42900000 42900000 >; 
-    NSDeviceSize = <44800000 44400000 >; 
-    NSScreenNumber = 1535231424; 
-}
-2006-02-08 17:31:29.913 XMeeting[3373] Screen Geometry Changed - (1024,768) Depth: 32, Samples: 3, rowBytesScreen 4096
-
-2006-02-08 17:32:49.837 XMeeting[3373] screen {
-    NSDeviceBitsPerSample = 8; 
-    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
-    NSDeviceIsScreen = YES; 
-    NSDeviceResolution = <42900000 42900000 >; 
-    NSDeviceSize = <44a00000 44400000 >; 
-    NSScreenNumber = 1535231424; 
-}
-2006-02-08 17:32:49.872 XMeeting[3373] Screen Geometry Changed - (1280,768) Depth: 32, Samples: 3, rowBytesScreen 5120
-
-
-Thousands of color:
-2006-02-08 17:34:09.579 XMeeting[3373] screen {
-    NSDeviceBitsPerSample = 8; 
-    NSDeviceColorSpaceName = NSCalibratedRGBColorSpace; 
-    NSDeviceIsScreen = YES; 
-    NSDeviceResolution = <42900000 42900000 >; 
-    NSDeviceSize = <44800000 44400000 >; 
-    NSScreenNumber = 1535231424; 
-}
-2006-02-08 17:34:09.616 XMeeting[3373] Screen Geometry Changed - (1024,768) Depth: 16, Samples: 3, rowBytesScreen 2048
-
-256 color does not work
-*/
-		}
+        }
 
 	}	// end for i
+    
+    if (displayID == NULL) {
+        // Screen not found
+        return NO;
+    }
 	
 	locked = NO;
 	CGRegisterScreenRefreshCallback(XMScreenModuleRefreshCallback, self);
 	CGDisplayRegisterReconfigurationCallback(XMScreenModuleReconfigurationCallback, self);
+    
+    [updateLock lock];
+    rowBytesScreen = CGDisplayBytesPerRow(displayID);
+    [updateLock unlock];
 	
 	return YES;
 }
@@ -252,7 +240,21 @@ Thousands of color:
 	CGDisplayRemoveReconfigurationCallback(XMScreenModuleReconfigurationCallback, self);
 	displayID = NULL;
 	
-	[self _disposeBuffers];
+    if(pixelBuffer != NULL)
+	{
+		CVPixelBufferRelease(pixelBuffer);
+		pixelBuffer = NULL;
+	}
+    if (imageBuffer != NULL) {
+        [updateLock lock];
+        free(imageBuffer);
+        imageBuffer = NULL;
+        [updateLock unlock];
+    }
+    if (imageCopyContext != NULL) {
+        XMDisposeImageCopyContext(imageCopyContext);
+        imageCopyContext = NULL;
+    }
 	
 	return YES;
 }
@@ -264,7 +266,22 @@ Thousands of color:
 	{
 		[updateLock lock];
 		
-		[self _disposeBuffers];
+        if (imageBuffer != NULL) {
+            [updateLock lock];
+            free(imageBuffer);
+            imageBuffer = NULL;
+            [updateLock unlock];
+        }
+        if (imageCopyContext != NULL) {
+            XMDisposeImageCopyContext(imageCopyContext);
+            imageCopyContext = NULL;
+        }
+        // Need to dispose / release these objects as well, even if they belong
+        // to the main thread
+        if (overviewCopyContext != NULL) {
+            XMDisposeImageCopyContext(overviewCopyContext);
+            overviewCopyContext = NULL;
+        }
 		needsDisposing = NO;
 		
 		[updateLock unlock];
@@ -278,13 +295,35 @@ Thousands of color:
 	
 	if(pixelBuffer == NULL)
 	{
+        pixelBuffer = XMCreatePixelBuffer(videoSize);
+    }
+    if (pixelBuffer == NULL)
+    {
+        return NO;
+    }
+    
+    if (imageBuffer == NULL)
+    {
+        unsigned height = CGDisplayPixelsHigh(displayID);
+        unsigned usedBytes = rowBytesScreen * height;
+        
+        [updateLock lock];
+        imageBuffer = malloc(usedBytes);
+        [updateLock unlock];
+        
+        [self _setNeedsUpdate:YES];
+        topLine = 0;
+		bottomLine = height;
+    }
+    
+    if (imageCopyContext == NULL)
+    {
+        [updateLock lock];
+        
 		// see:  CoreGraphics/CGDirectDisplay.h
-		rowBytesScreen = CGDisplayBytesPerRow(displayID);
 		unsigned height = CGDisplayPixelsHigh(displayID);
 		unsigned width = CGDisplayPixelsWide(displayID);
 		unsigned bitsPerPixel = CGDisplayBitsPerPixel(displayID);
-		
-		unsigned usedBytes = rowBytesScreen*height;
 		
 		CGDirectPaletteRef palette = NULL;
 		
@@ -305,19 +344,20 @@ Thousands of color:
 			screenPixelFormat = k8IndexedPixelFormat;
 			palette = CGPaletteCreateWithDisplay(displayID);
 		}
-	
-		// creating the CVPixelBufferRef
-		pixelBuffer = XMCreatePixelBuffer(videoSize);
+        
+        unsigned screenWidth = screenAreaRect.size.width * width;
+        unsigned screenHeight = screenAreaRect.size.height * height;
+        unsigned screenX = screenAreaRect.origin.x * width;
+        unsigned screenY = screenAreaRect.origin.y * height;
+        
+        // Screen / image coordinates have a flipped y-coordinate system compared to normal drawing
+        screenY = height - screenY - screenHeight;
+        
+        // Zero out the pixel buffer since the picture geometry has changed
+        XMClearPixelBuffer(pixelBuffer);
 		
-		if(pixelBuffer == NULL)
-		{
-			return NO;
-		}
-		
-		imageBuffer = malloc(usedBytes);	// creating an buffer for the pixels
-		
-		imageCopyContext = XMCreateImageCopyContext(imageBuffer, width, height, rowBytesScreen,
-													screenPixelFormat, palette, pixelBuffer, 
+		imageCopyContext = XMCreateImageCopyContext(screenWidth, screenHeight, screenX, screenY,
+                                                    rowBytesScreen, screenPixelFormat, palette, pixelBuffer, 
 													XMImageScaleOperation_ScaleProportionally);
 		
 		if(palette != NULL)
@@ -328,6 +368,8 @@ Thousands of color:
 		[self _setNeedsUpdate:YES];
 		topLine = 0;
 		bottomLine = height;
+        
+        [updateLock unlock];
 	}
 	
 	if (needsUpdate) 
@@ -360,7 +402,11 @@ Thousands of color:
 
 - (BOOL)hasSettingsForDevice:(NSString *)device
 {
-	return NO;
+	if (device != nil)
+    {
+        return YES;
+    }
+    return NO;
 }
 
 - (BOOL)requiresSettingsDialogWhenDeviceOpens:(NSString *)device
@@ -370,11 +416,31 @@ Thousands of color:
 
 - (NSData *)internalSettings
 {
-	return nil;
+    NSRect areaRect;
+    
+    if (selectionView != nil)
+    {
+        areaRect = [selectionView selectedArea];
+    }
+    else
+    {
+        areaRect = NSMakeRect(0, 0, 1, 1);
+    }
+    
+    NSData * data = [NSData dataWithBytes:(void *)&areaRect length:sizeof(NSRect)];
+	return data;
 }
 
 - (void)applyInternalSettings:(NSData *)settings
 {
+    NSRect * rect = (NSRect *)[settings bytes];
+    screenAreaRect = *rect;
+    
+    if(imageCopyContext != NULL)
+	{
+		XMDisposeImageCopyContext(imageCopyContext);
+        imageCopyContext = NULL;
+	}
 }
 
 - (NSDictionary *)permamentSettings
@@ -389,24 +455,23 @@ Thousands of color:
 
 - (NSView *)settingsViewForDevice:(NSString *)device
 {
-	return nil;
+	if (settingsView == nil)
+    {
+        [NSBundle loadNibNamed:@"ScreenSettings" owner:self];
+    }
+    
+    if (device == nil)
+    {
+        return nil;
+    }
+    
+    return settingsView;
 }
 
 - (void)setDefaultSettingsForDevice:(NSString *)device
 {
-}
-
-#pragma mark -
-#pragma mark Handling Screen settings
-
-- (NSRect)frameRect
-{
-	return frameRect;
-}
-
-- (void)setFrameRect:(NSRect *)aRect;
-{	
-	frameRect = *aRect;
+    [selectionView setSelectedArea:NSMakeRect(0, 0, 1, 1)];
+    [inputManager noteSettingsDidChangeForModule:self];
 }
 
 #pragma mark -
@@ -477,28 +542,11 @@ Thousands of color:
 	}
 }
 
-- (void)_disposeBuffers
-{
-	if(pixelBuffer != NULL)
-	{
-		CVPixelBufferRelease(pixelBuffer);
-		pixelBuffer = NULL;
-	}
-	if(imageBuffer != NULL)
-	{
-		free(imageBuffer);
-		imageBuffer = NULL;
-	}
-	if(imageCopyContext != NULL)
-	{
-		XMDisposeImageCopyContext(imageCopyContext);
-		imageCopyContext = NULL;
-	}
-}
-
 - (void)_handleUpdatedScreenRects:(const CGRect *)rectArray count:(CGRectCount)count;
 {
 	unsigned i;
+    
+    BOOL found = NO;
 	
 	[updateLock lock];
 	
@@ -524,10 +572,24 @@ Thousands of color:
 			}
 			
 			[self _setNeedsUpdate:YES];
+            
+            found = YES;
 		}
 	}
 	
 	[updateLock unlock];
+    
+    if (found == YES) {
+    
+        updateSelectionView = YES;
+    
+        // Improve performance by reducing the amount of redraws
+        overviewCounter++;
+        if (overviewCounter > 20) {
+            [selectionView setNeedsDisplay:YES];
+            overviewCounter = 0;
+        }
+    }
 }
 
 - (void)_handleScreenReconfigurationForDisplay:(CGDirectDisplayID)display 
@@ -549,6 +611,92 @@ Thousands of color:
 	}
 	
 	[updateLock unlock];
+}
+
+- (void)_handleAreaSelectionChange
+{
+    [inputManager noteSettingsDidChangeForModule:self];
+}
+
+- (void)_drawScreenImage:(NSRect)rect doesChangeSelection:(BOOL)doesChangeSelection
+{
+    if (overviewBuffer == NULL)
+    {
+        overviewBuffer = XMCreatePixelBuffer(XMVideoSize_QCIF);
+        
+        CVPixelBufferLockBaseAddress(overviewBuffer, 0);
+        
+        void *src = CVPixelBufferGetBaseAddress(overviewBuffer);
+        
+        overviewImageRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:(unsigned char **)&src
+                                                                   pixelsWide:CVPixelBufferGetWidth(overviewBuffer)
+                                                                   pixelsHigh:CVPixelBufferGetHeight(overviewBuffer)
+                                                                bitsPerSample:8
+                                                              samplesPerPixel:4
+                                                                     hasAlpha:YES
+                                                                     isPlanar:NO
+                                                               colorSpaceName:NSDeviceRGBColorSpace
+                                                                 bitmapFormat:NSAlphaFirstBitmapFormat
+                                                                  bytesPerRow:CVPixelBufferGetBytesPerRow(overviewBuffer)
+                                                                 bitsPerPixel:32];
+    }
+    if (overviewBuffer == NULL)
+    {
+        NSRectFill(rect);
+    }
+    if (updateSelectionView == YES && doesChangeSelection == NO)
+    {
+        [updateLock lock];
+        
+        if (overviewCopyContext == NULL)
+        {
+            overviewCopyContext = XMCreateImageCopyContext(screenRect.size.width, screenRect.size.height, 0, 0,
+                                                           rowBytesScreen, screenPixelFormat, NULL, overviewBuffer,
+                                                           XMImageScaleOperation_ScaleToFit);
+        }
+        XMCopyImageIntoPixelBuffer(imageBuffer, overviewBuffer, overviewCopyContext);
+        [updateLock unlock];
+        
+        updateSelectionView = NO;
+        overviewCounter = 0;
+    }
+    
+    [overviewImageRep drawInRect:rect];
+}
+
+@end
+
+#pragma mark -
+#pragma mark Screen Selection
+
+@implementation XMScreenSelectionView
+
+- (id)initWithFrame:(NSRect)frame
+{
+    self = [super initWithFrame:frame];
+    
+    inputModule = nil;
+    
+    return self;
+}
+
+- (void)setInputModule:(XMScreenVideoInputModule *)_inputModule
+{
+    inputModule = _inputModule;
+}
+
+- (void)drawBackground:(NSRect)rect doesChangeSelection:(BOOL)doesChangeSelection
+{
+    if (inputModule != nil) {
+        [inputModule _drawScreenImage:[self bounds] doesChangeSelection:doesChangeSelection];
+    } else {
+        [super drawBackground:rect doesChangeSelection:doesChangeSelection];
+    }
+}
+
+- (void)selectedAreaUpdated
+{
+    [inputModule _handleAreaSelectionChange];
 }
 
 @end

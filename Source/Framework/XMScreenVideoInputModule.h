@@ -1,9 +1,9 @@
 /*
- * $Id: XMScreenVideoInputModule.h,v 1.5 2006/05/02 06:58:18 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.h,v 1.6 2007/05/08 10:49:54 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Mark Fleming. All rights reserved.
+ * Copyright (c) 2006-2007 Mark Fleming, Hannes Friederich. All rights reserved.
  */
 
 /*!
@@ -23,6 +23,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMVideoInputModule.h"
+#import "XMAreaSelectionView.h"
+
+@class XMScreenSelectionView;
 
 @interface XMScreenVideoInputModule : NSObject <XMVideoInputModule> {
 
@@ -36,10 +39,9 @@
 	BOOL	needsUpdate;			// used to indicate whether the screen did change or not
 	unsigned topLine, bottomLine;	// optimized copy only rows updated (0, height) == full screen.
 	OSType screenPixelFormat;		// pixel format of the screen
+    NSRect screenAreaRect;
 	
 	NSLock *updateLock;				// assuring correct propagation of screen updates
-	
-	NSRect  frameRect;				// location on the screen (not used yet).
 	
 	XMVideoSize videoSize;			// required size of output image.
 	
@@ -51,9 +53,26 @@
 	
 	BOOL locked;					// used to prevent accessing the screen while a configuration change is ongoing
 	BOOL needsDisposing;			// indicates that the buffers need to be disposed
+    
+    IBOutlet NSView *settingsView;
+    IBOutlet XMScreenSelectionView * selectionView;
+    void *overviewCopyContext;
+    CVPixelBufferRef overviewBuffer;
+    NSBitmapImageRep *overviewImageRep;
+    BOOL updateSelectionView;
+    int overviewCounter;
 }
 
 - (id)_init;
+
+@end
+
+@interface XMScreenSelectionView : XMAreaSelectionView
+{
+    XMScreenVideoInputModule *inputModule;
+}
+
+- (void)setInputModule:(XMScreenVideoInputModule *)inputModule;
 
 @end
 

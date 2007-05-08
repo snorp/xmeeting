@@ -1,5 +1,5 @@
 /*
- * $Id: XMStillImageVideoInputModule.m,v 1.5 2007/03/12 13:33:51 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.m,v 1.6 2007/05/08 10:49:54 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -212,7 +212,7 @@
 		
 		pixelBuffer = XMCreatePixelBuffer(videoSize);
 		
-		void *context = XMCreateImageCopyContext(bitmapData, width, height, bytesPerRow, pixelFormat, NULL, pixelBuffer, scaleOperation);
+		void *context = XMCreateImageCopyContext(width, height, 0, 0, bytesPerRow, pixelFormat, NULL, pixelBuffer, scaleOperation);
 		
 		BOOL result = XMCopyImageIntoPixelBuffer(bitmapData, pixelBuffer, context);
 		
