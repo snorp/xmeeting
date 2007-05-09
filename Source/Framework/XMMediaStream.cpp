@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.12 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.13 2007/05/09 14:58:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,11 +36,13 @@ void XMMediaStream::OnPatchStart()
 {
     if (IsSource()) {
         
-        // Ensure the code below runs just once
-        if(hasStarted == TRUE) {
+        PWaitAndSignal m(patchMutex);
+        
+        // Ensure the code below runs just once.
+        // Also avoid possible race conditions
+        if(hasStarted == TRUE || isTerminated == TRUE) {
             return;
         }
-        hasStarted = TRUE;
         
         // Adjust the local media format
         mediaFormat = mediaPatch->GetSinkFormat();
@@ -98,6 +100,7 @@ void XMMediaStream::OnPatchStart()
         }
         
         videoTransmitterStream = this;
+        hasStarted = TRUE;
         
         dataFrame.SetPayloadSize(0);
         dataFrame.SetPayloadType(payloadType);
@@ -111,7 +114,13 @@ BOOL XMMediaStream::Close()
 {	
     if (IsSource())
     {
-        _XMStopMediaTransmit(2);
+        patchMutex.Wait();
+        if (hasStarted == TRUE) {
+            _XMStopMediaTransmit(2);
+        } else {
+            isTerminated = TRUE;
+        }
+        patchMutex.Signal();
         
         // Wait until the video system terminated
         while(isTerminated == FALSE) {
