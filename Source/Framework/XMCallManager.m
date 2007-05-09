@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.32 2007/03/28 07:25:17 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.33 2007/05/09 15:02:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -776,6 +776,9 @@
 		NSString *remoteAddress = (NSString *)[remotePartyInformations objectAtIndex:2];
 		NSString *remoteApplication = (NSString *)[remotePartyInformations objectAtIndex:3];
 		NSString *localAddress = (NSString *)[remotePartyInformations objectAtIndex:4];
+        
+        NSLog(@"RemoteNumber: (%@)", remoteNumber);
+        NSLog(@"RemoteAddress: (%@)", remoteAddress);
 		
 		[activeCall _setRemoteName:remoteName];
 		[activeCall _setRemoteNumber:remoteNumber];

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.33 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.34 2007/05/09 15:02:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,6 +44,8 @@ public:
     void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
 	/* getting/setting call information */
+    void LockCallInformation();
+    void UnlockCallInformation();
 	void GetCallInformation(PString & remoteName,
 							PString & remoteNumber,
 							PString & remoteAddress,
@@ -114,6 +116,7 @@ private:
     
     BOOL enableH264LimitedMode;
 	
+    PMutex callInformationMutex;
 	PString connectionToken;
 	PString remoteName;
 	PString remoteNumber;

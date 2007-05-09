@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.39 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.40 2007/05/09 15:01:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -215,8 +215,14 @@ void _XMRejectIncomingCall(unsigned callID);
 // Causes the OPAL system to clear the existing call
 void _XMClearCall(unsigned callID);
 
-// This function provides additional information about the remote party. 
-//Note that calling this function is only safe when the call is established
+// These functions provide additional information about the remote party. 
+// Note that calling this function is only safe when the call is established
+// Before calling XMGetCallInformation(), the call information has to be locked.
+// Afterwards, the call information has to be unlocked again.
+// Dereferencing the pointers after the call information has been unlocked is not
+// safe!
+void _XMLockCallInformation();
+void _XMUnlockCallInformation();
 void _XMGetCallInformation(unsigned callID,
 						   const char** remoteName, 
 						   const char** remoteNumber,

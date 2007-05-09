@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.29 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.30 2007/05/09 15:02:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -216,6 +216,24 @@ void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 		}
 		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
 	}	
+}
+
+void XMH323Connection::SetRemotePartyInfo(const H323SignalPDU & pdu)
+{
+    PString newNumber;
+    if (pdu.GetQ931().GetCalledPartyNumber(newNumber)) {
+        remotePartyNumber = newNumber;
+    }
+    
+    PString remoteHostName = signallingChannel->GetRemoteAddress().GetHostName();
+    PString newRemotePartyName = pdu.GetQ931().GetDisplayName();
+    if (newRemotePartyName.IsEmpty() || newRemotePartyName == remoteHostName) {
+        remotePartyName = remoteHostName;
+    } else {
+        remotePartyName = newRemotePartyName;
+    }
+    
+    PTRACE(3, "H225\tSet remote party name: \"" << remotePartyName << '"');
 }
 
 void XMH323Connection::CleanUp()

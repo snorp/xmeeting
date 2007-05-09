@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.40 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.41 2007/05/09 15:02:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1008,16 +1008,24 @@ typedef enum _XMOpalDispatcherMessage
 		const char *remoteNumber;
 		const char *remoteAddress;
 		const char *remoteApplication;
-	
+        
+        _XMLockCallInformation();
 		_XMGetCallInformation(callID, &remoteName, &remoteNumber, &remoteAddress, &remoteApplication);
 		
 		NSString *remoteNameString = [[NSString alloc] initWithCString:remoteName encoding:NSASCIIStringEncoding];
 		NSString *remoteNumberString = [[NSString alloc] initWithCString:remoteNumber encoding:NSASCIIStringEncoding];
 		NSString *remoteAddressString = [[NSString alloc] initWithCString:remoteAddress encoding:NSASCIIStringEncoding];
 		NSString *remoteApplicationString = [[NSString alloc] initWithCString:remoteApplication encoding:NSASCIIStringEncoding];
+        
+        _XMUnlockCallInformation();
 		
 		remotePartyInformations = [[NSArray alloc] initWithObjects:remoteNameString, remoteNumberString, remoteAddressString,
 													remoteApplicationString, localAddress, nil];
+        
+        [remoteNameString release];
+        [remoteNumberString release];
+        [remoteAddressString release];
+        [remoteApplicationString release];
 	}
 	
 	[_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallEstablished:)

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.9 2006/06/22 10:13:01 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.10 2007/05/09 15:02:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -916,6 +916,9 @@
 		NSString *remoteNumber = [callInfo remoteNumber];
 		if(remoteNumber != nil)
 		{
+            if ([remoteNumber isEqualToString:@""]) {
+                remoteNumber = @"--";
+            }
 			remoteNumberString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_NUMBER", @""), remoteNumber];
 		}
 		

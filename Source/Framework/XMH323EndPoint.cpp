@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.27 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.28 2007/05/09 15:02:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -234,12 +234,25 @@ void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 	XMOpalManager * manager = (XMOpalManager *)(&GetManager());
 	
 	connectionToken = connection.GetToken();
+    
+    const PString & remotePartyName = connection.GetRemotePartyName();
+    const PString & remotePartyNumber = connection.GetRemotePartyNumber();
+    const PString & remotePartyApplication = connection.GetRemoteApplication();
+    
+    const H323Transport *signallingChannel = ((H323Connection & )connection).GetSignallingChannel();
+    const PString & remotePartyAddress = signallingChannel->GetRemoteAddress().GetHostName();
+    
+    // If the address is in format 'tcp$xxx.xxx.xxx.xxx:xxx', strip 'tcp$' and ':xxx'
+    /*PINDEX location = remotePartyAddress.Find('$');
+    if (location != P_MAX_INDEX) {
+        remotePartyAddress = remotePartyAddress.Mid(location+1);
+    }*/
 	
 	manager->SetCallInformation(connectionToken,
-								connection.GetRemotePartyName(),
-								connection.GetRemotePartyNumber(),
-								connection.GetRemotePartyAddress(),
-								connection.GetRemoteApplication(),
+								remotePartyName,
+								remotePartyNumber,
+								remotePartyAddress,
+								remotePartyApplication,
 								XMCallProtocol_H323);
 	
 	H323EndPoint::OnEstablished(connection);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.53 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.54 2007/05/09 15:02:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,6 +158,16 @@ void XMOpalManager::HandleCallInitiationFailed(XMCallEndReason endReason)
 #pragma mark -
 #pragma mark Getting / Setting Call Information
 
+void XMOpalManager::LockCallInformation()
+{
+    callInformationMutex.Wait();
+}
+
+void XMOpalManager::UnlockCallInformation()
+{
+    callInformationMutex.Signal();
+}
+
 void XMOpalManager::GetCallInformation(PString & theRemoteName,
 									   PString & theRemoteNumber,
 									   PString & theRemoteAddress,
@@ -176,6 +186,8 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 									   const PString & theRemoteApplication,
 									   XMCallProtocol theCallProtocol)
 {
+    PWaitAndSignal m(callInformationMutex);
+    
 	BOOL isValid = FALSE;
 	
 	if(connectionToken == "") // current connection token is empty

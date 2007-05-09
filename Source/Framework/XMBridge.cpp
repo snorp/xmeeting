@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.45 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.46 2007/05/09 15:01:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -268,6 +268,16 @@ void _XMClearCall(unsigned callID)
 	XMOpalManager::GetCallEndPoint()->ClearCall(callToken);
 }
 
+void _XMLockCallInformation()
+{
+    XMOpalManager::GetManager()->LockCallInformation();
+}
+
+void _XMUnlockCallInformation()
+{
+    XMOpalManager::GetManager()->UnlockCallInformation();
+}
+
 void _XMGetCallInformation(unsigned callID,
 						   const char** remoteName, 
 						   const char** remoteNumber,
@@ -285,6 +295,8 @@ void _XMGetCallInformation(unsigned callID,
 	*remoteNumber = numberStr;
 	*remoteAddress = addressStr;
 	*remoteApplication = appStr;
+    
+    cout << "Test 2: " << (int)nameStr.GetPointer() << " 3: " << (int)*remoteName << endl;
 }
 
 void _XMGetCallStatistics(unsigned callID,

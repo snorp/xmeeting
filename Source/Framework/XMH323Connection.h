@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.19 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.20 2007/05/09 15:02:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,9 @@ public:
     // Overridden to being able to send in-band DTMF
 	virtual BOOL SendUserInputTone(char tone, unsigned duration);
     virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+    
+    // Customizing information
+    virtual void SetRemotePartyInfo(const H323SignalPDU & pdu);
     
     // Improved clean up when closing the framework
     void CleanUp();
