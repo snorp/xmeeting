@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.46 2007/05/09 15:01:58 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.47 2007/05/14 13:46:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -247,9 +247,10 @@ bool _XMIsSIPRegistered()
 #pragma mark -
 #pragma mark Call Management functions
 
-unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, XMCallEndReason *endReason)
+unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, 
+                         const char *origAddressString, XMCallEndReason *endReason)
 {	
-    return XMOpalManager::GetManager()->InitiateCall(protocol, remoteParty, endReason);
+    return XMOpalManager::GetManager()->InitiateCall(protocol, remoteParty, origAddressString, endReason);
 }
 
 void _XMAcceptIncomingCall(unsigned callID)
@@ -295,8 +296,6 @@ void _XMGetCallInformation(unsigned callID,
 	*remoteNumber = numberStr;
 	*remoteAddress = addressStr;
 	*remoteApplication = appStr;
-    
-    cout << "Test 2: " << (int)nameStr.GetPointer() << " 3: " << (int)*remoteName << endl;
 }
 
 void _XMGetCallStatistics(unsigned callID,

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.41 2007/05/09 15:02:00 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.42 2007/05/14 13:46:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -109,7 +109,7 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
 - (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address;
-- (NSString *)_adjustedAddress:(NSString *)address;
+- (NSString *)_adjustedAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
 
 @end
 
@@ -1838,11 +1838,12 @@ typedef enum _XMOpalDispatcherMessage
 	}
 	
 	// adjust address if needed
-	NSString *adjustedAddress = [self _adjustedAddress:address];
+	NSString *adjustedAddress = [self _adjustedAddress:address protocol:protocol];
 	
 	const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *origAddressString = [address cStringUsingEncoding:NSASCIIStringEncoding];
     XMCallEndReason endReason;
-	callID = _XMInitiateCall(protocol, addressString, &endReason);
+	callID = _XMInitiateCall(protocol, addressString, origAddressString, &endReason);
 	
 	if(callID == 0)
 	{
@@ -1887,22 +1888,25 @@ typedef enum _XMOpalDispatcherMessage
 	[info release];
 }
 
-- (NSString *)_adjustedAddress:(NSString *)address
+- (NSString *)_adjustedAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol
 {
-	// Try to do DNS lookups. This is needed to workaround problems with
-	// DNS addresses and Gatekeepers in recent versions of OPAL
-	NSHost *host = [NSHost hostWithName:address];
-	NSArray *addresses = [host addresses];
-	unsigned count = [addresses count];
-	unsigned i;
-	for(i = 0; i < count; i++)
-	{
-		NSString *resolvedAddress = [addresses objectAtIndex:i];
-		// at the moment only IPv4 addresses are accepted
-		if(XMIsIPAddress(resolvedAddress))
-		{
-			return resolvedAddress;
-		}
+    if (callProtocol == XMCallProtocol_H323 && _XMIsRegisteredAtGatekeeper() == YES)
+    {
+        // Try to do DNS lookups. This is needed to workaround problems with
+        // DNS addresses and Gatekeepers in recent versions of OPAL
+        NSHost *host = [NSHost hostWithName:address];
+        NSArray *addresses = [host addresses];
+        unsigned count = [addresses count];
+        unsigned i;
+        for(i = 0; i < count; i++)
+        {
+            NSString *resolvedAddress = [addresses objectAtIndex:i];
+            // at the moment only IPv4 addresses are accepted
+            if(XMIsIPAddress(resolvedAddress))
+            {
+                return resolvedAddress;
+            }
+        }
 	}
 	
 	return address;

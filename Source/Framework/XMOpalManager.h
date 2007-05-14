@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.34 2007/05/09 15:02:01 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.35 2007/05/14 13:46:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,8 @@ public:
 	static XMEndPoint * GetCallEndPoint();
     
     /* Initiating a call */
-    unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, XMCallEndReason * callEndReason);
+    unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, 
+                          const char *origAddressString, XMCallEndReason * callEndReason);
     void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
 	/* getting/setting call information */
@@ -122,6 +123,7 @@ private:
 	PString remoteNumber;
 	PString remoteAddress;
 	PString remoteApplication;
+    PString origRemoteAddress;
 	XMCallProtocol callProtocol;
     
     XMCallEndReason *callEndReason;

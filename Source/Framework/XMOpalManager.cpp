@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.54 2007/05/09 15:02:01 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.55 2007/05/14 13:46:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,6 +82,7 @@ XMOpalManager::XMOpalManager()
 	remoteNumber = "";
 	remoteAddress = "";
 	remoteApplication = "";
+    origRemoteAddress = "";
     
     callEndReason = NULL;
 	
@@ -131,6 +132,7 @@ XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 
 unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol, 
                                      const char * remoteParty, 
+                                     const char * origAddressString,
                                      XMCallEndReason * _callEndReason)
 {
     PString token;
@@ -143,6 +145,8 @@ unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol,
     if (returnValue == TRUE)
     {
         callID = token.AsUnsigned();
+        
+        origRemoteAddress = origAddressString;
     }
     
     return callID;
@@ -175,7 +179,11 @@ void XMOpalManager::GetCallInformation(PString & theRemoteName,
 {
 	theRemoteName = remoteName;
 	theRemoteNumber = remoteNumber;
-	theRemoteAddress = remoteAddress;
+    if (origRemoteAddress != "") {
+        theRemoteAddress = origRemoteAddress;
+    } else {
+        theRemoteAddress = remoteAddress;
+    }
 	theRemoteApplication = remoteApplication;
 }
 
@@ -214,6 +222,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 		   remoteApplication == "") // empty information, clear connection token / call protocol
 		{
 			connectionToken = "";
+            origRemoteAddress = "";
 			callProtocol = XMCallProtocol_UnknownProtocol;
 		}
 	}

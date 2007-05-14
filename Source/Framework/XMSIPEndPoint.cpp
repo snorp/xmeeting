@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.30 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.31 2007/05/14 13:46:33 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -366,11 +366,22 @@ void XMSIPEndPoint::OnEstablished(OpalConnection & connection)
 	XMOpalManager *manager = (XMOpalManager *)(&GetManager());
 	
 	connectionToken = connection.GetToken();
+    
+    SIPURL remoteURL = SIPURL(connection.GetRemotePartyAddress());
+    const PString & username = remoteURL.GetUserName();
+    const PString & host = remoteURL.GetHostName();
+    PString remoteAddress;
+    
+    if (username != "") {
+        remoteAddress = username + "@" + host;
+    } else {
+        remoteAddress = host;
+    }
 	
 	manager->SetCallInformation(connectionToken,
 								connection.GetRemotePartyName(),
-								connection.GetRemotePartyNumber(),
-								connection.GetRemotePartyAddress(),
+								"",
+								remoteAddress,
 								connection.GetRemoteApplication(),
 								XMCallProtocol_SIP);
 	

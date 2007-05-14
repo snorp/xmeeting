@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.40 2007/05/09 15:01:58 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.41 2007/05/14 13:46:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -204,7 +204,8 @@ bool _XMIsSIPRegistered();
 // back through callbacks.
 // In case the initiation of the call failed, the reason will be passed
 // back through failReason
-unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, XMCallEndReason *failReason);
+unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, 
+                         const char *origAddressString, XMCallEndReason *failReason);
 
 // Causes the OPAL system to accept the incoming call
 void _XMAcceptIncomingCall(unsigned callID);
