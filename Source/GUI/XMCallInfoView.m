@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfoView.m,v 1.10 2007/05/09 15:02:01 hfriederich Exp $
+ * $Id: XMCallInfoView.m,v 1.11 2007/05/14 13:38:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -913,14 +913,16 @@
 			localAddressString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_LOCAL_ADDRESS", @""), localAddress, localInterface];
 		}
 		
-		NSString *remoteNumber = [callInfo remoteNumber];
-		if(remoteNumber != nil)
-		{
-            if ([remoteNumber isEqualToString:@""]) {
-                remoteNumber = @"--";
+        if (callProtocol == XMCallProtocol_H323) {
+            NSString *remoteNumber = [callInfo remoteNumber];
+            if(remoteNumber != nil)
+            {
+                if ([remoteNumber isEqualToString:@""]) {
+                    remoteNumber = @"--";
+                }
+                remoteNumberString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_NUMBER", @""), remoteNumber];
             }
-			remoteNumberString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_INFO_VIEW_NUMBER", @""), remoteNumber];
-		}
+        }
 		
 		NSString *remoteAddress = [callInfo remoteAddress];
 		if(remoteAddress != nil)
