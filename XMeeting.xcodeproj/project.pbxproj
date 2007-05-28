@@ -227,7 +227,6 @@
 		D126F5580BB170F300044885 /* manager.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34D08F90263007E4ABE /* manager.cxx */; };
 		D126F5590BB170F300044885 /* mediafmt.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34E08F90263007E4ABE /* mediafmt.cxx */; };
 		D126F55A0BB170F300044885 /* mediastrm.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE34F08F90263007E4ABE /* mediastrm.cxx */; };
-		D126F55B0BB170F300044885 /* opalvxml.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35008F90263007E4ABE /* opalvxml.cxx */; };
 		D126F55C0BB170F300044885 /* patch.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35108F90263007E4ABE /* patch.cxx */; };
 		D126F55D0BB170F300044885 /* pcss.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35208F90263007E4ABE /* pcss.cxx */; };
 		D126F55E0BB170F300044885 /* transcoders.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE35308F90263007E4ABE /* transcoders.cxx */; };
@@ -301,6 +300,8 @@
 		D15436510C020535002A027E /* XMeetingABPlugin-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */; };
 		D15436520C020561002A027E /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
 		D15436650C02056D002A027E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
+		D15436F20C0ADF78002A027E /* psockbun.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15436F10C0ADF78002A027E /* psockbun.h */; };
+		D15436F40C0ADF9D002A027E /* psockbun.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15436F30C0ADF9D002A027E /* psockbun.cxx */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
@@ -492,6 +493,7 @@
 				D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */,
 				D13962170BF0BA2F00C76EFD /* XMH323URL.h in CopyFiles */,
 				D13962B70BF0C9F100C76EFD /* XMSIPURL.h in CopyFiles */,
+				D15436F20C0ADF78002A027E /* psockbun.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -796,6 +798,8 @@
 		D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPlugin.h; path = Source/AddressBookPlugin/XMAddressBookPlugin.h; sourceTree = "<group>"; };
 		D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPlugin.m; path = Source/AddressBookPlugin/XMAddressBookPlugin.m; sourceTree = "<group>"; };
 		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
+		D15436F10C0ADF78002A027E /* psockbun.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = psockbun.h; sourceTree = "<group>"; };
+		D15436F30C0ADF9D002A027E /* psockbun.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = psockbun.cxx; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
 		D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
@@ -1302,7 +1306,6 @@
 		D1CEE34D08F90263007E4ABE /* manager.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = manager.cxx; sourceTree = "<group>"; };
 		D1CEE34E08F90263007E4ABE /* mediafmt.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = mediafmt.cxx; sourceTree = "<group>"; };
 		D1CEE34F08F90263007E4ABE /* mediastrm.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = mediastrm.cxx; sourceTree = "<group>"; };
-		D1CEE35008F90263007E4ABE /* opalvxml.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = opalvxml.cxx; sourceTree = "<group>"; };
 		D1CEE35108F90263007E4ABE /* patch.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = patch.cxx; sourceTree = "<group>"; };
 		D1CEE35208F90263007E4ABE /* pcss.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pcss.cxx; sourceTree = "<group>"; };
 		D1CEE35308F90263007E4ABE /* transcoders.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = transcoders.cxx; sourceTree = "<group>"; };
@@ -2080,6 +2083,7 @@
 		D1B6062E08F8F8410034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D15436F10C0ADF78002A027E /* psockbun.h */,
 				D10BD5310AC1C81E004320A8 /* guid.h */,
 				D1B6078608F8F86B0034B47F /* udp.h */,
 				D1B6062F08F8F8410034B47F /* asnber.h */,
@@ -2259,6 +2263,7 @@
 		D1B6075808F8F86B0034B47F /* ptclib */ = {
 			isa = PBXGroup;
 			children = (
+				D15436F30C0ADF9D002A027E /* psockbun.cxx */,
 				D1885E140BE9F296007E7B2E /* delaychan.cxx */,
 				D10BD5330AC1C83B004320A8 /* guid.cxx */,
 				D1887DEB0A27B67B00C938BB /* psasl.cxx */,
@@ -2660,7 +2665,6 @@
 				D1CEE34D08F90263007E4ABE /* manager.cxx */,
 				D1CEE34E08F90263007E4ABE /* mediafmt.cxx */,
 				D1CEE34F08F90263007E4ABE /* mediastrm.cxx */,
-				D1CEE35008F90263007E4ABE /* opalvxml.cxx */,
 				D1CEE35108F90263007E4ABE /* patch.cxx */,
 				D1CEE35208F90263007E4ABE /* pcss.cxx */,
 				D1CEE35308F90263007E4ABE /* transcoders.cxx */,
@@ -3379,7 +3383,6 @@
 				D126F5580BB170F300044885 /* manager.cxx in Sources */,
 				D126F5590BB170F300044885 /* mediafmt.cxx in Sources */,
 				D126F55A0BB170F300044885 /* mediastrm.cxx in Sources */,
-				D126F55B0BB170F300044885 /* opalvxml.cxx in Sources */,
 				D126F55C0BB170F300044885 /* patch.cxx in Sources */,
 				D126F55D0BB170F300044885 /* pcss.cxx in Sources */,
 				D126F55E0BB170F300044885 /* transcoders.cxx in Sources */,
@@ -3561,6 +3564,7 @@
 				D1395EF30BEF76A700C76EFD /* XMAreaSelectionView.m in Sources */,
 				D13962180BF0BA2F00C76EFD /* XMH323URL.m in Sources */,
 				D13962B80BF0C9F100C76EFD /* XMSIPURL.m in Sources */,
+				D15436F40C0ADF9D002A027E /* psockbun.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
