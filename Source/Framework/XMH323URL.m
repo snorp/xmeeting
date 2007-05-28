@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323URL.m,v 1.1 2007/05/08 15:17:46 hfriederich Exp $
+ * $Id: XMH323URL.m,v 1.2 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,9 +55,19 @@
     }
     
     address = [stringRepresentation substringFromIndex:5];
-    [address retain];
+    
+    // Remove preceeding '//' if present. Not according to standard,
+    // But may be present in order to force Safari to do the correct
+    // URL lookup
+    if ([address hasPrefix:@"//"])
+    {
+        address = [address substringFromIndex:2];
+    }
+    
     
     // Do some more validicy checking here!
+    
+    [address retain];
 
 bail:
     if (valid == NO)

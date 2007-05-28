@@ -241,6 +241,10 @@
 "XM_FETCHING_EXTERNAL_ADDRESS" = "Fetching...";
 "XM_EXTERNAL_ADDRESS_NOT_AVAILABLE" = "<Not available>";
 
+/* External URIs */
+"XM_ALREADY_IN_CALL" = "Already in call";
+"XM_ILLEGAL_URI" = "The given address '%@' could not be parsed correctly.";
+
 /* Misc */
 "XM_UNKNOWN_REASON" = "Unknown reason (%d)";
 "XM_UNKNOWN" = "<Unknown>";

@@ -1,9 +1,9 @@
 /*
- * $Id: XMURICommand.h,v 1.1 2006/08/17 21:47:28 hfriederich Exp $
+ * $Id: XMURICommand.h,v 1.2 2007/05/28 09:56:04 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_URI_COMMAND_H__
@@ -14,6 +14,8 @@
 @interface XMURICommand : NSScriptCommand {
 
 }
+
++ (NSString *)tryToCallAddress:(NSString *)addressString;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.9 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.10 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -108,6 +108,22 @@
 		return nil;
 	}
 	return [provider completionStringForAddress:address uncompletedString:uncompletedString];
+}
+
+- (id<XMCallAddress>)addressMatchingResource:(XMAddressResource *)addressResource
+{
+    unsigned i;
+    unsigned count = [callAddressProviders count];
+    
+    for (i = 0; i < count; i++) 
+    {
+        id<XMCallAddressProvider> provider = (id<XMCallAddressProvider>)[callAddressProviders objectAtIndex:i];
+        id<XMCallAddress> address = [provider addressMatchingResource:addressResource];
+        if (address != nil) {
+            return address;
+        }
+    }
+    return nil;
 }
 
 - (NSArray *)alternativesForAddress:(id<XMCallAddress>)address selectedIndex:(unsigned *)selectedIndex

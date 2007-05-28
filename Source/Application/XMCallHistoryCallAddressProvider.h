@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.h,v 1.4 2007/05/28 09:56:04 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_HISTORY_CALL_ADDRESS_PROVIDER_H__
@@ -37,6 +37,12 @@ extern NSString *XMNotification_CallHistoryCallAddressProviderDataDidChange;
  * are XMCallHistoryRecord instance.
  **/
 - (NSArray *)recentCalls;
+
+/**
+ * Synchronizes the User Defaults database with the
+ * current call history records
+ **/
+- (void)synchronizeUserDefaults;
 
 @end
 

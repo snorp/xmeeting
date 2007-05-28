@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.m,v 1.11 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.m,v 1.12 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -259,6 +259,12 @@
 			return [NSString stringWithFormat:@"%@ <%@>", displayName, callAddress];
 		}
 	}
+}
+
+- (id<XMCallAddress>)addressMatchingResource:(XMAddressResource *)addressResource
+{
+    XMAddressBookManager *addressBookManager = [XMAddressBookManager sharedInstance];
+    return [addressBookManager recordWithCallAddress:[addressResource address]];
 }
 
 - (NSArray *)alternativesForAddress:(id<XMCallAddress>)address selectedIndex:(unsigned *)selectedIndex

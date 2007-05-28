@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.44 2007/05/08 15:18:40 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.45 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -914,11 +914,17 @@
 	
 	id representedObject = [callAddressField representedObject];
 	
-	if([representedObject displayImage] == nil)
-	{
-		XMSimpleAddressResource *resource = (XMSimpleAddressResource *)representedObject;
-		[resource setCallProtocol:callProtocol];
+    if ([representedObject isKindOfClass:[XMSimpleAddressResource class]])
+    {
+        XMSimpleAddressResource *resource = (XMSimpleAddressResource *)representedObject;
+        [resource setCallProtocol:callProtocol];
 	}
+    else if (representedObject != nil)
+    {
+        XMSimpleAddressResource *resource = [[XMSimpleAddressResource alloc] initWithAddress:[representedObject address] callProtocol:callProtocol];
+        [callAddressField setRepresentedObject:resource];
+        [resource release];
+    }
 	
 	[[NSUserDefaults standardUserDefaults] setInteger:(int)currentCallProtocol forKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
 }

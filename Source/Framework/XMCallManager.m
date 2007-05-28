@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.35 2007/05/14 15:41:56 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.36 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1254,6 +1254,25 @@
     XMCallProtocol callProtocol = [addressResource callProtocol];
 	
 	NSString *address = [addressResource address];
+
+    // clean phone numbers
+    if (XMIsPhoneNumber(address)) {
+        // remove any white spaces and '(', ')' in the address, replace any preceding + with the international prefix
+        NSMutableString *processedAddress = [[NSMutableString alloc] initWithCapacity:[address length]];
+        [processedAddress setString:address];
+        [processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
+        [processedAddress replaceOccurrencesOfString:@"(" withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
+        [processedAddress replaceOccurrencesOfString:@")" withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
+        if([processedAddress length] > 1)
+        {
+            if([processedAddress characterAtIndex:0] == '+')
+            {
+                [processedAddress replaceCharactersInRange:NSMakeRange(0, 1) withString:@"00"];
+            }
+        }
+        address = [processedAddress autorelease];
+                
+    }
 	if(callProtocol == XMCallProtocol_SIP)
 	{
         // if using SIP and the address is a phone number,
@@ -1273,18 +1292,6 @@
             }
         }
 	}
-    
-    // remove any white spaces in the address, replace any preceding + with the international prefix
-	NSMutableString *processedAddress = [[NSMutableString alloc] initWithCapacity:[address length]];
-	[processedAddress setString:address];
-	[processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
-	if([processedAddress length] > 1)
-	{
-		if([processedAddress characterAtIndex:0] == '+')
-		{
-			[processedAddress replaceCharactersInRange:NSMakeRange(0, 1) withString:@"00"];
-		}
-	}
 	
 	// validity check is done within XMOpalDispatcher
 	
@@ -1295,7 +1302,7 @@
 	// Stop the audio test if needed
 	[_XMAudioManagerSharedInstance stopAudioTest];
 	
-	return [processedAddress autorelease];
+	return address;
 }
 
 - (void)_storeCall:(XMCallInfo *)call

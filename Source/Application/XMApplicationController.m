@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.51 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.52 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,7 @@
 #import "XMSIPAccount.h"
 #import "XMLocation.h"
 #import "XMApplicationFunctions.h"
+#import "XMURICommand.h"
 
 #import "XMMainWindowController.h"
 #import "XMNoCallModule.h"
@@ -180,6 +181,7 @@
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Action Methods
 
 - (IBAction)showPreferences:(id)sender
@@ -327,6 +329,32 @@
 	
 	// wait for the FrameworkDidClose notification before terminating.
 	return NSTerminateLater;
+}
+
+#pragma mark -
+#pragma mark Services implementation
+
+- (void)handleServicesString:(NSPasteboard *)pboard
+                    userData:(NSString *)userData
+                       error:(NSString **)error
+{
+    NSArray *types;
+    NSString *pboardString;
+	
+	types = [pboard types];
+	if(![types containsObject:NSStringPboardType])
+	{
+		*error = @"No pboard string";
+		return;
+	}
+	pboardString = [pboard stringForType:NSStringPboardType];
+	if(!pboardString)
+	{
+		*error = @"No pboard string";
+		return;
+	}
+	
+    *error = [XMURICommand tryToCallAddress:pboardString];
 }
 
 #pragma mark -
@@ -882,6 +910,9 @@
 	
 	activeAlert = nil;
 	incomingCallSound = nil;
+    
+    // Enable the services menu
+    [NSApp setServicesProvider:self];
 }
 
 @end

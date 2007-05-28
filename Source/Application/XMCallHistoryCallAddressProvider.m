@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.10 2007/05/08 15:18:40 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.11 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,12 +17,12 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 - (id)_init;
 
 - (void)_didStartCalling:(NSNotification *)notif;
-- (void)_synchronizeUserDefaults;
 
 @end
 
 @implementation XMCallHistoryCallAddressProvider
 
+#pragma mark -
 #pragma mark Class Methods
 
 + (XMCallHistoryCallAddressProvider *)sharedInstance
@@ -37,6 +37,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	return sharedInstance;
 }
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -95,6 +96,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Activating / Deactivating this provider
 
 - (BOOL)isActiveCallAddressProvider
@@ -121,11 +123,35 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	}
 }
 
+#pragma mark -
+#pragma mark Public Methods
+
 - (NSArray *)recentCalls
 {
 	return callHistoryRecords;
 }
 
+- (void)synchronizeUserDefaults
+{
+	unsigned i;
+	unsigned count = [callHistoryRecords count];
+	
+	NSMutableArray *dictionaryRepresentations = [[NSMutableArray alloc] initWithCapacity:count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
+		NSDictionary *dictionaryRepresentation = [record dictionaryRepresentation];
+		[dictionaryRepresentations addObject:dictionaryRepresentation];
+	}
+	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	[userDefaults setObject:dictionaryRepresentations forKey:XMKey_CallHistoryRecords];
+	
+	[dictionaryRepresentations release];
+}
+
+#pragma mark -
 #pragma mark XMCallAddressProvider methods
 
 - (NSArray *)addressesMatchingString:(NSString *)searchString
@@ -188,6 +214,29 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	return [record displayString];
 }
 
+- (id<XMCallAddress>)addressMatchingResource:(XMAddressResource *)addressResource
+{
+    NSString *address = [addressResource address];
+    XMCallProtocol callProtocol = [addressResource callProtocol];
+    
+    unsigned i;
+	unsigned count = [callHistoryRecords count];
+	
+	for(i = 0; i < count; i++)
+	{
+		XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
+        
+		if ([record type] == XMCallHistoryRecordType_GeneralRecord &&
+            [record callProtocol] == callProtocol && 
+            [[record address] caseInsensitiveCompare:address] == NSOrderedSame)
+        {
+            return record;
+        }
+	}
+    
+    return nil;
+}
+
 - (NSArray *)alternativesForAddress:(id<XMCallAddress>)callAddress selectedIndex:(unsigned *)selectedIndex
 {
 	XMCallHistoryRecord *record = (XMCallHistoryRecord *)callAddress;
@@ -240,6 +289,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	return addresses;
 }
 
+#pragma mark -
 #pragma mark Private Methods
 
 - (void)_didStartCalling:(NSNotification *)notif
@@ -259,7 +309,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 			if(i == 0)
 			{
 				// Update the user defaults in case the user chose a different cal protocol
-				[self _synchronizeUserDefaults];
+				[self synchronizeUserDefaults];
 				return;
 			}
 			else
@@ -268,7 +318,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 				[callHistoryRecords removeObjectAtIndex:i];
 				[callHistoryRecords insertObject:record atIndex:0];
 				[record release];
-				[self _synchronizeUserDefaults];
+				[self synchronizeUserDefaults];
 				
 				[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallHistoryCallAddressProviderDataDidChange object:self];
 				return;
@@ -285,29 +335,9 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 	}
 	[callHistoryRecords insertObject:record atIndex:0];
 	[record release];
-	[self _synchronizeUserDefaults];
+	[self synchronizeUserDefaults];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallHistoryCallAddressProviderDataDidChange object:self];
-}
-
-- (void)_synchronizeUserDefaults
-{
-	unsigned i;
-	unsigned count = [callHistoryRecords count];
-	
-	NSMutableArray *dictionaryRepresentations = [[NSMutableArray alloc] initWithCapacity:count];
-	
-	for(i = 0; i < count; i++)
-	{
-		XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
-		NSDictionary *dictionaryRepresentation = [record dictionaryRepresentation];
-		[dictionaryRepresentations addObject:dictionaryRepresentation];
-	}
-	
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	[userDefaults setObject:dictionaryRepresentations forKey:XMKey_CallHistoryRecords];
-	
-	[dictionaryRepresentations release];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.21 2007/03/12 13:33:51 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.22 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -538,10 +538,10 @@ BOOL XMIsIPAddress(NSString *address)
 	
 	BOOL isIPAddress = NO;
 	
-	if([scanner scanInt:&byte] && [scanner scanString:@"." intoString:nil] &&
-	   [scanner scanInt:&byte] && [scanner scanString:@"." intoString:nil] &&
-	   [scanner scanInt:&byte] && [scanner scanString:@"." intoString:nil] &&
-	   [scanner scanInt:&byte])
+	if([scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+	   [scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+	   [scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+	   [scanner scanInt:&byte] && (byte < 256) && [scanner isAtEnd])
 	{
 		isIPAddress = YES;
 	}

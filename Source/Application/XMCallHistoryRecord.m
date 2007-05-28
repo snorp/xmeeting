@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.13 2006/06/20 20:14:39 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.14 2007/05/28 09:56:04 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallHistoryRecord.h"
@@ -27,6 +27,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 @implementation XMCallHistoryRecord
 
+#pragma mark -
 #pragma mark Init & Deallocation Methods
 
 - (id)init
@@ -93,6 +94,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	[super dealloc];
 }
 
+#pragma mark -
 #pragma mark Getting different Representations
 
 - (NSDictionary *)dictionaryRepresentation
@@ -108,6 +110,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	return dict;
 }
 
+#pragma mark -
 #pragma mark Getting the attributes
 
 - (XMAddressResource *)addressResource
@@ -158,7 +161,8 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	return type;
 }
 
-#pragma mark Overriding id<XMCallAddress> methods
+#pragma mark -
+#pragma mark Overriding XMSimpleAddressResource methods
 
 - (id<XMCallAddressProvider>)provider
 {
@@ -184,6 +188,13 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 	}
 }
 
+- (void)setCallProtocol:(XMCallProtocol)_callProtocol
+{
+    [super setCallProtocol:_callProtocol];
+    [[XMCallHistoryCallAddressProvider sharedInstance] synchronizeUserDefaults];
+}
+
+#pragma mark -
 #pragma mark Private Methods
 
 - (BOOL)_checkType
@@ -227,7 +238,8 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 {
 	if([self _checkType] == YES)
 	{
-		NSNotification *notif = [NSNotification notificationWithName:XMNotification_CallHistoryCallAddressProviderDataDidChange object:self];
+		NSNotification *notif = [NSNotification notificationWithName:XMNotification_CallHistoryCallAddressProviderDataDidChange 
+                                                              object:[XMCallHistoryCallAddressProvider sharedInstance]];
 		NSNotificationQueue *notificationQueue = [NSNotificationQueue defaultQueue];
 		[notificationQueue enqueueNotification:notif postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
 	}

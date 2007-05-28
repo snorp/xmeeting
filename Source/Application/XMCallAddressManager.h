@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.8 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.9 2007/05/28 09:56:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,10 +44,18 @@
 
 /**
  * queries the manager for matches and completions to a given search string.
- * These queries are forwarded to the appropriate call address providerrs
+ * These queries are forwarded to the appropriate call address providers
  **/
 - (NSArray *)addressesMatchingString:(NSString *)searchString;
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
+
+/**
+ * queries the manager for matches to the given address resource.
+ * The queries are forwarded to the appropriate call address providers.
+ * If there is more than one match, the "best" match is returned. If no match
+ * is found, returns nil
+ **/
+- (id<XMCallAddress>)addressMatchingResource:(XMAddressResource *)addressResource;
 
 /**
  * Returns an array of options for the given address. The array contains NSString instances
@@ -84,7 +92,7 @@
 @protocol XMCallAddressProvider <NSObject>
 
 /**
- * This method should return an array of id<XMCallResource> instances which match
+ * This method should return an array of id<XMCallAddress> instances which match
  * to searchString.
  **/
 - (NSArray *)addressesMatchingString:(NSString *)searchString;
@@ -94,6 +102,12 @@
  * If uncompletedString does not match the resource, this method should return nil.
  */
 - (NSString *)completionStringForAddress:(id<XMCallAddress>)address uncompletedString:(NSString *)uncompletedString;
+
+/**
+ * This method should return an id<XMCallAddress> instance that matches the given
+ * address resource, or nil if no match is found.
+ **/
+- (id<XMCallAddress>)addressMatchingResource:(XMAddressResource *)addressResource;
 
 /**
  * This method should return an array with alternatives for the given address. The options

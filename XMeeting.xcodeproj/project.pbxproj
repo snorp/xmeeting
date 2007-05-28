@@ -297,6 +297,10 @@
 		D13AED4B0BBA3854008B3CBA /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4A0BBA3854008B3CBA /* libssl.dylib */; };
 		D13AED4E0BBA38D4008B3CBA /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */; };
 		D13AED510BBA3931008B3CBA /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED500BBA3931008B3CBA /* libresolv.dylib */; };
+		D154361D0C01FC22002A027E /* XMAddressBookPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */; };
+		D15436510C020535002A027E /* XMeetingABPlugin-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */; };
+		D15436520C020561002A027E /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
+		D15436650C02056D002A027E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
@@ -788,6 +792,10 @@
 		D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMInBandDTMFHandler.cpp; path = Source/Framework/XMInBandDTMFHandler.cpp; sourceTree = "<group>"; };
 		D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMInBandDTMFHandler.h; path = Source/Framework/XMInBandDTMFHandler.h; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
+		D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XMeetingABPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPlugin.h; path = Source/AddressBookPlugin/XMAddressBookPlugin.h; sourceTree = "<group>"; };
+		D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPlugin.m; path = Source/AddressBookPlugin/XMAddressBookPlugin.m; sourceTree = "<group>"; };
+		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
 		D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
@@ -1528,6 +1536,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D15435ED0C01FB62002A027E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D15436650C02056D002A027E /* Cocoa.framework in Frameworks */,
+				D15436520C020561002A027E /* AddressBook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D1E314C00B52AA6900385072 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1548,6 +1565,7 @@
 				D1A02A6C081E40360018BD11 /* Preferences Window */,
 				D1EF07470918B15A008A8974 /* Setup Assistant */,
 				D163333C07A01A8B003FD9C0 /* Framework */,
+				D15436160C01FBC7002A027E /* AddressBook Plugin */,
 			);
 			name = "Code Source";
 			sourceTree = "<group>";
@@ -1590,6 +1608,7 @@
 				8D1107320486CEB800E47090 /* XMeeting.app */,
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
 				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
+				D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1880,6 +1899,16 @@
 				D10FD6560A7D49C700935B10 /* speex_preprocess.c */,
 			);
 			name = speex;
+			sourceTree = "<group>";
+		};
+		D15436160C01FBC7002A027E /* AddressBook Plugin */ = {
+			isa = PBXGroup;
+			children = (
+				D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */,
+				D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */,
+				D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */,
+			);
+			name = "AddressBook Plugin";
 			sourceTree = "<group>";
 		};
 		D163333C07A01A8B003FD9C0 /* Framework */ = {
@@ -3050,6 +3079,23 @@
 			productReference = D10975240BAE73F4007E8087 /* gsm_pwplugin.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		D15435EE0C01FB62002A027E /* XMeetingABPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D154360F0C01FB66002A027E /* Build configuration list for PBXNativeTarget "XMeetingABPlugin" */;
+			buildPhases = (
+				D15435EB0C01FB62002A027E /* Resources */,
+				D15435EC0C01FB62002A027E /* Sources */,
+				D15435ED0C01FB62002A027E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = XMeetingABPlugin;
+			productName = "Address Book plugin";
+			productReference = D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		D1E314C10B52AA6900385072 /* speex */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D1E314C30B52AA8900385072 /* Build configuration list for PBXNativeTarget "speex" */;
@@ -3087,6 +3133,7 @@
 				8D1107260486CEB800E47090 /* XMeeting */,
 				D1E314C10B52AA6900385072 /* speex */,
 				D10974F30BAE73F4007E8087 /* gsm */,
+				D15435EE0C01FB62002A027E /* XMeetingABPlugin */,
 			);
 		};
 /* End PBXProject section */
@@ -3233,6 +3280,14 @@
 				D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */,
 				D10BD5470AC1D503004320A8 /* recording.gif in Resources */,
 				D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D15435EB0C01FB62002A027E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D15436510C020535002A027E /* XMeetingABPlugin-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3528,6 +3583,14 @@
 				D10975460BAE7565007E8087 /* rpe.c in Sources */,
 				D10975470BAE7565007E8087 /* short_term.c in Sources */,
 				D10975480BAE7565007E8087 /* table.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D15435EC0C01FB62002A027E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D154361D0C01FC22002A027E /* XMAddressBookPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4168,6 +4231,100 @@
 			};
 			name = Deployment;
 		};
+		D15436100C01FB66002A027E /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "Address Book plugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "Address Book plugin";
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		D15436110C01FB66002A027E /* Development_PPC */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "XMeetingABPlugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = XMeetingABPlugin;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = YES;
+			};
+			name = Development_PPC;
+		};
+		D15436120C01FB66002A027E /* DevelopmentRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "Address Book plugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "Address Book plugin";
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = YES;
+			};
+			name = DevelopmentRelease;
+		};
+		D15436130C01FB66002A027E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "Address Book plugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "Address Book plugin";
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
 		D1E314C40B52AA8900385072 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4284,6 +4441,17 @@
 				D10FD9510A852E1500935B10 /* Development_PPC */,
 				D10FD6490A7D449200935B10 /* DevelopmentRelease */,
 				D11E93F708589A9200154C02 /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+		D154360F0C01FB66002A027E /* Build configuration list for PBXNativeTarget "XMeetingABPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D15436100C01FB66002A027E /* Development */,
+				D15436110C01FB66002A027E /* Development_PPC */,
+				D15436120C01FB66002A027E /* DevelopmentRelease */,
+				D15436130C01FB66002A027E /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
