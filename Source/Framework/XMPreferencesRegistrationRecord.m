@@ -1,17 +1,17 @@
 /*
- * $Id: XMPreferencesRegistrarRecord.m,v 1.1 2006/04/06 23:15:32 hfriederich Exp $
+ * $Id: XMPreferencesRegistrationRecord.m,v 1.1 2007/05/30 08:43:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
-#import "XMPreferencesRegistrarRecord.h"
+#import "XMPreferencesRegistrationRecord.h"
 
 #import "XMStringConstants.h"
 #import "XMPrivate.h"
 
-@implementation XMPreferencesRegistrarRecord
+@implementation XMPreferencesRegistrationRecord
 
 #pragma mark Init & Deallocation Methods
 
@@ -19,7 +19,7 @@
 {
 	self = [super init];
 	
-	host = nil;
+	domain = nil;
 	username = nil;
 	authorizationUsername = nil;
 	password = nil;
@@ -33,25 +33,25 @@
 	
 	Class stringClass = [NSString class];
 	
-	NSString *string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrarRecordHost];
+	NSString *string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordDomain];
 	if(string && [string isKindOfClass:stringClass])
 	{
-		host = [string retain];
+		domain = [string retain];
 	}
 	
-	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrarRecordUsername];
+	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordUsername];
 	if(string && [string isKindOfClass:stringClass])
 	{
 		username = [string retain];
 	}
 	
-	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrarRecordAuthorizationUsername];
+	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername];
 	if(string && [string isKindOfClass:stringClass])
 	{
 		authorizationUsername = [string retain];
 	}
 	
-	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrarRecordPassword];
+	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordPassword];
 	if(string && [string isKindOfClass:stringClass])
 	{
 		password = [string retain];
@@ -65,10 +65,10 @@
 	
 	if([coder allowsKeyedCoding]) // use keyed coding
 	{
-		[self setHost:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrarRecordHost]];
-		[self setUsername:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrarRecordUsername]];
-		[self setAuthorizationUsername:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrarRecordAuthorizationUsername]];
-		[self setPassword:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrarRecordPassword]];
+		[self setDomain:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordDomain]];
+		[self setUsername:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordUsername]];
+		[self setAuthorizationUsername:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername]];
+		[self setPassword:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordPassword]];
 	}
 	else // raise an exception
 	{
@@ -82,9 +82,9 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	XMPreferencesRegistrarRecord *record = [[XMPreferencesRegistrarRecord alloc] init];
+	XMPreferencesRegistrationRecord *record = [[XMPreferencesRegistrationRecord alloc] init];
 	
-	[record setHost:[self host]];
+	[record setDomain:[self domain]];
 	[record setUsername:[self username]];
 	[record setAuthorizationUsername:[self authorizationUsername]];
 	[record setPassword:[self password]];
@@ -96,10 +96,10 @@
 {
 	if([coder allowsKeyedCoding])
 	{
-		[coder encodeObject:[self host] forKey:XMKey_PreferencesRegistrarRecordHost];
-		[coder encodeObject:[self username] forKey:XMKey_PreferencesRegistrarRecordUsername];
-		[coder encodeObject:[self authorizationUsername] forKey:XMKey_PreferencesRegistrarRecordAuthorizationUsername];
-		[coder encodeObject:[self password] forKey:XMKey_PreferencesRegistrarRecordPassword];
+		[coder encodeObject:[self domain] forKey:XMKey_PreferencesRegistrationRecordDomain];
+		[coder encodeObject:[self username] forKey:XMKey_PreferencesRegistrationRecordUsername];
+		[coder encodeObject:[self authorizationUsername] forKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername];
+		[coder encodeObject:[self password] forKey:XMKey_PreferencesRegistrationRecordPassword];
 	}
 	else
 	{
@@ -122,9 +122,9 @@
 		return NO;
 	}
 	
-	XMPreferencesRegistrarRecord *record = (XMPreferencesRegistrarRecord *)object;
+	XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)object;
 	
-	if([[self host] isEqualToString:[record host]] &&
+	if([[self domain] isEqualToString:[record domain]] &&
 	   [[self username] isEqualToString:[record username]] &&
 	   [[self authorizationUsername] isEqualToString:[record authorizationUsername]] &&
 	   [[self password] isEqualToString:[record password]])
@@ -139,28 +139,28 @@
 {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:4];
 	
-	NSString *string = [self host];
+	NSString *string = [self domain];
 	if(string)
 	{
-		[dict setObject:string forKey:XMKey_PreferencesRegistrarRecordHost];
+		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordDomain];
 	}
 	
 	string = [self username];
 	if(string)
 	{
-		[dict setObject:string forKey:XMKey_PreferencesRegistrarRecordUsername];
+		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordUsername];
 	}
 	
 	string = [self authorizationUsername];
 	if(string)
 	{
-		[dict setObject:string forKey:XMKey_PreferencesRegistrarRecordAuthorizationUsername];
+		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername];
 	}
 	
 	string = [self password];
 	if(string)
 	{
-		[dict setObject:string forKey:XMKey_PreferencesRegistrarRecordPassword];
+		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordPassword];
 	}
 	
 	return dict;
@@ -169,15 +169,15 @@
 #pragma mark -
 #pragma mark Get & Set Methods
 
-- (NSString *)host
+- (NSString *)domain
 {
-	return host;
+	return domain;
 }
 
-- (void)setHost:(NSString *)theHost
+- (void)setDomain:(NSString *)theDomain
 {
-	NSString *old = host;
-	host = [theHost copy];
+	NSString *old = domain;
+	domain = [theDomain copy];
 	[old release];
 }
 
@@ -215,6 +215,17 @@
 	NSString *old = password;
 	password = [thePassword copy];
 	[old release];
+}
+
+- (NSString *)registration
+{
+    if (username != nil && [username rangeOfString:@"@"].location != NSNotFound) {
+        return username;
+    }
+    if (username == nil || domain == nil) {
+        return nil;
+    }
+    return [NSString stringWithFormat:@"%@@%@", username, domain];
 }
 
 @end
