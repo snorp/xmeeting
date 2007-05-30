@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPAccount.h,v 1.4 2006/05/16 21:30:06 hfriederich Exp $
+ * $Id: XMSIPAccount.h,v 1.5 2007/05/30 08:41:16 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SIP_ACCOUNT_H__
@@ -13,7 +13,7 @@
 #import "XMeeting.h"
 
 extern NSString *XMKey_SIPAccountName;
-extern NSString *XMKey_SIPAccountRegistrar;
+extern NSString *XMKey_SIPAccountDomain;
 extern NSString *XMKey_SIPAccountUsername;
 extern NSString *XMKey_SIPAccountAuthorizationUsername;
 extern NSString *XMKey_SIPAccountPassword;
@@ -22,13 +22,13 @@ extern NSString *XMKey_SIPAccountPassword;
  * An SIP account instance encapsulates all information required so that the client
  * can register at a SIP registrar.
  *
- * The locations then point to an account to define it's registrar settings.
+ * The locations then point to an account to define it's registration settings.
  **/
 @interface XMSIPAccount : NSObject <NSCopying> {
 
 	unsigned tag;
 	NSString *name;
-	NSString *registrar;
+	NSString *domain;
 	NSString *username;
 	NSString *authorizationUsername;
 	BOOL didLoadPassword;
@@ -45,8 +45,8 @@ extern NSString *XMKey_SIPAccountPassword;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
 
-- (NSString *)registrar;
-- (void)setRegistrar:(NSString *)registrar;
+- (NSString *)domain;
+- (void)setDomain:(NSString *)domain;
 
 - (NSString *)username;
 - (void)setUsername:(NSString *)username;
@@ -59,6 +59,8 @@ extern NSString *XMKey_SIPAccountPassword;
 
 - (void)clearPassword;
 - (void)savePassword;
+
+- (NSString *)registration;
 
 @end
 

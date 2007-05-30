@@ -1,9 +1,9 @@
 /*
- * $Id: XMeeting.h,v 1.11 2006/09/13 21:23:46 hfriederich Exp $
+ * $Id: XMeeting.h,v 1.12 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XMEETING_H__
@@ -40,7 +40,7 @@ void XMCloseFramework();
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
-#import "XMPreferencesRegistrarRecord.h"
+#import "XMPreferencesRegistrationRecord.h"
 
 #import "XMCodecManager.h"
 #import "XMCodec.h"

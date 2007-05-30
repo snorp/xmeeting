@@ -1,9 +1,9 @@
 /*
- * $Id: XMTypes.h,v 1.33 2007/03/21 18:03:06 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.34 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_TYPES_H__
@@ -56,7 +56,7 @@ typedef enum XMCallStartFailReason
 	XMCallStartFailReason_H323NotEnabled,
 	XMCallStartFailReason_GatekeeperRequired,
 	XMCallStartFailReason_SIPNotEnabled,
-	XMCallStartFailReason_SIPRegistrarRequired,
+	XMCallStartFailReason_SIPRegistrationRequired,
     XMCallStartFailReason_TransportFail,
 	XMCallStartFailReasonCount
 } XMCallStartFailReason;
@@ -124,7 +124,7 @@ typedef enum XMGatekeeperRegistrationFailReason
 } XMGatekeeperRegistrationFailReason;
 
 /**
- * Defines the various SIP registrar registration fail reasons
+ * Defines the various SIP registration fail reasons
  **/
 typedef enum XMSIPStatusCode
 {

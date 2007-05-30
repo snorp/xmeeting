@@ -1,9 +1,9 @@
 /*
- * $Id: XMStringConstants.h,v 1.29 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.30 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_STRING_CONSTANTS_H__
@@ -167,17 +167,17 @@ extern NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess;
  * This notification is only posted when the Framework has a new registration
  * made.
  **/
-extern NSString *XMNotification_CallManagerDidRegisterAtSIPRegistrar;
+extern NSString *XMNotification_CallManagerDidSIPRegister;
 
 /**
  * Posted when the Framework unregistered from a SIP registrar
  **/
-extern NSString *XMNotification_CallManagerDidUnregisterFromSIPRegistrar;
+extern NSString *XMNotification_CallManagerDidSIPUnregister;
 
 /**
  * Posted when the Framework failed to register at the registrar
  **/
-extern NSString *XMNotification_CallManagerDidNotRegisterAtSIPRegistrar;
+extern NSString *XMNotification_CallManagerDidNotSIPRegister;
 
 /**
  * Posted when the appropriate media stream is opened
@@ -331,7 +331,7 @@ extern NSString *XMKey_PreferencesGatekeeperPassword;
 
 // SIP-specific keys
 extern NSString *XMKey_PreferencesEnableSIP;
-extern NSString *XMKey_PreferencesRegistrarRecords;
+extern NSString *XMKey_PreferencesSIPRegistrationRecords;
 extern NSString *XMKey_PreferencesSIPProxyHost;
 extern NSString *XMKey_PreferencesSIPProxyUsername;
 extern NSString *XMKey_PreferencesSIPProxyPassword;
@@ -343,10 +343,10 @@ extern NSString *XMKey_PreferencesCodecListRecordIsEnabled;
 
 #pragma mark XMPreferencesRegistarRecord Keys
 
-extern NSString *XMKey_PreferencesRegistrarRecordHost;
-extern NSString *XMKey_PreferencesRegistrarRecordUsername;
-extern NSString *XMKey_PreferencesRegistrarRecordAuthorizationUsername;
-extern NSString *XMKey_PreferencesRegistrarRecordPassword;
+extern NSString *XMKey_PreferencesRegistrationRecordDomain;
+extern NSString *XMKey_PreferencesRegistrationRecordUsername;
+extern NSString *XMKey_PreferencesRegistrationRecordAuthorizationUsername;
+extern NSString *XMKey_PreferencesRegistrationRecordPassword;
 
 #pragma mark XMCodecManager Keys
 

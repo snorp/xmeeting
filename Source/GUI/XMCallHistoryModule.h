@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.11 2006/06/07 10:10:15 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.12 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_HISTORY_MODULE_H__
@@ -31,7 +31,7 @@
 	NSString *locationName;
 	
 	NSString *gatekeeperName;
-	NSString *sipRegistrarName;
+	NSString *sipRegistrationName;
 	
 	NSString *videoDevice;
 	

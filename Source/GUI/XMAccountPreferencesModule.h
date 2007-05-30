@@ -1,9 +1,9 @@
 /*
- * $Id: XMAccountPreferencesModule.h,v 1.3 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.h,v 1.4 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ACCOUNT_PREFERENCES_MODULE_H__
@@ -55,7 +55,7 @@ extern NSString *XMKey_AccountPreferencesPhoneNumberIdentifier;
 	
 	IBOutlet NSPanel *editSIPAccountPanel;
 	IBOutlet NSTextField *sipAccountNameField;
-	IBOutlet NSTextField *sipRegistrarHostField;
+	IBOutlet NSTextField *sipRegistrationDomainField;
 	IBOutlet NSTextField *sipUsernameField;
 	IBOutlet NSTextField *sipAuthorizationUsernameField;
 	IBOutlet NSTextField *sipPasswordField;

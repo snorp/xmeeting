@@ -1,9 +1,9 @@
 /*
- * $Id: XMPrivate.h,v 1.39 2007/03/19 10:07:27 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.40 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PRIVATE_H__
@@ -16,7 +16,7 @@
 #import "XMCallInfo.h"
 #import "XMPreferences.h"
 #import "XMPreferencesCodecListRecord.h"
-#import "XMPreferencesRegistrarRecord.h"
+#import "XMPreferencesRegistrationRecord.h"
 #import "XMCodecManager.h"
 #import "XMCodec.h"
 #import "XMAudioManager.h"
@@ -140,10 +140,10 @@ void _XMCheckCloseStatus();
 - (void)_handleSIPRegistrationProcessEnd;
 
 // Called every time the Framework register at a SIP registrar
-- (void)_handleSIPRegistration:(NSArray *)info;
+- (void)_handleSIPRegistration:(NSString *)registration;
 
 // Called every time the Framework unregisters from a SIP registrar
-- (void)_handleSIPUnregistration:(NSArray *)info;
+- (void)_handleSIPUnregistration:(NSString *)registration;
 
 // Called every time an attempt to register at a SIP registrar failed
 - (void)_handleSIPRegistrationFailure:(NSArray *)info;
@@ -210,7 +210,7 @@ void _XMCheckCloseStatus();
 
 @end
 
-@interface XMPreferencesRegistrarRecord (FrameworkMethods)
+@interface XMPreferencesRegistrationRecord (FrameworkMethods)
 
 - (id)_initWithDictionary:(NSDictionary *)dict;
 
@@ -321,8 +321,8 @@ extern NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistere
 extern NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled;
 extern NSString *XMExceptionReason_CallManagerInvalidActionIfSIPListening;
 extern NSString *XMExceptionReason_CallManagerInvalidActionIfSIPDisabled;
-extern NSString *XMExceptionReason_CallManagerInvalidActionIfAllRegistrarsRegistered;
-extern NSString *XMexceptionReason_CallManagerInvalidActionIfRegistrarsDisabled;
+extern NSString *XMExceptionReason_CallManagerInvalidActionIfCompletelySIPRegistered;
+extern NSString *XMexceptionReason_CallManagerInvalidActionIfSIPRegistrationDisabled;
 
 extern NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure;
 

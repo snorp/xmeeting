@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.25 2007/03/28 07:25:17 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.26 2007/05/30 08:41:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,7 @@
 	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
 	
 	// SIP variables
-	NSMutableArray *registrarHosts;
+	NSMutableArray *registrations;
 	NSMutableArray *sipRegistrationFailReasons;
 	
 	// InCall variables
@@ -198,24 +198,24 @@
 /**
  * Returns YES if all registrations were succesful or not.
  **/
-- (BOOL)isRegisteredAtAllRegistrars;
+- (BOOL)isCompletelyRegistered;
 
 /**
- * Returns the number of registrars the client is registered to at the
- * moment.
+ * Returns the number of successful registrations the client has at 
+ * the moment 
  **/
-- (unsigned)registrarCount;
+- (unsigned)registrationCount;
 
 /**
- * Returns the name of the registrar at index.
+ * Returns the registration at the given index
  **/
-- (NSString *)registrarHostAtIndex:(unsigned)index;
+- (NSString *)registrationAtIndex:(unsigned)index;
 
 /**
  * Returns the complete array of registrars the client is currently
  * registered at.
  **/
-- (NSArray *)registrarHosts;
+- (NSArray *)registrations;
 
 /**
  * Returns the number of registration fail reason records the manager
@@ -225,13 +225,13 @@
 - (unsigned)sipRegistrationFailReasonCount;
 
 /**
- * Returns the registration fail reason for the particular registrar at index.
+ * Returns the registration fail reason for the particular registration at index.
  **/
 - (XMSIPStatusCode)sipRegistrationFailReasonAtIndex:(unsigned)index;
 
 /**
- * Returns the status of the registration at the registrars provided.
- * If there client has no registrars in the current preferences set,
+ * Returns the status of the registrations provided.
+ * If there client has no registrations in the current preferences set,
  * an empty array is returned.
  **/
 - (NSArray *)sipRegistrationFailReasons;
@@ -246,11 +246,11 @@
 - (void)retryEnableSIP;
 
 /**
- * Call this method if one of the registrar registration failed somehow
- * (notified with XMNotification_CallManagerNotRegisterAtRegistrar)
- * and you want to retry the registrar registration process.
- * This method raises an exception if all registrar registrations were
- * succesful or if the current active preferences does not use registrars
+ * Call this method if one of the registration failed somehow
+ * (notified with XMNotification_CallManagerDidNotSIPRegister)
+ * and you want to retry the registration process.
+ * This method raises an exception if all registrations were
+ * succesful or if the current active preferences does not use registrations
  * at all
  **/
 - (void)retrySIPRegistrations;

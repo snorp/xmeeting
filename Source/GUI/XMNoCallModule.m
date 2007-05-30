@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.45 2007/05/28 09:56:04 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.46 2007/05/30 08:41:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -811,8 +811,8 @@
 		}
 		else if([activeLocation sipAccountTag] != 0)
 		{
-			unsigned registrarCount = [callManager registrarCount];
-			if(registrarCount == 0)
+			unsigned registrationCount = [callManager registrationCount];
+			if(registrationCount == 0)
 			{
 				isYellowSemaphore = YES;
 				[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE", @"")];

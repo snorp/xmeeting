@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.47 2007/05/14 13:46:33 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.48 2007/05/30 08:41:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -221,22 +221,22 @@ void _XMSetSIPProxy(const char *host,
 	XMOpalManager::GetSIPEndPoint()->UseProxy(host, username, password);
 }
 
-void _XMPrepareRegistrarSetup()
+void _XMPrepareRegistrationSetup()
 {
-	XMOpalManager::GetSIPEndPoint()->PrepareRegistrarSetup();
+	XMOpalManager::GetSIPEndPoint()->PrepareRegistrationSetup();
 }
 
-void _XMUseRegistrar(const char *host,
-					 const char *username,
-					 const char *authorizationUsername,
-					 const char *password)
+void _XMUseRegistration(const char *domain,
+					    const char *username,
+					    const char *authorizationUsername,
+					    const char *password)
 {
-	XMOpalManager::GetSIPEndPoint()->UseRegistrar(host, username, authorizationUsername, password);
+	XMOpalManager::GetSIPEndPoint()->UseRegistration(domain, username, authorizationUsername, password);
 }
 
-void _XMFinishRegistrarSetup()
+void _XMFinishRegistrationSetup()
 {
-	XMOpalManager::GetSIPEndPoint()->FinishRegistrarSetup();
+	XMOpalManager::GetSIPEndPoint()->FinishRegistrationSetup();
 }
 
 bool _XMIsSIPRegistered()

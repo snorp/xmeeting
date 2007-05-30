@@ -1,9 +1,9 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.5 2006/06/21 11:32:14 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.6 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SETUP_ASSISTANT_MANAGER_H__
@@ -68,7 +68,7 @@
 	IBOutlet NSView *h323SettingsView;
 	IBOutlet NSView *gatekeeperSettingsView;
 	IBOutlet NSView *sipSettingsView;
-	IBOutlet NSView *registrarSettingsView;
+	IBOutlet NSView *registrationSettingsView;
 	IBOutlet NSView *videoSettingsView;
 	
 	// flGeneralSettings objects
@@ -120,13 +120,13 @@
 	IBOutlet NSTextField *gkPasswordField;
 	
 	// sipSettings objects
-	IBOutlet NSMatrix *useRegistrarRadioButtons;
+	IBOutlet NSMatrix *useRegistrationRadioButtons;
 	
-	// registrarSettings object
-	IBOutlet NSTextField *registrarHostField;
-	IBOutlet NSTextField *registrarUsernameField;
-	IBOutlet NSTextField *registrarAuthUsernameField;
-	IBOutlet NSTextField *registrarPasswordField;
+	// registrationSettings object
+	IBOutlet NSTextField *registrationDomainField;
+	IBOutlet NSTextField *registrationUsernameField;
+	IBOutlet NSTextField *registrationAuthUsernameField;
+	IBOutlet NSTextField *registrationPasswordField;
 	
 	// videoSettings objects
 	IBOutlet NSMatrix *enableVideoRadioButtons;

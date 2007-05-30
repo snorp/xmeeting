@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPAccount.m,v 1.3 2006/05/16 21:30:06 hfriederich Exp $
+ * $Id: XMSIPAccount.m,v 1.4 2007/05/30 08:41:16 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMSIPAccount.h"
@@ -11,7 +11,7 @@
 #import "XMPreferencesManager.h"
 
 NSString *XMKey_SIPAccountName = @"XMeeting_SIPAccountName";
-NSString *XMKey_SIPAccountRegistrar = @"XMeeting_SIPAccountRegistrar";
+NSString *XMKey_SIPAccountDomain = @"XMeeting_SIPAccountRegistrar";
 NSString *XMKey_SIPAccountUsername = @"XMeeting_SIPAccountUsername";
 NSString *XMKey_SIPAccountAuthorizationUsername = @"XMeeting_SIPAccountAuthorizationUsername";
 NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
@@ -44,10 +44,10 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 	{
 		[self setName:(NSString *)obj];
 	}
-	obj = [dictionary objectForKey:XMKey_SIPAccountRegistrar];
+	obj = [dictionary objectForKey:XMKey_SIPAccountDomain];
 	if(obj != nil && [obj isKindOfClass:stringClass])
 	{
-		[self setRegistrar:(NSString *)obj];
+		[self setDomain:(NSString *)obj];
 	}
 	obj = [dictionary objectForKey:XMKey_SIPAccountUsername];
 	if(obj != nil && [obj isKindOfClass:stringClass])
@@ -68,7 +68,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 	XMSIPAccount *sipAccount = [[[self class] allocWithZone:zone] _initWithTag:[self tag]];
 	
 	[sipAccount setName:[self name]];
-	[sipAccount setRegistrar:[self registrar]];
+	[sipAccount setDomain:[self domain]];
 	[sipAccount setUsername:[self username]];
 	[sipAccount setAuthorizationUsername:[self authorizationUsername]];
 	[sipAccount setPassword:[self password]];
@@ -89,7 +89,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 	
 	tag = theTag;
 	name = nil;
-	registrar = nil;
+	domain = nil;
 	username = nil;
 	authorizationUsername = nil;
 	didLoadPassword = NO;
@@ -101,7 +101,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 - (void)dealloc
 {
 	[name release];
-	[registrar release];
+	[domain release];
 	[username release];
 	[authorizationUsername release];
 	[password release];
@@ -120,9 +120,9 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 	{
 		[dictionary setObject:name forKey:XMKey_SIPAccountName];
 	}
-	if(registrar != nil)
+	if(domain != nil)
 	{
-		[dictionary setObject:registrar forKey:XMKey_SIPAccountRegistrar];
+		[dictionary setObject:domain forKey:XMKey_SIPAccountDomain];
 	}
 	if(username != nil)
 	{
@@ -159,17 +159,17 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 	}
 }
 
-- (NSString *)registrar
+- (NSString *)domain
 {
-	return registrar;
+	return domain;
 }
 
-- (void)setRegistrar:(NSString *)theRegistrar
+- (void)setDomain:(NSString *)theDomain
 {
-	if(registrar != theRegistrar)
+	if(domain != theDomain)
 	{
-		NSString *old = registrar;
-		registrar = [theRegistrar copy];
+		NSString *old = domain;
+		domain = [theDomain copy];
 		[old release];
 	}
 }
@@ -208,7 +208,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 {
 	if(password == nil && didLoadPassword == NO)
 	{
-		[self setPassword:[[XMPreferencesManager sharedInstance] passwordForServiceName:registrar accountName:authorizationUsername]];
+		[self setPassword:[[XMPreferencesManager sharedInstance] passwordForServiceName:domain accountName:authorizationUsername]];
 		didLoadPassword = YES;
 	}
 	return password;
@@ -232,7 +232,18 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 - (void)savePassword
 {
-	[[XMPreferencesManager sharedInstance] setPassword:password forServiceName:registrar accountName:authorizationUsername];
+	[[XMPreferencesManager sharedInstance] setPassword:password forServiceName:domain accountName:authorizationUsername];
+}
+
+- (NSString *)registration
+{
+    if (username != nil && [username rangeOfString:@"@"].location != NSNotFound) {
+        return username;
+    }
+    if (username == nil || domain == nil) {
+        return nil;
+    }
+    return [NSString stringWithFormat:@"%@@%@", username, domain];
 }
 
 @end

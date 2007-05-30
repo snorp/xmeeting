@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferences.m,v 1.18 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.19 2007/05/30 08:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMPreferences.h"
@@ -11,7 +11,7 @@
 #import "XMStringConstants.h"
 #import "XMPrivate.h"
 #import "XMPreferencesCodecListRecord.h"
-#import "XMPreferencesRegistrarRecord.h"
+#import "XMPreferencesRegistrationRecord.h"
 #import "XMCodecManager.h"
 
 @interface XMPreferences (PrivateMethods)
@@ -297,7 +297,7 @@
 			result = XM_INVALID_VALUE_TYPE;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarRecords])
+	else if([key isEqualToString:XMKey_PreferencesSIPRegistrationRecords])
 	{
 		if([value isKindOfClass:[NSArray class]])
 		{
@@ -421,7 +421,7 @@
 	gatekeeperPassword = nil;
 	
 	enableSIP = NO;
-	registrarRecords = [[NSArray alloc] init];
+	sipRegistrationRecords = [[NSArray alloc] init];
 	sipProxyHost = nil;
 	sipProxyUsername = nil;
 	sipProxyPassword = nil;
@@ -644,14 +644,14 @@
 		[self setEnableSIP:[(NSNumber *)obj boolValue]];
 	}
 	
-	obj = [dict objectForKey:XMKey_PreferencesRegistrarRecords];
+	obj = [dict objectForKey:XMKey_PreferencesSIPRegistrationRecords];
 	if(obj && [obj isKindOfClass:[NSArray class]])
 	{
-		[self setRegistrarRecords:(NSArray *)obj];
+		[self setSIPRegistrationRecords:(NSArray *)obj];
 	}
 	else
 	{
-		[self setRegistrarRecords:[NSArray array]];
+		[self setSIPRegistrationRecords:[NSArray array]];
 	}
 		
 	obj = [dict objectForKey:XMKey_PreferencesSIPProxyHost];
@@ -711,7 +711,7 @@
 	[preferences setGatekeeperPassword:[self gatekeeperPassword]];
 	
 	[preferences setEnableSIP:[self enableSIP]];
-	[preferences setRegistrarRecords:[self registrarRecords]];
+	[preferences setSIPRegistrationRecords:[self sipRegistrationRecords]];
 	[preferences setSIPProxyHost:[self sipProxyHost]];
 	[preferences setSIPProxyUsername:[self sipProxyUsername]];
 	[preferences setSIPProxyPassword:[self sipProxyPassword]];
@@ -802,7 +802,7 @@
 		[self setGatekeeperPassword:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPassword]];
 		
 		[self setEnableSIP:[coder decodeBoolForKey:XMKey_PreferencesEnableSIP]];
-		[self setRegistrarRecords:[coder decodeObjectForKey:XMKey_PreferencesRegistrarRecords]];
+		[self setSIPRegistrationRecords:[coder decodeObjectForKey:XMKey_PreferencesSIPRegistrationRecords]];
 		[self setSIPProxyHost:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyHost]];
 		[self setSIPProxyUsername:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyUsername]];
 		[self setSIPProxyPassword:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyPassword]];
@@ -853,7 +853,7 @@
 		[coder encodeObject:[self gatekeeperPassword] forKey:XMKey_PreferencesGatekeeperPassword];
 		
 		[coder encodeBool:[self enableSIP] forKey:XMKey_PreferencesEnableSIP];
-		[coder encodeObject:[self registrarRecords] forKey:XMKey_PreferencesRegistrarRecords];
+		[coder encodeObject:[self sipRegistrationRecords] forKey:XMKey_PreferencesSIPRegistrationRecords];
 		[coder encodeObject:[self sipProxyHost] forKey:XMKey_PreferencesSIPProxyHost];
 		[coder encodeObject:[self sipProxyUsername] forKey:XMKey_PreferencesSIPProxyUsername];
 		[coder encodeObject:[self sipProxyPassword] forKey:XMKey_PreferencesSIPProxyPassword];
@@ -879,7 +879,7 @@
 	[gatekeeperPhoneNumber release];
 	[gatekeeperPassword release];
 	
-	[registrarRecords release];
+	[sipRegistrationRecords release];
 	[sipProxyHost release];
 	[sipProxyUsername release];
 	[sipProxyPassword release];
@@ -941,7 +941,7 @@
 	   [[otherPreferences gatekeeperPassword] isEqualToString:[self gatekeeperPassword]] &&
 	   
 	   [otherPreferences enableSIP] == [self enableSIP] &&
-	   [[otherPreferences registrarRecords] isEqualToArray:[self registrarRecords]] &&
+	   [[otherPreferences sipRegistrationRecords] isEqualToArray:[self sipRegistrationRecords]] &&
 	   [[otherPreferences sipProxyHost] isEqualToString:[self sipProxyHost]] &&
 	   [[otherPreferences sipProxyUsername] isEqualToString:[self sipProxyUsername]] &&
 	   [[otherPreferences sipProxyPassword] isEqualToString:[self sipProxyPassword]])
@@ -1116,10 +1116,10 @@
 	[dict setObject:number forKey:XMKey_PreferencesEnableSIP];
 	[number release];
 	
-	obj = [self registrarRecords];
+	obj = [self sipRegistrationRecords];
 	if([(NSArray *)obj count] != 0)
 	{
-		[dict setObject:obj forKey:XMKey_PreferencesRegistrarRecords];
+		[dict setObject:obj forKey:XMKey_PreferencesSIPRegistrationRecords];
 	}
 	
 	obj = [self sipProxyHost];
@@ -1256,9 +1256,9 @@
 	{
 		return [NSNumber numberWithBool:[self enableSIP]];
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarRecords])
+	else if([key isEqualToString:XMKey_PreferencesSIPRegistrationRecords])
 	{
-		return [self registrarRecords];
+		return [self sipRegistrationRecords];
 	}
 	else if([key isEqualToString:XMKey_PreferencesSIPProxyHost])
 	{
@@ -1555,11 +1555,11 @@
 			correctType = NO;
 		}
 	}
-	else if([key isEqualToString:XMKey_PreferencesRegistrarRecords])
+	else if([key isEqualToString:XMKey_PreferencesSIPRegistrationRecords])
 	{
 		if([value isKindOfClass:[NSArray class]])
 		{
-			[self setRegistrarRecords:(NSArray *)value];
+			[self setSIPRegistrationRecords:(NSArray *)value];
 		}
 		else
 		{
@@ -1957,24 +1957,24 @@
 	enableSIP = flag;
 }
 
-- (NSArray *)registrarRecords
+- (NSArray *)sipRegistrationRecords
 {
-	return registrarRecords;
+	return sipRegistrationRecords;
 }
 
-- (void)setRegistrarRecords:(NSArray *)records
+- (void)setSIPRegistrationRecords:(NSArray *)records
 {
-	if(registrarRecords != records)
+	if(sipRegistrationRecords != records)
 	{
-		NSArray *old = registrarRecords;
-		registrarRecords = [records copy];
+		NSArray *old = sipRegistrationRecords;
+		sipRegistrationRecords = [records copy];
 		[old release];
 	}
 }
 
-- (BOOL)usesRegistrars
+- (BOOL)usesRegistrations
 {
-	if([[self registrarRecords] count] != 0)
+	if([[self sipRegistrationRecords] count] != 0)
 	{
 		return YES;
 	}

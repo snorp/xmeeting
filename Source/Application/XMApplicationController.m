@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.52 2007/05/28 09:56:04 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.53 2007/05/30 08:41:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,7 +59,7 @@
 - (void)_didNotEnableH323:(NSNotification *)notif;
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
 - (void)_didNotEnableSIP:(NSNotification *)notif;
-- (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif;
+- (void)_sipRegistrationDidFail:(NSNotification *)notif;
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
 - (void)_videoManagerDidGetError:(NSNotification *)notif;
 - (void)_callRecorderDidGetError:(NSNotification *)notif;
@@ -135,8 +135,8 @@
 							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didNotEnableSIP:)
 							   name:XMNotification_CallManagerDidNotEnableSIP object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didNotRegisterAtSIPRegistrar:)
-							   name:XMNotification_CallManagerDidNotRegisterAtSIPRegistrar object:nil];
+	[notificationCenter addObserver:self selector:@selector(_sipRegistrationDidFail:)
+							   name:XMNotification_CallManagerDidNotSIPRegister object:nil];
 	[notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
 							   name:XMNotification_FrameworkDidClose object:nil];
 	[notificationCenter addObserver:self selector:@selector(_videoManagerDidGetError:)
@@ -431,7 +431,7 @@
 	[self performSelector:@selector(_displayEnableSIPFailedAlert) withObject:nil afterDelay:0.0];
 }
 
-- (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif
+- (void)_sipRegistrationDidFail:(NSNotification *)notif
 {
 	// same as _didNotStartCalling
 	[self performSelector:@selector(_displaySIPRegistrationFailedAlert) withObject:nil afterDelay:0.0];
@@ -543,8 +543,8 @@
 		case XMCallStartFailReason_SIPNotEnabled:
 			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_SIP_NOT_ENABLED", @"");
 			break;
-		case XMCallStartFailReason_SIPRegistrarRequired:
-			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_SIP_REGISTRAR_REQUIRED", @"");
+		case XMCallStartFailReason_SIPRegistrationRequired:
+			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_SIP_REGISTRATION_REQUIRED", @"");
 			break;
 		case XMCallStartFailReason_AlreadyInCall:
 			failReasonText = NSLocalizedString(@"XM_CALL_FAILED_ALREADY_IN_CALL", @"");
@@ -673,7 +673,7 @@
 	XMLocation *activeLocation = [preferencesManager activeLocation];
 	unsigned sipAccountTag = [activeLocation sipAccountTag];
 	XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
-	NSString *host = [sipAccount registrar];
+	NSString *domain = [sipAccount domain];
 	XMSIPStatusCode failReason = [callManager sipRegistrationFailReasonAtIndex:0];
 	
 	NSString *reasonText = XMSIPStatusCodeString(failReason);
@@ -699,7 +699,7 @@
 	[(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_SIP_REG_FAILED_MESSAGE", @"")];
 	NSString *informativeTextFormat = NSLocalizedString(@"XM_SIP_REG_FAILED_INFO_TEXT", @"");
 	
-	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
+	NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, domain, reasonText, suggestionText];
 	[(NSAlert *)activeAlert setInformativeText:informativeText];
 	[informativeText release];
 	
@@ -810,7 +810,7 @@
 	{
 		if(doesAllowModifications == YES &&
 		   [callManager sipRegistrationFailReasonCount] > 0 &&
-		   [callManager isRegisteredAtAllRegistrars] == NO)
+		   [callManager isCompletelyRegistered] == NO)
 		{
 			return YES;
 		}

@@ -1,9 +1,9 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.7 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.8 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAccountPreferencesModule.h"
@@ -210,7 +210,7 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 	sipAccountToEdit = nil;
 	
 	[sipAccountNameField setStringValue:@""];
-	[sipRegistrarHostField setStringValue:@""];
+	[sipRegistrationDomainField setStringValue:@""];
 	[sipUsernameField setStringValue:@""];
 	[sipPasswordField setStringValue:@""];
 	
@@ -245,12 +245,12 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 	}
 	[sipAccountNameField setStringValue:string];
 	
-	string = [sipAccountToEdit registrar];
+	string = [sipAccountToEdit domain];
 	if(string == nil)
 	{
 		string = @"";
 	}
-	[sipRegistrarHostField setStringValue:string];
+	[sipRegistrationDomainField setStringValue:string];
 	
 	string = [sipAccountToEdit username];
 	if(string == nil)
@@ -484,7 +484,7 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 		}
 		else if([identifier isEqualToString:XMKey_AccountPreferencesHostIdentifier])
 		{
-			return [sipAccount registrar];
+			return [sipAccount domain];
 		}
 		else if([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier])
 		{
@@ -616,12 +616,12 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 		}
 		[sipAccountToEdit setName:string];
 		
-		string = [sipRegistrarHostField stringValue];
+		string = [sipRegistrationDomainField stringValue];
 		if([string isEqualToString:@""])
 		{
 			string = nil;
 		}
-		[sipAccountToEdit setRegistrar:string];
+		[sipAccountToEdit setDomain:string];
 		
 		string = [sipUsernameField stringValue];
 		if([string isEqualToString:@""])

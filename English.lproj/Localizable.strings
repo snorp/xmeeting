@@ -17,7 +17,7 @@
 "XM_CALL_FAILED_H323_NOT_ENABLED" = "H.323 is not enabled";
 "XM_CALL_FAILED_GK_REQUIRED" = "Address requires a gatekeeper";
 "XM_CALL_FAILED_SIP_NOT_ENABLED" = "SIP is not enabled";
-"XM_CALL_FAILED_SIP_REGISTRAR_REQUIRED" = "Address requires a SIP registrar";
+"XM_CALL_FAILED_SIP_REGISTRATION_REQUIRED" = "Address requires that XMeeting is registered at a SIP registrar";
 "XM_CALL_FAILED_ALREADY_IN_CALL" = "Already in call. Please report this problem!";
 "XM_CALL_FAILED_TRANSPORT_FAIL" = "Could not connect to remote party";
 
@@ -35,7 +35,7 @@
 "XM_ENABLE_SIP_FAILED_INFO_TEXT" = "Unable to enable the SIP subsystem.";
 
 "XM_SIP_REG_FAILED_MESSAGE" = "SIP Registration Failed";
-"XM_SIP_REG_FAILED_INFO_TEXT" = "Unable to register at SIP registrar \"%@\" (%@). %@";
+"XM_SIP_REG_FAILED_INFO_TEXT" = "Unable to register as \"%@\" (%@). %@";
 "XM_SIP_UN_AUTHORIZED_SUGGESTION" = "Please check your username and password settings.";
 "XM_SIP_NOT_ACCEPTABLE_SUGGESTION" = "Please check your network settings.";
 "XM_SIP_BAD_GATEWAY_SUGGESTION" = "Please check your settings.";
@@ -89,7 +89,7 @@
 "XM_NO_CALL_TOOLTIP_SIP_FAILURE" = "SIP: Offline. Failed to enable SIP system\n";
 "XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE" = "SIP: Registration failed\n";
 "XM_NO_CALL_TOOLTIP_SIP_REG_OK" = "SIP: Registered\n";
-"XM_NO_CALL_TOOLTIP_SIP_NO_REG" = "SIP: Ready. Not using a Registrar\n";
+"XM_NO_CALL_TOOLTIP_SIP_NO_REG" = "SIP: Ready. Not using registrations\n";
 "XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES" = "\nNetwork Addresses:";
 "XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS" = "\nCould not fetch external address.";
 
@@ -125,9 +125,9 @@
 "XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Unregistered from gatekeeper \"%@\"";
 "XM_CALL_HISTORY_MODULE_GK_REG_FAILURE" = "Failed to register at gatekeeper \"%@\" (%@)";
 "XM_CALL_HISTORY_MODULE_SIP_FAILURE" = "Enabling the SIP subsystem failed.";
-"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION" = "Registered at SIP registrar \"%@\"";
-"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION" = "Unregistered from SIP registrar \"%@\"";
-"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE" = "Failed to register at SIP registrar \"%@\" (%@)";
+"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION" = "Registered as \"%@\"";
+"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION" = "Unregistered \"%@\"";
+"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE" = "Failed to register as \"%@\" (%@)";
 "XM_CALL_HISTORY_MODULE_OPENED_SENDING" = "Media stream opened: sending \"%@\"";
 "XM_CALL_HISTORY_MODULE_OPENED_RECEIVING" = "Media stream opened: receiving \"%@\"";
 "XM_CALL_HISTORY_MODULE_CLOSED_SENDING" = "Media stream closed: \"%@\" (Outgoing)";

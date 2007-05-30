@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.25 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.26 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallHistoryModule.h"
@@ -33,9 +33,9 @@
 - (void)_didUnregisterFromGatekeeper:(NSNotification *)notif;
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
 - (void)_didNotEnableSIP:(NSNotification *)notif;
-- (void)_didRegisterAtSIPRegistrar:(NSNotification *)notif;
-- (void)_didUnregisterFromSIPRegistrar:(NSNotification *)notif;
-- (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif;
+- (void)_didSIPRegister:(NSNotification *)notif;
+- (void)_didSIPUnregister:(NSNotification *)notif;
+- (void)_didNotSIPRegister:(NSNotification *)notif;
 
 - (void)_didOpenOutgoingAudioStream:(NSNotification *)notif;
 - (void)_didOpenIncomingAudioStream:(NSNotification *)notif;
@@ -85,12 +85,12 @@
 							   name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didNotEnableSIP:)
 							   name:XMNotification_CallManagerDidNotEnableSIP object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didRegisterAtSIPRegistrar:)
-							   name:XMNotification_CallManagerDidRegisterAtSIPRegistrar object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didUnregisterFromSIPRegistrar:)
-							   name:XMNotification_CallManagerDidUnregisterFromSIPRegistrar object:nil];
-	[notificationCenter addObserver:self selector:@selector(_didNotRegisterAtSIPRegistrar:)
-							   name:XMNotification_CallManagerDidNotRegisterAtSIPRegistrar object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didSIPRegister:)
+							   name:XMNotification_CallManagerDidSIPRegister object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didSIPUnregister:)
+							   name:XMNotification_CallManagerDidSIPUnregister object:nil];
+	[notificationCenter addObserver:self selector:@selector(_didNotSIPRegister:)
+							   name:XMNotification_CallManagerDidNotSIPRegister object:nil];
 	
 	[notificationCenter addObserver:self selector:@selector(_didOpenOutgoingAudioStream:)
 							   name:XMNotification_CallManagerDidOpenOutgoingAudioStream object:nil];
@@ -117,7 +117,7 @@
 	locationName = nil;
 	
 	gatekeeperName = nil;
-	sipRegistrarName = nil;
+	sipRegistrationName = nil;
 	
 	callAddress = nil;
 	
@@ -143,9 +143,9 @@
 		[gatekeeperName release];
 	}
 	
-	if(sipRegistrarName != nil)
+	if(sipRegistrationName != nil)
 	{
-		[sipRegistrarName release];
+		[sipRegistrationName release];
 	}
 	
 	if(videoDevice != nil)
@@ -473,49 +473,49 @@
 	[self _logText:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_FAILURE", @"") date:nil];
 }
 
-- (void)_didRegisterAtSIPRegistrar:(NSNotification *)notif
+- (void)_didSIPRegister:(NSNotification *)notif
 {
-	if(sipRegistrarName != nil)
+	if(sipRegistrationName != nil)
 	{
-		[sipRegistrarName release];
-		sipRegistrarName = nil;
+		[sipRegistrationName release];
+		sipRegistrationName = nil;
 	}
 	
-	sipRegistrarName = [[[XMCallManager sharedInstance] registrarHostAtIndex:0] retain];
+	sipRegistrationName = [[[XMCallManager sharedInstance] registrationAtIndex:0] retain];
 	
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION", @""), sipRegistrarName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION", @""), sipRegistrationName];
 	
 	[self _logText:logText date:nil];
 	
 	[logText release];
 }
 
-- (void)_didUnregisterFromSIPRegistrar:(NSNotification *)notif
+- (void)_didSIPUnregister:(NSNotification *)notif
 {
-	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION", @""), sipRegistrarName];
+	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_UNREGISTRATION", @""), sipRegistrationName];
 	
 	[self _logText:logText date:nil];
 	
 	[logText release];
 }
 
-- (void)_didNotRegisterAtSIPRegistrar:(NSNotification *)notif
+- (void)_didNotSIPRegister:(NSNotification *)notif
 {
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	XMLocation *activeLocation = [preferencesManager activeLocation];
 	XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:[activeLocation sipAccountTag]];
 	
-	NSString *sipRegistrarHost = [sipAccount registrar];
-	if(sipRegistrarHost == nil)
+	NSString *sipRegistration = [sipAccount registration];
+	if(sipRegistration == nil)
 	{
-		sipRegistrarHost = NSLocalizedString(@"XM_UNKNOWN", @"");
+		sipRegistration = NSLocalizedString(@"XM_UNKNOWN", @"");
 	}
 	
 	XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationFailReasonAtIndex:0];
 	NSString *failReasonString = XMSIPStatusCodeString(failReason);
 		
 	NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE", @""),
-		sipRegistrarHost, failReasonString];
+		sipRegistration, failReasonString];
 	
 	[self _logText:logText date:nil];
 	

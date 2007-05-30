@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferences.h,v 1.15 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.16 2007/05/30 08:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_H__
@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "XMTypes.h"
 
-@class XMPreferencesCodecListRecord, XMPreferencesRegistrarRecord;
+@class XMPreferencesCodecListRecord, XMPreferencesRegistrationRecord;
 
 /**
  * This class encapsulates all setting options which affect
@@ -70,7 +70,7 @@
 	
 	/* SIP-specific settings */
 	BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
-	NSArray		*registrarRecords;			// An array containing XMPreferencesRegistrarRecord instances
+	NSArray		*sipRegistrationRecords;		// An array containing XMPreferencesRegistrationRecord instances
 	NSString	*sipProxyHost;				// A string containing the host address of the SIP proxy to use
 	NSString	*sipProxyUsername;			// A string containing the username for the SIP proxy to use
 	NSString	*sipProxyPassword;			// A string containing the password for the SIP proxy to use
@@ -224,19 +224,15 @@
 /**
  * Since the underlying framework provides the possibility to register at
  * multiple SIP registrars simultaneously, this instance allows to specify
- * multiple registrars.
- * The host at index i corresponds with the username found at index i in the username array and the
- * password at index i.
- * The arrays set by -setRegistrarHosts, -setRegistrarUsername and returned by -registrarPasswords
- * must have the same number of elements. Only complete host/username pairs will be registered.
+ * multiple registrations.
  **/
-- (NSArray *)registrarRecords;
-- (void)setRegistrarRecords:(NSArray *)records;
+- (NSArray *)sipRegistrationRecords;
+- (void)setSIPRegistrationRecords:(NSArray *)records;
 
 /**
- * Convenience method to determine whether registrars are used or not
+ * Convenience method to determine whether registrations are used or not
  **/
-- (BOOL)usesRegistrars;
+- (BOOL)usesRegistrations;
 
 /**
  * SIP proxy settings

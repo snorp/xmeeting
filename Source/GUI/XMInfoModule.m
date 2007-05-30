@@ -1,9 +1,9 @@
 /*
- * $Id: XMInfoModule.m,v 1.19 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.20 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Ivan Guajana, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Ivan Guajana, Hannes Friederich. All rights reserved.
  */
 
 #import "XMInfoModule.h"
@@ -482,57 +482,49 @@
 			unsigned sipAccountTag = [activeLocation sipAccountTag];
 			if(sipAccountTag != 0)
 			{
-				NSString *registrar = nil;
-				unsigned registrarCount = [callManager registrarCount];
-				if(registrarCount != 0)
+				NSString *registration = nil;
+				unsigned registrationCount = [callManager registrationCount];
+				if(registrationCount != 0)
 				{
-					registrar = [callManager registrarHostAtIndex:0];
+					registration = [callManager registrationAtIndex:0];
 				}
 				
-				if(registrar != nil)
+				if(registration != nil)
 				{
-					XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
-					NSString *username = [sipAccount username];
-					
-					if(username == nil)
-					{
-						username = @"";
-					}
-					
-					[registrarField setStringValue:registrar];
-					[registrarSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
-					[sipUsernameField setStringValue:username];
+					[registrationField setStringValue:registration];
+					[registrationSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+					//[sipUsernameField setStringValue:username];
 				}
 				else
 				{
-					[registrarField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_REG_FAILURE", @"")];
-					[registrarSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
-					[sipUsernameField setStringValue:@""];
+					[registrationField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_REG_FAILURE", @"")];
+					[registrationSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+					//[sipUsernameField setStringValue:@""];
 				}
 			}
 			else
 			{
-				[registrarField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
-				[registrarSemaphoreView setImage:nil];
-				[sipUsernameField setStringValue:@""];
+				[registrationField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
+				[registrationSemaphoreView setImage:nil];
+				//[sipUsernameField setStringValue:@""];
 			}
 		}
 		else
 		{
 			[sipStatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_PROTOCOL_FAILURE", @"")];
 			[sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
-			[registrarField setStringValue:@""];
-			[registrarSemaphoreView setImage:nil];
-			[sipUsernameField setStringValue:@""];
+			[registrationField setStringValue:@""];
+			[registrationSemaphoreView setImage:nil];
+			//[sipUsernameField setStringValue:@""];
 		}
 	}
 	else
 	{
 		[sipStatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_PROTOCOL", @"")];
 		[sipStatusSemaphoreView setImage:nil];
-		[registrarField setStringValue:@""];
-		[registrarSemaphoreView setImage:nil];
-		[sipUsernameField setStringValue:@""];
+		[registrationField setStringValue:@""];
+		[registrationSemaphoreView setImage:nil];
+		//[sipUsernameField setStringValue:@""];
 	}
 }
 

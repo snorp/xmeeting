@@ -302,6 +302,13 @@
 		D15436650C02056D002A027E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D15436F20C0ADF78002A027E /* psockbun.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15436F10C0ADF78002A027E /* psockbun.h */; };
 		D15436F40C0ADF9D002A027E /* psockbun.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15436F30C0ADF9D002A027E /* psockbun.cxx */; };
+		D15437440C0B10F3002A027E /* audiorecord.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15437430C0B10F3002A027E /* audiorecord.h */; };
+		D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15437620C0B1331002A027E /* opalmixer.h */; };
+		D154390D0C0B3D60002A027E /* opalmixer.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D154390C0C0B3D60002A027E /* opalmixer.cxx */; };
+		D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15439280C0C4C09002A027E /* handlers.h */; };
+		D154392B0C0C4C09002A027E /* sharedtransports.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15439290C0C4C09002A027E /* sharedtransports.h */; };
+		D15439CB0C0C5769002A027E /* handlers.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15439C90C0C5769002A027E /* handlers.cxx */; };
+		D15439CC0C0C5769002A027E /* sharedtransports.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15439CA0C0C5769002A027E /* sharedtransports.cxx */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
@@ -333,7 +340,7 @@
 		D18913200B81B1DB00B32CCD /* XMRFC2833Handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */; };
 		D18913220B81B1DD00B32CCD /* XMReceiverMediaPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */; };
 		D18913240B81B1DE00B32CCD /* XMProcess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D163364F07A456C4003FD9C0 /* XMProcess.cpp */; };
-		D18913260B81B1E100B32CCD /* XMPreferencesRegistrarRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */; };
+		D18913260B81B1E100B32CCD /* XMPreferencesRegistrationRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D102A36309E5268D0050239C /* XMPreferencesRegistrationRecord.m */; };
 		D18913280B81B1E200B32CCD /* XMPreferencesCodecListRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */; };
 		D189132A0B81B1E300B32CCD /* XMPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = D163381C07A4E739003FD9C0 /* XMPreferences.m */; };
 		D189132D0B81B1E500B32CCD /* XMPacketReassemblers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */; };
@@ -494,6 +501,10 @@
 				D13962170BF0BA2F00C76EFD /* XMH323URL.h in CopyFiles */,
 				D13962B70BF0C9F100C76EFD /* XMSIPURL.h in CopyFiles */,
 				D15436F20C0ADF78002A027E /* psockbun.h in CopyFiles */,
+				D15437440C0B10F3002A027E /* audiorecord.h in CopyFiles */,
+				D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */,
+				D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */,
+				D154392B0C0C4C09002A027E /* sharedtransports.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,8 +639,8 @@
 		D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263Packetizer.h; path = Source/Framework/XMRTPH263Packetizer.h; sourceTree = "<group>"; };
 		D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMRTPH263Packetizer.c; path = Source/Framework/XMRTPH263Packetizer.c; sourceTree = "<group>"; };
 		D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PacketizerDispatch.h; path = Source/Framework/XMRTPH263PacketizerDispatch.h; sourceTree = "<group>"; };
-		D102A36209E5268D0050239C /* XMPreferencesRegistrarRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesRegistrarRecord.h; path = Source/Framework/XMPreferencesRegistrarRecord.h; sourceTree = "<group>"; };
-		D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesRegistrarRecord.m; path = Source/Framework/XMPreferencesRegistrarRecord.m; sourceTree = "<group>"; };
+		D102A36209E5268D0050239C /* XMPreferencesRegistrationRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMPreferencesRegistrationRecord.h; path = Source/Framework/XMPreferencesRegistrationRecord.h; sourceTree = "<group>"; };
+		D102A36309E5268D0050239C /* XMPreferencesRegistrationRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMPreferencesRegistrationRecord.m; path = Source/Framework/XMPreferencesRegistrationRecord.m; sourceTree = "<group>"; };
 		D102AFFB09EA770F0050239C /* XMInstantActionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMInstantActionButton.h; sourceTree = "<group>"; };
 		D102AFFC09EA770F0050239C /* XMInstantActionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMInstantActionButton.m; sourceTree = "<group>"; };
 		D104D94E0A0E5973000898F2 /* dial_pad_0_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dial_pad_0_down.tif; path = Resources/Images/dial_pad_0_down.tif; sourceTree = "<group>"; };
@@ -800,6 +811,13 @@
 		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
 		D15436F10C0ADF78002A027E /* psockbun.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = psockbun.h; sourceTree = "<group>"; };
 		D15436F30C0ADF9D002A027E /* psockbun.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = psockbun.cxx; sourceTree = "<group>"; };
+		D15437430C0B10F3002A027E /* audiorecord.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = audiorecord.h; sourceTree = "<group>"; };
+		D15437620C0B1331002A027E /* opalmixer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = opalmixer.h; sourceTree = "<group>"; };
+		D154390C0C0B3D60002A027E /* opalmixer.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = opalmixer.cxx; sourceTree = "<group>"; };
+		D15439280C0C4C09002A027E /* handlers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = handlers.h; sourceTree = "<group>"; };
+		D15439290C0C4C09002A027E /* sharedtransports.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sharedtransports.h; sourceTree = "<group>"; };
+		D15439C90C0C5769002A027E /* handlers.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = handlers.cxx; sourceTree = "<group>"; };
+		D15439CA0C0C5769002A027E /* sharedtransports.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sharedtransports.cxx; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
 		D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
@@ -1719,8 +1737,8 @@
 				D163381C07A4E739003FD9C0 /* XMPreferences.m */,
 				D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */,
 				D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */,
-				D102A36209E5268D0050239C /* XMPreferencesRegistrarRecord.h */,
-				D102A36309E5268D0050239C /* XMPreferencesRegistrarRecord.m */,
+				D102A36209E5268D0050239C /* XMPreferencesRegistrationRecord.h */,
+				D102A36309E5268D0050239C /* XMPreferencesRegistrationRecord.m */,
 				D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */,
 				D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */,
 				D1BA776A086CB1E3007E6CEC /* XMCodec.h */,
@@ -2478,6 +2496,7 @@
 		D1CEE16B08F9022B007E4ABE /* opal */ = {
 			isa = PBXGroup;
 			children = (
+				D15437430C0B10F3002A027E /* audiorecord.h */,
 				D1CEE16D08F9022B007E4ABE /* buildopts.h */,
 				D1CEE16F08F9022B007E4ABE /* call.h */,
 				D1CEE17008F9022B007E4ABE /* connection.h */,
@@ -2488,6 +2507,7 @@
 				D1CEE17508F9022B007E4ABE /* mediacmd.h */,
 				D1CEE17608F9022B007E4ABE /* mediafmt.h */,
 				D1CEE17708F9022B007E4ABE /* mediastrm.h */,
+				D15437620C0B1331002A027E /* opalmixer.h */,
 				D1CEE17808F9022B007E4ABE /* opalvxml.h */,
 				D1CEE17908F9022B007E4ABE /* patch.h */,
 				D1CEE17A08F9022B007E4ABE /* pcss.h */,
@@ -2512,6 +2532,8 @@
 		D1CEE18008F9022B007E4ABE /* sip */ = {
 			isa = PBXGroup;
 			children = (
+				D15439280C0C4C09002A027E /* handlers.h */,
+				D15439290C0C4C09002A027E /* sharedtransports.h */,
 				D1CEE18108F9022B007E4ABE /* sdp.h */,
 				D170A8430B75DF1F0060A9D1 /* sdpcaps.h */,
 				D1CEE18208F9022B007E4ABE /* sip.h */,
@@ -2656,6 +2678,7 @@
 		D1CEE34708F90263007E4ABE /* opal */ = {
 			isa = PBXGroup;
 			children = (
+				D154390C0C0B3D60002A027E /* opalmixer.cxx */,
 				D1B5817F0A76C24A005DF33D /* opalglobalstatics.cxx */,
 				D1CEE34808F90263007E4ABE /* call.cxx */,
 				D1CEE34908F90263007E4ABE /* connection.cxx */,
@@ -3011,6 +3034,8 @@
 		D1FD47CA09B6544B00EB517B /* sip */ = {
 			isa = PBXGroup;
 			children = (
+				D15439C90C0C5769002A027E /* handlers.cxx */,
+				D15439CA0C0C5769002A027E /* sharedtransports.cxx */,
 				D1FD47CB09B6544B00EB517B /* sdp.cxx */,
 				D170A8520B75E0D90060A9D1 /* sdpcaps.cxx */,
 				D1FD47CC09B6544B00EB517B /* sipcon.cxx */,
@@ -3527,7 +3552,7 @@
 				D18913200B81B1DB00B32CCD /* XMRFC2833Handler.cpp in Sources */,
 				D18913220B81B1DD00B32CCD /* XMReceiverMediaPatch.cpp in Sources */,
 				D18913240B81B1DE00B32CCD /* XMProcess.cpp in Sources */,
-				D18913260B81B1E100B32CCD /* XMPreferencesRegistrarRecord.m in Sources */,
+				D18913260B81B1E100B32CCD /* XMPreferencesRegistrationRecord.m in Sources */,
 				D18913280B81B1E200B32CCD /* XMPreferencesCodecListRecord.m in Sources */,
 				D189132A0B81B1E300B32CCD /* XMPreferences.m in Sources */,
 				D189132D0B81B1E500B32CCD /* XMPacketReassemblers.cpp in Sources */,
@@ -3565,6 +3590,9 @@
 				D13962180BF0BA2F00C76EFD /* XMH323URL.m in Sources */,
 				D13962B80BF0C9F100C76EFD /* XMSIPURL.m in Sources */,
 				D15436F40C0ADF9D002A027E /* psockbun.cxx in Sources */,
+				D154390D0C0B3D60002A027E /* opalmixer.cxx in Sources */,
+				D15439CB0C0C5769002A027E /* handlers.cxx in Sources */,
+				D15439CC0C0C5769002A027E /* sharedtransports.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.16 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.17 2007/05/30 08:41:16 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_MANAGER_H__

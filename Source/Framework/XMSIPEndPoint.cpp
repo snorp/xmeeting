@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.31 2007/05/14 13:46:33 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.32 2007/05/30 08:41:17 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,12 +16,6 @@
 
 #include <ptlib/ipsock.h>
 #include <ptclib/enum.h>
-
-#define XM_SIP_REGISTRAR_STATUS_TO_REGISTER 0
-#define XM_SIP_REGISTRAR_STATUS_REGISTERED 1
-#define XM_SIP_REGISTRAR_STATUS_FAILED 2
-#define XM_SIP_REGISTRAR_STATUS_TO_UNREGISTER 3
-#define XM_SIP_REGISTRAR_STATUS_TO_REMOVE 4
 
 XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 : SIPEndPoint(manager)
@@ -78,53 +72,50 @@ BOOL XMSIPEndPoint::IsListening()
 	return isListening;
 }
 
-void XMSIPEndPoint::PrepareRegistrarSetup()
+void XMSIPEndPoint::PrepareRegistrationSetup()
 {
-	PWaitAndSignal m(registrarListMutex);
+	PWaitAndSignal m(registrationListMutex);
 	
 	unsigned i;
-	unsigned count = activeRegistrars.GetSize();
+	unsigned count = activeRegistrations.GetSize();
 	
-	// marking all registrars as to unregister/remove
-	// If a registrar is still used, the status will be overridden again
+	// marking all registrations as to unregister/remove
+	// If a registration is still used, the status will be overridden again
 	for(i = 0; i < count; i++)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		XMSIPRegistrationRecord & record = activeRegistrations[i];
 		
-		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_REGISTERED)
+		if(record.GetStatus() == XMSIPRegistrationRecord::Registered)
 		{
-			record.SetStatus(XM_SIP_REGISTRAR_STATUS_TO_UNREGISTER);
+			record.SetStatus(XMSIPRegistrationRecord::ToUnregister);
 		}
 		else
 		{
-			record.SetStatus(XM_SIP_REGISTRAR_STATUS_TO_REMOVE);
+			record.SetStatus(XMSIPRegistrationRecord::ToRemove);
 		}
 	}
 }
 
-void XMSIPEndPoint::UseRegistrar(const PString & host,
-								 const PString & username,
-								 const PString & authorizationUsername,
-								 const PString & password)
+void XMSIPEndPoint::UseRegistration(const PString & host,
+                                    const PString & username,
+                                    const PString & authorizationUsername,
+                                    const PString & password)
 {
-	PWaitAndSignal m(registrarListMutex);
+	PWaitAndSignal m(registrationListMutex);
 	
 	unsigned i;
-	unsigned count = activeRegistrars.GetSize();
+	unsigned count = activeRegistrations.GetSize();
 	
-	PString adjustedHost;
-	PString adjustedUsername;
+    PString registration;
 	
 	PINDEX atLocation = username.Find('@');
 	if(atLocation != P_MAX_INDEX)
 	{
-		adjustedUsername = username.Left(atLocation);
-		adjustedHost = username.Mid(atLocation+1);
+		registration = username;
 	}
 	else
 	{
-		adjustedUsername = username;
-		adjustedHost = host;
+        registration = username + '@' + host;
 	}
 	
 	// searching for a record with the same information
@@ -132,80 +123,79 @@ void XMSIPEndPoint::UseRegistrar(const PString & host,
 	// if not, create a new record and add it to the list
 	for(i = 0; i < count; i++)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		XMSIPRegistrationRecord & record = activeRegistrations[i];
 		
-		if(record.GetHost() == host &&
-		   record.GetUsername() == username)
+		if(record.GetRegistration() == registration)
 		{
 			if(record.GetPassword() != password)
 			{
 				record.SetPassword(password);
-				record.SetStatus(XM_SIP_REGISTRAR_STATUS_TO_REGISTER);
+				record.SetStatus(XMSIPRegistrationRecord::ToRegister);
 			}
-			else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_UNREGISTER)
+			else if(record.GetStatus() == XMSIPRegistrationRecord::ToUnregister)
 			{
-				record.SetStatus(XM_SIP_REGISTRAR_STATUS_REGISTERED);
+				record.SetStatus(XMSIPRegistrationRecord::Registered);
 			}
 			else
 			{
-				record.SetStatus(XM_SIP_REGISTRAR_STATUS_TO_REGISTER);
+				record.SetStatus(XMSIPRegistrationRecord::ToRegister);
 			}
 			
 			return;
 		}
 	}
 	
-	XMSIPRegistrarRecord *record = new XMSIPRegistrarRecord(host, username, authorizationUsername, password, adjustedHost, adjustedUsername);
-	record->SetStatus(XM_SIP_REGISTRAR_STATUS_TO_REGISTER);
-	activeRegistrars.Append(record);
+	XMSIPRegistrationRecord *record = new XMSIPRegistrationRecord(registration, authorizationUsername, password);
+	record->SetStatus(XMSIPRegistrationRecord::ToRegister);
+	activeRegistrations.Append(record);
 }
 
-void XMSIPEndPoint::FinishRegistrarSetup()
+void XMSIPEndPoint::FinishRegistrationSetup()
 {
-	PWaitAndSignal m(registrarListMutex);
+	PWaitAndSignal m(registrationListMutex);
 	
 	int i;
-	unsigned count = activeRegistrars.GetSize();
+	unsigned count = activeRegistrations.GetSize();
 	
 	for(i = (count-1); i >= 0; i--)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		XMSIPRegistrationRecord & record = activeRegistrations[i];
 		
-		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_UNREGISTER)
+		if(record.GetStatus() == XMSIPRegistrationRecord::ToUnregister)
 		{
-			Unregister(record.GetHost(), record.GetUsername());
+			Unregister(record.GetRegistration());
 			
-			_XMHandleSIPUnregistration(record.GetHost(), record.GetUsername());
+			_XMHandleSIPUnregistration(record.GetRegistration());
 			
-			activeRegistrars.RemoveAt(i);
+			activeRegistrations.RemoveAt(i);
 		}
-		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REMOVE)
+		else if(record.GetStatus() == XMSIPRegistrationRecord::ToRemove)
 		{
-			activeRegistrars.RemoveAt(i);
+			activeRegistrations.RemoveAt(i);
 		}
-		else if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+		else if(record.GetStatus() == XMSIPRegistrationRecord::ToRegister)
 		{
-            BOOL result = Register(record.GetHost(),
-                                   record.GetUsername(),
+            BOOL result = Register(GetRegistrarTimeToLive().GetSeconds(),
+                                   record.GetRegistration(),
                                    record.GetAuthorizationUsername(),
                                    record.GetPassword());
             
-			if(result == FALSE && (record.GetStatus() != XM_SIP_REGISTRAR_STATUS_FAILED))
+			if(result == FALSE && (record.GetStatus() != XMSIPRegistrationRecord::Failed))
 			{
-				record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
+				record.SetStatus(XMSIPRegistrationRecord::Failed);
 				
-				_XMHandleSIPRegistrationFailure(record.GetHost(), record.GetUsername(), XMSIPStatusCode_UnknownFailure);
+				_XMHandleSIPRegistrationFailure(record.GetRegistration(), XMSIPStatusCode_UnknownFailure);
 			}
 		}
 	}
 	
 	BOOL completed = TRUE;
-	count = activeRegistrars.GetSize();
+	count = activeRegistrations.GetSize();
 	for(i = 0; i < count; i++)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		XMSIPRegistrationRecord & record = activeRegistrations[i];
 		
-		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+		if(record.GetStatus() == XMSIPRegistrationRecord::ToRegister)
 		{
 			completed = FALSE;
 			break;
@@ -214,7 +204,7 @@ void XMSIPEndPoint::FinishRegistrarSetup()
 	
 	if(completed == TRUE)
 	{
-		_XMHandleRegistrarSetupCompleted();
+		_XMHandleSIPRegistrationSetupCompleted();
 	}
 }
 
@@ -254,8 +244,7 @@ void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 	}
 }
 
-void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
-										 const PString & username,
+void XMSIPEndPoint::OnRegistrationFailed(const PString & aor,
 										 SIP_PDU::StatusCodes reason,
 										 BOOL wasRegistering)
 {
@@ -264,35 +253,31 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 		return;
 	}
 	
-	PWaitAndSignal m(registrarListMutex);
+	PWaitAndSignal m(registrationListMutex);
 	
 	BOOL setupIsComplete = TRUE;
 	
 	unsigned i;
-	unsigned count = activeRegistrars.GetSize();
+	unsigned count = activeRegistrations.GetSize();
 	
 	for(i = 0; i < count; i++)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		XMSIPRegistrationRecord & record = activeRegistrations[i];
 		
-		PString theHost = record.GetAdjustedHost();
-		PString theUsername = record.GetAdjustedUsername();
-		
-		if(theHost == host &&
-		  theUsername == username)
+		if(aor == record.GetRegistration())
 		{
-			if(record.GetStatus() != XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+			if(record.GetStatus() != XMSIPRegistrationRecord::ToRegister)
 			{
 				return;
 			}
-			record.SetStatus(XM_SIP_REGISTRAR_STATUS_FAILED);
+			record.SetStatus(XMSIPRegistrationRecord::Failed);
 			
-			_XMHandleSIPRegistrationFailure(record.GetHost(), record.GetUsername(), (XMSIPStatusCode)reason);
+			_XMHandleSIPRegistrationFailure(record.GetRegistration(), (XMSIPStatusCode)reason);
 		}
 		
 		unsigned status = record.GetStatus();
 		
-		if(status == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+		if(status == XMSIPRegistrationRecord::ToRegister)
 		{
 			setupIsComplete = FALSE;
 		}
@@ -300,13 +285,12 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & host,
 	
 	if(setupIsComplete == TRUE)
 	{
-		_XMHandleRegistrarSetupCompleted();
+		_XMHandleSIPRegistrationSetupCompleted();
 		return;
 	}
 }
 
-void XMSIPEndPoint::OnRegistered(const PString & host,
-								 const PString & username,
+void XMSIPEndPoint::OnRegistered(const PString & aor,
 								 BOOL wasRegistering)
 {
 	if(wasRegistering == FALSE)
@@ -314,42 +298,36 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 		return;
 	}
 	
-	PWaitAndSignal m(registrarListMutex);
+	PWaitAndSignal m(registrationListMutex);
+    
 	
 	BOOL setupIsComplete = TRUE;
 	
 	unsigned i;
-	unsigned count = activeRegistrars.GetSize();
+	unsigned count = activeRegistrations.GetSize();
 	
 	for(i = 0; i < count; i++)
 	{
-		XMSIPRegistrarRecord & record = activeRegistrars[i];
+		XMSIPRegistrationRecord & record = activeRegistrations[i];
 		
-		// if the user entered username in the form username@registrar.net
-		// both username and registrar.net will be used as username / host
-		// respectively. This circumstance is taken into account here
-		PString theHost = record.GetAdjustedHost();
-		PString theUsername = record.GetAdjustedUsername();
-		
-		if(theHost == host &&
-		   theUsername == username)
+		if(aor == record.GetRegistration())
 		{
 			unsigned status = record.GetStatus();
 			
-			if(status == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+			if(status == XMSIPRegistrationRecord::ToRegister)
 			{
-				_XMHandleSIPRegistration(record.GetHost(), record.GetUsername());
+				_XMHandleSIPRegistration(record.GetRegistration());
 			}
 			
-			record.SetStatus(XM_SIP_REGISTRAR_STATUS_REGISTERED);
+			record.SetStatus(XMSIPRegistrationRecord::Registered);
 			
-			if(status != XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+			if(status != XMSIPRegistrationRecord::ToRegister)
 			{
 				return;
 			}
 		}
 		
-		if(record.GetStatus() == XM_SIP_REGISTRAR_STATUS_TO_REGISTER)
+		if(record.GetStatus() == XMSIPRegistrationRecord::ToRegister)
 		{
 			setupIsComplete = FALSE;
 		}
@@ -357,7 +335,7 @@ void XMSIPEndPoint::OnRegistered(const PString & host,
 	
 	if(setupIsComplete == TRUE)
 	{
-		_XMHandleRegistrarSetupCompleted();
+		_XMHandleSIPRegistrationSetupCompleted();
 	}
 }
 
@@ -458,7 +436,7 @@ BOOL XMSIPEndPoint::AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
 	return TRUE;
 }
 
-SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost,
+/*SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost,
 									  			    const PString & adjustedUsername, 
 												    const PString & authName, 
 												    const PString & password, 
@@ -467,7 +445,7 @@ SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost
 												    const PTimeInterval & maxRetryTime)
 {
 	return new XMSIPRegisterInfo(*this, originalHost, adjustedUsername, authName, password, timeout, minRetryTime, maxRetryTime);
-}
+}*/
 
 /**
  * Creates a transport using the default OPAL facilities. Afterwards,
@@ -477,7 +455,7 @@ SIPRegisterInfo * XMSIPEndPoint::CreateRegisterInfo(const PString & originalHost
  * multiple INVITE / REGISTER out as these messages cause state changes
  * on the remote side. OPTIONS don't alter state, in contrast.
  **/
-OpalTransport * XMSIPEndPoint::CreateTransport(const OpalTransportAddress & addr, const OpalTransport * originalTransport)
+/*OpalTransport * XMSIPEndPoint::CreateTransport(const OpalTransportAddress & addr, const OpalTransport * originalTransport)
 {
 	// create the transport
 	OpalTransport *transport = SIPEndPoint::CreateTransport(addr, originalTransport);
@@ -529,13 +507,13 @@ OpalTransport * XMSIPEndPoint::CreateTransport(const OpalTransportAddress & addr
 	probingSyncPoint.Wait(); // wait until  probing completed
 	
 	return transport;
-}
+}*/
 
 /*
  * Callback that gets called for each available interface to write out
  * an OPTIONS probing request
  */
-BOOL XMSIPEndPoint::WriteSIPOptions(OpalTransport & transport, void *data)
+/*BOOL XMSIPEndPoint::WriteSIPOptions(OpalTransport & transport, void *data)
 {
 	void **theData = (void **)data;
 	XMSIPEndPoint *endPoint = (XMSIPEndPoint *)(theData[0]);
@@ -550,13 +528,13 @@ BOOL XMSIPEndPoint::WriteSIPOptions(OpalTransport & transport, void *data)
 	endPoint->probingOptions.SetAt(options->GetTransactionID(), options);
 	
 	return TRUE;
-}
+}*/
 
 /*
  * Gets called every time a response is received.
  * Filters out OPTIONS responses and processes them separately
  */
-void XMSIPEndPoint::OnReceivedResponse(SIPTransaction & transaction, SIP_PDU & response)
+/*void XMSIPEndPoint::OnReceivedResponse(SIPTransaction & transaction, SIP_PDU & response)
 {
 	if(transaction.GetMethod() == SIP_PDU::Method_OPTIONS)
 	{
@@ -575,14 +553,14 @@ void XMSIPEndPoint::OnReceivedResponse(SIPTransaction & transaction, SIP_PDU & r
 		return;
 	}
 	SIPEndPoint::OnReceivedResponse(transaction, response);
-}
+}*/
 
 /*
  * Gets called by XMSIPOptions instances when their transaction
  * times out. Needed to ensure that the OPTIONS probing fails
  * after all OPTIONS transactions have timed out.
  */
-void XMSIPEndPoint::OnOptionsTimeout(XMSIPOptions *options)
+/*void XMSIPEndPoint::OnOptionsTimeout(XMSIPOptions *options)
 {
 	probingOptionsMutex.Wait();
 	if(probingOptions.Contains(options->GetTransactionID()))
@@ -599,7 +577,7 @@ void XMSIPEndPoint::OnOptionsTimeout(XMSIPOptions *options)
 		}
 	}
 	probingOptionsMutex.Signal();
-}
+}*/
 
 SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 {
@@ -657,76 +635,25 @@ void XMSIPEndPoint::RemoveReleasingConnection(XMSIPConnection * connection)
 }
 
 #pragma mark -
-#pragma mark XMSIPRegistrarRecord methods
+#pragma mark XMSIPRegistrationRecord methods
 
-XMSIPRegistrarRecord::XMSIPRegistrarRecord(const PString & theHost,
-										   const PString & theUsername,
-										   const PString & theAuthorizationUsername,
-										   const PString & thePassword,
-										   const PString & theAdjustedHost,
-										   const PString & theAdjustedUsername)
+XMSIPRegistrationRecord::XMSIPRegistrationRecord(const PString & _registration,
+                                                 const PString & _authorizationUsername,
+                                                 const PString & _password)
 {
-	host = theHost;
-	username = theUsername;
-	authorizationUsername = theAuthorizationUsername;
-	password = thePassword;
-	adjustedHost = theAdjustedHost;
-	adjustedUsername = theAdjustedUsername;
+	registration = _registration;
+	authorizationUsername = _authorizationUsername;
+	password = _password;
 }
 
-XMSIPRegistrarRecord::~XMSIPRegistrarRecord()
+XMSIPRegistrationRecord::~XMSIPRegistrationRecord()
 {
-}
-
-const PString & XMSIPRegistrarRecord::GetHost() const
-{
-	return host;
-}
-
-const PString & XMSIPRegistrarRecord::GetUsername() const
-{
-	return username;
-}
-
-const PString & XMSIPRegistrarRecord::GetAuthorizationUsername() const
-{
-	return authorizationUsername;
-}
-
-const PString & XMSIPRegistrarRecord::GetPassword() const
-{
-	return password;
-}
-
-const PString & XMSIPRegistrarRecord::GetAdjustedHost() const
-{
-	return adjustedHost;
-}
-
-const PString & XMSIPRegistrarRecord::GetAdjustedUsername() const
-{
-	return adjustedUsername;
-}
-
-void XMSIPRegistrarRecord::SetPassword(const PString & thePassword)
-{
-	password = thePassword;
-}
-
-unsigned XMSIPRegistrarRecord::GetStatus() const
-{
-	return status;
-}
-
-void XMSIPRegistrarRecord::SetStatus(unsigned theStatus)
-{
-	status = theStatus;
 }
 
 #pragma mark -
 #pragma mark XMSIPRegisterInfo methods
 
-XMSIPRegisterInfo::XMSIPRegisterInfo(XMSIPEndPoint & ep, 
+/*XMSIPRegisterInfo::XMSIPRegisterInfo(XMSIPEndPoint & ep, 
 									 const PString & originalHost,
 									 const PString & adjustedUsername, 
 									 const PString & authName, 
@@ -775,7 +702,7 @@ BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
 	
 	transportMutex.Signal();
 	return TRUE;
-}
+}*/
 
 /*BOOL XMSIPRegisterInfo::WillExpireWithinTimeInterval(PTimeInterval interval)
 {	
@@ -803,7 +730,7 @@ BOOL XMSIPRegisterInfo::CreateTransport(OpalTransportAddress & addr)
 #pragma mark -
 #pragma mark XMSIPOptions methods
 
-XMSIPOptions::XMSIPOptions(SIPEndPoint & ep, OpalTransport & trans, const SIPURL & address)
+/*XMSIPOptions::XMSIPOptions(SIPEndPoint & ep, OpalTransport & trans, const SIPURL & address)
 : SIPTransaction(ep, trans)
 {
 	OpalTransportAddress transportAddress = trans.GetLocalAddress();
@@ -887,5 +814,5 @@ void XMSIPOptions::SetTerminated(States newState)
 		// after a short timeout
 		completionTimer = PTimeInterval(0, 4); // delete after 4s
 	}
-}
+}*/
 		

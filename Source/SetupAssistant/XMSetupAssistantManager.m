@@ -1,9 +1,9 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.13 2006/06/28 07:28:51 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.14 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMSetupAssistantManager.h"
@@ -40,7 +40,7 @@
 #define XM_H323_SETTINGS_VIEW_TAG 23
 #define XM_GATEKEEPER_SETTINGS_VIEW_TAG 24
 #define XM_SIP_SETTINGS_VIEW_TAG 25
-#define XM_REGISTRAR_SETTINGS_VIEW_TAG 26
+#define XM_REGISTRATION_SETTINGS_VIEW_TAG 26
 #define XM_VIDEO_SETTINGS_VIEW_TAG 27
 
 #define XMKey_SetupAssistantNibName @"SetupAssistant"
@@ -98,8 +98,8 @@
 - (void)_prepareFLSIPSettings;
 - (void)_finishFLSIPSettings;
 
-- (NSView *)_prepareFLRegistrarSettings;
-- (void)_finishFLRegistrarSettings;
+- (NSView *)_prepareFLRegistrationSettings;
+- (void)_finishFLRegistrationSettings;
 
 - (void)_prepareFLVideoSettings;
 - (void)_finishFLVideoSettings;
@@ -127,8 +127,8 @@
 - (NSView *)_prepareLIGatekeeperSettings;
 - (void)_finishLIGatekeeperSettings;
 
-- (NSView *)_prepareLIRegistrarSettings;
-- (void)_finishLIRegistrarSettings;
+- (NSView *)_prepareLIRegistrationSettings;
+- (void)_finishLIRegistrationSettings;
 
 - (void)_prepareLICompletedSettings;
 - (void)_finishLICompletedSettings;
@@ -477,9 +477,9 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		[continueButton setEnabled:enableContinueButton];
 	}
-	else if([notif object] == registrarHostField)
+	else if([notif object] == registrationDomainField)
 	{
-		NSString *text = [registrarHostField stringValue];
+		NSString *text = [registrationDomainField stringValue];
 		
 		BOOL enableContinueButton = YES;
 		if([text isEqualToString:@""])
@@ -665,9 +665,9 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			[self _finishFLSIPSettings];
 			if([location sipAccountTag] != 0)
 			{
-				nextView = registrarSettingsView;
-				viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
-				firstResponder = [self _prepareFLRegistrarSettings];
+				nextView = registrationSettingsView;
+				viewTag = XM_REGISTRATION_SETTINGS_VIEW_TAG;
+				firstResponder = [self _prepareFLRegistrationSettings];
 			}
 			else
 			{
@@ -677,8 +677,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			}
 			break;
 			
-		case XM_REGISTRAR_SETTINGS_VIEW_TAG:
-			[self _finishFLRegistrarSettings];
+		case XM_REGISTRATION_SETTINGS_VIEW_TAG:
+			[self _finishFLRegistrationSettings];
 			nextView = videoSettingsView;
 			viewTag = XM_VIDEO_SETTINGS_VIEW_TAG;
 			[self _prepareFLVideoSettings];
@@ -794,8 +794,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			}
 			break;
 			
-		case XM_REGISTRAR_SETTINGS_VIEW_TAG:
-			[self _finishFLRegistrarSettings];
+		case XM_REGISTRATION_SETTINGS_VIEW_TAG:
+			[self _finishFLRegistrationSettings];
 			nextView = sipSettingsView;
 			viewTag = XM_SIP_SETTINGS_VIEW_TAG;
 			[self _prepareFLSIPSettings];
@@ -807,9 +807,9 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			{
 				if([location sipAccountTag] != 0)
 				{
-					nextView = registrarSettingsView;
-					viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
-					firstResponder = [self _prepareFLRegistrarSettings];
+					nextView = registrationSettingsView;
+					viewTag = XM_REGISTRATION_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareFLRegistrationSettings];
 				}
 				else
 				{
@@ -1271,12 +1271,12 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	[self _setTitle:titleString];
 	
 	int tag = ([location sipAccountTag] != 0) ? 0 : 1;
-	[useRegistrarRadioButtons selectCellWithTag:tag];
+	[useRegistrationRadioButtons selectCellWithTag:tag];
 }
 
 - (void)_finishFLSIPSettings
 {
-	int tag = [[useRegistrarRadioButtons selectedCell] tag];
+	int tag = [[useRegistrationRadioButtons selectedCell] tag];
 	if(tag == 0)
 	{
 		[location setSIPAccountTag:[sipAccount tag]];
@@ -1288,74 +1288,74 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 }
 
-- (NSView *)_prepareFLRegistrarSettings
+- (NSView *)_prepareFLRegistrationSettings
 {
 	NSString *titleString = [NSString stringWithFormat:NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @""), [location name]];
 	[self _setTitle:titleString];
 	
-	NSString *registrarAddress = [sipAccount registrar];
-	NSString *registrarUsername = [sipAccount username];
-	NSString *registrarAuthUsername = [sipAccount authorizationUsername];
-	NSString *registrarPassword = [sipAccount password];
+	NSString *registrationDomain = [sipAccount domain];
+	NSString *registrationUsername = [sipAccount username];
+	NSString *registrationAuthUsername = [sipAccount authorizationUsername];
+	NSString *registrationPassword = [sipAccount password];
 	
 	BOOL enableContinueButton = YES;
 	
-	if(registrarAddress == nil)
+	if(registrationDomain == nil)
 	{
 		enableContinueButton = NO;
-		registrarAddress = @"";
+		registrationDomain = @"";
 	}
-	if(registrarUsername == nil)
+	if(registrationUsername == nil)
 	{
-		registrarUsername = @"";
+		registrationUsername = @"";
 	}
-	if(registrarAuthUsername == nil)
+	if(registrationAuthUsername == nil)
 	{
-		registrarAuthUsername = @"";
+		registrationAuthUsername = @"";
 	}
-	if(registrarPassword == nil)
+	if(registrationPassword == nil)
 	{
-		registrarPassword = @"";
+		registrationPassword = @"";
 	}
 	
-	[registrarHostField setStringValue:registrarAddress];
-	[registrarUsernameField setStringValue:registrarUsername];
-	[registrarAuthUsernameField setStringValue:registrarAuthUsername];
-	[registrarPasswordField setStringValue:registrarPassword];
+	[registrationDomainField setStringValue:registrationDomain];
+	[registrationUsernameField setStringValue:registrationUsername];
+	[registrationAuthUsernameField setStringValue:registrationAuthUsername];
+	[registrationPasswordField setStringValue:registrationPassword];
 	
 	[continueButton setEnabled:enableContinueButton];
 	
-	return registrarHostField;
+	return registrationDomainField;
 }
 
-- (void)_finishFLRegistrarSettings
+- (void)_finishFLRegistrationSettings
 {
-	NSString *registrarAddress = [registrarHostField stringValue];
-	NSString *registrarUsername = [registrarUsernameField stringValue];
-	NSString *registrarAuthUsername = [registrarAuthUsernameField stringValue];
-	NSString *registrarPassword = [registrarPasswordField stringValue];
+	NSString *registrationDomain = [registrationDomainField stringValue];
+	NSString *registrationUsername = [registrationUsernameField stringValue];
+	NSString *registrationAuthUsername = [registrationAuthUsernameField stringValue];
+	NSString *registrationPassword = [registrationPasswordField stringValue];
 	
-	if([registrarAddress isEqualToString:@""])
+	if([registrationDomain isEqualToString:@""])
 	{
-		registrarAddress = nil;
+		registrationDomain = nil;
 	}
-	if([registrarUsername isEqualToString:@""])
+	if([registrationUsername isEqualToString:@""])
 	{
-		registrarUsername = nil;
+		registrationUsername = nil;
 	}
-	if([registrarAuthUsername isEqualToString:@""])
+	if([registrationAuthUsername isEqualToString:@""])
 	{
-		registrarAuthUsername = nil;
+		registrationAuthUsername = nil;
 	}
-	if([registrarPassword isEqualToString:@""])
+	if([registrationPassword isEqualToString:@""])
 	{
-		registrarPassword = nil;
+		registrationPassword = nil;
 	}
 	
-	[sipAccount setRegistrar:registrarAddress];
-	[sipAccount setUsername:registrarUsername];
-	[sipAccount setAuthorizationUsername:registrarAuthUsername];
-	[sipAccount setPassword:registrarPassword];
+	[sipAccount setDomain:registrationDomain];
+	[sipAccount setUsername:registrationUsername];
+	[sipAccount setAuthorizationUsername:registrationAuthUsername];
+	[sipAccount setPassword:registrationPassword];
 	
 	[continueButton setEnabled:YES];
 }
@@ -1780,16 +1780,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 				   [keys containsObject:XMKey_SIPAccountAuthorizationUsername] ||
 				   [keys containsObject:XMKey_SIPAccountPassword])
 				{
-					nextView = registrarSettingsView;
-					viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
-					firstResponder = [self _prepareLIRegistrarSettings];
+					nextView = registrationSettingsView;
+					viewTag = XM_REGISTRATION_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareLIRegistrationSettings];
 					break;
 				}
 				
-			case XM_REGISTRAR_SETTINGS_VIEW_TAG:
+			case XM_REGISTRATION_SETTINGS_VIEW_TAG:
 				if(didFinishCurrentSettings == NO)
 				{
-					[self _finishLIRegistrarSettings];
+					[self _finishLIRegistrationSettings];
 					didFinishCurrentSettings = YES;
 				}
 				
@@ -1870,16 +1870,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 				   [keys containsObject:XMKey_SIPAccountAuthorizationUsername] ||
 				   [keys containsObject:XMKey_SIPAccountPassword])
 				{
-					nextView = registrarSettingsView;
-					viewTag = XM_REGISTRAR_SETTINGS_VIEW_TAG;
-					firstResponder = [self _prepareLIRegistrarSettings];
+					nextView = registrationSettingsView;
+					viewTag = XM_REGISTRATION_SETTINGS_VIEW_TAG;
+					firstResponder = [self _prepareLIRegistrationSettings];
 					break;
 				}
 					
-			case XM_REGISTRAR_SETTINGS_VIEW_TAG:
+			case XM_REGISTRATION_SETTINGS_VIEW_TAG:
 				if(didFinishCurrentSettings == NO)
 				{
-					[self _finishLIRegistrarSettings];
+					[self _finishLIRegistrationSettings];
 					didFinishCurrentSettings = YES;
 				}
 				
@@ -2300,13 +2300,13 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	[gkPasswordField setEnabled:YES];
 }
 
-- (NSView *)_prepareLIRegistrarSettings
+- (NSView *)_prepareLIRegistrationSettings
 {
 	NSArray *sipAccounts = [locationImportData objectForKey:XMKey_SIPAccounts];
 	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
 	NSArray *accountIndexes = [currentKeys objectForKey:XMKey_AppliesTo];
 	NSArray *keys = [currentKeys objectForKey:XMKey_Keys];
-	NSView *firstResponder = registrarUsernameField;
+	NSView *firstResponder = registrationUsernameField;
 	
 	NSString *title = [currentKeys objectForKey:XMKey_Title];
 	if(title != nil && [title isKindOfClass:[NSString class]])
@@ -2320,55 +2320,55 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	XMSIPAccount *theSIPAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:[[accountIndexes objectAtIndex:0] unsignedIntValue]];
 	
-	NSString *registrarAddress = [theSIPAccount registrar];
-	if(registrarAddress == nil)
+	NSString *registrationDomain = [theSIPAccount domain];
+	if(registrationDomain == nil)
 	{
-		registrarAddress = @"";
+		registrationDomain = @"";
 	}
 	
-	NSString *registrarUsername = [theSIPAccount username];
-	if(registrarUsername == nil)
+	NSString *registrationUsername = [theSIPAccount username];
+	if(registrationUsername == nil)
 	{
-		registrarUsername = @"";
+		registrationUsername = @"";
 	}
 	
-	NSString *registrarAuthUsername = [theSIPAccount authorizationUsername];
-	if(registrarAuthUsername == nil)
+	NSString *registrationAuthUsername = [theSIPAccount authorizationUsername];
+	if(registrationAuthUsername == nil)
 	{
-		registrarAuthUsername = @"";
+		registrationAuthUsername = @"";
 	}
 	
-	NSString *registrarPwd = @"";
+	NSString *registrationPwd = @"";
 	
-	[registrarHostField setStringValue:registrarAddress];
-	[registrarUsernameField setStringValue:registrarUsername];
-	[registrarAuthUsernameField setStringValue:registrarAuthUsername];
-	[registrarPasswordField setStringValue:registrarPwd];
+	[registrationDomainField setStringValue:registrationDomain];
+	[registrationUsernameField setStringValue:registrationUsername];
+	[registrationAuthUsernameField setStringValue:registrationAuthUsername];
+	[registrationPasswordField setStringValue:registrationPwd];
 	
-	[registrarHostField setEnabled:NO];
+	[registrationDomainField setEnabled:NO];
 	
 	if(![keys containsObject:XMKey_SIPAccountUsername])
 	{
-		[registrarUsernameField setEnabled:NO];
-		firstResponder = registrarAuthUsernameField;
+		[registrationUsernameField setEnabled:NO];
+		firstResponder = registrationAuthUsernameField;
 	}
 	if(![keys containsObject:XMKey_SIPAccountAuthorizationUsername])
 	{
-		[registrarAuthUsernameField setEnabled:NO];
-		if(firstResponder == registrarAuthUsernameField)
+		[registrationAuthUsernameField setEnabled:NO];
+		if(firstResponder == registrationAuthUsernameField)
 		{
-			firstResponder = registrarPasswordField;
+			firstResponder = registrationPasswordField;
 		}
 	}
 	if(![keys containsObject:XMKey_SIPAccountPassword])
 	{
-		[registrarPasswordField setEnabled:NO];
+		[registrationPasswordField setEnabled:NO];
 	}
 	
 	return firstResponder;
 }
 
-- (void)_finishLIRegistrarSettings
+- (void)_finishLIRegistrationSettings
 {
 	NSArray *sipAccounts = [locationImportData objectForKey:XMKey_SIPAccounts];
 	NSDictionary *currentKeys = [[locationImportData objectForKey:XMKey_KeysToAsk] objectAtIndex:currentKeysToAskIndex];
@@ -2385,37 +2385,37 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		if([keys containsObject:XMKey_SIPAccountUsername])
 		{
-			NSString *registrarUsername = [registrarUsernameField stringValue];
-			if([registrarUsername isEqualToString:@""])
+			NSString *registrationUsername = [registrationUsernameField stringValue];
+			if([registrationUsername isEqualToString:@""])
 			{
-				registrarUsername = nil;
+				registrationUsername = nil;
 			}
-			[accountToChange setUsername:registrarUsername];
+			[accountToChange setUsername:registrationUsername];
 		}
 		if([keys containsObject:XMKey_SIPAccountAuthorizationUsername])
 		{
-			NSString *registrarAuthUsername = [registrarAuthUsernameField stringValue];
-			if([registrarAuthUsername isEqualToString:@""])
+			NSString *registrationAuthUsername = [registrationAuthUsernameField stringValue];
+			if([registrationAuthUsername isEqualToString:@""])
 			{
-				registrarAuthUsername = nil;
+				registrationAuthUsername = nil;
 			}
-			[accountToChange setAuthorizationUsername:registrarAuthUsername];
+			[accountToChange setAuthorizationUsername:registrationAuthUsername];
 		}
 		if([keys containsObject:XMKey_SIPAccountPassword])
 		{
-			NSString *registrarPassword = [registrarPasswordField stringValue];
-			if([registrarPassword isEqualToString:@""])
+			NSString *registrationPassword = [registrationPasswordField stringValue];
+			if([registrationPassword isEqualToString:@""])
 			{
-				registrarPassword = nil;
+				registrationPassword = nil;
 			}
-			[accountToChange setPassword:registrarPassword];
+			[accountToChange setPassword:registrationPassword];
 		}
 	}
 	
-	[registrarHostField setEnabled:YES];
-	[registrarUsernameField setEnabled:YES];
-	[registrarAuthUsernameField setEnabled:YES];
-	[registrarPasswordField setEnabled:YES];
+	[registrationDomainField setEnabled:YES];
+	[registrationUsernameField setEnabled:YES];
+	[registrationAuthUsernameField setEnabled:YES];
+	[registrationPasswordField setEnabled:YES];
 }
 
 - (void)_prepareLICompletedSettings

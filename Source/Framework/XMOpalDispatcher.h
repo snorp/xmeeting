@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.17 2007/01/06 20:41:17 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.18 2007/05/30 08:41:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,15 +102,15 @@
 	// Called on the OpalDispatcherThread, therefore safe
 - (void)_handleGatekeeperUnregistration;
 
-- (void)_handleSIPRegistrationForHost:(NSString *)host username:(NSString *)username;
+- (void)_handleSIPRegistration:(NSString *)registration;
 
-- (void)_handleSIPUnregistrationForHost:(NSString *)host username:(NSString *)username;
+- (void)_handleSIPUnregistration:(NSString *)registration;
 
-- (void)_handleSIPRegistrationFailureForHost:(NSString *)host username:(NSString *)username failReason:(XMSIPStatusCode)failReason;
+- (void)_handleSIPRegistrationFailure:(NSString *)registration failReason:(XMSIPStatusCode)failReason;
 
 	// called every time the Framework completes SIP Registration
     // may be called on any thread
-- (void)_handleRegistrarSetupCompleted;
+- (void)_handleRegistrationSetupCompleted;
 
 @end
 

@@ -1,9 +1,9 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.14 2006/11/10 21:43:05 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.15 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_LOCATION_PREFERENCES_MODULE_H__
@@ -66,9 +66,9 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	// SIP outlets
 	IBOutlet NSButton *enableSIPSwitch;
 	IBOutlet NSPopUpButton *sipAccountsPopUp;
-	IBOutlet NSTextField *registrarHostField;
-	IBOutlet NSTextField *registrarUsernameField;
-	IBOutlet NSTextField *registrarAuthorizationUsernameField;
+	IBOutlet NSTextField *registrationDomainField;
+	IBOutlet NSTextField *registrationUsernameField;
+	IBOutlet NSTextField *registrationAuthorizationUsernameField;
 	IBOutlet NSMatrix *sipProxyModeMatrix;
 	IBOutlet NSTextField *sipProxyHostField;
 	IBOutlet NSTextField *sipProxyUsernameField;

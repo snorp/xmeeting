@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.29 2007/03/28 07:25:17 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.30 2007/05/30 08:41:16 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -282,50 +282,44 @@ void _XMHandleGatekeeperUnregistration()
 #pragma mark -
 #pragma mark SIP specific Callbacks
 
-void _XMHandleSIPRegistration(const char *theHost, const char *theUsername)
+void _XMHandleSIPRegistration(const char *_registration)
+{
+	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+    
+	NSString *registration = [[NSString alloc] initWithCString:_registration encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistration:registration];
+	[registration release];
+    
+	[autoreleasePool release];
+}
+
+void _XMHandleSIPUnregistration(const char *_registration)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
-	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationForHost:host username:username];
-	[host release];
-	[username release];
+	NSString *registration = [[NSString alloc] initWithCString:_registration encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPUnregistration:registration];
+	[registration release];
 	
 	[autoreleasePool release];
 }
 
-void _XMHandleSIPUnregistration(const char *theHost, const char *theUsername)
+void _XMHandleSIPRegistrationFailure(const char *_registration, XMSIPStatusCode failReason)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
-	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPUnregistrationForHost:host username:username];
-	[host release];
-	[username release];
+	NSString *registration = [[NSString alloc] initWithCString:_registration encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:registration failReason:failReason];
+	[registration release];
 	
 	[autoreleasePool release];
 }
 
-void _XMHandleSIPRegistrationFailure(const char *theHost, const char *theUsername, XMSIPStatusCode failReason)
+void _XMHandleSIPRegistrationSetupCompleted()
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *host = [[NSString alloc] initWithCString:theHost encoding:NSASCIIStringEncoding];
-	NSString *username = [[NSString alloc] initWithCString:theUsername encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailureForHost:host username:username failReason:failReason];
-	[host release];
-	[username release];
-	
-	[autoreleasePool release];
-}
-
-void _XMHandleRegistrarSetupCompleted()
-{
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	
-	[_XMOpalDispatcherSharedInstance _handleRegistrarSetupCompleted];
+	[_XMOpalDispatcherSharedInstance _handleRegistrationSetupCompleted];
 	
 	[autoreleasePool release];
 }

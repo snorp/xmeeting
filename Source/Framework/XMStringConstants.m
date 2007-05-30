@@ -1,9 +1,9 @@
 /*
- * $Id: XMStringConstants.m,v 1.27 2006/11/10 21:43:06 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.28 2007/05/30 08:41:17 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMStringConstants.h"
@@ -40,9 +40,9 @@ NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper = @"XMeetingCallM
 NSString *XMNotification_CallManagerDidNotEnableSIP = @"XMeetingCallManagerDidNotEnableSIPNotification";
 NSString *XMNotification_CallManagerDidStartSIPRegistrationProcess = @"XMeetingCallManagerDidStartSIPRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess = @"XMeetingCallManagerDidEndSIPRegistrationProcessNotification";
-NSString *XMNotification_CallManagerDidRegisterAtSIPRegistrar = @"XMeetingCallManagerDidRegisterAtSIPRegistrarNotification";
-NSString *XMNotification_CallManagerDidUnregisterFromSIPRegistrar = @"XMeetingCallManagerDidUnregisterFromSIPRegistrar";
-NSString *XMNotification_CallManagerDidNotRegisterAtSIPRegistrar = @"XMeetingCallManagerDidNotRegisterAtSIPRegistrar";
+NSString *XMNotification_CallManagerDidSIPRegister = @"XMeetingCallManagerDidSIPRegisterNotification";
+NSString *XMNotification_CallManagerDidSIPUnregister = @"XMeetingCallManagerDidSIPUnregister";
+NSString *XMNotification_CallManagerDidNotSIPRegister = @"XMeetingCallManagerDidNotSIPRegister";
 
 NSString *XMNotification_CallManagerDidOpenOutgoingAudioStream = @"XMeetingCallManagerDidOpenOutgoingAudioStreamNotification";
 NSString *XMNotification_CallManagerDidOpenIncomingAudioStream = @"XMeetingCallManagerDidOpenIncomingAudioStreamNotification";
@@ -102,8 +102,8 @@ NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered = @"N
 NSString *XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled = @"Not allowed if gatekeeper usage is disabled in preferences";
 NSString *XMExceptionReason_CallManagerInvalidActionIfSIPListening = @"Not allowed if SIP is already succesfully setup";
 NSString *XMExceptionReason_CallManagerInvalidActionIfSIPDisabled = @"Not allowed if SIP is disabled in preferences";
-NSString *XMExceptionReason_CallManagerInvalidActionIfAllRegistrarsRegistered = @"Not allowed if succesfully registered at all registrars";
-NSString *XMexceptionReason_CallManagerInvalidActionIfRegistrarsDisabled = @"Not allowed if registrar usage is disabled in preferences";
+NSString *XMExceptionReason_CallManagerInvalidActionIfCompletelySIPRegistered = @"Not allowed if all SIP registrations were successful";
+NSString *XMexceptionReason_CallManagerInvalidActionIfRegistrationsDisabled = @"Not allowed if SIP registrations are disabled in preferences";
 
 NSString *XMExceptionReason_CodecManagerInternalConsistencyFailure = @"Parsing the infos for available codecs failed (%@)";
 
@@ -142,7 +142,7 @@ NSString *XMKey_PreferencesGatekeeperPhoneNumber = @"XMeeting_GatekeeperPhoneNum
 NSString *XMKey_PreferencesGatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 NSString *XMKey_PreferencesEnableSIP = @"XMeeting_EnableSIP";
-NSString *XMKey_PreferencesRegistrarRecords = @"XMeeting_RegistrarRecords";
+NSString *XMKey_PreferencesSIPRegistrationRecords = @"XMeeting_RegistrarRecords";
 NSString *XMKey_PreferencesSIPProxyHost = @"XMeeting_SIPProxyHost";
 NSString *XMKey_PreferencesSIPProxyUsername = @"XMeeting_SIPProxyUsername";
 NSString *XMKey_PreferencesSIPProxyPassword = @"XMeeting_SIPProxyPassword";
@@ -150,10 +150,10 @@ NSString *XMKey_PreferencesSIPProxyPassword = @"XMeeting_SIPProxyPassword";
 NSString *XMKey_PreferencesCodecListRecordIdentifier = @"XMeeting_Identifier";
 NSString *XMKey_PreferencesCodecListRecordIsEnabled = @"XMeeting_IsEnabled";
 
-NSString *XMKey_PreferencesRegistrarRecordHost = @"XMeeting_Host";
-NSString *XMKey_PreferencesRegistrarRecordUsername = @"XMeeting_Username";
-NSString *XMKey_PreferencesRegistrarRecordAuthorizationUsername = @"XMeeting_AuthorizationUsername";
-NSString *XMKey_PreferencesRegistrarRecordPassword = @"XMeeting_Password";
+NSString *XMKey_PreferencesRegistrationRecordDomain = @"XMeeting_Host";
+NSString *XMKey_PreferencesRegistrationRecordUsername = @"XMeeting_Username";
+NSString *XMKey_PreferencesRegistrationRecordAuthorizationUsername = @"XMeeting_AuthorizationUsername";
+NSString *XMKey_PreferencesRegistrationRecordPassword = @"XMeeting_Password";
 
 NSString *XMKey_CodecManagerCodecDescriptionsFilename = @"XMCodecDescriptions";
 NSString *XMKey_CodecManagerCodecDescriptionsFiletype = @"plist";
