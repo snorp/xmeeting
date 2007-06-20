@@ -306,9 +306,7 @@
 		D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15437620C0B1331002A027E /* opalmixer.h */; };
 		D154390D0C0B3D60002A027E /* opalmixer.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D154390C0C0B3D60002A027E /* opalmixer.cxx */; };
 		D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15439280C0C4C09002A027E /* handlers.h */; };
-		D154392B0C0C4C09002A027E /* sharedtransports.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15439290C0C4C09002A027E /* sharedtransports.h */; };
 		D15439CB0C0C5769002A027E /* handlers.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15439C90C0C5769002A027E /* handlers.cxx */; };
-		D15439CC0C0C5769002A027E /* sharedtransports.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15439CA0C0C5769002A027E /* sharedtransports.cxx */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
@@ -504,7 +502,6 @@
 				D15437440C0B10F3002A027E /* audiorecord.h in CopyFiles */,
 				D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */,
 				D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */,
-				D154392B0C0C4C09002A027E /* sharedtransports.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -815,9 +812,7 @@
 		D15437620C0B1331002A027E /* opalmixer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = opalmixer.h; sourceTree = "<group>"; };
 		D154390C0C0B3D60002A027E /* opalmixer.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = opalmixer.cxx; sourceTree = "<group>"; };
 		D15439280C0C4C09002A027E /* handlers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = handlers.h; sourceTree = "<group>"; };
-		D15439290C0C4C09002A027E /* sharedtransports.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sharedtransports.h; sourceTree = "<group>"; };
 		D15439C90C0C5769002A027E /* handlers.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = handlers.cxx; sourceTree = "<group>"; };
-		D15439CA0C0C5769002A027E /* sharedtransports.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sharedtransports.cxx; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
 		D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
@@ -2533,7 +2528,6 @@
 			isa = PBXGroup;
 			children = (
 				D15439280C0C4C09002A027E /* handlers.h */,
-				D15439290C0C4C09002A027E /* sharedtransports.h */,
 				D1CEE18108F9022B007E4ABE /* sdp.h */,
 				D170A8430B75DF1F0060A9D1 /* sdpcaps.h */,
 				D1CEE18208F9022B007E4ABE /* sip.h */,
@@ -3035,7 +3029,6 @@
 			isa = PBXGroup;
 			children = (
 				D15439C90C0C5769002A027E /* handlers.cxx */,
-				D15439CA0C0C5769002A027E /* sharedtransports.cxx */,
 				D1FD47CB09B6544B00EB517B /* sdp.cxx */,
 				D170A8520B75E0D90060A9D1 /* sdpcaps.cxx */,
 				D1FD47CC09B6544B00EB517B /* sipcon.cxx */,
@@ -3592,7 +3585,6 @@
 				D15436F40C0ADF9D002A027E /* psockbun.cxx in Sources */,
 				D154390D0C0B3D60002A027E /* opalmixer.cxx in Sources */,
 				D15439CB0C0C5769002A027E /* handlers.cxx in Sources */,
-				D15439CC0C0C5769002A027E /* sharedtransports.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
