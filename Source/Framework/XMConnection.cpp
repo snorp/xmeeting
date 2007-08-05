@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.23 2007/05/03 10:40:16 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.24 2007/08/05 13:14:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,9 +102,12 @@ BOOL XMConnection::SetUpConnection()
 			return FALSE;
 		}
 		
-		remotePartyName = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyName();
-		remotePartyAddress = ownerCall.GetOtherPartyConnection(*this)->GetRemotePartyAddress();
-		remoteApplication = ownerCall.GetOtherPartyConnection(*this)->GetRemoteApplication();
+        PSafePtr<OpalConnection> otherConn = ownerCall.GetOtherPartyConnection(*this);
+        if (otherConn != NULL) {
+		  remotePartyName    = otherConn->GetRemotePartyName();
+		  remotePartyAddress = otherConn->GetRemotePartyAddress();
+		  remoteProductInfo  = otherConn->GetRemoteProductInfo();
+        }
 		
 		if(phase < AlertingPhase)
 		{

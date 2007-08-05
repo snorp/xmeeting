@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.30 2007/05/09 15:02:00 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.31 2007/08/05 13:14:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,7 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 	
     // Delete the default RFC2833 handler and replace it with our own implementation
 	delete rfc2833Handler;
-	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
+	rfc2833Handler = new XMRFC2833Handler(*this, PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
 	inBandDTMFHandler = NULL;
 }

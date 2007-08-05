@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.23 2007/05/04 09:53:15 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.24 2007/08/05 13:14:36 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,7 +33,7 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
     
     // Delete the default RFC2833 handler and replace it with our own implementation
 	delete rfc2833Handler;
-	rfc2833Handler = new XMRFC2833Handler(PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
+	rfc2833Handler = new XMRFC2833Handler(*this, PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
 	inBandDTMFHandler = NULL;
 }

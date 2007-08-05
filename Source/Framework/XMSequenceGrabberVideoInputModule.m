@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.23 2007/03/16 09:32:47 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.24 2007/08/05 13:14:36 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1000,6 +1000,10 @@ bail:
 	number = [[NSNumber alloc] initWithInt:k32ARGBPixelFormat];
 	[pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferPixelFormatTypeKey];
 	[number release];
+    
+    number = [[NSNumber alloc] initWithBool:YES];
+    [pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferOpenGLCompatibilityKey];
+    [number release];
 	
 	ICMDecompressionTrackingCallbackRecord trackingCallbackRecord;
 	trackingCallbackRecord.decompressionTrackingCallback = XMSGProcessDecompressedFrameProc;
