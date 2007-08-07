@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.42 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.43 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -77,7 +77,8 @@ void _XMSetBandwidthLimit(unsigned limit);
  * Sets the NAT information to use to establish
  * NAT traversal
  **/
-void _XMSetNATInformation(const char *stunServer,
+void _XMSetNATInformation(const char * const * stunServers,
+						  unsigned stunServerCount,
 						  const char *translationAddress);
 /**
  * defines which port ranges to use to establish

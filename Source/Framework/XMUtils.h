@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.20 2007/03/12 13:33:51 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.21 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,7 +81,7 @@
  * This corresponds to the STUN server specified in the currently active
  * XMPreferences instance of XMCallManager
  **/
-- (NSString *)stunServer;
+//- (NSString *)stunServer;
 
 /**
  * Starts a search for the external address by a HTTP page

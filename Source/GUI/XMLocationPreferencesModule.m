@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.28 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.29 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,8 +40,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 // user interface validation methods
 - (void)_validateLocationButtonUserInterface;
-- (void)_validateSTUNUserInterface;
-- (void)_validateAddressTranslationUserInterface;
 - (void)_validateExternalAddressUserInterface;
 - (void)_validateH323UserInterface;
 - (void)_validateSIPUserInterface;
@@ -94,9 +92,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	contentViewHeight = [contentView frame].size.height;
 	[prefWindowController addPreferencesModule:self];
-	
-	// setting the default list of STUN servers
-	[stunServerField addItemsWithObjectValues:XMDefaultSTUNServers()];
 	
 	// replacing the table column identifiers with better ones
 	NSTableColumn *tableColumn;
@@ -358,29 +353,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 - (IBAction)defaultAction:(id)sender
 {
 	[prefWindowController notePreferencesDidChange];
-}
-
-- (IBAction)toggleNATMethod:(id)sender
-{
-	if(sender == useSTUNRadioButton)
-	{
-		[useIPAddressTranslationRadioButton setState:NSOffState];
-		[noneRadioButton setState:NSOffState];
-	}
-	else if(sender == useIPAddressTranslationRadioButton)
-	{
-		[useSTUNRadioButton setState:NSOffState];
-		[noneRadioButton setState:NSOffState];
-	}
-	else
-	{
-		[useSTUNRadioButton setState:NSOffState];
-		[useIPAddressTranslationRadioButton setState:NSOffState];
-	}
-	
-	[self _validateSTUNUserInterface];
-	[self _validateAddressTranslationUserInterface];
-	[self defaultAction:self];
 }
 
 - (IBAction)getExternalAddress:(id)sender
@@ -743,36 +715,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	unsigned index = [bandwidthLimitPopUp indexOfItemWithTag:bandwidth];
 	[bandwidthLimitPopUp selectItemAtIndex:index];
 	
-	state = ([currentLocation useSTUN] == YES) ? NSOnState : NSOffState;
-	[useSTUNRadioButton setState:state];
-	
-	if(state == NSOffState)
-	{
-		state = ([currentLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
-		[useIPAddressTranslationRadioButton setState:state];
-		
-		if(state == NSOffState)
-		{
-			[noneRadioButton setState:NSOnState];
-		}
-		else
-		{
-			[noneRadioButton setState:NSOffState];
-		}
-	}
-	else
-	{
-		[useIPAddressTranslationRadioButton setState:NSOffState];
-		[noneRadioButton setState:NSOffState];
-	}
-	
-	string = [currentLocation stunServer];
-	if(string == nil)
-	{
-		string = @"";
-	}
-	[stunServerField setStringValue:string];
-	
 	string = [currentLocation externalAddress];
 	if(string == nil)	// this means that the external address is automatically picked
 	{
@@ -877,8 +819,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	[enableH264LimitedModeSwitch setState:state];
 	
 	// finally, it's time to validate some GUI-Elements
-	[self _validateSTUNUserInterface];
-	[self _validateAddressTranslationUserInterface];
 	[self _validateExternalAddressUserInterface];
 	[self _validateH323UserInterface];
 	[self _validateSIPUserInterface];
@@ -899,19 +839,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 	
 	// saving the network section
 	[currentLocation setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
-	
-	flag = ([useSTUNRadioButton state] == NSOnState) ? YES : NO;
-	[currentLocation setUseSTUN:flag];
-	
-	string = [stunServerField stringValue];
-	if([string isEqualToString:@""])
-	{
-		string = nil;
-	}
-	[currentLocation setSTUNServer:string];
-	
-	flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
-	[currentLocation setUseAddressTranslation:flag];
 	
 	string = [externalAddressField stringValue];
 	if([string isEqualToString:@""] || [autoGetExternalAddressSwitch state] == NSOnState)
@@ -992,30 +919,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
 	BOOL flag = ([locations count] == 1) ? NO : YES;
 	[deleteLocationButton setEnabled:flag];
-}
-
-- (void)_validateSTUNUserInterface
-{
-	BOOL flag = ([useSTUNRadioButton state] == NSOnState) ? YES : NO;
-	
-	[stunServerField setEnabled:flag];
-}
-
-- (void)_validateAddressTranslationUserInterface
-{
-	BOOL flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
-	
-	[autoGetExternalAddressSwitch setEnabled:flag];
-	[getExternalAddressButton setEnabled:flag];
-	
-	if(flag)
-	{
-		[self _validateExternalAddressUserInterface];
-	}
-	else
-	{
-		[externalAddressField setEnabled:NO];
-	}
 }
 
 - (void)_validateExternalAddressUserInterface

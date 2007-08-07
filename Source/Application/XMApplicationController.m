@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.53 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.54 2007/08/07 14:55:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,6 +113,9 @@
 		pTracePath = [XMPreferencesManager pTraceFilePath];
 	}
 	XMInitFramework(pTracePath);
+	
+	// Ensure that the STUN servers are read, to avoid race conditions
+	XMDefaultSTUNServers();
 	
 	// registering for notifications
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

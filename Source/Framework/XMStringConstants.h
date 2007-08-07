@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.30 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.31 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -298,14 +298,12 @@ extern NSString *XMKey_PreferencesAutomaticallyAcceptIncomingCalls;
 
 // Network-specific keys
 extern NSString *XMKey_PreferencesBandwidthLimit;
-extern NSString *XMKey_PreferencesUseSTUN;
-extern NSString *XMKey_PreferencesSTUNServer;
-extern NSString *XMKey_PreferencesUseAddressTranslation;
 extern NSString *XMKey_PreferencesExternalAddress;
 extern NSString *XMKey_PreferencesTCPPortBase;
 extern NSString *XMKey_PreferencesTCPPortMax;
 extern NSString *XMKey_PreferencesUDPPortBase;
 extern NSString *XMKey_PreferencesUDPPortMax;
+extern NSString *XMKey_PreferencesSTUNServers;
 
 // audio-specific keys
 extern NSString *XMKey_PreferencesAudioCodecList;

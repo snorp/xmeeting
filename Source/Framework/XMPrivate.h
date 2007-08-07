@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.40 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.41 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -151,8 +151,6 @@ void _XMCheckCloseStatus();
 #pragma mark Misc.
 
 - (void)_updateSTUNInformation;
-- (BOOL)_usesSTUN;
-- (NSString *)_stunServer;
 
 @end
 

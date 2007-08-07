@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.46 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.47 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -838,18 +838,12 @@
 	}
 	
 	// appending the network addresses to the tool tip
-	BOOL useAddressTranslation = [activeLocation useAddressTranslation];
 	NSString *externalAddress = nil;
 	unsigned externalAddressIndex = NSNotFound;
-	
-	if(useAddressTranslation == YES)
-	{
-		externalAddress = [utils checkipExternalAddress];
+	externalAddress = [utils checkipExternalAddress];
 		
-		if(externalAddress != nil)
-		{
-			externalAddressIndex = [localAddresses indexOfObject:externalAddress];
-		}
+	if(externalAddress != nil) {
+	  externalAddressIndex = [localAddresses indexOfObject:externalAddress];
 	}
 	
 	[toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES", @"")];
@@ -867,7 +861,7 @@
 		}
 	}
 	
-	if(useAddressTranslation == YES && externalAddressIndex == NSNotFound)
+	if(externalAddressIndex == NSNotFound)
 	{
 		if(externalAddress == nil)
 		{

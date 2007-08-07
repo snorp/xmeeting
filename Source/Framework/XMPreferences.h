@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.16 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.17 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,14 +38,12 @@
 	
 	/* Network settings */
 	unsigned	 bandwidthLimit;				// The bandwidth limit in bit/s (0 for no limit)
-	BOOL		 useSTUN;						// Set whether to use a STUN server or not
-	NSString	*stunServer;					// Address of the STUN server
-	BOOL		 useAddressTranslation;			// Set whether to use address translation or not (NAT)
-	NSString	*externalAddress;				// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
+	NSString	*externalAddress; 				// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
 	unsigned	 tcpPortBase;					// The lower limit of the tcp port range
 	unsigned	 tcpPortMax;					// The upper limit of the tcp port range
 	unsigned	 udpPortBase;					// The lower limit of the udp port range
 	unsigned	 udpPortMax;					// The upper limit of the udp port range
+	NSArray     *stunServers;                   // A list of STUN servers to be used
 
 	/* audio settings */
 	NSMutableArray *audioCodecList;				// An array containing XMCodecListRecord instances.
@@ -126,15 +124,6 @@
 - (unsigned)bandwidthLimit;
 - (void)setBandwidthLimit:(unsigned)limit;
 
-- (BOOL)useSTUN;
-- (void)setUseSTUN:(BOOL)flag;
-
-- (NSString *)stunServer;
-- (void)setSTUNServer:(NSString *)string;
-
-- (BOOL)useAddressTranslation;
-- (void)setUseAddressTranslation:(BOOL)flag;
-
 - (NSString *)externalAddress;
 - (void)setExternalAddress:(NSString *)string;
 
@@ -149,6 +138,9 @@
 
 - (unsigned)udpPortMax;
 - (void)setUDPPortMax:(unsigned)value;
+
+- (NSArray *)stunServers;
+- (void)setSTUNServers:(NSArray *)stunServers;
 
 #pragma mark Audio-specific Methods
 

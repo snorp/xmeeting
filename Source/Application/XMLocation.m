@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.10 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.11 2007/08/07 14:55:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,7 @@
 
 #import "XMLocation.h"
 
+#import "XMApplicationFunctions.h"
 #import "XMPreferencesManager.h"
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
@@ -364,6 +365,15 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 }
 
 - (void)setAutoAnswerCalls:(BOOL)flag
+{
+}
+
+- (NSArray *)stunServers
+{
+  return XMDefaultSTUNServers();
+}
+
+- (void)setSTUNServers:(NSArray *)servers
 {
 }
 

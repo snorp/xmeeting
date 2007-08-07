@@ -414,6 +414,7 @@
 		D1CE4B62083CDED900B66B5D /* XMAddressBookModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1CE4B61083CDED900B66B5D /* XMAddressBookModule.m */; };
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
 		D1CE4B76083CE0FC00B66B5D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
+		D1D910BB0C6681B400A1EDBD /* rfc4175.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D910BA0C6681B400A1EDBD /* rfc4175.h */; };
 		D1E2DA1008F470D700BE224E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D1E2DB8908F4720A00BE224E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DB8808F4720A00BE224E /* QuartzCore.framework */; };
 		D1E314CA0B52AB3700385072 /* speexcodec.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1E314860B529FA200385072 /* speexcodec.cxx */; };
@@ -502,6 +503,7 @@
 				D15437440C0B10F3002A027E /* audiorecord.h in CopyFiles */,
 				D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */,
 				D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */,
+				D1D910BB0C6681B400A1EDBD /* rfc4175.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1333,6 +1335,7 @@
 		D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCodecManager.m; path = Source/Framework/XMCodecManager.m; sourceTree = "<group>"; };
 		D1D6F9BD0BA2A57A005CAA26 /* srtp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = srtp.h; sourceTree = "<group>"; };
 		D1D6F9ED0BA2A85C005CAA26 /* srtp.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = srtp.cxx; sourceTree = "<group>"; };
+		D1D910BA0C6681B400A1EDBD /* rfc4175.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = rfc4175.h; sourceTree = "<group>"; };
 		D1D9A46C08519C9200445833 /* XMStringConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMStringConstants.m; path = Source/Framework/XMStringConstants.m; sourceTree = "<group>"; };
 		D1D9A7220851DE8F00445833 /* XMStringConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMStringConstants.h; path = Source/Framework/XMStringConstants.h; sourceTree = "<group>"; };
 		D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323EndPoint.h; path = Source/Framework/XMH323EndPoint.h; sourceTree = "<group>"; };
@@ -2412,6 +2415,7 @@
 		D1CEE12808F9022B007E4ABE /* codec */ = {
 			isa = PBXGroup;
 			children = (
+				D1D910BA0C6681B400A1EDBD /* rfc4175.h */,
 				D10973CF0BADCB1E007E8087 /* opalplugin.h */,
 				D10973CA0BADCABB007E8087 /* opalpluginmgr.h */,
 				D1F49D02097E50790010A324 /* echocancel.h */,
@@ -3340,7 +3344,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"PWLib: Running configure not needed\";\nelse\necho \"PWLib: Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\nautoconf\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PWLib: Running bison not needed\";\nelse\necho \"PWLib: Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"PWLib: Running configure not needed\";\nelse\necho \"PWLib: Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\nautoconf\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PWLib: Running bison not needed\";\nelse\necho \"PWLib: Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 

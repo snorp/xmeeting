@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.37 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.38 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1138,16 +1138,6 @@
 - (void)_updateSTUNInformation
 {
 	[self _doSubsystemSetupWithPreferences:activePreferences];
-}
-
-- (BOOL)_usesSTUN
-{
-	return [activePreferences useSTUN];
-}
-
-- (NSString *)_stunServer
-{
-	return [activePreferences stunServer];
 }
 
 #pragma mark -

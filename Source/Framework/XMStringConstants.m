@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.28 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.29 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,14 +113,12 @@ NSString *XMKey_PreferencesUserName = @"XMeeting_UserName";
 NSString *XMKey_PreferencesAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 
 NSString *XMKey_PreferencesBandwidthLimit = @"XMeeting_BandwidthLimit";
-NSString *XMKey_PreferencesUseSTUN = @"XMeeting_UseSTUN";
-NSString *XMKey_PreferencesSTUNServer = @"XMeeting_STUNServer";
-NSString *XMKey_PreferencesUseAddressTranslation = @"XMeeting_UseAddressTranslation";
 NSString *XMKey_PreferencesExternalAddress = @"XMeeting_ExternalAddress";
 NSString *XMKey_PreferencesTCPPortBase = @"XMeeting_TCPPortBase";
 NSString *XMKey_PreferencesTCPPortMax = @"XMeeting_TCPPortMax";
 NSString *XMKey_PreferencesUDPPortBase = @"XMeeting_UDPPortBase";
 NSString *XMKey_PreferencesUDPPortMax = @"XMeeting_UDPPortMax";
+NSString *XMKey_PreferencesSTUNServers = @"XMeeting_STUNServers";
 
 NSString *XMKey_PreferencesAudioCodecList = @"XMeeting_AudioCodecList";
 NSString *XMKey_PreferencesEnableSilenceSuppression = @"XMeeting_EnableSilenceSuppression";

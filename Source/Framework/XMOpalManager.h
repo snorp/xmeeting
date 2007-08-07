@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.35 2007/05/14 13:46:33 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.36 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -80,7 +80,7 @@ public:
 	unsigned GetVideoBandwidthLimit() const { return bandwidthLimit - 64000; }
 	
     /* NAT methods */
-	void SetNATInformation(const PString & stunServer,
+	void SetNATInformation(const PStringArray & stunServers,
 						   const PString & translationAddress);
 	
 	/* Audio setup methods */
@@ -109,6 +109,9 @@ public:
     static unsigned GetH264BandwidthLimit();
 	
 private:
+      
+    void HandleSTUNInformation(PSTUNClient::NatTypes natType,
+                               const PString & externalAddress);
     
     unsigned bandwidthLimit;
 	

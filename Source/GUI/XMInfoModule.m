@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.20 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.21 2007/08/07 14:55:03 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -309,8 +309,7 @@
 - (void)_updateNetworkStatus:(NSNotification *)notif
 {
 	XMUtils *utils = [XMUtils sharedInstance];
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	
+  
 	NSArray *localAddresses = [utils localAddresses];
 	NSArray *localAddressInterfaces = [utils localAddressInterfaces];
 	unsigned localAddressCount = [localAddresses count];
@@ -348,33 +347,17 @@
 	
 	addressExtraHeight = (localAddressCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
 	
-	if([[preferencesManager activeLocation] useSTUN])
-	{
-		NSString *externalAddress = [utils stunExternalAddress];
-		if(externalAddress == nil)
-		{
-			externalAddress = [utils checkipExternalAddress];
-		}
-		
-		if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
-		{
-			[ipAddressString appendString:@"\n"];
-			[ipAddressString appendString:externalAddress];
-			[ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
-			addressExtraHeight += XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
-		}
+	NSString *externalAddress = [utils stunExternalAddress];
+	if(externalAddress == nil) {
+      externalAddress = [utils checkipExternalAddress];
 	}
-	else if([[preferencesManager activeLocation] useAddressTranslation])
-	{
-		NSString *externalAddress = [utils checkipExternalAddress];
 		
-		if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
-		{
-			[ipAddressString appendString:@"\n"];
-			[ipAddressString appendString:externalAddress];
-			[ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
-			addressExtraHeight += XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
-		}
+	if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
+	{
+	  [ipAddressString appendString:@"\n"];
+	  [ipAddressString appendString:externalAddress];
+	  [ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
+	  addressExtraHeight += XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
 	}
 	
 	[ipAddressesField setStringValue:ipAddressString];
