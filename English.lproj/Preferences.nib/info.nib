@@ -79,6 +79,10 @@
 	<array>
 		<integer>684</integer>
 	</array>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>338</integer>
+	</array>
 	<key>IBSystem Version</key>
 	<string>8R218</string>
 </dict>
