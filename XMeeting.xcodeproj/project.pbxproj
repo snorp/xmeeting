@@ -51,12 +51,6 @@
 		1A5821C409A1DE7F00CBE017 /* locationPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1A5821C309A1DE7F00CBE017 /* locationPreferences.tif */; };
 		1A9E27BE09A5BF3600E9A7CE /* Ringer.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 1A9E27BD09A5BF3600E9A7CE /* Ringer.aiff */; };
 		1AC7C1EF098665E2008521B4 /* no_video_screen.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AC7C1EE098665E2008521B4 /* no_video_screen.tif */; };
-		1ACBD4510992270500B88F0F /* Action_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44B0992270500B88F0F /* Action_Pressed.tiff */; };
-		1ACBD4520992270500B88F0F /* Action.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44C0992270500B88F0F /* Action.tiff */; };
-		1ACBD4530992270500B88F0F /* Add_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */; };
-		1ACBD4540992270500B88F0F /* Add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44E0992270500B88F0F /* Add.tiff */; };
-		1ACBD4550992270500B88F0F /* Remove_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD44F0992270500B88F0F /* Remove_Pressed.tiff */; };
-		1ACBD4560992270500B88F0F /* Remove.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 1ACBD4500992270500B88F0F /* Remove.tiff */; };
 		1AD42B5F09938EF500F92546 /* XMInCallOSD.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AD42B5D09938EF500F92546 /* XMInCallOSD.m */; };
 		1AD42C390993BF1100F92546 /* pinp_off_large_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C350993BF1100F92546 /* pinp_off_large_down.tif */; };
 		1AD42C3A0993BF1100F92546 /* pinp_off_large.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AD42C360993BF1100F92546 /* pinp_off_large.tif */; };
@@ -381,6 +375,13 @@
 		D1A02ADE081E56DB0018BD11 /* XMGeneralPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02ADC081E56DB0018BD11 /* XMGeneralPreferencesModule.m */; };
 		D1A02AEE081E57040018BD11 /* XMLocationPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */; };
 		D1A02B26081E96D30018BD11 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1A02B24081E96D30018BD11 /* Preferences.nib */; };
+		D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1A24F2A0C6FD96000408CF7 /* XMIDDPrefixFormatter.h */; };
+		D1A24F2D0C6FD96000408CF7 /* XMIDDPrefixFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A24F2B0C6FD96000408CF7 /* XMIDDPrefixFormatter.m */; };
+		D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1A561020C6CA45A0086E6F6 /* XMIPAddressFormatter.h */; };
+		D1A561050C6CA45A0086E6F6 /* XMIPAddressFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A561030C6CA45A0086E6F6 /* XMIPAddressFormatter.m */; };
+		D1A562A10C6DA9460086E6F6 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A00C6DA9460086E6F6 /* Add.png */; };
+		D1A562A70C6DAA280086E6F6 /* Remove.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A60C6DAA280086E6F6 /* Remove.png */; };
+		D1A562AA0C6DAB420086E6F6 /* Action.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A90C6DAB420086E6F6 /* Action.png */; };
 		D1A5E1FD09C8835E0063B926 /* XMLocalVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */; };
 		D1A5E9E409C9C69F0063B926 /* XMInspectorModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */; };
 		D1A5EE1609CB08E30063B926 /* DummyImage.gif in Resources */ = {isa = PBXBuildFile; fileRef = D1A5EE1509CB08E30063B926 /* DummyImage.gif */; };
@@ -504,6 +505,8 @@
 				D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */,
 				D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */,
 				D1D910BB0C6681B400A1EDBD /* rfc4175.h in CopyFiles */,
+				D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */,
+				D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -601,12 +604,6 @@
 		1A5821C309A1DE7F00CBE017 /* locationPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = locationPreferences.tif; path = Resources/Images/locationPreferences.tif; sourceTree = "<group>"; };
 		1A9E27BD09A5BF3600E9A7CE /* Ringer.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; name = Ringer.aiff; path = Resources/Sounds/Ringer.aiff; sourceTree = "<group>"; };
 		1AC7C1EE098665E2008521B4 /* no_video_screen.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = no_video_screen.tif; path = Resources/Images/no_video_screen.tif; sourceTree = "<group>"; };
-		1ACBD44B0992270500B88F0F /* Action_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Action_Pressed.tiff; path = Resources/Images/Action_Pressed.tiff; sourceTree = "<group>"; };
-		1ACBD44C0992270500B88F0F /* Action.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Action.tiff; path = Resources/Images/Action.tiff; sourceTree = "<group>"; };
-		1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Add_Pressed.tiff; path = Resources/Images/Add_Pressed.tiff; sourceTree = "<group>"; };
-		1ACBD44E0992270500B88F0F /* Add.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Add.tiff; path = Resources/Images/Add.tiff; sourceTree = "<group>"; };
-		1ACBD44F0992270500B88F0F /* Remove_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Remove_Pressed.tiff; path = Resources/Images/Remove_Pressed.tiff; sourceTree = "<group>"; };
-		1ACBD4500992270500B88F0F /* Remove.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Remove.tiff; path = Resources/Images/Remove.tiff; sourceTree = "<group>"; };
 		1AD42B5C09938EF500F92546 /* XMInCallOSD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMInCallOSD.h; path = Source/GUI/XMInCallOSD.h; sourceTree = "<group>"; };
 		1AD42B5D09938EF500F92546 /* XMInCallOSD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInCallOSD.m; path = Source/GUI/XMInCallOSD.m; sourceTree = "<group>"; };
 		1AD42C350993BF1100F92546 /* pinp_off_large_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pinp_off_large_down.tif; path = Resources/Images/pinp_off_large_down.tif; sourceTree = "<group>"; };
@@ -911,6 +908,13 @@
 		D1A02AEB081E57040018BD11 /* XMLocationPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLocationPreferencesModule.h; path = Source/GUI/XMLocationPreferencesModule.h; sourceTree = "<group>"; };
 		D1A02AEC081E57040018BD11 /* XMLocationPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLocationPreferencesModule.m; path = Source/GUI/XMLocationPreferencesModule.m; sourceTree = "<group>"; };
 		D1A02B25081E96D30018BD11 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
+		D1A24F2A0C6FD96000408CF7 /* XMIDDPrefixFormatter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = XMIDDPrefixFormatter.h; sourceTree = "<group>"; };
+		D1A24F2B0C6FD96000408CF7 /* XMIDDPrefixFormatter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = XMIDDPrefixFormatter.m; sourceTree = "<group>"; };
+		D1A561020C6CA45A0086E6F6 /* XMIPAddressFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMIPAddressFormatter.h; sourceTree = "<group>"; };
+		D1A561030C6CA45A0086E6F6 /* XMIPAddressFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMIPAddressFormatter.m; sourceTree = "<group>"; };
+		D1A562A00C6DA9460086E6F6 /* Add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Add.png; path = Resources/Images/Add.png; sourceTree = "<group>"; };
+		D1A562A60C6DAA280086E6F6 /* Remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remove.png; path = Resources/Images/Remove.png; sourceTree = "<group>"; };
+		D1A562A90C6DAB420086E6F6 /* Action.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Action.png; path = Resources/Images/Action.png; sourceTree = "<group>"; };
 		D1A5E1FA09C8835E0063B926 /* XMLocalVideoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMLocalVideoView.h; path = Source/GUI/XMLocalVideoView.h; sourceTree = "<group>"; };
 		D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMLocalVideoView.m; path = Source/GUI/XMLocalVideoView.m; sourceTree = "<group>"; };
 		D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInspectorModule.m; path = Source/GUI/XMInspectorModule.m; sourceTree = "<group>"; };
@@ -1651,6 +1655,10 @@
 				D102AFFC09EA770F0050239C /* XMInstantActionButton.m */,
 				D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */,
 				D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */,
+				D1A561020C6CA45A0086E6F6 /* XMIPAddressFormatter.h */,
+				D1A561030C6CA45A0086E6F6 /* XMIPAddressFormatter.m */,
+				D1A24F2A0C6FD96000408CF7 /* XMIDDPrefixFormatter.h */,
+				D1A24F2B0C6FD96000408CF7 /* XMIDDPrefixFormatter.m */,
 			);
 			name = "GUI-Objects";
 			path = Source/GUI;
@@ -2863,12 +2871,11 @@
 		D1EB1897084379C5002CEF53 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				D1A562A90C6DAB420086E6F6 /* Action.png */,
+				D1A562A60C6DAA280086E6F6 /* Remove.png */,
+				D1A562A00C6DA9460086E6F6 /* Add.png */,
 				D10BD5460AC1D503004320A8 /* recording.gif */,
 				D1BB917309BCDF99000897D9 /* accountPreferences.tif */,
-				1ACBD44C0992270500B88F0F /* Action.tiff */,
-				1ACBD44B0992270500B88F0F /* Action_Pressed.tiff */,
-				1ACBD44E0992270500B88F0F /* Add.tiff */,
-				1ACBD44D0992270500B88F0F /* Add_Pressed.tiff */,
 				D1EB18AC08437A26002CEF53 /* AddressBook.tiff */,
 				D120614309FBDE5100179B6C /* AddressBook_16.tiff */,
 				D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */,
@@ -2948,8 +2955,6 @@
 				1A348FC80984E4680033FA95 /* pinpmode_ichat_large_down.tif */,
 				1A348FCB0984E4680033FA95 /* pinpmode_sidebyside_large.tif */,
 				1A348FCA0984E4680033FA95 /* pinpmode_sidebyside_large_down.tif */,
-				1ACBD4500992270500B88F0F /* Remove.tiff */,
-				1ACBD44F0992270500B88F0F /* Remove_Pressed.tiff */,
 				D1205B0909F9899600179B6C /* right_arrow.tif */,
 				D1205B0809F9899600179B6C /* right_arrow_down.tif */,
 				1A348FCC0984E4680033FA95 /* semaphore_green.tif */,
@@ -3227,12 +3232,6 @@
 				1ADAFBEB0990F74700F6C5FF /* camera_24.tif in Resources */,
 				1ADAFC010990FABD00F6C5FF /* hangup_24_down.tif in Resources */,
 				1ADAFC020990FABD00F6C5FF /* hangup_24.tif in Resources */,
-				1ACBD4510992270500B88F0F /* Action_Pressed.tiff in Resources */,
-				1ACBD4520992270500B88F0F /* Action.tiff in Resources */,
-				1ACBD4530992270500B88F0F /* Add_Pressed.tiff in Resources */,
-				1ACBD4540992270500B88F0F /* Add.tiff in Resources */,
-				1ACBD4550992270500B88F0F /* Remove_Pressed.tiff in Resources */,
-				1ACBD4560992270500B88F0F /* Remove.tiff in Resources */,
 				1AD42C390993BF1100F92546 /* pinp_off_large_down.tif in Resources */,
 				1AD42C3A0993BF1100F92546 /* pinp_off_large.tif in Resources */,
 				1AD42C3B0993BF1100F92546 /* pinp_on_large_down.tif in Resources */,
@@ -3306,6 +3305,9 @@
 				D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */,
 				D10BD5470AC1D503004320A8 /* recording.gif in Resources */,
 				D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */,
+				D1A562A10C6DA9460086E6F6 /* Add.png in Resources */,
+				D1A562A70C6DAA280086E6F6 /* Remove.png in Resources */,
+				D1A562AA0C6DAB420086E6F6 /* Action.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3589,6 +3591,8 @@
 				D15436F40C0ADF9D002A027E /* psockbun.cxx in Sources */,
 				D154390D0C0B3D60002A027E /* opalmixer.cxx in Sources */,
 				D15439CB0C0C5769002A027E /* handlers.cxx in Sources */,
+				D1A561050C6CA45A0086E6F6 /* XMIPAddressFormatter.m in Sources */,
+				D1A24F2D0C6FD96000408CF7 /* XMIDDPrefixFormatter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
