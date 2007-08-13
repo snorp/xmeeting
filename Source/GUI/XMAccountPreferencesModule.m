@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.8 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.9 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -125,6 +125,10 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 	
 	[preferencesManager setH323Accounts:h323Accounts];
 	[preferencesManager setSIPAccounts:sipAccounts];
+}
+
+- (void)becomeActiveModule
+{
 }
 
 #pragma mark -

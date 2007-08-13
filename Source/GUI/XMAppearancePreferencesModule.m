@@ -1,9 +1,9 @@
 /*
- * $Id: XMAppearancePreferencesModule.m,v 1.1 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAppearancePreferencesModule.m,v 1.2 2007/08/13 00:36:34 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAppearancePreferencesModule.h"
@@ -16,22 +16,22 @@
 
 - (id)init
 {
-	prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
-	
-	return self;
+  prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
+  
+  return self;
 }
 
 - (void)awakeFromNib
 {
-	contentViewHeight = [contentView frame].size.height;
-	[prefWindowController addPreferencesModule:self];
+  contentViewHeight = [contentView frame].size.height;
+  [prefWindowController addPreferencesModule:self];
 }
 
 - (void)dealloc
 {
-	[prefWindowController release];
-	
-	[super dealloc];
+  [prefWindowController release];
+  
+  [super dealloc];
 }
 
 #pragma mark -
@@ -39,87 +39,91 @@
 
 - (unsigned)position
 {
-	return 1;
+  return 1;
 }
 
 - (NSString *)identifier
 {
-	return @"XMeeting_AppearancePreferencesModule";
+  return @"XMeeting_AppearancePreferencesModule";
 }
 
 - (NSString *)toolbarLabel
 {
-	return NSLocalizedString(@"XM_APPEARANCE_PREFERENCES_NAME", @"");
+  return NSLocalizedString(@"XM_APPEARANCE_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
 {
-	return [NSImage imageNamed:@"appearancePreferences.tif"];
+  return [NSImage imageNamed:@"appearancePreferences.tif"];
 }
 
 - (NSString *)toolTipText
 {
-	return NSLocalizedString(@"XM_APPEARANCE_PREFERENCES_TOOLTIP", @"");
+  return NSLocalizedString(@"XM_APPEARANCE_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView
 {
-	return contentView;
+  return contentView;
 }
 
 - (float)contentViewHeight
 {
-	return contentViewHeight;
+  return contentViewHeight;
 }
 
 - (void)loadPreferences
 {
-	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
-	
-	int state = ([prefManager automaticallyEnterFullScreen] == YES) ? NSOnState : NSOffState;
-	[automaticallyEnterFullScreenSwitch setState:state];
-	
-	state = ([prefManager showSelfViewMirrored] == YES) ? NSOnState : NSOffState;
-	[showSelfViewMirroredSwitch setState:state];
-	
-	state = ([prefManager automaticallyHideInCallControls] == YES) ? NSOnState : NSOffState;
-	[automaticallyHideInCallControlsSwitch setState:state];
-	
-	XMInCallControlHideAndShowEffect effect = [prefManager inCallControlHideAndShowEffect];
-	[inCallControlsHideAndShowEffectPopUp selectItemAtIndex:(unsigned)effect];
-	
-	state = ([prefManager alertIncomingCalls] == YES) ? NSOnState : NSOffState;
-	[playSoundOnIncomingCallSwitch setState:state];
-	
-	XMIncomingCallAlertType alertType = [prefManager incomingCallAlertType];
-	[soundTypePopUp selectItemAtIndex:((unsigned)alertType - 1)];
-	
-	// validating the user interface
-	[self toggleAutomaticallyHideInCallControls:self];
-	[self togglePlaySoundOnIncomingCall:self];
+  XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  
+  int state = ([prefManager automaticallyEnterFullScreen] == YES) ? NSOnState : NSOffState;
+  [automaticallyEnterFullScreenSwitch setState:state];
+  
+  state = ([prefManager showSelfViewMirrored] == YES) ? NSOnState : NSOffState;
+  [showSelfViewMirroredSwitch setState:state];
+  
+  state = ([prefManager automaticallyHideInCallControls] == YES) ? NSOnState : NSOffState;
+  [automaticallyHideInCallControlsSwitch setState:state];
+  
+  XMInCallControlHideAndShowEffect effect = [prefManager inCallControlHideAndShowEffect];
+  [inCallControlsHideAndShowEffectPopUp selectItemAtIndex:(unsigned)effect];
+  
+  state = ([prefManager alertIncomingCalls] == YES) ? NSOnState : NSOffState;
+  [playSoundOnIncomingCallSwitch setState:state];
+  
+  XMIncomingCallAlertType alertType = [prefManager incomingCallAlertType];
+  [soundTypePopUp selectItemAtIndex:((unsigned)alertType - 1)];
+  
+  // validating the user interface
+  [self toggleAutomaticallyHideInCallControls:self];
+  [self togglePlaySoundOnIncomingCall:self];
 }
 
 - (void)savePreferences
 {
-	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  
+  BOOL flag = ([automaticallyEnterFullScreenSwitch state] == NSOnState) ? YES : NO;
+  [prefManager setAutomaticallyEnterFullScreen:flag];
+  
+  flag = ([showSelfViewMirroredSwitch state] == NSOnState) ? YES : NO;
+  [prefManager setShowSelfViewMirrored:flag];
+  
+  flag = ([automaticallyHideInCallControlsSwitch state] == NSOnState) ? YES : NO;
+  [prefManager setAutomaticallyHideInCallControls:flag];
+  
+  XMInCallControlHideAndShowEffect effect = (XMInCallControlHideAndShowEffect)[inCallControlsHideAndShowEffectPopUp indexOfSelectedItem];
+  [prefManager setInCallControlHideAndShowEffect:effect];
+  
+  flag = ([playSoundOnIncomingCallSwitch state] == NSOnState) ? YES : NO;
+  [prefManager setAlertIncomingCalls:flag];
+  
+  XMIncomingCallAlertType alertType = (XMIncomingCallAlertType)([soundTypePopUp indexOfSelectedItem] + 1);
+  [prefManager setIncomingCallAlertType:alertType];
+}
 
-	BOOL flag = ([automaticallyEnterFullScreenSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setAutomaticallyEnterFullScreen:flag];
-	
-	flag = ([showSelfViewMirroredSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setShowSelfViewMirrored:flag];
-	
-	flag = ([automaticallyHideInCallControlsSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setAutomaticallyHideInCallControls:flag];
-	
-	XMInCallControlHideAndShowEffect effect = (XMInCallControlHideAndShowEffect)[inCallControlsHideAndShowEffectPopUp indexOfSelectedItem];
-	[prefManager setInCallControlHideAndShowEffect:effect];
-	
-	flag = ([playSoundOnIncomingCallSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setAlertIncomingCalls:flag];
-	
-	XMIncomingCallAlertType alertType = (XMIncomingCallAlertType)([soundTypePopUp indexOfSelectedItem] + 1);
-	[prefManager setIncomingCallAlertType:alertType];
+- (void)becomeActiveModule
+{
 }
 
 #pragma mark -
@@ -127,27 +131,27 @@
 
 - (IBAction)defaultAction:(id)sender
 {
-	[prefWindowController notePreferencesDidChange];	
+  [prefWindowController notePreferencesDidChange];	
 }
 
 - (IBAction)toggleAutomaticallyHideInCallControls:(id)sender
 {
-	int state = [automaticallyHideInCallControlsSwitch state];
-	BOOL enablePopUp = (state == NSOnState) ? YES : NO;
-	
-	[inCallControlsHideAndShowEffectPopUp setEnabled:enablePopUp];
-	
-	[self defaultAction:sender];
+  int state = [automaticallyHideInCallControlsSwitch state];
+  BOOL enablePopUp = (state == NSOnState) ? YES : NO;
+  
+  [inCallControlsHideAndShowEffectPopUp setEnabled:enablePopUp];
+  
+  [self defaultAction:sender];
 }
 
 - (IBAction)togglePlaySoundOnIncomingCall:(id)sender
 {
-	int state = [playSoundOnIncomingCallSwitch state];
-	BOOL enablePopUp = (state == NSOnState) ? YES : NO;
-	
-	[soundTypePopUp setEnabled:enablePopUp];
-	
-	[self defaultAction:sender];
+  int state = [playSoundOnIncomingCallSwitch state];
+  BOOL enablePopUp = (state == NSOnState) ? YES : NO;
+  
+  [soundTypePopUp setEnabled:enablePopUp];
+  
+  [self defaultAction:sender];
 }
 
 @end

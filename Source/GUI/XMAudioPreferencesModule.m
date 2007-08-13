@@ -1,9 +1,9 @@
 /*
- * $Id: XMAudioPreferencesModule.m,v 1.2 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMAudioPreferencesModule.m,v 1.3 2007/08/13 00:36:34 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAudioPreferencesModule.h"
@@ -28,31 +28,31 @@ NSString *XMString_UseDefaultDevice = @"";
 
 - (id)init
 {
-	prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
-	
-	return self;
+  prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
+  
+  return self;
 }
 
 - (void)awakeFromNib
 {
-	contentViewHeight = [contentView frame].size.height;
-	
-	[prefWindowController addPreferencesModule:self];
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateDeviceLists:)
-												 name:XMNotification_AudioManagerDidUpdateDeviceLists
-											   object:nil];
-	
-	XMString_UseDefaultDevice = [NSLocalizedString(@"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE", @"") retain];
+  contentViewHeight = [contentView frame].size.height;
+  
+  [prefWindowController addPreferencesModule:self];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateDeviceLists:)
+                                               name:XMNotification_AudioManagerDidUpdateDeviceLists
+                                             object:nil];
+  
+  XMString_UseDefaultDevice = [NSLocalizedString(@"XM_AUDIO_PREFERENCES_DEFAULT_DEVICE", @"") retain];
 }
 
 - (void)dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	[prefWindowController release];
-	
-	[super dealloc];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  
+  [prefWindowController release];
+  
+  [super dealloc];
 }
 
 #pragma mark -
@@ -60,80 +60,71 @@ NSString *XMString_UseDefaultDevice = @"";
 
 - (unsigned)position
 {
-	return 4;
+  return 4;
 }
 
 - (NSString *)identifier
 {
-	return XMKey_AudioPreferencesModuleIdentifier;
+  return XMKey_AudioPreferencesModuleIdentifier;
 }
 
 - (NSString *)toolbarLabel
 {
-	return NSLocalizedString(@"XM_AUDIO_PREFERENCES_NAME", @"");
+  return NSLocalizedString(@"XM_AUDIO_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
 {
-	return [NSImage imageNamed:@"Audio"];
+  return [NSImage imageNamed:@"Audio"];
 }
 
 - (NSString *)toolTipText
 {
-	return NSLocalizedString(@"XM_AUDIO_PREFERENCES_TOOLTIP", @"");
+  return NSLocalizedString(@"XM_AUDIO_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView
 {
-	return contentView;
+  return contentView;
 }
 
 - (float)contentViewHeight
 {
-	return contentViewHeight;
+  return contentViewHeight;
 }
 
 - (void)loadPreferences
 {	
-	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
-	
-	[preferredOutputDevicePopUp removeAllItems];
-	[preferredInputDevicePopUp removeAllItems];
-	
-	[self _buildOutputDeviceList];
-	[self _buildInputDeviceList];
-	
-	int state = ([prefManager enableSilenceSuppression] == YES) ? NSOnState : NSOffState;
-	[enableSilenceSuppressionSwitch setState:state];
-	
-	state = ([prefManager enableEchoCancellation] == YES) ? NSOnState : NSOffState;
-	[enableEchoCancellationSwitch setState:state];
+  [preferredOutputDevicePopUp removeAllItems];
+  [preferredInputDevicePopUp removeAllItems];
+  
+  [self _buildOutputDeviceList];
+  [self _buildInputDeviceList];
 }
 
 - (void)savePreferences
 {
-	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
-	
-	NSString *preferredOutputDevice = [preferredOutputDevicePopUp titleOfSelectedItem];
-	if([preferredOutputDevice isEqualToString:XMString_UseDefaultDevice])
-	{
-		preferredOutputDevice = nil;
-	}
-	
-	NSString *preferredInputDevice = [preferredInputDevicePopUp titleOfSelectedItem];
-	if([preferredInputDevice isEqualToString:XMString_UseDefaultDevice])
-	{
-		preferredInputDevice = nil;
-	}
-	
-	[prefManager setPreferredAudioOutputDevice:preferredOutputDevice];
-	[prefManager setPreferredAudioInputDevice:preferredInputDevice];
-	
-	BOOL flag = ([enableSilenceSuppressionSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setEnableSilenceSuppression:flag];
-	
-	flag = ([enableEchoCancellationSwitch state] == NSOnState) ? YES : NO;
-	[prefManager setEnableEchoCancellation:flag];
+  XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  
+  NSString *preferredOutputDevice = [preferredOutputDevicePopUp titleOfSelectedItem];
+  if([preferredOutputDevice isEqualToString:XMString_UseDefaultDevice])
+  {
+    preferredOutputDevice = nil;
+  }
+  
+  NSString *preferredInputDevice = [preferredInputDevicePopUp titleOfSelectedItem];
+  if([preferredInputDevice isEqualToString:XMString_UseDefaultDevice])
+  {
+    preferredInputDevice = nil;
+  }
+  
+  [prefManager setPreferredAudioOutputDevice:preferredOutputDevice];
+  [prefManager setPreferredAudioInputDevice:preferredInputDevice];
+  
+}
+
+- (void)becomeActiveModule
+{
 }
 
 #pragma mark -
@@ -141,17 +132,17 @@ NSString *XMString_UseDefaultDevice = @"";
 
 - (IBAction)preferredOutputDeviceSelectionDidChange:(id)sender
 {
-	[self defaultAction:sender];
+  [self defaultAction:sender];
 }
 
 - (IBAction)preferredInputDeviceSelectionDidChange:(id)sender
 {
-	[self defaultAction:sender];
+  [self defaultAction:sender];
 }
 
 - (IBAction)defaultAction:(id)sender
 {
-	[prefWindowController notePreferencesDidChange];
+  [prefWindowController notePreferencesDidChange];
 }
 
 #pragma mark -
@@ -159,98 +150,98 @@ NSString *XMString_UseDefaultDevice = @"";
 
 - (void)_buildOutputDeviceList
 {
-	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
-	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
-	
-	NSString *preferredDevice;
-	
-	if([preferredOutputDevicePopUp numberOfItems] == 0)
-	{
-		preferredDevice = [prefManager preferredAudioOutputDevice];
-	}
-	else
-	{
-		preferredDevice = [preferredOutputDevicePopUp titleOfSelectedItem];
-		if([preferredDevice isEqualToString:XMString_UseDefaultDevice])
-		{
-			preferredDevice = nil;
-		}
-	}
-	
-	NSArray *devices = [audioManager outputDevices];
-	
-	[preferredOutputDevicePopUp removeAllItems];
-	
-	[preferredOutputDevicePopUp addItemWithTitle:XMString_UseDefaultDevice];
-	
-	if(preferredDevice != nil && ![devices containsObject:preferredDevice])
-	{
-		[preferredOutputDevicePopUp addItemWithTitle:preferredDevice];
-	}
-	
-	[[preferredOutputDevicePopUp menu] addItem:[NSMenuItem separatorItem]];
-	
-	[preferredOutputDevicePopUp addItemsWithTitles:devices];
-	
-	if(preferredDevice == nil)
-	{
-		[preferredOutputDevicePopUp selectItemAtIndex:0];
-	}
-	else
-	{
-		[preferredOutputDevicePopUp selectItemWithTitle:preferredDevice];
-	}
+  XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+  
+  NSString *preferredDevice;
+  
+  if([preferredOutputDevicePopUp numberOfItems] == 0)
+  {
+    preferredDevice = [prefManager preferredAudioOutputDevice];
+  }
+  else
+  {
+    preferredDevice = [preferredOutputDevicePopUp titleOfSelectedItem];
+    if([preferredDevice isEqualToString:XMString_UseDefaultDevice])
+    {
+      preferredDevice = nil;
+    }
+  }
+  
+  NSArray *devices = [audioManager outputDevices];
+  
+  [preferredOutputDevicePopUp removeAllItems];
+  
+  [preferredOutputDevicePopUp addItemWithTitle:XMString_UseDefaultDevice];
+  
+  if(preferredDevice != nil && ![devices containsObject:preferredDevice])
+  {
+    [preferredOutputDevicePopUp addItemWithTitle:preferredDevice];
+  }
+  
+  [[preferredOutputDevicePopUp menu] addItem:[NSMenuItem separatorItem]];
+  
+  [preferredOutputDevicePopUp addItemsWithTitles:devices];
+  
+  if(preferredDevice == nil)
+  {
+    [preferredOutputDevicePopUp selectItemAtIndex:0];
+  }
+  else
+  {
+    [preferredOutputDevicePopUp selectItemWithTitle:preferredDevice];
+  }
 }
 
 - (void)_buildInputDeviceList
 {
-	XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
-	XMAudioManager *audioManager = [XMAudioManager sharedInstance];
-	
-	NSString *preferredDevice;
-	
-	if([preferredInputDevicePopUp numberOfItems] == 0)
-	{
-		preferredDevice = [prefManager preferredAudioInputDevice];
-	}
-	else
-	{
-		preferredDevice = [preferredInputDevicePopUp titleOfSelectedItem];
-		if([preferredDevice isEqualToString:XMString_UseDefaultDevice])
-		{
-			preferredDevice = nil;
-		}
-	}
-	
-	NSArray *devices = [audioManager inputDevices];
-	
-	[preferredInputDevicePopUp removeAllItems];
-	
-	[preferredInputDevicePopUp addItemWithTitle:XMString_UseDefaultDevice];
-	
-	if(preferredDevice != nil && ![devices containsObject:preferredDevice])
-	{
-		[preferredInputDevicePopUp addItemWithTitle:preferredDevice];
-	}
-	
-	[[preferredInputDevicePopUp menu] addItem:[NSMenuItem separatorItem]];
-	
-	[preferredInputDevicePopUp addItemsWithTitles:devices];
-	
-	if(preferredDevice == nil)
-	{
-		[preferredInputDevicePopUp selectItemAtIndex:0];
-	}
-	else
-	{
-		[preferredInputDevicePopUp selectItemWithTitle:preferredDevice];
-	}
+  XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  XMAudioManager *audioManager = [XMAudioManager sharedInstance];
+  
+  NSString *preferredDevice;
+  
+  if([preferredInputDevicePopUp numberOfItems] == 0)
+  {
+    preferredDevice = [prefManager preferredAudioInputDevice];
+  }
+  else
+  {
+    preferredDevice = [preferredInputDevicePopUp titleOfSelectedItem];
+    if([preferredDevice isEqualToString:XMString_UseDefaultDevice])
+    {
+      preferredDevice = nil;
+    }
+  }
+  
+  NSArray *devices = [audioManager inputDevices];
+  
+  [preferredInputDevicePopUp removeAllItems];
+  
+  [preferredInputDevicePopUp addItemWithTitle:XMString_UseDefaultDevice];
+  
+  if(preferredDevice != nil && ![devices containsObject:preferredDevice])
+  {
+    [preferredInputDevicePopUp addItemWithTitle:preferredDevice];
+  }
+  
+  [[preferredInputDevicePopUp menu] addItem:[NSMenuItem separatorItem]];
+  
+  [preferredInputDevicePopUp addItemsWithTitles:devices];
+  
+  if(preferredDevice == nil)
+  {
+    [preferredInputDevicePopUp selectItemAtIndex:0];
+  }
+  else
+  {
+    [preferredInputDevicePopUp selectItemWithTitle:preferredDevice];
+  }
 }
 
 - (void)_updateDeviceLists:(NSNotification *)notif
 {
-	[self _buildOutputDeviceList];
-	[self _buildInputDeviceList];
+  [self _buildOutputDeviceList];
+  [self _buildInputDeviceList];
 }
 
 @end

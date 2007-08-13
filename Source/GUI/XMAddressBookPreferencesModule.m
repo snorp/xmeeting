@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookPreferencesModule.m,v 1.2 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMAddressBookPreferencesModule.m,v 1.3 2007/08/13 00:36:34 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAddressBookPreferencesModule.h"
@@ -104,6 +104,10 @@
 	
 	XMCallProtocol callProtocol = (XMCallProtocol)[[phoneNumberProtocolMatrix selectedCell] tag];
 	[preferencesManager setAddressBookPhoneNumberProtocol:callProtocol];
+}
+
+- (void)becomeActiveModule
+{
 }
 
 #pragma mark -

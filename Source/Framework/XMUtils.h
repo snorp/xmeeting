@@ -1,9 +1,9 @@
 /*
- * $Id: XMUtils.h,v 1.21 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.22 2007/08/13 00:36:34 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_UTILS_H__
@@ -77,13 +77,6 @@
 - (NSString *)stunExternalAddress;
 
 /**
- * Returns the name of the STUN server currently used
- * This corresponds to the STUN server specified in the currently active
- * XMPreferences instance of XMCallManager
- **/
-//- (NSString *)stunServer;
-
-/**
  * Starts a search for the external address by a HTTP page
  * that displays the external address to be used
  * This is a nonblocking action, the end of a search is reported by
@@ -127,6 +120,12 @@
  * digits, white space and '(' ')' '+' or '-'
  **/
 BOOL XMIsPhoneNumber(NSString *phoneNumber);
+
+/**
+ * checks whether phoneNumber is a phone number, similar
+ * to XMIsPhoneNumber, but must only contain digits
+ **/
+BOOL XMIsPlainPhoneNumber(NSString *phoneNumber);
 
 /**
  * checks whether address is an ip address in the form

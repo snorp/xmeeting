@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.38 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.39 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1253,7 +1253,7 @@
         {
             if([processedAddress characterAtIndex:0] == '+')
             {
-                [processedAddress replaceCharactersInRange:NSMakeRange(0, 1) withString:@"00"];
+                [processedAddress replaceCharactersInRange:NSMakeRange(0, 1) withString:[activePreferences internationalDialingPrefix]];
             }
         }
         address = [processedAddress autorelease];

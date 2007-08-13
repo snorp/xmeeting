@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.56 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.57 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -557,7 +557,6 @@ void XMOpalManager::SetNATInformation(const PStringArray & stunServers,
 	delete stun;
 	stun = NULL;
   }
-  
 
   for (PINDEX i = 0; i < stunServers.GetSize(); i++) {
 	const PString & stunServer = stunServers[i];

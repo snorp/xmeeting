@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.17 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.18 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,10 +68,13 @@
 	
 	/* SIP-specific settings */
 	BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
-	NSArray		*sipRegistrationRecords;		// An array containing XMPreferencesRegistrationRecord instances
+	NSArray		*sipRegistrationRecords;	// An array containing XMPreferencesRegistrationRecord instances
 	NSString	*sipProxyHost;				// A string containing the host address of the SIP proxy to use
 	NSString	*sipProxyUsername;			// A string containing the username for the SIP proxy to use
 	NSString	*sipProxyPassword;			// A string containing the password for the SIP proxy to use
+    
+    /* Misc settings */
+    NSString    *internationalDialingPrefix;
 }
 
 #pragma mark Init & Representation Methods
@@ -148,6 +151,7 @@
 - (unsigned)audioCodecListCount;
 - (XMPreferencesCodecListRecord *)audioCodecListRecordAtIndex:(unsigned)index;
 - (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
+- (void)resetAudioCodecs;
 
 - (BOOL)enableSilenceSuppression;
 - (void)setEnableSilenceSuppression:(BOOL)flag;
@@ -170,6 +174,7 @@
 - (unsigned)videoCodecListCount;
 - (XMPreferencesCodecListRecord *)videoCodecListRecordAtIndex:(unsigned)index;
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2;
+- (void)resetVideoCodecs;
 
 - (BOOL)enableH264LimitedMode;
 - (void)setEnableH264LimitedMode:(BOOL)flag;
@@ -243,6 +248,11 @@
  **/
 - (NSString *)sipProxyPassword;
 - (void)setSIPProxyPassword:(NSString *)password;
+
+#pragma mark Misc Methods
+
+- (NSString *)internationalDialingPrefix;
+- (void)setInternationalDialingPrefix:(NSString *)prefix;
 
 @end
 

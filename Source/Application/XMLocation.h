@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.8 2006/10/17 21:07:30 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.9 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,6 +95,32 @@ typedef enum XMSIPProxyMode
  * Also stores other global information from the XMPreferences class
  **/
 - (void)storeGlobalInformationsInSubsystem;
+
+#pragma mark Methods for Preferences Editing
+
+- (NSNumber *)enableSilenceSuppressionNumber;
+- (void)setEnableSilenceSuppressionNumber:(NSNumber *)number;
+
+- (NSNumber *)enableEchoCancellationNumber;
+- (void)setEnableEchoCancellationNumber:(NSNumber *)number;
+
+- (NSNumber *)enableVideoNumber;
+- (void)setEnableVideoNumber:(NSNumber *)number;
+
+- (NSNumber *)enableH264LimitedModeNumber;
+- (void)setEnableH264LimitedModeNumber:(NSNumber *)number;
+
+- (NSNumber *)enableH323Number;
+- (void)setEnableH323Number:(NSNumber *)number;
+
+- (NSNumber *)enableH245TunnelNumber;
+- (void)setEnableH245TunnelNumber:(NSNumber *)number;
+
+- (NSNumber *)enableFastStartNumber;
+- (void)setEnableFastStartNumber:(NSNumber *)number;
+
+- (NSNumber *)enableSIPNumber;
+- (void)setEnableSIPNumber:(NSNumber *)number;
 
 @end
 

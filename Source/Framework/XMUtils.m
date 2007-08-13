@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.23 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.24 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -506,6 +506,22 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 BOOL XMIsPhoneNumber(NSString *string)
 {
   NSCharacterSet *charSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789 ()+-"];
+  NSScanner *scanner = [[NSScanner alloc] initWithString:string];
+  BOOL result = NO;
+  
+  if([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
+  {
+	result = YES;
+  }
+  
+  [scanner release];
+  
+  return result;
+}
+
+BOOL XMIsPlainPhoneNumber(NSString *string)
+{
+  NSCharacterSet *charSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
   NSScanner *scanner = [[NSScanner alloc] initWithString:string];
   BOOL result = NO;
   

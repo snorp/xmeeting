@@ -1,9 +1,9 @@
 /*
- * $Id: XMVideoPreferencesModule.m,v 1.9 2006/06/27 18:05:32 hfriederich Exp $
+ * $Id: XMVideoPreferencesModule.m,v 1.10 2007/08/13 00:36:35 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #import "XMVideoPreferencesModule.h"
@@ -155,6 +155,10 @@ NSString *XMString_UseFirstAvailableDevice = @"";
 	[prefManager setPreferredVideoInputDevice:preferredDevice];
 	
 	[prefManager storeVideoManagerSettings];
+}
+
+- (void)becomeActiveModule
+{
 }
 
 #pragma mark -

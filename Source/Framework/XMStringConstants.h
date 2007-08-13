@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.31 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.32 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -333,6 +333,9 @@ extern NSString *XMKey_PreferencesSIPRegistrationRecords;
 extern NSString *XMKey_PreferencesSIPProxyHost;
 extern NSString *XMKey_PreferencesSIPProxyUsername;
 extern NSString *XMKey_PreferencesSIPProxyPassword;
+
+// Misc keys
+extern NSString *XMKey_PreferencesInternationalDialingPrefix;
 
 #pragma mark XMPreferencesCodecListRecord Keys
 

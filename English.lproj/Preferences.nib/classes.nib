@@ -83,8 +83,6 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 contentView = NSView; 
-                enableEchoCancellationSwitch = NSButton; 
-                enableSilenceSuppressionSwitch = NSButton; 
                 preferredInputDevicePopUp = NSPopUpButton; 
                 preferredOutputDevicePopUp = NSPopUpButton; 
             }; 
@@ -113,9 +111,11 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = XMIPAddressFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
         {
             ACTIONS = {
                 actionButton = id; 
+                addSTUNServer = id; 
                 createNewLocation = id; 
                 defaultAction = id; 
                 deleteLocation = id; 
@@ -125,15 +125,21 @@
                 getExternalAddress = id; 
                 importLocations = id; 
                 moveAudioCodec = id; 
+                moveSTUNServerDown = id; 
+                moveSTUNServerUp = id; 
                 moveVideoCodec = id; 
+                overwriteAudioCodecs = id; 
+                overwriteSTUNServers = id; 
+                overwriteVideoCodecs = id; 
+                removeSTUNServer = id; 
                 renameLocation = id; 
+                selectAllLocations = id; 
                 sipAccountSelected = id; 
                 sipProxyModeSelected = id; 
                 toggleAutoGetExternalAddress = id; 
                 toggleEnableH323 = id; 
                 toggleEnableSIP = id; 
                 toggleEnableVideo = id; 
-                toggleNATMethod = id; 
             }; 
             CLASS = XMLocationPreferencesModule; 
             LANGUAGE = ObjC; 
@@ -142,16 +148,19 @@
                 actionButton = NSButton; 
                 actionPopup = NSPopUpButton; 
                 audioCodecPreferenceOrderTableView = NSTableView; 
+                audioCodecsTab = NSTabView; 
                 audioPacketTimePopUp = NSPopUpButton; 
                 autoGetExternalAddressSwitch = NSButton; 
                 bandwidthLimitPopUp = NSPopUpButton; 
                 contentView = NSView; 
                 deleteLocationButton = NSButton; 
+                enableEchoCancellationSwitch = NSButton; 
                 enableFastStartSwitch = NSButton; 
                 enableH245TunnelSwitch = NSButton; 
                 enableH264LimitedModeSwitch = NSButton; 
                 enableH323Switch = NSButton; 
                 enableSIPSwitch = NSButton; 
+                enableSilenceSuppressionSwitch = NSButton; 
                 enableVideoSwitch = NSButton; 
                 externalAddressField = NSTextField; 
                 gatekeeperHostField = NSTextField; 
@@ -159,6 +168,7 @@
                 gatekeeperUserAliasField = NSTextField; 
                 getExternalAddressButton = NSButton; 
                 h323AccountsPopUp = NSPopUpButton; 
+                internationalDialingPrefixField = NSTextField; 
                 locationsTableView = NSTableView; 
                 maxTCPPortField = NSTextField; 
                 maxUDPPortField = NSTextField; 
@@ -166,6 +176,8 @@
                 minUDPPortField = NSTextField; 
                 moveAudioCodecDownButton = NSButton; 
                 moveAudioCodecUpButton = NSButton; 
+                moveSTUNServerDownButton = NSButton; 
+                moveSTUNServerUpButton = NSButton; 
                 moveVideoCodecDownButton = NSButton; 
                 moveVideoCodecUpButton = NSButton; 
                 newLocationButton = NSButton; 
@@ -173,20 +185,20 @@
                 newLocationNameField = NSTextField; 
                 newLocationOKButton = NSButton; 
                 newLocationSheet = NSPanel; 
-                noneRadioButton = NSButton; 
-                registrarAuthorizationUsernameField = NSTextField; 
-                registrarHostField = NSTextField; 
-                registrarUsernameField = NSTextField; 
+                registrationAuthorizationUsernameField = NSTextField; 
+                registrationDomainField = NSTextField; 
+                registrationUsernameField = NSTextField; 
+                removeSTUNServerButton = NSButton; 
                 sectionsTab = NSTabView; 
                 sipAccountsPopUp = NSPopUpButton; 
                 sipProxyHostField = NSTextField; 
                 sipProxyModeMatrix = NSMatrix; 
                 sipProxyPasswordField = NSTextField; 
                 sipProxyUsernameField = NSTextField; 
-                stunServerField = NSComboBox; 
-                useIPAddressTranslationRadioButton = NSButton; 
-                useSTUNRadioButton = NSButton; 
+                stunServersTab = NSTabView; 
+                stunServersTable = NSTableView; 
                 videoCodecPreferenceOrderTableView = NSTableView; 
+                videoCodecsTab = NSTabView; 
                 videoFrameRateField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 

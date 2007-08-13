@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.29 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.30 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -144,6 +144,8 @@ NSString *XMKey_PreferencesSIPRegistrationRecords = @"XMeeting_RegistrarRecords"
 NSString *XMKey_PreferencesSIPProxyHost = @"XMeeting_SIPProxyHost";
 NSString *XMKey_PreferencesSIPProxyUsername = @"XMeeting_SIPProxyUsername";
 NSString *XMKey_PreferencesSIPProxyPassword = @"XMeeting_SIPProxyPassword";
+
+NSString *XMKey_PreferencesInternationalDialingPrefix = @"XMeeting_InternationalDialingPrefix";
 
 NSString *XMKey_PreferencesCodecListRecordIdentifier = @"XMeeting_Identifier";
 NSString *XMKey_PreferencesCodecListRecordIsEnabled = @"XMeeting_IsEnabled";

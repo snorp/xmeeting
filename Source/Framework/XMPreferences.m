@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.20 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.21 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,38 @@
 #import "XMPreferencesRegistrationRecord.h"
 #import "XMCodecManager.h"
 
+@interface XMValueTypeRecord : NSObject {
+  @public
+  NSString *key;
+  Class     class;
+  BOOL      allowNil;
+}
+
++ (XMValueTypeRecord *)createWithKey:(NSString *)key class:(Class)class allowNil:(BOOL)allowNil;
+- (id)initWithKey:(NSString *)key class:(Class)class allowNil:(BOOL)allowNil;
+
+@end
+
+@implementation XMValueTypeRecord
+
++ (XMValueTypeRecord *)createWithKey:(NSString *)key class:(Class)class allowNil:(BOOL)allowNil
+{
+  return [[[XMValueTypeRecord alloc] initWithKey:key class:class allowNil:allowNil] autorelease];
+}
+
+- (id)initWithKey:(NSString *)_key class:(Class)_class allowNil:(BOOL)_allowNil
+{
+  key = _key;
+  class = _class;
+  allowNil = _allowNil;
+  return self;
+}
+
+@end
+
 @interface XMPreferences (PrivateMethods)
+
++ (NSArray *)_valueTypes;
 
 - (NSMutableArray *)_audioCodecList;
 - (void)_setAudioCodecList:(NSArray *)arr;
@@ -29,172 +60,61 @@
 #pragma mark -
 #pragma mark Framework Methods
 
++ (NSArray *)_valueTypes {
+  static NSArray *valueTypes = nil;
+  if (valueTypes == nil) {
+    Class number = [NSNumber class];
+    Class string = [NSString class];
+    Class array = [NSArray class];
+    valueTypes = [[NSArray alloc] initWithObjects:
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesUserName class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesBandwidthLimit class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesExternalAddress class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesTCPPortBase class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesTCPPortMax class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesUDPPortBase class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesUDPPortMax class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesSTUNServers class:array allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableSilenceSuppression class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableEchoCancellation class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesAudioPacketTime class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableVideo class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesVideoFramesPerSecond class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableH264LimitedMode class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableH323 class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableH245Tunnel class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableFastStart class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesGatekeeperAddress class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesGatekeeperUsername class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesGatekeeperPhoneNumber class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesGatekeeperPassword class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesEnableSIP class:number allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesSIPRegistrationRecords class:array allowNil:NO],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesSIPProxyHost class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesSIPProxyUsername class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesSIPProxyPassword class:string allowNil:YES],
+      [XMValueTypeRecord createWithKey:XMKey_PreferencesInternationalDialingPrefix class:string allowNil:YES],
+      
+      nil];      
+  }
+  return valueTypes;
+}
+
 + (XM_VALUE_TEST_RESULT)_checkValue:(id)value forKey:(NSString *)key
 {
-  XM_VALUE_TEST_RESULT result;
+  NSArray *valueTypes = [XMPreferences _valueTypes];
+  unsigned count = [valueTypes count];
+  unsigned i;
   
-  if([key isEqualToString:XMKey_PreferencesUserName]) {
-	if([value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesAutomaticallyAcceptIncomingCalls]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesBandwidthLimit]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesExternalAddress]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesTCPPortBase]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesTCPPortMax]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesUDPPortBase]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesUDPPortMax]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if ([key isEqualToString:XMKey_PreferencesSTUNServers]) {
-	if ([value isKindOfClass:[NSArray class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableSilenceSuppression]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesAudioPacketTime]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableVideo]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-    } else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableH323]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableH245Tunnel]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableFastStart]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesGatekeeperPassword]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesEnableSIP]) {
-	if([value isKindOfClass:[NSNumber class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesSIPRegistrationRecords]) {
-	if([value isKindOfClass:[NSArray class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesSIPProxyHost]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesSIPProxyUsername]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword]) {
-	if(value == nil || [value isKindOfClass:[NSString class]]) {
-	  result = XM_VALID_VALUE;
-	} else {
-	  result = XM_INVALID_VALUE_TYPE;
-	}
-  } else {
-	result = XM_INVALID_KEY;
+  for (i = 0; i < count; i++) {
+    XMValueTypeRecord *record = (XMValueTypeRecord *)[valueTypes objectAtIndex:i];
+    if ([key isEqualToString:record->key]) {
+      return ((value == nil && record->allowNil == YES) || [value isKindOfClass:record->class]) ? XM_VALID_VALUE : XM_INVALID_VALUE_TYPE;
+    }
   }
   
-  return result;
+  return XM_INVALID_KEY;
 }
 
 - (BOOL)_value:(id)value differsFromPropertyWithKey:(NSString *)key
@@ -228,15 +148,8 @@
   
   unsigned audioCodecCount = [_XMCodecManagerSharedInstance audioCodecCount];
   audioCodecList = [[NSMutableArray alloc] initWithCapacity:audioCodecCount];
-  unsigned i;
-  for(i = 0; i < audioCodecCount; i++)
-  {
-	XMCodec *audioCodec = [_XMCodecManagerSharedInstance audioCodecAtIndex:i];
-	XMCodecIdentifier identifier = [audioCodec identifier];
-	XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-	[audioCodecList addObject:record];
-	[record release];
-  }
+  
+  [self resetAudioCodecs];
   
   enableSilenceSuppression = NO;
   enableEchoCancellation = NO;
@@ -247,14 +160,7 @@
   
   unsigned videoCodecCount = [_XMCodecManagerSharedInstance videoCodecCount];
   videoCodecList = [[NSMutableArray alloc] initWithCapacity:videoCodecCount];
-  for(i = 0; i < videoCodecCount; i++)
-  {
-	XMCodec *videoCodec = [_XMCodecManagerSharedInstance videoCodecAtIndex:i];
-	XMCodecIdentifier identifier = [videoCodec identifier];
-	XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
-	[videoCodecList addObject:record];
-	[record release];
-  }
+  [self resetVideoCodecs];
   
   enableH264LimitedMode = NO;
   
@@ -272,6 +178,8 @@
   sipProxyUsername = nil;
   sipProxyPassword = nil;
   
+  internationalDialingPrefix = @"00";
+  
   return self;
 }
 
@@ -281,59 +189,19 @@
   
   self = [self init];
   
-  obj = [dict objectForKey:XMKey_PreferencesUserName];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setUserName:(NSString *)obj];
+  NSArray *valueTypes = [XMPreferences _valueTypes];
+  unsigned count = [valueTypes count];
+  unsigned i;
+  
+  for (i = 0; i < count; i++) {
+    XMValueTypeRecord *record = (XMValueTypeRecord *)[valueTypes objectAtIndex:i];
+    obj = [dict objectForKey:record->key];
+    if (obj) {
+      [self setValue:obj forKey:record->key];
+    }
   }
   
-  obj = [dict objectForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setAutomaticallyAcceptIncomingCalls:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesBandwidthLimit];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setBandwidthLimit:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesExternalAddress];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setExternalAddress:(NSString *)obj];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesTCPPortBase];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setTCPPortBase:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesTCPPortMax];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setTCPPortMax:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesUDPPortBase];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setUDPPortBase:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesUDPPortMax];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setUDPPortMax:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesSTUNServers];
-  if (obj && [obj isKindOfClass:[NSArray class]]) {
-	[self setSTUNServers:(NSArray *)obj];
-  }
-  
+  // Special code for the codec lists
   obj = [dict objectForKey:XMKey_PreferencesAudioCodecList];
   if(obj && [obj isKindOfClass:[NSArray class]])
   {
@@ -363,37 +231,7 @@
 	  [record release];
 	}
   }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableSilenceSuppression];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableSilenceSuppression:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableEchoCancellation];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableEchoCancellation:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesAudioPacketTime];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setAudioPacketTime:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableVideo];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableVideo:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesVideoFramesPerSecond];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setVideoFramesPerSecond:[(NSNumber *)obj unsignedIntValue]];
-  }
-  
+
   obj = [dict objectForKey:XMKey_PreferencesVideoCodecList];
   if(obj && [obj isKindOfClass:[NSArray class]])
   {
@@ -424,83 +262,6 @@
 	}
   }
   
-  obj = [dict objectForKey:XMKey_PreferencesEnableH264LimitedMode];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableH264LimitedMode:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableH323];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableH323:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableH245Tunnel];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableH245Tunnel:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableFastStart];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableFastStart:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesGatekeeperAddress];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setGatekeeperAddress:(NSString *)obj];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesGatekeeperUsername];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setGatekeeperUsername:(NSString *)obj];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesGatekeeperPhoneNumber];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setGatekeeperPhoneNumber:(NSString *)obj];
-  }
-  obj = [dict objectForKey:XMKey_PreferencesGatekeeperPassword];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setGatekeeperPassword:(NSString *)obj];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesEnableSIP];
-  if(obj && [obj isKindOfClass:[NSNumber class]])
-  {
-	[self setEnableSIP:[(NSNumber *)obj boolValue]];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesSIPRegistrationRecords];
-  if(obj && [obj isKindOfClass:[NSArray class]])
-  {
-	[self setSIPRegistrationRecords:(NSArray *)obj];
-  }
-		
-  obj = [dict objectForKey:XMKey_PreferencesSIPProxyHost];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setSIPProxyHost:(NSString *)obj];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesSIPProxyUsername];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setSIPProxyUsername:(NSString *)obj];
-  }
-  
-  obj = [dict objectForKey:XMKey_PreferencesSIPProxyPassword];
-  if(obj && [obj isKindOfClass:[NSString class]])
-  {
-	[self setSIPProxyPassword:(NSString *)obj];
-  }
-  
   return self;
 }
 
@@ -508,40 +269,18 @@
 {
   XMPreferences *preferences = [[[self class] allocWithZone:zone] init];
   
-  [preferences setUserName:[self userName]];
-  [preferences setAutomaticallyAcceptIncomingCalls:[self automaticallyAcceptIncomingCalls]];
+  NSArray *valueTypes = [XMPreferences _valueTypes];
+  unsigned count = [valueTypes count];
+  unsigned i;
   
-  [preferences setBandwidthLimit:[self bandwidthLimit]];
-  [preferences setExternalAddress:[self externalAddress]];
-  [preferences setTCPPortBase:[self tcpPortBase]];
-  [preferences setTCPPortMax:[self tcpPortMax]];
-  [preferences setUDPPortBase:[self udpPortBase]];
-  [preferences setUDPPortMax:[self udpPortMax]];
-  [preferences setSTUNServers:[self stunServers]];
+  for (i = 0; i < count; i++) {
+    XMValueTypeRecord *record = (XMValueTypeRecord *)[valueTypes objectAtIndex:i];
+    [preferences setValue:[self valueForKey:record->key] forKey:record->key];
+  }
   
+  // Special code for the audio codec lists
   [preferences _setAudioCodecList:[self _audioCodecList]];
-  [preferences setEnableSilenceSuppression:[self enableSilenceSuppression]];
-  [preferences setEnableEchoCancellation:[self enableEchoCancellation]];
-  [preferences setAudioPacketTime:[self audioPacketTime]];
-  
-  [preferences setEnableVideo:[self enableVideo]];
-  [preferences setVideoFramesPerSecond:[self videoFramesPerSecond]];
   [preferences _setVideoCodecList:[self _videoCodecList]];
-  [preferences setEnableH264LimitedMode:[self enableH264LimitedMode]];
-  
-  [preferences setEnableH323:[self enableH323]];
-  [preferences setEnableH245Tunnel:[self enableH245Tunnel]];
-  [preferences setEnableFastStart:[self enableFastStart]];
-  [preferences setGatekeeperAddress:[self gatekeeperAddress]];
-  [preferences setGatekeeperUsername:[self gatekeeperUsername]];
-  [preferences setGatekeeperPhoneNumber:[self gatekeeperPhoneNumber]];
-  [preferences setGatekeeperPassword:[self gatekeeperPassword]];
-  
-  [preferences setEnableSIP:[self enableSIP]];
-  [preferences setSIPRegistrationRecords:[self sipRegistrationRecords]];
-  [preferences setSIPProxyHost:[self sipProxyHost]];
-  [preferences setSIPProxyUsername:[self sipProxyUsername]];
-  [preferences setSIPProxyPassword:[self sipProxyPassword]];
   
   return preferences;
 }
@@ -552,18 +291,18 @@
   
   if([coder allowsKeyedCoding]) // use keyed coding
   {
+    NSArray *valueTypes = [XMPreferences _valueTypes];
+    unsigned count = [valueTypes count];
+    unsigned i;
+    
+    for (i = 0; i < count; i++) {
+      XMValueTypeRecord *record = (XMValueTypeRecord *)[valueTypes objectAtIndex:i];
+      [self setValue:[coder decodeObjectForKey:record->key] forKey:record->key];
+    }
+    
+    // Special code for the codec lists
 	NSArray *array;
-	unsigned count, codecCount, i;
-	
-	[self setUserName:[coder decodeObjectForKey:XMKey_PreferencesUserName]];
-	[self setAutomaticallyAcceptIncomingCalls:[coder decodeBoolForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls]];
-	[self setBandwidthLimit:[coder decodeIntForKey:XMKey_PreferencesBandwidthLimit]];
-	[self setExternalAddress:[coder decodeObjectForKey:XMKey_PreferencesExternalAddress]];
-	[self setTCPPortBase:[coder decodeIntForKey:XMKey_PreferencesTCPPortBase]];
-	[self setTCPPortMax:[coder decodeIntForKey:XMKey_PreferencesTCPPortMax]];
-	[self setUDPPortBase:[coder decodeIntForKey:XMKey_PreferencesUDPPortBase]];
-	[self setUDPPortMax:[coder decodeIntForKey:XMKey_PreferencesUDPPortMax]];
-	[self setSTUNServers:[coder decodeObjectForKey:XMKey_PreferencesSTUNServers]];
+	unsigned codecCount;
 	
 	array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesAudioCodecList];
 	count = [array count];
@@ -586,14 +325,7 @@
 		}
 	  }
 	}
-	
-	[self setEnableSilenceSuppression:[coder decodeBoolForKey:XMKey_PreferencesEnableSilenceSuppression]];
-	[self setEnableEchoCancellation:[coder decodeBoolForKey:XMKey_PreferencesEnableEchoCancellation]];
-	[self setAudioPacketTime:[coder decodeIntForKey:XMKey_PreferencesAudioPacketTime]];
-	
-	[self setEnableVideo:[coder decodeBoolForKey:XMKey_PreferencesEnableVideo]];
-	[self setVideoFramesPerSecond:[coder decodeIntForKey:XMKey_PreferencesVideoFramesPerSecond]];
-	
+
 	array = (NSArray *)[coder decodeObjectForKey:XMKey_PreferencesVideoCodecList];
 	count = [array count];
 	codecCount = [videoCodecList count];
@@ -615,22 +347,6 @@
 		}
 	  }
 	}
-	
-	[self setEnableH264LimitedMode:[coder decodeBoolForKey:XMKey_PreferencesEnableH264LimitedMode]];
-	
-	[self setEnableH323:[coder decodeBoolForKey:XMKey_PreferencesEnableH323]];
-	[self setEnableH245Tunnel:[coder decodeBoolForKey:XMKey_PreferencesEnableH245Tunnel]];
-	[self setEnableFastStart:[coder decodeBoolForKey:XMKey_PreferencesEnableFastStart]];
-	[self setGatekeeperAddress:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperAddress]];
-	[self setGatekeeperUsername:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperUsername]];
-	[self setGatekeeperPhoneNumber:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber]];
-	[self setGatekeeperPassword:[coder decodeObjectForKey:XMKey_PreferencesGatekeeperPassword]];
-	
-	[self setEnableSIP:[coder decodeBoolForKey:XMKey_PreferencesEnableSIP]];
-	[self setSIPRegistrationRecords:[coder decodeObjectForKey:XMKey_PreferencesSIPRegistrationRecords]];
-	[self setSIPProxyHost:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyHost]];
-	[self setSIPProxyUsername:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyUsername]];
-	[self setSIPProxyPassword:[coder decodeObjectForKey:XMKey_PreferencesSIPProxyPassword]];
   }
   else // raise an exception
   {
@@ -646,40 +362,18 @@
 {
   if([coder allowsKeyedCoding])
   {
-	[coder encodeObject:[self userName] forKey:XMKey_PreferencesUserName];
-	[coder encodeBool:[self automaticallyAcceptIncomingCalls] forKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
+    NSArray *valueTypes = [XMPreferences _valueTypes];
+    unsigned count = [valueTypes count];
+    unsigned i;
+    
+    for (i = 0; i < count; i++) {
+      XMValueTypeRecord *record = (XMValueTypeRecord *)[valueTypes objectAtIndex:i];
+      [coder encodeObject:[self valueForKey:record->key] forKey:record->key];
+    }
 	
-	[coder encodeInt:[self bandwidthLimit] forKey:XMKey_PreferencesBandwidthLimit];
-	[coder encodeObject:[self externalAddress] forKey:XMKey_PreferencesExternalAddress];
-	[coder encodeInt:[self tcpPortBase] forKey:XMKey_PreferencesTCPPortBase];
-	[coder encodeInt:[self tcpPortMax] forKey:XMKey_PreferencesTCPPortMax];
-	[coder encodeInt:[self udpPortBase] forKey:XMKey_PreferencesUDPPortBase];
-	[coder encodeInt:[self udpPortMax] forKey:XMKey_PreferencesUDPPortMax];
-	[coder encodeObject:[self stunServers] forKey:XMKey_PreferencesSTUNServers];
-	
+    // Special handling for the codec lists
 	[coder encodeObject:[self _audioCodecList] forKey:XMKey_PreferencesAudioCodecList];
-	[coder encodeBool:[self enableSilenceSuppression] forKey:XMKey_PreferencesEnableSilenceSuppression];
-	[coder encodeBool:[self enableEchoCancellation] forKey:XMKey_PreferencesEnableEchoCancellation];
-	[coder encodeInt:[self audioPacketTime] forKey:XMKey_PreferencesAudioPacketTime];
-	
-	[coder encodeBool:[self enableVideo] forKey:XMKey_PreferencesEnableVideo];
-	[coder encodeInt:[self videoFramesPerSecond] forKey:XMKey_PreferencesVideoFramesPerSecond];
 	[coder encodeObject:[self _videoCodecList] forKey:XMKey_PreferencesVideoCodecList];
-	[coder encodeBool:[self enableH264LimitedMode] forKey:XMKey_PreferencesEnableH264LimitedMode];
-	
-	[coder encodeBool:[self enableH323] forKey:XMKey_PreferencesEnableH323];
-	[coder encodeBool:[self enableH245Tunnel] forKey:XMKey_PreferencesEnableH245Tunnel];
-	[coder encodeBool:[self enableFastStart] forKey:XMKey_PreferencesEnableFastStart];
-	[coder encodeObject:[self gatekeeperAddress] forKey:XMKey_PreferencesGatekeeperAddress];
-	[coder encodeObject:[self gatekeeperUsername] forKey:XMKey_PreferencesGatekeeperUsername];
-	[coder encodeObject:[self gatekeeperPhoneNumber] forKey:XMKey_PreferencesGatekeeperPhoneNumber];
-	[coder encodeObject:[self gatekeeperPassword] forKey:XMKey_PreferencesGatekeeperPassword];
-	
-	[coder encodeBool:[self enableSIP] forKey:XMKey_PreferencesEnableSIP];
-	[coder encodeObject:[self sipRegistrationRecords] forKey:XMKey_PreferencesSIPRegistrationRecords];
-	[coder encodeObject:[self sipProxyHost] forKey:XMKey_PreferencesSIPProxyHost];
-	[coder encodeObject:[self sipProxyUsername] forKey:XMKey_PreferencesSIPProxyUsername];
-	[coder encodeObject:[self sipProxyPassword] forKey:XMKey_PreferencesSIPProxyPassword];
   }
   else // raise an exception
   {
@@ -707,6 +401,8 @@
   [sipProxyUsername release];
   [sipProxyPassword release];
   
+  [internationalDialingPrefix release];
+  
   [super dealloc];
 }
 
@@ -733,44 +429,7 @@
   
   otherPreferences = (XMPreferences *)object;
   
-  if([[otherPreferences userName] isEqualToString:[self userName]] &&
-	 [otherPreferences automaticallyAcceptIncomingCalls] == [self automaticallyAcceptIncomingCalls] &&
-	 [otherPreferences bandwidthLimit] == [self bandwidthLimit] &&
-	 [[otherPreferences externalAddress] isEqualToString:[self externalAddress]] &&
-	 [otherPreferences tcpPortBase] == [self tcpPortBase] &&
-	 [otherPreferences tcpPortMax] == [self tcpPortMax] &&
-	 [otherPreferences udpPortBase] == [self udpPortBase] &&
-	 [otherPreferences udpPortMax] == [self udpPortMax] &&
-	 [[otherPreferences stunServers] isEqualToArray:[self stunServers]] &&
-	 
-	 [[otherPreferences _audioCodecList] isEqual:[self _audioCodecList]] &&
-	 [otherPreferences enableSilenceSuppression] == [self enableSilenceSuppression] &&
-	 [otherPreferences enableEchoCancellation] == [self enableEchoCancellation] &&
-	 [otherPreferences audioPacketTime] == [self audioPacketTime] &&
-	 
-	 [otherPreferences enableVideo] == [self enableVideo] &&
-	 [otherPreferences videoFramesPerSecond] == [self videoFramesPerSecond] &&
-	 [[otherPreferences _videoCodecList] isEqual:[self _videoCodecList]] &&
-	 [otherPreferences enableH264LimitedMode] == [self enableH264LimitedMode] &&
-	 
-	 [otherPreferences enableH323] == [self enableH323] &&
-	 [otherPreferences enableH245Tunnel] == [self enableH245Tunnel] &&
-	 [otherPreferences enableFastStart] == [self enableFastStart] &&
-	 [[otherPreferences gatekeeperAddress] isEqualToString:[self gatekeeperAddress]] &&
-	 [[otherPreferences gatekeeperUsername] isEqualToString:[self gatekeeperUsername]] &&
-	 [[otherPreferences gatekeeperPhoneNumber] isEqualToString:[self gatekeeperPhoneNumber]] &&
-	 [[otherPreferences gatekeeperPassword] isEqualToString:[self gatekeeperPassword]] &&
-	 
-	 [otherPreferences enableSIP] == [self enableSIP] &&
-	 [[otherPreferences sipRegistrationRecords] isEqualToArray:[self sipRegistrationRecords]] &&
-	 [[otherPreferences sipProxyHost] isEqualToString:[self sipProxyHost]] &&
-	 [[otherPreferences sipProxyUsername] isEqualToString:[self sipProxyUsername]] &&
-	 [[otherPreferences sipProxyPassword] isEqualToString:[self sipProxyPassword]])
-  {
-	return YES;
-  }
-  
-  return NO;
+  return [[otherPreferences dictionaryRepresentation] isEqual:[self dictionaryRepresentation]];
 }
 
 #pragma mark -
@@ -779,179 +438,38 @@
 - (NSMutableDictionary *)dictionaryRepresentation
 {
   NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:30];
-  NSNumber *number;
   NSObject *obj;
-  unsigned integer;
   
-  obj = [self userName];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesUserName];
-  }
+  NSArray *valueTypes = [XMPreferences _valueTypes];
+  unsigned count = [valueTypes count];
+  unsigned i;
   
-  number = [[NSNumber alloc] initWithBool:[self automaticallyAcceptIncomingCalls]];
-  [dict setObject:number forKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
-  [number release];
-  
-  integer = [self bandwidthLimit];
-  if(integer != 0)
-  {
-	number = [[NSNumber alloc] initWithUnsignedInt:integer];
-	[dict setObject:number forKey:XMKey_PreferencesBandwidthLimit];
-	[number release];
+  for (i = 0; i < count; i++) {
+    XMValueTypeRecord *record = (XMValueTypeRecord *)[valueTypes objectAtIndex:i];
+    obj = [self valueForKey:record->key];
+    if (obj) {
+      [dict setObject:obj forKey:record->key];
+    }
   }
   
-  obj = [self externalAddress];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesExternalAddress];
-  }
-  
-  integer = [self tcpPortBase];
-  if(integer != 0)
-  {
-	number = [[NSNumber alloc] initWithUnsignedInt:integer];
-	[dict setObject:number forKey:XMKey_PreferencesTCPPortBase];
-	[number release];
-  }
-  integer = [self tcpPortMax];
-  if(integer != UINT_MAX)
-  {
-	number = [[NSNumber alloc] initWithUnsignedInt:integer];
-	[dict setObject:number forKey:XMKey_PreferencesTCPPortMax];
-	[number release];
-  }
-  integer = [self udpPortBase];
-  if(integer != 0)
-  {
-	number = [[NSNumber alloc] initWithUnsignedInt:integer];
-	[dict setObject:number forKey:XMKey_PreferencesUDPPortBase];
-	[number release];
-  }
-  integer = [self udpPortMax];
-  if(integer != UINT_MAX)
-  {
-	number = [[NSNumber alloc] initWithUnsignedInt:integer];
-	[dict setObject:number forKey:XMKey_PreferencesUDPPortMax];
-	[number release];
-  }
-  
-  obj = [self stunServers];
-  if([(NSArray *)obj count] != 0)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesSTUNServers];
-  }
-  
-  integer = [audioCodecList count];
-  int i;
-  NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:integer];
-  for(i = 0; i < integer; i++)
+  // special handling for the codec lists
+  count = [audioCodecList count];
+  NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i = 0; i < count; i++)
   {
 	[arr addObject:[(XMPreferencesCodecListRecord *)[audioCodecList objectAtIndex:i] dictionaryRepresentation]];
   }
   [dict setObject:arr forKey:XMKey_PreferencesAudioCodecList];
   [arr release];
   
-  number = [[NSNumber alloc] initWithBool:[self enableSilenceSuppression]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableSilenceSuppression];
-  [number release];
-  
-  number = [[NSNumber alloc] initWithBool:[self enableEchoCancellation]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableEchoCancellation];
-  [number release];
-  
-  number = [[NSNumber alloc] initWithUnsignedInt:[self audioPacketTime]];
-  [dict setObject:number forKey:XMKey_PreferencesAudioPacketTime];
-  [number release];
-  
-  number = [[NSNumber alloc] initWithBool:[self enableVideo]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableVideo];
-  [number release];
-  
-  integer = [self videoFramesPerSecond];
-  if(integer != 0)
-  {
-	number = [[NSNumber alloc] initWithUnsignedInt:integer];
-	[dict setObject:number forKey:XMKey_PreferencesVideoFramesPerSecond];
-	[number release];
-  }
-		
-  integer = [videoCodecList count];
-  arr = [[NSMutableArray alloc] initWithCapacity:integer];
-  for(i = 0; i < integer; i++)
+  count = [videoCodecList count];
+  arr = [[NSMutableArray alloc] initWithCapacity:count];
+  for(i = 0; i < count; i++)
   {
 	[arr addObject:[(XMPreferencesCodecListRecord *)[videoCodecList objectAtIndex:i] dictionaryRepresentation]];
   }
   [dict setObject:arr forKey:XMKey_PreferencesVideoCodecList];
   [arr release];
-  
-  number = [[NSNumber alloc] initWithBool:[self enableH264LimitedMode]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableH264LimitedMode];
-  [number release];
-  
-  number = [[NSNumber alloc] initWithBool:[self enableH323]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableH323];
-  [number release];
-  
-  number = [[NSNumber alloc] initWithBool:[self enableH245Tunnel]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableH245Tunnel];
-  [number release];
-  
-  number = [[NSNumber alloc] initWithBool:[self enableFastStart]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableFastStart];
-  [number release];
-  
-  obj = [self gatekeeperAddress];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesGatekeeperAddress];
-  }
-  
-  obj = [self gatekeeperUsername];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesGatekeeperUsername];
-  }
-  
-  obj = [self gatekeeperPhoneNumber];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesGatekeeperPhoneNumber];
-  }
-  
-  obj = [self gatekeeperPassword];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesGatekeeperPassword];
-  }
-  
-  number = [[NSNumber alloc] initWithBool:[self enableSIP]];
-  [dict setObject:number forKey:XMKey_PreferencesEnableSIP];
-  [number release];
-  
-  obj = [self sipRegistrationRecords];
-  if([(NSArray *)obj count] != 0)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesSIPRegistrationRecords];
-  }
-  
-  obj = [self sipProxyHost];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesSIPProxyHost];
-  }
-  
-  obj = [self sipProxyUsername];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesSIPProxyUsername];
-  }
-  
-  obj = [self sipProxyPassword];
-  if(obj)
-  {
-	[dict setObject:obj forKey:XMKey_PreferencesSIPProxyPassword];
-  }
   
   return dict;
 }
@@ -1019,6 +537,8 @@
 	return [self sipProxyUsername];
   } else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword]) {
 	return [self sipProxyPassword];
+  } else if ([key isEqualToString:XMKey_PreferencesInternationalDialingPrefix]) {
+    return [self internationalDialingPrefix];
   }
   
   return nil;
@@ -1026,308 +546,69 @@
 
 - (void)setValue:(id)value forKey:(NSString *)key
 {
-  BOOL correctType = YES;
+  XM_VALUE_TEST_RESULT result = [XMPreferences _checkValue:value forKey:key];
+  if (result == XM_VALID_VALUE) {
   
-  if([key isEqualToString:XMKey_PreferencesUserName])
-  {
-	if([value isKindOfClass:[NSString class]])
-	{
-	  [self setUserName:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesAutomaticallyAcceptIncomingCalls])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
-	  [self setAutomaticallyAcceptIncomingCalls:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesBandwidthLimit])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+    if([key isEqualToString:XMKey_PreferencesUserName]) {
+      [self setUserName:(NSString *)value];
+    } else if([key isEqualToString:XMKey_PreferencesAutomaticallyAcceptIncomingCalls]) {
+      [self setAutomaticallyAcceptIncomingCalls:[(NSNumber *)value boolValue]];
+    } else if([key isEqualToString:XMKey_PreferencesBandwidthLimit]) {
 	  [self setBandwidthLimit:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesExternalAddress])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesExternalAddress]) {
 	  [self setExternalAddress:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesTCPPortBase])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesTCPPortBase]) {
 	  [self setTCPPortBase:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesTCPPortMax])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+    } else if([key isEqualToString:XMKey_PreferencesTCPPortMax]) {
 	  [self setTCPPortMax:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesUDPPortBase])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+    } else if([key isEqualToString:XMKey_PreferencesUDPPortBase]) {
 	  [self setUDPPortBase:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesUDPPortMax])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesUDPPortMax]) {
 	  [self setUDPPortMax:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if ([key isEqualToString:XMKey_PreferencesSTUNServers]) {
-	if ([value isKindOfClass:[NSArray class]]) {
+	} else if ([key isEqualToString:XMKey_PreferencesSTUNServers]) {
 	  [self setSTUNServers:(NSArray *)value];
-	} else {
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableSilenceSuppression])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+    } else if([key isEqualToString:XMKey_PreferencesEnableSilenceSuppression]) {
 	  [self setEnableSilenceSuppression:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesEnableEchoCancellation]) {
 	  [self setEnableEchoCancellation:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesAudioPacketTime])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesAudioPacketTime]) {
 	  [self setAudioPacketTime:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableVideo])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesEnableVideo]) {
 	  [self setEnableVideo:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesVideoFramesPerSecond]) {
 	  [self setVideoFramesPerSecond:[(NSNumber *)value unsignedIntValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableH264LimitedMode])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+    } else if([key isEqualToString:XMKey_PreferencesEnableH264LimitedMode]) {
 	  [self setEnableH264LimitedMode:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableH323])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+    } else if([key isEqualToString:XMKey_PreferencesEnableH323]) {
 	  [self setEnableH323:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableH245Tunnel])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesEnableH245Tunnel]) {
 	  [self setEnableH245Tunnel:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableFastStart])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesEnableFastStart]) {
 	  [self setEnableFastStart:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesGatekeeperAddress]) {
 	  [self setGatekeeperAddress:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesGatekeeperUsername]) {
 	  [self setGatekeeperUsername:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesGatekeeperPhoneNumber]) {
 	  [self setGatekeeperPhoneNumber:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesGatekeeperPassword])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesGatekeeperPassword]) {
 	  [self setGatekeeperPassword:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesEnableSIP])
-  {
-	if([value isKindOfClass:[NSNumber class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesEnableSIP]) {
 	  [self setEnableSIP:[(NSNumber *)value boolValue]];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesSIPRegistrationRecords])
-  {
-	if([value isKindOfClass:[NSArray class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesSIPRegistrationRecords]) {
 	  [self setSIPRegistrationRecords:(NSArray *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesSIPProxyHost])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesSIPProxyHost]) {
 	  [self setSIPProxyHost:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesSIPProxyUsername])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesSIPProxyUsername]) {
 	  [self setSIPProxyUsername:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword])
-  {
-	if(value == nil || [value isKindOfClass:[NSString class]])
-	{
+	} else if([key isEqualToString:XMKey_PreferencesSIPProxyPassword]) {
 	  [self setSIPProxyPassword:(NSString *)value];
-	}
-	else
-	{
-	  correctType = NO;
-	}
-  }
-  else
-  {
-	[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeValidKey];
-  }
-  
-  if(correctType == NO)
-  {
+    } else if ([key isEqualToString:XMKey_PreferencesInternationalDialingPrefix]) {
+      [self setInternationalDialingPrefix:(NSString *)value];
+	} else {
+	  [NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeValidKey];
+    }
+  } else {
 	[NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeOfCorrectType];
   }
 }
@@ -1463,6 +744,22 @@
   [[self _audioCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
 }
 
+- (void)resetAudioCodecs
+{
+  [audioCodecList removeAllObjects];
+  
+  unsigned count = [_XMCodecManagerSharedInstance audioCodecCount];
+  unsigned i;
+  for(i = 0; i < count; i++)
+  {
+	XMCodec *audioCodec = [_XMCodecManagerSharedInstance audioCodecAtIndex:i];
+	XMCodecIdentifier identifier = [audioCodec identifier];
+	XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+	[audioCodecList addObject:record];
+	[record release];
+  }
+}
+
 - (BOOL)enableSilenceSuppression
 {
   return enableSilenceSuppression;
@@ -1534,6 +831,21 @@
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
   [[self _videoCodecList] exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
+}
+
+- (void)resetVideoCodecs
+{
+  [videoCodecList removeAllObjects];
+  unsigned count = [_XMCodecManagerSharedInstance videoCodecCount];
+  unsigned i;
+  for(i = 0; i < count; i++)
+  {
+	XMCodec *videoCodec = [_XMCodecManagerSharedInstance videoCodecAtIndex:i];
+	XMCodecIdentifier identifier = [videoCodec identifier];
+	XMPreferencesCodecListRecord *record = [[XMPreferencesCodecListRecord alloc] _initWithIdentifier:identifier enabled:YES];
+	[videoCodecList addObject:record];
+	[record release];
+  }
 }
 
 - (BOOL)enableH264LimitedMode
@@ -1719,6 +1031,21 @@
 {
   NSString *old = sipProxyPassword;
   sipProxyPassword = [password copy];
+  [old release];
+}
+
+#pragma mark -
+#pragma mark Misc Methods
+
+- (NSString *)internationalDialingPrefix
+{
+  return internationalDialingPrefix;
+}
+
+- (void)setInternationalDialingPrefix:(NSString *)prefix
+{
+  NSString *old = internationalDialingPrefix;
+  internationalDialingPrefix = [prefix copy];
   [old release];
 }
 

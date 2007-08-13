@@ -206,6 +206,7 @@
 "XM_LOCATION_PREFERENCES_COPY_SUFFIX" = " Copy";
 "XM_LOCATION_PREFERENCES_NONE_ITEM" = "None";
 "XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";
+"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES" = "<Multiple Values>";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
 "XM_AUDIO_PREFERENCES_NAME" = "Audio";

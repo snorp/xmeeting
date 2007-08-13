@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.16 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.17 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,16 +12,18 @@
 #import <Cocoa/Cocoa.h>
 
 #import "XMPreferencesModule.h"
+#import "XMLocation.h"
 
 extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
-@class XMPreferencesWindowController, XMAccountPreferencesModule, XMLocation;
+@class XMPreferencesWindowController, XMAccountPreferencesModule, XMMultipleLocationsWrapper;
 
 @interface XMLocationPreferencesModule : NSObject <XMPreferencesModule> {
 	
 	XMPreferencesWindowController *prefWindowController;
 	NSMutableArray *locations;
 	XMLocation *currentLocation;
+    XMMultipleLocationsWrapper *multipleLocationsWrapper;
 	IBOutlet NSView *contentView;
 	float contentViewHeight;
 	
@@ -43,6 +45,12 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *externalAddressField;
 	IBOutlet NSButton *getExternalAddressButton;
 	IBOutlet NSButton *autoGetExternalAddressSwitch;
+    IBOutlet NSTabView *stunServersTab;
+    IBOutlet NSTableView *stunServersTable;
+    NSMutableArray * stunServers;
+    IBOutlet NSButton *removeSTUNServerButton;
+    IBOutlet NSButton *moveSTUNServerUpButton;
+    IBOutlet NSButton *moveSTUNServerDownButton;
 	IBOutlet NSTextField *minTCPPortField;
 	IBOutlet NSTextField *maxTCPPortField;
 	IBOutlet NSTextField *minUDPPortField;
@@ -71,18 +79,27 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	IBOutlet NSTextField *sipProxyPasswordField;
 	
 	// Audio outlets
+    IBOutlet NSTabView *audioCodecsTab;
 	IBOutlet NSTableView *audioCodecPreferenceOrderTableView;
+    NSMutableArray *audioCodecs;
 	IBOutlet NSButton *moveAudioCodecUpButton;
 	IBOutlet NSButton *moveAudioCodecDownButton;
+    IBOutlet NSButton *enableSilenceSuppressionSwitch;
+    IBOutlet NSButton *enableEchoCancellationSwitch;
 	IBOutlet NSPopUpButton *audioPacketTimePopUp;
 	
 	// Video outlets
 	IBOutlet NSButton *enableVideoSwitch;
 	IBOutlet NSTextField *videoFrameRateField;
+    IBOutlet NSTabView *videoCodecsTab;
 	IBOutlet NSTableView *videoCodecPreferenceOrderTableView;
+    NSMutableArray *videoCodecs;
 	IBOutlet NSButton *moveVideoCodecUpButton;
 	IBOutlet NSButton *moveVideoCodecDownButton;
 	IBOutlet NSButton *enableH264LimitedModeSwitch;
+    
+    // Misc outlets
+    IBOutlet NSTextField *internationalDialingPrefixField;
 	
 	// Outlets for the newLocation Sheet
 	IBOutlet NSPanel *newLocationSheet;
@@ -96,15 +113,21 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 - (IBAction)importLocations:(id)sender;
 - (IBAction)duplicateLocation:(id)sender;
 - (IBAction)deleteLocation:(id)sender;
+- (IBAction)selectAllLocations:(id)sender;
 - (IBAction)renameLocation:(id)sender;
 - (IBAction)actionButton:(id)sender;
 
 // default action method.
 - (IBAction)defaultAction:(id)sender;
 
-// General action methods
+// Network action methods
 - (IBAction)getExternalAddress:(id)sender;
 - (IBAction)toggleAutoGetExternalAddress:(id)sender;
+- (IBAction)addSTUNServer:(id)sender;
+- (IBAction)removeSTUNServer:(id)sender;
+- (IBAction)moveSTUNServerUp:(id)sender;
+- (IBAction)moveSTUNServerDown:(id)sender;
+- (IBAction)overwriteSTUNServers:(id)sender;
 
 // H.323 action methods
 - (IBAction)toggleEnableH323:(id)sender;
@@ -117,10 +140,12 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
 // Audio action methods
 - (IBAction)moveAudioCodec:(id)sender;
+- (IBAction)overwriteAudioCodecs:(id)sender;
 
 // Video action methods
 - (IBAction)toggleEnableVideo:(id)sender;
 - (IBAction)moveVideoCodec:(id)sender;
+- (IBAction)overwriteVideoCodecs:(id)sender;
 
 // Action methods for the newLocation Sheet
 - (IBAction)endNewLocationSheet:(id)sender;

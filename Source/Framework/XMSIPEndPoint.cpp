@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.33 2007/08/07 17:09:58 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.34 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -398,7 +398,7 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 BOOL XMSIPEndPoint::AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
 										 PIPSocket::InterfaceTable & interfaceTable)
 {
-	for(int i = interfaceTable.GetSize()-1; i >= 0; i--) {
+	/*for(int i = interfaceTable.GetSize()-1; i >= 0; i--) {
 		PIPSocket::InterfaceEntry & interface = interfaceTable[i];
 		
 		PIPSocket::Address localAddress = interface.GetAddress();
@@ -429,7 +429,7 @@ BOOL XMSIPEndPoint::AdjustInterfaceTable(PIPSocket::Address & remoteAddress,
 			interfaceTable.Append(&interface);
 			break;
 		}
-	}
+	}*/
 	return TRUE;
 }
 

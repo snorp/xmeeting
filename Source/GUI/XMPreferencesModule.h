@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesModule.h,v 1.4 2006/03/13 23:46:26 hfriederich Exp $
+ * $Id: XMPreferencesModule.h,v 1.5 2007/08/13 00:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,6 +71,11 @@
  * to XMPreferencesManager
  **/
 - (void)savePreferences;
+
+/**
+ * Callback to inform that the contentView became visible
+ **/
+- (void)becomeActiveModule;
 
 @end
 
