@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.54 2007/08/07 14:55:02 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.55 2007/08/14 10:56:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,7 +73,7 @@
 - (void)_displayEnablingH323FailedAlert;
 - (void)_displayGatekeeperRegistrationFailedAlert;
 - (void)_displayEnablingSIPFailedAlert;
-- (void)_displaySIPRegistrationFailedAlert;
+- (void)_displaySIPRegistrationFailedAlert:(NSNumber *)index;
 - (void)_displayVideoManagerErrorAlert;
 - (void)_displayCallRecorderErrorAlert;
 
@@ -437,7 +437,7 @@
 - (void)_sipRegistrationDidFail:(NSNotification *)notif
 {
 	// same as _didNotStartCalling
-	[self performSelector:@selector(_displaySIPRegistrationFailedAlert) withObject:nil afterDelay:0.0];
+  [self performSelector:@selector(_displaySIPRegistrationFailedAlert:) withObject:[notif object] afterDelay:0.0];
 }
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
@@ -667,17 +667,18 @@
 	activeAlert = nil;
 }
 
-- (void)_displaySIPRegistrationFailedAlert
+- (void)_displaySIPRegistrationFailedAlert:(NSNumber *)indexNumber
 {
 	activeAlert = [[NSAlert alloc] init];
 	
 	XMCallManager *callManager = [XMCallManager sharedInstance];
 	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
 	XMLocation *activeLocation = [preferencesManager activeLocation];
-	unsigned sipAccountTag = [activeLocation sipAccountTag];
+    unsigned index = [indexNumber unsignedIntValue];
+    unsigned sipAccountTag = [(NSNumber *)[[activeLocation sipAccountTags] objectAtIndex:index] unsignedIntValue];
 	XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
 	NSString *domain = [sipAccount domain];
-	XMSIPStatusCode failReason = [callManager sipRegistrationFailReasonAtIndex:0];
+	XMSIPStatusCode failReason = [callManager sipRegistrationFailReasonAtIndex:index];
 	
 	NSString *reasonText = XMSIPStatusCodeString(failReason);
 	

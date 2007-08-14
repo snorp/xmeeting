@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.h,v 1.5 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMSIPAccount.h,v 1.6 2007/08/14 10:56:39 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMeeting.h"
+#import "XMPreferencesManager.h"
 
 extern NSString *XMKey_SIPAccountName;
 extern NSString *XMKey_SIPAccountDomain;
@@ -24,14 +25,14 @@ extern NSString *XMKey_SIPAccountPassword;
  *
  * The locations then point to an account to define it's registration settings.
  **/
-@interface XMSIPAccount : NSObject <NSCopying> {
+@interface XMSIPAccount : NSObject <NSCopying, XMPasswordObject> {
 
 	unsigned tag;
 	NSString *name;
 	NSString *domain;
 	NSString *username;
 	NSString *authorizationUsername;
-	BOOL didLoadPassword;
+	BOOL didSetPassword;
 	NSString *password;
 }
 
@@ -56,9 +57,6 @@ extern NSString *XMKey_SIPAccountPassword;
 
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;
-
-- (void)clearPassword;
-- (void)savePassword;
 
 - (NSString *)registration;
 

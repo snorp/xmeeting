@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.17 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.18 2007/08/14 10:56:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,14 +69,14 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 	
 	// SIP outlets
 	IBOutlet NSButton *enableSIPSwitch;
-	IBOutlet NSPopUpButton *sipAccountsPopUp;
-	IBOutlet NSTextField *registrationDomainField;
-	IBOutlet NSTextField *registrationUsernameField;
-	IBOutlet NSTextField *registrationAuthorizationUsernameField;
-	IBOutlet NSMatrix *sipProxyModeMatrix;
-	IBOutlet NSTextField *sipProxyHostField;
+    IBOutlet NSTabView *sipAccountsTab;
+    IBOutlet NSTableView *sipAccountsTable;
+    NSMutableArray * sipAccounts;
+    IBOutlet NSPopUpButton *sipProxyPopUp;
+    IBOutlet NSTextField *sipProxyHostField;
 	IBOutlet NSTextField *sipProxyUsernameField;
 	IBOutlet NSTextField *sipProxyPasswordField;
+    BOOL sipProxyPasswordDidChange;
 	
 	// Audio outlets
     IBOutlet NSTabView *audioCodecsTab;
@@ -135,8 +135,8 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
 // SIP action methods
 - (IBAction)toggleEnableSIP:(id)sender;
-- (IBAction)sipAccountSelected:(id)sender;
-- (IBAction)sipProxyModeSelected:(id)sender;
+- (IBAction)overwriteSIPAccounts:(id)sender;
+- (IBAction)sipProxySelected:(id)sender;
 
 // Audio action methods
 - (IBAction)moveAudioCodec:(id)sender;

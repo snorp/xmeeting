@@ -88,7 +88,10 @@
 "XM_NO_CALL_TOOLTIP_NO_GK" = "H.323: Ready. Not using a Gatekeeper\n";
 "XM_NO_CALL_TOOLTIP_SIP_FAILURE" = "SIP: Offline. Failed to enable SIP system\n";
 "XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE" = "SIP: Registration failed\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE_ALL" = "SIP: All Registrations failed\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE_SOME" = "SIP: Some Registrations failed\n";
 "XM_NO_CALL_TOOLTIP_SIP_REG_OK" = "SIP: Registered\n";
+"XM_NO_CALL_TOOLTIP_SIP_REG_OK_MULTIPLE" = "SIP: Registered at all registrars specified\n";
 "XM_NO_CALL_TOOLTIP_SIP_NO_REG" = "SIP: Ready. Not using registrations\n";
 "XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES" = "\nNetwork Addresses:";
 "XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS" = "\nCould not fetch external address.";
@@ -207,6 +210,7 @@
 "XM_LOCATION_PREFERENCES_NONE_ITEM" = "None";
 "XM_LOCATION_PREFERENCES_NAME_EXISTS" = "Location name already exists";
 "XM_LOCATION_PREFERENCES_MULTIPLE_VALUES" = "<Multiple Values>";
+"XM_LOCATION_PREFERENCES_CUSTOM_PROXY" = "Custom";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
 "XM_AUDIO_PREFERENCES_NAME" = "Audio";

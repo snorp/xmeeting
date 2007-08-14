@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.h,v 1.6 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMInfoModule.h,v 1.7 2007/08/14 10:56:39 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,11 +40,12 @@
 	IBOutlet NSImageView *sipStatusSemaphoreView;
 	IBOutlet NSTextField *registrationField;
 	IBOutlet NSImageView *registrationSemaphoreView;
-	IBOutlet NSTextField *sipUsernameField;
+    NSMutableArray *registrationViews;
 	
 	unsigned addressExtraHeight;
 	unsigned h323BoxHeight;
 	unsigned sipBoxHeight;
+    unsigned sipRegistrationsExtraHeight;
 	
 	BOOL showH323Details;
 	BOOL showSIPDetails;

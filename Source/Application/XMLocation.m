@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.12 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.13 2007/08/14 10:56:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,8 +15,8 @@
 
 NSString *XMKey_LocationName = @"XMeeting_LocationName";
 NSString *XMKey_LocationH323AccountID = @"XMeeting_H323AccountID";
-NSString *XMKey_LocationSIPAccountID = @"XMeeting_SIPAccountID";
-NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
+NSString *XMKey_LocationSIPAccountIDs = @"XMeeting_SIPAccountIDs";
+NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 
 @interface XMLocation (PrivateMethods)
 
@@ -44,10 +44,10 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
   [self setName:theName];
   
   h323AccountTag = 0;
-  sipAccountTag = 0;
-  proxyMode = XMSIPProxyMode_NoProxy;
-  
-  temporarySIPProxyPassword = nil;
+  sipAccountTags = [[NSArray array] retain];
+  sipProxyTag = 0;
+  didSetSIPProxyPassword = NO;
+  _sipProxyPassword = nil;
   
   [self setSTUNServers:XMDefaultSTUNServers()];
   
@@ -71,23 +71,39 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
     h323AccountTag = [h323Account tag];
   }
   
-  number = (NSNumber *)[dict objectForKey:XMKey_LocationSIPAccountID];
-  if(number != nil)
+  NSArray *array = [dict objectForKey:XMKey_LocationSIPAccountIDs];
+  if(array != nil)
   {
-    unsigned index = [number unsignedIntValue];
-    XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:index];
-    sipAccountTag = [sipAccount tag];
+    [sipAccountTags release];
+    
+    unsigned count = [array count];
+    unsigned i;
+    NSMutableArray *tags = [[NSMutableArray alloc] initWithCapacity:count];
+    
+    for (i = 0; i < count; i++) {
+      number = (NSNumber *)[array objectAtIndex:i];
+      unsigned index = [number unsignedIntValue];
+      XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:index];
+      [tags addObject:[NSNumber numberWithUnsignedInt:[sipAccount tag]]];
+    }
+    sipAccountTags = [tags copy];
+    [tags release];
   }
   
-  number = (NSNumber *)[dict objectForKey:XMKey_LocationSIPProxyMode];
-  if(number != nil)
+  number = (NSNumber *)[dict objectForKey:XMKey_LocationSIPProxyID];
+  if (number != nil)
   {
-    proxyMode = (XMSIPProxyMode)[number unsignedIntValue];
+    unsigned index = [number unsignedIntValue];
+    if (index == UINT_MAX) {
+      sipProxyTag = XMCustomSIPProxyTag;
+    } else {
+      XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:index];
+      sipProxyTag = [sipAccount tag];
+    }
   }
-  else
-  {
-    proxyMode = XMSIPProxyMode_NoProxy;
-  }
+  
+  didSetSIPProxyPassword = NO;
+  _sipProxyPassword = nil;
   
   return self;
 }
@@ -100,8 +116,12 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
   [location setName:[self name]];
   
   [location setH323AccountTag:[self h323AccountTag]];
-  [location setSIPAccountTag:[self sipAccountTag]];
-  [location setSIPProxyMode:[self sipProxyMode]];
+  [location setSIPAccountTags:[self sipAccountTags]];
+  [location setSIPProxyTag:[self sipProxyTag]];
+  
+  if (didSetSIPProxyPassword) {
+    [location _setSIPProxyPassword:[self _sipProxyPassword]];
+  }
   
   return location;
 }
@@ -109,6 +129,8 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 - (void)dealloc
 {
   [name release];
+  [sipAccountTags release];
+  [_sipProxyPassword release];
   
   [super dealloc];
 }
@@ -121,8 +143,8 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
   if ([super isEqual:object] && 
       [[self name] isEqualToString:[(XMLocation *)object name]] &&
       [self h323AccountTag] == [(XMLocation *)object h323AccountTag] &&
-      [self sipAccountTag] == [(XMLocation *)object sipAccountTag] &&
-      [self sipProxyMode] == [(XMLocation *)object sipProxyMode])
+      [self sipAccountTags] == [(XMLocation *)object sipAccountTags] &&
+      [self sipProxyTag] == [(XMLocation *)object sipProxyTag])
   {
     return YES;
   }
@@ -147,11 +169,8 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
   [dict removeObjectForKey:XMKey_PreferencesGatekeeperPassword];
   [dict removeObjectForKey:XMKey_PreferencesSIPRegistrationRecords];
   [dict removeObjectForKey:XMKey_PreferencesSIPProxyPassword];
-  [dict removeObjectForKey:XMKey_PreferencesEnableSilenceSuppression];
-  [dict removeObjectForKey:XMKey_PreferencesEnableEchoCancellation];
   
-  if(proxyMode != XMSIPProxyMode_CustomProxy)
-  {
+  if (sipProxyTag != XMCustomSIPProxyTag) {
     [dict removeObjectForKey:XMKey_PreferencesSIPProxyHost];
     [dict removeObjectForKey:XMKey_PreferencesSIPProxyUsername];
   }
@@ -181,26 +200,50 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
     }
   }
   
-  if(sipAccountTag != 0)
-  {
+  unsigned count = [sipAccountTags count];
+  unsigned i;
+  NSMutableArray *sipAccountIndexes = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i = 0; i < count; i++) {
+    unsigned _tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
     unsigned sipAccountCount = [sipAccounts count];
-    unsigned i;
+    unsigned j;
     
-    for(i = 0; i < sipAccountCount; i++)
+    for(j = 0; j < sipAccountCount; j++)
     {
-      XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:i];
-      if([sipAccount tag] == sipAccountTag)
+      XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:j];
+      if([sipAccount tag] == _tag)
       {
-        NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
-        [dict setObject:number forKey:XMKey_LocationSIPAccountID];
+        NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:j];
+        [sipAccountIndexes addObject:number];
         [number release];
         break;
       }
     }
   }
+  [dict setObject:sipAccountIndexes forKey:XMKey_LocationSIPAccountIDs];
+  [sipAccountIndexes release];
   
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:proxyMode];
-  [dict setObject:number forKey:XMKey_LocationSIPProxyMode];
+  if(sipProxyTag != 0)
+  {
+    if (sipProxyTag != XMCustomSIPProxyTag) {
+      unsigned sipAccountCount = [sipAccounts count];
+      unsigned i;
+    
+      for(i = 0; i < sipAccountCount; i++)
+      {
+        XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
+        if([sipAccount tag] == sipProxyTag)
+        {
+          NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
+          [dict setObject:number forKey:XMKey_LocationSIPProxyID];
+          [number release];
+          break;
+        }
+      }
+    } else {
+      [dict setObject:[NSNumber numberWithUnsignedInt:UINT_MAX] forKey:XMKey_LocationSIPProxyID];
+    }
+  }
   
   return dict;
 }
@@ -246,24 +289,62 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
   h323AccountTag = theTag;
 }
 
-- (unsigned)sipAccountTag
+- (NSArray *)sipAccountTags
 {
-  return sipAccountTag;
+  return sipAccountTags;
 }
 
-- (void)setSIPAccountTag:(unsigned)theTag
+- (void)setSIPAccountTags:(NSArray *)tags
 {
-  sipAccountTag = theTag;
+  NSArray *old = sipAccountTags;
+  sipAccountTags = [tags copy];
+  [old release];
 }
 
-- (XMSIPProxyMode)sipProxyMode
+- (unsigned)sipProxyTag
 {
-  return proxyMode;
+  return sipProxyTag;
 }
 
-- (void)setSIPProxyMode:(XMSIPProxyMode)sipProxyMode
+- (void)setSIPProxyTag:(unsigned)_sipProxyTag
 {
-  proxyMode = sipProxyMode;
+  sipProxyTag = _sipProxyTag;
+}
+
+- (NSString *)_sipProxyPassword
+{
+  if (didSetSIPProxyPassword) {
+    return _sipProxyPassword;
+  }
+  return [[XMPreferencesManager sharedInstance] passwordForServiceName:[super sipProxyHost] accountName:[super sipProxyUsername]];
+}
+
+- (void)_setSIPProxyPassword:(NSString *)password
+{
+  NSString *old = _sipProxyPassword;
+  _sipProxyPassword = [password copy];
+  [old release];
+  didSetSIPProxyPassword = YES;
+}
+
+- (void)savePassword
+{
+  if (didSetSIPProxyPassword == YES) {
+    [[XMPreferencesManager sharedInstance] setPassword:_sipProxyPassword 
+                                        forServiceName:[super sipProxyHost] 
+                                           accountName:[super sipProxyUsername]];
+    didSetSIPProxyPassword = NO;
+  }
+}
+
+- (void)resetPassword
+{
+  didSetSIPProxyPassword = NO;
+}
+
+- (XMPasswordObjectType)type
+{
+  return XMPasswordObjectType_SIPProxyPassword;
 }
 
 - (void)storeGlobalInformationsInSubsystem
@@ -296,62 +377,40 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
   }
   
   didFillAccount = NO;
-  XMSIPAccount *sipAccount = nil;
-  NSString *domain = nil;
-  NSString *username = nil;
-  NSString *authorizationUsername = nil;
-  NSString *password = nil;
-  
-  if(sipAccountTag != 0)
-  {
-    sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
-    if(sipAccount != nil)
-    {
-      domain = [sipAccount domain];
-      username = [sipAccount username];
-      authorizationUsername = [sipAccount authorizationUsername];
-      password = [sipAccount password];
+  unsigned count = [sipAccountTags count];
+  unsigned i;
+  NSMutableArray *sipInfo = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i = 0; i < count; i++) {
+    unsigned _tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
+    XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:_tag];
+    if (sipAccount != nil) {
+      XMPreferencesRegistrationRecord *record = [[XMPreferencesRegistrationRecord alloc] init];
+      [record setDomain:[sipAccount domain]];
+      [record setUsername:[sipAccount username]];
+      [record setAuthorizationUsername:[sipAccount authorizationUsername]];
+      [record setPassword:[sipAccount password]];
+      
+      [sipInfo addObject:record];
+      [record release];
     }
   }
+  [self setSIPRegistrationRecords:sipInfo];
+  [sipInfo release];
   
-  if(domain != nil && username != nil)
-  {
-    XMPreferencesRegistrationRecord *record = [[XMPreferencesRegistrationRecord alloc] init];
-				
-    [record setDomain:domain];
-    [record setUsername:username];
-    [record setAuthorizationUsername:authorizationUsername];
-    [record setPassword:password];
-				
-    NSArray *records = [[NSArray alloc] initWithObjects:record, nil];
-    [self setSIPRegistrationRecords:records];
-    [records release];
-    
-    didFillAccount = YES;
-  }
-  
-  if(didFillAccount == NO)
-  {
-    [self setSIPRegistrationRecords:[NSArray array]];
-  }
-  
-  switch(proxyMode)
-  {
-    case XMSIPProxyMode_NoProxy:
+  if (sipProxyTag == XMCustomSIPProxyTag) {
+    [self setSIPProxyPassword:[self _sipProxyPassword]];
+    // Username and host should already be present
+  } else if (sipProxyTag != 0) {
+    XMSIPAccount *account = [preferencesManager sipAccountWithTag:sipProxyTag];
+    if (account != nil) {
+      [self setSIPProxyHost:[account domain]];
+      [self setSIPProxyUsername:[account username]];
+      [self setSIPProxyPassword:[account password]];
+    } else {
       [self setSIPProxyHost:nil];
       [self setSIPProxyUsername:nil];
       [self setSIPProxyPassword:nil];
-      break;
-    case XMSIPProxyMode_UseSIPAccount:
-      [self setSIPProxyHost:domain];
-      [self setSIPProxyUsername:authorizationUsername];
-      [self setSIPProxyPassword:password];
-      break;
-    default:
-      // don't change proxy host & username
-      password = [preferencesManager passwordForServiceName:[self sipProxyHost] accountName:[self sipProxyUsername]];
-      [self setSIPProxyPassword:password];
-      break;
+    }
   }
 }
 
@@ -461,7 +520,7 @@ NSString *XMKey_LocationSIPProxyMode = @"XMeeting_SIPProxyMode";
 
 - (BOOL)usesRegistrations
 {
-  if(sipAccountTag != 0)
+  if([sipAccountTags count] != 0)
   {
     return YES;
   }

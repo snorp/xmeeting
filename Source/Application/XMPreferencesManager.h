@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.17 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.18 2007/08/14 10:56:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,20 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMeeting.h"
+
+typedef enum XMPasswordObjectType {
+  XMPasswordObjectType_H323Account,
+  XMPasswordObjectType_SIPAccount,
+  XMPasswordObjectType_SIPProxyPassword
+} XMPasswordObjectType;
+
+@protocol XMPasswordObject
+
+- (void)savePassword;
+- (void)resetPassword;
+- (XMPasswordObjectType)type;
+
+@end
 
 @class XMH323Account, XMSIPAccount, XMLocation;
 
@@ -34,8 +48,6 @@ extern NSString *XMKey_PreferencesManagerAlertIncomingCalls;
 extern NSString *XMKey_PreferencesManagerIncomingCallAlertType;
 extern NSString *XMKey_PreferencesManagerPreferredAudioOutputDevice;
 extern NSString *XMKey_PreferencesManagerPreferredAudioInputDevice;
-extern NSString *XMKey_PreferencesManagerEnableSilenceSuppression;
-extern NSString *XMKey_PreferencesManagerEnableEchoCancellation;
 extern NSString *XMKey_PreferencesManagerDisabledVideoModules;
 extern NSString *XMKey_PreferencesManagerPreferredVideoInputDevice;
 extern NSString *XMKey_PreferencesManagerVideoManagerSettings;
@@ -82,6 +94,7 @@ typedef enum XMIncomingCallAlertType
 	NSMutableArray *h323Accounts;
 	NSMutableArray *sipAccounts;
 	NSMutableArray *locations;
+    NSMutableArray *passwordObjects;
 	unsigned activeLocation;
 	BOOL automaticallyAcceptIncomingCalls;
 	
@@ -285,6 +298,12 @@ typedef enum XMIncomingCallAlertType
 - (void)setPassword:(NSString *)password forServiceName:(NSString *)serviceName accountName:(NSString *)accountName;
 
 /**
+ * Used to keep passwords up-to-date
+ **/
+- (void)addPasswordObject:(id<XMPasswordObject>)object;
+- (void)removePasswordObject:(id<XMPasswordObject>)object;
+
+/**
  * Returns the name of the preferred audio output device.
  **/
 - (NSString *)preferredAudioOutputDevice;
@@ -303,26 +322,6 @@ typedef enum XMIncomingCallAlertType
  * Stores the name of the preferred audio input device.
  **/
 - (void)setPreferredAudioInputDevice:(NSString *)device;
-
-/**
- * Returns whether silence suppression is enabled or not
- **/
-- (BOOL)enableSilenceSuppression;
-
-/**
- * Stores whether silence suppression is enabled or not
- **/
-- (void)setEnableSilenceSuppression:(BOOL)flag;
-
-/**
- * Returns whether echo cancellation is enabled or not
- **/
-- (BOOL)enableEchoCancellation;
-
-/**
- * Stores whether echo cancellation is enabled or not
- **/
-- (void)setEnableEchoCancellation:(BOOL)flag;
 
 /**
  * Returns an array containing identifiers of the disabled video modules

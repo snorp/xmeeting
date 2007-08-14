@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.12 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.13 2007/08/14 10:56:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -31,7 +31,6 @@
 	NSString *locationName;
 	
 	NSString *gatekeeperName;
-	NSString *sipRegistrationName;
 	
 	NSString *videoDevice;
 	

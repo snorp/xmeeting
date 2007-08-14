@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.30 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.31 2007/08/14 10:56:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,6 +30,23 @@ NSString *XMKey_InitialNameIdentifier = @"Name";
 NSString *XMKey_InitialBandwidthIdentifier = @"Bandwidth";
 NSString *XMKey_InitialQualityIdentifier = @"Quality";
 NSString *XMKey_EnabledIdentifier = @"Enabled";
+
+NSString *XMKey_SIPAccountNameIdentifier = @"name";
+NSString *XMKey_SIPAccountDomainIdentifier = @"domain";
+NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
+
+@interface XMSIPAccountInfo : NSObject {
+  unsigned tag;
+  BOOL enabled;
+}
+
+- (id)_initWithTag:(unsigned)tag enabled:(BOOL)enabled;
+- (unsigned)tag;
+- (void)setTag:(unsigned)tag;
+- (BOOL)enabled;
+- (void)setEnabled:(BOOL)flag;
+
+@end
 
 @interface XMMultipleLocationsWrapper : XMLocation {
   NSArray *locations;
@@ -69,12 +86,16 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 - (void)_setString:(NSString *)string forTextField:(NSTextField *)textField;
 - (NSString *)_extractStringFromTextField:(NSTextField *)textField;
 
+- (void)_updateGatekeeperAccountInfo;
+
   // user interface validation methods
 - (void)_validateLocationButtonUserInterface;
 - (void)_validateExternalAddressUserInterface;
 - (void)_validateSTUNUserInterface;
 - (void)_validateH323UserInterface;
 - (void)_validateSIPUserInterface;
+- (void)_validateSIPAccountsUserInterface;
+- (void)_validateSIPProxyUserInterface;
 - (void)_validateAudioOrderUserInterface;
 - (void)_validateVideoUserInterface;
 - (void)_validateVideoOrderUserInterface;
@@ -116,6 +137,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   multipleLocationsWrapper = nil;
   
   stunServers = nil;
+  sipAccounts = nil;
   audioCodecs = nil;
   videoCodecs = nil;
   
@@ -186,6 +208,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [prefWindowController release];
   [locations release];
   [stunServers release];
+  [sipAccounts release];
   [audioCodecs release];
   [videoCodecs release];
   
@@ -238,22 +261,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [locations removeAllObjects];
   [locations addObjectsFromArray:[preferencesManager locations]];
   
-  // adjusting SIP proxy passwords if needed
-  unsigned i;
-  unsigned count = [locations count];
-  
-  for(i = 0; i < count; i++)
-  {
-    XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
-    
-    if([location sipProxyMode] == XMSIPProxyMode_CustomProxy)
-    {
-      NSString *password = [[XMPreferencesManager sharedInstance] passwordForServiceName:[location sipProxyHost] 
-                                                                             accountName:[location sipProxyUsername]];
-      [location setSIPProxyPassword:password];
-    }
-  }
-  
   // making sure that there is no wrong data saved
   currentLocation = nil;
   
@@ -286,21 +293,6 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   
   // first, save the current location
   [self _saveCurrentLocation];
-  
-  // store any passwords needed
-  unsigned i;
-  unsigned count = [locations count];
-  for(i = 0; i < count; i++)
-  {
-    XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
-    
-    if([location sipProxyMode] == XMSIPProxyMode_CustomProxy)
-    {
-      [preferencesManager setPassword:[location sipProxyPassword]
-                       forServiceName:[location sipProxyHost]
-                          accountName:[location sipProxyUsername]];
-    }
-  }
   
   // pass the changed locations to the preferences manager
   [preferencesManager setLocations:locations];
@@ -487,45 +479,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (IBAction)gatekeeperAccountSelected:(id)sender
 {
-  unsigned index = [h323AccountsPopUp indexOfSelectedItem];
-  unsigned indexOffset = 2;
-  
-  if ([[h323AccountsPopUp itemAtIndex:0] tag] == -1) {
-    indexOffset++;
-  }
-  
-  if(index < indexOffset)
-  {
-    [gatekeeperHostField setStringValue:@""];
-    [gatekeeperUserAliasField setStringValue:@""];
-    [gatekeeperPhoneNumberField setStringValue:@""];
-  }
-  else
-  {
-    index -= indexOffset;
-    
-    XMH323Account *h323Account = [accountModule h323AccountAtIndex:index];
-    
-    NSString *gkHost = [h323Account gatekeeper];
-    NSString *gkUsername = [h323Account username];
-    NSString *gkPhoneNumber = [h323Account phoneNumber];
-    
-    if(gkHost == nil)
-    {
-      gkHost = @"";
-    }
-    if(gkUsername == nil)
-    {
-      gkUsername = @"";
-    }
-    if(gkPhoneNumber == nil)
-    {
-      gkPhoneNumber = @"";
-    }
-    [gatekeeperHostField setStringValue:gkHost];
-    [gatekeeperUserAliasField setStringValue:gkUsername];
-    [gatekeeperPhoneNumberField setStringValue:gkPhoneNumber];
-  }
+  [self _updateGatekeeperAccountInfo];
   
   [self defaultAction:self];
 }
@@ -536,74 +490,24 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [self defaultAction:self];
 }
 
-- (IBAction)sipAccountSelected:(id)sender
+- (IBAction)overwriteSIPAccounts:(id)sender
 {
-  unsigned index = [sipAccountsPopUp indexOfSelectedItem];
+  [sipAccounts release];
   
-  BOOL enableSIPAccountProxy = NO;
-  
-  if(index == 0)
-  {
-    [registrationDomainField setStringValue:@""];
-    [registrationUsernameField setStringValue:@""];
-    [registrationAuthorizationUsernameField setStringValue:@""];
+  unsigned count = [accountModule sipAccountCount];
+  unsigned i;
+  sipAccounts = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i = 0; i < count; i++) {
+    XMSIPAccount *account = [accountModule sipAccountAtIndex:i];
+    [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:[account tag] enabled:NO] autorelease]];
   }
-  else
-  {
-    index -= 2;
-    
-    XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:index];
-    
-    NSString *domain = [sipAccount domain];
-    if(domain == nil)
-    {
-      domain = @"";
-    }
-    NSString *username = [sipAccount username];
-    if(username == nil)
-    {
-      username = @"";
-    }
-    NSString *authorizationUsername = [sipAccount authorizationUsername];
-    if(authorizationUsername == nil)
-    {
-      authorizationUsername = @"";
-    }
-    [registrationDomainField setStringValue:domain];
-    [registrationUsernameField setStringValue:username];
-    [registrationAuthorizationUsernameField setStringValue:authorizationUsername];
-    
-    enableSIPAccountProxy = YES;
-  }
-  
-  NSCell *cell = (NSCell *)[sipProxyModeMatrix cellWithTag:XMSIPProxyMode_UseSIPAccount];
-  if(enableSIPAccountProxy == YES)
-  {
-    [cell setEnabled:YES];
-  }
-  else
-  {
-    [cell setEnabled:NO];
-    [sipProxyModeMatrix selectCellWithTag:XMSIPProxyMode_NoProxy];
-  }
-  [self sipProxyModeSelected:self];
+  [self _validateSIPAccountsUserInterface];
+  [self defaultAction:self];
 }
 
-- (IBAction)sipProxyModeSelected:(id)sender
+- (IBAction)sipProxySelected:(id)sender
 {
-  XMSIPProxyMode proxyMode = (XMSIPProxyMode)[[sipProxyModeMatrix selectedCell] tag];
-  
-  BOOL enableTextFields = NO;
-  
-  if(proxyMode == XMSIPProxyMode_CustomProxy)
-  {
-    enableTextFields = YES;
-  }
-  
-  [sipProxyHostField setEnabled:enableTextFields];
-  [sipProxyUsernameField setEnabled:enableTextFields];
-  [sipProxyPasswordField setEnabled:enableTextFields];
-  
+  [self _validateSIPProxyUserInterface];
   [self defaultAction:self];
 }
 
@@ -723,18 +627,29 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
   unsigned h323AccountToSelect = 0;
   unsigned h323AccountTag = 0;
-  unsigned sipAccountToSelect = 0;
-  unsigned sipAccountTag = 0;
   
   if(currentLocation != nil)
   {
-    h323AccountTag = [currentLocation h323AccountTag];
-    sipAccountTag = [currentLocation sipAccountTag];
+    h323AccountTag = [[h323AccountsPopUp selectedItem] tag];
   }
   
   /* updating the H323 accounts Pop Up */
+  BOOL hasMultiItem = NO;
+  if ([[h323AccountsPopUp itemAtIndex:0] tag] == -1) {
+    hasMultiItem = YES;
+  }
+  
   [h323AccountsPopUp removeAllItems];
   NSMenu *menu = [h323AccountsPopUp menu];
+  
+  if (hasMultiItem) {
+    NSMenuItem *multiItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")
+                                                       action:NULL
+                                                keyEquivalent:@""];
+    [multiItem setTag:-1];
+    [menu addItem:multiItem];
+    [multiItem release];
+  }
   
   NSMenuItem *noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NONE_ITEM", @"")
                                                     action:NULL
@@ -746,33 +661,76 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   unsigned count = [accountModule h323AccountCount];
   unsigned i;
   
-  if(count != 0)
-  {
+  if(count != 0) {
     [menu addItem:[NSMenuItem separatorItem]];
   }
   
   for(i = 0; i < count; i++)
   {
     XMH323Account *h323Account = [accountModule h323AccountAtIndex:i];
-    
     NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[h323Account name]
                                                       action:NULL keyEquivalent:@""];
     unsigned tag = [h323Account tag];
-    
     [menuItem setTag:tag];
-    if(tag == h323AccountTag)
-    {
+    if(tag == h323AccountTag) {
       h323AccountToSelect = (i+2);
     }
-    
     [menu addItem:menuItem];
-    
     [menuItem release];
   }
   
-  /* updating the SIP accounts Pop Up */
-  [sipAccountsPopUp removeAllItems];
-  menu = [sipAccountsPopUp menu];
+  // Updating the SIP account tag infos (if present)
+  
+  if (currentLocation != nil && sipAccounts != nil) {
+    NSArray *oldAccounts = sipAccounts;
+    count = [accountModule sipAccountCount];
+    sipAccounts = [[NSMutableArray alloc] initWithCapacity:count];
+    for (i = 0; i < count; i++) {
+      XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:i];
+      unsigned numInfos = [oldAccounts count];
+      unsigned j;
+      BOOL enabled = NO;
+      for (j = 0; j < numInfos; j++) {
+        XMSIPAccountInfo *info = (XMSIPAccountInfo *)[oldAccounts objectAtIndex:j];
+        if ([info tag] == [sipAccount tag]) {
+          enabled = [info enabled];
+          break;
+        }
+      }
+      [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:[sipAccount tag] enabled:enabled] autorelease]];
+    }
+    [sipAccountsTable reloadData];
+    [oldAccounts release];
+  }
+  
+  // updating the SIP proxy Pop Up
+  unsigned sipAccountToSelect = 0;
+  unsigned sipAccountTag = 0;
+  
+  if(currentLocation != nil)
+  {
+    sipAccountTag = [[sipProxyPopUp selectedItem] tag];
+  }
+  if (sipAccountTag == XMCustomSIPProxyTag) {
+    sipAccountToSelect = 1;
+  }
+  
+  hasMultiItem = NO;
+  if ([[sipProxyPopUp itemAtIndex:0] tag] == -1) {
+    hasMultiItem = YES;
+  }
+  
+  [sipProxyPopUp removeAllItems];
+  menu = [sipProxyPopUp menu];
+  
+  if (hasMultiItem) {
+    NSMenuItem *multiItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")
+                                                       action:NULL
+                                                keyEquivalent:@""];
+    [multiItem setTag:-1];
+    [menu addItem:multiItem];
+    [multiItem release];
+  }  
   
   noneItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NONE_ITEM", @"")
                                         action:NULL
@@ -780,6 +738,13 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [noneItem setTag:0];
   [menu addItem:noneItem];
   [noneItem release];
+  
+  NSMenuItem *customItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_CUSTOM_PROXY", @"")
+                                                      action:NULL
+                                               keyEquivalent:@""];
+  [customItem setTag:XMCustomSIPProxyTag];
+  [menu addItem:customItem];
+  [customItem release];
   
   count = [accountModule sipAccountCount];
   
@@ -799,7 +764,7 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
     
     if(sipAccountTag == tag)
     {
-      sipAccountToSelect = (i+2);
+      sipAccountToSelect = (i+3);
     }
     
     [menu addItem:menuItem];
@@ -808,10 +773,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   }
   
   [h323AccountsPopUp selectItemAtIndex:h323AccountToSelect];
-  [sipAccountsPopUp selectItemAtIndex:sipAccountToSelect];
+  [sipProxyPopUp selectItemAtIndex:sipAccountToSelect];
   
   [self gatekeeperAccountSelected:self];
-  [self sipAccountSelected:self];
+  [self sipProxySelected:self];
 }
 
 #pragma mark -
@@ -819,6 +784,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (void)controlTextDidChange:(NSNotification *)notif
 {
+  if ([notif object] == sipProxyPasswordField) {
+    sipProxyPasswordDidChange = YES;
+  }
   // we simply want the same effect as the default action.
   [self defaultAction:self];
 }
@@ -935,52 +903,54 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [self _setTag:gatekeeperAccountTag forNonePopUp:h323AccountsPopUp];
   
   // causing the account information to be displayed.
-  [self gatekeeperAccountSelected:self];
+  [self _updateGatekeeperAccountInfo];
   
   // loading the SIP section
   [self _setState:[currentLocation enableSIPNumber] forSwitch:enableSIPSwitch];
-  
-  unsigned sipAccountTag = [currentLocation sipAccountTag];
-  [self _setTag:sipAccountTag forNonePopUp:sipAccountsPopUp];
-  
-  XMSIPProxyMode sipProxyMode = [currentLocation sipProxyMode];
-  if(sipProxyMode == XMSIPProxyMode_UseSIPAccount && sipAccountTag == 0)
-  {
-    sipProxyMode = XMSIPProxyMode_NoProxy;
+  [sipAccounts release];
+  NSArray *sipAccountTags = [currentLocation sipAccountTags];
+  if ((NSObject *)sipAccountTags == [NSNull null]) {
+    sipAccounts = nil;
+  } else {
+    NSArray *sipAccountRecords = [accountModule sipAccounts];
+    unsigned numSIPAccounts = [sipAccountRecords count];
+    sipAccounts = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
+    unsigned numTags = [sipAccountTags count];
+    unsigned i, j;
+    for (i = 0; i < numSIPAccounts; i++) {
+      XMSIPAccount *account = (XMSIPAccount *)[sipAccountRecords objectAtIndex:i];
+      unsigned _tag = [account tag];
+      BOOL found = NO;
+      for (j = 0; j < numTags; j++) {
+        if (_tag == [(NSNumber *)[sipAccountTags objectAtIndex:j] unsignedIntValue]) {
+          found = YES;
+          break;
+        }
+      }
+      if (found) {
+        [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:_tag enabled:YES] autorelease]];
+      } else {
+        [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:_tag enabled:NO] autorelease]];
+      }
+    }
   }
-  
-  [sipProxyModeMatrix selectCellWithTag:sipProxyMode];
-  
-  NSString *sipProxyHost = nil;
-  NSString *sipProxyUsername = nil;
-  NSString *sipProxyPassword = nil;
-  
-  if(sipProxyMode == XMSIPProxyMode_CustomProxy)
-  {
-    sipProxyHost = [currentLocation sipProxyHost];
-    sipProxyUsername = [currentLocation sipProxyUsername];
-    sipProxyPassword = [currentLocation sipProxyPassword];
+  [sipAccountsTable reloadData];
+  [self _setTag:[currentLocation sipProxyTag] forNonePopUp:sipProxyPopUp];
+  NSString *host = [currentLocation sipProxyHost];
+  NSString *username = [currentLocation sipProxyUsername];
+  NSString *password = [currentLocation _sipProxyPassword];
+  if (host == nil) {
+    host = @"";
   }
-  
-  if(sipProxyHost == nil)
-  {
-    sipProxyHost = @"";
+  if (username == nil) {
+    username = @"";
   }
-  if(sipProxyUsername == nil)
-  {
-    sipProxyUsername = @"";
+  if (password == nil) {
+    password = @"";
   }
-  if(sipProxyPassword == nil)
-  {
-    sipProxyPassword = @"";
-  }
-  
-  [sipProxyHostField setStringValue:sipProxyHost];
-  [sipProxyUsernameField setStringValue:sipProxyUsername];
-  [sipProxyPasswordField setStringValue:sipProxyPassword];
-  
-  // causing the account information to be displayed
-  [self sipAccountSelected:self];
+  [self _setString:host forTextField:sipProxyHostField];
+  [self _setString:username forTextField:sipProxyUsernameField];
+  [self _setString:password forTextField:sipProxyPasswordField];
   
   // loading the Audio section
   [audioCodecs release];
@@ -1016,14 +986,17 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [self _validateSTUNUserInterface];
   [self _validateH323UserInterface];
   [self _validateSIPUserInterface];
+  [self _validateSIPAccountsUserInterface];
+  [self _validateSIPProxyUserInterface];
   [self _validateAudioOrderUserInterface];
   [self _validateVideoUserInterface];
   [self _validateVideoOrderUserInterface];
+  
+  sipProxyPasswordDidChange = NO;
 }
 
 - (void)_saveCurrentLocation
 {
-  BOOL flag;
   NSObject *obj;
   int state;
   
@@ -1066,35 +1039,45 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [currentLocation setH323AccountTag:[self _extractTagFromPopUp:h323AccountsPopUp]];
   
   // saving the SIP section
-  flag = ([enableSIPSwitch state] == NSOnState) ? YES : NO;
-  [currentLocation setEnableSIP:flag];
+  [currentLocation setEnableSIPNumber:[self _extractStateFromSwitch:enableSIPSwitch]];
   
-  [currentLocation setSIPAccountTag:[self _extractTagFromPopUp:sipAccountsPopUp]];
+  if (sipAccounts != nil) {
+    unsigned numSIPAccounts = [sipAccounts count];
+    unsigned i;
+    NSMutableArray *accountTags = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
+    NSArray *accountRecords = [accountModule sipAccounts];
+    for (i = 0; i < numSIPAccounts; i++) {
+      if ([(XMSIPAccountInfo *)[sipAccounts objectAtIndex:i] enabled] == YES) {
+        XMSIPAccount *account = (XMSIPAccount *)[accountRecords objectAtIndex:i];
+        [accountTags addObject:[NSNumber numberWithUnsignedInt:[account tag]]];
+      }
+    }
+    [currentLocation setSIPAccountTags:accountTags];
+    [accountTags release];
+  }
+  unsigned tag = [self _extractTagFromPopUp:sipProxyPopUp];
+  [currentLocation setSIPProxyTag:tag];
   
-  XMSIPProxyMode sipProxyMode = (XMSIPProxyMode)[[sipProxyModeMatrix selectedCell] tag];
-  [currentLocation setSIPProxyMode:sipProxyMode];
-  if(sipProxyMode == XMSIPProxyMode_CustomProxy)
+  NSString *host = [self _extractStringFromTextField:sipProxyHostField];
+  NSString *username = [self _extractStringFromTextField:sipProxyUsernameField];
+  NSString *password = [self _extractStringFromTextField:sipProxyPasswordField];
+  if ((NSObject *)host != [NSNull null] && [host isEqualToString:@""]) {
+    host = nil;
+  }
+  if((NSObject *)username != [NSNull null] && [username isEqualToString:@""])
   {
-    NSString *host = [sipProxyHostField stringValue];
-    NSString *username = [sipProxyUsernameField stringValue];
-    NSString *password = [sipProxyPasswordField stringValue];
+    username = nil;
+  }
+  if((NSObject *)password != [NSNull null] && [password isEqualToString:@""])
+  {
+    password = nil;
+  }
     
-    if([host isEqualToString:@""])
-    {
-      host = nil;
-    }
-    if([username isEqualToString:@""])
-    {
-      username = nil;
-    }
-    if([password isEqualToString:@""])
-    {
-      password = nil;
-    }
-    
-    [currentLocation setSIPProxyHost:host];
-    [currentLocation setSIPProxyUsername:username];
-    [currentLocation setSIPProxyPassword:password];
+  [currentLocation setSIPProxyHost:host];
+  [currentLocation setSIPProxyUsername:username];
+  if (sipProxyPasswordDidChange) {
+    [currentLocation _setSIPProxyPassword:password];
+    sipProxyPasswordDidChange = NO;
   }
   
   // saving the audio section
@@ -1220,6 +1203,80 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   }
 }
 
+- (void)_buildSIPAccountTags
+{
+  [sipAccounts release];
+  NSArray *sipAccountTags = [currentLocation sipAccountTags];
+  if ((NSObject *)sipAccountTags == [NSNull null]) {
+    sipAccounts = nil;
+  } else {
+    NSArray *sipAccountRecords = [accountModule sipAccounts];
+    unsigned numSIPAccounts = [sipAccountRecords count];
+    sipAccounts = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
+    unsigned numTags = [sipAccountTags count];
+    unsigned i, j;
+    for (i = 0; i < numSIPAccounts; i++) {
+      XMSIPAccount *account = (XMSIPAccount *)[sipAccountRecords objectAtIndex:i];
+      unsigned _tag = [account tag];
+      BOOL found = NO;
+      for (j = 0; j < numTags; j++) {
+        if (_tag == [(NSNumber *)[sipAccountTags objectAtIndex:j] unsignedIntValue]) {
+          found = YES;
+          break;
+        }
+      }
+      if (found) {
+        [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:_tag enabled:YES] autorelease]];
+      } else {
+        [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:_tag enabled:NO] autorelease]];
+      }
+    }
+  }
+}
+
+- (void)_updateGatekeeperAccountInfo
+{
+  unsigned index = [h323AccountsPopUp indexOfSelectedItem];
+  unsigned indexOffset = 2;
+  
+  if ([[h323AccountsPopUp itemAtIndex:0] tag] == -1) {
+    indexOffset++;
+  }
+  
+  if(index < indexOffset)
+  {
+    [gatekeeperHostField setStringValue:@""];
+    [gatekeeperUserAliasField setStringValue:@""];
+    [gatekeeperPhoneNumberField setStringValue:@""];
+  }
+  else
+  {
+    index -= indexOffset;
+    
+    XMH323Account *h323Account = [accountModule h323AccountAtIndex:index];
+    
+    NSString *gkHost = [h323Account gatekeeper];
+    NSString *gkUsername = [h323Account username];
+    NSString *gkPhoneNumber = [h323Account phoneNumber];
+    
+    if(gkHost == nil)
+    {
+      gkHost = @"";
+    }
+    if(gkUsername == nil)
+    {
+      gkUsername = @"";
+    }
+    if(gkPhoneNumber == nil)
+    {
+      gkPhoneNumber = @"";
+    }
+    [gatekeeperHostField setStringValue:gkHost];
+    [gatekeeperUserAliasField setStringValue:gkUsername];
+    [gatekeeperPhoneNumberField setStringValue:gkPhoneNumber];
+  }
+}
+
 #pragma mark -
 #pragma mark User Interface validation Methods
 
@@ -1318,7 +1375,33 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 {
   BOOL flag = ([enableSIPSwitch state] == NSOffState) ? NO : YES;
   
-  [sipAccountsPopUp setEnabled:flag];
+  [sipAccountsTable setHidden:!flag];
+  [sipProxyPopUp setEnabled:flag];
+  
+  [self _validateSIPProxyUserInterface];
+}
+
+- (void)_validateSIPAccountsUserInterface
+{
+  if (sipAccounts != nil) {
+    [sipAccountsTab selectFirstTabViewItem:self];
+  } else {
+    [sipAccountsTab selectLastTabViewItem:self];
+  }
+}
+
+- (void)_validateSIPProxyUserInterface
+{
+  BOOL sipEnabled = ([enableSIPSwitch state] == NSOffState) ? NO : YES;
+  unsigned selectedTag = [[sipProxyPopUp selectedItem] tag];
+  BOOL enableFields = NO;
+  
+  if (sipEnabled == YES && selectedTag == XMCustomSIPProxyTag) {
+    enableFields = YES;
+  }
+  [sipProxyHostField setEnabled:enableFields];
+  [sipProxyUsernameField setEnabled:enableFields];
+  [sipProxyPasswordField setEnabled:enableFields];
 }
 
 - (void)_validateAudioOrderUserInterface
@@ -1400,6 +1483,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   {
     return [stunServers count];
   }
+  else if (tableView == sipAccountsTable) {
+    return [[accountModule sipAccounts] count];
+  }
   else if(tableView == audioCodecPreferenceOrderTableView)
   {
     return [audioCodecs count];
@@ -1420,6 +1506,18 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   }
   else if (tableView == stunServersTable) {
     return [stunServers objectAtIndex:rowIndex];
+  }
+  else if (tableView == sipAccountsTable) {
+    XMSIPAccount *sipAccount = (XMSIPAccount *)[[accountModule sipAccounts] objectAtIndex:rowIndex];
+    NSString *identifier = [column identifier];
+    
+    if ([identifier isEqualToString:XMKey_SIPAccountNameIdentifier]) {
+      return [sipAccount name];
+    } else if ([identifier isEqualToString:XMKey_SIPAccountDomainIdentifier]) {
+      return [sipAccount domain];
+    } else {
+      return [NSNumber numberWithBool:[(XMSIPAccountInfo *)[sipAccounts objectAtIndex:rowIndex] enabled]];
+    }
   }
   else if(tableView != audioCodecPreferenceOrderTableView &&
      tableView != videoCodecPreferenceOrderTableView)
@@ -1482,6 +1580,11 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   {
     NSString *serverName = (NSString *)anObject;
     [stunServers replaceObjectAtIndex:rowIndex withObject:serverName];
+  }
+  else if (tableView == sipAccountsTable)
+  {
+    XMSIPAccountInfo *info = (XMSIPAccountInfo *)[sipAccounts objectAtIndex:rowIndex];
+    [info setEnabled:[anObject boolValue]];
   }
   else if(tableView == audioCodecPreferenceOrderTableView)
   {
@@ -1596,10 +1699,10 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 
 - (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)theLocations
 										h323Accounts:(NSArray *)h323Accounts
-										 sipAccounts:(NSArray *)sipAccounts
+										 sipAccounts:(NSArray *)_sipAccounts
 {
   [accountModule addH323Accounts:h323Accounts];
-  [accountModule addSIPAccounts:sipAccounts];
+  [accountModule addSIPAccounts:_sipAccounts];
   [self noteAccountsDidChange];
   
   unsigned count = [theLocations count];
@@ -1677,6 +1780,40 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   [alert runModal];
   
   [alert release];
+}
+
+@end
+
+#pragma mark -
+
+@implementation XMSIPAccountInfo
+
+- (id)_initWithTag:(unsigned)_tag enabled:(BOOL)_enabled
+{
+  self = [super init];
+  tag = _tag;
+  enabled = _enabled;
+  return self;
+}
+
+- (unsigned)tag
+{
+  return tag;
+}
+
+- (void)setTag:(unsigned)_tag
+{
+  tag = _tag;
+}
+
+- (BOOL)enabled
+{
+  return enabled;
+}
+
+- (void)setEnabled:(BOOL)flag
+{
+  enabled = flag;
 }
 
 @end
@@ -1890,7 +2027,40 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   }
 }
 
-- (unsigned)sipAccountTag
+- (NSArray *)sipAccountTags
+{
+  unsigned count = [locations count];
+  unsigned i;
+  NSArray *array;
+  
+  for (i = 0; i < count; i++) {
+    XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+    if (i == 0) {
+      array = [location sipAccountTags];
+    } else {
+      NSArray *array2 = [location sipAccountTags];
+      if (![array2 isEqual:array] && array2 != array) {
+        array = (NSArray *)[NSNull null]; // Locations have different values
+        break;
+      }
+    }
+  }
+  return array;
+}
+
+- (void)setSIPAccountTags:(NSArray *)tags
+{
+  if ((NSObject *)tags != [NSNull null]) {
+    unsigned count = [locations count];
+    unsigned i;
+    for (i = 0; i < count; i++) {
+      XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+      [location setSIPAccountTags:tags];
+    }
+  }
+}
+
+- (unsigned)sipProxyTag
 {
   unsigned count = [locations count];
   unsigned i;
@@ -1898,9 +2068,9 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   for (i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
-      _tag = [location sipAccountTag];
+      _tag = [location sipProxyTag];
     } else {
-      if (_tag != [location sipAccountTag]) {
+      if (_tag != [location sipProxyTag]) {
         return UINT_MAX;
       }
     }
@@ -1908,14 +2078,69 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
   return _tag;
 }
 
-- (void)setSIPAccountTag:(unsigned)_tag
+- (void)setSIPProxyTag:(unsigned)_tag
 {
   if (_tag != UINT_MAX) {
     unsigned count = [locations count];
     unsigned i;
     for (i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
-      [location setSIPAccountTag:_tag];
+      [location setSIPProxyTag:_tag];
+    }
+  }
+}
+
+- (NSString *)sipProxyHost
+{
+  return (NSString *)[self _valueForKey:XMKey_PreferencesSIPProxyHost];
+}
+
+- (void)setSIPProxyHost:(NSString *)host
+{
+  if ((NSObject *)host != [NSNull null]) {
+    [self _setValue:host forKey:XMKey_PreferencesSIPProxyHost];
+  }
+}
+
+- (NSString *)sipProxyUsername
+{
+  return (NSString *)[self _valueForKey:XMKey_PreferencesSIPProxyUsername];
+}
+
+- (void)setSIPProxyUsername:(NSString *)username
+{
+  if ((NSObject *)username != [NSNull null]) {
+    [self _setValue:username forKey:XMKey_PreferencesSIPProxyUsername];
+  }
+}
+
+- (NSString *)_sipProxyPassword
+{
+  unsigned count = [locations count];
+  unsigned i;
+  NSString *pwd;
+  for (i = 0; i < count; i++) {
+    XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+    if (i == 0) {
+      pwd = [location _sipProxyPassword];
+    } else {
+      NSString *pwd2 = [location _sipProxyPassword];
+      if (![pwd isEqualToString:pwd2] && pwd != pwd2) {
+        return (NSString *)[NSNull null];
+      }
+    }
+  }
+  return pwd;
+}
+
+- (void)_setSIPProxyPassword:(NSString *)password
+{
+  if ((NSObject *)password != [NSNull null]) {
+    unsigned count = [locations count];
+    unsigned i;
+    for (i = 0; i < count; i++) {
+      XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+      [location _setSIPProxyPassword:password];
     }
   }
 }

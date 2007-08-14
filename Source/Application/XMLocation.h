@@ -1,9 +1,9 @@
 /*
- * $Id: XMLocation.h,v 1.9 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.10 2007/08/14 10:56:39 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_LOCATION_H__
@@ -11,18 +11,16 @@
 
 #import <Cocoa/Cocoa.h>
 #import "XMeeting.h"
+#import "XMPreferencesManager.h"
+
+enum {
+  XMCustomSIPProxyTag = UINT_MAX-1
+};
 
 extern NSString *XMKey_LocationName;
 extern NSString *XMKey_LocationH323AccountID;
-extern NSString *XMKey_LocationSIPAccountID;
-extern NSString *XMKey_LocationSIPProxyMode;
-
-typedef enum XMSIPProxyMode
-{
-	XMSIPProxyMode_NoProxy,
-	XMSIPProxyMode_UseSIPAccount,
-	XMSIPProxyMode_CustomProxy
-} XMSIPProxyMode;
+extern NSString *XMKey_LocationSIPAccountIDs;
+extern NSString *XMKey_LocationSIPProxyID;
 
 /**
  * Overrides the default XMPreferences instance to provide the following
@@ -33,16 +31,15 @@ typedef enum XMSIPProxyMode
  * - Keeps a tag to identify instances which were copied. Required for safe
  *   editing of preferences
  **/
-@interface XMLocation : XMPreferences {
+@interface XMLocation : XMPreferences <XMPasswordObject> {
 	
 	unsigned tag;
 	NSString *name;
 	unsigned h323AccountTag;
-	unsigned sipAccountTag;
-	XMSIPProxyMode proxyMode;
-	
-	NSString *temporarySIPProxyPassword;
-	
+	NSArray * sipAccountTags;
+    unsigned sipProxyTag;
+    BOOL didSetSIPProxyPassword;
+    NSString *_sipProxyPassword;
 }
 
 /**
@@ -82,11 +79,14 @@ typedef enum XMSIPProxyMode
 - (unsigned)h323AccountTag;
 - (void)setH323AccountTag:(unsigned)tag;
 
-- (unsigned)sipAccountTag;
-- (void)setSIPAccountTag:(unsigned)tag;
+- (NSArray *)sipAccountTags;
+- (void)setSIPAccountTags:(NSArray *)tags;
 
-- (XMSIPProxyMode)sipProxyMode;
-- (void)setSIPProxyMode:(XMSIPProxyMode)sipProxyMode;
+- (unsigned)sipProxyTag;
+- (void)setSIPProxyTag:(unsigned)tag;
+
+- (NSString *)_sipProxyPassword;
+- (void)_setSIPProxyPassword:(NSString *)password;
 
 /**
  * Stores the information from the accounts in the data storage

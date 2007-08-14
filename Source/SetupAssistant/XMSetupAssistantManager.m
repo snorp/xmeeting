@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.14 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.15 2007/08/14 10:56:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -259,7 +259,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	[location setEnableH323:YES];
 	[location setEnableSIP:YES];
 	[location setSIPAccountTag:[sipAccount tag]];
-	[location setSIPProxyMode:XMSIPProxyMode_UseSIPAccount];
+	//[location setSIPProxyMode:XMSIPProxyMode_UseSIPAccount];
 	
 	detectedNATType = XMNATType_Error;
 	

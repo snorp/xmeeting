@@ -20,14 +20,13 @@
                 natTypeSemaphoreView = NSImageView; 
                 networkBox = NSBox; 
                 phoneNumberField = NSTextField; 
-                registrarField = NSTextField; 
-                registrarSemaphoreView = NSImageView; 
+                registrationField = NSTextField; 
+                registrationSemaphoreView = NSImageView; 
                 sipBox = NSBox; 
                 sipDisclosure = NSButton; 
                 sipStatusField = NSTextField; 
                 sipStatusSemaphoreView = NSImageView; 
                 sipTitle = NSTextField; 
-                sipUsernameField = NSTextField; 
             }; 
             SUPERCLASS = XMInspectorModule; 
         }, 
