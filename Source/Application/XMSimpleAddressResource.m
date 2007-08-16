@@ -1,5 +1,5 @@
 /*
- * $Id: XMSimpleAddressResource.m,v 1.4 2007/05/08 15:18:40 hfriederich Exp $
+ * $Id: XMSimpleAddressResource.m,v 1.5 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,60 +15,80 @@
 
 - (id)initWithAddress:(NSString *)theAddress callProtocol:(XMCallProtocol)theCallProtocol
 {
-	address = [theAddress copy];
-	
-	callProtocol = theCallProtocol;
-	
-	return self;
+  address = [theAddress copy];
+  callProtocol = theCallProtocol;
+  displayString = nil;
+  displayImage = nil;
+  
+  return self;
 }
 
 - (void)dealloc
 {
-	[address release];
-	
-	[super dealloc];
+  [address release];
+  [displayString release];
+  [displayImage release];
+  
+  [super dealloc];
 }
 
 #pragma mark Getting & Setting the attributes
 
 - (NSString *)address
 {
-	return address;
+  return address;
 }
 
 - (id<XMCallAddressProvider>)provider
 {
-	return  nil;
+  return  nil;
 }
 
 - (NSImage *)displayImage
 {
-	return nil;
+  return displayImage;
+}
+
+- (void)setDisplayImage:(NSImage *)image
+{
+  NSImage *old = displayImage;
+  displayImage = [image retain];
+  [old release];
 }
 
 - (XMAddressResource *)addressResource
 {
-	return self;
+  return self;
 }
 
 - (NSString *)displayString
 {
-	return [self address];
+  if (displayString != nil) {
+    return displayString;
+  }
+  return [self address];
+}
+
+- (void)setDisplayString:(NSString *)_displayString
+{
+  NSString *old = displayString;
+  displayString = [_displayString copy];
+  [old release];
 }
 
 - (XMCallProtocol)callProtocol
 {
-	return callProtocol;
+  return callProtocol;
 }
 
 - (void)setCallProtocol:(XMCallProtocol)theCallProtocol
 {
-	callProtocol = theCallProtocol;
+  callProtocol = theCallProtocol;
 }
 
 - (NSString *)humanReadableAddress
 {
-	return [self address];
+  return [self displayString];
 }
 
 @end
@@ -80,18 +100,18 @@
 
 - (id)initWithAddressResource:(XMAddressResource *)_addressResource
 {
-    self = [super init];
-    
-    addressResource = [_addressResource retain];
-    
-    return self;
+  self = [super init];
+  
+  addressResource = [_addressResource retain];
+  
+  return self;
 }
 
 - (void)dealloc
 {
-    [addressResource release];
-    
-    [super dealloc];
+  [addressResource release];
+  
+  [super dealloc];
 }
 
 #pragma mark -
@@ -99,22 +119,22 @@
 
 - (id<XMCallAddressProvider>)provider
 {
-    return nil;
+  return nil;
 }
 
 - (XMAddressResource *)addressResource
 {
-    return addressResource;
+  return addressResource;
 }
 
 - (NSString *)displayString
 {
-    return [addressResource address];
+  return [addressResource humanReadableAddress];
 }
 
 - (NSImage *)displayImage
 {
-    return nil;
+  return nil;
 }
 
 @end

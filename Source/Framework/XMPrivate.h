@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.41 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.42 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,6 +26,7 @@
 #import "XMVideoView.h"
 #import "XMGeneralPurposeAddressResource.h"
 #import "XMCallRecorder.h"
+#import "XMURLParser.h"
 
 extern unsigned _XMInitializedStatus;
 extern XMUtils *_XMUtilsSharedInstance;
@@ -284,6 +285,13 @@ void _XMCheckCloseStatus();
 								   length:(UInt32)length
 						 imageDescription:(ImageDescriptionHandle)imageDesc;
 - (void)_handleLocalVideoRecordingDidEnd;
+
+@end
+
+@interface XMURL (FrameworkMethods)
+
+- (NSString *)_prefix;
+- (BOOL)_parseString:(const char *)string usingCallback:(XMURLParseCallback)callback;
 
 @end
 

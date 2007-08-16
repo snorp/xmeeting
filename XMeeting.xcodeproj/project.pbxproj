@@ -74,6 +74,8 @@
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		D1010AB50C71F6D20010523E /* XMURLParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1010AB30C71F6D20010523E /* XMURLParser.cpp */; };
+		D1010AB60C71F6D20010523E /* XMURLParser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1010AB40C71F6D20010523E /* XMURLParser.h */; };
 		D102A8FC09E6B4DA0050239C /* XMDialPadModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D163941B083E17ED00F7FD83 /* XMDialPadModule.m */; };
 		D102AFFE09EA770F0050239C /* XMInstantActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = D102AFFC09EA770F0050239C /* XMInstantActionButton.m */; };
 		D104D9660A0E5973000898F2 /* dial_pad_0_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D94E0A0E5973000898F2 /* dial_pad_0_down.tif */; };
@@ -505,6 +507,7 @@
 				D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */,
 				D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */,
 				D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */,
+				D1010AB60C71F6D20010523E /* XMURLParser.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -630,6 +633,8 @@
 		32CA4F630368D1EE00C91783 /* XMeeting_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMeeting_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* XMeeting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XMeeting.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1010AB30C71F6D20010523E /* XMURLParser.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMURLParser.cpp; path = Source/Framework/XMURLParser.cpp; sourceTree = "<group>"; };
+		D1010AB40C71F6D20010523E /* XMURLParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMURLParser.h; path = Source/Framework/XMURLParser.h; sourceTree = "<group>"; };
 		D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263Packetizer.h; path = Source/Framework/XMRTPH263Packetizer.h; sourceTree = "<group>"; };
 		D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = XMRTPH263Packetizer.c; path = Source/Framework/XMRTPH263Packetizer.c; sourceTree = "<group>"; };
 		D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PacketizerDispatch.h; path = Source/Framework/XMRTPH263PacketizerDispatch.h; sourceTree = "<group>"; };
@@ -1853,6 +1858,8 @@
 				D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */,
 				D163364E07A456C4003FD9C0 /* XMProcess.h */,
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
+				D1010AB40C71F6D20010523E /* XMURLParser.h */,
+				D1010AB30C71F6D20010523E /* XMURLParser.cpp */,
 				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
 			);
 			name = OPAL;
@@ -3589,6 +3596,7 @@
 				D15439CB0C0C5769002A027E /* handlers.cxx in Sources */,
 				D1A561050C6CA45A0086E6F6 /* XMIPAddressFormatter.m in Sources */,
 				D1A24F2D0C6FD96000408CF7 /* XMIDDPrefixFormatter.m in Sources */,
+				D1010AB50C71F6D20010523E /* XMURLParser.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

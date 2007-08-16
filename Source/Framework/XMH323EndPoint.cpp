@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.29 2007/05/14 13:46:33 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.30 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,11 +96,12 @@ XMGatekeeperRegistrationFailReason XMH323EndPoint::SetGatekeeper(const PString &
 																 const PString & password)
 {
 	// By setting the user name, we clear all previously used aliases
-	SetLocalUserName(GetManager().GetDefaultUserName());
+	//SetLocalUserName(GetManager().GetDefaultUserName());
 	
 	if(username != NULL)
 	{
-		AddAliasName(username);
+		//AddAliasName(username);
+      SetLocalUserName(username);
 	}
 	if(phoneNumber != NULL)
 	{

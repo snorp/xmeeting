@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.10 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.11 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,6 +81,9 @@ extern NSString *XMKey_LocationSIPProxyID;
 
 - (NSArray *)sipAccountTags;
 - (void)setSIPAccountTags:(NSArray *)tags;
+
+- (unsigned)defaultSIPAccountTag;
+- (void)setDefaultSIPAccountTag:(unsigned)tag;
 
 - (unsigned)sipProxyTag;
 - (void)setSIPProxyTag:(unsigned)tag;

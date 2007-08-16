@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressResource.h,v 1.2 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMAddressResource.h,v 1.3 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,6 +104,32 @@
  * better human readable than just using -address
  **/
 - (NSString *)humanReadableAddress;
+
+/**
+ * Return the 'username' part of the call address if such a feature exists.
+ * Else returns nil
+ **/
+- (NSString *)username;
+
+/**
+ * Returns the 'host' part of the call address if such a feature exists.
+ * Else returns nil
+ **/
+- (NSString *)host;
+
+@end
+
+@interface XMURL : XMAddressResource {
+  NSString *url;
+  NSString *displayName;
+  NSString *username;
+  NSString *host;
+}
+
+- (id)initWithStringRepresentation:(NSString *)url;
+- (NSString *)stringRepresentation;
+
+- (NSString *)displayName; // Equivalent to -humanReadableAddress
 
 @end
 

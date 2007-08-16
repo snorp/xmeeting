@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.55 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.56 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -856,9 +856,8 @@
 						   sipAccounts:(NSArray *)sipAccounts
 {		
 	// registering the call address providers
+  	[self _preferencesDidChange:nil];
 	[[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
-	
-	[self _preferencesDidChange:nil];
 	
 	noCallModule = [[XMNoCallModule alloc] init];
 	inCallModule = [[XMInCallModule alloc] init];

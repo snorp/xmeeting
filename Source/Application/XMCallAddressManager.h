@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.9 2007/05/28 09:56:04 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.10 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,11 @@
 
 @protocol XMCallAddress;
 @protocol XMCallAddressProvider;
+
+typedef enum XMProviderPriority {
+  XMProviderPriority_Low,
+  XMProviderPriority_Normal
+} XMProviderPriority;
 
 /**
  * XMCallAddressManager encapsulates functionality used to
@@ -125,6 +130,11 @@
  * provide
  **/
 - (NSArray *)allAddresses;
+
+/**
+ * Returns the piority of this provider for the allAddresses result
+ **/
+- (XMProviderPriority)priorityForAllAddresses;
 
 @end
 

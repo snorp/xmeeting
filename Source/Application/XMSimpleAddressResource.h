@@ -1,5 +1,5 @@
 /*
- * $Id: XMSimpleAddressResource.h,v 1.4 2007/05/08 15:18:40 hfriederich Exp $
+ * $Id: XMSimpleAddressResource.h,v 1.5 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,14 +14,15 @@
 #import "XMCallAddressManager.h"
 
 /**
- * This class implements the simple most address resource, containing
+* This class implements the simple most address resource, containing
  * only an address and a protocol information
  **/
 @interface XMSimpleAddressResource : XMAddressResource <XMCallAddress> {
-	
-	NSString *address;
-	XMCallProtocol callProtocol;
-	
+  
+  NSString *address;
+  XMCallProtocol callProtocol;
+  NSString *displayString;
+  NSImage *displayImage;
 }
 
 - (id)initWithAddress:(NSString *)address callProtocol:(XMCallProtocol)protocol;
@@ -31,14 +32,22 @@
 - (XMCallProtocol)callProtocol;
 - (void)setCallProtocol:(XMCallProtocol)callProtocol;
 
+- (NSString *)displayString;
+- (void)setDisplayString:(NSString *)displayString;
+
+- (NSImage *)displayImage;
+- (void)setDisplayImage:(NSImage *)image;
+
+- (id<XMCallAddressProvider>)provider;
+
 @end
 
 /**
- * Simple class that wraps another address resource and implements
+* Simple class that wraps another address resource and implements
  * the XMCallAddress interface
  **/
 @interface XMSimpleAddressResourceWrapper : NSObject <XMCallAddress> {
-    XMAddressResource *addressResource;
+  XMAddressResource *addressResource;
 }
 
 - (id)initWithAddressResource:(XMAddressResource *)addressResource;

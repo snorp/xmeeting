@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323URL.h,v 1.1 2007/05/08 15:17:46 hfriederich Exp $
+ * $Id: XMH323URL.h,v 1.2 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,10 +13,7 @@
 #import "XMTypes.h"
 #import "XMAddressResource.h"
 
-@interface XMH323URL : XMAddressResource {
-	
-	NSString *url;
-    NSString *address;
+@interface XMH323URL : XMURL {
 }
 
 /**
@@ -40,9 +37,6 @@
  * Dictionaries are not supported for H323-URLs. Returns nil
  **/
 + (XMH323URL *)addressResourceWithDictionaryRepresentation:(NSDictionary *)dictionary;
-
-- (id)initWithStringRepresentation:(NSString *)url;
-- (NSString *)stringRepresentation;
 
 @end
 

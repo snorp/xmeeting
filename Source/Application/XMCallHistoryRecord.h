@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.h,v 1.5 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.h,v 1.6 2007/08/16 15:41:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,7 +41,6 @@ typedef enum XMCallHistoryRecordType
  **/
 @interface XMCallHistoryRecord : XMSimpleAddressResource {
 	
-	NSString *displayString;
 	XMAddressBookRecord *addressBookRecord;
 	XMCallHistoryRecordType type;
 

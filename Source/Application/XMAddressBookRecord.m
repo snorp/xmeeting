@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookRecord.m,v 1.4 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookRecord.m,v 1.5 2007/08/16 15:41:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -343,6 +343,10 @@
 - (id<XMCallAddressProvider>)provider
 {
 	return [XMAddressBookCallAddressProvider sharedInstance];
+}
+
+- (void)setProvider:(id<XMCallAddressProvider>)provider
+{
 }
 
 - (XMAddressResource *)addressResource
