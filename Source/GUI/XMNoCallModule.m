@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.48 2007/08/14 10:56:40 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.49 2007/08/17 12:33:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -910,6 +910,9 @@
 
 - (void)_setCallProtocol:(XMCallProtocol)callProtocol
 {
+  if (currentCallProtocol == callProtocol) {
+    return;
+  }
   currentCallProtocol = callProtocol;
   
   if(callProtocol == XMCallProtocol_H323)
@@ -921,7 +924,7 @@
     [callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL_SIP"]];
   }
   
-  id representedObject = [callAddressField representedObject];
+  id<XMCallAddress> representedObject = (id<XMCallAddress>)[callAddressField representedObject];
   
   if ([representedObject isKindOfClass:[XMSimpleAddressResource class]])
   {
@@ -930,7 +933,10 @@
   }
   else if (representedObject != nil)
   {
-    XMSimpleAddressResource *resource = [[XMSimpleAddressResource alloc] initWithAddress:[representedObject address] callProtocol:callProtocol];
+    XMAddressResource *res = [representedObject addressResource];
+    XMSimpleAddressResource *resource = [[XMSimpleAddressResource alloc] initWithAddress:[res address] callProtocol:callProtocol];
+    [resource setDisplayString:[representedObject displayString]];
+    [resource setDisplayImage:[representedObject displayImage]];
     [callAddressField setRepresentedObject:resource];
     [resource release];
   }
