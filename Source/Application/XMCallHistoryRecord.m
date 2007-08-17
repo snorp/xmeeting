@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.15 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.16 2007/08/17 10:28:35 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,7 +48,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   
   self = [super initWithAddress:theAddress callProtocol:theCallProtocol];
   
-  displayString = [theDisplayString copy];
+  [super setDisplayString:theDisplayString];
   
   addressBookRecord = nil;
   
@@ -80,14 +80,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (void)dealloc
 {
-  if(displayString != nil)
-  {
-    [displayString release];
-  }
-  if(addressBookRecord != nil)
-  {
-    [addressBookRecord release];
-  }
+  [addressBookRecord release];
   
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   
@@ -103,7 +96,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:[self address], XMKey_CallHistoryRecordAddress,
     number, XMKey_CallHistoryRecordProtocol,
-    displayString, XMKey_CallHistoryRecordDisplayString, nil];
+    [super displayString], XMKey_CallHistoryRecordDisplayString, nil];
   
   [number release];
   
@@ -137,7 +130,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   }
   else
   {
-    theDisplayString = displayString;
+    theDisplayString = [super displayString];
   }
   
   if(theDisplayString == nil)
@@ -146,13 +139,6 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   }
   
   return theDisplayString;
-}
-
-- (void)setDisplayString:(NSString *)_displayString
-{
-  NSString *old = displayString;
-  displayString = [_displayString copy];
-  [old release];
 }
 
 - (XMCallHistoryRecordType)type
