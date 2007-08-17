@@ -305,6 +305,7 @@
 		D15439CB0C0C5769002A027E /* handlers.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15439C90C0C5769002A027E /* handlers.cxx */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
+		D160F04C0C76263E00132F5E /* XMCalltoURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395610841B4E100F7FD83 /* XMCalltoURL.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
 		D162158509F0F91600647E48 /* CallHistory_SIP.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158309F0F91600647E48 /* CallHistory_SIP.tiff */; };
 		D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D163336407A01BD5003FD9C0 /* XMApplicationController.m */; };
@@ -3597,6 +3598,7 @@
 				D1A561050C6CA45A0086E6F6 /* XMIPAddressFormatter.m in Sources */,
 				D1A24F2D0C6FD96000408CF7 /* XMIDDPrefixFormatter.m in Sources */,
 				D1010AB50C71F6D20010523E /* XMURLParser.cpp in Sources */,
+				D160F04C0C76263E00132F5E /* XMCalltoURL.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

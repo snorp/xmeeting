@@ -1,5 +1,5 @@
 /*
- * $Id: XMURICommand.m,v 1.4 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMURICommand.m,v 1.5 2007/08/17 19:38:56 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,7 @@
       addressResource = [XMAddressResource addressResourceWithStringRepresentation:addressString];
     }
     if (addressResource != nil) {
-      
+      NSLog(@"A");
       id<XMCallAddress> callAddress = [callManager addressMatchingResource:addressResource];
       if (callAddress == nil) {
         callAddress = [[[XMSimpleAddressResourceWrapper alloc] initWithAddressResource:addressResource] autorelease];
@@ -46,6 +46,7 @@
     }
     else
     {
+      NSLog(@"b");
       NSString *formatString = NSLocalizedString(@"XM_ILLEGAL_URI", @"");
       return [NSString stringWithFormat:formatString, addressString];
     }

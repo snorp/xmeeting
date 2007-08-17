@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressResource.m,v 1.4 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMAddressResource.m,v 1.5 2007/08/17 19:38:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #import "XMGeneralPurposeAddressResource.h"
 #import "XMH323URL.h"
 #import "XMSIPURL.h"
+#import "XMCalltoURL.h"
 #import "XMURLParser.h"
 #import "XMPrivate.h"
 
@@ -35,7 +36,8 @@ void _XMParseURLCallback(const char *displayName,
 {
   if([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation] ||
      [XMH323URL canHandleStringRepresentation:stringRepresentation] ||
-     [XMSIPURL canHandleStringRepresentation:stringRepresentation])
+     [XMSIPURL canHandleStringRepresentation:stringRepresentation] ||
+     [XMCalltoURL canHandleStringRepresentation:stringRepresentation])
   {
     return YES;
   }
@@ -46,7 +48,8 @@ void _XMParseURLCallback(const char *displayName,
 {
   if([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation] ||
      [XMH323URL canHandleDictionaryRepresentation:dictionaryRepresentation] ||
-     [XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation])
+     [XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation] ||
+     [XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation])
   {
     return YES;
   }
@@ -68,6 +71,10 @@ void _XMParseURLCallback(const char *displayName,
   else if ([XMSIPURL canHandleStringRepresentation:stringRepresentation])
   {
     instance = [XMSIPURL addressResourceWithStringRepresentation:stringRepresentation];
+  } 
+  else if ([XMCalltoURL canHandleStringRepresentation:stringRepresentation])
+  {
+    instance = [XMCalltoURL addressResourceWithStringRepresentation:stringRepresentation];
   }
   
   return instance;
@@ -88,6 +95,10 @@ void _XMParseURLCallback(const char *displayName,
   else if ([XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation])
   {
     instance = [XMSIPURL addressResourceWithDictionaryRepresentation:dictionaryRepresentation];
+  } 
+  else if ([XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation])
+  {
+    instance = [XMCalltoURL addressResourceWithDictionaryRepresentation:dictionaryRepresentation];
   }
   
   return instance;
@@ -119,6 +130,10 @@ void _XMParseURLCallback(const char *displayName,
   {
     return [[XMSIPURL alloc] initWithStringRepresentation:stringRepresentation];
   }
+  else if ([XMCalltoURL canHandleStringRepresentation:stringRepresentation])
+  {
+    return [[XMCalltoURL alloc] initWithStringRepresentation:stringRepresentation];
+  }
   
   return nil;
 }
@@ -139,6 +154,10 @@ void _XMParseURLCallback(const char *displayName,
   else if ([XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation])
   {
     return [[XMSIPURL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
+  }
+  else if ([XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation])
+  {
+    return [[XMCalltoURL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
   }
   
   return nil;
@@ -192,6 +211,7 @@ void _XMParseURLCallback(const char *displayName,
 
 - (id)initWithStringRepresentation:(NSString *)stringRepresentation
 {
+  self = [super init];
   displayName = nil;
   username = nil;
   host = nil;
