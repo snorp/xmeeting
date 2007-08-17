@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodec.h,v 1.3 2006/01/20 17:17:04 hfriederich Exp $
+ * $Id: XMCodec.h,v 1.4 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,11 +17,13 @@
  * the information about a certain codec.
  **/
 @interface XMCodec : NSObject {
-	XMCodecIdentifier identifier;
-	NSString *name;
-	NSString *bandwidth;
-	NSString *quality;
-	BOOL canDisable;
+  
+@private
+  XMCodecIdentifier identifier;
+  NSString *name;
+  NSString *bandwidth;
+  NSString *quality;
+  BOOL canDisable;
 }
 
 /**

@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.6 2006/05/24 12:01:15 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.7 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_WINDOW_CONTROLLER_H__
@@ -20,19 +20,20 @@
  **/
 @interface XMPreferencesWindowController : NSWindowController {
 	
-	BOOL preferencesHaveChanged;
-	
-	NSMutableArray *modules;
-	NSMutableArray *identifiers;
-	NSMutableArray *toolbarItems;
-	NSView *emptyContentView;
-	
-	NSToolbarItem *buttonToolbarItem;
-	IBOutlet NSView *buttonToolbarView;
-	IBOutlet NSButton *applyButton;
-	
-	NSToolbarItem *currentSelectedItem;
-	float currentSelectedItemHeight;
+@private
+  BOOL preferencesHaveChanged;
+  
+  NSMutableArray *modules;
+  NSMutableArray *identifiers;
+  NSMutableArray *toolbarItems;
+  NSView *emptyContentView;
+  
+  NSToolbarItem *buttonToolbarItem;
+  IBOutlet NSView *buttonToolbarView;
+  IBOutlet NSButton *applyButton;
+  
+  NSToolbarItem *currentSelectedItem;
+  float currentSelectedItemHeight;
 }
 
 /**

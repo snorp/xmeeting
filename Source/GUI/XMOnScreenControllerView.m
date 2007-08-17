@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerView.m,v 1.6 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOnScreenControllerView.m,v 1.7 2007/08/17 11:36:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,6 +100,11 @@ NSString *XM_OSD_Separator = @"separator";
 
 #pragma mark -
 #pragma mark Button Management
+
+- (NSMutableArray *)buttons
+{
+  return buttons;
+}
 
 - (void)addButtons:(NSArray*)newButtons
 {

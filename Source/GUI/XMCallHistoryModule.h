@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.13 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.14 2007/08/17 11:36:43 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,23 +18,24 @@
 
 @interface XMCallHistoryModule : XMInspectorModule {
 	
-	IBOutlet NSView *contentView;
-	NSSize contentViewMinSize;
-	NSSize contentViewSize;
-	
-	IBOutlet NSScrollView *recentCallsScrollView;
-	IBOutlet XMRecentCallsView *recentCallsView;
-	IBOutlet NSTextView *logTextView;
-	
-	BOOL didLogIncomingCall;
-	
-	NSString *locationName;
-	
-	NSString *gatekeeperName;
-	
-	NSString *videoDevice;
-	
-	id<XMCallAddress> callAddress;
+@private
+  IBOutlet NSView *contentView;
+  NSSize contentViewMinSize;
+  NSSize contentViewSize;
+  
+  IBOutlet NSScrollView *recentCallsScrollView;
+  IBOutlet XMRecentCallsView *recentCallsView;
+  IBOutlet NSTextView *logTextView;
+  
+  BOOL didLogIncomingCall;
+  
+  NSString *locationName;
+  
+  NSString *gatekeeperName;
+  
+  NSString *videoDevice;
+  
+  id<XMCallAddress> callAddress;
 	
 }
 

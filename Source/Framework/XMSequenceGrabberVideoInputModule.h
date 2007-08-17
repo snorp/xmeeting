@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.h,v 1.8 2007/03/12 13:33:50 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.h,v 1.9 2007/08/17 11:36:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,48 +16,49 @@
 
 @interface XMSequenceGrabberVideoInputModule : NSObject <XMVideoInputModule> {
 	
-	id<XMVideoInputManager> inputManager;
-	
-	SGDeviceList deviceList;
-	NSArray *deviceNames;
-	NSArray *deviceNameIndexes;
-	NSString *selectedDevice;
-	
-	SeqGrabComponent sequenceGrabber;
-	SGChannel videoChannel;
-	SGDataUPP dataGrabUPP;
-	ICMDecompressionSessionRef grabDecompressionSession;
-	TimeValue lastTime;
-	TimeValue timeScale;
-	TimeValue desiredFrameDuration;
-	
-	NSSize frameSize;
-	unsigned framesPerSecond;
-	
-	BOOL isGrabbing;
-	unsigned callbackMissCounter;
-	unsigned callbackStatus;
-	
-	unsigned short brightness;
-	unsigned short hue;
-	unsigned short saturation;
-	unsigned short contrast;
-	unsigned short sharpness;
-	
-	IBOutlet NSView *settingsView;
-	
-	IBOutlet NSSlider *brightnessSlider;
-	IBOutlet NSTextField *brightnessField;
-	IBOutlet NSSlider *hueSlider;
-	IBOutlet NSTextField *hueField;
-	IBOutlet NSSlider *saturationSlider;
-	IBOutlet NSTextField *saturationField;
-	IBOutlet NSSlider *contrastSlider;
-	IBOutlet NSTextField *contrastField;
-	IBOutlet NSSlider *sharpnessSlider;
-	IBOutlet NSTextField *sharpnessField;
-	
-	OSErr openAndConfigureChannelErr;
+@private
+  id<XMVideoInputManager> inputManager;
+  
+  SGDeviceList deviceList;
+  NSArray *deviceNames;
+  NSArray *deviceNameIndexes;
+  NSString *selectedDevice;
+  
+  SeqGrabComponent sequenceGrabber;
+  SGChannel videoChannel;
+  SGDataUPP dataGrabUPP;
+  ICMDecompressionSessionRef grabDecompressionSession;
+  TimeValue lastTime;
+  TimeValue timeScale;
+  TimeValue desiredFrameDuration;
+  
+  NSSize frameSize;
+  unsigned framesPerSecond;
+  
+  BOOL isGrabbing;
+  unsigned callbackMissCounter;
+  unsigned callbackStatus;
+  
+  unsigned short brightness;
+  unsigned short hue;
+  unsigned short saturation;
+  unsigned short contrast;
+  unsigned short sharpness;
+  
+  IBOutlet NSView *settingsView;
+  
+  IBOutlet NSSlider *brightnessSlider;
+  IBOutlet NSTextField *brightnessField;
+  IBOutlet NSSlider *hueSlider;
+  IBOutlet NSTextField *hueField;
+  IBOutlet NSSlider *saturationSlider;
+  IBOutlet NSTextField *saturationField;
+  IBOutlet NSSlider *contrastSlider;
+  IBOutlet NSTextField *contrastField;
+  IBOutlet NSSlider *sharpnessSlider;
+  IBOutlet NSTextField *sharpnessField;
+  
+  OSErr openAndConfigureChannelErr;
 }
 
 - (id)_init;

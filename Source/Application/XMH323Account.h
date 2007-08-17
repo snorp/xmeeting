@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Account.h,v 1.3 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMH323Account.h,v 1.4 2007/08/17 11:36:40 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,13 +27,14 @@ extern NSString *XMKey_H323AccountPassword;
  **/
 @interface XMH323Account : NSObject <NSCopying, XMPasswordObject> {
 
-	unsigned tag;
-	NSString *name;
-	NSString *gatekeeper;
-	NSString *username;
-	NSString *phoneNumber;
-	BOOL didSetPassword;
-	NSString *password;
+@private
+  unsigned tag;
+  NSString *name;
+  NSString *gatekeeper;
+  NSString *username;
+  NSString *phoneNumber;
+  BOOL didSetPassword;
+  NSString *password;
 	
 }
 

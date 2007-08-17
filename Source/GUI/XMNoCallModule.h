@@ -1,9 +1,9 @@
 /*
- * $Id: XMNoCallModule.h,v 1.13 2006/03/20 18:22:40 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.14 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_NO_CALL_MODULE_H__
@@ -21,34 +21,35 @@
  * application is not in a call.
  **/
 @interface XMNoCallModule : NSObject <XMMainWindowModule, XMDatabaseFieldDataSource> {
-	
-	// XMMainWindowModule Outlets and variables
-	IBOutlet NSView *contentView;
-	
-	NSSize contentViewSizeWithSelfViewHidden;
-	NSSize contentViewMinSizeWithSelfViewShown;
-	NSSize contentViewSizeWithSelfViewShown;
-	
-	// GUI Outlets
-	IBOutlet XMLocalVideoView *selfView;
-	IBOutlet NSButton *semaphoreButton;
-	IBOutlet NSProgressIndicator *busyIndicator;
-	IBOutlet NSTextField *statusField;
-	IBOutlet NSPopUpButton *locationsPopUpButton;
-	IBOutlet XMDatabaseField *callAddressField;
-	IBOutlet NSButton *callButton;
-	
-	// timer to clear the call end reason
-	NSTimer *callEndReasonTimer;
-	
-	// Optimizations for XMDatabaseField completions
-	unsigned uncompletedStringLength;
-	NSMutableArray *matchedAddresses;
-	NSMutableArray *completions;
-	
-	XMCallProtocol currentCallProtocol;
-	BOOL doesShowSelfView;
-	BOOL isCalling;
+  
+@private
+  // XMMainWindowModule Outlets and variables
+  IBOutlet NSView *contentView;
+  
+  NSSize contentViewSizeWithSelfViewHidden;
+  NSSize contentViewMinSizeWithSelfViewShown;
+  NSSize contentViewSizeWithSelfViewShown;
+  
+  // GUI Outlets
+  IBOutlet XMLocalVideoView *selfView;
+  IBOutlet NSButton *semaphoreButton;
+  IBOutlet NSProgressIndicator *busyIndicator;
+  IBOutlet NSTextField *statusField;
+  IBOutlet NSPopUpButton *locationsPopUpButton;
+  IBOutlet XMDatabaseField *callAddressField;
+  IBOutlet NSButton *callButton;
+  
+  // timer to clear the call end reason
+  NSTimer *callEndReasonTimer;
+  
+  // Optimizations for XMDatabaseField completions
+  unsigned uncompletedStringLength;
+  NSMutableArray *matchedAddresses;
+  NSMutableArray *completions;
+  
+  XMCallProtocol currentCallProtocol;
+  BOOL doesShowSelfView;
+  BOOL isCalling;
 }
 
 - (IBAction)call:(id)sender;

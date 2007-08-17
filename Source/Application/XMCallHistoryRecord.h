@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryRecord.h,v 1.6 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.h,v 1.7 2007/08/17 11:36:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_HISTORY_RECORD_H__
@@ -19,9 +19,9 @@
  **/
 typedef enum XMCallHistoryRecordType
 {
-	XMCallHistoryRecordType_GeneralRecord = 0, // this record has no match in the Address Book
-	XMCallHistoryRecordType_AddressBookRecord, // this record has a match in the Address Book
-	XMCallHistoryRecordTypeCount
+  XMCallHistoryRecordType_GeneralRecord = 0, // this record has no match in the Address Book
+  XMCallHistoryRecordType_AddressBookRecord, // this record has a match in the Address Book
+  XMCallHistoryRecordTypeCount
 } XMCallHistoryRecordType;
 
 @class XMAddressBookRecord;
@@ -40,9 +40,10 @@ typedef enum XMCallHistoryRecordType
  * store this information as well.
  **/
 @interface XMCallHistoryRecord : XMSimpleAddressResource {
-	
-	XMAddressBookRecord *addressBookRecord;
-	XMCallHistoryRecordType type;
+
+@private
+  XMAddressBookRecord *addressBookRecord;
+  XMCallHistoryRecordType type;
 
 }
 

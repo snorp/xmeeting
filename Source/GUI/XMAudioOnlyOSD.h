@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioOnlyOSD.h,v 1.3 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMAudioOnlyOSD.h,v 1.4 2007/08/17 11:36:43 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,8 +16,9 @@
 @class XMOSDVideoView;
 
 @interface XMAudioOnlyOSD : XMOnScreenControllerView {
-	
-	XMOSDVideoView *videoView;
+
+@private
+  XMOSDVideoView *videoView;
 }
 
 - (id)initWithFrame:(NSRect)frameRect videoView:(XMOSDVideoView *)videoView andSize:(XMOSDSize)size;

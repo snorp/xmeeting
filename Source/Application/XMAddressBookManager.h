@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.6 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.7 2007/08/17 11:36:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_MANAGER_H__
@@ -57,8 +57,9 @@ extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
  * are not searched
  **/
 @interface XMAddressBookManager : NSObject {
-	
-	ABAddressBook *addressBook;
+  
+@private
+  ABAddressBook *addressBook;
 }
 
 + (XMAddressBookManager *)sharedInstance;
@@ -77,7 +78,7 @@ extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
  * values may be nil, but at least one value should not be nil.
  **/
 - (ABPerson *)createPersonWithFirstName:(NSString *)firstName lastName:(NSString *)lastName
-					companyName:(NSString *)companyName isCompany:(BOOL)isCompany;
+                            companyName:(NSString *)companyName isCompany:(BOOL)isCompany;
 
 /**
  * Adds the person record created by -createPersonWithFirstName... 

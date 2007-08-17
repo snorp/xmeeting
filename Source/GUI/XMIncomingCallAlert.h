@@ -1,5 +1,5 @@
 /*
- * $Id: XMIncomingCallAlert.h,v 1.1 2006/06/21 22:16:48 hfriederich Exp $
+ * $Id: XMIncomingCallAlert.h,v 1.2 2007/08/17 11:36:44 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,10 +14,11 @@
 
 @interface XMIncomingCallAlert : NSObject {
 
-	IBOutlet NSPanel *panel;
-	IBOutlet NSTextField *infoField;
-	IBOutlet NSTextField *detailsField;
-	float detailsFieldHeight;
+@private
+  IBOutlet NSPanel *panel;
+  IBOutlet NSTextField *infoField;
+  IBOutlet NSTextField *detailsField;
+  float detailsFieldHeight;
 }
 
 /**

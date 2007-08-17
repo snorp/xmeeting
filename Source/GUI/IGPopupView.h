@@ -1,5 +1,5 @@
 /*
- * $Id: IGPopupView.h,v 1.2 2006/03/14 23:06:00 hfriederich Exp $
+ * $Id: IGPopupView.h,v 1.3 2007/08/17 11:36:43 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
@@ -12,19 +12,19 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface IGPopupView : NSPopUpButton
-{
-    NSBezierPath* oval, *triangle;
-    NSRect area;
-    NSString* title;
-    NSDictionary* titleAttributes, *titleAttributesOver;
-    NSTrackingRectTag trackingRect;
-    float fontSize;
-    
-    BOOL mouseOver;
-	BOOL showingTitleOfSelectedItem;
-    
-    IBOutlet NSMenu* theMenu;
+@interface IGPopupView : NSPopUpButton {
+@private
+  NSBezierPath* oval, *triangle;
+  NSRect area;
+  NSString* title;
+  NSDictionary* titleAttributes, *titleAttributesOver;
+  NSTrackingRectTag trackingRect;
+  float fontSize;
+  
+  BOOL mouseOver;
+  BOOL showingTitleOfSelectedItem;
+  
+  IBOutlet NSMenu* theMenu;
 }
 
 - (void)setTitle:(NSString*)t;

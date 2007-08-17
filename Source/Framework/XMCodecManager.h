@@ -1,5 +1,5 @@
 /*
- * $Id: XMCodecManager.h,v 1.7 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCodecManager.h,v 1.8 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,9 +22,10 @@
  * to manage their codec preference lists.
  **/
 @interface XMCodecManager : NSObject {
-	
-	NSMutableArray *audioCodecs;
-	NSMutableArray *videoCodecs;
+
+@private
+  NSMutableArray *audioCodecs;
+  NSMutableArray *videoCodecs;
 
 }
 

@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesCodecListRecord.h,v 1.3 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMPreferencesCodecListRecord.h,v 1.4 2007/08/17 11:36:42 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_CODEC_LIST_RECORD_H__
@@ -22,8 +22,9 @@
  **/
 @interface XMPreferencesCodecListRecord : NSObject <NSCopying, NSCoding>
 {
-	XMCodecIdentifier identifier;
-	BOOL isEnabled;
+@private
+  XMCodecIdentifier identifier;
+  BOOL isEnabled;
 }
 
 /**

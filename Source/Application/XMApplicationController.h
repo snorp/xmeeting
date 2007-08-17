@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationController.h,v 1.21 2006/09/17 10:22:32 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.22 2007/08/17 11:36:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_APPLICATION_CONTROLLER_H__
@@ -27,29 +27,30 @@
  * (windows, alert panels)
  **/
 @interface XMApplicationController : NSObject {
-	
-	XMNoCallModule *noCallModule;
-	XMInCallModule *inCallModule;
-	
-	XMInfoModule *infoModule;
-	XMStatisticsModule *statisticsModule;
-	XMCallHistoryModule *callHistoryModule;
-	
-	XMLocalAudioVideoModule *localAudioVideoModule;
-	XMDialPadModule *dialPadModule;
-	XMCallRecorderModule *callRecorderModule;
-	
-	XMAddressBookModule *addressBookModule;
-	//XMZeroConfModule *zeroConfModule;
-	//XMTextChatModule *textChatModule;
-	
-	BOOL isFullScreen;
-	
-	NSObject *activeAlert;
-	NSSound *incomingCallSound;
-	XMIncomingCallAlertType alertType;
-	
-	NSString *calledAddress;
+  
+@private
+  XMNoCallModule *noCallModule;
+  XMInCallModule *inCallModule;
+  
+  XMInfoModule *infoModule;
+  XMStatisticsModule *statisticsModule;
+  XMCallHistoryModule *callHistoryModule;
+  
+  XMLocalAudioVideoModule *localAudioVideoModule;
+  XMDialPadModule *dialPadModule;
+  XMCallRecorderModule *callRecorderModule;
+  
+  XMAddressBookModule *addressBookModule;
+  //XMZeroConfModule *zeroConfModule;
+  //XMTextChatModule *textChatModule;
+  
+  BOOL isFullScreen;
+  
+  NSObject *activeAlert;
+  NSSound *incomingCallSound;
+  XMIncomingCallAlertType alertType;
+  
+  NSString *calledAddress;
 }
 
 /**

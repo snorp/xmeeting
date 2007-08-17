@@ -1,7 +1,7 @@
 /*
- * $Id: XMInspectorController.h,v 1.4 2006/03/23 10:04:48 hfriederich Exp $
+ * $Id: XMInspectorController.h,v 1.5 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2006 Ivan Guajana. All rights reserved.
  */
@@ -10,10 +10,10 @@
 
 typedef enum XMInspectorControllerTag
 {
-	XMInspectorControllerTag_Inspector,
-	XMInspectorControllerTag_Tools,
-	XMInspectorControllerTag_Contacts
-	
+  XMInspectorControllerTag_Inspector,
+  XMInspectorControllerTag_Tools,
+  XMInspectorControllerTag_Contacts
+  
 } XMInspectorControllerTag;
 
 @class XMInspectorModule;
@@ -24,16 +24,17 @@ typedef enum XMInspectorControllerTag
  **/
 @interface XMInspectorController : NSObject {
 	
-	NSArray *modules;
-	NSString *name;
-	
-	//Outlets
-	IBOutlet NSBox *contentBox;
-	IBOutlet NSSegmentedControl *pageController;
-	IBOutlet NSPanel *panel;
-			
-	XMInspectorModule *activeModule;
-	BOOL isFullScreen;
+@private
+  NSArray *modules;
+  NSString *name;
+  
+  //Outlets
+  IBOutlet NSBox *contentBox;
+  IBOutlet NSSegmentedControl *pageController;
+  IBOutlet NSPanel *panel;
+  
+  XMInspectorModule *activeModule;
+  BOOL isFullScreen;
 
 }
 

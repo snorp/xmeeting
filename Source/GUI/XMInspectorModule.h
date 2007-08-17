@@ -1,9 +1,9 @@
 /*
- * $Id: XMInspectorModule.h,v 1.3 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMInspectorModule.h,v 1.4 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich, Ivan Guajana. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich, Ivan Guajana. All rights reserved.
  */
 
 #ifndef __XM_INSPECTOR_MODULE_H__
@@ -19,9 +19,9 @@
  **/
 @interface XMInspectorModule : NSObject {
 	
-	@private
-	XMInspectorControllerTag tag;
-	BOOL isEnabled;
+@private
+  XMInspectorControllerTag tag;
+  BOOL isEnabled;
 	
 }
 

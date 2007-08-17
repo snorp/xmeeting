@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallRecorder.h,v 1.4 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMCallRecorder.h,v 1.5 2007/08/17 11:36:41 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_RECORDER_H__
@@ -16,45 +16,46 @@
 
 @interface XMCallRecorder : NSObject {
 
-	BOOL isRecording;
-	int recordingMode;
-	
-	Movie movie;
-	short movieResRefNum;
-	Track videoTrack;
-	Media videoMedia;
-	Track audioTrack;
-	Media audioMedia;
-	struct timeval startTime;
-	
-	NSLock *audioLock;
-	BOOL isAudioRecording;
-	XMCodecIdentifier audioCodecIdentifier;
-	unsigned audioTrackOffset;
-	unsigned audioMediaOffset;
-	void *audioBuffer1;
-	void *audioBuffer2;
-	unsigned numLocalAudioFrames;
-	unsigned numRemoteAudioFrames;
-	SoundDescriptionHandle soundDesc;
-	
-	NSLock *videoLock;
-	NSTimer *recordTimer;
-	unsigned videoTrackOffset;
-	TimeValue64 previousTimestamp;
-	BOOL recordLocalVideo;
-	BOOL recordRemoteVideo;
-	int lockingMode;
-	BOOL quitRecording;
-	BOOL frameOccupied;
-	BOOL frameUpdated;
-	
-	CVPixelBufferRef recompressionBuffer;
-	ICMCompressionSessionRef compressionSession;
-	ComponentInstance compressor;
-	
-	OSStatus errorCode;
-	unsigned locationCode;
+@private
+  BOOL isRecording;
+  int recordingMode;
+  
+  Movie movie;
+  short movieResRefNum;
+  Track videoTrack;
+  Media videoMedia;
+  Track audioTrack;
+  Media audioMedia;
+  struct timeval startTime;
+  
+  NSLock *audioLock;
+  BOOL isAudioRecording;
+  XMCodecIdentifier audioCodecIdentifier;
+  unsigned audioTrackOffset;
+  unsigned audioMediaOffset;
+  void *audioBuffer1;
+  void *audioBuffer2;
+  unsigned numLocalAudioFrames;
+  unsigned numRemoteAudioFrames;
+  SoundDescriptionHandle soundDesc;
+  
+  NSLock *videoLock;
+  NSTimer *recordTimer;
+  unsigned videoTrackOffset;
+  TimeValue64 previousTimestamp;
+  BOOL recordLocalVideo;
+  BOOL recordRemoteVideo;
+  int lockingMode;
+  BOOL quitRecording;
+  BOOL frameOccupied;
+  BOOL frameUpdated;
+  
+  CVPixelBufferRef recompressionBuffer;
+  ICMCompressionSessionRef compressionSession;
+  ComponentInstance compressor;
+  
+  OSStatus errorCode;
+  unsigned locationCode;
 }
 
 + (XMCallRecorder *)sharedInstance;

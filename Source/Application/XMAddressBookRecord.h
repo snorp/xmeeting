@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookRecord.h,v 1.2 2006/05/24 10:11:49 hfriederich Exp $
+ * $Id: XMAddressBookRecord.h,v 1.3 2007/08/17 11:36:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_RECORD_H__
@@ -15,23 +15,23 @@
 
 typedef enum XMAddressBookRecordPropertyMatch
 {
-	XMAddressBookRecordPropertyMatch_NoMatch = 0,
-	XMAddressBookRecordPropertyMatch_FirstNameMatch,
-	XMAddressBookRecordPropertyMatch_LastNameMatch,
-	XMAddressBookRecordPropertyMatch_CompanyMatch,
-	XMAddressBookRecordPropertyMatch_CallAddressMatch,
-	XMAddressBookRecordPropertyMatch_PhoneNumberMatch,
-	XMAddressBookRecordPropertyMatchCount
+  XMAddressBookRecordPropertyMatch_NoMatch = 0,
+  XMAddressBookRecordPropertyMatch_FirstNameMatch,
+  XMAddressBookRecordPropertyMatch_LastNameMatch,
+  XMAddressBookRecordPropertyMatch_CompanyMatch,
+  XMAddressBookRecordPropertyMatch_CallAddressMatch,
+  XMAddressBookRecordPropertyMatch_PhoneNumberMatch,
+  XMAddressBookRecordPropertyMatchCount
 } XMAddressBookRecordPropertyMatch;
 
 @class ABPerson, XMAddressResource;
 
 @interface XMAddressBookRecord : NSObject <XMCallAddress> {
 
-	ABPerson *addressBookPerson;
-	unsigned index;
-	XMAddressBookRecordPropertyMatch propertyMatch;
-	
+@private
+  ABPerson *addressBookPerson;
+  unsigned index;
+  XMAddressBookRecordPropertyMatch propertyMatch;	
 }
 
 - (NSString *)firstName;

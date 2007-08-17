@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallInfo.h,v 1.11 2006/06/21 20:33:28 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.12 2007/08/17 11:36:41 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_INFO_H__
@@ -24,30 +24,30 @@
 @interface XMCallInfo : NSObject {
 	
 @private
-	unsigned callID;	//identifier for the call token in OPAL
-	
-	XMCallProtocol protocol;
-	NSString *remoteName;
-	NSString *remoteNumber;
-	NSString *remoteAddress;
-	NSString *remoteApplication;
-	NSString *callAddress;
-	NSString *localAddress;
-	NSString *localAddressInterface;
-	
-	XMCallStatus callStatus;
-	XMCallEndReason callEndReason;
-	
-	NSDate *callInitiationDate;
-	NSDate *callStartDate;
-	NSDate *callEndDate;
-	
-	NSString *incomingAudioCodec;
-	NSString *outgoingAudioCodec;
-	NSString *incomingVideoCodec;
-	NSString *outgoingVideoCodec;
-	
-	XMCallStatisticsRecord callStatistics;
+  unsigned callID;	//identifier for the call token in OPAL
+  
+  XMCallProtocol protocol;
+  NSString *remoteName;
+  NSString *remoteNumber;
+  NSString *remoteAddress;
+  NSString *remoteApplication;
+  NSString *callAddress;
+  NSString *localAddress;
+  NSString *localAddressInterface;
+  
+  XMCallStatus callStatus;
+  XMCallEndReason callEndReason;
+  
+  NSDate *callInitiationDate;
+  NSDate *callStartDate;
+  NSDate *callEndDate;
+  
+  NSString *incomingAudioCodec;
+  NSString *outgoingAudioCodec;
+  NSString *incomingVideoCodec;
+  NSString *outgoingVideoCodec;
+  
+  XMCallStatisticsRecord callStatistics;
 }
 
 /**

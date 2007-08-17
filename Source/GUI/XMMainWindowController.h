@@ -1,9 +1,9 @@
 /*
- * $Id: XMMainWindowController.h,v 1.12 2006/09/21 20:14:23 hfriederich Exp $
+ * $Id: XMMainWindowController.h,v 1.13 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_MAIN_WINDOW_CONTROLLER_H__
@@ -24,11 +24,12 @@ extern NSString *XMNotification_DidEndFullScreenMode;
  **/
 @interface XMMainWindowController : NSWindowController {
 	
-	NSArray *modules;
-	unsigned activeModuleIndex;
-	
-	XMFullScreenWindow *fullScreenWindow;
-	BOOL isFullScreen;
+@private
+  NSArray *modules;
+  unsigned activeModuleIndex;
+  
+  XMFullScreenWindow *fullScreenWindow;
+  BOOL isFullScreen;
 }
 
 /**

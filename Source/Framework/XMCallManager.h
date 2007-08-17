@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.26 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.27 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,33 +25,34 @@
  **/
 @interface XMCallManager : NSObject {
 	
-	unsigned callManagerStatus;
-	
-	unsigned h323ListeningStatus;
-	unsigned sipListeningStatus;
-	
-	XMPreferences *activePreferences;
-	BOOL automaticallyAcceptIncomingCalls;
-	
-	XMCallInfo *activeCall;
-	BOOL needsSubsystemSetupAfterCallEnd;
-	XMCallStartFailReason callStartFailReason;
-	
-	BOOL canSendCameraEvents;
-	
-	// h.323 variables
-	NSString *gatekeeperName;
-	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
-	
-	// SIP variables
-	NSMutableArray *registrations;
-	NSMutableArray *sipRegistrationFailReasons;
-	
-	// InCall variables
-	NSTimeInterval callStatisticsUpdateInterval;
-	
-	// call history
-	NSMutableArray *recentCalls;
+@private
+  unsigned callManagerStatus;
+  
+  unsigned h323ListeningStatus;
+  unsigned sipListeningStatus;
+  
+  XMPreferences *activePreferences;
+  BOOL automaticallyAcceptIncomingCalls;
+  
+  XMCallInfo *activeCall;
+  BOOL needsSubsystemSetupAfterCallEnd;
+  XMCallStartFailReason callStartFailReason;
+  
+  BOOL canSendCameraEvents;
+  
+  // h.323 variables
+  NSString *gatekeeperName;
+  XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
+  
+  // SIP variables
+  NSMutableArray *registrations;
+  NSMutableArray *sipRegistrationFailReasons;
+  
+  // InCall variables
+  NSTimeInterval callStatisticsUpdateInterval;
+  
+  // call history
+  NSMutableArray *recentCalls;
 }
 
 /**

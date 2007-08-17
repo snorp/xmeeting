@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.19 2007/08/17 09:17:08 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.20 2007/08/17 11:36:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,49 +32,50 @@
  **/
 @interface XMPreferences : NSObject <NSCopying, NSCoding> 
 {	
-	/* General settings */
-	NSString	*userName;						// The user name to be used
-	BOOL		 automaticallyAcceptIncomingCalls;
-	
-	/* Network settings */
-	unsigned	 bandwidthLimit;				// The bandwidth limit in bit/s (0 for no limit)
-	NSString	*externalAddress; 				// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
-	unsigned	 tcpPortBase;					// The lower limit of the tcp port range
-	unsigned	 tcpPortMax;					// The upper limit of the tcp port range
-	unsigned	 udpPortBase;					// The lower limit of the udp port range
-	unsigned	 udpPortMax;					// The upper limit of the udp port range
-	NSArray     *stunServers;                   // A list of STUN servers to be used
-
-	/* audio settings */
-	NSMutableArray *audioCodecList;				// An array containing XMCodecListRecord instances.
-	BOOL         enableSilenceSuppression;      // Flag to indicate whether silence suppression is enabled or not
-	BOOL         enableEchoCancellation;        // Flag to indicate whether echo cancellation is enabled or not
-	unsigned	 audioPacketTime;				// time (in ms) of audio per packet
-
-	/* video settings */
-	BOOL		 enableVideo;					// Enables/disables video
-	unsigned	 videoFramesPerSecond;			// Framerate for sent video
-	NSMutableArray *videoCodecList;				// An array containing XMCodecListRecord instances
-	BOOL		 enableH264LimitedMode;			// Enables/disables the H.264 limited mode
-
-	/* H.323-specific settings */
-	BOOL		 enableH323;				// Flag to indicate whether H.323 is active or not
-	BOOL		 enableH245Tunnel;			// Enable H.245 Tunneling
-	BOOL		 enableFastStart;			// Enable H.323 Fast-Start
-	NSString	*gatekeeperAddress;			// A string with the address of the gatekeeper to use (domain or ip)
-	NSString	*gatekeeperUsername;		// A string containing the username for gatekeeper registration
-	NSString	*gatekeeperPhoneNumber;		// A string containing the E164 number for gatekeeper registration
-	NSString	*gatekeeperPassword;		// A string containing the password for the gatekeeper registration
-	
-	/* SIP-specific settings */
-	BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
-	NSArray		*sipRegistrationRecords;	// An array containing XMPreferencesRegistrationRecord instances. Index zero is default
-	NSString	*sipProxyHost;				// A string containing the host address of the SIP proxy to use
-	NSString	*sipProxyUsername;			// A string containing the username for the SIP proxy to use
-	NSString	*sipProxyPassword;			// A string containing the password for the SIP proxy to use
-    
-    /* Misc settings */
-    NSString    *internationalDialingPrefix;
+@private
+  /* General settings */
+  NSString	*userName;						// The user name to be used
+  BOOL		 automaticallyAcceptIncomingCalls;
+  
+  /* Network settings */
+  unsigned	 bandwidthLimit;				// The bandwidth limit in bit/s (0 for no limit)
+  NSString	*externalAddress; 				// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
+  unsigned	 tcpPortBase;					// The lower limit of the tcp port range
+  unsigned	 tcpPortMax;					// The upper limit of the tcp port range
+  unsigned	 udpPortBase;					// The lower limit of the udp port range
+  unsigned	 udpPortMax;					// The upper limit of the udp port range
+  NSArray     *stunServers;                 // A list of STUN servers to be used
+  
+  /* audio settings */
+  NSMutableArray *audioCodecList;			// An array containing XMCodecListRecord instances.
+  BOOL         enableSilenceSuppression;    // Flag to indicate whether silence suppression is enabled or not
+  BOOL         enableEchoCancellation;      // Flag to indicate whether echo cancellation is enabled or not
+  unsigned	 audioPacketTime;				// time (in ms) of audio per packet
+  
+  /* video settings */
+  BOOL		 enableVideo;					// Enables/disables video
+  unsigned	 videoFramesPerSecond;			// Framerate for sent video
+  NSMutableArray *videoCodecList;			// An array containing XMCodecListRecord instances
+  BOOL		 enableH264LimitedMode;			// Enables/disables the H.264 limited mode
+  
+  /* H.323-specific settings */
+  BOOL		 enableH323;				// Flag to indicate whether H.323 is active or not
+  BOOL		 enableH245Tunnel;			// Enable H.245 Tunneling
+  BOOL		 enableFastStart;			// Enable H.323 Fast-Start
+  NSString	*gatekeeperAddress;			// A string with the address of the gatekeeper to use (domain or ip)
+  NSString	*gatekeeperUsername;		// A string containing the username for gatekeeper registration
+  NSString	*gatekeeperPhoneNumber;		// A string containing the E164 number for gatekeeper registration
+  NSString	*gatekeeperPassword;		// A string containing the password for the gatekeeper registration
+  
+  /* SIP-specific settings */
+  BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
+  NSArray		*sipRegistrationRecords;	// An array containing XMPreferencesRegistrationRecord instances. Index zero is default
+  NSString	*sipProxyHost;				// A string containing the host address of the SIP proxy to use
+  NSString	*sipProxyUsername;			// A string containing the username for the SIP proxy to use
+  NSString	*sipProxyPassword;			// A string containing the password for the SIP proxy to use
+  
+  /* Misc settings */
+  NSString    *internationalDialingPrefix;
 }
 
 #pragma mark Init & Representation Methods

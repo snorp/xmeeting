@@ -1,5 +1,5 @@
 /*
- * $Id: XMInCallOSD.m,v 1.7 2006/06/22 11:11:09 hfriederich Exp $
+ * $Id: XMInCallOSD.m,v 1.8 2007/08/17 11:36:44 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -172,11 +172,11 @@
 	}
 	
 	NSNumber *number = [[NSNumber alloc] initWithInt:theState];
-	[[buttons objectAtIndex:2] setObject:number forKey:@"CurrentStateIndex"];
+	[[[self buttons] objectAtIndex:2] setObject:number forKey:@"CurrentStateIndex"];
 	[number release];
 	
 	number = [[NSNumber alloc] initWithInt:theMode];
-	[[buttons objectAtIndex:3] setObject:number forKey:@"CurrentStateIndex"];
+	[[[self buttons] objectAtIndex:3] setObject:number forKey:@"CurrentStateIndex"];
 	[number release];
 }
 
@@ -194,7 +194,7 @@
 	}
 	
 	NSNumber *number = [[NSNumber alloc] initWithInt:theState];
-	[[buttons objectAtIndex:8] setObject:number forKey:@"CurrentStateIndex"];
+	[[[self buttons] objectAtIndex:8] setObject:number forKey:@"CurrentStateIndex"];
 	[number release];
 	
 	[self setNeedsDisplay:YES];
@@ -205,13 +205,13 @@
 	if (isFullscreen)
 	{
 		NSNumber *number = [[NSNumber alloc] initWithInt:1];
-		[[buttons objectAtIndex:0] setObject:number forKey:@"CurrentStateIndex"];
+		[[[self buttons] objectAtIndex:0] setObject:number forKey:@"CurrentStateIndex"];
 		[number release];
 	}
 	else
 	{
 		NSNumber *number = [[NSNumber alloc] initWithInt:0];
-		[[buttons objectAtIndex:0] setObject:number forKey:@"CurrentStateIndex"];
+		[[[self buttons] objectAtIndex:0] setObject:number forKey:@"CurrentStateIndex"];
 		[number release];
 	}
 }

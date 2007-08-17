@@ -1,9 +1,9 @@
 /*
- * $Id: XMVideoManager.h,v 1.19 2007/03/15 22:15:57 hfriederich Exp $
+ * $Id: XMVideoManager.h,v 1.20 2007/08/17 11:36:42 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_VIDEO_MANAGER_H__
@@ -36,28 +36,29 @@
  **/
 @interface XMVideoManager : NSObject {
 	
-	NSMutableArray *videoViews;
-	
-	NSArray *inputDevices;
-	NSString *selectedInputDevice;
-	id<XMVideoModule> selectedVideoModule;
-	
-	BOOL isDoingVideoDisplay;
-	XMVideoSize localVideoSize;
-	XMVideoSize remoteVideoSize;
-	NSSize remoteVideoDimensions;
-	
-	NSLock *videoLock;
-	NSOpenGLPixelFormat *openGLPixelFormat;
-	NSOpenGLContext *openGLContext;
-	CVOpenGLTextureCacheRef textureCache;
-	CVOpenGLTextureRef localVideoTexture;
-	BOOL localVideoTextureDidChange;
-	CVOpenGLTextureRef remoteVideoTexture;
-	BOOL remoteVideoTextureDidChange;
-	CVDisplayLinkRef displayLink;
-	
-	NSString *errorDescription;
+@private
+  NSMutableArray *videoViews;
+  
+  NSArray *inputDevices;
+  NSString *selectedInputDevice;
+  id<XMVideoModule> selectedVideoModule;
+  
+  BOOL isDoingVideoDisplay;
+  XMVideoSize localVideoSize;
+  XMVideoSize remoteVideoSize;
+  NSSize remoteVideoDimensions;
+  
+  NSLock *videoLock;
+  NSOpenGLPixelFormat *openGLPixelFormat;
+  NSOpenGLContext *openGLContext;
+  CVOpenGLTextureCacheRef textureCache;
+  CVOpenGLTextureRef localVideoTexture;
+  BOOL localVideoTextureDidChange;
+  CVOpenGLTextureRef remoteVideoTexture;
+  BOOL remoteVideoTextureDidChange;
+  CVDisplayLinkRef displayLink;
+  
+  NSString *errorDescription;
 }
 
 /**

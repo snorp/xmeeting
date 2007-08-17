@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.18 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.19 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,17 +58,17 @@ extern NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol;
 
 typedef enum XMInCallControlHideAndShowEffect
 {
-	XMInCallControlHideAndShowEffect_NoEffect = 0,
-	XMInCallControlHideAndShowEffect_Fade,
-	XMInCallControlHideAndShowEffect_Roll
+  XMInCallControlHideAndShowEffect_NoEffect = 0,
+  XMInCallControlHideAndShowEffect_Fade,
+  XMInCallControlHideAndShowEffect_Roll
 } XMInCallControlHideAndShowEffect;
 
 typedef enum XMIncomingCallAlertType
 {
-	XMIncomingCallAlertType_NoAlert = 0,
-	XMIncomingCallAlertType_Ringing,
-	XMIncomingCallAlertType_RingOnce,
-	XMIncomingCallAlertType_Beep
+  XMIncomingCallAlertType_NoAlert = 0,
+  XMIncomingCallAlertType_Ringing,
+  XMIncomingCallAlertType_RingOnce,
+  XMIncomingCallAlertType_Beep
 } XMIncomingCallAlertType;
 
 /**
@@ -91,12 +91,13 @@ typedef enum XMIncomingCallAlertType
  **/
 @interface XMPreferencesManager : NSObject {
 
-	NSMutableArray *h323Accounts;
-	NSMutableArray *sipAccounts;
-	NSMutableArray *locations;
-    NSMutableArray *passwordObjects;
-	unsigned activeLocation;
-	BOOL automaticallyAcceptIncomingCalls;
+@private
+  NSMutableArray *h323Accounts;
+  NSMutableArray *sipAccounts;
+  NSMutableArray *locations;
+  NSMutableArray *passwordObjects;
+  unsigned activeLocation;
+  BOOL automaticallyAcceptIncomingCalls;
 	
 }
 

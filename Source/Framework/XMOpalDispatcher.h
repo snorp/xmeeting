@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.18 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.19 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,15 +19,16 @@
  **/
 @interface XMOpalDispatcher : NSObject {
 
-	NSPort *receivePort;
-	
-	unsigned callID;
-	
-	NSTimer *gatekeeperRegistrationCheckTimer;
-	
-	NSTimer *callStatisticsUpdateIntervalTimer;
-	
-	NSLock *sipRegistrationWaitLock;
+@private
+  NSPort *receivePort;
+  
+  unsigned callID;
+  
+  NSTimer *gatekeeperRegistrationCheckTimer;
+  
+  NSTimer *callStatisticsUpdateIntervalTimer;
+  
+  NSLock *sipRegistrationWaitLock;
 	
 }
 

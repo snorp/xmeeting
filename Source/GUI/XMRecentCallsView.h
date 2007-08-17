@@ -1,9 +1,9 @@
 /*
- * $Id: XMRecentCallsView.h,v 1.3 2006/03/16 14:13:57 hfriederich Exp $
+ * $Id: XMRecentCallsView.h,v 1.4 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_RECENT_CALLS_VIEW_H__
@@ -17,9 +17,9 @@
  **/
 @interface XMRecentCallsView : NSView {
 	
-	IBOutlet NSScrollView *scrollView;
-	
-	BOOL layoutDone;
+@private
+  IBOutlet NSScrollView *scrollView;
+  BOOL layoutDone;
 }
 
 - (void)noteSubviewHeightDidChange:(NSView *)subview;

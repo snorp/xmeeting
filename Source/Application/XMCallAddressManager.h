@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallAddressManager.h,v 1.10 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMCallAddressManager.h,v 1.11 2007/08/17 11:36:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_ADDRESS_MANAGER_H__
@@ -31,9 +31,10 @@ typedef enum XMProviderPriority {
  * look and behaviour.
  **/
 @interface XMCallAddressManager : NSObject {
-	
-	NSMutableArray *callAddressProviders;
-	id<XMCallAddress> activeCallAddress;
+
+@private
+  NSMutableArray *callAddressProviders;
+  id<XMCallAddress> activeCallAddress;
 }
 
 /**

@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallInfoView.h,v 1.5 2006/06/21 22:54:10 hfriederich Exp $
+ * $Id: XMCallInfoView.h,v 1.6 2007/08/17 11:36:43 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_INFO_VIEW_H__
@@ -18,31 +18,32 @@
  * made in a user-friendly manner.
  **/
 @interface XMCallInfoView : NSControl {
-	
-	XMCallInfo *callInfo;
-	NSTextFieldCell *textDrawCell;
-	NSRect disclosureRect;
-	unsigned disclosureState;
-	
-	NSAnimation *resizeAnimation;
-	float animationStartHeight;
-	float animationTargetHeight;
-	
-	NSString *endDateString;
-	NSString *callStartString;
-	NSString *callEndString;
-	NSString *callDurationString;
-	NSString *callDirectionString;
-	NSString *callProtocolString;
-	NSString *endReasonString;
-	NSString *localAddressString;
-	NSString *remoteNumberString;
-	NSString *remoteAddressString;
-	NSString *remoteApplicationString;
-	NSString *audioOutString;
-	NSString *audioInString;
-	NSString *videoOutString;
-	NSString *videoInString;
+
+@private
+  XMCallInfo *callInfo;
+  NSTextFieldCell *textDrawCell;
+  NSRect disclosureRect;
+  unsigned disclosureState;
+  
+  NSAnimation *resizeAnimation;
+  float animationStartHeight;
+  float animationTargetHeight;
+  
+  NSString *endDateString;
+  NSString *callStartString;
+  NSString *callEndString;
+  NSString *callDurationString;
+  NSString *callDirectionString;
+  NSString *callProtocolString;
+  NSString *endReasonString;
+  NSString *localAddressString;
+  NSString *remoteNumberString;
+  NSString *remoteAddressString;
+  NSString *remoteApplicationString;
+  NSString *audioOutString;
+  NSString *audioInString;
+  NSString *videoOutString;
+  NSString *videoInString;
 }
 
 - (XMCallInfo *)callInfo;

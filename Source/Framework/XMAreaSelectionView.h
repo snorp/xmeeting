@@ -1,5 +1,5 @@
 /*
- * $Id: XMAreaSelectionView.h,v 1.1 2007/05/08 10:49:54 hfriederich Exp $
+ * $Id: XMAreaSelectionView.h,v 1.2 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,14 +12,15 @@
 #import <Cocoa/Cocoa.h>
 
 @interface XMAreaSelectionView : NSView {
-    int x;
-    int y;
-    int width;
-    int height;
-    
-    int status;
-    NSRect startRect;
-    NSPoint startMousePoint;
+@private
+  int x;
+  int y;
+  int width;
+  int height;
+  
+  int status;
+  NSRect startRect;
+  NSPoint startMousePoint;
 }
 
 /**

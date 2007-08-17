@@ -1,9 +1,9 @@
 /*
- * $Id: XMGeneralPurposeAddressResource.h,v 1.3 2006/03/25 10:41:56 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.h,v 1.4 2007/08/17 11:36:41 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_GENERAL_PURPOSE_ADDRESS_RESOURCE_H__
@@ -24,7 +24,8 @@
  **/
 @interface XMGeneralPurposeAddressResource : XMAddressResource {
 	
-	NSMutableDictionary *dictionary;
+@private
+  NSMutableDictionary *dictionary;
 
 }
 

@@ -1,9 +1,9 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.24 2007/03/15 22:15:57 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.25 2007/08/17 11:36:41 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_MEDIA_TRANSMITTER_H__
@@ -17,61 +17,62 @@
 #import "XMTypes.h"
 
 @interface XMMediaTransmitter : NSObject <XMVideoInputManager> {
-
-	NSPort *receivePort;
-	
-	NSArray *videoInputModules;
-	id<XMVideoInputModule> activeModule;
-	NSString *selectedDevice;
-	
-	BOOL isGrabbing;
-    NSTimer *frameGrabTimer;
-	unsigned previewFrameGrabRate;
-	unsigned frameGrabRate;
-    
-    BOOL isDoingVideoDisplay;
-	
-	BOOL isTransmitting;
-	unsigned transmitFrameCounter;
-	unsigned transmitFrameGrabRate;
-	XMVideoSize videoSize;
-	CodecType codecType;
-	OSType codecManufacturer;
-	unsigned codecSpecificCallFlags;
-	unsigned bitrateToUse;
-	unsigned keyframeInterval;
-	
-	BOOL isRecording;
-	CodecType recordingCodec;
-	XMVideoSize recordingSize;
-	XMCodecQuality recordingQuality;
-	unsigned recordingBitrate;
-	
-	BOOL needsPictureUpdate;
-
-	BOOL useCompressionSessionAPI;
-	ComponentInstance compressor;
-	
-	TimeValue previousTimeStamp;
-	struct timeval firstTime;
-	
-	ICMCompressionSessionRef compressionSession;
-	ICMCompressionFrameOptionsRef compressionFrameOptions;
-	TimeValue compressionSessionPreviousTimeStamp;
-	
-	BOOL compressSequenceIsActive;
-	ImageSequence compressSequence;
-	ImageDescriptionHandle compressSequenceImageDescription;
-	Ptr compressSequenceCompressedFrame;
-	TimeValue compressSequencePreviousTimeStamp;
-	UInt32 compressSequenceFrameNumber;
-	UInt32 compressSequenceFrameCounter;
-	UInt32 compressSequenceLastVideoBytesSent;
-	UInt32 compressSequenceNonKeyFrameCounter;
-	struct timeval dataRateUpdateTime;
-	
-	RTPMediaPacketizer mediaPacketizer;
-	RTPMPSampleDataParams sampleData;
+  
+@private
+  NSPort *receivePort;
+  
+  NSArray *videoInputModules;
+  id<XMVideoInputModule> activeModule;
+  NSString *selectedDevice;
+  
+  BOOL isGrabbing;
+  NSTimer *frameGrabTimer;
+  unsigned previewFrameGrabRate;
+  unsigned frameGrabRate;
+  
+  BOOL isDoingVideoDisplay;
+  
+  BOOL isTransmitting;
+  unsigned transmitFrameCounter;
+  unsigned transmitFrameGrabRate;
+  XMVideoSize videoSize;
+  CodecType codecType;
+  OSType codecManufacturer;
+  unsigned codecSpecificCallFlags;
+  unsigned bitrateToUse;
+  unsigned keyframeInterval;
+  
+  BOOL isRecording;
+  CodecType recordingCodec;
+  XMVideoSize recordingSize;
+  XMCodecQuality recordingQuality;
+  unsigned recordingBitrate;
+  
+  BOOL needsPictureUpdate;
+  
+  BOOL useCompressionSessionAPI;
+  ComponentInstance compressor;
+  
+  TimeValue previousTimeStamp;
+  struct timeval firstTime;
+  
+  ICMCompressionSessionRef compressionSession;
+  ICMCompressionFrameOptionsRef compressionFrameOptions;
+  TimeValue compressionSessionPreviousTimeStamp;
+  
+  BOOL compressSequenceIsActive;
+  ImageSequence compressSequence;
+  ImageDescriptionHandle compressSequenceImageDescription;
+  Ptr compressSequenceCompressedFrame;
+  TimeValue compressSequencePreviousTimeStamp;
+  UInt32 compressSequenceFrameNumber;
+  UInt32 compressSequenceFrameCounter;
+  UInt32 compressSequenceLastVideoBytesSent;
+  UInt32 compressSequenceNonKeyFrameCounter;
+  struct timeval dataRateUpdateTime;
+  
+  RTPMediaPacketizer mediaPacketizer;
+  RTPMPSampleDataParams sampleData;
 }
 
 + (void)_getDeviceList;

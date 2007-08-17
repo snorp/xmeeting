@@ -1,9 +1,9 @@
 /*
- * $Id: XMDatabaseField.h,v 1.8 2006/03/27 15:31:21 hfriederich Exp $
+ * $Id: XMDatabaseField.h,v 1.9 2007/08/17 11:36:43 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_DATABASE_FIELD_H__
@@ -26,26 +26,27 @@
  * control.
  **/
 @interface XMDatabaseField : NSTextField {
-	
-	IBOutlet id<XMDatabaseFieldDataSource> dataSource;
-	
-	NSWindow *pulldownWindow;
-	NSScrollView *pulldownScrollView;
-	NSTableView *pulldownTableView;
-	NSArray *tableData;
-	BOOL windowIsShown;
-	BOOL isOverDisclosure;
-	unsigned pulldownMode;
-	
-	BOOL shouldFetchCompletions;
-	
-	NSString *uncompletedString;
-	
-	id representedObject;
-	
-	NSImage *defaultImage;
-	
-	NSTrackingRectTag disclosureTrackingRect;
+
+@private
+  IBOutlet id<XMDatabaseFieldDataSource> dataSource;
+  
+  NSWindow *pulldownWindow;
+  NSScrollView *pulldownScrollView;
+  NSTableView *pulldownTableView;
+  NSArray *tableData;
+  BOOL windowIsShown;
+  BOOL isOverDisclosure;
+  unsigned pulldownMode;
+  
+  BOOL shouldFetchCompletions;
+  
+  NSString *uncompletedString;
+  
+  id representedObject;
+  
+  NSImage *defaultImage;
+  
+  NSTrackingRectTag disclosureTrackingRect;
 }
 
 /**

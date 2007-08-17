@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookCallAddressProvider.h,v 1.4 2006/03/14 22:44:38 hfriederich Exp $
+ * $Id: XMAddressBookCallAddressProvider.h,v 1.5 2007/08/17 11:36:40 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_CALL_ADDRESS_PROVIDER_H__
@@ -20,8 +20,8 @@
  **/
 @interface XMAddressBookCallAddressProvider : NSObject <XMCallAddressProvider> {
 
-	BOOL isActiveCallAddressProvider;
-	
+@private
+  BOOL isActiveCallAddressProvider;
 }
 
 + (XMAddressBookCallAddressProvider *)sharedInstance;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocalVideoView.h,v 1.4 2007/03/15 22:15:58 hfriederich Exp $
+ * $Id: XMLocalVideoView.h,v 1.5 2007/08/17 11:36:44 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,29 +20,30 @@
  **/
 @interface XMLocalVideoView : NSView <XMVideoView> {
 
-	unsigned displayStatus;
-	
-	NSOpenGLContext *openGLContext;
-	NSSize displaySize;
-	
-	// used in case we can't directly use OpenGL
-	// (miniaturized window)
-	NSCIImageRep *videoImageRep;
-	BOOL isMiniaturized;
-	
-	// indicates that something video-related is in progress
-	NSWindow *busyWindow;
-	NSProgressIndicator *busyIndicator;
-	
-	// displayed when -startDisplayingNoVideo is called
-	NSImage *noVideoImage;
-	
-	// mirror local video
-	BOOL doMirror;
-	BOOL isLocalVideoMirrored;
-    
-    // Only used when the video displayed is empty
-    BOOL drawsBorder;
+@private
+  unsigned displayStatus;
+  
+  NSOpenGLContext *openGLContext;
+  NSSize displaySize;
+  
+  // used in case we can't directly use OpenGL
+  // (miniaturized window)
+  NSCIImageRep *videoImageRep;
+  BOOL isMiniaturized;
+  
+  // indicates that something video-related is in progress
+  NSWindow *busyWindow;
+  NSProgressIndicator *busyIndicator;
+  
+  // displayed when -startDisplayingNoVideo is called
+  NSImage *noVideoImage;
+  
+  // mirror local video
+  BOOL doMirror;
+  BOOL isLocalVideoMirrored;
+  
+  // Only used when the video displayed is empty
+  BOOL drawsBorder;
 }
 
 /**

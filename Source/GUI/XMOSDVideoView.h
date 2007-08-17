@@ -1,5 +1,5 @@
 /*
- * $Id: XMOSDVideoView.h,v 1.8 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMOSDVideoView.h,v 1.9 2007/08/17 11:36:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,34 +16,34 @@
 
 typedef enum XMPinPMode
 {
-	XMPinPMode_NoPinP = 0,
-	XMPinPMode_Classic,
-	XMPinPMode_3D,
-	XMPinPMode_SideBySide
-	
+  XMPinPMode_NoPinP = 0,
+  XMPinPMode_Classic,
+  XMPinPMode_3D,
+  XMPinPMode_SideBySide
+  
 } XMPinPMode;
 
 typedef enum XMOSDDisplayMode
 {
-	XMOSDDisplayMode_NoOSD = 0,
-	XMOSDDisplayMode_AlwaysVisible,
-	XMOSDDisplayMode_AutomaticallyHiding
-	
+  XMOSDDisplayMode_NoOSD = 0,
+  XMOSDDisplayMode_AlwaysVisible,
+  XMOSDDisplayMode_AutomaticallyHiding
+  
 } XMOSDDisplayMode;
 
 typedef enum XMOpeningEffect 
 {
-	XMOpeningEffect_NoEffect,
-	XMOpeningEffect_FadeIn,
-	XMOpeningEffect_RollInFromBottomBorder
+  XMOpeningEffect_NoEffect,
+  XMOpeningEffect_FadeIn,
+  XMOpeningEffect_RollInFromBottomBorder
 } XMOpeningEffect;
 
 typedef enum XMClosingEffect
 {
-	XMClosingEffect_NoEffect,
-	XMClosingEffect_FadeOut,
-	XMClosingEffect_RollOutToBottomBorder,
-	
+  XMClosingEffect_NoEffect,
+  XMClosingEffect_FadeOut,
+  XMClosingEffect_RollOutToBottomBorder,
+  
 } XMClosingEffect;
 
 @class XMOnScreenControllerView, XMOnScreenControllerWindow;
@@ -55,45 +55,46 @@ typedef enum XMClosingEffect
  **/
 @interface XMOSDVideoView : NSView <XMVideoView> {
 
-	unsigned displayStatus;
-	
-	NSOpenGLContext *openGLContext;
-	NSSize displaySize;
-	CVOpenGLTextureRef noVideoTexture;
-	
-	// only used to draw into the window draw buffer when
-	// the window does miniaturize or there is no local video
-	// (e.g. when the device is changed)
-	BOOL isMiniaturized;
-	
-	// displayed when -startDisplayingNoVideo is called
-	NSImage *noVideoImage;
-	
-	//on screen display
-	XMOnScreenControllerView *osd;
-	XMOnScreenControllerWindow *osdControllerWindow;
-	XMOSDDisplayMode osdDisplayMode;
-	BOOL doesShowOSD;
-	NSTrackingRectTag osdTrackingRect;
-	XMOpeningEffect osdOpeningEffect;
-	XMClosingEffect osdClosingEffect;
-	
-	//Fullscreen stuff
-	BOOL isFullScreen;
-	
-	//Picture-in-picture stuff
-	NSRect pinpRect;	// rect of local video for classic PinP.
-	NSPoint downPoint; //store the distance of the mouse click from the local view's center (in classic PinP)
-	Scene noPinP, classicPinP, sideBySidePinP, roomPinP, temporaryScene;
-	Scene *currentPinPMode;
-	Scene *targetPinPMode, *initialPinPMode; //used for animation
-	NSAnimation *sceneAnimation;
-	BOOL switchedPinPMode;
-	BOOL enableComplexPinPModes;
-	
-	// mirroring local video
-	BOOL doMirror;
-	BOOL isLocalVideoMirrored;
+@private
+  unsigned displayStatus;
+  
+  NSOpenGLContext *openGLContext;
+  NSSize displaySize;
+  CVOpenGLTextureRef noVideoTexture;
+  
+  // only used to draw into the window draw buffer when
+  // the window does miniaturize or there is no local video
+  // (e.g. when the device is changed)
+  BOOL isMiniaturized;
+  
+  // displayed when -startDisplayingNoVideo is called
+  NSImage *noVideoImage;
+  
+  //on screen display
+  XMOnScreenControllerView *osd;
+  XMOnScreenControllerWindow *osdControllerWindow;
+  XMOSDDisplayMode osdDisplayMode;
+  BOOL doesShowOSD;
+  NSTrackingRectTag osdTrackingRect;
+  XMOpeningEffect osdOpeningEffect;
+  XMClosingEffect osdClosingEffect;
+  
+  //Fullscreen stuff
+  BOOL isFullScreen;
+  
+  //Picture-in-picture stuff
+  NSRect pinpRect;	// rect of local video for classic PinP.
+  NSPoint downPoint; //store the distance of the mouse click from the local view's center (in classic PinP)
+  Scene noPinP, classicPinP, sideBySidePinP, roomPinP, temporaryScene;
+  Scene *currentPinPMode;
+  Scene *targetPinPMode, *initialPinPMode; //used for animation
+  NSAnimation *sceneAnimation;
+  BOOL switchedPinPMode;
+  BOOL enableComplexPinPModes;
+  
+  // mirroring local video
+  BOOL doMirror;
+  BOOL isLocalVideoMirrored;
 }
 
 // determines whether video will be displayed and how

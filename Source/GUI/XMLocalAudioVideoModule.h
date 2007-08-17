@@ -1,9 +1,9 @@
 /*
- * $Id: XMLocalAudioVideoModule.h,v 1.13 2006/09/24 18:56:48 hfriederich Exp $
+ * $Id: XMLocalAudioVideoModule.h,v 1.14 2007/08/17 11:36:44 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_LOCAL_AUDIO_VIDEO_MODULE_H__
@@ -16,29 +16,30 @@
 @class XMLocalVideoView, XMLocalAudioVideoView;
 
 @interface XMLocalAudioVideoModule : XMInspectorModule {
-	
-	IBOutlet NSView *contentView;
-	NSSize contentViewSize;
-	BOOL isActive;
-	
-	IBOutlet XMLocalVideoView *localVideoView;
-	IBOutlet NSPopUpButton *videoDevicesPopUp;
-	IBOutlet NSButton *videoDeviceSettingsButton;
-	IBOutlet NSPopUpButton *audioInputDevicesPopUp;
-	IBOutlet NSPopUpButton *audioOutputDevicesPopUp;
-	IBOutlet NSSlider *audioInputVolumeSlider;
-	IBOutlet NSSlider *audioOutputVolumeSlider;
-	IBOutlet NSButton *muteAudioInputSwitch;
-	IBOutlet NSButton *muteAudioOutputSwitch;
-	IBOutlet NSLevelIndicator *audioInputLevelIndicator;
-	IBOutlet NSTextField *videoDisabledFld;	
-	
-	IBOutlet NSButton *audioTestButton;
-	IBOutlet NSPopUpButton *audioTestDelayPopUp;
-	
-	IBOutlet NSPanel *videoDeviceSettingsPanel;
-	IBOutlet NSBox *videoDeviceSettingsBox;
-	IBOutlet XMLocalVideoView *videoDeviceSettingsView;
+  
+@private
+  IBOutlet NSView *contentView;
+  NSSize contentViewSize;
+  BOOL isActive;
+  
+  IBOutlet XMLocalVideoView *localVideoView;
+  IBOutlet NSPopUpButton *videoDevicesPopUp;
+  IBOutlet NSButton *videoDeviceSettingsButton;
+  IBOutlet NSPopUpButton *audioInputDevicesPopUp;
+  IBOutlet NSPopUpButton *audioOutputDevicesPopUp;
+  IBOutlet NSSlider *audioInputVolumeSlider;
+  IBOutlet NSSlider *audioOutputVolumeSlider;
+  IBOutlet NSButton *muteAudioInputSwitch;
+  IBOutlet NSButton *muteAudioOutputSwitch;
+  IBOutlet NSLevelIndicator *audioInputLevelIndicator;
+  IBOutlet NSTextField *videoDisabledFld;	
+  
+  IBOutlet NSButton *audioTestButton;
+  IBOutlet NSPopUpButton *audioTestDelayPopUp;
+  
+  IBOutlet NSPanel *videoDeviceSettingsPanel;
+  IBOutlet NSBox *videoDeviceSettingsBox;
+  IBOutlet XMLocalVideoView *videoDeviceSettingsView;
 }
 
 - (IBAction)changeVideoDevice:(id)sender;

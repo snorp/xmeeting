@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallStatistics.h,v 1.2 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCallStatistics.h,v 1.3 2007/08/17 11:36:41 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_STATISTICS_H__
@@ -15,7 +15,8 @@
 
 @interface XMCallStatistics : NSObject {
 
-	XMCallStatisticsRecord callStatisticsRecord;
+@private
+  XMCallStatisticsRecord callStatisticsRecord;
 	
 }
 

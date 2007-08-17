@@ -1,5 +1,5 @@
 /*
- * $Id: XMSimpleAddressResource.h,v 1.5 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMSimpleAddressResource.h,v 1.6 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,11 +14,12 @@
 #import "XMCallAddressManager.h"
 
 /**
-* This class implements the simple most address resource, containing
+ * This class implements the simple most address resource, containing
  * only an address and a protocol information
  **/
 @interface XMSimpleAddressResource : XMAddressResource <XMCallAddress> {
-  
+ 
+@private
   NSString *address;
   XMCallProtocol callProtocol;
   NSString *displayString;
@@ -43,10 +44,12 @@
 @end
 
 /**
-* Simple class that wraps another address resource and implements
+ * Simple class that wraps another address resource and implements
  * the XMCallAddress interface
  **/
 @interface XMSimpleAddressResourceWrapper : NSObject <XMCallAddress> {
+
+@private
   XMAddressResource *addressResource;
 }
 

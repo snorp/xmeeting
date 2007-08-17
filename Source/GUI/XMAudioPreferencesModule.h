@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioPreferencesModule.h,v 1.3 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMAudioPreferencesModule.h,v 1.4 2007/08/17 11:36:43 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,12 +17,13 @@ extern NSString *XMKey_AudioPreferencesModuleIdentifier;
 
 @interface XMAudioPreferencesModule : NSObject <XMPreferencesModule> {
 
-	XMPreferencesWindowController *prefWindowController;
-	float contentViewHeight;
-	IBOutlet NSView *contentView;
-	
-	IBOutlet NSPopUpButton *preferredOutputDevicePopUp;
-	IBOutlet NSPopUpButton *preferredInputDevicePopUp;
+@private
+  XMPreferencesWindowController *prefWindowController;
+  float contentViewHeight;
+  IBOutlet NSView *contentView;
+  
+  IBOutlet NSPopUpButton *preferredOutputDevicePopUp;
+  IBOutlet NSPopUpButton *preferredInputDevicePopUp;
 }
 
 - (IBAction)preferredOutputDeviceSelectionDidChange:(id)sender;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOnScreenControllerWindow.h,v 1.4 2006/03/23 10:04:49 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.h,v 1.5 2007/08/17 11:36:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,10 +16,11 @@
 @class XMOnScreenControllerView;
 
 @interface XMOnScreenControllerWindow : NSWindow {
-	@private
-	NSTimer* timer;
+
+@private
+  NSTimer* timer;
 	
-	XMOnScreenControllerView *controllerView;
+  XMOnScreenControllerView *controllerView;
 
 }
 

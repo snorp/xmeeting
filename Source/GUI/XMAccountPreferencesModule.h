@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.h,v 1.5 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.h,v 1.6 2007/08/17 11:36:43 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,43 +22,44 @@ extern NSString *XMKey_AccountPreferencesPhoneNumberIdentifier;
 
 @interface XMAccountPreferencesModule : NSObject <XMPreferencesModule> {
 
-	XMPreferencesWindowController *prefWindowController;
-	
-	NSMutableArray *h323Accounts;
-	NSMutableArray *sipAccounts;
-	
-	XMH323Account *h323AccountToEdit;
-	XMSIPAccount *sipAccountToEdit;
-	
-	IBOutlet NSView *contentView;
-	float contentViewHeight;
-	
-	/* connection to the location module */
-	IBOutlet XMLocationPreferencesModule *locationModule;
-	
-	IBOutlet NSTableView *h323AccountsTableView;
-	IBOutlet NSButton *addH323AccountButton;
-	IBOutlet NSButton *deleteH323AccountButton;
-	IBOutlet NSButton *editH323AccountButton;
-	
-	IBOutlet NSTableView *sipAccountsTableView;
-	IBOutlet NSButton *addSIPAccountButton;
-	IBOutlet NSButton *deleteSIPAccountButton;
-	IBOutlet NSButton *editSIPAccountButton;
-	
-	IBOutlet NSPanel *editH323AccountPanel;
-	IBOutlet NSTextField *h323AccountNameField;
-	IBOutlet NSTextField *h323GatekeeperHostField;
-	IBOutlet NSTextField *h323UsernameField;
-	IBOutlet NSTextField *h323PhoneNumberField;
-	IBOutlet NSTextField *h323PasswordField;
-	
-	IBOutlet NSPanel *editSIPAccountPanel;
-	IBOutlet NSTextField *sipAccountNameField;
-	IBOutlet NSTextField *sipRegistrationDomainField;
-	IBOutlet NSTextField *sipUsernameField;
-	IBOutlet NSTextField *sipAuthorizationUsernameField;
-	IBOutlet NSTextField *sipPasswordField;
+@private
+  XMPreferencesWindowController *prefWindowController;
+  
+  NSMutableArray *h323Accounts;
+  NSMutableArray *sipAccounts;
+  
+  XMH323Account *h323AccountToEdit;
+  XMSIPAccount *sipAccountToEdit;
+  
+  IBOutlet NSView *contentView;
+  float contentViewHeight;
+  
+  /* connection to the location module */
+  IBOutlet XMLocationPreferencesModule *locationModule;
+  
+  IBOutlet NSTableView *h323AccountsTableView;
+  IBOutlet NSButton *addH323AccountButton;
+  IBOutlet NSButton *deleteH323AccountButton;
+  IBOutlet NSButton *editH323AccountButton;
+  
+  IBOutlet NSTableView *sipAccountsTableView;
+  IBOutlet NSButton *addSIPAccountButton;
+  IBOutlet NSButton *deleteSIPAccountButton;
+  IBOutlet NSButton *editSIPAccountButton;
+  
+  IBOutlet NSPanel *editH323AccountPanel;
+  IBOutlet NSTextField *h323AccountNameField;
+  IBOutlet NSTextField *h323GatekeeperHostField;
+  IBOutlet NSTextField *h323UsernameField;
+  IBOutlet NSTextField *h323PhoneNumberField;
+  IBOutlet NSTextField *h323PasswordField;
+  
+  IBOutlet NSPanel *editSIPAccountPanel;
+  IBOutlet NSTextField *sipAccountNameField;
+  IBOutlet NSTextField *sipRegistrationDomainField;
+  IBOutlet NSTextField *sipUsernameField;
+  IBOutlet NSTextField *sipAuthorizationUsernameField;
+  IBOutlet NSTextField *sipPasswordField;
 
 }
 

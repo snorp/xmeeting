@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioOnlyOSD.m,v 1.6 2006/06/22 11:36:54 hfriederich Exp $
+ * $Id: XMAudioOnlyOSD.m,v 1.7 2007/08/17 11:36:43 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,7 +92,7 @@
 	}
 	
 	NSNumber *number = [[NSNumber alloc] initWithInt:theState];
-	[[buttons objectAtIndex:3] setObject:number forKey:@"CurrentStateIndex"];
+	[[[self buttons] objectAtIndex:3] setObject:number forKey:@"CurrentStateIndex"];
 	[number release];
 	
 	[self setNeedsDisplay:YES];

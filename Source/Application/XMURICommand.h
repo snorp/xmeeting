@@ -1,5 +1,5 @@
 /*
- * $Id: XMURICommand.h,v 1.3 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMURICommand.h,v 1.4 2007/08/17 11:36:41 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,8 @@
 @end
 
 @interface XMeetingURL : XMAddressResource {
+  
+@private
   NSString *url;
   NSString *username;
   NSString *host;

@@ -1,9 +1,9 @@
 /*
- * $Id: XMAudioManager.h,v 1.8 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMAudioManager.h,v 1.9 2007/08/17 11:36:41 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_AUDIO_MANAGER_H__
@@ -19,24 +19,26 @@
  * and volume control.
  **/
 @interface XMAudioManager : NSObject {
-	NSArray *inputDevices;
-	NSString *selectedInputDevice;
-	AudioDeviceID selectedInputDeviceID;
-	BOOL selectedInputDeviceIsMuted;
-	
-	NSArray *outputDevices;
-	NSString *selectedOutputDevice;
-	AudioDeviceID selectedOutputDeviceID;
-	BOOL selectedOutputDeviceIsMuted;
-	
-	NSString *noDeviceName;
-	NSString *unknownDeviceName;
-	
-	BOOL doesMeasureSignalLevels;
-	double inputLevel;
-	double outputLevel;
-	
-	BOOL doesRunAudioTest;
+  
+@private
+  NSArray *inputDevices;
+  NSString *selectedInputDevice;
+  AudioDeviceID selectedInputDeviceID;
+  BOOL selectedInputDeviceIsMuted;
+  
+  NSArray *outputDevices;
+  NSString *selectedOutputDevice;
+  AudioDeviceID selectedOutputDeviceID;
+  BOOL selectedOutputDeviceIsMuted;
+  
+  NSString *noDeviceName;
+  NSString *unknownDeviceName;
+  
+  BOOL doesMeasureSignalLevels;
+  double inputLevel;
+  double outputLevel;
+  
+  BOOL doesRunAudioTest;
 }
 
 /**

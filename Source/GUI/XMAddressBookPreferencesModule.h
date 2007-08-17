@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookPreferencesModule.h,v 1.1 2006/06/13 20:27:18 hfriederich Exp $
+ * $Id: XMAddressBookPreferencesModule.h,v 1.2 2007/08/17 11:36:43 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_PREFERENCES_MODULE_H__
@@ -15,14 +15,15 @@
 
 @interface XMAddressBookPreferencesModule : NSObject <XMPreferencesModule> {
 
-	XMPreferencesWindowController *prefWindowController;
-	
-	IBOutlet NSView *contentView;
-	float contentViewHeight;
-	
-	IBOutlet NSButton *enableABDatabaseSearchSwitch;
-	IBOutlet NSButton *enableABPhoneNumbersSwitch;
-	IBOutlet NSMatrix *phoneNumberProtocolMatrix;
+@private
+  XMPreferencesWindowController *prefWindowController;
+  
+  IBOutlet NSView *contentView;
+  float contentViewHeight;
+  
+  IBOutlet NSButton *enableABDatabaseSearchSwitch;
+  IBOutlet NSButton *enableABPhoneNumbersSwitch;
+  IBOutlet NSMatrix *phoneNumberProtocolMatrix;
 	
 }
 

@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallRecorderModule.h,v 1.3 2006/11/21 10:08:11 hfriederich Exp $
+ * $Id: XMCallRecorderModule.h,v 1.4 2007/08/17 11:36:43 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_RECORDER_MODULE_H__
@@ -13,25 +13,26 @@
 #import "XMInspectorModule.h"
 
 @interface XMCallRecorderModule : XMInspectorModule {
-	
-	IBOutlet NSView *contentView;
-	NSSize contentViewSize;
-	
-	IBOutlet NSButton *recordButton;
-	IBOutlet NSTextField *filePathTextField;
-	
-	IBOutlet NSButton *recordAudioSwitch;
-	IBOutlet NSButton *recordVideoSwitch;
-	IBOutlet NSPopUpButton *videoModePopUp;
-	IBOutlet NSMatrix *videoSourceMatrix;
-	IBOutlet NSPopUpButton *videoCodecPopUp;
-	IBOutlet NSSlider *videoQualitySlider;
-	IBOutlet NSButton *dataRateLimitSwitch;
-	IBOutlet NSTextField *dataRateLimitField;
-	NSString *bwLimitString;
-	IBOutlet NSButton *lowPrioritySwitch;
-	
-	NSWindow *recorderWindow;
+
+@private
+  IBOutlet NSView *contentView;
+  NSSize contentViewSize;
+  
+  IBOutlet NSButton *recordButton;
+  IBOutlet NSTextField *filePathTextField;
+  
+  IBOutlet NSButton *recordAudioSwitch;
+  IBOutlet NSButton *recordVideoSwitch;
+  IBOutlet NSPopUpButton *videoModePopUp;
+  IBOutlet NSMatrix *videoSourceMatrix;
+  IBOutlet NSPopUpButton *videoCodecPopUp;
+  IBOutlet NSSlider *videoQualitySlider;
+  IBOutlet NSButton *dataRateLimitSwitch;
+  IBOutlet NSTextField *dataRateLimitField;
+  NSString *bwLimitString;
+  IBOutlet NSButton *lowPrioritySwitch;
+  
+  NSWindow *recorderWindow;
 
 }
 

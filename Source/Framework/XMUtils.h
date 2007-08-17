@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.22 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.23 2007/08/17 11:36:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,21 +19,22 @@
  **/
 @interface XMUtils : NSObject {
 	
-	SCDynamicStoreRef dynamicStore;
-	SCDynamicStoreContext dynamicStoreContext;
-	NSArray *localAddresses;
-	NSArray *localAddressInterfaces;
-	
-	XMNATType natType;
-	NSString *stunExternalAddress;
-	
-	BOOL isFetchingCheckipExternalAddress;
-	BOOL didSucceedFetchingCheckipExternalAddress;
-	NSURLConnection *checkipURLConnection;
-	NSMutableData *checkipURLData;
-	NSString *checkipExternalAddress;
-	NSString *checkipExternalAddressFetchFailReason;
-	NSTimer *checkipTimer;
+@private
+  SCDynamicStoreRef dynamicStore;
+  SCDynamicStoreContext dynamicStoreContext;
+  NSArray *localAddresses;
+  NSArray *localAddressInterfaces;
+  
+  XMNATType natType;
+  NSString *stunExternalAddress;
+  
+  BOOL isFetchingCheckipExternalAddress;
+  BOOL didSucceedFetchingCheckipExternalAddress;
+  NSURLConnection *checkipURLConnection;
+  NSMutableData *checkipURLData;
+  NSString *checkipExternalAddress;
+  NSString *checkipExternalAddressFetchFailReason;
+  NSTimer *checkipTimer;
 }
 
 /**
