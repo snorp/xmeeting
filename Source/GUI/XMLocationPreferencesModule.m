@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.31 2007/08/14 10:56:40 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.32 2007/08/17 09:17:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,8 @@
 
 #define XM_RENAME_TAG 50
 #define XM_DUPLICATE_TAG 51
+
+#define TABLE_FONT_SIZE 13
 
 NSString *XMKey_LocationPreferencesModuleIdentifier = @"XMeeting_LocationPreferencesModule";
 
@@ -490,6 +492,17 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self defaultAction:self];
 }
 
+- (IBAction)makeDefaultSIPAccount:(id)sender
+{
+  unsigned selectedRow = [sipAccountsTable selectedRow];
+  if (selectedRow != -1) {
+    [(XMSIPAccountInfo *)[sipAccounts objectAtIndex:selectedRow] setEnabled:YES];
+    defaultSIPAccountIndex = selectedRow;
+    [sipAccountsTable reloadData];
+    [self defaultAction:self];
+  }
+}
+
 - (IBAction)overwriteSIPAccounts:(id)sender
 {
   [sipAccounts release];
@@ -501,6 +514,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     XMSIPAccount *account = [accountModule sipAccountAtIndex:i];
     [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:[account tag] enabled:NO] autorelease]];
   }
+  defaultSIPAccountIndex = UINT_MAX-1;
   [self _validateSIPAccountsUserInterface];
   [self defaultAction:self];
 }
@@ -908,7 +922,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // loading the SIP section
   [self _setState:[currentLocation enableSIPNumber] forSwitch:enableSIPSwitch];
   [sipAccounts release];
+  defaultSIPAccountIndex = UINT_MAX;
   NSArray *sipAccountTags = [currentLocation sipAccountTags];
+  unsigned  defaultSIPAccountTag = [currentLocation defaultSIPAccountTag];
   if ((NSObject *)sipAccountTags == [NSNull null]) {
     sipAccounts = nil;
   } else {
@@ -929,10 +945,16 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
       }
       if (found) {
         [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:_tag enabled:YES] autorelease]];
+        if (defaultSIPAccountIndex == UINT_MAX || defaultSIPAccountTag == _tag) {
+          defaultSIPAccountIndex = i;
+        }
       } else {
         [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:_tag enabled:NO] autorelease]];
       }
     }
+  }
+  if (defaultSIPAccountIndex == UINT_MAX) {
+    defaultSIPAccountIndex = (UINT_MAX-1);
   }
   [sipAccountsTable reloadData];
   [self _setTag:[currentLocation sipProxyTag] forNonePopUp:sipProxyPopUp];
@@ -1041,18 +1063,23 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // saving the SIP section
   [currentLocation setEnableSIPNumber:[self _extractStateFromSwitch:enableSIPSwitch]];
   
-  if (sipAccounts != nil) {
+  if (sipAccounts != nil && defaultSIPAccountIndex != UINT_MAX) {
     unsigned numSIPAccounts = [sipAccounts count];
     unsigned i;
     NSMutableArray *accountTags = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
     NSArray *accountRecords = [accountModule sipAccounts];
+    unsigned defaultSIPAccountTag = 0;
     for (i = 0; i < numSIPAccounts; i++) {
       if ([(XMSIPAccountInfo *)[sipAccounts objectAtIndex:i] enabled] == YES) {
         XMSIPAccount *account = (XMSIPAccount *)[accountRecords objectAtIndex:i];
         [accountTags addObject:[NSNumber numberWithUnsignedInt:[account tag]]];
+        if (defaultSIPAccountTag == 0 || defaultSIPAccountIndex == i) {
+          defaultSIPAccountTag = [account tag];
+        }
       }
     }
     [currentLocation setSIPAccountTags:accountTags];
+    [currentLocation setDefaultSIPAccountTag:defaultSIPAccountTag];
     [accountTags release];
   }
   unsigned tag = [self _extractTagFromPopUp:sipProxyPopUp];
@@ -1383,8 +1410,14 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (void)_validateSIPAccountsUserInterface
 {
-  if (sipAccounts != nil) {
+  if (sipAccounts != nil && defaultSIPAccountIndex != UINT_MAX) {
     [sipAccountsTab selectFirstTabViewItem:self];
+    int selectedRow = [sipAccountsTable selectedRow];
+    if (selectedRow == UINT_MAX) {
+      [makeDefaultSIPAccountButton setEnabled:NO];
+    } else {
+      [makeDefaultSIPAccountButton setEnabled:YES];
+    }
   } else {
     [sipAccountsTab selectLastTabViewItem:self];
   }
@@ -1585,6 +1618,27 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   {
     XMSIPAccountInfo *info = (XMSIPAccountInfo *)[sipAccounts objectAtIndex:rowIndex];
     [info setEnabled:[anObject boolValue]];
+    
+    unsigned count = [sipAccounts count];
+    unsigned numEnabled = 0;
+    unsigned enabledIndex = UINT_MAX;
+    unsigned i;
+    for (i = 0; i < count; i++) {
+      XMSIPAccountInfo *info = (XMSIPAccountInfo *)[sipAccounts objectAtIndex:i];
+      if ([info enabled] == YES) {
+        numEnabled++;
+        if (enabledIndex == UINT_MAX || i == defaultSIPAccountIndex) {
+          enabledIndex = i;
+        }
+      }
+    }
+    if (numEnabled == 0) {
+      enabledIndex = (UINT_MAX-1);
+    }
+    if (enabledIndex != defaultSIPAccountIndex) {
+      defaultSIPAccountIndex = enabledIndex;
+      [sipAccountsTable reloadData];
+    }
   }
   else if(tableView == audioCodecPreferenceOrderTableView)
   {
@@ -1612,6 +1666,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   else if (tableView == stunServersTable) {
     [self _validateSTUNUserInterface];
   }
+  else if (tableView == sipAccountsTable) {
+    [self _validateSIPAccountsUserInterface];
+  }
   else if(tableView == audioCodecPreferenceOrderTableView)
   {
     [self _validateAudioOrderUserInterface];
@@ -1638,7 +1695,18 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     }
     [(NSTextFieldCell *)aCell setTextColor:color];
   }
-  if(tableView == audioCodecPreferenceOrderTableView)
+  else if (tableView == sipAccountsTable)
+  {
+    if ([[aTableColumn identifier] isEqualToString:XMKey_SIPAccountEnabledIdentifier]) {
+      return;
+    }
+    if (rowIndex == defaultSIPAccountIndex) {
+      [aCell setFont:[NSFont boldSystemFontOfSize:TABLE_FONT_SIZE]];
+    } else {
+      [aCell setFont:[NSFont systemFontOfSize:TABLE_FONT_SIZE]];
+    }
+  }
+  else if(tableView == audioCodecPreferenceOrderTableView)
   {
     XMPreferencesCodecListRecord *codecRecord = (XMPreferencesCodecListRecord *)[audioCodecs objectAtIndex:rowIndex];
     XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[codecRecord identifier]];
@@ -2056,6 +2124,36 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     for (i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
       [location setSIPAccountTags:tags];
+    }
+  }
+}
+
+- (unsigned)defaultSIPAccountTag
+{
+  unsigned count = [locations count];
+  unsigned i;
+  unsigned _tag;
+  for (i = 0; i < count; i++) {
+    XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+    if (i == 0) {
+      _tag = [location sipProxyTag];
+    } else {
+      if (_tag != [location defaultSIPAccountTag]) {
+        return UINT_MAX;
+      }
+    }
+  }
+  return _tag;
+}
+
+- (void)setDefaultSIPAccountTag:(unsigned)_tag
+{
+  if (_tag != UINT_MAX) {
+    unsigned count = [locations count];
+    unsigned i;
+    for (i = 0; i < count; i++) {
+      XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+      [location setDefaultSIPAccountTag:_tag];
     }
   }
 }

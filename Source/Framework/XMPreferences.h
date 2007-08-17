@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.18 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.19 2007/08/17 09:17:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,7 +68,7 @@
 	
 	/* SIP-specific settings */
 	BOOL		 enableSIP;					// Flag to indicate whether SIP is active or not
-	NSArray		*sipRegistrationRecords;	// An array containing XMPreferencesRegistrationRecord instances
+	NSArray		*sipRegistrationRecords;	// An array containing XMPreferencesRegistrationRecord instances. Index zero is default
 	NSString	*sipProxyHost;				// A string containing the host address of the SIP proxy to use
 	NSString	*sipProxyUsername;			// A string containing the username for the SIP proxy to use
 	NSString	*sipProxyPassword;			// A string containing the password for the SIP proxy to use

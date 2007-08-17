@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.14 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.15 2007/08/17 09:17:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,6 +16,7 @@
 NSString *XMKey_LocationName = @"XMeeting_LocationName";
 NSString *XMKey_LocationH323AccountID = @"XMeeting_H323AccountID";
 NSString *XMKey_LocationSIPAccountIDs = @"XMeeting_SIPAccountIDs";
+NSString *XMKey_LocationDefaultSIPAccountID = @"XMeeting_DefaultSIPAccountID";
 NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 
 @interface XMLocation (PrivateMethods)
@@ -45,6 +46,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   
   h323AccountTag = 0;
   sipAccountTags = [[NSArray array] retain];
+  defaultSIPAccountTag = 0;
   sipProxyTag = 0;
   didSetSIPProxyPassword = NO;
   _sipProxyPassword = nil;
@@ -90,6 +92,13 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
     [tags release];
   }
   
+  number = (NSNumber *)[dict objectForKey:XMKey_LocationDefaultSIPAccountID];
+  if (number != nil) {
+    unsigned index = [number unsignedIntValue];
+    XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:index];
+    defaultSIPAccountTag = [sipAccount tag];
+  }
+  
   number = (NSNumber *)[dict objectForKey:XMKey_LocationSIPProxyID];
   if (number != nil)
   {
@@ -117,6 +126,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   
   [location setH323AccountTag:[self h323AccountTag]];
   [location setSIPAccountTags:[self sipAccountTags]];
+  [location setDefaultSIPAccountTag:[self defaultSIPAccountTag]];
   [location setSIPProxyTag:[self sipProxyTag]];
   
   if (didSetSIPProxyPassword) {
@@ -144,6 +154,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
       [[self name] isEqualToString:[(XMLocation *)object name]] &&
       [self h323AccountTag] == [(XMLocation *)object h323AccountTag] &&
       [self sipAccountTags] == [(XMLocation *)object sipAccountTags] &&
+      [self defaultSIPAccountTag] == [(XMLocation *)object defaultSIPAccountTag] &&
       [self sipProxyTag] == [(XMLocation *)object sipProxyTag])
   {
     return YES;
@@ -222,6 +233,23 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   }
   [dict setObject:sipAccountIndexes forKey:XMKey_LocationSIPAccountIDs];
   [sipAccountIndexes release];
+  
+  if (defaultSIPAccountTag != 0) {
+    unsigned sipAccountCount = [sipAccounts count];
+    unsigned i;
+    
+    for(i = 0; i < sipAccountCount; i++)
+    {
+      XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:i];
+      if([sipAccount tag] == defaultSIPAccountTag)
+      {
+        NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
+        [dict setObject:number forKey:XMKey_LocationDefaultSIPAccountID];
+        [number release];
+        break;
+      }
+    }
+  }
   
   if(sipProxyTag != 0)
   {
@@ -306,11 +334,12 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   if ([sipAccountTags count] == 0) {
     return 0;
   }
-  return [[sipAccountTags objectAtIndex:0] unsignedIntValue];
+  return defaultSIPAccountTag;
 }
 
-- (void)setDefaultSIPAccountTag:(unsigned)tag
+- (void)setDefaultSIPAccountTag:(unsigned)_tag
 {
+  defaultSIPAccountTag = _tag;
 }
 
 - (unsigned)sipProxyTag
@@ -392,8 +421,22 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   unsigned count = [sipAccountTags count];
   unsigned i;
   NSMutableArray *sipInfo = [[NSMutableArray alloc] initWithCapacity:count];
+  XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:defaultSIPAccountTag];
+  if (sipAccount != nil) {
+    XMPreferencesRegistrationRecord *record = [[XMPreferencesRegistrationRecord alloc] init];
+    [record setDomain:[sipAccount domain]];
+    [record setUsername:[sipAccount username]];
+    [record setAuthorizationUsername:[sipAccount authorizationUsername]];
+    [record setPassword:[sipAccount password]];
+    
+    [sipInfo addObject:record];
+    [record release];
+  }
   for (i = 0; i < count; i++) {
     unsigned _tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
+    if (_tag == defaultSIPAccountTag) {
+      continue;
+    }
     XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:_tag];
     if (sipAccount != nil) {
       XMPreferencesRegistrationRecord *record = [[XMPreferencesRegistrationRecord alloc] init];

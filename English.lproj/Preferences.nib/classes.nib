@@ -124,6 +124,7 @@
                 gatekeeperAccountSelected = id; 
                 getExternalAddress = id; 
                 importLocations = id; 
+                makeDefaultSIPAccount = id; 
                 moveAudioCodec = id; 
                 moveSTUNServerDown = id; 
                 moveSTUNServerUp = id; 
@@ -170,6 +171,7 @@
                 h323AccountsPopUp = NSPopUpButton; 
                 internationalDialingPrefixField = NSTextField; 
                 locationsTableView = NSTableView; 
+                makeDefaultSIPAccountButton = NSButton; 
                 maxTCPPortField = NSTextField; 
                 maxUDPPortField = NSTextField; 
                 minTCPPortField = NSTextField; 

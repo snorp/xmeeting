@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.h,v 1.11 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMLocation.h,v 1.12 2007/08/17 09:17:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,6 +20,7 @@ enum {
 extern NSString *XMKey_LocationName;
 extern NSString *XMKey_LocationH323AccountID;
 extern NSString *XMKey_LocationSIPAccountIDs;
+extern NSString *XMKey_LocationDefaultSIPAccountID;
 extern NSString *XMKey_LocationSIPProxyID;
 
 /**
@@ -37,6 +38,7 @@ extern NSString *XMKey_LocationSIPProxyID;
 	NSString *name;
 	unsigned h323AccountTag;
 	NSArray * sipAccountTags;
+    unsigned defaultSIPAccountTag;
     unsigned sipProxyTag;
     BOOL didSetSIPProxyPassword;
     NSString *_sipProxyPassword;

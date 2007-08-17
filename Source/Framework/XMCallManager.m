@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.40 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.41 2007/08/17 09:17:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1266,19 +1266,12 @@
     // the address must have the form xxx@registrar.net
     // In case the suffix @registrar.net is missing, 
     // the suffix is added from the information of the
-    // registration domain
-    if(XMIsPhoneNumber(address) && [registrations count] != 0)
+    // default registration domain
+    if(XMIsPhoneNumber(address) && [[activePreferences sipRegistrationRecords] count] != 0)
     {
-      NSRange atRange = [address rangeOfString:@"@"];
-      
-      if(atRange.location == NSNotFound)
-      {
-        NSString *registration = (NSString *)[registrations objectAtIndex:0];
-        NSRange range = [registration rangeOfString:@"@"];
-        NSString *domain = [registration substringFromIndex:(range.location + 1)];
-        
-        address = [NSString stringWithFormat:@"%@@%@", address, domain];
-      }
+      XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[[activePreferences sipRegistrationRecords] objectAtIndex:0];
+      NSString *registrationDomain = [record domain];
+      address = [NSString stringWithFormat:@"%@@%@", address, registrationDomain];
     }
   }
   

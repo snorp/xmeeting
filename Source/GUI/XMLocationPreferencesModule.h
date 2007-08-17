@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.18 2007/08/14 10:56:40 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.19 2007/08/17 09:17:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -72,6 +72,8 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
     IBOutlet NSTabView *sipAccountsTab;
     IBOutlet NSTableView *sipAccountsTable;
     NSMutableArray * sipAccounts;
+    unsigned defaultSIPAccountIndex;
+    IBOutlet NSButton *makeDefaultSIPAccountButton;
     IBOutlet NSPopUpButton *sipProxyPopUp;
     IBOutlet NSTextField *sipProxyHostField;
 	IBOutlet NSTextField *sipProxyUsernameField;
@@ -135,6 +137,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
 
 // SIP action methods
 - (IBAction)toggleEnableSIP:(id)sender;
+- (IBAction)makeDefaultSIPAccount:(id)sender;
 - (IBAction)overwriteSIPAccounts:(id)sender;
 - (IBAction)sipProxySelected:(id)sender;
 
