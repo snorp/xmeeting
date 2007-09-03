@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.57 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.58 2007/09/03 11:36:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,6 +21,7 @@
 #include "XMConnection.h"
 #include "XMH323EndPoint.h"
 #include "XMSIPEndPoint.h"
+#include "XMNetworkConfiguration.h"
 
 #define XM_MAX_BANDWIDTH 1100000
 
@@ -85,6 +86,8 @@ XMOpalManager::XMOpalManager()
   origRemoteAddress = "";
   
   callEndReason = NULL;
+  
+  PInterfaceMonitor::GetInstance().SetInterfaceFilter(new XMInterfaceFilter());
   
   OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
   SetEchoCancelParams(params);

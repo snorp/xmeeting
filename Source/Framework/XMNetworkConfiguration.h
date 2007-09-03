@@ -1,5 +1,5 @@
 /*
- * $Id: XMNetworkConfiguration.h,v 1.1 2007/01/06 20:41:17 hfriederich Exp $
+ * $Id: XMNetworkConfiguration.h,v 1.2 2007/09/03 11:36:34 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,12 +17,19 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-/**
- * Returns the current reachablility status (as defined above)
- * for the given address pair
- **/
-int XMGetReachabilityStatusForAddresses(const in_addr *localAddress,
-										const in_addr *remoteAddress);
+#include <ptclib/psockbun.h>
+
+class XMInterfaceFilter : public PInterfaceFilter
+{
+  PCLASSINFO(XMInterfaceFilter, PInterfaceFilter);
+public:
+  PIPSocket::InterfaceTable FilterInterfaces(const PIPSocket::Address & destination,
+                                             PIPSocket::InterfaceTable & interfaces) const;
+  
+private:
+  BOOL IsReachable(const PIPSocket::Address & localAddress,
+                   const PIPSocket::Address & destination) const;
+};
 
 #endif // __XM_NETWORK_CONFIGURATION_H__
 
