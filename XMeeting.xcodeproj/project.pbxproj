@@ -805,7 +805,7 @@
 		D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMInBandDTMFHandler.cpp; path = Source/Framework/XMInBandDTMFHandler.cpp; sourceTree = "<group>"; };
 		D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMInBandDTMFHandler.h; path = Source/Framework/XMInBandDTMFHandler.h; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
-		D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XMeetingABPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D15435EF0C01FB62002A027E /* Address Book plugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Address Book plugin.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPlugin.h; path = Source/AddressBookPlugin/XMAddressBookPlugin.h; sourceTree = "<group>"; };
 		D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPlugin.m; path = Source/AddressBookPlugin/XMAddressBookPlugin.m; sourceTree = "<group>"; };
 		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
@@ -1634,7 +1634,7 @@
 				8D1107320486CEB800E47090 /* XMeeting.app */,
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
 				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
-				D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */,
+				D15435EF0C01FB62002A027E /* Address Book plugin.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3128,7 +3128,7 @@
 			);
 			name = XMeetingABPlugin;
 			productName = "Address Book plugin";
-			productReference = D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */;
+			productReference = D15435EF0C01FB62002A027E /* Address Book plugin.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D1E314C10B52AA6900385072 /* speex */ = {
@@ -4046,10 +4046,141 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = ppc;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Development_PPC;
+		};
+		D11B6B590C8C416500CA9DE3 /* Development_i386 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = NO;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DEBUGGING_SYMBOLS = default;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = XMeeting_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
+				GCC_THREADSAFE_STATICS = YES;
+				GCC_USE_GCC3_PFE_SUPPORT = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_LABEL = NO;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../pwlib/include,
+					../opal/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				PREBINDING = YES;
+				PRODUCT_NAME = XMeeting;
+				WARNING_CFLAGS = "-Wno-long-double";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Development_i386;
+		};
+		D11B6B5A0C8C416500CA9DE3 /* Development_i386 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					../pwlib/include,
+					../opal/include,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				PREBINDING = NO;
+				PRODUCT_NAME = speex_pwplugin;
+				ZERO_LINK = YES;
+			};
+			name = Development_i386;
+		};
+		D11B6B5B0C8C416500CA9DE3 /* Development_i386 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../opal/include;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
+				PREBINDING = NO;
+				PRODUCT_NAME = gsm_pwplugin;
+				ZERO_LINK = YES;
+			};
+			name = Development_i386;
+		};
+		D11B6B5C0C8C416500CA9DE3 /* Development_i386 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "Address Book plugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "Address Book plugin";
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = YES;
+			};
+			name = Development_i386;
+		};
+		D11B6B5D0C8C416500CA9DE3 /* Development_i386 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Development_i386;
 		};
 		D11E93F208589A9200154C02 /* Development */ = {
 			isa = XCBuildConfiguration;
@@ -4170,6 +4301,7 @@
 					ppc,
 					i386,
 				);
+				GCC_OPTIMIZATION_LEVEL = 0;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
@@ -4324,123 +4456,6 @@
 			};
 			name = Deployment;
 		};
-		D1EF8A640C8C282A000509C9 /* Development_x86 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = ppc;
-				COPY_PHASE_STRIP = NO;
-				GCC_CW_ASM_SYNTAX = NO;
-				GCC_DEBUGGING_SYMBOLS = default;
-				GCC_DYNAMIC_NO_PIC = YES;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_PASCAL_STRINGS = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = XMeeting_Prefix.pch;
-				GCC_PREPROCESSOR_DEFINITIONS = PTRACING;
-				GCC_THREADSAFE_STATICS = YES;
-				GCC_USE_GCC3_PFE_SUPPORT = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNKNOWN_PRAGMAS = YES;
-				GCC_WARN_UNUSED_FUNCTION = NO;
-				GCC_WARN_UNUSED_LABEL = NO;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = NO;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					../pwlib/include,
-					../opal/include,
-				);
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
-				MACOSX_DEPLOYMENT_TARGET = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = XMeeting;
-				WARNING_CFLAGS = "-Wno-long-double";
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
-			};
-			name = Development_x86;
-		};
-		D1EF8A650C8C282A000509C9 /* Development_x86 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = (
-					../pwlib/include,
-					../opal/include,
-				);
-				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
-				PREBINDING = NO;
-				PRODUCT_NAME = speex_pwplugin;
-				ZERO_LINK = YES;
-			};
-			name = Development_x86;
-		};
-		D1EF8A660C8C282A000509C9 /* Development_x86 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = ../opal/include;
-				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)";
-				PREBINDING = NO;
-				PRODUCT_NAME = gsm_pwplugin;
-				ZERO_LINK = YES;
-			};
-			name = Development_x86;
-		};
-		D1EF8A670C8C282A000509C9 /* Development_x86 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INFOPLIST_FILE = "XMeetingABPlugin-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = XMeetingABPlugin;
-				WRAPPER_EXTENSION = bundle;
-				ZERO_LINK = YES;
-			};
-			name = Development_x86;
-		};
-		D1EF8A680C8C282A000509C9 /* Development_x86 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = i386;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-			};
-			name = Development_x86;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4448,8 +4463,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D10975200BAE73F4007E8087 /* Development */,
+				D11B6B5B0C8C416500CA9DE3 /* Development_i386 */,
 				D10975210BAE73F4007E8087 /* Development_PPC */,
-				D1EF8A660C8C282A000509C9 /* Development_x86 */,
 				D10975230BAE73F4007E8087 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4459,8 +4474,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D11E93F208589A9200154C02 /* Development */,
+				D11B6B590C8C416500CA9DE3 /* Development_i386 */,
 				D10FD9500A852E1500935B10 /* Development_PPC */,
-				D1EF8A640C8C282A000509C9 /* Development_x86 */,
 				D11E93F308589A9200154C02 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4470,8 +4485,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D11E93F608589A9200154C02 /* Development */,
+				D11B6B5D0C8C416500CA9DE3 /* Development_i386 */,
 				D10FD9510A852E1500935B10 /* Development_PPC */,
-				D1EF8A680C8C282A000509C9 /* Development_x86 */,
 				D11E93F708589A9200154C02 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4481,8 +4496,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D15436100C01FB66002A027E /* Development */,
+				D11B6B5C0C8C416500CA9DE3 /* Development_i386 */,
 				D15436110C01FB66002A027E /* Development_PPC */,
-				D1EF8A670C8C282A000509C9 /* Development_x86 */,
 				D15436130C01FB66002A027E /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4492,8 +4507,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D1E314C40B52AA8900385072 /* Development */,
+				D11B6B5A0C8C416500CA9DE3 /* Development_i386 */,
 				D1E314C50B52AA8900385072 /* Development_PPC */,
-				D1EF8A650C8C282A000509C9 /* Development_x86 */,
 				D1E314C70B52AA8900385072 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
