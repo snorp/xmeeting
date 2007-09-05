@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.58 2007/09/03 11:36:34 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.59 2007/09/05 07:29:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,6 +140,12 @@ unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol,
 {
   PString token;
   unsigned callID = 0;
+  
+  if (!HasNetworkInterfaces()) {
+    *_callEndReason = XMCallEndReason_EndedByNoNetworkInterfaces;
+    return callID;
+  }
+  
   
   callEndReason = _callEndReason;
   BOOL returnValue = GetCallEndPoint()->StartCall(protocol, remoteParty, token);
@@ -560,6 +566,12 @@ void XMOpalManager::SetNATInformation(const PStringArray & stunServers,
 	delete stun;
 	stun = NULL;
   }
+  
+  if (!HasNetworkInterfaces()) {
+    PTRACE(3, "No usable network interfaces present, don't use STUN");
+    HandleSTUNInformation(PSTUNClient::UnknownNat, PString());
+    return;
+  }
 
   for (PINDEX i = 0; i < stunServers.GetSize(); i++) {
 	const PString & stunServer = stunServers[i];
@@ -621,6 +633,16 @@ void XMOpalManager::HandleSTUNInformation(PSTUNClient::NatTypes natType,
 {
   PTRACE(3, "Determined NAT Type " << natType << ", external address " << externalAddress);
   _XMHandleSTUNInformation((XMNATType)natType, externalAddress);
+}
+
+BOOL XMOpalManager::HasNetworkInterfaces() const
+{
+  PIPSocket::InterfaceTable interfaces;
+  PIPSocket::GetInterfaceTable(interfaces);
+  if (interfaces.GetSize() == 0 || (interfaces.GetSize() == 1 && interfaces[0].GetAddress().IsLoopback())) {
+    return FALSE;
+  }
+  return TRUE;
 }
 
 #pragma mark -

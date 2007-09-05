@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.44 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.45 2007/09/05 07:29:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1068,7 +1068,8 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *callIDNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [callIDNumber unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
+  // If call initiation fails, no callID is set (zero), don't log this
+  if((theCallID != callID) && (callID != UINT_MAX) && (callID != 0))
   {
 	NSLog(@"callID mismatch in callCleared: %d to current %d", (int)theCallID, (int)callID);
 	return;
@@ -1847,6 +1848,10 @@ typedef enum _XMOpalDispatcherMessage
 	{
 	  failReason = XMCallStartFailReason_TransportFail;
 	}
+    if (endReason == XMCallEndReason_EndedByNoNetworkInterfaces)
+    {
+      failReason = XMCallStartFailReason_NoNetworkInterfaces;
+    }
 	
 	// Initiating the call failed
 	[self _sendCallStartFailReason:failReason address:address];

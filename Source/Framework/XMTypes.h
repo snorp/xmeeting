@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.35 2007/08/17 11:36:42 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.36 2007/09/05 07:29:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -58,6 +58,7 @@ typedef enum XMCallStartFailReason
   XMCallStartFailReason_SIPNotEnabled,
   XMCallStartFailReason_SIPRegistrationRequired,
   XMCallStartFailReason_TransportFail,
+  XMCallStartFailReason_NoNetworkInterfaces,
   XMCallStartFailReasonCount
 } XMCallStartFailReason;
 
@@ -109,6 +110,7 @@ typedef enum XMCallEndReason
   XMCallEndReason_EndedByQ931Cause,         /// The remote ended the call with unmapped Q.931 cause code
   XMCallEndReason_EndedByDurationLimit,     /// Call cleared due to an enforced duration limit
   XMCallEndReason_EndedByInvalidConferenceID, /// Call cleared due to invalid conference ID
+  XMCallEndReason_EndedByNoNetworkInterfaces, /// No network interfaces present on the system
   XMCallEndReasonCount
 } XMCallEndReason;
 
@@ -128,70 +130,68 @@ typedef enum XMGatekeeperRegistrationFailReason
  **/
 typedef enum XMSIPStatusCode
 {
-  XMSIPStatusCode_NoFailure							=   0,
-  XMSIPStatusCode_UnknownFailure						=   1,
+  XMSIPStatusCode_NoFailure                           =   0,
+  XMSIPStatusCode_NoNetworkInterfaces                 =   1,
   
-  XMSIPStatusCode_Information_Trying					= 100,
-  XMSIPStatusCode_Information_Ringing					= 180,
-  XMSIPStatusCode_Information_CallForwarded			= 181,
-  XMSIPStatusCode_Information_Queued					= 182,
-  XMSIPStatusCode_Information_Session_Progress		= 183,
+  XMSIPStatusCode_Information_Trying                  = 100,
+  XMSIPStatusCode_Information_Ringing                 = 180,
+  XMSIPStatusCode_Information_CallForwarded           = 181,
+  XMSIPStatusCode_Information_Queued                  = 182,
+  XMSIPStatusCode_Information_Session_Progress        = 183,
   
-  XMSIPStatusCode_Succesful_OK						= 200,
-  XMSIPStatusCode_Succesful_Accepted					= 202,
+  XMSIPStatusCode_Succesful_OK                        = 200,
+  XMSIPStatusCode_Succesful_Accepted                  = 202,
   
-  XMSIPStatusCode_Redirection_MultipleChoices			= 300,
-  XMSIPStatusCode_Redirection_MovedPermamently		= 301,
-  XMSIPStatusCode_Redirection_MovedTemporarily		= 302,
-  XMSIPStatusCode_Redirection_UseProxy				= 305,
-  XMSIPStatusCode_Redirection_AlternativeService		= 380,
+  XMSIPStatusCode_Redirection_MultipleChoices         = 300,
+  XMSIPStatusCode_Redirection_MovedPermamently        = 301,
+  XMSIPStatusCode_Redirection_MovedTemporarily        = 302,
+  XMSIPStatusCode_Redirection_UseProxy                = 305,
+  XMSIPStatusCode_Redirection_AlternativeService      = 380,
   
-  XMSIPStatusCode_Failure_BadRequest					= 400,
-  XMSIPStatusCode_Failure_UnAuthorized				= 401,
-  XMSIPStatusCode_Failure_PaymentRequired				= 402,
-  XMSIPStatusCode_Failure_Forbidden					= 403,
-  XMSIPStatusCode_Failure_NotFound					= 404,
-  XMSIPStatusCode_Failure_MethodNotAllowed			= 405,
-  XMSIPStatusCode_Failure_NotAcceptable				= 406,
+  XMSIPStatusCode_Failure_BadRequest                  = 400,
+  XMSIPStatusCode_Failure_UnAuthorized                = 401,
+  XMSIPStatusCode_Failure_PaymentRequired             = 402,
+  XMSIPStatusCode_Failure_Forbidden                   = 403,
+  XMSIPStatusCode_Failure_NotFound                    = 404,
+  XMSIPStatusCode_Failure_MethodNotAllowed            = 405,
+  XMSIPStatusCode_Failure_NotAcceptable               = 406,
   XMSIPStatusCode_Failure_ProxyAuthenticationRequired = 407,
-  XMSIPStatusCode_Failure_RequestTimeout				= 408,
-  XMSIPStatusCode_Failure_Conflict					= 409,
-  XMSIPStatusCode_Failure_Gone						= 410,
-  XMSIPStatusCode_Failure_LengthRequired				= 411,
-  XMSIPStatusCode_Failure_RequestEntityTooLarge		= 413,
-  XMSIPStatusCode_Failure_RequestURITooLong			= 414,
-  XMSIPStatusCode_Failure_UnsupportedMediaScheme		= 415,
-  XMSIPStatusCode_Failure_UnsupportedURIScheme		= 416,
-  XMSIPStatusCode_Failure_BadExtension				= 420,
-  XMSIPStatusCode_Failure_ExtensionRequired			= 421,
-  XMSIPStatusCode_Failure_IntervalTooBrief			= 423,
-  XMSIPStatusCode_Failure_TemporarilyUnavailable		= 480,
-  XMSIPStatusCode_Failure_TransactionDoesNotExist		= 481,
-  XMSIPStatusCode_Failure_LoopDetected				= 482,
-  XMSIPStatusCode_Failure_TooManyHops					= 483,
-  XMSIPStatusCode_Failure_AddressIncomplete			= 484,
-  XMSIPStatusCode_Failure_Ambiguous					= 485,
-  XMSIPStatusCode_Failure_BusyHere					= 486,
-  XMSIPStatusCode_Failure_RequestTerminated			= 487,
-  XMSIPStatusCode_Failure_NotAcceptableHere			= 488,
-  XMSIPStatusCode_Failure_BadEvent					= 489,
-  XMSIPStatusCode_Failure_RequestPending				= 491,
-  XMSIPStatusCode_Failure_Undecipherable				= 493,
+  XMSIPStatusCode_Failure_RequestTimeout			  = 408,
+  XMSIPStatusCode_Failure_Conflict                    = 409,
+  XMSIPStatusCode_Failure_Gone                        = 410,
+  XMSIPStatusCode_Failure_LengthRequired              = 411,
+  XMSIPStatusCode_Failure_RequestEntityTooLarge       = 413,
+  XMSIPStatusCode_Failure_RequestURITooLong           = 414,
+  XMSIPStatusCode_Failure_UnsupportedMediaScheme      = 415,
+  XMSIPStatusCode_Failure_UnsupportedURIScheme        = 416,
+  XMSIPStatusCode_Failure_BadExtension                = 420,
+  XMSIPStatusCode_Failure_ExtensionRequired           = 421,
+  XMSIPStatusCode_Failure_IntervalTooBrief            = 423,
+  XMSIPStatusCode_Failure_TemporarilyUnavailable      = 480,
+  XMSIPStatusCode_Failure_TransactionDoesNotExist     = 481,
+  XMSIPStatusCode_Failure_LoopDetected                = 482,
+  XMSIPStatusCode_Failure_TooManyHops                 = 483,
+  XMSIPStatusCode_Failure_AddressIncomplete           = 484,
+  XMSIPStatusCode_Failure_Ambiguous                   = 485,
+  XMSIPStatusCode_Failure_BusyHere                    = 486,
+  XMSIPStatusCode_Failure_RequestTerminated           = 487,
+  XMSIPStatusCode_Failure_NotAcceptableHere           = 488,
+  XMSIPStatusCode_Failure_BadEvent                    = 489,
+  XMSIPStatusCode_Failure_RequestPending              = 491,
+  XMSIPStatusCode_Failure_Undecipherable              = 493,
   
-  XMSIPStatusCode_Failure_InternalServerError			= 500,
-  XMSIPStatusCode_Failure_NotImplemented				= 501,
-  XMSIPStatusCode_Failure_BadGateway					= 502,
-  XMSIPStatusCode_Failure_ServiceUnavailable			= 503,
-  XMSIPStatusCode_Failure_ServerTimeout				= 504,
-  XMSIPStatusCode_Failure_SIPVersionNotSupported		= 505,
-  XMSIPStatusCode_Failure_MessageTooLarge				= 513,
+  XMSIPStatusCode_Failure_InternalServerError         = 500,
+  XMSIPStatusCode_Failure_NotImplemented              = 501,
+  XMSIPStatusCode_Failure_BadGateway                  = 502,
+  XMSIPStatusCode_Failure_ServiceUnavailable          = 503,
+  XMSIPStatusCode_Failure_ServerTimeout               = 504,
+  XMSIPStatusCode_Failure_SIPVersionNotSupported      = 505,
+  XMSIPStatusCode_Failure_MessageTooLarge             = 513,
   
-  XMSIPStatusCode_GlobalFailure_BusyEverywhere		= 600,
-  XMSIPStatusCode_GlobalFailure_Decline				= 603,
-  XMSIPStatusCode_GlobalFailure_DoesNotExistAnywhere	= 604,
-  XMSIPStatusCode_GlobalFailure_NotAcceptable			= 606,
-  
-  XMSIPStatusCodeCount
+  XMSIPStatusCode_GlobalFailure_BusyEverywhere        = 600,
+  XMSIPStatusCode_GlobalFailure_Decline               = 603,
+  XMSIPStatusCode_GlobalFailure_DoesNotExistAnywhere  = 604,
+  XMSIPStatusCode_GlobalFailure_NotAcceptable         = 606
 } XMSIPStatusCode;
 
 /**

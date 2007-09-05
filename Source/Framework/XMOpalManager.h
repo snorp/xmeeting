@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.36 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.37 2007/09/05 07:29:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,6 +112,7 @@ private:
       
     void HandleSTUNInformation(PSTUNClient::NatTypes natType,
                                const PString & externalAddress);
+    BOOL HasNetworkInterfaces() const;
     
     unsigned bandwidthLimit;
 	

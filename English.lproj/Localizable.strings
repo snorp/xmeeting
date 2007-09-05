@@ -256,6 +256,7 @@
 "XM_DATE_FORMAT_STRING" = "%Y-%m-%d %H:%M:%S";
 "XM_EXTERNAL_ADDRESS_SUFFIX" = " (External)";
 "XM_EXTERNAL_ADDRESS" = "External";
+"XM_NO_NETWORK_INTERFACES" = "No network interfaces";
 
 /* Framework */
 "XM_FRAMEWORK_CONNECTION_TIMEOUT" = "Connection timeout";

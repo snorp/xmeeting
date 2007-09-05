@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.35 2007/09/03 11:36:34 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.36 2007/09/05 07:29:08 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -161,9 +161,7 @@ void XMSIPEndPoint::FinishRegistrationSetup()
     if(record.GetStatus() == XMSIPRegistrationRecord::ToUnregister)
     {
       Unregister(record.GetRegistration());
-      
       _XMHandleSIPUnregistration(record.GetRegistration());
-      
       activeRegistrations.RemoveAt(i);
     }
     else if(record.GetStatus() == XMSIPRegistrationRecord::ToRemove)
@@ -180,8 +178,7 @@ void XMSIPEndPoint::FinishRegistrationSetup()
       if(result == FALSE && (record.GetStatus() != XMSIPRegistrationRecord::Failed))
       {
         record.SetStatus(XMSIPRegistrationRecord::Failed);
-        
-        _XMHandleSIPRegistrationFailure(record.GetRegistration(), XMSIPStatusCode_UnknownFailure);
+        _XMHandleSIPRegistrationFailure(record.GetRegistration(), XMSIPStatusCode_NoNetworkInterfaces);
       }
     }
   }
