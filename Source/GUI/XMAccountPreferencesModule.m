@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.10 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.11 2007/09/09 20:27:49 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -166,6 +166,10 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   unsigned index = [h323AccountsTableView selectedRow];
   
+  if (index == UINT_MAX) {
+    return;
+  }
+  
   h323AccountToEdit = (XMH323Account *)[h323Accounts objectAtIndex:index];
   
   NSString *string = [h323AccountToEdit name];
@@ -239,6 +243,10 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 - (IBAction)editSIPAccount:(id)sender
 {
   unsigned index = [sipAccountsTableView selectedRow];
+  
+  if (index == UINT_MAX) {
+    return;
+  }
   
   sipAccountToEdit = (XMSIPAccount *)[sipAccounts objectAtIndex:index];
   
