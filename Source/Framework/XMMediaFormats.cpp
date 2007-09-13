@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.29 2007/05/03 10:40:16 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.30 2007/09/13 15:00:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -783,7 +783,7 @@ BOOL XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	return TRUE;
 }
 
-void XM_H323_H263_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
+/*void XM_H323_H263_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
 {
 	if(isH263PlusCapability)
 	{
@@ -885,7 +885,7 @@ void XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParame
         unsigned payloadType = rtpPayloadType.m_payloadType;
         SetPayloadType((RTP_DataFrame::PayloadTypes)payloadType);
     }
-}
+}*/
 
 BOOL XM_H323_H263_Capability::IsValidCapabilityForSending() const
 {
@@ -1271,7 +1271,7 @@ BOOL XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	return TRUE;
 }
 
-void XM_H323_H264_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
+/*void XM_H323_H264_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
 {
 	// Signal H.264 packetization modes understood by this endpoint
 	BOOL alreadyPresent = FALSE;
@@ -1332,7 +1332,7 @@ void XM_H323_H264_Capability::OnReceivedPDU(const H245_MediaPacketizationCapabil
 			}
 		}
 	}
-}
+}*/
 
 BOOL XM_H323_H264_Capability::IsValidCapabilityForSending() const
 {

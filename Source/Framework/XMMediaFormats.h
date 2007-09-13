@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.20 2007/02/16 14:12:36 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.21 2007/09/13 15:00:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -157,11 +157,11 @@ public:
 	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
 	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
 	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
-    virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
-    virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
-    virtual BOOL HasMediaPacketizationParameters() const { return IsH263PlusCapability(); }
-	virtual void OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const;
-	virtual void OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization);
+    //virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
+    //virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
+    //virtual BOOL HasMediaPacketizationParameters() const { return IsH263PlusCapability(); }
+	//virtual void OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const;
+	//virtual void OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization);
 	
 	virtual BOOL IsValidCapabilityForSending() const;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
@@ -219,8 +219,8 @@ public:
 	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
 	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
 	
-	virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
-	virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
+	//virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
+	//virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
 	
 	virtual BOOL IsValidCapabilityForSending() const;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
