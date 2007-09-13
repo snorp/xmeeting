@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.15 2007/08/17 09:17:08 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.16 2007/09/13 14:59:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -466,6 +466,10 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
       [self setSIPProxyUsername:nil];
       [self setSIPProxyPassword:nil];
     }
+  } else {
+    [self setSIPProxyHost:nil];
+    [self setSIPProxyUsername:nil];
+    [self setSIPProxyPassword:nil];
   }
 }
 
