@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.45 2007/09/05 07:29:07 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.46 2007/09/13 15:02:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,7 +100,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose;
 - (void)_doGatekeeperSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
-- (void)_doRegistrationSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
+- (void)_doRegistrationSetup:(XMPreferences *)preferences verbose:(BOOL)verbose proxyChanged:(BOOL)proxyChanged;
 
 - (void)_waitForSubsystemSetupCompletion:(BOOL)verbose;
 
@@ -810,7 +810,7 @@ typedef enum _XMOpalDispatcherMessage
   NSData *preferencesData = (NSData *)[components objectAtIndex:0];
   XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
   
-  [self _doRegistrationSetup:preferences verbose:YES];
+  [self _doRegistrationSetup:preferences verbose:YES proxyChanged:NO];
   
   [self _waitForSubsystemSetupCompletion:YES];
   
@@ -1603,6 +1603,8 @@ typedef enum _XMOpalDispatcherMessage
 {
   if([preferences enableSIP] == YES)
   {
+    BOOL proxyInfoChanged = NO;
+    
 	if(_XMEnableSIPListeners(YES) == YES)
 	{
 	  NSString *host = [preferences sipProxyHost];
@@ -1613,9 +1615,9 @@ typedef enum _XMOpalDispatcherMessage
 	  const char *proxyUsername = [username cStringUsingEncoding:NSASCIIStringEncoding];
 	  const char *proxyPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
 	  
-	  _XMSetSIPProxy(proxyHost, proxyUsername, proxyPassword);
+	  proxyInfoChanged = _XMSetSIPProxy(proxyHost, proxyUsername, proxyPassword);
 	  
-	  [self _doRegistrationSetup:preferences verbose:verbose];
+	  [self _doRegistrationSetup:preferences verbose:verbose proxyChanged:proxyInfoChanged];
 	}
 	else
 	{
@@ -1633,8 +1635,8 @@ typedef enum _XMOpalDispatcherMessage
 	
 	// unregistering if needed
 	[sipRegistrationWaitLock lock]; // will be unlocked from within _XMFinishRegistrationSetup()
-	_XMPrepareRegistrationSetup();
-	_XMFinishRegistrationSetup();
+	_XMPrepareRegistrationSetup(NO);
+	_XMFinishRegistrationSetup(NO);
 	
 	// disabling the SIP Listeners
 	_XMEnableSIPListeners(NO);
@@ -1642,6 +1644,7 @@ typedef enum _XMOpalDispatcherMessage
 }
 
 - (void)_doRegistrationSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
+                proxyChanged:(BOOL)proxyInfoChanged
 {
   NSArray *records = [preferences sipRegistrationRecords];
   
@@ -1657,7 +1660,7 @@ typedef enum _XMOpalDispatcherMessage
 												waitUntilDone:NO];
   }
   
-  _XMPrepareRegistrationSetup();
+  _XMPrepareRegistrationSetup(proxyInfoChanged);
   
   for(i = 0; i < count; i++)
   {
@@ -1684,11 +1687,11 @@ typedef enum _XMOpalDispatcherMessage
 	  registrationAuthorizationUsername = [authorizationUsername cStringUsingEncoding:NSASCIIStringEncoding];
 	  registrationPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
 	  
-	  _XMUseRegistration(registrationDomain, registrationUsername, registrationAuthorizationUsername, registrationPassword);
+	  _XMUseRegistration(registrationDomain, registrationUsername, registrationAuthorizationUsername, registrationPassword, proxyInfoChanged);
 	}
   }
   
-  _XMFinishRegistrationSetup();
+  _XMFinishRegistrationSetup(proxyInfoChanged);
 }
 
 - (void)_waitForSubsystemSetupCompletion:(BOOL)verbose

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.43 2007/08/07 14:55:03 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.44 2007/09/13 15:02:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,16 +180,18 @@ bool _XMEnableSIPListeners(bool enable);
 
 bool _XMIsSIPEnabled();
 
-void _XMSetSIPProxy(const char *host,
+/* Returns if the proxy information changed or not */
+bool _XMSetSIPProxy(const char *host,
 					const char *username,
 					const char *password);
 
-void _XMPrepareRegistrationSetup();
+void _XMPrepareRegistrationSetup(bool proxyChanged);
 void _XMUseRegistration(const char *domain,
 					    const char *username,
 					    const char *authorizationUsername,
-					    const char *password);
-void _XMFinishRegistrationSetup();
+					    const char *password,
+                        bool proxyChanged);
+void _XMFinishRegistrationSetup(bool proxyChanged);
 
 bool _XMIsSIPRegistered();
 

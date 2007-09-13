@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.36 2007/09/05 07:29:08 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.37 2007/09/13 15:02:44 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,8 +25,6 @@ XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
   connectionToken = "";
   
   SetInitialBandwidth(UINT_MAX);
-  
-  probingOptions.DisallowDeleteObjects();
   
   SetNATBindingRefreshMethod(EmptyRequest);
   
@@ -69,7 +67,7 @@ BOOL XMSIPEndPoint::IsListening()
   return isListening;
 }
 
-void XMSIPEndPoint::PrepareRegistrationSetup()
+void XMSIPEndPoint::PrepareRegistrationSetup(BOOL proxyChanged)
 {
   PWaitAndSignal m(registrationListMutex);
   
@@ -82,7 +80,8 @@ void XMSIPEndPoint::PrepareRegistrationSetup()
   {
     XMSIPRegistrationRecord & record = activeRegistrations[i];
     
-    if(record.GetStatus() == XMSIPRegistrationRecord::Registered)
+    if(record.GetStatus() == XMSIPRegistrationRecord::Registered &&
+       proxyChanged == FALSE)
     {
       record.SetStatus(XMSIPRegistrationRecord::ToUnregister);
     }
@@ -96,7 +95,8 @@ void XMSIPEndPoint::PrepareRegistrationSetup()
 void XMSIPEndPoint::UseRegistration(const PString & host,
                                     const PString & username,
                                     const PString & authorizationUsername,
-                                    const PString & password)
+                                    const PString & password,
+                                    BOOL proxyChanged)
 {
   PWaitAndSignal m(registrationListMutex);
   
@@ -115,30 +115,32 @@ void XMSIPEndPoint::UseRegistration(const PString & host,
     registration = username + '@' + host;
   }
   
-  // searching for a record with the same information
-  // if found, marking this record as registered/needs to register.
-  // if not, create a new record and add it to the list
-  for(i = 0; i < count; i++)
-  {
-    XMSIPRegistrationRecord & record = activeRegistrations[i];
-    
-    if(record.GetRegistration() == registration)
+  if (proxyChanged == FALSE) {
+    // searching for a record with the same information
+    // if found, marking this record as registered/needs to register.
+    // if not, create a new record and add it to the list
+    for(i = 0; i < count; i++)
     {
-      if(record.GetPassword() != password)
-      {
-        record.SetPassword(password);
-        record.SetStatus(XMSIPRegistrationRecord::ToRegister);
-      }
-      else if(record.GetStatus() == XMSIPRegistrationRecord::ToUnregister)
-      {
-        record.SetStatus(XMSIPRegistrationRecord::Registered);
-      }
-      else
-      {
-        record.SetStatus(XMSIPRegistrationRecord::ToRegister);
-      }
+      XMSIPRegistrationRecord & record = activeRegistrations[i];
       
-      return;
+      if(record.GetRegistration() == registration)
+      {
+        if(record.GetPassword() != password)
+        {
+          record.SetPassword(password);
+          record.SetStatus(XMSIPRegistrationRecord::ToRegister);
+        }
+        else if(record.GetStatus() == XMSIPRegistrationRecord::ToUnregister)
+        {
+          record.SetStatus(XMSIPRegistrationRecord::Registered);
+        }
+        else
+        {
+          record.SetStatus(XMSIPRegistrationRecord::ToRegister);
+        }
+        
+        return;
+      }
     }
   }
   
@@ -147,8 +149,15 @@ void XMSIPEndPoint::UseRegistration(const PString & host,
   activeRegistrations.Append(record);
 }
 
-void XMSIPEndPoint::FinishRegistrationSetup()
+void XMSIPEndPoint::FinishRegistrationSetup(BOOL proxyChanged)
 {
+  if (proxyChanged) {
+    // Unregister all registrations and re-register with the new proxy information
+    for (PSafePtr<SIPHandler> handler(activeSIPHandlers, PSafeReadWrite); handler != NULL; ++handler) {
+      Unregister(handler->GetRemotePartyAddress());
+    }
+  }
+  
   PWaitAndSignal m(registrationListMutex);
   
   int i;
@@ -173,7 +182,11 @@ void XMSIPEndPoint::FinishRegistrationSetup()
       BOOL result = Register(GetRegistrarTimeToLive().GetSeconds(),
                              record.GetRegistration(),
                              record.GetAuthorizationUsername(),
-                             record.GetPassword());
+                             record.GetPassword(),
+                             PString::Empty(),
+                             PMaxTimeInterval,
+                             PMaxTimeInterval,
+                             proxyChanged);
       
       if(result == FALSE && (record.GetStatus() != XMSIPRegistrationRecord::Failed))
       {
@@ -206,10 +219,12 @@ void XMSIPEndPoint::HandleNetworkStatusChange()
 {
 }
 
-void XMSIPEndPoint::UseProxy(const PString & hostname,
+BOOL XMSIPEndPoint::UseProxy(const PString & hostname,
 							 const PString & username,
 							 const PString & password)
 {
+  SIPURL oldProxy = GetProxy();
+  
   PString adjustedUsername;
   
   PINDEX location = username.Find('@');
@@ -223,6 +238,13 @@ void XMSIPEndPoint::UseProxy(const PString & hostname,
   }
   
   SetProxy(hostname, username, password);
+  
+  SIPURL newProxy = GetProxy();
+  
+  if (newProxy != oldProxy) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
