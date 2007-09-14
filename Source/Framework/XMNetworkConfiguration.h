@@ -1,5 +1,5 @@
 /*
- * $Id: XMNetworkConfiguration.h,v 1.2 2007/09/03 11:36:34 hfriederich Exp $
+ * $Id: XMNetworkConfiguration.h,v 1.3 2007/09/14 13:03:06 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,10 +25,6 @@ class XMInterfaceFilter : public PInterfaceFilter
 public:
   PIPSocket::InterfaceTable FilterInterfaces(const PIPSocket::Address & destination,
                                              PIPSocket::InterfaceTable & interfaces) const;
-  
-private:
-  BOOL IsReachable(const PIPSocket::Address & localAddress,
-                   const PIPSocket::Address & destination) const;
 };
 
 #endif // __XM_NETWORK_CONFIGURATION_H__
