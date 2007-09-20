@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.23 2007/08/17 11:36:42 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.24 2007/09/20 19:14:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,19 +21,18 @@
 	
 @private
   SCDynamicStoreRef dynamicStore;
-  SCDynamicStoreContext dynamicStoreContext;
   NSArray *localAddresses;
   NSArray *localAddressInterfaces;
   
+  BOOL doesUpdateSTUNInformation;
+  BOOL doesUpdateCheckipInformation;
+  
   XMNATType natType;
   NSString *stunExternalAddress;
+  NSString *checkipExternalAddress;
   
-  BOOL isFetchingCheckipExternalAddress;
-  BOOL didSucceedFetchingCheckipExternalAddress;
   NSURLConnection *checkipURLConnection;
   NSMutableData *checkipURLData;
-  NSString *checkipExternalAddress;
-  NSString *checkipExternalAddressFetchFailReason;
   NSTimer *checkipTimer;
 }
 
@@ -65,17 +64,20 @@
 - (XMNATType)natType;
 
 /**
- * Forces an update of the STUN information. If there is no STUN server
- * used at the moment, this method does nothing.
- * If the STUN information is updated, the appropriate notification will
- * be posted
+ * Returns the external address as determined either by STUN
+ * or by the checkip - address lookup
  **/
-- (void)updateSTUNInformation;
+- (NSString *)externalAddress;
+
+/**
+ * Updates the network information
+ **/
+- (void)updateNetworkInformation;
 
 /**
  * Returns the external address as reported by the STUN server
  **/
-- (NSString *)stunExternalAddress;
+//- (NSString *)stunExternalAddress;
 
 /**
  * Starts a search for the external address by a HTTP page
@@ -83,13 +85,13 @@
  * This is a nonblocking action, the end of a search is reported by
  * sending the appropriate notification.
  **/
-- (void)startFetchingCheckipExternalAddress;
+//- (void)startFetchingCheckipExternalAddress;
 
 /**
  * Returns whether the external address as reported by the HTTP
  * method is currently being updated or not
  **/
-- (BOOL)isFetchingCheckipExternalAddress;
+//- (BOOL)isFetchingCheckipExternalAddress;
 
 /**
  * Returns whether the last attempt to fetch the external address
@@ -97,7 +99,7 @@
  * Returns YES if no external address has been fetched yet, even
  * if -externalAddress returns nil in this case.
  **/
-- (BOOL)didSucceedFetchingCheckipExternalAddress;
+//- (BOOL)didSucceedFetchingCheckipExternalAddress;
 
 /**
  * Returns the external address as determined by the HTTP Method. 
@@ -105,14 +107,14 @@
  * starts a search but returns nil. Thus, this method is nonblocking
  * even if there is no external address yet.
  **/
-- (NSString *)checkipExternalAddress;
+//- (NSString *)checkipExternalAddress;
 
 /**
  * Returns the fail reason for the external address fetch using
  * the HTTP method.
  * This string is returned localized if present.
  **/
-- (NSString *)checkipExternalAddressFetchFailReason;
+//- (NSString *)checkipExternalAddressFetchFailReason;
 
 @end
 

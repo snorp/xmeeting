@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.32 2007/08/13 00:36:34 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.33 2007/09/20 19:14:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,30 +25,12 @@ extern NSString *XMNotification_FrameworkDidClose;
 #pragma mark XMUtils Notifications
 
 /**
- * Posted every time the local addresses do change. This happens
+ * Posted every time the network information does change.
+ * (local addresses, external address, NAT Type). This happens
  * if the system configuration location changes or if a network
  * cable is plugged in and the host gets connected to a network.
  **/
-extern NSString *XMNotification_UtilsDidUpdateLocalAddresses;
-
-/**
- * Posted every time the receiver starts a search for an external
- * address.
- **/
-extern NSString *XMNotification_UtilsDidStartFetchingCheckipExternalAddress;
-
-/**
- * Posted every time a search for an external address ends.
- * The success or failure of the operation can be queried
- * from the XMUtils instance.
- **/
-extern NSString *XMNotification_UtilsDidEndFetchingCheckipExternalAddress;
-
-/**
- * Posted every time the STUN information (natType and probably
- * external address) are updated
- **/
-extern NSString *XMNotification_UtilsDidUpdateSTUNInformation;
+extern NSString *XMNotification_UtilsDidUpdateNetworkInformation;
 
 #pragma mark XMCallManager Notifications
 

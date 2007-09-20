@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.27 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.28 2007/09/20 19:14:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,6 +39,9 @@
   XMCallStartFailReason callStartFailReason;
   
   BOOL canSendCameraEvents;
+  
+  // External address handling
+  BOOL needsCheckipAddress;
   
   // h.323 variables
   NSString *gatekeeperName;

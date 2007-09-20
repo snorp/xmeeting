@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.49 2007/08/17 12:33:07 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.50 2007/09/20 19:11:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,10 +94,7 @@
                              name:XMNotification_CallManagerDidEndSubsystemSetup
                            object:nil];
   [notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
-                             name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
-                             name:XMNotification_UtilsDidUpdateLocalAddresses
+                             name:XMNotification_UtilsDidUpdateNetworkInformation
                            object:nil];
   [notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
                              name:XMNotification_CallManagerDidStartCallInitiation
@@ -855,7 +852,7 @@
   // appending the network addresses to the tool tip
   NSString *externalAddress = nil;
   unsigned externalAddressIndex = NSNotFound;
-  externalAddress = [utils checkipExternalAddress];
+  externalAddress = [utils externalAddress];
 		
   if(externalAddress != nil) {
     externalAddressIndex = [localAddresses indexOfObject:externalAddress];

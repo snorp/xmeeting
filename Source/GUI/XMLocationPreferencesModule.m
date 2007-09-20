@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.32 2007/08/17 09:17:08 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.33 2007/09/20 19:11:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,8 +113,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)_newLocationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode context:(void *)context;
 - (void)_deleteLocationAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode context:(void *)context;
 
-  // notification responding
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif;
+- (void)_didUpdateNetworkInformation:(NSNotification *)notif;
 
 - (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)locations
 										h323Accounts:(NSArray *)h323Accounts
@@ -142,9 +141,6 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   sipAccounts = nil;
   audioCodecs = nil;
   videoCodecs = nil;
-  
-  externalAddressIsValid = YES;
-  isFetchingExternalAddress = NO;
   
   return self;
 }
@@ -178,24 +174,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // adjusting the autoresizing behaviour of the two codec tables
   [audioCodecPreferenceOrderTableView setColumnAutoresizingStyle:NSTableViewLastColumnOnlyAutoresizingStyle];
   [videoCodecPreferenceOrderTableView setColumnAutoresizingStyle:NSTableViewLastColumnOnlyAutoresizingStyle];
-  
-  // making the table view use a XMBoolean cell for the "enabled" column
   [audioCodecPreferenceOrderTableView setRowHeight:16];
   [videoCodecPreferenceOrderTableView setRowHeight:16];
   
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
-                                               name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-                                               name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
-  
-  XMUtils *utils = [XMUtils sharedInstance];
-  if([utils didSucceedFetchingCheckipExternalAddress] && [utils checkipExternalAddress] == nil)
-  {
-    // in this case, the external address has not yet been fetched, thus
-    // we start fetching the address
-    [utils startFetchingCheckipExternalAddress];
-    isFetchingExternalAddress = YES;
-  }
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didUpdateNetworkInformation:)
+                                               name:XMNotification_UtilsDidUpdateNetworkInformation object:nil];
   
   [actionButton sendActionOn:NSLeftMouseDownMask];
   [actionPopup selectItem: nil];
@@ -395,17 +378,6 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (IBAction)defaultAction:(id)sender
 {
   [prefWindowController notePreferencesDidChange];
-}
-
-- (IBAction)getExternalAddress:(id)sender
-{
-  XMUtils *utils = [XMUtils sharedInstance];
-  
-  [utils startFetchingCheckipExternalAddress];
-  
-  [externalAddressField setStringValue:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
-  [externalAddressField setEnabled:NO];
-  externalAddressIsValid = NO;
 }
 
 - (IBAction)toggleAutoGetExternalAddress:(id)sender
@@ -1322,32 +1294,21 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   unsigned state = [autoGetExternalAddressSwitch state];
   [externalAddressField setEnabled:(state == NSOffState ? YES : NO)];
 		
-  if(state == NSOnState || externalAddressIsValid == NO)
+  if(state == NSOnState)
   {
     XMUtils *utils = [XMUtils sharedInstance];
-    NSString *externalAddress = [utils checkipExternalAddress];
+    NSString *externalAddress = [utils externalAddress];
     NSString *displayString;
     
     if(externalAddress == nil)
     {
-      if(isFetchingExternalAddress)
-      {
-        [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
-        displayString = @"";
-      }
-      else
-      {
-        [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"")];
-        displayString = @"";
-      }
-      externalAddressIsValid = NO;
+      [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"")];
+      displayString = @"";
     }
     else
     {
       displayString = externalAddress;
-      externalAddressIsValid = YES;
     }
-    
     [externalAddressField setStringValue:displayString];
   }
   else if (state == NSOffState)
@@ -1355,11 +1316,6 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     if (![currentLocation isKindOfClass:[XMMultipleLocationsWrapper class]]) {
       [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:@""];
     }
-  }
-  if (state == NSMixedState) {
-    [getExternalAddressButton setEnabled:NO];
-  } else {
-    [getExternalAddressButton setEnabled:YES];
   }
 }
 
@@ -1754,14 +1710,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 #pragma mark -
 #pragma mark Notification Responding Methods
 
-- (void)_didStartFetchingExternalAddress:(NSNotification *)notif
+- (void)_didUpdateNetworkInformation:(NSNotification *)notif
 {
-  isFetchingExternalAddress = YES;
-}
-
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
-{
-  isFetchingExternalAddress = NO;
   [self _validateExternalAddressUserInterface];
 }
 

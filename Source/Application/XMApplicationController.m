@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.57 2007/09/05 07:29:07 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.58 2007/09/20 19:10:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -221,10 +221,7 @@
 - (IBAction)updateNetworkInformation:(id)sender
 {
   XMUtils *utils = [XMUtils sharedInstance];
-  
-  [utils startFetchingCheckipExternalAddress];
-  [utils updateSTUNInformation];
-  
+  [utils updateNetworkInformation];
   
   [[XMMainWindowController sharedInstance] showMainWindow];
 }
@@ -893,10 +890,6 @@
   NSArray *contactsModules = [[NSArray alloc] initWithObjects:addressBookModule, nil];
   [[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Contacts] setModules:contactsModules];
   [contactsModules release];
-  
-  // start fetching the external address
-  XMUtils *utils = [XMUtils sharedInstance];
-  [utils startFetchingCheckipExternalAddress];
   
   // causing the PreferencesManager to activate the active location
   // by calling XMCallManager -setActivePreferences:

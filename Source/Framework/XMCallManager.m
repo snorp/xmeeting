@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.41 2007/08/17 09:17:08 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.42 2007/09/20 19:14:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,6 +96,8 @@
   callStartFailReason = XMCallStartFailReason_NoFailure;
   
   canSendCameraEvents = NO;
+  
+  needsCheckipAddress = NO;
   
   gatekeeperName = nil;
   gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
@@ -736,11 +738,7 @@
   }
   else
   {
-    NSString *externalAddress = [_XMUtilsSharedInstance stunExternalAddress];
-    if(externalAddress == nil)
-    {
-      externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
-    }
+    NSString *externalAddress = [_XMUtilsSharedInstance externalAddress];
     
     if([localAddress isEqualToString:externalAddress])
     {
@@ -794,11 +792,7 @@
     }
     else
     {
-      NSString *externalAddress = [_XMUtilsSharedInstance stunExternalAddress];
-      if(externalAddress == nil)
-      {
-        externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
-      }
+      NSString *externalAddress = [_XMUtilsSharedInstance externalAddress];
       
       if([localAddress isEqualToString:externalAddress])
       {
@@ -865,11 +859,7 @@
     }
     else
     {
-      NSString *externalAddress = [_XMUtilsSharedInstance stunExternalAddress];
-      if(externalAddress == nil)
-      {
-        externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
-      }
+      NSString *externalAddress = [_XMUtilsSharedInstance externalAddress];
       
       if([address isEqualToString:externalAddress])
       {
@@ -1136,9 +1126,17 @@
                                                       object:[NSNumber numberWithUnsignedInt:searchIndex]];
 }
 
-- (void)_updateSTUNInformation
+- (void)_networkStatusChanged
 {
   [self _doSubsystemSetupWithPreferences:activePreferences];
+}
+
+- (void)_checkipAddressUpdated
+{
+  if (needsCheckipAddress == YES) {
+    needsCheckipAddress = NO;
+    [self _doSubsystemSetupWithPreferences:activePreferences];
+  }
 }
 
 #pragma mark -
@@ -1169,19 +1167,14 @@
   [number release];
   
   NSString *externalAddress = nil;
-  externalAddress = [_XMUtilsSharedInstance checkipExternalAddress];
-  if(externalAddress == nil)
+  externalAddress = [_XMUtilsSharedInstance _checkipExternalAddress];
+  if(externalAddress == nil || [_XMUtilsSharedInstance _doesUpdateCheckipInformation])
   {
-    if([_XMUtilsSharedInstance didSucceedFetchingCheckipExternalAddress] == YES)
-    {
-      // not yet fetched
-      [_XMUtilsSharedInstance startFetchingCheckipExternalAddress];
-      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-                                                   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
+    // not yet fetched
+    needsCheckipAddress = YES;
       
-      // we continue this job when the external address fetch task is finished
-      return;
-    }
+    // we continue this job when the external address fetch task is finished
+    return;
   }
   
   // resetting the H323 listening status if an error previously
@@ -1190,6 +1183,7 @@
     h323ListeningStatus = XM_H323_NOT_LISTENING;
   }
   
+  // resetting the SIP listening status if an error previously
   if(sipListeningStatus == XM_SIP_ERROR)
   {
     sipListeningStatus = XM_SIP_NOT_LISTENING;
@@ -1197,15 +1191,6 @@
   
   // preparations complete
   [XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
-}
-
-- (void)_didEndFetchingExternalAddress:(NSNotification *)notif
-{
-  // removing the listener
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
-  
-  // do the subsystem setup again
-  [self _doSubsystemSetupWithPreferences:activePreferences];
 }
 
 - (void)_initiateCall:(XMAddressResource *)addressResource
@@ -1231,7 +1216,7 @@
   [XMOpalDispatcher _initiateSpecificCallToAddress:address
                                           protocol:callProtocol 
                                        preferences:modifiedPreferences 
-                                   externalAddress:[_XMUtilsSharedInstance checkipExternalAddress]];
+                                   externalAddress:[_XMUtilsSharedInstance externalAddress]];
   
   [modifiedPreferences release];
 }

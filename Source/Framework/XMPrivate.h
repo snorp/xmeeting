@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.42 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.43 2007/09/20 19:14:03 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,6 +53,8 @@ void _XMCheckCloseStatus();
 - (void)_close;
 
 - (void)_handleSTUNInformation:(NSArray *)info;
+- (NSString *)_checkipExternalAddress;
+- (BOOL)_doesUpdateCheckipInformation;
 
 @end
 
@@ -149,9 +151,13 @@ void _XMCheckCloseStatus();
 // Called every time an attempt to register at a SIP registrar failed
 - (void)_handleSIPRegistrationFailure:(NSArray *)info;
 
-#pragma mark Misc.
+#pragma mark Misc
 
-- (void)_updateSTUNInformation;
+// Called when the network status changed
+- (void)_networkStatusChanged;
+
+// Called when the checkip address changed
+- (void)_checkipAddressUpdated;
 
 @end
 

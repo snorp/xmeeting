@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.22 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.23 2007/09/20 19:11:51 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,13 +81,7 @@
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   
   [notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
-                             name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
-                             name:XMNotification_UtilsDidUpdateLocalAddresses
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
-                             name:XMNotification_UtilsDidUpdateSTUNInformation
+                             name:XMNotification_UtilsDidUpdateNetworkInformation
                            object:nil];
   
   [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
@@ -358,10 +352,7 @@
   
   addressExtraHeight = (localAddressCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
   
-  NSString *externalAddress = [utils stunExternalAddress];
-  if(externalAddress == nil) {
-    externalAddress = [utils checkipExternalAddress];
-  }
+  NSString *externalAddress = [utils externalAddress];
 		
   if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
   {
