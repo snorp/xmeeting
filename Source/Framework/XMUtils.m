@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.25 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.26 2007/09/20 19:26:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,6 +175,10 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)updateNetworkInformation
 {
+  if (dynamicStore == NULL) {
+    return; // Framework is already closing
+  }
+  
   doesUpdateSTUNInformation = YES;
   [_XMCallManagerSharedInstance _networkStatusChanged];
   
@@ -289,6 +293,10 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)_handleSTUNInformation:(NSArray *)array
 {
+  if (dynamicStore == NULL) {
+    return; // Framework is already closing
+  }
+  
   NSNumber *number = [array objectAtIndex:0];
   natType = (XMNATType)[number unsignedIntValue];
   
@@ -387,6 +395,10 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)_cleanupCheckipFetching
 {
+  if (dynamicStore == NULL) {
+    return; // Framework is already closing. SHOULD NOT HAPPEN
+  }
+  
   doesUpdateCheckipInformation = NO;
   
   [checkipURLConnection release];
