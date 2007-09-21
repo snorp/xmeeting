@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.15 2007/08/14 10:56:40 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.16 2007/09/21 06:13:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1086,10 +1086,10 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
+	/*[notificationCenter addObserver:self selector:@selector(_didStartFetchingExternalAddress:)
 							   name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
 	[notificationCenter addObserver:self selector:@selector(_didEndFetchingExternalAddress:)
-							   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
+							   name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];*/
 	
 	[continueButton setEnabled:NO];
 	[goBackButton setEnabled:NO];
@@ -1104,8 +1104,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		[natDetectionProgressIndicator startAnimation:self];
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didUpdateSTUNInformation:)
-													 name:XMNotification_UtilsDidUpdateSTUNInformation object:nil];
+		/*[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didUpdateSTUNInformation:)
+													 name:XMNotification_UtilsDidUpdateSTUNInformation object:nil];*/
 		
 		XMPreferences *preferences = [[XMPreferences alloc] init];
 		[preferences setUseSTUN:YES];
@@ -1144,8 +1144,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	[location setExternalAddress:string];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
-	[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
+	//[notificationCenter removeObserver:self name:XMNotification_UtilsDidStartFetchingCheckipExternalAddress object:nil];
+	//[notificationCenter removeObserver:self name:XMNotification_UtilsDidEndFetchingCheckipExternalAddress object:nil];
 }
 
 - (void)_prepareFLProtocolSettings
@@ -2449,7 +2449,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	detectedNATType = [utils natType];
 	[self _setupNATTypeView];
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidUpdateSTUNInformation object:nil];
+	//[[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_UtilsDidUpdateSTUNInformation object:nil];
 }
 
 - (void)_setupNATTypeView
