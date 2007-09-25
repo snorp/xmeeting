@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.58 2007/09/20 19:10:39 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.59 2007/09/25 12:11:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,15 +96,6 @@
 {
   self = [super init];
   
-  // all setup is done in -applicationDidFinishLaunching
-  // in order to avoid problems with the XMeeting framework's runtime
-  // engine
-  
-  return self;
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)notif
-{
   // Initialize the framework
   BOOL enablePTrace = [XMPreferencesManager enablePTrace];
   NSString *pTracePath = nil;
@@ -114,6 +105,11 @@
   }
   XMInitFramework(pTracePath);
   
+  return self;
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)notif
+{  
   // Ensure that the STUN servers are read, to avoid race conditions
   XMDefaultSTUNServers();
   

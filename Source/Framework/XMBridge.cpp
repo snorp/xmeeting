@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.50 2007/09/13 15:02:44 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.51 2007/09/25 12:12:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -54,11 +54,12 @@ void _XMSetBandwidthLimit(unsigned limit)
 
 void _XMSetNATInformation(const char * const *stunServers,
 						  unsigned stunServerCount,
-						  const char *translationAddress)
+						  const char *translationAddress,
+                          bool networkStatusChanged)
 {
   PStringArray servers = PStringArray(stunServerCount, stunServers, TRUE);
   PString externalAddress = translationAddress;
-  XMOpalManager::GetManager()->SetNATInformation(servers, externalAddress);
+  XMOpalManager::GetManager()->SetNATInformation(servers, externalAddress, networkStatusChanged);
 }
 
 void _XMSetPortRanges(unsigned int udpPortMin, 

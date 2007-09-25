@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.24 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.25 2007/09/25 12:12:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,48 +73,6 @@
  * Updates the network information
  **/
 - (void)updateNetworkInformation;
-
-/**
- * Returns the external address as reported by the STUN server
- **/
-//- (NSString *)stunExternalAddress;
-
-/**
- * Starts a search for the external address by a HTTP page
- * that displays the external address to be used
- * This is a nonblocking action, the end of a search is reported by
- * sending the appropriate notification.
- **/
-//- (void)startFetchingCheckipExternalAddress;
-
-/**
- * Returns whether the external address as reported by the HTTP
- * method is currently being updated or not
- **/
-//- (BOOL)isFetchingCheckipExternalAddress;
-
-/**
- * Returns whether the last attempt to fetch the external address
- * by using the HTTP method was succesful or not.
- * Returns YES if no external address has been fetched yet, even
- * if -externalAddress returns nil in this case.
- **/
-//- (BOOL)didSucceedFetchingCheckipExternalAddress;
-
-/**
- * Returns the external address as determined by the HTTP Method. 
- * If the external address hasn't been fetched yet, this method 
- * starts a search but returns nil. Thus, this method is nonblocking
- * even if there is no external address yet.
- **/
-//- (NSString *)checkipExternalAddress;
-
-/**
- * Returns the fail reason for the external address fetch using
- * the HTTP method.
- * This string is returned localized if present.
- **/
-//- (NSString *)checkipExternalAddressFetchFailReason;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.59 2007/09/05 07:29:08 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.60 2007/09/25 12:12:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -553,9 +553,17 @@ void XMOpalManager::SetUserName(const PString & username)
 #pragma mark -
 #pragma mark Network Setup Methods
 
-void XMOpalManager::SetNATInformation(const PStringArray & stunServers,
-									  const PString & theTranslationAddress)
+void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
+									  const PString & theTranslationAddress,
+                                      BOOL networkStatusChanged)
 {
+  // Don't re-fetch the STUN information if the network status didn't change
+  if (networkStatusChanged == FALSE && stunServers.Compare(theStunServers) == PObject::EqualTo) {
+    return;
+  }
+  
+  stunServers = theStunServers;
+  
   //
   // In case STUN works as expected, use it. In case of failures,
   // SymmetricNAT, SymmetricFirewall, PartialBlockedNAT, dont' use

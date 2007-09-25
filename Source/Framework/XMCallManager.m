@@ -1,10 +1,12 @@
 /*
- * $Id: XMCallManager.m,v 1.42 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.43 2007/09/25 12:12:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
+
+#import <AppKit/AppKit.h>
 
 #import "XMTypes.h"
 #import "XMStringConstants.h"
@@ -45,6 +47,10 @@
 
 - (void)_storeCall:(XMCallInfo *)callInfo;
 
+- (void)_didFinishLaunching:(NSNotification *)notif;
+- (void)_willSleep:(NSNotification *)notif;
+- (void)_didWakeup:(NSNotification *)notif;
+
 @end
 
 @implementation XMCallManager
@@ -79,7 +85,7 @@
   return nil;
 }
 
-- (id)_init
+- (id)_initWithPTracePath:(NSString *)path
 {
   self = [super init];
   
@@ -109,46 +115,50 @@
   
   recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
   
+  pTracePath = [path copy];
+  
+  networkStatusChanged = YES;
+  doesSleep = NO;
+  isActiveSession = YES;
+  
+  // Registering notifications
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter addObserver:self selector:@selector(_didFinishLaunching:)
+                             name:NSApplicationDidFinishLaunchingNotification object:nil];
+  
+  // Use NSWorkspace's notification center for these notifications
+  notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+  
+  [notificationCenter addObserver:self selector:@selector(_willSleep:)
+                             name:NSWorkspaceWillSleepNotification object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didWake:)
+                             name:NSWorkspaceDidWakeNotification object:nil];
+  
   return self;
 }
 
 - (void)_close
 {
-  if(activePreferences != nil)
-  {
-    [activePreferences release];
-    activePreferences = nil;
-  }
+  [activePreferences release];
+  activePreferences = nil;
   
-  if(activeCall != nil)
-  {
-    [activeCall release];
-    activeCall = nil;
-  }
+  [activeCall release];
+  activeCall = nil;
   
-  if(gatekeeperName != nil)
-  {
-    [gatekeeperName release];
-    gatekeeperName = nil;
-  }
+  [gatekeeperName release];
+  gatekeeperName = nil;
   
-  if(registrations != nil)
-  {
-    [registrations release];
-    registrations = nil;
-  }
+  [registrations release];
+  registrations = nil;
   
-  if(sipRegistrationFailReasons != nil)
-  {
-    [sipRegistrationFailReasons release];
-    sipRegistrationFailReasons = nil;
-  }
+  [sipRegistrationFailReasons release];
+  sipRegistrationFailReasons = nil;
+
+  [recentCalls release];
+  recentCalls = nil;
   
-  if(recentCalls != nil)
-  {
-    [recentCalls release];
-    recentCalls = nil;
-  }
+  [pTracePath release];
+  pTracePath = nil;
   
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -671,6 +681,10 @@
     callManagerStatus = XM_CALL_MANAGER_READY;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
   }
+  
+  if (doesSleep == YES) {
+    canSleep = YES;
+  }
 }
 
 - (void)_handleCallInitiated:(XMCallInfo *)call
@@ -1128,7 +1142,10 @@
 
 - (void)_networkStatusChanged
 {
-  [self _doSubsystemSetupWithPreferences:activePreferences];
+  if (doesSleep == NO) {
+    networkStatusChanged = YES;
+    [self _doSubsystemSetupWithPreferences:activePreferences];
+  }
 }
 
 - (void)_checkipAddressUpdated
@@ -1166,9 +1183,7 @@
   }
   [number release];
   
-  NSString *externalAddress = nil;
-  externalAddress = [_XMUtilsSharedInstance _checkipExternalAddress];
-  if(externalAddress == nil || [_XMUtilsSharedInstance _doesUpdateCheckipInformation])
+  if([_XMUtilsSharedInstance _doesUpdateCheckipInformation])
   {
     // not yet fetched
     needsCheckipAddress = YES;
@@ -1176,6 +1191,8 @@
     // we continue this job when the external address fetch task is finished
     return;
   }
+  NSString *externalAddress = nil;
+  externalAddress = [_XMUtilsSharedInstance _checkipExternalAddress];
   
   // resetting the H323 listening status if an error previously
   if(h323ListeningStatus == XM_H323_ERROR)
@@ -1190,7 +1207,9 @@
   }
   
   // preparations complete
-  [XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress];
+  [XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress 
+               networkStatusChanged:networkStatusChanged];
+  networkStatusChanged = NO;
 }
 
 - (void)_initiateCall:(XMAddressResource *)addressResource
@@ -1279,6 +1298,37 @@
     [recentCalls removeObjectAtIndex:99];
   }
   [recentCalls insertObject:call atIndex:0];
+}
+
+- (void)_didFinishLaunching:(NSNotification *)notif
+{
+  // Now it's time to launch the framework
+  _XMLaunchFramework(pTracePath);
+}
+
+- (void)_willSleep:(NSNotification *)notif
+{
+  doesSleep = YES;
+  canSleep = NO;
+  XMPreferences *prefs = [[XMPreferences alloc] init];
+  [self _doSubsystemSetupWithPreferences:prefs];
+  [prefs release];
+  
+  // Sleeping is suspended until this method returns
+  // (or until 30s have elapsed) Thus, run the run
+  // loop here until the subsystem setup has completed
+  BOOL isRunning;
+  do {
+    NSDate *next = [NSDate dateWithTimeIntervalSinceNow:1.0];
+    isRunning = [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:next];
+  } while(isRunning && !canSleep);
+}
+
+- (void)_didWake:(NSNotification *)notif
+{
+  doesSleep = NO;
+  networkStatusChanged = YES;
+  [self _doSubsystemSetupWithPreferences:activePreferences];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.37 2007/09/05 07:29:08 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.38 2007/09/25 12:12:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,7 +81,8 @@ public:
 	
     /* NAT methods */
 	void SetNATInformation(const PStringArray & stunServers,
-						   const PString & translationAddress);
+						   const PString & translationAddress,
+                           BOOL networkStatusChanged);
 	
 	/* Audio setup methods */
 	void SetAudioPacketTime(unsigned audioPacketTime);
@@ -113,6 +114,8 @@ private:
     void HandleSTUNInformation(PSTUNClient::NatTypes natType,
                                const PString & externalAddress);
     BOOL HasNetworkInterfaces() const;
+    
+    PStringArray stunServers;
     
     unsigned bandwidthLimit;
 	

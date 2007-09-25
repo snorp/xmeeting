@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.19 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.20 2007/09/25 12:12:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,8 @@
 	
 }
 
-+ (void)_setPreferences:(XMPreferences *)preferences externalAddress:(NSString *)externalAddress;
++ (void)_setPreferences:(XMPreferences *)preferences externalAddress:(NSString *)externalAddress
+   networkStatusChanged:(BOOL)networkStatusChanged;
 + (void)_retryEnableH323:(XMPreferences *)preferences;
 + (void)_retryGatekeeperRegistration:(XMPreferences *)preferences;
 + (void)_retryEnableSIP:(XMPreferences *)preferences;

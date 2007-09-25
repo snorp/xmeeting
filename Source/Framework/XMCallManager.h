@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.28 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.29 2007/09/25 12:12:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,6 +56,15 @@
   
   // call history
   NSMutableArray *recentCalls;
+  
+  // Framework initialization
+  NSString *pTracePath;
+  
+  // Tracking system state
+  BOOL networkStatusChanged;
+  BOOL doesSleep;
+  BOOL canSleep;
+  BOOL isActiveSession;
 }
 
 /**

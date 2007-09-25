@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.43 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.44 2007/09/25 12:12:01 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,6 +39,7 @@ extern XMMediaTransmitter *_XMMediaTransmitterSharedInstance;
 extern XMMediaReceiver *_XMMediaReceiverSharedInstance;
 extern XMCallRecorder *_XMCallRecorderSharedInstance;
 
+void _XMLaunchFramework(NSString *pTracePath);
 void _XMSubsystemInitialized();
 void _XMThreadExit();
 void _XMCheckCloseStatus();
@@ -60,7 +61,7 @@ void _XMCheckCloseStatus();
 
 @interface XMCallManager (FrameworkMethods)
 
-- (id)_init;
+- (id)_initWithPTracePath:(NSString *)pTracePath;
 - (void)_close;
 
 // Called when the OpalDispatcher did complete the

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.44 2007/09/13 15:02:44 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.45 2007/09/25 12:12:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -79,7 +79,8 @@ void _XMSetBandwidthLimit(unsigned limit);
  **/
 void _XMSetNATInformation(const char * const * stunServers,
 						  unsigned stunServerCount,
-						  const char *translationAddress);
+						  const char *translationAddress,
+                          bool networkStatusChanged);
 /**
  * defines which port ranges to use to establish
  * the media streams
