@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.44 2007/09/25 12:12:01 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.45 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -122,7 +122,7 @@ void _XMCheckCloseStatus();
 - (void)_handleGatekeeperRegistrationProcessEnd;
 
 // Called every time the Framework registers at a gatekeeper
-- (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName;
+- (void)_handleGatekeeperRegistration:(NSArray *)objects;
 
 // Called every time the Framework unregisters from a gatekeeper
 - (void)_handleGatekeeperUnregistration;

@@ -30,8 +30,8 @@
                 h323AccountsTableView = NSTableView; 
                 h323GatekeeperHostField = NSTextField; 
                 h323PasswordField = NSTextField; 
-                h323PhoneNumberField = NSTextField; 
-                h323UsernameField = NSTextField; 
+                h323TerminalAlias1Field = NSTextField; 
+                h323TerminalAlias2Field = NSTextField; 
                 locationModule = XMLocationPreferencesModule; 
                 sipAccountNameField = NSTextField; 
                 sipAccountsTableView = NSTableView; 

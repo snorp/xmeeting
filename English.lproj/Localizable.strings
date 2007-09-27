@@ -25,11 +25,16 @@
 "XM_ENABLE_H323_FAILED_INFO_TEXT" = "Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls";
 
 "XM_GK_REG_FAILED_MESSAGE" = "Gatekeeper Registration Failed";
-"XM_GK_REG_FAILED_INFO_TEXT" = "Unable to register at gatekeeper \"%@\" (%@). You will not be able to use phone numbers when making a call. %@";
-"XM_GK_NOT_FOUND_SUGGESTION" = "Please check your internet connection.";
-"XM_GK_REG_REJECT_SUGGESTION" = "Please check your gatekeeper settings.";
+"XM_GK_REG_FAILED_INFO_TEXT" = "Unable to register at gatekeeper \"%@\" (%@). You will not be able to use H.323 IDs (alias names, phone numbers) when making a call. %@";
+"XM_GK_NOT_FOUND_SUGGESTION" = "\nPlease check your internet connection and the H.323 account settings.";
+"XM_GK_DUPLICATE_ALIAS_SUGGESTION" = "\n\nSomeone else is already registered with the H.323 IDs you're provided. If XMeeting previously crashed, you may have to wait some time until you can re-register. Otherwise check your H.323 account settings and contact the responsible Gatekeeper administrator.";
+"XM_GK_SECURITY_DENIED_SUGGESTION" = "\nPlease check the H.323 account settings (user alias and password) or contact the responsible Gatekeeper administrator.";
+"XM_GK_UNREG_BY_GK_SUGGESTION" = "\n\nXMeeting will automatically try to re-register.";
 "XM_GK_REG_FAILED_NOT_FOUND" = "Gatekeeper not found";
-"XM_GK_REG_FAILED_REJECTED" = "Gatekeeper rejected registration";
+"XM_GK_REG_FAILED_DUPLICATE_ALIAS" = "Gatekeeper rejected registration - duplicate alias";
+"XM_GK_REG_FAILED_SECURITY_DENIED" = "Gatekeeper rejected registration - security denial";
+"XM_GK_REG_FAILED_TRANSPORT_ERROR" = "Transport Error";
+"XM_GK_REG_FAILED_UNREG_BY_GK" = "Gatekeeper unregistered client";
 
 "XM_ENABLE_SIP_FAILED_MESSAGE" = "Enabling SIP Failed";
 "XM_ENABLE_SIP_FAILED_INFO_TEXT" = "Unable to enable the SIP subsystem.";
@@ -124,7 +129,7 @@
 "XM_CALL_HISTORY_MODULE_CALL_ESTABLISHED" = "Call with \"%@\" established.\nLocal IP Address: %@ (%@).\nRemote Address: %@\nRemote Application: \"%@\".";
 "XM_CALL_HISTORY_MODULE_CALL_CLEARED" = "Call with \"%@\" cleared.\nDuration: %@\nCall End Reason: %@";
 "XM_CALL_HISTORY_MODULE_H323_FAILURE" = "Enabling the H.323 subsystem failed.";
-"XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Registered at gatekeeper \"%@\"";
+"XM_CALL_HISTORY_MODULE_GK_REGISTRATION" = "Registered at gatekeeper \"%@\" with ID's %@";
 "XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION" = "Unregistered from gatekeeper \"%@\"";
 "XM_CALL_HISTORY_MODULE_GK_REG_FAILURE" = "Failed to register at gatekeeper \"%@\" (%@)";
 "XM_CALL_HISTORY_MODULE_SIP_FAILURE" = "Enabling the SIP subsystem failed.";

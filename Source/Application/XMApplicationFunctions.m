@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.16 2007/09/05 07:29:07 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.17 2007/09/27 21:13:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,8 +140,17 @@ NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailR
     case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
       failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_NOT_FOUND", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_RegistrationReject:
-      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_REJECTED", @"");
+    case XMGatekeeperRegistrationFailReason_DuplicateAlias:
+      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_DUPLICATE_ALIAS", @"");
+      break;
+    case XMGatekeeperRegistrationFailReason_SecurityDenied:
+      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_SECURITY_DENIED", @"");
+      break;
+    case XMGatekeeperRegistrationFailReason_TransportError:
+      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_TRANSPORT_ERROR", @"");
+      break;
+    case XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper:
+      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_UNREG_BY_GK", @"");
       break;
     default:
       failReasonString = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), failReason];

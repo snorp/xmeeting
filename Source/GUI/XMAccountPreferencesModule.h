@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.h,v 1.6 2007/08/17 11:36:43 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.h,v 1.7 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,7 +16,7 @@
 extern NSString *XMKey_AccountPreferencesNameIdentifier;
 extern NSString *XMKey_AccountPreferencesHostIdentifier;
 extern NSString *XMKey_AccountPreferencesUsernameIdentifier;
-extern NSString *XMKey_AccountPreferencesPhoneNumberIdentifier;
+extern NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier;
 
 @class XMLocationPreferencesModule, XMH323Account, XMSIPAccount;
 
@@ -50,8 +50,8 @@ extern NSString *XMKey_AccountPreferencesPhoneNumberIdentifier;
   IBOutlet NSPanel *editH323AccountPanel;
   IBOutlet NSTextField *h323AccountNameField;
   IBOutlet NSTextField *h323GatekeeperHostField;
-  IBOutlet NSTextField *h323UsernameField;
-  IBOutlet NSTextField *h323PhoneNumberField;
+  IBOutlet NSTextField *h323TerminalAlias1Field;
+  IBOutlet NSTextField *h323TerminalAlias2Field;
   IBOutlet NSTextField *h323PasswordField;
   
   IBOutlet NSPanel *editSIPAccountPanel;

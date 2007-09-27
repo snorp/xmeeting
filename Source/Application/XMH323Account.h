@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Account.h,v 1.4 2007/08/17 11:36:40 hfriederich Exp $
+ * $Id: XMH323Account.h,v 1.5 2007/09/27 21:13:10 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,9 +14,9 @@
 #import "XMPreferencesManager.h"
 
 extern NSString *XMKey_H323AccountName;
-extern NSString *XMKey_H323AccountGatekeeper;
-extern NSString *XMKey_H323AccountUsername;
-extern NSString *XMKey_H323AccountPhoneNumber;
+extern NSString *XMKey_H323AccountGatekeeperHost;
+extern NSString *XMKey_H323AccountTerminalAlias1;
+extern NSString *XMKey_H323AccountTerminalAlias2;
 extern NSString *XMKey_H323AccountPassword;
 
 /**
@@ -30,9 +30,9 @@ extern NSString *XMKey_H323AccountPassword;
 @private
   unsigned tag;
   NSString *name;
-  NSString *gatekeeper;
-  NSString *username;
-  NSString *phoneNumber;
+  NSString *gatekeeperHost;
+  NSString *terminalAlias1;
+  NSString *terminalAlias2;
   BOOL didSetPassword;
   NSString *password;
 	
@@ -48,14 +48,14 @@ extern NSString *XMKey_H323AccountPassword;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
 
-- (NSString *)gatekeeper;
-- (void)setGatekeeper:(NSString *)gatekeeper;
+- (NSString *)gatekeeperHost;
+- (void)setGatekeeperHost:(NSString *)host;
 
-- (NSString *)username;
-- (void)setUsername:(NSString *)username;
+- (NSString *)terminalAlias1;
+- (void)setTerminalAlias1:(NSString *)alias;
 
-- (NSString *)phoneNumber;
-- (void)setPhoneNumber:(NSString *)phoneNumber;
+- (NSString *)terminalAlias2;
+- (void)setTerminalAlias2:(NSString *)alias;
 
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;

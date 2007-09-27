@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.33 2007/09/20 19:11:51 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.34 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1254,9 +1254,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     
     XMH323Account *h323Account = [accountModule h323AccountAtIndex:index];
     
-    NSString *gkHost = [h323Account gatekeeper];
-    NSString *gkUsername = [h323Account username];
-    NSString *gkPhoneNumber = [h323Account phoneNumber];
+    NSString *gkHost = [h323Account gatekeeperHost];
+    NSString *gkUsername = [h323Account terminalAlias1];
+    NSString *gkPhoneNumber = [h323Account terminalAlias2];
     
     if(gkHost == nil)
     {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.59 2007/09/25 12:11:52 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.60 2007/09/27 21:13:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -600,7 +600,7 @@
   XMLocation *activeLocation = [preferencesManager activeLocation];
   unsigned h323AccountTag = [activeLocation h323AccountTag];
   XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
-  NSString *host = [h323Account gatekeeper];
+  NSString *host = [h323Account gatekeeperHost];
   
   XMGatekeeperRegistrationFailReason failReason = [callManager gatekeeperRegistrationFailReason];
   NSString *reasonText = XMGatekeeperRegistrationFailReasonString(failReason);
@@ -611,8 +611,14 @@
     case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
       suggestionText = NSLocalizedString(@"XM_GK_NOT_FOUND_SUGGESTION", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_RegistrationReject:
-      suggestionText = NSLocalizedString(@"XM_GK_REG_REJECT_SUGGESTION", @"");
+    case XMGatekeeperRegistrationFailReason_DuplicateAlias:
+      suggestionText = NSLocalizedString(@"XM_GK_DUPLICATE_ALIAS_SUGGESTION", @"");
+      break;
+    case XMGatekeeperRegistrationFailReason_SecurityDenied:
+      suggestionText = NSLocalizedString(@"XM_GK_SECURITY_DENIED_SUGGESTION", @"");
+      break;
+    case XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper:
+      suggestionText = NSLocalizedString(@"XM_GK_UNREG_BY_GK_SUGGESTION", @"");
       break;
     default:
       suggestionText = @"";

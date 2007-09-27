@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.33 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.34 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -172,7 +172,8 @@ void _XMHandleAudioTestEnd();
 #pragma mark -
 #pragma mark H.323 specific callbacks
 
-void _XMHandleGatekeeperRegistration(const char *gatekeeperName);
+void _XMHandleGatekeeperRegistration(const char *gatekeeperName, const char *gatekeeperAliases);
+void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason failure);
 void _XMHandleGatekeeperUnregistration();
 
 #pragma mark -

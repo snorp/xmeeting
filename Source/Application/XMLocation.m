@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.16 2007/09/13 14:59:04 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.17 2007/09/27 21:13:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,8 +175,8 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   [dict removeObjectForKey:XMKey_PreferencesUserName];
   [dict removeObjectForKey:XMKey_PreferencesAutomaticallyAcceptIncomingCalls];
   [dict removeObjectForKey:XMKey_PreferencesGatekeeperAddress];
-  [dict removeObjectForKey:XMKey_PreferencesGatekeeperUsername];
-  [dict removeObjectForKey:XMKey_PreferencesGatekeeperPhoneNumber];
+  [dict removeObjectForKey:XMKey_PreferencesGatekeeperTerminalAlias1];
+  [dict removeObjectForKey:XMKey_PreferencesGatekeeperTerminalAlias2];
   [dict removeObjectForKey:XMKey_PreferencesGatekeeperPassword];
   [dict removeObjectForKey:XMKey_PreferencesSIPRegistrationRecords];
   [dict removeObjectForKey:XMKey_PreferencesSIPProxyPassword];
@@ -400,9 +400,9 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
     XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
     if(h323Account != nil)
     {
-      [self setGatekeeperAddress:[h323Account gatekeeper]];
-      [self setGatekeeperUsername:[h323Account username]];
-      [self setGatekeeperPhoneNumber:[h323Account phoneNumber]];
+      [self setGatekeeperAddress:[h323Account gatekeeperHost]];
+      [self setGatekeeperTerminalAlias1:[h323Account terminalAlias1]];
+      [self setGatekeeperTerminalAlias2:[h323Account terminalAlias2]];
       [self setGatekeeperPassword:[h323Account password]];
       
       didFillAccount = YES;
@@ -412,8 +412,8 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   if(didFillAccount == NO)
   {
     [self setGatekeeperAddress:nil];
-    [self setGatekeeperUsername:nil];
-    [self setGatekeeperPhoneNumber:nil];
+    [self setGatekeeperTerminalAlias1:nil];
+    [self setGatekeeperTerminalAlias2:nil];
     [self setGatekeeperPassword:nil];
   }
   

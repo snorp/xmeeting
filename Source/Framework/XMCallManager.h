@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.29 2007/09/25 12:12:00 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.30 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,6 +45,7 @@
   
   // h.323 variables
   NSString *gatekeeperName;
+  NSArray *terminalAliases;
   XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
   
   // SIP variables
@@ -180,6 +181,13 @@
  * is not registered at a gatekeeper
  **/
 - (NSString *)gatekeeperName;
+
+/**
+ * Returns an array of terminalAliases under which the endpoint
+ * currently is registered at the Gatekeeper. Returns nil
+ * if the client is not registered at a Gatekeeper.
+ **/
+- (NSArray *)terminalAliases;
 
 /**
  * Returns the reason indicating what caused the gatekeeper registration

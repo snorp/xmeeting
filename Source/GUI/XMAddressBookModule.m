@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.22 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.23 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -365,8 +365,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 		[editedAddress setAddress:addressPart];
 		[editedAddress setCallProtocol:callProtocol];
 		[editedAddress setValue:gatekeeperHost forKey:XMKey_PreferencesGatekeeperAddress];
-		[editedAddress setValue:gatekeeperUsername forKey:XMKey_PreferencesGatekeeperUsername];
-		[editedAddress setValue:gatekeeperPhoneNumber forKey:XMKey_PreferencesGatekeeperPhoneNumber];
+		[editedAddress setValue:gatekeeperUsername forKey:XMKey_PreferencesGatekeeperTerminalAlias1];
+		[editedAddress setValue:gatekeeperPhoneNumber forKey:XMKey_PreferencesGatekeeperTerminalAlias2];
 		
 		int tag = [[labelPopUp selectedItem] tag];
 		NSString *label = nil;
@@ -559,8 +559,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 			callProtocolPopUpItemIndex = 0;
 			h323Address = address;
 			gatekeeperHost = [editedAddress valueForKey:XMKey_PreferencesGatekeeperAddress];
-			gatekeeperUsername = [editedAddress valueForKey:XMKey_PreferencesGatekeeperUsername];
-			gatekeeperPhoneNumber = [editedAddress valueForKey:XMKey_PreferencesGatekeeperPhoneNumber];
+			gatekeeperUsername = [editedAddress valueForKey:XMKey_PreferencesGatekeeperTerminalAlias1];
+			gatekeeperPhoneNumber = [editedAddress valueForKey:XMKey_PreferencesGatekeeperTerminalAlias2];
 			
 			if(gatekeeperHost != nil && ![gatekeeperHost isEqualToString:@""] &&
 			   gatekeeperUsername != nil && ![gatekeeperUsername isEqualToString:@""] &&

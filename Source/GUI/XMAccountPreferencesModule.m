@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.11 2007/09/09 20:27:49 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.12 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,6 @@
 NSString *XMKey_AccountPreferencesNameIdentifier = @"name";
 NSString *XMKey_AccountPreferencesHostIdentifier = @"host";
 NSString *XMKey_AccountPreferencesUsernameIdentifier = @"username";
-NSString *XMKey_AccountPreferencesPhoneNumberIdentifier = @"phonenumber";
 NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizationUsername";
 
 @interface XMAccountPreferencesModule (PrivateMethods)
@@ -140,8 +139,8 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
   
   [h323AccountNameField setStringValue:@""];
   [h323GatekeeperHostField setStringValue:@""];
-  [h323UsernameField setStringValue:@""];
-  [h323PhoneNumberField setStringValue:@""];
+  [h323TerminalAlias1Field setStringValue:@""];
+  [h323TerminalAlias2Field setStringValue:@""];
   [h323PasswordField setStringValue:@""];
   
   [editH323AccountPanel makeFirstResponder:h323AccountNameField];
@@ -179,26 +178,26 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
   }
   [h323AccountNameField setStringValue:string];
   
-  string = [h323AccountToEdit gatekeeper];
+  string = [h323AccountToEdit gatekeeperHost];
   if(string == nil)
   {
     string = @"";
   }
   [h323GatekeeperHostField setStringValue:string];
   
-  string = [h323AccountToEdit username];
+  string = [h323AccountToEdit terminalAlias1];
   if(string == nil)
   {
     string = @"";
   }
-  [h323UsernameField setStringValue:string];
+  [h323TerminalAlias1Field setStringValue:string];
   
-  string = [h323AccountToEdit phoneNumber];
+  string = [h323AccountToEdit terminalAlias2];
   if(string == nil)
   {
     string = @"";
   }
-  [h323PhoneNumberField setStringValue:string];
+  [h323TerminalAlias2Field setStringValue:string];
   
   string = [h323AccountToEdit password];
   if(string == nil)
@@ -480,15 +479,11 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
     }
     else if([identifier isEqualToString:XMKey_AccountPreferencesHostIdentifier])
     {
-      return [h323Account gatekeeper];
+      return [h323Account gatekeeperHost];
     }
     else if([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier])
     {
-      return [h323Account username];
-    }
-    else if([identifier isEqualToString:XMKey_AccountPreferencesPhoneNumberIdentifier])
-    {
-      return [h323Account phoneNumber];
+      return [h323Account terminalAlias1];
     }
   }
   else if(tableView == sipAccountsTableView)
@@ -577,21 +572,21 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
     {
       string = nil;
     }
-    [h323AccountToEdit setGatekeeper:string];
+    [h323AccountToEdit setGatekeeperHost:string];
     
-    string = [h323UsernameField stringValue];
+    string = [h323TerminalAlias1Field stringValue];
     if([string isEqualToString:@""])
     {
       string = nil;
     }
-    [h323AccountToEdit setUsername:string];
+    [h323AccountToEdit setTerminalAlias1:string];
     
-    string = [h323PhoneNumberField stringValue];
+    string = [h323TerminalAlias2Field stringValue];
     if([string isEqualToString:@""])
     {
       string = nil;
     }
-    [h323AccountToEdit setPhoneNumber:string];
+    [h323AccountToEdit setTerminalAlias2:string];
     
     string = [h323PasswordField stringValue];
     if([string isEqualToString:@""])

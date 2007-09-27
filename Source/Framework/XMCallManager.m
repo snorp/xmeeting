@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.43 2007/09/25 12:12:00 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.44 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -106,6 +106,7 @@
   needsCheckipAddress = NO;
   
   gatekeeperName = nil;
+  terminalAliases = nil;
   gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
   
   registrations = [[NSMutableArray alloc] initWithCapacity:1];
@@ -147,6 +148,9 @@
   
   [gatekeeperName release];
   gatekeeperName = nil;
+  
+  [terminalAliases release];
+  terminalAliases = nil;
   
   [registrations release];
   registrations = nil;
@@ -350,6 +354,11 @@
   return gatekeeperName;
 }
 
+- (NSArray *)terminalAliases
+{
+  return terminalAliases;
+}
+
 - (XMGatekeeperRegistrationFailReason)gatekeeperRegistrationFailReason
 {
   return gatekeeperRegistrationFailReason;
@@ -400,12 +409,12 @@
   if(callManagerStatus == XM_CALL_MANAGER_READY &&
      gatekeeperName == nil && 
      activePreferences != nil &&
-     [activePreferences gatekeeperAddress] != nil &&
-     [activePreferences gatekeeperUsername] != nil)
+     [activePreferences gatekeeperTerminalAlias1] != nil)
   {
     callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
                                                         object:self];
+    gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
     [XMOpalDispatcher _retryGatekeeperRegistration:activePreferences];
   }
   else
@@ -984,18 +993,26 @@
                                                       object:self];
 }
 
-- (void)_handleGatekeeperRegistration:(NSString *)theGatekeeperName
+- (void)_handleGatekeeperRegistration:(NSArray *)objects
 {
-  if(gatekeeperName != nil)
+  NSString *theGatekeeperName = (NSString *)[objects objectAtIndex:0];
+  NSArray *aliases = (NSArray *)[objects objectAtIndex:1];
+  
+  // Only send a notification if the registration status or the terminalAliases changed
+  if (gatekeeperName == nil || ![gatekeeperName isEqualToString:theGatekeeperName]
+      || ![aliases isEqual:terminalAliases])
   {
     [gatekeeperName release];
+    gatekeeperName = [theGatekeeperName copy];
+    
+    [terminalAliases release];
+    terminalAliases = [aliases copy];
+  
+    gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+  
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtGatekeeper
+                                                        object:self];
   }
-  gatekeeperName = [theGatekeeperName retain];
-  
-  gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtGatekeeper
-                                                      object:self];
 }
 
 - (void)_handleGatekeeperUnregistration
@@ -1008,22 +1025,34 @@
   [gatekeeperName release];
   gatekeeperName = nil;
   
+  [terminalAliases release];
+  terminalAliases = nil;
+  
+  gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+  
   [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUnregisterFromGatekeeper
                                                       object:self];
 }
 
 - (void)_handleGatekeeperRegistrationFailure:(NSNumber *)failReason
 {
-  if(gatekeeperName != nil)
-  {
-    [gatekeeperName release];
-    gatekeeperName = nil;
+  [gatekeeperName release];
+  gatekeeperName = nil;
+  
+  XMGatekeeperRegistrationFailReason theGatekeeperRegistrationFailReason = (XMGatekeeperRegistrationFailReason)[failReason unsignedIntValue];
+  
+  if (gatekeeperRegistrationFailReason != theGatekeeperRegistrationFailReason) {
+    if (gatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper &&
+        theGatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_GatekeeperNotFound) {
+      // Special case: GK unregistered, went offline. Don't post a notification for the second time
+      return;
+    }
+    
+    gatekeeperRegistrationFailReason = theGatekeeperRegistrationFailReason;
+  
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper
+                                                        object:self];
   }
-  
-  gatekeeperRegistrationFailReason = (XMGatekeeperRegistrationFailReason)[failReason unsignedIntValue];
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper
-                                                      object:self];
 }
 
 - (void)_handleSIPEnablingFailure

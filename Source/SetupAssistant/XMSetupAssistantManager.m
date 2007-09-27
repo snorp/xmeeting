@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.16 2007/09/21 06:13:04 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.17 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1759,8 +1759,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_H323AccountUsername] ||
-				   [keys containsObject:XMKey_H323AccountPhoneNumber] ||
+				if([keys containsObject:XMKey_H323AccountTerminalAlias1] ||
+				   [keys containsObject:XMKey_H323AccountTerminalAlias2] ||
 				   [keys containsObject:XMKey_H323AccountPassword])
 				{
 					nextView = gatekeeperSettingsView;
@@ -1883,8 +1883,8 @@ static XMSetupAssistantManager *sharedInstance = nil;
 					didFinishCurrentSettings = YES;
 				}
 				
-				if([keys containsObject:XMKey_H323AccountUsername] ||
-				   [keys containsObject:XMKey_H323AccountPhoneNumber] ||
+				if([keys containsObject:XMKey_H323AccountTerminalAlias1] ||
+				   [keys containsObject:XMKey_H323AccountTerminalAlias2] ||
 				   [keys containsObject:XMKey_H323AccountPassword])
 				{
 					nextView = gatekeeperSettingsView;
@@ -2229,12 +2229,12 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	[gkHostField setEnabled:NO];
 	
-	if(![keys containsObject:XMKey_H323AccountUsername])
+	if(![keys containsObject:XMKey_H323AccountTerminalAlias1])
 	{
 		[gkUsernameField setEnabled:NO];
 		firstResponder = gkPhoneNumberField;
 	}
-	if(![keys containsObject:XMKey_H323AccountPhoneNumber])
+	if(![keys containsObject:XMKey_H323AccountTerminalAlias2])
 	{
 		[gkPhoneNumberField setEnabled:NO];
 		if(firstResponder == gkPhoneNumberField)
@@ -2265,23 +2265,23 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		NSNumber *number = [accountIndexes objectAtIndex:i];
 		XMH323Account *accountToChange = (XMH323Account *)[h323Accounts objectAtIndex:[number unsignedIntValue]];
 		
-		if([keys containsObject:XMKey_H323AccountUsername])
+		if([keys containsObject:XMKey_H323AccountTerminalAlias1])
 		{
 			NSString *gkUsername = [gkUsernameField stringValue];
 			if([gkUsername isEqualToString:@""])
 			{
 				gkUsername = nil;
 			}
-			[accountToChange setUsername:gkUsername];
+			[accountToChange setTerminalAlias1:gkUsername];
 		}
-		if([keys containsObject:XMKey_H323AccountPhoneNumber])
+		if([keys containsObject:XMKey_H323AccountTerminalAlias2])
 		{
 			NSString *gkPhoneNumber = [gkPhoneNumberField stringValue];
 			if([gkPhoneNumber isEqualToString:@""])
 			{
 				gkPhoneNumber = nil;
 			}
-			[accountToChange setPhoneNumber:gkPhoneNumber];
+			[accountToChange setTerminalAlias2:gkPhoneNumber];
 		}
 		if([keys containsObject:XMKey_H323AccountPassword])
 		{

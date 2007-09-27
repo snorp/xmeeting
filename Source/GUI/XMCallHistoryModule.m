@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.27 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.28 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -421,9 +421,10 @@
     gatekeeperName = nil;
   }
   
-  gatekeeperName = [[[XMCallManager sharedInstance] gatekeeperName] retain];
+  XMCallManager *callManager = [XMCallManager sharedInstance];
+  gatekeeperName = [[callManager gatekeeperName] retain];
   
-  NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_REGISTRATION", @""), gatekeeperName];
+  NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_REGISTRATION", @""), gatekeeperName, [callManager terminalAliases]];
   
   [self _logText:logText date:nil];
   
@@ -445,7 +446,7 @@
   XMLocation *activeLocation = [preferencesManager activeLocation];
   XMH323Account *h323Account = [preferencesManager h323AccountWithTag:[activeLocation h323AccountTag]];
   
-  NSString *gkHost = [h323Account gatekeeper];
+  NSString *gkHost = [h323Account gatekeeperHost];
   if(gkHost == nil)
   {
     gkHost = NSLocalizedString(@"XM_UNKNOWN", @"");

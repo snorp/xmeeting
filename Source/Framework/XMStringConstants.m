@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.31 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.32 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -132,8 +132,8 @@ NSString *XMKey_PreferencesEnableH323 = @"XMeeting_EnableH323";
 NSString *XMKey_PreferencesEnableH245Tunnel = @"XMeeting_EnableH245Tunnel";
 NSString *XMKey_PreferencesEnableFastStart = @"XMeeting_EnableFastStart";
 NSString *XMKey_PreferencesGatekeeperAddress = @"XMeeting_GatekeeperAddress";
-NSString *XMKey_PreferencesGatekeeperUsername = @"XMeeting_GatekeeperUsername";
-NSString *XMKey_PreferencesGatekeeperPhoneNumber = @"XMeeting_GatekeeperPhoneNumber";
+NSString *XMKey_PreferencesGatekeeperTerminalAlias1 = @"XMeeting_GatekeeperTerminalAlias1";
+NSString *XMKey_PreferencesGatekeeperTerminalAlias2 = @"XMeeting_GatekeeperTerminalAlias2";
 NSString *XMKey_PreferencesGatekeeperPassword = @"XMeeting_GatekeeperPassword";
 
 NSString *XMKey_PreferencesEnableSIP = @"XMeeting_EnableSIP";

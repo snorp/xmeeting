@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.20 2007/09/25 12:12:00 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.21 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,8 +23,6 @@
   NSPort *receivePort;
   
   unsigned callID;
-  
-  NSTimer *gatekeeperRegistrationCheckTimer;
   
   NSTimer *callStatisticsUpdateIntervalTimer;
   
@@ -96,12 +94,11 @@
 	// called every time the STUN information is updated
 - (void)_handleNATType:(XMNATType)natType externalAddress:(NSString *)externalAddress;
 
-	// called every time the Framework registers at a gatekeeper
-	// called on the OpalDispatcherThread, therefore safe
-- (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName;
+	// called every time the Framework (re-)registers at a gatekeeper
+- (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName aliases:(NSArray *)gkAliases;
 
-	// Called every time the Framework unregisters from a gatekeeper
-	// Called on the OpalDispatcherThread, therefore safe
+- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason;
+
 - (void)_handleGatekeeperUnregistration;
 
 - (void)_handleSIPRegistration:(NSString *)registration;
@@ -111,7 +108,7 @@
 - (void)_handleSIPRegistrationFailure:(NSString *)registration failReason:(XMSIPStatusCode)failReason;
 
 	// called every time the Framework completes SIP Registration
-    // may be called on any thread
+  // may be called on any thread
 - (void)_handleRegistrationSetupCompleted;
 
 @end

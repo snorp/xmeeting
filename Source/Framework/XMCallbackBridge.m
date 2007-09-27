@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.30 2007/05/30 08:41:16 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.31 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -259,15 +259,27 @@ void _XMHandleAudioTestEnd()
 #pragma mark -
 #pragma mark H.323 specific Callbacks
 
-void _XMHandleGatekeeperRegistration(const char *gatekeeperName)
+void _XMHandleGatekeeperRegistration(const char *gatekeeperName, const char *gatekeeperAliases)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
 	NSString *name = [[NSString alloc] initWithCString:gatekeeperName encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistration:name];
+  NSString *aliases = [[NSString alloc] initWithCString:gatekeeperAliases encoding:NSASCIIStringEncoding];
+  NSArray *aliasArr = [aliases componentsSeparatedByString:@"\n"];
+	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistration:name aliases:aliasArr];
 	[name release];
+  [aliases release];
 	
 	[autoreleasePool release];
+}
+
+void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason)
+{
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  
+  [_XMOpalDispatcherSharedInstance _handleGatekeeperRegistrationFailure:reason];
+  
+  [autoreleasePool release];
 }
 
 void _XMHandleGatekeeperUnregistration()

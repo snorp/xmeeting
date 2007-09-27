@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.17 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.18 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -19,7 +19,7 @@ class XMH323Connection;
 class XMH323EndPoint : public H323EndPoint
 {
 	PCLASSINFO(XMH323EndPoint, H323EndPoint);
-
+  
 public:
 	XMH323EndPoint(OpalManager & manager);
 	virtual ~XMH323EndPoint();
@@ -27,49 +27,51 @@ public:
 	// Setup methods
 	BOOL EnableListeners(BOOL flag);
 	BOOL IsListening();
-	XMGatekeeperRegistrationFailReason SetGatekeeper(const PString & address,
-													 const PString & username, 
-													 const PString & phoneNumber,
-													 const PString & password);
-	void CheckGatekeeperRegistration();
+	void SetGatekeeper(const PString & address,
+                     const PString & terminalAlias1, 
+                     const PString & terminalAlias2,
+                     const PString & password);
+  void HandleRegistrationConfirm();
 	void HandleNetworkStatusChange();
 	
 	// obtaining call statistics
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	
 	// overriding some callbacks
+  virtual H323Gatekeeper * CreateGatekeeper(H323Transport * transport);
 	virtual void OnRegistrationConfirm();
 	virtual void OnRegistrationReject();
 	
 	virtual void OnEstablished(OpalConnection & connection);
-    virtual void OnReleased(OpalConnection & connection);
+  virtual void OnReleased(OpalConnection & connection);
 	
 	virtual H323Connection * CreateConnection(OpalCall & call,
-											  const PString & token,
-											  void * userData,
-											  OpalTransport & transport,
-											  const PString & alias,
-											  const H323TransportAddress & address,
-											  H323SignalPDU * setupPDU,
-											  unsigned options = 0,
-                                              OpalConnection::StringOptions * stringOptions = NULL);
+                                            const PString & token,
+                                            void * userData,
+                                            OpalTransport & transport,
+                                            const PString & alias,
+                                            const H323TransportAddress & address,
+                                            H323SignalPDU * setupPDU,
+                                            unsigned options = 0,
+                                            OpalConnection::StringOptions * stringOptions = NULL);
 	
 	// H.460 support
 	virtual BOOL OnSendFeatureSet(unsigned, H225_FeatureSet &);
-    virtual void OnReceiveFeatureSet(unsigned, const H225_FeatureSet &);
-    
-    // Called when the framework is closing
-    void CleanUp();
-    void AddReleasingConnection(XMH323Connection * connection);
-    void RemoveReleasingConnection(XMH323Connection * connection);
+  virtual void OnReceiveFeatureSet(unsigned, const H225_FeatureSet &);
+  
+  // Called when the framework is closing
+  void CleanUp();
+  void AddReleasingConnection(XMH323Connection * connection);
+  void RemoveReleasingConnection(XMH323Connection * connection);
 	
 private:
-	BOOL isListening;
+  BOOL isListening;
 	BOOL didRegisterAtGatekeeper;
-	XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
-    
-    PMutex releasingConnectionsMutex;
-    PList<XMH323Connection> releasingConnections;
+  PString gatekeeperAddress;
+	//XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
+  
+  PMutex releasingConnectionsMutex;
+  PList<XMH323Connection> releasingConnections;
 	
 	PString connectionToken;
 };

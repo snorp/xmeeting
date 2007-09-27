@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.33 2007/09/20 19:14:03 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.34 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -305,8 +305,8 @@ extern NSString *XMKey_PreferencesEnableH323;
 extern NSString *XMKey_PreferencesEnableH245Tunnel;
 extern NSString *XMKey_PreferencesEnableFastStart;
 extern NSString *XMKey_PreferencesGatekeeperAddress;
-extern NSString *XMKey_PreferencesGatekeeperUsername;
-extern NSString *XMKey_PreferencesGatekeeperPhoneNumber;
+extern NSString *XMKey_PreferencesGatekeeperTerminalAlias1;
+extern NSString *XMKey_PreferencesGatekeeperTerminalAlias2;
 extern NSString *XMKey_PreferencesGatekeeperPassword;
 
 // SIP-specific keys

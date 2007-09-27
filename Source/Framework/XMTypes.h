@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.36 2007/09/05 07:29:08 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.37 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -122,7 +122,10 @@ typedef enum XMGatekeeperRegistrationFailReason
   XMGatekeeperRegistrationFailReason_NoFailure = 0,
   XMGatekeeperRegistrationFailReason_UnknownFailure,
   XMGatekeeperRegistrationFailReason_GatekeeperNotFound,
-  XMGatekeeperRegistrationFailReason_RegistrationReject
+  XMGatekeeperRegistrationFailReason_DuplicateAlias,
+  XMGatekeeperRegistrationFailReason_SecurityDenied,
+  XMGatekeeperRegistrationFailReason_TransportError,
+  XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper,
 } XMGatekeeperRegistrationFailReason;
 
 /**

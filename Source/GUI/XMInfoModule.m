@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.23 2007/09/20 19:11:51 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.24 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,9 +22,9 @@
 #define XM_DISCLOSURE_OFFSET -2
 #define XM_HIDDEN_OFFSET 4
 
-#define XM_REGISTRATION_INFO_HEIGHT 18
-
 #define XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT 14
+#define XM_ALIASES_TEXT_FIELD_HEIGHT 14
+#define XM_REGISTRATION_INFO_HEIGHT 18
 
 #define XM_SHOW_H323_DETAILS 1
 #define XM_SHOW_SIP_DETAILS 2
@@ -49,10 +49,12 @@
 {
   self = [super init];
   
+  terminalAliasViews = [[NSMutableArray alloc] initWithCapacity:3];
   registrationViews = [[NSMutableArray alloc] initWithCapacity:3];
   
   addressExtraHeight = 0;
   h323BoxHeight = 0;
+  h323AliasesExtraHeight = 0;
   sipBoxHeight = 0;
   sipRegistrationsExtraHeight = 0;
   
@@ -64,7 +66,10 @@
 
 - (void)dealloc
 {	
+  [terminalAliasViews release];
   [registrationViews release];
+  
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   
   [super dealloc];
 }
@@ -87,27 +92,27 @@
   [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
                              name:XMNotification_CallManagerDidEndSubsystemSetup
                            object:nil];
+  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
+                             name:XMNotification_CallManagerDidRegisterAtGatekeeper
+                           object:nil];
+  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
+                             name:XMNotification_CallManagerDidUnregisterFromGatekeeper
+                           object:nil];
   
   unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
   
-  if(detailStatus & XM_SHOW_H323_DETAILS)
-  {
+  if(detailStatus & XM_SHOW_H323_DETAILS) {
     showH323Details = YES;
     [h323Disclosure setState:NSOnState];
-  }
-  else
-  {
+  } else {
     showH323Details = NO;
     [h323Disclosure setState:NSOffState];
   }
   
-  if(detailStatus & XM_SHOW_SIP_DETAILS)
-  {
+  if(detailStatus & XM_SHOW_SIP_DETAILS) {
     showSIPDetails = YES;
     [sipDisclosure setState:NSOnState];
-  }
-  else
-  {
+  } else {
     showSIPDetails = NO;
     [sipDisclosure setState:NSOffState];
   }
@@ -122,12 +127,10 @@
   [contentView setFrameSize:size];
   
   NSRect frameRect = NSMakeRect(XM_BOX_X, XM_BOTTOM_SPACING, boxWidth, XM_HIDDEN_OFFSET);
-  if(showSIPDetails == YES)
-  {
+  
+  if(showSIPDetails == YES) {
     frameRect.size.height += sipBoxHeight + sipRegistrationsExtraHeight;
-  }
-  else
-  {
+  } else {
     [sipBox setHidden:YES];
   }
   [sipBox setFrame:frameRect];
@@ -147,7 +150,7 @@
   
   if(showH323Details == YES)
   {
-    frameRect.size.height += h323BoxHeight;
+    frameRect.size.height += h323BoxHeight + h323AliasesExtraHeight;
   }
   else
   {
@@ -214,6 +217,8 @@
   if(showH323Details == NO)
   {
     heightDifference -= h323BoxHeight;
+  } else {
+    heightDifference += h323AliasesExtraHeight;
   }
   if(showSIPDetails == NO)
   {
@@ -397,64 +402,93 @@
   XMLocation *activeLocation = [preferencesManager activeLocation];
   XMCallManager *callManager = [XMCallManager sharedInstance];
   
+  // Change the autoresize behavious
+  [networkBox setAutoresizingMask:NSViewMinYMargin];
+  
   // setting up the H.323 info
+  h323AliasesExtraHeight = 0;
+  [terminalAliasViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+  [terminalAliasViews removeAllObjects];
+  
   if([activeLocation enableH323] == YES)
   {
+    [h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
+    [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+    
     if([callManager isH323Listening] == YES)
     {
-      [h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
-      [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
-      
       unsigned h323AccountTag = [activeLocation h323AccountTag];
-      if(h323AccountTag != 0)
-      {
+      NSString *terminalAlias = 0;
+      if (h323AccountTag != 0) {
+        XMH323Account *account = [preferencesManager h323AccountWithTag:h323AccountTag];
+        terminalAlias = [account terminalAlias1];
+      }
+      
+      if (terminalAlias != nil) {
         NSString *gatekeeper = [callManager gatekeeperName];
-        XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
-        NSString *phoneNumber = [h323Account phoneNumber];
         
-        if(phoneNumber == nil)
-        {
-          phoneNumber = @"";
-        }
-        [phoneNumberField setStringValue:phoneNumber];
-        
-        if(gatekeeper != nil)
-        {
+        if (gatekeeper != nil) {
+          
           [gatekeeperField setStringValue:gatekeeper];
           [gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
-          [phoneNumberField setTextColor:[NSColor controlTextColor]];
-        }
-        else
-        {
+          
+          NSArray *aliases = [callManager terminalAliases];
+          unsigned numAliases = [aliases count];
+          unsigned i;
+        
+          for (i = 0; i < numAliases; i++) {
+            NSString *alias = (NSString *)[aliases objectAtIndex:i];
+            if (i == 0) {
+              [terminalAliasField setTextColor:[NSColor controlTextColor]];
+              [terminalAliasField setStringValue:alias];
+            } else {
+              h323AliasesExtraHeight += XM_ALIASES_TEXT_FIELD_HEIGHT;
+              NSTextField *textField = [self _copyTextField:terminalAliasField];
+              NSRect frame = [textField frame];
+              frame.origin.y -= (i*XM_ALIASES_TEXT_FIELD_HEIGHT);
+              [textField setFrame:frame];
+              [h323Box addSubview:textField];
+              [textField setStringValue:alias];
+              [terminalAliasViews addObject:textField];
+              [textField release];
+            }
+          }
+        } else {
           [gatekeeperField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_REG_FAILURE", @"")];
           [gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
-          [phoneNumberField setTextColor:[NSColor disabledControlTextColor]];
+          [terminalAliasField setTextColor:[NSColor disabledControlTextColor]];
+          [terminalAliasField setStringValue:terminalAlias];
         }
-      }
-      else
-      {
+      } else {
         [gatekeeperField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
         [gatekeeperSemaphoreView setImage:nil];
-        [phoneNumberField setStringValue:@""];
+        [terminalAliasField setStringValue:@""];
       }
-    }
-    else
-    {
+    } else {
       [h323StatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_PROTOCOL_FAILURE", @"")];
       [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
       [gatekeeperField setStringValue:@""];
       [gatekeeperSemaphoreView setImage:nil];
-      [phoneNumberField setStringValue:@""];
+      [terminalAliasField setStringValue:@""];
     }
-  }
-  else
-  {
+  } else {
     [h323StatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_PROTOCOL", @"")];
     [h323StatusSemaphoreView setImage:nil];
     [gatekeeperField setStringValue:@""];
     [gatekeeperSemaphoreView setImage:nil];
-    [phoneNumberField setStringValue:@""];
+    [terminalAliasField setStringValue:@""];
   }
+  
+  // Resize the H.323 box
+  [h323Box setAutoresizingMask:NSViewHeightSizable];
+  [h323Disclosure setAutoresizingMask:NSViewMinYMargin];
+  [h323Title setAutoresizingMask:NSViewMinYMargin];
+  
+  [sipBox setAutoresizingMask:NSViewMaxYMargin];
+  [sipDisclosure setAutoresizingMask:NSViewMaxYMargin];
+  [sipTitle setAutoresizingMask:NSViewMaxYMargin];
+  
+  [self resizeContentView];
   
   // setting up the SIP info
   sipRegistrationsExtraHeight = 0;
@@ -536,18 +570,15 @@
     [registrationSemaphoreView setImage:nil];
   }
   
-  [networkBox setAutoresizingMask:NSViewMinYMargin];
-  
+  // Now resize the SIP content view
   [h323Box setAutoresizingMask:NSViewMinYMargin];
-  [h323Disclosure setAutoresizingMask:NSViewMinYMargin];
-  [h323Title setAutoresizingMask:NSViewMinYMargin];
-  
   [sipBox setAutoresizingMask:NSViewHeightSizable];
   [sipDisclosure setAutoresizingMask:NSViewMinYMargin];
   [sipTitle setAutoresizingMask:NSViewMinYMargin];
   
   [self resizeContentView];
   
+  // Restore the default autoresize values
   [networkBox setAutoresizingMask:NSViewHeightSizable];
   
   [h323Box setAutoresizingMask:NSViewMaxYMargin];
@@ -584,7 +615,7 @@
   [textField setBordered:NO];
   [textField setFont:[_textField font]];
   [textField setAutoresizingMask:[_textField autoresizingMask]];
-
+  
   return textField;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.50 2007/09/20 19:11:51 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.51 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,7 @@
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif;
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
-- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif;
+- (void)_didChangeGatekeeperStatus:(NSNotification *)notif;
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
 
 - (void)_clearCallEndReason:(NSTimer *)timer;
@@ -114,7 +114,13 @@
   [notificationCenter addObserver:self selector:@selector(_didClearCall:)
                              name:XMNotification_CallManagerDidClearCall
                            object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:)
+  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:)
+                             name:XMNotification_CallManagerDidRegisterAtGatekeeper
+                           object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:)
+                             name:XMNotification_CallManagerDidNotRegisterAtGatekeeper
+                           object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:)
                              name:XMNotification_CallManagerDidUnregisterFromGatekeeper
                            object:nil];
   [notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
@@ -669,7 +675,7 @@
   isCalling = NO;
 }
 
-- (void)_didUnregisterFromGatekeeper:(NSNotification *)notif
+- (void)_didChangeGatekeeperStatus:(NSNotification *)notif
 {
   // we're only interested in the situation when the client gets
   // unregistered from the gatekeeper immediately without being part

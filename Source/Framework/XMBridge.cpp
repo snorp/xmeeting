@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.51 2007/09/25 12:12:00 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.52 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -53,8 +53,8 @@ void _XMSetBandwidthLimit(unsigned limit)
 }
 
 void _XMSetNATInformation(const char * const *stunServers,
-						  unsigned stunServerCount,
-						  const char *translationAddress,
+                          unsigned stunServerCount,
+                          const char *translationAddress,
                           bool networkStatusChanged)
 {
   PStringArray servers = PStringArray(stunServerCount, stunServers, TRUE);
@@ -63,11 +63,11 @@ void _XMSetNATInformation(const char * const *stunServers,
 }
 
 void _XMSetPortRanges(unsigned int udpPortMin, 
-					  unsigned int udpPortMax, 
-					  unsigned int tcpPortMin, 
-					  unsigned int tcpPortMax,
-					  unsigned int rtpPortMin,
-					  unsigned int rtpPortMax)
+                      unsigned int udpPortMax, 
+                      unsigned int tcpPortMin, 
+                      unsigned int tcpPortMax,
+                      unsigned int rtpPortMin,
+                      unsigned int rtpPortMax)
 {
   XMOpalManager *theManager = XMOpalManager::GetManager();
   theManager->SetUDPPorts(udpPortMin, udpPortMax);
@@ -115,8 +115,8 @@ void _XMSetRecordAudio(bool flag)
 }
 
 void _XMSetAudioFunctionality(bool enableSilenceSuppression,
-							  bool enableEchoCancellation,
-							  unsigned packetTime)
+                              bool enableEchoCancellation,
+                              unsigned packetTime)
 {
   XMOpalManager::GetCallEndPoint()->SetEnableSilenceSuppression(enableSilenceSuppression);
   XMOpalManager::GetCallEndPoint()->SetEnableEchoCancellation(enableEchoCancellation);
@@ -155,7 +155,7 @@ void _XMSetEnableH264LimitedMode(bool enableH264LimitedMode)
 #pragma mark codec functions
 
 void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount,
-				  const char * const * disabledCodecs, unsigned disabledCodecCount)
+                  const char * const * disabledCodecs, unsigned disabledCodecCount)
 {
   PStringArray orderedCodecsArray = PStringArray(orderedCodecCount, orderedCodecs, TRUE);
   PStringArray disabledCodecsArray = PStringArray(disabledCodecCount, disabledCodecs, TRUE);
@@ -185,22 +185,17 @@ void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel)
   h323EndPoint->DisableH245Tunneling(!enableH245Tunnel);
 }
 
-XMGatekeeperRegistrationFailReason _XMSetGatekeeper(const char *address, 
-													const char *gkUsername, 
-													const char *phoneNumber,
-													const char *password)
+void _XMSetGatekeeper(const char *address, 
+                      const char *terminalAlias1, 
+                      const char *terminalAlias2,
+                      const char *password)
 {
-  return XMOpalManager::GetH323EndPoint()->SetGatekeeper(address, gkUsername, phoneNumber, password);
+  XMOpalManager::GetH323EndPoint()->SetGatekeeper(address, terminalAlias1, terminalAlias2, password);
 }
 
 bool _XMIsRegisteredAtGatekeeper()
 {
   return XMOpalManager::GetH323EndPoint()->IsRegisteredWithGatekeeper();
-}
-
-void _XMCheckGatekeeperRegistration()
-{
-  XMOpalManager::GetH323EndPoint()->CheckGatekeeperRegistration();
 }
 
 #pragma mark -
@@ -217,8 +212,8 @@ bool _XMIsSIPEnabled()
 }
 
 bool _XMSetSIPProxy(const char *host,
-					const char *username,
-					const char *password)
+                    const char *username,
+                    const char *password)
 {
   return XMOpalManager::GetSIPEndPoint()->UseProxy(host, username, password);
 }
@@ -229,9 +224,9 @@ void _XMPrepareRegistrationSetup(bool proxyChanged)
 }
 
 void _XMUseRegistration(const char *domain,
-					    const char *username,
-					    const char *authorizationUsername,
-					    const char *password,
+                        const char *username,
+                        const char *authorizationUsername,
+                        const char *password,
                         bool proxyChanged)
 {
   XMOpalManager::GetSIPEndPoint()->UseRegistration(domain, username, authorizationUsername, password, proxyChanged);
@@ -283,10 +278,10 @@ void _XMUnlockCallInformation()
 }
 
 void _XMGetCallInformation(unsigned callID,
-						   const char** remoteName, 
-						   const char** remoteNumber,
-						   const char** remoteAddress, 
-						   const char** remoteApplication)
+                           const char** remoteName, 
+                           const char** remoteNumber,
+                           const char** remoteAddress, 
+                           const char** remoteApplication)
 {
   PString nameStr;
   PString numberStr;
@@ -302,7 +297,7 @@ void _XMGetCallInformation(unsigned callID,
 }
 
 void _XMGetCallStatistics(unsigned callID,
-						  XMCallStatisticsRecord *callStatistics)
+                          XMCallStatisticsRecord *callStatistics)
 {
   XMOpalManager::GetManager()->GetCallStatistics(callStatistics);
 }

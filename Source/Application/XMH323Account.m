@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Account.m,v 1.3 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMH323Account.m,v 1.4 2007/09/27 21:13:10 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,9 +11,9 @@
 #import "XMPreferencesManager.h"
 
 NSString *XMKey_H323AccountName = @"XMeeting_H323AccountName";
-NSString *XMKey_H323AccountGatekeeper = @"XMeeting_H323AccountGatekeeper";
-NSString *XMKey_H323AccountUsername = @"XMeeting_H323AccountUsername";
-NSString *XMKey_H323AccountPhoneNumber = @"XMeeting_H323AccountPhoneNumber";
+NSString *XMKey_H323AccountGatekeeperHost = @"XMeeting_H323AccountGatekeeperHost";
+NSString *XMKey_H323AccountTerminalAlias1 = @"XMeeting_H323AccountTerminalAlias1";
+NSString *XMKey_H323AccountTerminalAlias2 = @"XMeeting_H323AccountTerminalAlias2";
 NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 @interface XMH323Account (PrivateMethods)
@@ -44,20 +44,20 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   {
     [self setName:(NSString *)obj];
   }
-  obj = [dictionary objectForKey:XMKey_H323AccountGatekeeper];
+  obj = [dictionary objectForKey:XMKey_H323AccountGatekeeperHost];
   if(obj != nil && [obj isKindOfClass:stringClass])
   {
-    [self setGatekeeper:(NSString *)obj];
+    [self setGatekeeperHost:(NSString *)obj];
   }
-  obj = [dictionary objectForKey:XMKey_H323AccountUsername];
+  obj = [dictionary objectForKey:XMKey_H323AccountTerminalAlias1];
   if(obj != nil && [obj isKindOfClass:stringClass])
   {
-    [self setUsername:(NSString *)obj];
+    [self setTerminalAlias1:(NSString *)obj];
   }
-  obj = [dictionary objectForKey:XMKey_H323AccountPhoneNumber];
+  obj = [dictionary objectForKey:XMKey_H323AccountTerminalAlias2];
   if(obj != nil && [obj isKindOfClass:stringClass])
   {
-    [self setPhoneNumber:(NSString *)obj];
+    [self setTerminalAlias2:(NSString *)obj];
   }
   
   return self;
@@ -68,9 +68,9 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   XMH323Account *h323Account = [[[self class] allocWithZone:zone] _initWithTag:[self tag]];
   
   [h323Account setName:[self name]];
-  [h323Account setGatekeeper:[self gatekeeper]];
-  [h323Account setUsername:[self username]];
-  [h323Account setPhoneNumber:[self phoneNumber]];
+  [h323Account setGatekeeperHost:[self gatekeeperHost]];
+  [h323Account setTerminalAlias1:[self terminalAlias1]];
+  [h323Account setTerminalAlias2:[self terminalAlias2]];
   
   if (didSetPassword) {
     [h323Account setPassword:[self password]];
@@ -92,9 +92,9 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   
   tag = theTag;
   name = nil;
-  gatekeeper = nil;
-  username = nil;
-  phoneNumber = nil;
+  gatekeeperHost = nil;
+  terminalAlias1 = nil;
+  terminalAlias2 = nil;
   didSetPassword = NO;
   password = nil;
   
@@ -106,9 +106,9 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 - (void)dealloc
 {
   [name release];
-  [gatekeeper release];
-  [username release];
-  [phoneNumber release];
+  [gatekeeperHost release];
+  [terminalAlias1 release];
+  [terminalAlias2 release];
   [password release];
   
   [[XMPreferencesManager sharedInstance] removePasswordObject:self];
@@ -127,17 +127,17 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   {
     [dictionary setObject:name forKey:XMKey_H323AccountName];
   }
-  if(gatekeeper != nil)
+  if(gatekeeperHost != nil)
   {
-    [dictionary setObject:gatekeeper forKey:XMKey_H323AccountGatekeeper];
+    [dictionary setObject:gatekeeperHost forKey:XMKey_H323AccountGatekeeperHost];
   }
-  if(username != nil)
+  if(terminalAlias1 != nil)
   {
-    [dictionary setObject:username forKey:XMKey_H323AccountUsername];
+    [dictionary setObject:terminalAlias1 forKey:XMKey_H323AccountTerminalAlias1];
   }
-  if(phoneNumber != nil)
+  if(terminalAlias2 != nil)
   {
-    [dictionary setObject:phoneNumber forKey:XMKey_H323AccountPhoneNumber];
+    [dictionary setObject:terminalAlias2 forKey:XMKey_H323AccountTerminalAlias2];
   }
   
   return dictionary;
@@ -166,47 +166,47 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   }
 }
 
-- (NSString *)gatekeeper
+- (NSString *)gatekeeperHost
 {
-  return gatekeeper;
+  return gatekeeperHost;
 }
 
-- (void)setGatekeeper:(NSString *)theGatekeeper
+- (void)setGatekeeperHost:(NSString *)theGatekeeperHost
 {
-  if(gatekeeper != theGatekeeper)
+  if(gatekeeperHost != theGatekeeperHost)
   {
-    NSString *old = gatekeeper;
-    gatekeeper = [theGatekeeper copy];
+    NSString *old = gatekeeperHost;
+    gatekeeperHost = [theGatekeeperHost copy];
     [old release];
   }
 }
 
-- (NSString *)username
+- (NSString *)terminalAlias1
 {
-  return username;
+  return terminalAlias1;
 }
 
-- (void)setUsername:(NSString *)theUsername
+- (void)setTerminalAlias1:(NSString *)theTerminalAlias1
 {
-  if(username != theUsername)
+  if(terminalAlias1 != theTerminalAlias1)
   {
-    NSString *old = username;
-    username = [theUsername copy];
+    NSString *old = terminalAlias1;
+    terminalAlias1 = [theTerminalAlias1 copy];
     [old release];
   }
 }
 
-- (NSString *)phoneNumber
+- (NSString *)terminalAlias2
 {
-  return phoneNumber;
+  return terminalAlias2;
 }
 
-- (void)setPhoneNumber:(NSString *)thePhoneNumber
+- (void)setTerminalAlias2:(NSString *)theTerminalAlias2
 {
-  if(phoneNumber != thePhoneNumber)
+  if(terminalAlias2 != theTerminalAlias2)
   {
-    NSString *old = phoneNumber;
-    phoneNumber = [thePhoneNumber copy];
+    NSString *old = terminalAlias2;
+    terminalAlias2 = [theTerminalAlias2 copy];
     [old release];
   }
 }
@@ -216,7 +216,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   if (didSetPassword == YES) {
     return password;
   }
-  return [[XMPreferencesManager sharedInstance] passwordForServiceName:gatekeeper accountName:username];
+  return [[XMPreferencesManager sharedInstance] passwordForServiceName:gatekeeperHost accountName:terminalAlias1];
 }
 
 - (void)setPassword:(NSString *)thePassword
@@ -233,7 +233,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 - (void)savePassword
 {
   if (didSetPassword == YES) {
-	[[XMPreferencesManager sharedInstance] setPassword:password forServiceName:gatekeeper accountName:username];
+    [[XMPreferencesManager sharedInstance] setPassword:password forServiceName:gatekeeperHost accountName:terminalAlias1];
     didSetPassword = NO;
   }
 }

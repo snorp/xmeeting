@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.60 2007/09/25 12:12:01 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.61 2007/09/27 21:13:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -571,8 +571,8 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
   // In case of STUN problems, connections MAY still work this way.
   //
   if(stun != NULL) {
-	delete stun;
-	stun = NULL;
+	  delete stun;
+	  stun = NULL;
   }
   
   if (!HasNetworkInterfaces()) {
@@ -582,41 +582,41 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
   }
 
   for (PINDEX i = 0; i < stunServers.GetSize(); i++) {
-	const PString & stunServer = stunServers[i];
-	PTRACE(3, "Trying STUN server " << stunServer);
-	stun = new PSTUNClient(stunServer, GetUDPPortBase(), GetUDPPortMax(),
-						   GetRtpIpPortBase(), GetRtpIpPortMax());
-	PSTUNClient::NatTypes natType = stun->GetNatType();
+    const PString & stunServer = stunServers[i];
+    PTRACE(3, "Trying STUN server " << stunServer);
+    stun = new PSTUNClient(stunServer, GetUDPPortBase(), GetUDPPortMax(),
+                           GetRtpIpPortBase(), GetRtpIpPortMax());
+    PSTUNClient::NatTypes natType = stun->GetNatType();
 	  
-	switch(natType) {
-		
-	  case PSTUNClient::UnknownNat:
-	  case PSTUNClient::BlockedNat:
-		// Communication with STUN server was not successful.
-		// Try next STUN server
-		PTRACE(3, "Connection to STUN server unsuccessful. Trying next server");
-		continue;
-		  
-	  case PSTUNClient::ConeNat:
-	  case PSTUNClient::RestrictedNat:
-	  case PSTUNClient::PortRestrictedNat:
-	  case PSTUNClient::OpenNat:
-		// STUN does work in these cases
-		stun->GetExternalAddress(translationAddress);
-		if (GetTranslationAddress().IsValid()) {
+    switch(natType) {
+      
+      case PSTUNClient::UnknownNat:
+      case PSTUNClient::BlockedNat:
+        // Communication with STUN server was not successful.
+        // Try next STUN server
+        PTRACE(3, "Connection to STUN server unsuccessful. Trying next server");
+        continue;
+        
+      case PSTUNClient::ConeNat:
+      case PSTUNClient::RestrictedNat:
+      case PSTUNClient::PortRestrictedNat:
+      case PSTUNClient::OpenNat:
+        // STUN does work in these cases
+        stun->GetExternalAddress(translationAddress);
+        if (GetTranslationAddress().IsValid()) {
           const PString & address = GetTranslationAddress().AsString();
-		  HandleSTUNInformation(natType, address);
-		} else {
-		  // something wrong here
-		  delete stun;
-		  stun = NULL;
-		  SetTranslationAddress(theTranslationAddress);
-		  HandleSTUNInformation(natType, PString());
-		}
-		return;
+          HandleSTUNInformation(natType, address);
+        } else {
+          // something wrong here
+          delete stun;
+          stun = NULL;
+          SetTranslationAddress(theTranslationAddress);
+          HandleSTUNInformation(natType, PString());
+        }
+        return;
 				
-	  default:
-
+      default:
+        
         // STUN does not work: Use the traditional address translation feature
         PIPSocket::Address stunExternalAddress;
         stun->GetExternalAddress(stunExternalAddress);
@@ -625,7 +625,7 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
         SetTranslationAddress(theTranslationAddress);
         HandleSTUNInformation(natType, stunExternalAddress.AsString());
         return;
-	}
+    }
   }
 	
   // No STUN servers availalbe: Use the traditional address translation feature

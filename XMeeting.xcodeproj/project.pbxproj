@@ -195,7 +195,6 @@
 		D126F53C0BB170C300044885 /* x880.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE22F08F90262007E4ABE /* x880.cxx */; };
 		D126F53D0BB170D500044885 /* channels.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31C08F90262007E4ABE /* channels.cxx */; };
 		D126F53E0BB170D500044885 /* gkclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE31D08F90262007E4ABE /* gkclient.cxx */; };
-		D126F53F0BB170D500044885 /* gkserver.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32008F90262007E4ABE /* gkserver.cxx */; };
 		D126F5400BB170D500044885 /* h225ras.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32108F90262007E4ABE /* h225ras.cxx */; };
 		D126F5410BB170D500044885 /* h235auth.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32208F90262007E4ABE /* h235auth.cxx */; };
 		D126F5420BB170D500044885 /* h235auth1.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F844B0A24880000FB2EDB /* h235auth1.cxx */; };
@@ -308,7 +307,6 @@
 		D160F04C0C76263E00132F5E /* XMCalltoURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395610841B4E100F7FD83 /* XMCalltoURL.m */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
 		D162158509F0F91600647E48 /* CallHistory_SIP.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158309F0F91600647E48 /* CallHistory_SIP.tiff */; };
-		D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D163336407A01BD5003FD9C0 /* XMApplicationController.m */; };
 		D16333E207A020D9003FD9C0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333E007A020D9003FD9C0 /* AudioToolbox.framework */; };
 		D16333E307A020D9003FD9C0 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333E107A020D9003FD9C0 /* AudioUnit.framework */; };
 		D16333EE07A020FF003FD9C0 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D16333ED07A020FF003FD9C0 /* CoreAudio.framework */; };
@@ -460,6 +458,7 @@
 		D1E315270B52AC1000385072 /* vbr.c in Sources */ = {isa = PBXBuildFile; fileRef = D1E314760B529FA200385072 /* vbr.c */; };
 		D1E315280B52AC1900385072 /* vorbis_psy.c in Sources */ = {isa = PBXBuildFile; fileRef = D1E314780B529FA200385072 /* vorbis_psy.c */; };
 		D1E315290B52AC1F00385072 /* vq.c in Sources */ = {isa = PBXBuildFile; fileRef = D1E3147A0B529FA200385072 /* vq.c */; };
+		D1E8B5CC0CABE92400083FFF /* XMApplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */; };
 		D1E912BE0A308DDA00AEABA5 /* XMSTUNServers.plist in Resources */ = {isa = PBXBuildFile; fileRef = D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */; };
 		D1EB18AD08437A26002CEF53 /* AddressBook.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18AC08437A26002CEF53 /* AddressBook.tiff */; };
 		D1EB18BA0843D6B6002CEF53 /* ZeroConf.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1EB18B90843D6B6002CEF53 /* ZeroConf.tiff */; };
@@ -475,6 +474,11 @@
 		D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068D091756FA008A8974 /* XMAddressBookManager.m */; };
 		D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */; };
 		D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1EF07510918B212008A8974 /* SetupAssistant.nib */; };
+		D1F1FB110CA06EAE0049493C /* h46018.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F1FB0F0CA06EAE0049493C /* h46018.h */; };
+		D1F1FB120CA06EAE0049493C /* h46019.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F1FB100CA06EAE0049493C /* h46019.h */; };
+		D1F1FD710CA16C0A0049493C /* h46018.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F1FB130CA06EAE0049493C /* h46018.cxx */; };
+		D1F1FDD90CA173A70049493C /* h46018handler.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F1FDD80CA173A70049493C /* h46018handler.h */; };
+		D1F1FDEC0CA174190049493C /* h46018handler.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F1FDEB0CA174190049493C /* h46018handler.cxx */; };
 		D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */; };
 		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */; };
 		D1FB991809D56F9C0078BBA9 /* XMAddressBookRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */; };
@@ -509,6 +513,9 @@
 				D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */,
 				D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */,
 				D1010AB60C71F6D20010523E /* XMURLParser.h in CopyFiles */,
+				D1F1FB110CA06EAE0049493C /* h46018.h in CopyFiles */,
+				D1F1FB120CA06EAE0049493C /* h46019.h in CopyFiles */,
+				D1F1FDD90CA173A70049493C /* h46018handler.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -805,7 +812,7 @@
 		D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMInBandDTMFHandler.cpp; path = Source/Framework/XMInBandDTMFHandler.cpp; sourceTree = "<group>"; };
 		D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMInBandDTMFHandler.h; path = Source/Framework/XMInBandDTMFHandler.h; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
-		D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XMeetingABPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D15435EF0C01FB62002A027E /* Address Book plugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Address Book plugin.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPlugin.h; path = Source/AddressBookPlugin/XMAddressBookPlugin.h; sourceTree = "<group>"; };
 		D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPlugin.m; path = Source/AddressBookPlugin/XMAddressBookPlugin.m; sourceTree = "<group>"; };
 		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
@@ -830,7 +837,6 @@
 		D162158209F0F91600647E48 /* CallHistory_H323.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory_H323.tiff; path = Resources/Images/CallHistory_H323.tiff; sourceTree = "<group>"; };
 		D162158309F0F91600647E48 /* CallHistory_SIP.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CallHistory_SIP.tiff; path = Resources/Images/CallHistory_SIP.tiff; sourceTree = "<group>"; };
 		D163336307A01BD5003FD9C0 /* XMApplicationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationController.h; path = Source/Application/XMApplicationController.h; sourceTree = "<group>"; };
-		D163336407A01BD5003FD9C0 /* XMApplicationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationController.m; path = Source/Application/XMApplicationController.m; sourceTree = "<group>"; };
 		D16333E007A020D9003FD9C0 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		D16333E107A020D9003FD9C0 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		D16333ED07A020FF003FD9C0 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
@@ -1304,7 +1310,6 @@
 		D1CEE31608F90262007E4ABE /* vidcodec.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = vidcodec.cxx; sourceTree = "<group>"; };
 		D1CEE31C08F90262007E4ABE /* channels.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = channels.cxx; sourceTree = "<group>"; };
 		D1CEE31D08F90262007E4ABE /* gkclient.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gkclient.cxx; sourceTree = "<group>"; };
-		D1CEE32008F90262007E4ABE /* gkserver.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gkserver.cxx; sourceTree = "<group>"; };
 		D1CEE32108F90262007E4ABE /* h225ras.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h225ras.cxx; sourceTree = "<group>"; };
 		D1CEE32208F90262007E4ABE /* h235auth.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h235auth.cxx; sourceTree = "<group>"; };
 		D1CEE32408F90262007E4ABE /* h323.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h323.cxx; sourceTree = "<group>"; };
@@ -1471,6 +1476,7 @@
 		D1E3147E0B529FA200385072 /* vq_sse.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = vq_sse.h; sourceTree = "<group>"; };
 		D1E314860B529FA200385072 /* speexcodec.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = speexcodec.cxx; sourceTree = "<group>"; };
 		D1E314C20B52AA6900385072 /* speex_pwplugin.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = speex_pwplugin.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMApplicationController.m; path = Source/Application/XMApplicationController.m; sourceTree = "<group>"; };
 		D1E912BD0A308DDA00AEABA5 /* XMSTUNServers.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = XMSTUNServers.plist; path = Resources/XMSTUNServers.plist; sourceTree = "<group>"; };
 		D1E9137D0A4833F7005CDF27 /* config.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = config.cxx; sourceTree = "<group>"; };
 		D1EB18AC08437A26002CEF53 /* AddressBook.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AddressBook.tiff; path = Resources/Images/AddressBook.tiff; sourceTree = "<group>"; };
@@ -1504,6 +1510,12 @@
 		D1F0B78909DC4867005D0464 /* q922.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = q922.h; sourceTree = "<group>"; };
 		D1F0B7C509DC50E5005D0464 /* h323h224.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h323h224.cxx; sourceTree = "<group>"; };
 		D1F0B7C709DC50F6005D0464 /* h323h224.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h323h224.h; sourceTree = "<group>"; };
+		D1F1FB0F0CA06EAE0049493C /* h46018.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h46018.h; sourceTree = "<group>"; };
+		D1F1FB100CA06EAE0049493C /* h46019.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h46019.h; sourceTree = "<group>"; };
+		D1F1FB130CA06EAE0049493C /* h46018.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h46018.cxx; sourceTree = "<group>"; };
+		D1F1FB140CA06EAE0049493C /* h46019.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h46019.cxx; sourceTree = "<group>"; };
+		D1F1FDD80CA173A70049493C /* h46018handler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h46018handler.h; sourceTree = "<group>"; };
+		D1F1FDEB0CA174190049493C /* h46018handler.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h46018handler.cxx; sourceTree = "<group>"; };
 		D1F49D02097E50790010A324 /* echocancel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = echocancel.h; sourceTree = "<group>"; };
 		D1F49D04097E509E0010A324 /* echocancel.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = echocancel.cxx; sourceTree = "<group>"; };
 		D1F6056908BA0E600005E9A0 /* XMInspectorModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMInspectorModule.h; path = Source/GUI/XMInspectorModule.h; sourceTree = "<group>"; };
@@ -1634,7 +1646,7 @@
 				8D1107320486CEB800E47090 /* XMeeting.app */,
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
 				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
-				D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */,
+				D15435EF0C01FB62002A027E /* Address Book plugin.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2012,7 +2024,7 @@
 			isa = PBXGroup;
 			children = (
 				D163336307A01BD5003FD9C0 /* XMApplicationController.h */,
-				D163336407A01BD5003FD9C0 /* XMApplicationController.m */,
+				D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */,
 				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
 				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
 				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */,
@@ -2461,6 +2473,9 @@
 				D1CEE14A08F9022B007E4ABE /* h450pdu.h */,
 				D1887CC40A2713E200C938BB /* h460.h */,
 				D15F84430A24874400FB2EDB /* h4601.h */,
+				D1F1FB0F0CA06EAE0049493C /* h46018.h */,
+				D1F1FDD80CA173A70049493C /* h46018handler.h */,
+				D1F1FB100CA06EAE0049493C /* h46019.h */,
 				D1CEE14B08F9022B007E4ABE /* h501pdu.h */,
 				D1CEE14C08F9022B007E4ABE /* peclient.h */,
 				D1CEE14D08F9022B007E4ABE /* q931.h */,
@@ -2661,7 +2676,6 @@
 			children = (
 				D1CEE31C08F90262007E4ABE /* channels.cxx */,
 				D1CEE31D08F90262007E4ABE /* gkclient.cxx */,
-				D1CEE32008F90262007E4ABE /* gkserver.cxx */,
 				D1CEE32108F90262007E4ABE /* h225ras.cxx */,
 				D1CEE32208F90262007E4ABE /* h235auth.cxx */,
 				D15F844B0A24880000FB2EDB /* h235auth1.cxx */,
@@ -2675,6 +2689,9 @@
 				D1CEE32B08F90263007E4ABE /* h323trans.cxx */,
 				D1CEE32C08F90263007E4ABE /* h450pdu.cxx */,
 				D15F84470A24878400FB2EDB /* h4601.cxx */,
+				D1F1FB130CA06EAE0049493C /* h46018.cxx */,
+				D1F1FDEB0CA174190049493C /* h46018handler.cxx */,
+				D1F1FB140CA06EAE0049493C /* h46019.cxx */,
 				D1CEE32D08F90263007E4ABE /* h501pdu.cxx */,
 				D1CEE32E08F90263007E4ABE /* peclient.cxx */,
 				D1CEE32F08F90263007E4ABE /* q931.cxx */,
@@ -3128,7 +3145,7 @@
 			);
 			name = XMeetingABPlugin;
 			productName = "Address Book plugin";
-			productReference = D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */;
+			productReference = D15435EF0C01FB62002A027E /* Address Book plugin.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D1E314C10B52AA6900385072 /* speex */ = {
@@ -3460,7 +3477,6 @@
 				D126F53C0BB170C300044885 /* x880.cxx in Sources */,
 				D126F53D0BB170D500044885 /* channels.cxx in Sources */,
 				D126F53E0BB170D500044885 /* gkclient.cxx in Sources */,
-				D126F53F0BB170D500044885 /* gkserver.cxx in Sources */,
 				D126F5400BB170D500044885 /* h225ras.cxx in Sources */,
 				D126F5410BB170D500044885 /* h235auth.cxx in Sources */,
 				D126F5420BB170D500044885 /* h235auth1.cxx in Sources */,
@@ -3489,7 +3505,6 @@
 				D126F57B0BB1715200044885 /* sipcon.cxx in Sources */,
 				D126F57C0BB1715200044885 /* sipep.cxx in Sources */,
 				D126F57D0BB1715200044885 /* sippdu.cxx in Sources */,
-				D163336607A01BD5003FD9C0 /* XMApplicationController.m in Sources */,
 				D1A02882081CBCC00018BD11 /* XMPreferencesManager.m in Sources */,
 				D1A02896081CBED00018BD11 /* XMLocation.m in Sources */,
 				D1A02A78081E40580018BD11 /* XMPreferencesWindowController.m in Sources */,
@@ -3599,6 +3614,9 @@
 				D1A24F2D0C6FD96000408CF7 /* XMIDDPrefixFormatter.m in Sources */,
 				D1010AB50C71F6D20010523E /* XMURLParser.cpp in Sources */,
 				D160F04C0C76263E00132F5E /* XMCalltoURL.m in Sources */,
+				D1F1FD710CA16C0A0049493C /* h46018.cxx in Sources */,
+				D1F1FDEC0CA174190049493C /* h46018handler.cxx in Sources */,
+				D1E8B5CC0CABE92400083FFF /* XMApplicationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

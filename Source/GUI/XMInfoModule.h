@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.h,v 1.8 2007/08/17 11:36:44 hfriederich Exp $
+ * $Id: XMInfoModule.h,v 1.9 2007/09/27 21:13:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,8 @@
   IBOutlet NSImageView *h323StatusSemaphoreView;
   IBOutlet NSTextField *gatekeeperField;
   IBOutlet NSImageView *gatekeeperSemaphoreView;
-  IBOutlet NSTextField *phoneNumberField;
+  IBOutlet NSTextField *terminalAliasField;
+  NSMutableArray *terminalAliasViews;
   
   IBOutlet NSButton *sipDisclosure;
   IBOutlet NSBox *sipBox;
@@ -45,6 +46,7 @@
   
   unsigned addressExtraHeight;
   unsigned h323BoxHeight;
+  unsigned h323AliasesExtraHeight;
   unsigned sipBoxHeight;
   unsigned sipRegistrationsExtraHeight;
   
