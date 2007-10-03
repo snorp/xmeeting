@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.38 2007/09/25 12:12:01 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.39 2007/10/03 07:22:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,6 +38,9 @@ public:
 	static XMH323EndPoint * GetH323EndPoint();
 	static XMSIPEndPoint * GetSIPEndPoint();
 	static XMEndPoint * GetCallEndPoint();
+  
+  /* Handle network status changes */
+  void HandleNetworkStatusChange();
     
     /* Initiating a call */
     unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, 

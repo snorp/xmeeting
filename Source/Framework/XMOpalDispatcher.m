@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.48 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.49 2007/10/03 07:22:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1368,6 +1368,10 @@ typedef enum _XMOpalDispatcherMessage
        networkStatusChanged:(BOOL)networkStatusChanged verbose:(BOOL)verbose
 {
   unsigned i;
+  
+  if (networkStatusChanged) {
+    _XMHandleNetworkStatusChange();
+  }
   
   // ***** Adjusting the general settings ***** //
   NSString *theUserName = [preferences userName];

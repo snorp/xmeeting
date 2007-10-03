@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.52 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.53 2007/10/03 07:22:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -77,8 +77,9 @@ void _XMSetPortRanges(unsigned int udpPortMin,
 
 void _XMHandleNetworkStatusChange()
 {
-  XMOpalManager::GetH323EndPoint()->HandleNetworkStatusChange();
-  XMOpalManager::GetSIPEndPoint()->HandleNetworkStatusChange();
+  //XMOpalManager::GetH323EndPoint()->HandleNetworkStatusChange();
+  //XMOpalManager::GetSIPEndPoint()->HandleNetworkStatusChange();
+  XMOpalManager::GetManager()->HandleNetworkStatusChange();
 }
 
 #pragma mark -

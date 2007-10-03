@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.44 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.45 2007/10/03 07:22:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1173,7 +1173,7 @@
 {
   if (doesSleep == NO) {
     networkStatusChanged = YES;
-    [self _doSubsystemSetupWithPreferences:activePreferences];
+    [XMOpalDispatcher _handleNetworkStatusChange];
   }
 }
 

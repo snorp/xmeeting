@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.61 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.62 2007/10/03 07:22:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,20 +40,20 @@ void XMOpalManager::InitOpal(const PString & pTracePath)
 {	
   if(theProcess == NULL)
   {
-	PProcess::PreInitialise(0, 0, 0);
-	theProcess = new XMProcess;
-	
-	if(pTracePath != NULL)
-	{
-	  PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
-	}
-	
-	managerInstance = new XMOpalManager();
-	callEndPointInstance = new XMEndPoint(*managerInstance);
-	h323EndPointInstance = new XMH323EndPoint(*managerInstance);
-	sipEndPointInstance = new XMSIPEndPoint(*managerInstance);
-	
-	XMSoundChannel::Init();
+    PProcess::PreInitialise(0, 0, 0);
+    theProcess = new XMProcess;
+    
+    if(pTracePath != NULL)
+    {
+      PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
+    }
+    
+    managerInstance = new XMOpalManager();
+    callEndPointInstance = new XMEndPoint(*managerInstance);
+    h323EndPointInstance = new XMH323EndPoint(*managerInstance);
+    sipEndPointInstance = new XMSIPEndPoint(*managerInstance);
+    
+    XMSoundChannel::Init();
   }
 }
 
@@ -87,7 +87,9 @@ XMOpalManager::XMOpalManager()
   
   callEndReason = NULL;
   
-  PInterfaceMonitor::GetInstance().SetInterfaceFilter(new XMInterfaceFilter());
+  // Create an interface monitor which does NOT run a monitor thread
+  PInterfaceMonitor *monitor = new PInterfaceMonitor(0, FALSE);
+  monitor->SetInterfaceFilter(new XMInterfaceFilter());
   
   OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
   SetEchoCancelParams(params);
@@ -128,6 +130,14 @@ XMH323EndPoint * XMOpalManager::GetH323EndPoint()
 XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 {
   return sipEndPointInstance;
+}
+
+#pragma mark -
+#pragma mark Handling network status changes
+
+void XMOpalManager::HandleNetworkStatusChange()
+{
+  PInterfaceMonitor::GetInstance().RefreshInterfaceList();
 }
 
 #pragma mark -
