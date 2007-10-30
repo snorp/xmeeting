@@ -207,7 +207,6 @@
 		D126F5490BB170D500044885 /* h323rtp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32A08F90263007E4ABE /* h323rtp.cxx */; };
 		D126F54A0BB170D500044885 /* h323trans.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32B08F90263007E4ABE /* h323trans.cxx */; };
 		D126F54B0BB170D500044885 /* h450pdu.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32C08F90263007E4ABE /* h450pdu.cxx */; };
-		D126F54C0BB170D500044885 /* h4601.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F84470A24878400FB2EDB /* h4601.cxx */; };
 		D126F54D0BB170D500044885 /* h501pdu.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32D08F90263007E4ABE /* h501pdu.cxx */; };
 		D126F54E0BB170D500044885 /* peclient.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32E08F90263007E4ABE /* peclient.cxx */; };
 		D126F54F0BB170D500044885 /* q931.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1CEE32F08F90263007E4ABE /* q931.cxx */; };
@@ -302,6 +301,7 @@
 		D154390D0C0B3D60002A027E /* opalmixer.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D154390C0C0B3D60002A027E /* opalmixer.cxx */; };
 		D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15439280C0C4C09002A027E /* handlers.h */; };
 		D15439CB0C0C5769002A027E /* handlers.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15439C90C0C5769002A027E /* handlers.cxx */; };
+		D1594F180CD71240006021DF /* h4601.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F84470A24878400FB2EDB /* h4601.cxx */; };
 		D15B067B084763F000FA58A1 /* XMDatabaseField.m in Sources */ = {isa = PBXBuildFile; fileRef = D15B067A084763F000FA58A1 /* XMDatabaseField.m */; };
 		D15D5A2908C0BD0A00C7D89C /* XMApplicationFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */; };
 		D160F04C0C76263E00132F5E /* XMCalltoURL.m in Sources */ = {isa = PBXBuildFile; fileRef = D16395610841B4E100F7FD83 /* XMCalltoURL.m */; };
@@ -474,11 +474,6 @@
 		D1EF0690091756FA008A8974 /* XMAddressBookManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF068D091756FA008A8974 /* XMAddressBookManager.m */; };
 		D1EF074C0918B1B3008A8974 /* XMSetupAssistantManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */; };
 		D1EF07530918B212008A8974 /* SetupAssistant.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1EF07510918B212008A8974 /* SetupAssistant.nib */; };
-		D1F1FB110CA06EAE0049493C /* h46018.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F1FB0F0CA06EAE0049493C /* h46018.h */; };
-		D1F1FB120CA06EAE0049493C /* h46019.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F1FB100CA06EAE0049493C /* h46019.h */; };
-		D1F1FD710CA16C0A0049493C /* h46018.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F1FB130CA06EAE0049493C /* h46018.cxx */; };
-		D1F1FDD90CA173A70049493C /* h46018handler.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F1FDD80CA173A70049493C /* h46018handler.h */; };
-		D1F1FDEC0CA174190049493C /* h46018handler.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F1FDEB0CA174190049493C /* h46018handler.cxx */; };
 		D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */; };
 		D1F61AA108706A6900FDD4F0 /* XMSimpleAddressResource.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */; };
 		D1FB991809D56F9C0078BBA9 /* XMAddressBookRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */; };
@@ -513,9 +508,6 @@
 				D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */,
 				D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */,
 				D1010AB60C71F6D20010523E /* XMURLParser.h in CopyFiles */,
-				D1F1FB110CA06EAE0049493C /* h46018.h in CopyFiles */,
-				D1F1FB120CA06EAE0049493C /* h46019.h in CopyFiles */,
-				D1F1FDD90CA173A70049493C /* h46018handler.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -952,7 +944,6 @@
 		D1B4D0060833937200A444E1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/ZeroConfModule.nib; sourceTree = "<group>"; };
 		D1B5817F0A76C24A005DF33D /* opalglobalstatics.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = opalglobalstatics.cxx; sourceTree = "<group>"; };
 		D1B581820A76C299005DF33D /* opalpluginmgr.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = opalpluginmgr.cxx; sourceTree = "<group>"; };
-		D1B6062C08F8F8410034B47F /* ptbuildopts.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptbuildopts.h; path = ../pwlib/include/ptbuildopts.h; sourceTree = SOURCE_ROOT; };
 		D1B6062F08F8F8410034B47F /* asnber.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = asnber.h; sourceTree = "<group>"; };
 		D1B6063008F8F8410034B47F /* asner.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = asner.h; sourceTree = "<group>"; };
 		D1B6063108F8F8410034B47F /* asnper.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = asnper.h; sourceTree = "<group>"; };
@@ -1097,7 +1088,7 @@
 		D1B606C208F8F8410034B47F /* video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = video.h; sourceTree = "<group>"; };
 		D1B606C308F8F8410034B47F /* videoio.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = videoio.h; sourceTree = "<group>"; };
 		D1B606C408F8F8410034B47F /* videoio1394dc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = videoio1394dc.h; sourceTree = "<group>"; };
-		D1B606C508F8F8410034B47F /* ptlib.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptlib.h; path = ../pwlib/include/ptlib.h; sourceTree = SOURCE_ROOT; };
+		D1B606C508F8F8410034B47F /* ptlib.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptlib.h; path = ../ptlib/include/ptlib.h; sourceTree = SOURCE_ROOT; };
 		D1B6075A08F8F86B0034B47F /* asner.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = asner.cxx; sourceTree = "<group>"; };
 		D1B6075D08F8F86B0034B47F /* cypher.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cypher.cxx; sourceTree = "<group>"; };
 		D1B6075F08F8F86B0034B47F /* dtmf.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = dtmf.cxx; sourceTree = "<group>"; };
@@ -2113,7 +2104,6 @@
 			isa = PBXGroup;
 			children = (
 				D1B606C508F8F8410034B47F /* ptlib.h */,
-				D1B6062C08F8F8410034B47F /* ptbuildopts.h */,
 				D1B6062E08F8F8410034B47F /* ptclib */,
 				D1B6065D08F8F8410034B47F /* ptlib */,
 				D1887E0B0A27B96900C938BB /* Patches */,
@@ -2175,7 +2165,7 @@
 				D1B6065C08F8F8410034B47F /* xmpp_roster.h */,
 			);
 			name = ptclib;
-			path = ../pwlib/include/ptclib;
+			path = ../ptlib/include/ptclib;
 			sourceTree = SOURCE_ROOT;
 		};
 		D1B6065D08F8F8410034B47F /* ptlib */ = {
@@ -2244,7 +2234,7 @@
 				D1B606C408F8F8410034B47F /* videoio1394dc.h */,
 			);
 			name = ptlib;
-			path = ../pwlib/include/ptlib;
+			path = ../ptlib/include/ptlib;
 			sourceTree = SOURCE_ROOT;
 		};
 		D1B6069708F8F8410034B47F /* unix */ = {
@@ -2327,7 +2317,7 @@
 				D1B6078008F8F86B0034B47F /* random.cxx */,
 			);
 			name = ptclib;
-			path = ../pwlib/src/ptclib;
+			path = ../ptlib/src/ptclib;
 			sourceTree = SOURCE_ROOT;
 		};
 		D1B6078D08F8F86B0034B47F /* ptlib */ = {
@@ -2337,7 +2327,7 @@
 				D1B607C208F8F86C0034B47F /* unix */,
 			);
 			name = ptlib;
-			path = ../pwlib/src/ptlib;
+			path = ../ptlib/src/ptlib;
 			sourceTree = SOURCE_ROOT;
 		};
 		D1B6078E08F8F86B0034B47F /* common */ = {
@@ -3367,7 +3357,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../pwlib/include/ptbuildopts.h ];\nthen\necho \"PWLib: Running configure not needed\";\nelse\necho \"PWLib: Running configure\";\ncd ../pwlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\nautoconf\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../pwlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PWLib: Running bison not needed\";\nelse\necho \"PWLib: Running bison\";\n/usr/bin/bison ../pwlib/src/ptlib/common/getdate.y -o ../pwlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../ptlib/include/ptbuildopts.h ];\nthen\necho \"PTLib: Running configure not needed\";\nelse\necho \"PTLib: Running configure\";\ncd ../ptlib\n./configure --enable-minsize --enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\nautoconf\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PTLib: Running bison not needed\";\nelse\necho \"PTLib: Running bison\";\n/usr/bin/bison ../ptlib/src/ptlib/common/getdate.y -o ../ptlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3489,7 +3479,6 @@
 				D126F5490BB170D500044885 /* h323rtp.cxx in Sources */,
 				D126F54A0BB170D500044885 /* h323trans.cxx in Sources */,
 				D126F54B0BB170D500044885 /* h450pdu.cxx in Sources */,
-				D126F54C0BB170D500044885 /* h4601.cxx in Sources */,
 				D126F54D0BB170D500044885 /* h501pdu.cxx in Sources */,
 				D126F54E0BB170D500044885 /* peclient.cxx in Sources */,
 				D126F54F0BB170D500044885 /* q931.cxx in Sources */,
@@ -3614,9 +3603,8 @@
 				D1A24F2D0C6FD96000408CF7 /* XMIDDPrefixFormatter.m in Sources */,
 				D1010AB50C71F6D20010523E /* XMURLParser.cpp in Sources */,
 				D160F04C0C76263E00132F5E /* XMCalltoURL.m in Sources */,
-				D1F1FD710CA16C0A0049493C /* h46018.cxx in Sources */,
-				D1F1FDEC0CA174190049493C /* h46018handler.cxx in Sources */,
 				D1E8B5CC0CABE92400083FFF /* XMApplicationController.m in Sources */,
+				D1594F180CD71240006021DF /* h4601.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4045,7 +4033,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../pwlib/include,
+					../ptlib/include,
 					../opal/include,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -4106,7 +4094,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../pwlib/include,
+					../ptlib/include,
 					../opal/include,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -4239,7 +4227,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../pwlib/include,
+					../ptlib/include,
 					../opal/include,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -4295,7 +4283,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../pwlib/include,
+					../ptlib/include,
 					../opal/include,
 				);
 				INFOPLIST_FILE = Info.plist;
