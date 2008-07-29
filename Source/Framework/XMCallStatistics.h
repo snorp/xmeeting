@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallStatistics.h,v 1.3 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMCallStatistics.h,v 1.4 2008/07/29 17:14:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,10 @@
 
 #import "XMTypes.h"
 
+/**
+ * Object wrapper for the XMCallStatisticsRecord structure,
+ * to allow it to pass around in the ObjC world
+ **/
 @interface XMCallStatistics : NSObject {
 
 @private
