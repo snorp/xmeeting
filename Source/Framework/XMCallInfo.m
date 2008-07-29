@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.8 2006/06/08 08:54:28 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.9 2008/07/29 17:05:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,14 +23,14 @@
 }
 
 - (id)_initWithCallID:(unsigned)theID 
-			 protocol:(XMCallProtocol)theProtocol
-		   remoteName:(NSString *)theRemoteName 
-		 remoteNumber:(NSString *)theRemoteNumber
-		remoteAddress:(NSString *)theRemoteAddress
-	remoteApplication:(NSString *)theRemoteApplication
-		  callAddress:(NSString *)theCallAddress
-		 localAddress:(NSString *)theLocalAddress
-		   callStatus:(XMCallStatus)theStatus;
+             protocol:(XMCallProtocol)theProtocol
+           remoteName:(NSString *)theRemoteName 
+         remoteNumber:(NSString *)theRemoteNumber
+        remoteAddress:(NSString *)theRemoteAddress
+    remoteApplication:(NSString *)theRemoteApplication
+          callAddress:(NSString *)theCallAddress
+         localAddress:(NSString *)theLocalAddress
+           callStatus:(XMCallStatus)theStatus;
 {
 	self = [super init];
 	
@@ -186,24 +186,18 @@
 
 - (NSTimeInterval)callDuration
 {
-	if(callStartDate != nil)
-	{
-		if(callEndDate == nil)
-		{
-			NSDate *now = [[NSDate alloc] init];
-			NSTimeInterval callDuration = [now timeIntervalSinceDate:callStartDate];
-			[now release];
-			return callDuration;
-		}
-		else
-		{
-			return [callEndDate timeIntervalSinceDate:callStartDate];
-		}
-	}
-	else
-	{
-		return (NSTimeInterval)0.0;
-	}
+  if(callStartDate != nil) {
+    if(callEndDate == nil) {
+      NSDate *now = [[NSDate alloc] init];
+      NSTimeInterval callDuration = [now timeIntervalSinceDate:callStartDate];
+      [now release];
+      return callDuration;
+    } else {
+      return [callEndDate timeIntervalSinceDate:callStartDate];
+    }
+  } else {
+    return (NSTimeInterval)0.0;
+  }
 }
 
 - (NSString *)incomingAudioCodec
@@ -417,15 +411,17 @@
 
 - (void)_setCallStatus:(XMCallStatus)status
 {
+  // do nothing if the status doesn't change
+  if (callStatus == status) {
+    return;
+  }
+  
 	callStatus = status;
-	
-	if(status == XMCallStatus_Active)
-	{
-		// fetching the start time
+
+	// update the start / end times if needed
+	if(status == XMCallStatus_Active) {
 		callStartDate = [[NSDate alloc] init];
-	}
-	else if(status == XMCallStatus_Ended)
-	{
+	} else if(status == XMCallStatus_Ended) {
 		callEndDate = [[NSDate alloc] init];
 	}
 }

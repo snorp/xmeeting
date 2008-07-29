@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.12 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.13 2008/07/29 17:05:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,7 @@
 #import "XMTypes.h"
 
 /**
-* This class encapsulates all information about a specific call,
+ * This class encapsulates all information about a specific call,
  * whether this is a call to or from an remote endpoint.
  * Instances of this class can be queried about the remote name,
  * the protocol used (H.323 or SIP) and additional informations
@@ -102,9 +102,9 @@
 /**
  * Returns the network interface about which
  * the call did run in a human readable fashion.
- * Returns "<EXT>" if the local address matches
- * the external address at the time the call was.
- * Returns "<UNK>" if the interface isn't known.
+ * Returns "<PUBLIC>" if the local address matches
+ * the public (non NATed) address at the time the call was.
+ * Returns "<UNKNOWN>" if the interface isn't known.
  **/
 - (NSString *)localAddressInterface;
 
