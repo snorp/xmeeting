@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.21 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.22 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,19 +30,18 @@
 	
 }
 
-+ (void)_setPreferences:(XMPreferences *)preferences externalAddress:(NSString *)externalAddress
-   networkStatusChanged:(BOOL)networkStatusChanged;
++ (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress networkConfigurationChanged:(BOOL)networkConfigurationChanged;
 + (void)_retryEnableH323:(XMPreferences *)preferences;
 + (void)_retryGatekeeperRegistration:(XMPreferences *)preferences;
 + (void)_retryEnableSIP:(XMPreferences *)preferences;
 + (void)_retrySIPRegistrations:(XMPreferences *)preferences;
-+ (void)_handleNetworkStatusChange;
++ (void)_handleNetworkConfigurationChange;
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
 + (void)_initiateSpecificCallToAddress:(NSString *)address 
 							  protocol:(XMCallProtocol)protocol
 						   preferences:(XMPreferences *)preferences 
-					   externalAddress:(NSString *)externalAddress;
+					   publicAddress:(NSString *)publicAddress;
 + (void)_callIsAlerting:(unsigned)callID;
 + (void)_incomingCall:(unsigned)callID
 			 protocol:(XMCallProtocol)callProtocol
@@ -92,7 +91,7 @@
 - (void)_runOpalDispatcherThread:(NSString *)pTracePath;
 
 	// called every time the STUN information is updated
-- (void)_handleNATType:(XMNATType)natType externalAddress:(NSString *)externalAddress;
+- (void)_handleNATType:(XMNATType)natType publicAddress:(NSString *)publicAddress;
 
 	// called every time the Framework (re-)registers at a gatekeeper
 - (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName aliases:(NSArray *)gkAliases;

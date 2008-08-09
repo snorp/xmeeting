@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.30 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.31 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,30 +18,26 @@
 /**
  * XMCallManager is the central class in the XMeeting framework.
  * This class allows to make calls, accept/reject incoming calls
- * and hangup active calls
+ * and hangup active calls. In addition, the active call is
+ * managed through this class.
  * This class is a singleton instance which can be accessed
- * through the +sharedInstance method, but allows to specify
- * a delegate to customize the behaviour.
+ * through the +sharedInstance method.
  **/
 @interface XMCallManager : NSObject {
 	
 @private
-  unsigned callManagerStatus;
+  // overall state
+  unsigned state;
   
-  unsigned h323ListeningStatus;
-  unsigned sipListeningStatus;
-  
+  // preferences
   XMPreferences *activePreferences;
   BOOL automaticallyAcceptIncomingCalls;
   
+  // call management
   XMCallInfo *activeCall;
   BOOL needsSubsystemSetupAfterCallEnd;
   XMCallStartFailReason callStartFailReason;
-  
   BOOL canSendCameraEvents;
-  
-  // External address handling
-  BOOL needsCheckipAddress;
   
   // h.323 variables
   NSString *gatekeeperName;
@@ -49,23 +45,20 @@
   XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
   
   // SIP variables
-  NSMutableArray *registrations;
+  NSMutableArray *sipRegistrations;
   NSMutableArray *sipRegistrationFailReasons;
-  
-  // InCall variables
-  NSTimeInterval callStatisticsUpdateInterval;
   
   // call history
   NSMutableArray *recentCalls;
   
+  // Tracking system state
+  BOOL networkConfigurationChanged;
+  unsigned systemSleepStatus;
+  unsigned h323ListeningStatus;
+  unsigned sipListeningStatus;
+  
   // Framework initialization
   NSString *pTracePath;
-  
-  // Tracking system state
-  BOOL networkStatusChanged;
-  BOOL doesSleep;
-  BOOL canSleep;
-  BOOL isActiveSession;
 }
 
 /**
@@ -195,48 +188,29 @@
  **/
 - (XMGatekeeperRegistrationFailReason)gatekeeperRegistrationFailReason;
 
-/**
- * Call this method if the enabling of the H.323 subsystem failed somehow
- * (notified with XMNotification_CallManagerDidNotEnableH323)
- * and you want to retry the subsystem setup process.
- * This method raises an exception if the H.323 subsystem is successfully
- * listening or if the current active preferences do not use H.323 at all!
- **/
-- (void)retryEnableH323;
-
-/**
- * Call this method if the gatekeeper registration failed somehow
- * (notified with XMNotification_CallManagerDidNotRegisterAtGatekeeper)
- * and you want to retry the gatekeeper registration process.
- * This method raises an exception if the gatekeeper registration was
- * succesful or if the current active preferences does not use a gatekeeper
- * at all
- **/
-- (void)retryGatekeeperRegistration;
-
 #pragma mark SIP-specific methods
 
 /**
- * Returns YES if all registrations were succesful or not.
+ * Returns YES if all SIP registrations were succesful or not.
  **/
-- (BOOL)isCompletelyRegistered;
+- (BOOL)isCompletelySIPRegistered;
 
 /**
  * Returns the number of successful registrations the client has at 
  * the moment 
  **/
-- (unsigned)registrationCount;
+- (unsigned)sipRegistrationCount;
 
 /**
  * Returns the registration at the given index
  **/
-- (NSString *)registrationAtIndex:(unsigned)index;
+- (NSString *)sipRegistrationAtIndex:(unsigned)index;
 
 /**
  * Returns the complete array of registrars the client is currently
  * registered at.
  **/
-- (NSArray *)registrations;
+- (NSArray *)sipRegistrations;
 
 /**
  * Returns the number of registration fail reason records the manager
@@ -257,29 +231,12 @@
  **/
 - (NSArray *)sipRegistrationFailReasons;
 
-/**
- * Call this method if the enabling of the SIP subsystem failed somehow
- * (notified with XMNotification_CallManagerDidNotEnableSIP)
- * and you want to retry the subsystem setup process.
- * This method raises an exception if the SIP subsystem is successfully
- * listening or if the current active preferences do not use SIP at all!
- **/
-- (void)retryEnableSIP;
-
-/**
- * Call this method if one of the registration failed somehow
- * (notified with XMNotification_CallManagerDidNotSIPRegister)
- * and you want to retry the registration process.
- * This method raises an exception if all registrations were
- * succesful or if the current active preferences does not use registrations
- * at all
- **/
-- (void)retrySIPRegistrations;
-
 #pragma mark InCall functionality
 
 /**
- * Defines which UserInputMode to send
+ * Defines which UserInputMode to send.
+ * This method may be called at any time, the framework
+ * remembers the current value
  **/
 - (void)setUserInputMode:(XMUserInputMode)mode;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.45 2007/10/03 07:22:41 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.46 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,19 +21,29 @@
 #import "XMAddressResource.h"
 #import "XMBridge.h"
 
-#define XM_H323_NOT_LISTENING 0
-#define XM_H323_LISTENING 1
-#define XM_H323_ERROR 2
+// Call Manager State
+enum {
+  Ready,
+  SubsystemSetup,
+  PreparingCall,
+  InCall,
+  TerminatingCall,
+  WaitingForCheckipAddress,
+};
 
-#define XM_SIP_NOT_LISTENING 0
-#define XM_SIP_LISTENING 1
-#define XM_SIP_ERROR 2
+// Listening State
+enum {
+  NotListening,
+  Listening,
+  Error,
+};
 
-#define XM_CALL_MANAGER_READY 0
-#define XM_CALL_MANAGER_SUBSYSTEM_SETUP 1
-#define XM_CALL_MANAGER_PREPARING_CALL 2
-#define XM_CALL_MANAGER_IN_CALL 3
-#define XM_CALL_MANAGER_TERMINATING_CALL 4
+// System Sleep State
+enum {
+  Awake = 0,
+  EnterSleep,
+  Asleep,
+};
 
 @interface XMCallManager (PrivateMethods)
 
@@ -51,6 +61,8 @@
 - (void)_willSleep:(NSNotification *)notif;
 - (void)_didWakeup:(NSNotification *)notif;
 
++ (void)_updateLocalAddressInterfaceForCall:(XMCallInfo *)callInfo;
+
 @end
 
 @implementation XMCallManager
@@ -66,7 +78,7 @@
 
 + (XMCallManager *)sharedInstance
 {	
-  if(_XMCallManagerSharedInstance == nil)
+  if (_XMCallManagerSharedInstance == nil)
   {
     NSLog(@"Attempt to acces XMCallManager prior to initialization");
   }
@@ -89,10 +101,7 @@
 {
   self = [super init];
   
-  callManagerStatus = XM_CALL_MANAGER_READY;
-  
-  h323ListeningStatus = XM_H323_NOT_LISTENING;
-  sipListeningStatus = XM_SIP_NOT_LISTENING;
+  state = Ready;
   
   activePreferences = [[XMPreferences alloc] init];
   automaticallyAcceptIncomingCalls = NO;
@@ -100,36 +109,32 @@
   activeCall = nil;
   needsSubsystemSetupAfterCallEnd = NO;
   callStartFailReason = XMCallStartFailReason_NoFailure;
-  
   canSendCameraEvents = NO;
-  
-  needsCheckipAddress = NO;
   
   gatekeeperName = nil;
   terminalAliases = nil;
   gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
   
-  registrations = [[NSMutableArray alloc] initWithCapacity:1];
+  sipRegistrations = [[NSMutableArray alloc] initWithCapacity:1];
   sipRegistrationFailReasons = [[NSMutableArray alloc] initWithCapacity:1];
-  
-  callStatisticsUpdateInterval = 1.0;
   
   recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
   
-  pTracePath = [path copy];
+  networkConfigurationChanged = YES;
+  systemSleepStatus = Awake;
+  h323ListeningStatus = NotListening;
+  sipListeningStatus = NotListening;
   
-  networkStatusChanged = YES;
-  doesSleep = NO;
-  isActiveSession = YES;
+  pTracePath = [path copy];
   
   // Registering notifications
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   [notificationCenter addObserver:self selector:@selector(_didFinishLaunching:)
                              name:NSApplicationDidFinishLaunchingNotification object:nil];
   
+  // track when the system is going to sleep
   // Use NSWorkspace's notification center for these notifications
   notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-  
   [notificationCenter addObserver:self selector:@selector(_willSleep:)
                              name:NSWorkspaceWillSleepNotification object:nil];
   [notificationCenter addObserver:self selector:@selector(_didWake:)
@@ -152,8 +157,8 @@
   [terminalAliases release];
   terminalAliases = nil;
   
-  [registrations release];
-  registrations = nil;
+  [sipRegistrations release];
+  sipRegistrations = nil;
   
   [sipRegistrationFailReasons release];
   sipRegistrationFailReasons = nil;
@@ -165,6 +170,7 @@
   pTracePath = nil;
   
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
 }
 
 - (void)dealloc
@@ -179,17 +185,17 @@
 
 - (BOOL)doesAllowModifications
 {
-  return (callManagerStatus == XM_CALL_MANAGER_READY);
+  return (state == Ready);
 }
 
 - (BOOL)isH323Listening
 {
-  return (h323ListeningStatus == XM_H323_LISTENING);
+  return (h323ListeningStatus == Listening);
 }
 
 - (BOOL)isSIPListening
 {
-  return (sipListeningStatus == XM_SIP_LISTENING);
+  return (sipListeningStatus == Listening);
 }
 
 - (XMPreferences *)activePreferences
@@ -199,13 +205,11 @@
 
 - (void)setActivePreferences:(XMPreferences *)prefs
 {	
-  if(prefs == nil)
-  {
+  if (prefs == nil) {
     [NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustNotBeNil];
     return;
   }
-  if(callManagerStatus != XM_CALL_MANAGER_READY)
-  {
+  if (state != Ready) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall];
     return;
   }
@@ -222,14 +226,14 @@
 
 - (BOOL)isInCall
 {
-  if((callManagerStatus == XM_CALL_MANAGER_PREPARING_CALL) ||
-     (callManagerStatus == XM_CALL_MANAGER_IN_CALL) ||
-     (callManagerStatus == XM_CALL_MANAGER_TERMINATING_CALL))
-  {
-    return YES;
+  switch (state) {
+    case PreparingCall:
+    case InCall:
+    case TerminatingCall:
+      return YES;
+    default:
+      return NO;
   }
-  
-  return NO;
 }
 
 - (XMCallInfo *)activeCall
@@ -240,18 +244,16 @@
 - (void)makeCall:(XMAddressResource *)addressResource;
 {	
   // invalid action checks
-  if(callManagerStatus != XM_CALL_MANAGER_READY)
-  {
+  if (state != Ready) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall];
     return;
   }
   
-  if([addressResource isKindOfClass:[XMGeneralPurposeAddressResource class]])
-  {
+  // special check for preference-modifying address resources
+  if ([addressResource isKindOfClass:[XMGeneralPurposeAddressResource class]]) {
     XMGeneralPurposeAddressResource *resource = (XMGeneralPurposeAddressResource *)addressResource;
     
-    if([resource _doesModifyPreferences:activePreferences])
-    {
+    if ([resource _doesModifyPreferences:activePreferences]) {
       [self _initiateSpecificCall:resource];
       return;
     }
@@ -267,61 +269,51 @@
 
 - (void)acceptIncomingCall
 {
-  if(activeCall == nil)
-  {
+  if (activeCall == nil) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
-  if([activeCall callStatus] != XMCallStatus_Incoming)
-  {
+  if ([activeCall callStatus] != XMCallStatus_Incoming) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfCallStatusNotIncoming];
     return;
   }
   
   unsigned callID = [activeCall _callID];
-		
   [XMOpalDispatcher _acceptIncomingCall:callID];
 }
 
 - (void)rejectIncomingCall
 {
-  if(activeCall == nil)
-  {
+  if (activeCall == nil) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
-  if([activeCall callStatus] != XMCallStatus_Incoming)
-  {
+  if ([activeCall callStatus] != XMCallStatus_Incoming) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfCallStatusNotIncoming];
     return;
   }
   
   unsigned callID = [activeCall _callID];
-  
   [XMOpalDispatcher _rejectIncomingCall:callID];
 }
 
 - (void)clearActiveCall
 {
-  if(activeCall == nil)
-  {
+  if (activeCall == nil) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
-  if(callManagerStatus == XM_CALL_MANAGER_TERMINATING_CALL)
-  {
+  if (state == TerminatingCall) { // already terminating the call, no need to do anything
     return;
   }
   
-  callManagerStatus = XM_CALL_MANAGER_TERMINATING_CALL;
+  state = TerminatingCall;
   
   unsigned callID = [activeCall _callID];
-  
   [activeCall _setCallStatus:XMCallStatus_Terminating];
-  
   [XMOpalDispatcher _clearCall:callID];
 }
 
@@ -364,9 +356,9 @@
   return gatekeeperRegistrationFailReason;
 }
 
-- (void)retryEnableH323
+/*- (void)retryEnableH323
 {
-  if(callManagerStatus == XM_CALL_MANAGER_READY &&
+  if (callManagerStatus == XM_CALL_MANAGER_READY &&
      h323ListeningStatus == XM_H323_ERROR && 
      activePreferences != nil &&
      [activePreferences enableH323] == YES)
@@ -383,15 +375,15 @@
   {
     NSString *exceptionReason;
     
-    if(callManagerStatus != XM_CALL_MANAGER_READY)
+    if (callManagerStatus != XM_CALL_MANAGER_READY)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
     }
-    else if([self isH323Listening] == YES)
+    else if ([self isH323Listening] == YES)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfH323Listening;
     }
-    else if(activePreferences == nil)
+    else if (activePreferences == nil)
     {
       exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
     }
@@ -406,7 +398,7 @@
 
 - (void)retryGatekeeperRegistration
 {
-  if(callManagerStatus == XM_CALL_MANAGER_READY &&
+  if (callManagerStatus == XM_CALL_MANAGER_READY &&
      gatekeeperName == nil && 
      activePreferences != nil &&
      [activePreferences gatekeeperTerminalAlias1] != nil)
@@ -421,15 +413,15 @@
   {
     NSString *exceptionReason;
     
-    if(callManagerStatus != XM_CALL_MANAGER_READY)
+    if (callManagerStatus != XM_CALL_MANAGER_READY)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
     }
-    else if(gatekeeperName != nil)
+    else if (gatekeeperName != nil)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered;
     }
-    else if(activePreferences == nil)
+    else if (activePreferences == nil)
     {
       exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
     }
@@ -440,28 +432,25 @@
     
     [NSException raise:XMException_InvalidAction format:exceptionReason];
   }
-}
+}*/
 
 #pragma mark -
 #pragma mark SIP specific Methods
 
-- (BOOL)isCompletelyRegistered
+- (BOOL)isCompletelySIPRegistered
 {
   unsigned count = [sipRegistrationFailReasons count];
-  if(count == 0)
-  {
+  if (count == 0) {
     return NO;
   }
   
   BOOL didRegisterAll = YES;
   
   unsigned i;
-  for(i = 0; i < count; i++)
-  {
+  for (i = 0; i < count; i++) {
     NSNumber *number = (NSNumber *)[sipRegistrationFailReasons objectAtIndex:i];
     XMSIPStatusCode failReason = (XMSIPStatusCode)[number unsignedIntValue];
-    if(failReason != XMSIPStatusCode_NoFailure)
-    {
+    if (failReason != XMSIPStatusCode_NoFailure) {
       didRegisterAll = NO;
       break;
     }
@@ -470,20 +459,20 @@
   return didRegisterAll;
 }
 
-- (unsigned)registrationCount
+- (unsigned)sipRegistrationCount
 {
-  return [registrations count];
+  return [sipRegistrations count];
 }
 
-- (NSString *)registrationAtIndex:(unsigned)index
+- (NSString *)sipRegistrationAtIndex:(unsigned)index
 {
-  return (NSString *)[registrations objectAtIndex:index];
+  return (NSString *)[sipRegistrations objectAtIndex:index];
 }
 
-- (NSArray *)registrations
+- (NSArray *)sipRegistrations
 {
-  NSArray *registrationsCopy = [registrations copy];
-  return [registrationsCopy autorelease];
+  NSArray *sipRegistrationsCopy = [sipRegistrations copy];
+  return [sipRegistrationsCopy autorelease];
 }
 
 - (unsigned)sipRegistrationFailReasonCount
@@ -494,7 +483,6 @@
 - (XMSIPStatusCode)sipRegistrationFailReasonAtIndex:(unsigned)index
 {
   NSNumber *number = (NSNumber *)[sipRegistrationFailReasons objectAtIndex:index];
-  
   return (XMSIPStatusCode)[number unsignedIntValue];
 }
 
@@ -504,9 +492,8 @@
   return [copy autorelease];
 }
 
-- (void)retryEnableSIP
-{
-  if(callManagerStatus == XM_CALL_MANAGER_READY &&
+/*- (void)retryEnableSIP {
+  if (callManagerStatus == XM_CALL_MANAGER_READY &&
      sipListeningStatus == XM_SIP_ERROR && 
      activePreferences != nil &&
      [activePreferences enableSIP] == YES)
@@ -523,15 +510,15 @@
   {
     NSString *exceptionReason;
     
-    if(callManagerStatus != XM_CALL_MANAGER_READY)
+    if (callManagerStatus != XM_CALL_MANAGER_READY)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
     }
-    else if([self isSIPListening] == YES)
+    else if ([self isSIPListening] == YES)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPListening;
     }
-    else if(activePreferences == nil)
+    else if (activePreferences == nil)
     {
       exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
     }
@@ -546,7 +533,7 @@
 
 - (void)retrySIPRegistrations
 {
-  if(callManagerStatus == XM_CALL_MANAGER_READY &&
+  if (callManagerStatus == XM_CALL_MANAGER_READY &&
      [self isCompletelyRegistered] == NO && 
      activePreferences != nil &&
      [[activePreferences sipRegistrationRecords] count] != 0)
@@ -560,15 +547,15 @@
   {
     NSString *exceptionReason;
     
-    if(callManagerStatus != XM_CALL_MANAGER_READY)
+    if (callManagerStatus != XM_CALL_MANAGER_READY)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
     }
-    else if([self isCompletelyRegistered] == YES)
+    else if ([self isCompletelyRegistered] == YES)
     {
       exceptionReason = XMExceptionReason_CallManagerInvalidActionIfCompletelySIPRegistered;
     }
-    else if(activePreferences == nil)
+    else if (activePreferences == nil)
     {
       exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
     }
@@ -579,7 +566,7 @@
     
     [NSException raise:XMException_InvalidAction format:exceptionReason];
   }
-}
+}*/
 
 #pragma mark -
 #pragma mark InCall Methods
@@ -591,27 +578,23 @@
 
 - (void)sendUserInputTone:(char)tone
 {
-  if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
-  {
+  if (state != InCall) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
   unsigned callID = [activeCall _callID];
-  
   [XMOpalDispatcher _sendUserInputToneForCall:callID tone:tone];
 }
 
 - (void)sendUserInputString:(NSString *)string
 {
-  if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
-  {
+  if (state != InCall) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
   unsigned callID = [activeCall _callID];
-  
   [XMOpalDispatcher _sendUserInputStringForCall:callID string:string];
 }
 
@@ -622,27 +605,23 @@
 
 - (void)startCameraEvent:(XMCameraEvent)cameraEvent
 {
-  if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
-  {
+  if (state != InCall) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
   unsigned callID = [activeCall _callID];
-  
   [XMOpalDispatcher _startCameraEventForCall:callID event:cameraEvent];
 }
 
 - (void)stopCameraEvent
 {
-  if(callManagerStatus != XM_CALL_MANAGER_IN_CALL)
-  {
+  if (state != InCall) {
     [NSException raise:XMException_InvalidAction format:XMExceptionReason_CallManagerInvalidActionIfNotInCall];
     return;
   }
   
   unsigned callID = [activeCall _callID];
-  
   [XMOpalDispatcher _stopCameraEventForCall:callID];
 }
 
@@ -651,138 +630,97 @@
 
 - (void)_handleSubsystemSetupEnd
 {	
+  // update the listening status variables to reflect
   BOOL enableH323 = [activePreferences enableH323];
-  if((enableH323 == YES) && (h323ListeningStatus != XM_H323_ERROR))
-  {
-    h323ListeningStatus = XM_H323_LISTENING;
-  }
-  else if(enableH323 == NO)
-  {
-    h323ListeningStatus = XM_H323_NOT_LISTENING;
+  if (enableH323 == YES && h323ListeningStatus != Error) {
+    h323ListeningStatus = Listening;
+  } else if (enableH323 == NO) {
+    h323ListeningStatus = NotListening;
   }
   
   BOOL enableSIP = [activePreferences enableSIP];
-  if((enableSIP == YES) && (sipListeningStatus != XM_SIP_ERROR))
-  {
-    sipListeningStatus = XM_SIP_LISTENING;
-  }
-  else if(enableSIP == NO)
-  {
-    sipListeningStatus = XM_SIP_NOT_LISTENING;
+  if (enableSIP == YES && sipListeningStatus != Error) {
+    sipListeningStatus = Listening;
+  } else if (enableSIP == NO) {
+    sipListeningStatus = NotListening;
   }
   
-  if(needsSubsystemSetupAfterCallEnd == YES)
-  {
-    callManagerStatus = XM_CALL_MANAGER_READY;
+  // if the subsystem setup was done right after a call
+  // ended, it's time to go back into the Ready state
+  if (needsSubsystemSetupAfterCallEnd == YES) {
+    state = Ready;
     
     needsSubsystemSetupAfterCallEnd = NO;
     
     [self _storeCall:activeCall];
-    
     [activeCall release];
     activeCall = nil;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidClearCall
                                                         object:self];
-  }
-  else if(callManagerStatus == XM_CALL_MANAGER_SUBSYSTEM_SETUP)
-  {
-    callManagerStatus = XM_CALL_MANAGER_READY;
+    
+  } else if (state == SubsystemSetup) { // protect against multiple invocations
+    state = Ready;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
   }
   
-  if (doesSleep == YES) {
-    canSleep = YES;
+  // if system is going to sleep, tell that is okay
+  if (systemSleepStatus == EnterSleep) {
+    systemSleepStatus = Asleep;
   }
 }
 
 - (void)_handleCallInitiated:(XMCallInfo *)call
 {
-  if(activeCall != nil)
-  {
-    NSLog(@"Call initiated and active call not nil!");
+  if (activeCall != nil) { // logic inconsistency
+    NSLog(@"Call initiated while active call not nil!");
     [activeCall release];
     activeCall = nil;
   }
-  
   activeCall = [call retain];
   
-  callManagerStatus = XM_CALL_MANAGER_IN_CALL;
-  
+  state = InCall;
   [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCalling object:self];
 }
 
 - (void)_handleCallInitiationFailed:(NSArray *)info
 {
   NSNumber *number = (NSNumber *)[info objectAtIndex:0];
-  NSString *address = (NSString *)[info objectAtIndex:1];
-  
   callStartFailReason = (XMCallStartFailReason)[number unsignedIntValue];
   
-  callManagerStatus = XM_CALL_MANAGER_READY;
+  NSString *address = (NSString *)[info objectAtIndex:1];
   
-  needsSubsystemSetupAfterCallEnd = NO;
+  state = Ready;
+  needsSubsystemSetupAfterCallEnd = NO; // call initiation fails before the subsystem state is modified
   
   NSDictionary *infoDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:address, @"Address", nil];
-  
   [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotStartCalling object:self userInfo:infoDictionary];
-  
   [infoDictionary release];
 }
 
 - (void)_handleCallIsAlerting
 {
   [activeCall _setCallStatus:XMCallStatus_Ringing];
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartRingingAtRemoteParty
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartRingingAtRemoteParty object:self];
 }
 
 - (void)_handleIncomingCall:(XMCallInfo *)call
 {
-  if(activeCall != nil)
-  {
+  if (activeCall != nil) { // logic inconsistency
     NSLog(@"incoming call with non-nil active call");
     [activeCall release];
     activeCall = nil;
   }
-  
   activeCall = [call retain];
   
-  NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
-  NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
+  [XMCallManager _updateLocalAddressInterfaceForCall:activeCall];
   
-  NSString *localAddress = [call localAddress];
-  NSString *localAddressInterface;
-  unsigned index = [localAddresses indexOfObject:localAddress];
-  if(index != NSNotFound)
-  {
-    localAddressInterface = (NSString *)[localAddressInterfaces objectAtIndex:index];
-  }
-  else
-  {
-    NSString *externalAddress = [_XMUtilsSharedInstance externalAddress];
-    
-    if([localAddress isEqualToString:externalAddress])
-    {
-      localAddressInterface = @"<EXT>";
-    }
-    else
-    {
-      localAddressInterface = @"<UNK>";
-    }
-  }	
+  state = InCall;
   
-  callManagerStatus = XM_CALL_MANAGER_IN_CALL;
-  
-  if(automaticallyAcceptIncomingCalls == YES)
-  {
+  if (automaticallyAcceptIncomingCalls == YES) {
     [XMOpalDispatcher _acceptIncomingCall:[activeCall _callID]];
-  }
-  else
-  {
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidReceiveIncomingCall 
-														object:self];
+  } else {
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidReceiveIncomingCall object:self];
   }
 }
 
@@ -790,8 +728,9 @@
 {
   [activeCall _setCallStatus:XMCallStatus_Active];
   
-  if([activeCall isOutgoingCall])
-  {
+  // the remote party information is not known before if there is an outgoing call:
+  // update the information here
+  if ([activeCall isOutgoingCall]) {
     NSString *remoteName = (NSString *)[remotePartyInformations objectAtIndex:0];
     NSString *remoteNumber = (NSString *)[remotePartyInformations objectAtIndex:1];
     NSString *remoteAddress = (NSString *)[remotePartyInformations objectAtIndex:2];
@@ -804,33 +743,43 @@
     [activeCall _setRemoteApplication:remoteApplication];
     [activeCall _setLocalAddress:localAddress];
     
-    NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
-    NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
-    
-    unsigned index = [localAddresses indexOfObject:localAddress];
-    NSString *localAddressInterface;
-    if(index != NSNotFound)
-    {
-      localAddressInterface = (NSString *)[localAddressInterfaces objectAtIndex:index];
-    }
-    else
-    {
-      NSString *externalAddress = [_XMUtilsSharedInstance externalAddress];
-      
-      if([localAddress isEqualToString:externalAddress])
-      {
-        localAddressInterface = @"<EXT>";
-      }
-      else
-      {
-        localAddressInterface = @"<UNK>";
-      }
-    }
-    [activeCall _setLocalAddressInterface:localAddressInterface];
+    [XMCallManager _updateLocalAddressInterfaceForCall:activeCall];
   }
   
   [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEstablishCall
                                                       object:self];
+}
+
++ (void)_updateLocalAddressInterfaceForCall:(XMCallInfo *)call
+{
+  NSString *localAddress = [call localAddress];
+  NSString *localAddressInterface;
+  
+  if (localAddress == nil) {
+    return;
+  }
+  
+  NSArray *networkInterfaces = [_XMUtilsSharedInstance networkInterfaces];
+  unsigned count = [networkInterfaces count];
+  BOOL found = NO;
+  for (unsigned i = 0; i < count; i++) {
+    XMNetworkInterface *networkInterface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:i];
+    if ([[networkInterface ipAddress] isEqualToString:localAddress]) {
+      localAddressInterface = [networkInterface interface];
+      found = YES;
+      break;
+    }
+  }
+  if (found == NO) {
+    NSString *publicAddress = [_XMUtilsSharedInstance publicAddress];
+    
+    if ([localAddress isEqualToString:publicAddress]) {
+      localAddressInterface = XMPublicInterface;
+    } else {
+      localAddressInterface = XMUnknownInterface;
+    }
+  }
+  [call _setLocalAddressInterface:localAddressInterface];
 }
 
 - (void)_handleCallCleared:(NSNumber *)callEndReason
@@ -847,19 +796,14 @@
   
   [activeCall _setCallEndReason:reason];
   
-  if(needsSubsystemSetupAfterCallEnd == YES)
-  {
+  if (needsSubsystemSetupAfterCallEnd == YES) {
     [self _doSubsystemSetupWithPreferences:activePreferences];
-  }
-  else
-  {
+  } else {
     [self _storeCall:activeCall];
-    
     [activeCall release];
     activeCall = nil;
     
-    callManagerStatus = XM_CALL_MANAGER_READY;
-	
+    state = Ready;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidClearCall
                                                         object:self];
   }
@@ -867,130 +811,120 @@
 
 - (void)_handleLocalAddress:(NSString *)address
 {
-  if([activeCall localAddress] == nil)
+  if ([activeCall localAddress] == nil)
   {
     [activeCall _setLocalAddress:address];
     
-    NSArray *localAddresses = [_XMUtilsSharedInstance localAddresses];
-    NSArray *localAddressInterfaces = [_XMUtilsSharedInstance localAddressInterfaces];
-    
-    unsigned index = [localAddresses indexOfObject:address];
-    NSString *localAddressInterface;
-    if(index != NSNotFound)
-    {
-      localAddressInterface = (NSString *)[localAddressInterfaces objectAtIndex:index];
-    }
-    else
-    {
-      NSString *externalAddress = [_XMUtilsSharedInstance externalAddress];
-      
-      if([address isEqualToString:externalAddress])
-      {
-        localAddressInterface = @"<EXT>";
-      }
-      else
-      {
-        localAddressInterface = @"<UNK>";
-      }
-    }
-    [activeCall _setLocalAddressInterface:localAddressInterface];
+    [XMCallManager _updateLocalAddressInterfaceForCall:activeCall];
   }
 }
 
 - (void)_handleCallStatisticsUpdate:(XMCallStatistics *)updatedStatistics
 {
   [activeCall _updateCallStatistics:updatedStatistics];
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUpdateCallStatistics
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUpdateCallStatistics object:self];
 }
 
 - (void)_handleOutgoingAudioStreamOpened:(NSString *)codec
 {
-  [activeCall _setOutgoingAudioCodec:codec];
+  if ([activeCall isSendingAudio]) { // protection if the callback is called multiple times
+    return;
+  }
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenOutgoingAudioStream
-                                                      object:self];
+  [activeCall _setOutgoingAudioCodec:codec];
+  [activeCall _setIsSendingAudio:YES];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenOutgoingAudioStream object:self];
 }
 
 - (void)_handleIncomingAudioStreamOpened:(NSString *)codec
 {
-  [activeCall _setIncomingAudioCodec:codec];
+  if ([activeCall isReceivingAudio]) { // protection if the callback is called multiple times
+    return;
+  }
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenIncomingAudioStream
-                                                      object:self];
+  [activeCall _setIncomingAudioCodec:codec];
+  [activeCall _setIsReceivingAudio:YES];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenIncomingAudioStream object:self];
 }
 
 - (void)_handleOutgoingVideoStreamOpened:(NSString *)codec
 {
-  [activeCall _setOutgoingVideoCodec:codec];
+  if ([activeCall isSendingVideo]) { // protection if the callback is called multiple times
+    return;
+  }
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenOutgoingVideoStream
-                                                      object:self];
+  [activeCall _setOutgoingVideoCodec:codec];
+  [activeCall _setIsSendingVideo:YES];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenOutgoingVideoStream object:self];
 }
 
 - (void)_handleIncomingVideoStreamOpened:(NSString *)codec
 {
-  if([activeCall incomingVideoCodec] != nil)
-  {
+  if ([activeCall isReceivingVideo]) { // protection if the callback is called multiple times
     return;
   }
   
   [activeCall _setIncomingVideoCodec:codec];
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenIncomingVideoStream
-                                                      object:self];
+  [activeCall _setIsReceivingVideo:YES];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenIncomingVideoStream object:self];
 }
 
 - (void)_handleOutgoingAudioStreamClosed
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseOutgoingAudioStream
-                                                      object:self];
+  [activeCall _setIsSendingAudio:NO];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseOutgoingAudioStream object:self];
 }
 
 - (void)_handleIncomingAudioStreamClosed
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseIncomingAudioStream
-                                                      object:self];
+  [activeCall _setIsReceivingAudio:NO];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseIncomingAudioStream object:self];
 }
 
 - (void)_handleOutgoingVideoStreamClosed
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseOutgoingVideoStream
-                                                      object:self];
+  [activeCall _setIsSendingVideo:NO];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseOutgoingVideoStream object:self];
 }
 
 - (void)_handleIncomingVideoStreamClosed
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseIncomingVideoStream
-                                                      object:self];
+  [activeCall _setIsReceivingVideo:NO];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseIncomingVideoStream object:self];
 }
 
 - (void)_handleFECCChannelOpened
 {
-  canSendCameraEvents = YES;
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenFECCChannel
-                                                      object:self];
+  if (canSendCameraEvents == NO) { // protection against calling this multiple times
+    canSendCameraEvents = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidOpenFECCChannel object:self];
+  }
+}
+
+- (void)_handleFECCChannelClosed
+{
+  if (canSendCameraEvents == YES) {
+    canSendCameraEvents = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidCloseFECCChannel object:self];
+  }
 }
 
 - (void)_handleH323EnablingFailure
 {
-  h323ListeningStatus = XM_H323_ERROR;
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableH323
-                                                      object:self];
+  if (h323ListeningStatus != Error) { // only post a notification if the status changes
+    h323ListeningStatus = Error;
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableH323 object:self];
+  }
 }
 
 - (void)_handleGatekeeperRegistrationProcessStart
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartGatekeeperRegistrationProcess
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartGatekeeperRegistrationProcess object:self];
 }
 
 - (void)_handleGatekeeperRegistrationProcessEnd
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndGatekeeperRegistrationProcess
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndGatekeeperRegistrationProcess object:self];
 }
 
 - (void)_handleGatekeeperRegistration:(NSArray *)objects
@@ -999,9 +933,7 @@
   NSArray *aliases = (NSArray *)[objects objectAtIndex:1];
   
   // Only send a notification if the registration status or the terminalAliases changed
-  if (gatekeeperName == nil || ![gatekeeperName isEqualToString:theGatekeeperName]
-      || ![aliases isEqual:terminalAliases])
-  {
+  if (gatekeeperName == nil || ![gatekeeperName isEqualToString:theGatekeeperName] || ![aliases isEqualToArray:terminalAliases]) {
     [gatekeeperName release];
     gatekeeperName = [theGatekeeperName copy];
     
@@ -1010,15 +942,13 @@
   
     gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
   
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtGatekeeper
-                                                        object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtGatekeeper object:self];
   }
 }
 
 - (void)_handleGatekeeperUnregistration
 {
-  if(gatekeeperName == nil)
-  {
+  if (gatekeeperName == nil) { // not registered
     return;
   }
   
@@ -1030,8 +960,7 @@
   
   gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUnregisterFromGatekeeper
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUnregisterFromGatekeeper object:self];
 }
 
 - (void)_handleGatekeeperRegistrationFailure:(NSNumber *)failReason
@@ -1050,29 +979,26 @@
     
     gatekeeperRegistrationFailReason = theGatekeeperRegistrationFailReason;
   
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper
-                                                        object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:self];
   }
 }
 
 - (void)_handleSIPEnablingFailure
 {
-  sipListeningStatus = XM_SIP_ERROR;
-  
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableSIP
-                                                      object:self];
+  if (sipListeningStatus != Error) { // only post this notification once
+    sipListeningStatus = Error;
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableSIP object:self];
+  }
 }
 
 - (void)_handleSIPRegistrationProcessStart
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSIPRegistrationProcess
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSIPRegistrationProcess object:self];
 }
 
 - (void)_handleSIPRegistrationProcessEnd
 {
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSIPRegistrationProcess
-                                                      object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSIPRegistrationProcess object:self];
 }
 
 - (void)_handleSIPRegistration:(NSString *)registration
@@ -1081,53 +1007,45 @@
   
   unsigned searchIndex = NSNotFound;
   unsigned count = [registrationRecords count];
-  unsigned i;
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[registrationRecords objectAtIndex:i];
-    if(![record isKindOfClass:[XMPreferencesRegistrationRecord class]])
-    {
+    if (![record isKindOfClass:[XMPreferencesRegistrationRecord class]]) { // protect against illegal classes
       continue;
     }
     
     NSString *reg = [record registration];
     
-    if([reg isEqualToString:registration])
-    {
+    if ([reg isEqualToString:registration]) {
       searchIndex = i;
       break;
     }
   }
   
-  if(searchIndex == NSNotFound)
-  {
+  if (searchIndex == NSNotFound) {
     NSLog(@"REGISTRATION NOT FOUND IN REGISTRATIONS");
     return;
   }
   
-  count = [registrations count];
-  [registrations addObject:registration];
+  count = [sipRegistrations count];
+  [sipRegistrations addObject:registration];
   
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_NoFailure];
   [sipRegistrationFailReasons replaceObjectAtIndex:searchIndex withObject:number];
   [number release];
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidSIPRegister
-                                                      object:[NSNumber numberWithUnsignedInt:count]];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidSIPRegister object:[NSNumber numberWithUnsignedInt:count]];
 }
 
 - (void)_handleSIPUnregistration:(NSString *)registration
 {	
-  unsigned index = [registrations indexOfObject:registration];
+  unsigned index = [sipRegistrations indexOfObject:registration];
   
-  if(index == NSNotFound)
-  {
+  if (index == NSNotFound) {
     return;
   }
-  [registrations removeObjectAtIndex:index];
+  [sipRegistrations removeObjectAtIndex:index];
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidSIPUnregister
-                                                      object:registration];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidSIPUnregister object:registration];
 }
 
 - (void)_handleSIPRegistrationFailure:(NSArray *)info
@@ -1141,46 +1059,42 @@
   unsigned count = [records count];
   unsigned i;
   
-  for(i = 0; i < count; i++)
-  {
+  for (i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[records objectAtIndex:i];
-    if(![record isKindOfClass:[XMPreferencesRegistrationRecord class]])
-    {
+    if (![record isKindOfClass:[XMPreferencesRegistrationRecord class]]) { // protect against illegal classes
       continue;
     }
     
     NSString *reg = [record registration];
     
-    if([reg isEqualToString:registration])
-    {
+    if ([reg isEqualToString:registration]) {
       searchIndex = i;
       break;
     }
   }
   
-  if(searchIndex == NSNotFound)
-  {
+  if (searchIndex == NSNotFound) {
     NSLog(@"OBJECT NOT FOUND ON SIP REGISTRATION FAILURE");
+    return;
   }
   
   [sipRegistrationFailReasons replaceObjectAtIndex:searchIndex withObject:failReason];
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotSIPRegister
-                                                      object:[NSNumber numberWithUnsignedInt:searchIndex]];
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotSIPRegister object:[NSNumber numberWithUnsignedInt:searchIndex]];
 }
 
-- (void)_networkStatusChanged
+- (void)_networkConfigurationChanged
 {
-  if (doesSleep == NO) {
-    networkStatusChanged = YES;
-    [XMOpalDispatcher _handleNetworkStatusChange];
+  if (systemSleepStatus == Awake) {
+    networkConfigurationChanged = YES;
+    [XMOpalDispatcher _handleNetworkConfigurationChange];
   }
 }
 
 - (void)_checkipAddressUpdated
 {
-  if (needsCheckipAddress == YES) {
-    needsCheckipAddress = NO;
+  if (state == WaitingForCheckipAddress) {
+    state = SubsystemSetup;
     [self _doSubsystemSetupWithPreferences:activePreferences];
   }
 }
@@ -1190,55 +1104,47 @@
 
 - (void)_doSubsystemSetupWithPreferences:(XMPreferences *)preferences
 {
-  if(callManagerStatus == XM_CALL_MANAGER_READY)
-  {
-    callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
-                                                        object:self];
+  if (state == Ready) { // only post the notification once
+    state = SubsystemSetup;
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup object:self];
   }
   
   automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
-  
+
   gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
-  
   [sipRegistrationFailReasons removeAllObjects];
   
   unsigned count = [[preferences sipRegistrationRecords] count];
-  unsigned i;
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMSIPStatusCode_NoFailure];
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     [sipRegistrationFailReasons addObject:number];
   }
   [number release];
   
-  if([_XMUtilsSharedInstance _doesUpdateCheckipInformation])
-  {
+  if ([_XMUtilsSharedInstance _doesUpdateCheckipInformation]) {
     // not yet fetched
-    needsCheckipAddress = YES;
+    state = WaitingForCheckipAddress;
       
-    // we continue this job when the external address fetch task is finished
+    // we continue this job when the public address fetch task is finished
     return;
   }
-  NSString *externalAddress = nil;
-  externalAddress = [_XMUtilsSharedInstance _checkipExternalAddress];
+  
+  NSString *publicAddress = nil;
+  publicAddress = [_XMUtilsSharedInstance _checkipPublicAddress];
   
   // resetting the H323 listening status if an error previously
-  if(h323ListeningStatus == XM_H323_ERROR)
-  {
-    h323ListeningStatus = XM_H323_NOT_LISTENING;
+  if (h323ListeningStatus == Error) {
+    h323ListeningStatus = NotListening;
   }
   
   // resetting the SIP listening status if an error previously
-  if(sipListeningStatus == XM_SIP_ERROR)
-  {
-    sipListeningStatus = XM_SIP_NOT_LISTENING;
+  if (sipListeningStatus == Error) {
+    sipListeningStatus = NotListening;
   }
   
   // preparations complete
-  [XMOpalDispatcher _setPreferences:preferences externalAddress:externalAddress 
-               networkStatusChanged:networkStatusChanged];
-  networkStatusChanged = NO;
+  [XMOpalDispatcher _setPreferences:preferences publicAddress:publicAddress networkConfigurationChanged:networkConfigurationChanged];
+  networkConfigurationChanged = NO;
 }
 
 - (void)_initiateCall:(XMAddressResource *)addressResource
@@ -1264,7 +1170,7 @@
   [XMOpalDispatcher _initiateSpecificCallToAddress:address
                                           protocol:callProtocol 
                                        preferences:modifiedPreferences 
-                                   externalAddress:[_XMUtilsSharedInstance externalAddress]];
+                                   publicAddress:[_XMUtilsSharedInstance publicAddress]];
   
   [modifiedPreferences release];
 }
@@ -1283,25 +1189,21 @@
     [processedAddress replaceOccurrencesOfString:@" " withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
     [processedAddress replaceOccurrencesOfString:@"(" withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
     [processedAddress replaceOccurrencesOfString:@")" withString:@"" options:0 range:NSMakeRange(0, [processedAddress length])];
-    if([processedAddress length] > 1)
-    {
-      if([processedAddress characterAtIndex:0] == '+')
-      {
+    if ([processedAddress length] > 1) {
+      if ([processedAddress characterAtIndex:0] == '+') {
         [processedAddress replaceCharactersInRange:NSMakeRange(0, 1) withString:[activePreferences internationalDialingPrefix]];
       }
     }
     address = [processedAddress autorelease];
     
   }
-  if(callProtocol == XMCallProtocol_SIP)
-  {
+  if (callProtocol == XMCallProtocol_SIP) {
     // if using SIP and the address is a phone number,
     // the address must have the form xxx@registrar.net
     // In case the suffix @registrar.net is missing, 
     // the suffix is added from the information of the
     // default registration domain
-    if(XMIsPhoneNumber(address) && [[activePreferences sipRegistrationRecords] count] != 0)
-    {
+    if (XMIsPhoneNumber(address) && [[activePreferences sipRegistrationRecords] count] != 0) {
       XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[[activePreferences sipRegistrationRecords] objectAtIndex:0];
       NSString *registrationDomain = [record domain];
       address = [NSString stringWithFormat:@"%@@%@", address, registrationDomain];
@@ -1310,9 +1212,8 @@
   
   // validity check is done within XMOpalDispatcher
   
-  callManagerStatus = XM_CALL_MANAGER_PREPARING_CALL;
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation
-                                                      object:self];
+  state = PreparingCall;
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartCallInitiation object:self];
   
   // Stop the audio test if needed
   [_XMAudioManagerSharedInstance stopAudioTest];
@@ -1322,8 +1223,7 @@
 
 - (void)_storeCall:(XMCallInfo *)call
 {
-  if([recentCalls count] == 100)
-  {
+  if ([recentCalls count] == 100) { // only store 100 calls at maximum
     [recentCalls removeObjectAtIndex:99];
   }
   [recentCalls insertObject:call atIndex:0];
@@ -1337,8 +1237,11 @@
 
 - (void)_willSleep:(NSNotification *)notif
 {
-  doesSleep = YES;
-  canSleep = NO;
+  // System wants to go to sleep:
+  // Cleanup the network part (unregister, etc), 
+  // before actually going to sleep
+  systemSleepStatus = EnterSleep;
+  
   XMPreferences *prefs = [[XMPreferences alloc] init];
   [self _doSubsystemSetupWithPreferences:prefs];
   [prefs release];
@@ -1350,13 +1253,16 @@
   do {
     NSDate *next = [NSDate dateWithTimeIntervalSinceNow:1.0];
     isRunning = [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:next];
-  } while(isRunning && !canSleep);
+  } while(isRunning && systemSleepStatus != Asleep);
 }
 
 - (void)_didWake:(NSNotification *)notif
 {
-  doesSleep = NO;
-  networkStatusChanged = YES;
+  // System is awake again
+  systemSleepStatus = Awake;
+
+  // update the network information and re-register
+  networkConfigurationChanged = YES;
   [self _doSubsystemSetupWithPreferences:activePreferences];
 }
 

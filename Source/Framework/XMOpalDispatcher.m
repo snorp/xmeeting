@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.49 2007/10/03 07:22:41 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.50 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #import "XMCallStatistics.h"
 #import "XMBridge.h"
 
+#import <unistd.h>
+
 typedef enum _XMOpalDispatcherMessage
 {
   // General messages
@@ -24,7 +26,7 @@ typedef enum _XMOpalDispatcherMessage
   _XMOpalDispatcherMessage_RetryGatekeeperRegistration,
   _XMOpalDispatcherMessage_RetryEnableSIP,
   _XMOpalDispatcherMessage_RetrySIPRegistrations,
-  _XMOpalDispatcherMessage_HandleNetworkStatusChange,
+  _XMOpalDispatcherMessage_HandleNetworkConfigurationChange,
   
   // Call Management messages
   _XMOpalDispatcherMessage_InitiateCall = 0x0200,
@@ -69,7 +71,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleRetryGatekeeperRegistrationMessage:(NSArray *)messageComponents;
 - (void)_handleRetryEnableSIPMessage:(NSArray *)messageComponents;
 - (void)_handleRetrySIPRegistrationsMessage:(NSArray *)messageComponents;
-- (void)_handleNetworkStatusChangeMessage;
+- (void)_handleNetworkConfigurationChangeMessage;
 
 - (void)_handleInitiateCallMessage:(NSArray *)messageComponents;
 - (void)_handleInitiateSpecificCallMessage:(NSArray *)messageComponents;
@@ -95,8 +97,8 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleStopCameraEventMessage:(NSArray *)messageComponents;
 
 - (void)_doPreferencesSetup:(XMPreferences *)preferences 
-            externalAddress:(NSString *)externalAddress
-       networkStatusChanged:(BOOL)networkStatusChanged
+            publicAddress:(NSString *)publicAddress
+       networkConfigurationChanged:(BOOL)networkConfigurationChanged
                     verbose:(BOOL)verbose;
 - (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose;
 - (void)_doGatekeeperSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
@@ -122,14 +124,14 @@ typedef enum _XMOpalDispatcherMessage
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_Shutdown withComponents:nil];
 }
 
-+ (void)_setPreferences:(XMPreferences *)preferences externalAddress:(NSString *)externalAddress
-   networkStatusChanged:(BOOL)networkStatusChanged
++ (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress
+   networkConfigurationChanged:(BOOL)networkConfigurationChanged
 {
   NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-  NSData *externalAddressData = [NSKeyedArchiver archivedDataWithRootObject:externalAddress];
-  NSData *networkStatusChangedData = [NSKeyedArchiver archivedDataWithRootObject:[NSNumber numberWithBool:networkStatusChanged]];
+  NSData *publicAddressData = [NSKeyedArchiver archivedDataWithRootObject:publicAddress];
+  NSData *networkConfigurationChangedData = [NSKeyedArchiver archivedDataWithRootObject:[NSNumber numberWithBool:networkConfigurationChanged]];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, externalAddressData, networkStatusChangedData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, publicAddressData, networkConfigurationChangedData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SetPreferences withComponents:components];
   
@@ -180,9 +182,9 @@ typedef enum _XMOpalDispatcherMessage
   [components release];
 }
 
-+ (void)_handleNetworkStatusChange
++ (void)_handleNetworkConfigurationChange
 {
-  [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_HandleNetworkStatusChange withComponents:nil];
+  [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_HandleNetworkConfigurationChange withComponents:nil];
 }
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
@@ -203,7 +205,7 @@ typedef enum _XMOpalDispatcherMessage
 + (void)_initiateSpecificCallToAddress:(NSString *)address
                               protocol:(XMCallProtocol)protocol
                            preferences:(XMPreferences *)preferences
-                       externalAddress:(NSString *)externalAddress;
+                       publicAddress:(NSString *)publicAddress;
 {
   NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:address];
   
@@ -213,10 +215,10 @@ typedef enum _XMOpalDispatcherMessage
   
   NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
   
-  NSData *externalAddressData = [NSKeyedArchiver archivedDataWithRootObject:externalAddress];
+  NSData *publicAddressData = [NSKeyedArchiver archivedDataWithRootObject:publicAddress];
   
   NSArray *components = [[NSArray alloc] initWithObjects:addressData, protocolData, preferencesData,
-    externalAddressData, nil];
+    publicAddressData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_InitiateSpecificCall withComponents:components];
   
@@ -644,8 +646,8 @@ typedef enum _XMOpalDispatcherMessage
     case _XMOpalDispatcherMessage_RetrySIPRegistrations:
       [self _handleRetrySIPRegistrationsMessage:[portMessage components]];
       break;
-    case _XMOpalDispatcherMessage_HandleNetworkStatusChange:
-      [self _handleNetworkStatusChangeMessage];
+    case _XMOpalDispatcherMessage_HandleNetworkConfigurationChange:
+      [self _handleNetworkConfigurationChangeMessage];
       break;
     case _XMOpalDispatcherMessage_InitiateCall:
       [self _handleInitiateCallMessage:[portMessage components]];
@@ -726,7 +728,7 @@ typedef enum _XMOpalDispatcherMessage
   // By using the default XMPreferences instance,
   // we shutdown the subsystem
   XMPreferences *preferences = [[XMPreferences alloc] init];
-  [self _doPreferencesSetup:preferences externalAddress:nil networkStatusChanged:NO verbose:NO];
+  [self _doPreferencesSetup:preferences publicAddress:nil networkConfigurationChanged:NO verbose:NO];
   [preferences release];
   
   if(callStatisticsUpdateIntervalTimer != nil)
@@ -739,7 +741,7 @@ typedef enum _XMOpalDispatcherMessage
   // exiting from the run loop
   [[NSRunLoop currentRunLoop] removePort:receivePort forMode:NSDefaultRunLoopMode];
   
-  // Wait give one s time to cleanup
+  // Give one s time to cleanup
   usleep(1000*1000);
 }
 
@@ -748,13 +750,13 @@ typedef enum _XMOpalDispatcherMessage
   NSData *preferencesData = (NSData *)[components objectAtIndex:0];
   XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
 		
-  NSData *externalAddressData = (NSData *)[components objectAtIndex:1];
-  NSString *externalAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:externalAddressData];
+  NSData *publicAddressData = (NSData *)[components objectAtIndex:1];
+  NSString *publicAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:publicAddressData];
   
-  NSData *networkStatusChangedData = (NSData *)[components objectAtIndex:2];
-  BOOL networkStatusChanged = [(NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:networkStatusChangedData] boolValue];
+  NSData *networkConfigurationChangedData = (NSData *)[components objectAtIndex:2];
+  BOOL networkConfigurationChanged = [(NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:networkConfigurationChangedData] boolValue];
   
-  [self _doPreferencesSetup:preferences externalAddress:externalAddress networkStatusChanged:networkStatusChanged verbose:YES];
+  [self _doPreferencesSetup:preferences publicAddress:publicAddress networkConfigurationChanged:networkConfigurationChanged verbose:YES];
   
   [self _waitForSubsystemSetupCompletion:YES];
   
@@ -815,9 +817,9 @@ typedef enum _XMOpalDispatcherMessage
                                               waitUntilDone:NO];
 }
 
-- (void)_handleNetworkStatusChangeMessage
+- (void)_handleNetworkConfigurationChangeMessage
 {
-  _XMHandleNetworkStatusChange();
+  _XMHandleNetworkConfigurationChange();
 }
 
 - (void)_handleInitiateCallMessage:(NSArray *)components
@@ -845,13 +847,13 @@ typedef enum _XMOpalDispatcherMessage
   NSData *addressData = (NSData *)[messageComponents objectAtIndex:0];
   NSData *protocolData = (NSData *)[messageComponents objectAtIndex:1];
   NSData *preferencesData = (NSData *)[messageComponents objectAtIndex:2];
-  NSData *externalAddressData = (NSData *)[messageComponents objectAtIndex:3];
+  NSData *publicAddressData = (NSData *)[messageComponents objectAtIndex:3];
   
   NSString *address = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:addressData];
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
   XMCallProtocol callProtocol = (XMCallProtocol)[number unsignedIntValue];
   XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
-  NSString *externalAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:externalAddressData];
+  NSString *publicAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:publicAddressData];
   
   if(callID != 0)
   {
@@ -862,7 +864,7 @@ typedef enum _XMOpalDispatcherMessage
     return;
   }
   
-  [self _doPreferencesSetup:preferences externalAddress:externalAddress networkStatusChanged:NO verbose:NO];
+  [self _doPreferencesSetup:preferences publicAddress:publicAddress networkConfigurationChanged:NO verbose:NO];
   
   [self _initiateCallToAddress:address protocol:callProtocol];	
 }
@@ -1364,13 +1366,13 @@ typedef enum _XMOpalDispatcherMessage
 #pragma mark -
 #pragma mark Setup Methods
 
-- (void)_doPreferencesSetup:(XMPreferences *)preferences externalAddress:(NSString *)suppliedExternalAddress
-       networkStatusChanged:(BOOL)networkStatusChanged verbose:(BOOL)verbose
+- (void)_doPreferencesSetup:(XMPreferences *)preferences publicAddress:(NSString *)suppliedExternalAddress
+       networkConfigurationChanged:(BOOL)networkConfigurationChanged verbose:(BOOL)verbose
 {
   unsigned i;
   
-  if (networkStatusChanged) {
-    _XMHandleNetworkStatusChange();
+  if (networkConfigurationChanged) {
+    _XMHandleNetworkConfigurationChange();
   }
   
   // ***** Adjusting the general settings ***** //
@@ -1405,13 +1407,13 @@ typedef enum _XMOpalDispatcherMessage
     servers[i] = serverString;
   }
   
-  NSString *externalAddress = [preferences externalAddress];
-  if (externalAddress == nil) {
-    externalAddress = suppliedExternalAddress;
+  NSString *publicAddress = [preferences publicAddress];
+  if (publicAddress == nil) {
+    publicAddress = suppliedExternalAddress;
   }
   
-  const char * translationAddress = [externalAddress cStringUsingEncoding:NSASCIIStringEncoding];
-  _XMSetNATInformation(servers, numServers, translationAddress, networkStatusChanged);
+  const char * translationAddress = [publicAddress cStringUsingEncoding:NSASCIIStringEncoding];
+  _XMSetNATInformation(servers, numServers, translationAddress, networkConfigurationChanged);
   
   free(servers);
   
@@ -1708,10 +1710,10 @@ typedef enum _XMOpalDispatcherMessage
 #pragma mark -
 #pragma mark Subsystem Feedback
 
-- (void)_handleNATType:(XMNATType)natType externalAddress:(NSString *)externalAddress
+- (void)_handleNATType:(XMNATType)natType publicAddress:(NSString *)publicAddress
 {
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)natType];
-  NSArray *array = [[NSArray alloc] initWithObjects:number, externalAddress, nil];
+  NSArray *array = [[NSArray alloc] initWithObjects:number, publicAddress, nil];
   
   [_XMUtilsSharedInstance performSelectorOnMainThread:@selector(_handleSTUNInformation:) withObject:array waitUntilDone:NO];
   

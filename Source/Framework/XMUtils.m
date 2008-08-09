@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.26 2007/09/20 19:26:41 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.27 2008/08/09 12:32:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,6 +27,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 - (void)_cleanupCheckipFetching;
 - (void)_getLocalAddresses;
 - (void)_gotInformation;
+- (BOOL)_hasLocalAddress:(NSString *)localAddress;
 
 @end
 
@@ -69,12 +70,11 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   doesUpdateSTUNInformation = YES; // at startup, STUN is automatically updated
   doesUpdateCheckipInformation = NO;
   
-  localAddresses = nil;
-  localAddressInterfaces = nil;
+  networkInterfaces = nil;
   
   natType = XMNATType_NoNAT;
-  stunExternalAddress = nil;
-  checkipExternalAddress = nil;
+  stunPublicAddress = nil;
+  checkipPublicAddress = nil;
 
   checkipURLConnection = nil;
   checkipURLData = nil;
@@ -93,17 +93,14 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   }
   dynamicStore = NULL;
   
-  [localAddresses release];
-  localAddresses = nil;
+  [networkInterfaces release];
+  networkInterfaces = nil;
   
-  [localAddressInterfaces release];
-  localAddressInterfaces = nil;
+  [stunPublicAddress release];
+  stunPublicAddress = nil;
   
-  [stunExternalAddress release];
-  stunExternalAddress = nil;
-  
-  [checkipExternalAddress release];
-  checkipExternalAddress = nil;
+  [checkipPublicAddress release];
+  checkipPublicAddress = nil;
   
   [checkipURLConnection cancel];
   [checkipURLConnection release];
@@ -127,16 +124,22 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 }
 
 #pragma mark -
-#pragma mark Handling local addresses
+#pragma mark Handling local network interfaces
 
-- (NSArray *)localAddresses
+- (NSArray *)networkInterfaces
 {
-  return localAddresses;
+  return networkInterfaces;
 }
 
-- (NSArray *)localAddressInterfaces
-{
-  return localAddressInterfaces;
+- (BOOL)_hasLocalAddress:(NSString *)address {
+  unsigned count = [networkInterfaces count];
+  for (unsigned i = 0; i < count; i++) {
+    XMNetworkInterface *interface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:i];
+    if ([[interface ipAddress] isEqualToString:address]) {
+      return YES;
+    }
+  }
+  return NO;
 }
 
 #pragma mark -
@@ -144,33 +147,33 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (XMNATType)natType
 {	
-  if([localAddresses count] == 0)
+  if ([networkInterfaces count] == 0)
   {
     // we have no network interface!
     return XMNATType_Error;
   }
   
+  // If STUN couldn't resolve the NAT type, determine
+  // if there is a NAT based on a comparison of public
+  // address and the local addresses
   if (natType == XMNATType_Error) {
-    if (checkipExternalAddress == nil) {
+    if (checkipPublicAddress == nil) {
       return XMNATType_Error;
-    }
-    else if ([localAddresses containsObject:checkipExternalAddress])
-    {
+    } else if ([self _hasLocalAddress:checkipPublicAddress]) {
       return XMNATType_NoNAT;
     }
-    
     return XMNATType_UnknownNAT;
   }
   
   return natType;
 }
 
-- (NSString *)externalAddress
+- (NSString *)publicAddress
 {
-  if (stunExternalAddress != nil) {
-    return stunExternalAddress;
+  if (stunPublicAddress != nil) {
+    return stunPublicAddress;
   }
-  return checkipExternalAddress;
+  return checkipPublicAddress;
 }
 
 - (void)updateNetworkInformation
@@ -180,7 +183,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   }
   
   doesUpdateSTUNInformation = YES;
-  [_XMCallManagerSharedInstance _networkStatusChanged];
+  [_XMCallManagerSharedInstance _networkConfigurationChanged];
   
   [self _updateCheckipInformation];
   [self _getLocalAddresses];
@@ -216,7 +219,6 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)_getLocalAddresses
 {
-  NSMutableArray *addresses = [[NSMutableArray alloc] initWithCapacity:3];
   NSMutableArray *interfaces = [[NSMutableArray alloc] initWithCapacity:3];
   
   /**
@@ -231,8 +233,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   
   unsigned count = [keys count];
   unsigned i;
-  for(i = 0; i < count; i++)
-  {
+  for (i = 0; i < count; i++) {
     NSString *key = (NSString *)[keys objectAtIndex:i];
     
     // obtaining the address
@@ -249,21 +250,19 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
     NSDictionary *serviceInfo = (NSDictionary *)SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)serviceKey);
     
     NSString *interfaceName = [serviceInfo objectForKey:@"UserDefinedName"];
-    if(interfaceName == nil)
-    {
+    if (interfaceName == nil) {
       interfaceName = [serviceDict objectForKey:@"InterfaceName"];
     }
-    if(interfaceName == nil)
-    {
+    if (interfaceName == nil) {
       interfaceName = @"";
     }
     
     unsigned addressCount = [interfaceAddresses count];
     unsigned j;
-    for(j = 0; j < addressCount; j++)
-    {
-      [addresses addObject:[interfaceAddresses objectAtIndex:j]];
-      [interfaces addObject:interfaceName];
+    for (j = 0; j < addressCount; j++) {
+      NSString *address = [interfaceAddresses objectAtIndex:j];
+      XMNetworkInterface *interface = [[XMNetworkInterface alloc] initWithIPAddress:address interface:interfaceName];
+      [interfaces addObject:interface];
     }
     
     [serviceDict release];
@@ -272,18 +271,14 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   
   [keys release];
   
-  [localAddresses release];
-  localAddresses = [addresses copy];
-  [addresses release];
-  
-  [localAddressInterfaces release];
-  localAddressInterfaces = [interfaces copy];
+  [networkInterfaces release];
+  networkInterfaces = [interfaces copy];
   [interfaces release];
 }
 
 - (void)_gotInformation
 {
-  if (doesUpdateSTUNInformation == NO && doesUpdateCheckipInformation == NO) {
+  if (doesUpdateSTUNInformation == NO && doesUpdateCheckipInformation == NO) { // only post the notification if no updates are pending
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_UtilsDidUpdateNetworkInformation object:self];
   }
 }
@@ -301,13 +296,12 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   natType = (XMNATType)[number unsignedIntValue];
   
   NSString *address = (NSString *)[array objectAtIndex:1];
-  if([address isEqualToString:@""])
-  {
+  if ([address isEqualToString:@""]) {
     address = nil;
   }
   
-  [stunExternalAddress release];
-  stunExternalAddress = [address copy];
+  [stunPublicAddress release];
+  stunPublicAddress = [address copy];
   
   doesUpdateSTUNInformation = NO;
   
@@ -317,9 +311,9 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 #pragma mark -
 #pragma mark Checkip Methods
 
-- (NSString *)_checkipExternalAddress
+- (NSString *)_checkipPublicAddress
 {
-  return checkipExternalAddress;
+  return checkipPublicAddress;
 }
 
 - (BOOL)_doesUpdateCheckipInformation
@@ -329,44 +323,39 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-  if(checkipURLData == nil)
-  {
+  if (checkipURLData == nil) {
     checkipURLData = [data mutableCopy];
-  }
-  else
-  {
+  } else {
     [checkipURLData appendData:data];
   }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-  if(connection != checkipURLConnection)
-  {
+  if (connection != checkipURLConnection) {
     return;
   }
   
-  [checkipExternalAddress release];
-  checkipExternalAddress = nil;
+  [checkipPublicAddress release];
+  checkipPublicAddress = nil;
   
-  if(checkipURLData != nil)
-  {
+  if (checkipURLData != nil) {
     // parsing the data for the address string
     NSString *urlDataString = [[NSString alloc] initWithData:checkipURLData encoding:NSASCIIStringEncoding];
     NSScanner *scanner = [[NSScanner alloc] initWithString:urlDataString];
     
-    if([scanner scanString:XM_CHECKIP_PREFIX intoString:nil])
-    {
+    // too bad Cocoa doesn't have built-in regexp support
+    if ([scanner scanString:XM_CHECKIP_PREFIX intoString:nil]) {
       int firstByte;
       int secondByte;
       int thirdByte;
       int fourthByte;
-      if([scanner scanInt:&firstByte] && [scanner scanString:@"." intoString:nil] &&
+      if ([scanner scanInt:&firstByte] && [scanner scanString:@"." intoString:nil] &&
          [scanner scanInt:&secondByte] && [scanner scanString:@"." intoString:nil] &&
          [scanner scanInt:&thirdByte] && [scanner scanString:@"." intoString:nil] &&
          [scanner scanInt:&fourthByte])
       {
-        checkipExternalAddress = [[NSString alloc] initWithFormat:@"%d.%d.%d.%d", firstByte, secondByte, thirdByte, fourthByte];
+        checkipPublicAddress = [[NSString alloc] initWithFormat:@"%d.%d.%d.%d", firstByte, secondByte, thirdByte, fourthByte];
       }
     }
     
@@ -379,16 +368,16 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-  [checkipExternalAddress release];
-  checkipExternalAddress = nil;
+  [checkipPublicAddress release];
+  checkipPublicAddress = nil;
   
   [self _cleanupCheckipFetching];
 }
 
 - (void)_urlLoadingTimeout:(NSTimer *)timer
 {
-  [checkipExternalAddress release];
-  checkipExternalAddress = nil;
+  [checkipPublicAddress release];
+  checkipPublicAddress = nil;
   
   [self _cleanupCheckipFetching];
 }
@@ -418,6 +407,43 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 @end
 
+@implementation XMNetworkInterface
+
+- (id)init
+{
+  [self doesNotRecognizeSelector:_cmd];
+  [self release];
+  return nil;
+}
+
+- (id)initWithIPAddress:(NSString *)theIPAddress interface:(NSString *)theInterface
+{
+  ipAddress = [theIPAddress copy];
+  interface = [theInterface copy];
+  return self;
+}
+
+- (NSString *)ipAddress
+{
+  return ipAddress;
+}
+
+- (NSString *)interface
+{
+  return interface;
+}
+
+- (BOOL)isEqual:(NSObject *)obj
+{
+  if ([obj isKindOfClass:[XMNetworkInterface class]]) {
+    XMNetworkInterface *networkInterface = (XMNetworkInterface *)obj;
+    return ([ipAddress isEqualToString:[networkInterface ipAddress]] && [interface isEqualToString:[networkInterface interface]]);
+  }
+  return NO;
+}
+
+@end
+
 #pragma mark -
 #pragma mark Functions
 
@@ -427,7 +453,7 @@ BOOL XMIsPhoneNumber(NSString *string)
   NSScanner *scanner = [[NSScanner alloc] initWithString:string];
   BOOL result = NO;
   
-  if([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
+  if ([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
   {
 	result = YES;
   }
@@ -443,7 +469,7 @@ BOOL XMIsPlainPhoneNumber(NSString *string)
   NSScanner *scanner = [[NSScanner alloc] initWithString:string];
   BOOL result = NO;
   
-  if([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
+  if ([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
   {
 	result = YES;
   }
@@ -461,7 +487,7 @@ BOOL XMIsIPAddress(NSString *address)
   
   BOOL isIPAddress = NO;
   
-  if([scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+  if ([scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
 	 [scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
 	 [scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
 	 [scanner scanInt:&byte] && (byte < 256) && [scanner isAtEnd])
@@ -511,13 +537,13 @@ XMVideoSize XMDimensionsToVideoSize(NSSize size)
 
 float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize)
 {
-  if(videoSize == XMVideoSize_NoVideo ||
+  if (videoSize == XMVideoSize_NoVideo ||
 	 videoSize == XMVideoSize_Custom) // when video size is custom, the aspect ration cannot be determined without looking at the video frames
   {
 	return 0;
   }
 		
-  if(videoSize == XMVideoSize_SQCIF)
+  if (videoSize == XMVideoSize_SQCIF)
   {
 	// 4:3 aspect ratio
 	return width * (3.0 / 4.0);
@@ -531,11 +557,11 @@ float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize)
 
 float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize)
 {
-  if(videoSize == XMVideoSize_NoVideo)
+  if (videoSize == XMVideoSize_NoVideo)
   {
 	return 0;
   }
-  if(videoSize == XMVideoSize_SQCIF)
+  if (videoSize == XMVideoSize_SQCIF)
   {
 	// 4:3 aspect ratio
 	return height * (4.0 / 3.0);

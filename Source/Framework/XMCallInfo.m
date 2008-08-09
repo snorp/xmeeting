@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.9 2008/07/29 17:05:38 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.10 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,6 +57,11 @@
 	outgoingAudioCodec = nil;
 	incomingVideoCodec = nil;
 	outgoingVideoCodec = nil;
+  
+  isReceivingAudio = NO;
+  isSendingAudio = NO;
+  isReceivingVideo = NO;
+  isSendingVideo = NO;
 	
 	callStatistics.roundTripDelay = 0;
 	
@@ -218,6 +223,26 @@
 - (NSString *)outgoingVideoCodec
 {
 	return outgoingVideoCodec;
+}
+
+- (BOOL)isReceivingAudio
+{
+  return isReceivingAudio;
+}
+
+- (BOOL)isSendingAudio
+{
+  return isSendingAudio;
+}
+
+- (BOOL)isReceivingVideo
+{
+  return isReceivingVideo;
+}
+
+- (BOOL)isSendingVideo
+{
+  return isSendingVideo;
 }
 
 - (unsigned)roundTripDelay
@@ -457,6 +482,26 @@
 	NSString *old = outgoingVideoCodec;
 	outgoingVideoCodec = [codec copy];
 	[old release];
+}
+
+- (void)_setIsReceivingAudio:(BOOL)flag
+{
+  isReceivingAudio = flag;
+}
+
+- (void)_setIsSendingAudio:(BOOL)flag
+{
+  isSendingAudio = flag;
+}
+
+- (void)_setIsReceivingVideo:(BOOL)flag
+{
+  isReceivingVideo = flag;
+}
+
+- (void)_setIsSendingVideo:(BOOL)flag
+{
+  isSendingVideo = flag;
 }
 
 - (void)_updateCallStatistics:(XMCallStatistics *)callStats

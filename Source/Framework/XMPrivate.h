@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.45 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.46 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,7 +54,7 @@ void _XMCheckCloseStatus();
 - (void)_close;
 
 - (void)_handleSTUNInformation:(NSArray *)info;
-- (NSString *)_checkipExternalAddress;
+- (NSString *)_checkipPublicAddress;
 - (BOOL)_doesUpdateCheckipInformation;
 
 @end
@@ -154,8 +154,8 @@ void _XMCheckCloseStatus();
 
 #pragma mark Misc
 
-// Called when the network status changed
-- (void)_networkStatusChanged;
+// Called when the network configuration changed
+- (void)_networkConfigurationChanged;
 
 // Called when the checkip address changed
 - (void)_checkipAddressUpdated;
@@ -191,6 +191,10 @@ void _XMCheckCloseStatus();
 - (void)_setOutgoingAudioCodec:(NSString *)codec;
 - (void)_setIncomingVideoCodec:(NSString *)codec;
 - (void)_setOutgoingVideoCodec:(NSString *)codec;
+- (void)_setIsReceivingAudio:(BOOL)flag;
+- (void)_setIsSendingAudio:(BOOL)flag;
+- (void)_setIsReceivingVideo:(BOOL)flag;
+- (void)_setIsSendingVideo:(BOOL)flag;
 
 - (void)_updateCallStatistics:(XMCallStatistics *)callStatistics;
 

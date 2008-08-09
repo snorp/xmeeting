@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.34 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.35 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -183,10 +183,14 @@ extern NSString *XMNotification_CallManagerDidCloseIncomingVideoStream;
 extern NSString *XMNotification_CallManagerDidUpdateCallStatistics;
 
 /**
- * Posted when a FECC channel was opened. This channel will remain
- * open until the call is finished
+ * Posted when the FECC channel was opened.
  **/
 extern NSString *XMNotification_CallManagerDidOpenFECCChannel;
+
+/**
+ * Posted when the FECC channel was closed.
+ **/
+extern NSString *XMNotification_CallManagerDidCloseFECCChannel;
 
 #pragma mark XMAudioManager Notifications
 
@@ -347,5 +351,10 @@ extern NSString *XMKey_CodecCanDisable;
 extern NSString *XMKey_AddressResourceCallProtocol;
 extern NSString *XMKey_AddressResourceAddress;
 extern NSString *XMKey_AddressResourceHumanReadableAddress;
+
+#pragma mark Interface constants
+
+extern NSString *XMPublicInterface;
+extern NSString *XMUnknownInterface;
 
 #endif // __XM_STRING_CONSTANTS_H__

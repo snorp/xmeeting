@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.32 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.33 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,6 +54,7 @@ NSString *XMNotification_CallManagerDidCloseIncomingVideoStream = @"XMeetingCall
 NSString *XMNotification_CallManagerDidUpdateCallStatistics = @"XMeetingCallManagerDidUpdateCallStatisticsNotification";
 
 NSString *XMNotification_CallManagerDidOpenFECCChannel = @"XMeetingCallManagerDidOpenFECCChannel";
+NSString *XMNotification_CallManagerDidCloseFECCChannel = @"XMeetingCallManagerDidCloseFECCChannel";
 
 NSString *XMNotification_AudioManagerInputDeviceDidChange = @"XMeetingAudioManagerInputDeviceDidChangeNotification";
 NSString *XMNotification_AudioManagerOutputDeviceDidChange = @"XMeetingAudioManagerOutputDeviceDidChangeNotification";
@@ -168,3 +169,6 @@ NSString *XMKey_AddressResourceAddress = @"XMeeting_Address";
 NSString *XMKey_AddressResourceHumanReadableAddress = @"XMeeting_HumanReadableAddress";
 
 NSString *XMKey_GeneralPurposeAddressResource = @"XMeeting_GeneralPurposeAddressResource";
+
+NSString *XMPublicInterface = @"<PUBLIC>";
+NSString *XMUnknownInterface = @"<UNKNOWN>";

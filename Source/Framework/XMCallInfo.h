@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.13 2008/07/29 17:05:37 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.14 2008/08/09 12:32:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,11 @@
   NSString *outgoingAudioCodec;
   NSString *incomingVideoCodec;
   NSString *outgoingVideoCodec;
+  
+  BOOL isReceivingAudio;
+  BOOL isSendingAudio;
+  BOOL isReceivingVideo;
+  BOOL isSendingVideo;
   
   XMCallStatisticsRecord callStatistics;
 }
@@ -165,6 +170,26 @@
  * Returns the video codec used for the outgoing video stream
  **/
 - (NSString *)outgoingVideoCodec;
+
+/**
+ * Returns whether the call is currently receiving audio
+ **/
+- (BOOL)isReceivingAudio;
+
+/**
+ * Returns whether the call is currently sending audio
+ **/
+- (BOOL)isSendingAudio;
+
+/**
+ * Returns whether the call is currently receiving video
+ **/
+- (BOOL)isReceivingVideo;
+
+/**
+ * Returns whether the call is currently sending video
+ **/
+- (BOOL)isSendingVideo;
 
 /**
  * Returns the roundTripDelay in milliseconds

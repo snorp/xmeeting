@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.25 2007/09/25 12:12:02 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.26 2008/08/09 12:32:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,15 +21,14 @@
 	
 @private
   SCDynamicStoreRef dynamicStore;
-  NSArray *localAddresses;
-  NSArray *localAddressInterfaces;
+  NSArray *networkInterfaces;
   
   BOOL doesUpdateSTUNInformation;
   BOOL doesUpdateCheckipInformation;
   
   XMNATType natType;
-  NSString *stunExternalAddress;
-  NSString *checkipExternalAddress;
+  NSString *stunPublicAddress;
+  NSString *checkipPublicAddress;
   
   NSURLConnection *checkipURLConnection;
   NSMutableData *checkipURLData;
@@ -42,37 +41,44 @@
 + (XMUtils *)sharedInstance;
 
 /**
- * Returns the local addresses for this computer
+ * Returns the local network interfaces for this computer
  **/
-- (NSArray *)localAddresses;
-
-/**
- * Returns the (human readable) interfaces corresponding to the
- * addresses returned by -localAddresses
- **/
-- (NSArray *)localAddressInterfaces;
+- (NSArray *)networkInterfaces;
 
 /**
  * Returns the type of NAT detected.
  * The value returned may depend on the STUN settings of the currently
  * active preferences set in XMCallManager.
  * If a STUN-Server is used, returns the NAT-Type returned by the
- * STUN-Server. If no STUN-Server is used, checks whether the external
+ * STUN-Server. If no STUN-Server is used, checks whether the public
  * address is contained is found in the localAddresses array. If so,
  * returns XMNATType_NoNAT. Else, returns XMNATType_UnknownNAT
  **/
 - (XMNATType)natType;
 
 /**
- * Returns the external address as determined either by STUN
+ * Returns the public address as determined either by STUN
  * or by the checkip - address lookup
  **/
-- (NSString *)externalAddress;
+- (NSString *)publicAddress;
 
 /**
  * Updates the network information
  **/
 - (void)updateNetworkInformation;
+
+@end
+
+@interface XMNetworkInterface : NSObject {
+  
+@private
+  NSString *ipAddress;
+  NSString *interface;
+}
+
+- (id)initWithIPAddress:(NSString *)ipAddress interface:(NSString *)interface;
+- (NSString *)ipAddress;
+- (NSString *)interface;
 
 @end
 
