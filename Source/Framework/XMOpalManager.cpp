@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.62 2007/10/03 07:22:42 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.63 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -88,14 +88,14 @@ XMOpalManager::XMOpalManager()
   callEndReason = NULL;
   
   // Create an interface monitor which does NOT run a monitor thread
-  PInterfaceMonitor *monitor = new PInterfaceMonitor(0, FALSE);
+  PInterfaceMonitor *monitor = new PInterfaceMonitor(0, false);
   monitor->SetInterfaceFilter(new XMInterfaceFilter());
   
   OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
   SetEchoCancelParams(params);
   
-  SetAutoStartTransmitVideo(TRUE);
-  SetAutoStartReceiveVideo(TRUE);
+  SetAutoStartTransmitVideo(true);
+  SetAutoStartReceiveVideo(true);
   
   AddRouteEntry("xm:.*   = h323:<da>");
   AddRouteEntry("h323:.* = xm:<da>");
@@ -137,6 +137,9 @@ XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 
 void XMOpalManager::HandleNetworkStatusChange()
 {
+  cout << "WAIT" << endl;
+  usleep(5000000);
+  cout << "DONE" << endl;
   PInterfaceMonitor::GetInstance().RefreshInterfaceList();
 }
 
@@ -158,10 +161,10 @@ unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol,
   
   
   callEndReason = _callEndReason;
-  BOOL returnValue = GetCallEndPoint()->StartCall(protocol, remoteParty, token);
+  bool returnValue = GetCallEndPoint()->StartCall(protocol, remoteParty, token);
   callEndReason = NULL;
   
-  if (returnValue == TRUE)
+  if (returnValue == true)
   {
 	callID = token.AsUnsigned();
 	
@@ -215,20 +218,20 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 {
   PWaitAndSignal m(callInformationMutex);
   
-  BOOL isValid = FALSE;
+  bool isValid = false;
   
   if(connectionToken == "") // current connection token is empty
   {
 	connectionToken = theConnectionToken;
 	callProtocol = theCallProtocol;
-	isValid = TRUE;
+	isValid = true;
   }
   else if(connectionToken == theConnectionToken) // same connection token
   {
-	isValid = TRUE;
+	isValid = true;
   }
   
-  if(isValid == TRUE) // if valid, update information
+  if(isValid == true) // if valid, update information
   {
 	remoteName = theRemoteName;
 	remoteNumber = theRemoteNumber;
@@ -304,7 +307,7 @@ void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
                                           XMCallStatisticsRecord *callStatistics)
 {
-  RTP_Session *session = connection.GetSession(OpalDefaultAudioMediaType);
+  /*RTP_Session *session = connection.GetSession(OpalDefaultAudioMediaType);
   if (session != NULL)
   {
 	callStatistics->audioPacketsSent = session->GetPacketsSent();
@@ -392,7 +395,7 @@ void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
 	
 	callStatistics->videoAverageJitterTime = UINT_MAX;
 	callStatistics->videoMaximumJitterTime = UINT_MAX;
-  }
+  }*/
 }
 
 #pragma mark -
@@ -405,11 +408,11 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
   // Determine if we were originating the call or not, by looking at
   // the class of the endpoint associated with the first connection
   // in the call dictionary.
-  BOOL isIncomingCall = TRUE;
+  bool isIncomingCall = true;
   OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
   if(PIsDescendant(&endPoint, XMEndPoint))
   {
-	isIncomingCall = FALSE;
+	isIncomingCall = false;
   }
   
   // Determine the IP address this call is running on.
@@ -492,13 +495,13 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
   }
 }
 
-OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread)
+OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, bool requiresPatchThread)
 {
   // Incoming video streams are treated using a special patch instance.
   // The other streams have the default OpalMediaPatch / OpalPassiveMediaPatch instance
-  if (requiresPatchThread == TRUE && source.GetMediaFormat().GetMediaType() == OpalDefaultVideoMediaType) {
+  /*if (requiresPatchThread == true && source.GetMediaFormat().GetMediaType() == OpalDefaultVideoMediaType) {
 	return new XMReceiverMediaPatch(source);
-  }
+  }*/
   
   return OpalManager::CreateMediaPatch(source, requiresPatchThread);
 }
@@ -511,7 +514,7 @@ void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, cons
   unsigned callID = connection.GetCall().GetToken().AsUnsigned();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-  if(mediaType == OpalDefaultVideoMediaType)
+  /*if(mediaType == OpalDefaultVideoMediaType)
   {
 	// The incoming video stream (source for OPAL) is treated as being open as soon the
 	// first data is decoded and the exact parameters of the stream are
@@ -527,7 +530,7 @@ void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, cons
   else if(mediaType == OpalDefaultAudioMediaType)
   {
 	_XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
-  }
+  }*/
 }
 
 void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream)
@@ -538,14 +541,14 @@ void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, co
   unsigned callID = connection.GetCall().GetToken().AsUnsigned();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-  if(mediaType == OpalDefaultVideoMediaType) 
+  /*if(mediaType == OpalDefaultVideoMediaType) 
   {
 	_XMHandleVideoStreamClosed(callID, stream.IsSource());
   }
   else if(mediaType == OpalDefaultAudioMediaType)
   {
 	_XMHandleAudioStreamClosed(callID, stream.IsSource());
-  }
+  }*/
 }
 
 #pragma mark -
@@ -564,11 +567,11 @@ void XMOpalManager::SetUserName(const PString & username)
 #pragma mark Network Setup Methods
 
 void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
-									  const PString & theTranslationAddress,
-                                      BOOL networkStatusChanged)
+                                      const PString & theTranslationAddress,
+                                      bool networkStatusChanged)
 {
   // Don't re-fetch the STUN information if the network status didn't change
-  if (networkStatusChanged == FALSE && stunServers.Compare(theStunServers) == PObject::EqualTo) {
+  if (networkStatusChanged == false && stunServers.Compare(theStunServers) == PObject::EqualTo) {
     return;
   }
   
@@ -582,7 +585,9 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
   //
   if(stun != NULL) {
 	  delete stun;
+    delete interfaceMonitor;
 	  stun = NULL;
+    interfaceMonitor = NULL;
   }
   
   if (!HasNetworkInterfaces()) {
@@ -623,6 +628,7 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
           SetTranslationAddress(theTranslationAddress);
           HandleSTUNInformation(natType, PString());
         }
+        interfaceMonitor = new InterfaceMonitor(stun);
         return;
 				
       default:
@@ -647,20 +653,20 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
 }
 
 void XMOpalManager::HandleSTUNInformation(PSTUNClient::NatTypes natType,
-                                          const PString & externalAddress)
+                                          const PString & publicAddress)
 {
-  PTRACE(3, "Determined NAT Type " << natType << ", external address " << externalAddress);
-  _XMHandleSTUNInformation((XMNATType)natType, externalAddress);
+  PTRACE(3, "Determined NAT Type " << natType << ", external address " << publicAddress);
+  _XMHandleSTUNInformation((XMNATType)natType, publicAddress);
 }
 
-BOOL XMOpalManager::HasNetworkInterfaces() const
+bool XMOpalManager::HasNetworkInterfaces() const
 {
   PIPSocket::InterfaceTable interfaces;
   PIPSocket::GetInterfaceTable(interfaces);
   if (interfaces.GetSize() == 0 || (interfaces.GetSize() == 1 && interfaces[0].GetAddress().IsLoopback())) {
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 #pragma mark -
@@ -713,7 +719,7 @@ unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier code
   }
 }
 
-BOOL XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const
+bool XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const
 {
   if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
   {
@@ -721,16 +727,16 @@ BOOL XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat)
 	// H.263 to this MGC for now.
 	if (remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
 	{
-	  return FALSE;
+	  return false;
 	}
   }
-  return TRUE;
+  return true;
 }
 
 #pragma mark -
 #pragma mark UserInput methods
 
-BOOL XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
+bool XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
 {
   OpalConnection::SendUserInputModes mode;
   
@@ -750,14 +756,14 @@ BOOL XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
 	  mode = OpalConnection::SendUserInputAsSeparateRFC2833;
 	  break;
 	default:
-	  return FALSE;
+	  return false;
   }
   
   GetH323EndPoint()->SetSendUserInputMode(mode);
   GetSIPEndPoint()->SetSendUserInputMode(mode);
   GetCallEndPoint()->SetSendUserInputMode(mode);
   
-  return TRUE;
+  return true;
 }
 
 #pragma mark -

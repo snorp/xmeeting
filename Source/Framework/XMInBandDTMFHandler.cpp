@@ -1,5 +1,5 @@
 /*
- * $Id: XMInBandDTMFHandler.cpp,v 1.3 2006/11/12 20:31:41 hfriederich Exp $
+ * $Id: XMInBandDTMFHandler.cpp,v 1.4 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,14 +21,14 @@ XMInBandDTMFHandler::XMInBandDTMFHandler()
 	PTRACE(3, "InBandDTMF\tHandler created");
 }
 
-BOOL XMInBandDTMFHandler::SendTone(char tone, unsigned duration)
+bool XMInBandDTMFHandler::SendTone(char tone, unsigned duration)
 {
 	PWaitAndSignal m(mutex);
 	
 	if(tones->GetSize() != 0)
 	{
 		PTRACE(3, "InBandDTMF\tAlready sending tone");
-		return FALSE;
+		return false;
 	}
 	
 	// borrowed from PDTMFEncoder
@@ -71,7 +71,7 @@ BOOL XMInBandDTMFHandler::SendTone(char tone, unsigned duration)
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 	
 	if(duration < 400)
@@ -85,7 +85,7 @@ BOOL XMInBandDTMFHandler::SendTone(char tone, unsigned duration)
 	// limit tone duration to desired duration
 	tones->SetSize(8*duration); // 8khz sample rate
 	
-	return TRUE;
+	return true;
 }
 
 const PNotifier & XMInBandDTMFHandler::GetTransmitHandler() const

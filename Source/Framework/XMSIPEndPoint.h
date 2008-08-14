@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.18 2007/09/13 15:02:44 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.19 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -60,20 +60,20 @@ public:
   XMSIPEndPoint(OpalManager & manager);
   virtual ~XMSIPEndPoint();
   
-  BOOL EnableListeners(BOOL enable);
-  BOOL IsListening();
+  bool EnableListeners(bool enable);
+  bool IsListening();
   
-  void PrepareRegistrationSetup(BOOL proxyChanged);
+  void PrepareRegistrationSetup(bool proxyChanged);
   void UseRegistration(const PString & host,
                        const PString & username,
                        const PString & authorizationUsername,
                        const PString & password,
-                       BOOL proxyChanged);
-  void FinishRegistrationSetup(BOOL proxyChanged);
+                       bool proxyChanged);
+  void FinishRegistrationSetup(bool proxyChanged);
   
   void HandleNetworkStatusChange();
   
-  BOOL UseProxy(const PString & hostname,
+  bool UseProxy(const PString & hostname,
                 const PString & username,
                 const PString & password);
   
@@ -81,9 +81,9 @@ public:
   
   virtual void OnRegistrationFailed(const PString & aor,
                                     SIP_PDU::StatusCodes reason,
-                                    BOOL wasRegistering);
+                                    bool wasRegistering);
   virtual void OnRegistered(const PString & aor,
-                            BOOL wasRegistering);
+                            bool wasRegistering);
   
   virtual void OnEstablished(OpalConnection & connection);
   virtual void OnReleased(OpalConnection & connection);
@@ -105,7 +105,7 @@ public:
   void RemoveReleasingConnection(XMSIPConnection * connection);
   
 private:
-	BOOL isListening;
+	bool isListening;
   
   PString connectionToken;
   

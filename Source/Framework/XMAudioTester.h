@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioTester.h,v 1.1 2006/09/24 17:53:31 hfriederich Exp $
+ * $Id: XMAudioTester.h,v 1.2 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,7 +27,7 @@ public:
 private:
 	unsigned delay;
 	XMCircularBuffer circularBuffer;
-	BOOL stop;
+	bool stop;
 };
 
 #endif // __XM_AUDIO_TESTER_H__

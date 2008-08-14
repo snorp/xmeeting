@@ -1,5 +1,5 @@
 /*
- * $Id: XMRFC2833Handler.cpp,v 1.2 2007/08/05 13:14:36 hfriederich Exp $
+ * $Id: XMRFC2833Handler.cpp,v 1.3 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,7 +8,7 @@
 
 #include "XMRFC2833Handler.h"
 
-XMRFC2833Handler::XMRFC2833Handler(OpalConnection & connection,
+XMRFC2833Handler::XMRFC2833Handler(OpalRTPConnection & connection,
                                    const PNotifier & notifier)
 : OpalRFC2833Proto(connection, notifier)
 {

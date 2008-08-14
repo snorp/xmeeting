@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.30 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.31 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,12 +28,12 @@ XM_REGISTER_FORMATS();
 #pragma mark Constructor & Destructor
 
 XMEndPoint::XMEndPoint(XMOpalManager & manager)
-: OpalEndPoint(manager, "xm", CanTerminateCall)
+: OpalLocalEndPoint(manager, "xm")
 {
-	isIncomingCall = FALSE;
-	enableSilenceSuppression = FALSE;
-	enableEchoCancellation = FALSE;
-	enableVideo = FALSE;
+	isIncomingCall = false;
+	enableSilenceSuppression = false;
+	enableEchoCancellation = false;
+	enableVideo = false;
 }
 
 XMEndPoint::~XMEndPoint()
@@ -43,7 +43,7 @@ XMEndPoint::~XMEndPoint()
 #pragma mark -
 #pragma mark Overriding OpalEndPoint Methods
 
-BOOL XMEndPoint::MakeConnection(OpalCall & call,
+bool XMEndPoint::MakeConnection(OpalCall & call,
                                 const PString & remoteParty,
                                 void *userData,
                                 unsigned int options,
@@ -53,19 +53,19 @@ BOOL XMEndPoint::MakeConnection(OpalCall & call,
 	PSafePtr<XMConnection> connection = GetXMConnectionWithLock(token);
 	if(connection != NULL)
 	{
-		return FALSE;
+		return false;
 	}
 	
-	connection = CreateConnection(call, token);
+	connection = (XMConnection *)CreateConnection(call, NULL);
 	if(!AddConnection(connection))
 	{
-		return FALSE;
+		return false;
 	}
 	
-	return TRUE;
+	return true;
 }
 
-BOOL XMEndPoint::OnIncomingConnection(OpalConnection & connection,
+bool XMEndPoint::OnIncomingConnection(OpalConnection & connection,
                                       unsigned options,
                                       OpalConnection::StringOptions * stringOptions)
 {
@@ -78,13 +78,13 @@ PSafePtr<XMConnection> XMEndPoint::GetXMConnectionWithLock(const PString & token
 	return PSafePtrCast<OpalConnection, XMConnection>(GetConnectionWithLock(token, mode));
 }
 
-XMConnection * XMEndPoint::CreateConnection(OpalCall & call, PString & token)
+OpalLocalConnection * XMEndPoint::CreateConnection(OpalCall & call, void *userData)
 {
-	return new XMConnection(call, *this, token);
+	return new XMConnection(call, *this);
 }
 
 PSoundChannel * XMEndPoint::CreateSoundChannel(const XMConnection & connection,
-											   BOOL isSource)
+											   bool isSource)
 {
 	PString deviceName;
 	
@@ -113,7 +113,7 @@ PSoundChannel * XMEndPoint::CreateSoundChannel(const XMConnection & connection,
 #pragma mark -
 #pragma mark Call Management Methods
 
-BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty, PString & token)
+bool XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty, PString & token)
 {
 	PString partyB;
 	
@@ -126,7 +126,7 @@ BOOL XMEndPoint::StartCall(XMCallProtocol protocol, const PString & remoteParty,
 			partyB = "sip:";
 			break;
 		default:
-			return FALSE;
+			return false;
 			break;
 	}
 	
@@ -157,7 +157,7 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 		return;
 	}
 	
-	isIncomingCall = TRUE;
+	isIncomingCall = true;
 	
 	// determine the IP address this connection runs on
 	PIPSocket::Address address(0);
@@ -179,7 +179,7 @@ void XMEndPoint::OnShowIncoming(XMConnection & connection)
 
 void XMEndPoint::AcceptIncomingCall()
 {
-	if(isIncomingCall == FALSE)
+	if(isIncomingCall == false)
 	{
 		return;
 	}
@@ -192,7 +192,7 @@ void XMEndPoint::AcceptIncomingCall()
 
 void XMEndPoint::RejectIncomingCall()
 {
-	if(isIncomingCall == FALSE)
+	if(isIncomingCall == false)
 	{
 		return;
 	}
@@ -208,7 +208,7 @@ void XMEndPoint::RejectIncomingCall()
 
 void XMEndPoint::OnEstablished(OpalConnection & connection)
 {
-	isIncomingCall = FALSE;
+	isIncomingCall = false;
 	OpalEndPoint::OnEstablished(connection);
 }
 
@@ -230,7 +230,7 @@ void XMEndPoint::SetSendUserInputMode(OpalConnection::SendUserInputModes mode)
 	}
 }
 
-BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
+bool XMEndPoint::SendUserInputTone(PString & callID, const char tone)
 {	
 	OpalConnection *otherConnection;
 	// Send the user input tone while the connection isn't locked
@@ -239,13 +239,13 @@ BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
 		PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
 		if(connection == NULL)
 		{
-			return FALSE;
+			return false;
 		}
 		
 		PSafePtr<OpalConnection> theConnection = connection->GetCall().GetOtherPartyConnection(*connection);
 		if(theConnection == NULL)
 		{
-			return FALSE;
+			return false;
 		}
 		otherConnection = theConnection;
 	}
@@ -253,7 +253,7 @@ BOOL XMEndPoint::SendUserInputTone(PString & callID, const char tone)
 	return otherConnection->SendUserInputTone(tone, 240);
 }
 
-BOOL XMEndPoint::SendUserInputString(PString & callID, const PString & string)
+bool XMEndPoint::SendUserInputString(PString & callID, const PString & string)
 {
 	OpalConnection *otherConnection;
 	// Send the user input string while the connection isn't locked
@@ -262,26 +262,26 @@ BOOL XMEndPoint::SendUserInputString(PString & callID, const PString & string)
 		PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
 		if(connection == NULL)
 		{
-			return FALSE;
+			return false;
 		}
 	
 		PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
 		if(otherConnection == NULL)
 		{
-			return FALSE;
+			return false;
 		}
 	}
 	
 	return otherConnection->SendUserInputString(string);
 }
 
-BOOL XMEndPoint::StartCameraEvent(PString & callID, XMCameraEvent cameraEvent)
+bool XMEndPoint::StartCameraEvent(PString & callID, XMCameraEvent cameraEvent)
 {	
 	OpalH281Handler *h281Handler = GetH281Handler(callID);
 	
 	if(h281Handler == NULL)
 	{
-		return FALSE;
+		return false;
 	}
 	
 	H281_Frame::PanDirection panDirection = H281_Frame::NoPan;
@@ -292,7 +292,7 @@ BOOL XMEndPoint::StartCameraEvent(PString & callID, XMCameraEvent cameraEvent)
 	switch(cameraEvent)
 	{
 		case XMCameraEvent_NoEvent:
-			return FALSE;
+			return false;
 		case XMCameraEvent_PanLeft:
 			panDirection = H281_Frame::PanLeft;
 			break;
@@ -321,7 +321,7 @@ BOOL XMEndPoint::StartCameraEvent(PString & callID, XMCameraEvent cameraEvent)
 	
 	h281Handler->StartAction(panDirection, tiltDirection, zoomDirection, focusDirection);
 	
-	return TRUE;
+	return true;
 }
 
 void XMEndPoint::StopCameraEvent(PString & callID)

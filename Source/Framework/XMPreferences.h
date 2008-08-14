@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.h,v 1.21 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMPreferences.h,v 1.22 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,7 +39,7 @@
   
   /* Network settings */
   unsigned	 bandwidthLimit;			// The bandwidth limit in bit/s (0 for no limit)
-  NSString	*externalAddress; 		// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
+  NSString	*publicAddress; 		// A string containing the external ipv4 address (xxx.xxx.xxx.xxx)
   unsigned	 tcpPortBase;					// The lower limit of the tcp port range
   unsigned	 tcpPortMax;					// The upper limit of the tcp port range
   unsigned	 udpPortBase;					// The lower limit of the udp port range
@@ -128,7 +128,7 @@
 - (unsigned)bandwidthLimit;
 - (void)setBandwidthLimit:(unsigned)limit;
 
-- (NSString *)externalAddress;
+- (NSString *)publicAddress;
 - (void)setExternalAddress:(NSString *)string;
 
 - (unsigned)tcpPortBase;

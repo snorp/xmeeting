@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.37 2007/09/13 15:02:44 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.38 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,7 +20,7 @@
 XMSIPEndPoint::XMSIPEndPoint(OpalManager & manager)
 : SIPEndPoint(manager)
 {
-  isListening = FALSE;
+  isListening = false;
   
   connectionToken = "";
   
@@ -35,39 +35,39 @@ XMSIPEndPoint::~XMSIPEndPoint()
 {
 }
 
-BOOL XMSIPEndPoint::EnableListeners(BOOL enable)
+bool XMSIPEndPoint::EnableListeners(bool enable)
 {
-  BOOL result = TRUE;
+  bool result = true;
   
-  if(enable == TRUE)
+  if(enable == true)
   {
-    if(isListening == FALSE)
+    if(isListening == false)
     {
       result = StartListeners(GetDefaultListeners());
-      if(result == TRUE)
+      if(result == true)
       {
-        isListening = TRUE;
+        isListening = true;
       }
     }
   }
   else
   {
-    if(isListening == TRUE)
+    if(isListening == true)
     {
       RemoveListener(NULL);
-      isListening = FALSE;
+      isListening = false;
     }
   }
   
   return result;
 }
 
-BOOL XMSIPEndPoint::IsListening()
+bool XMSIPEndPoint::IsListening()
 {
   return isListening;
 }
 
-void XMSIPEndPoint::PrepareRegistrationSetup(BOOL proxyChanged)
+void XMSIPEndPoint::PrepareRegistrationSetup(bool proxyChanged)
 {
   PWaitAndSignal m(registrationListMutex);
   
@@ -81,7 +81,7 @@ void XMSIPEndPoint::PrepareRegistrationSetup(BOOL proxyChanged)
     XMSIPRegistrationRecord & record = activeRegistrations[i];
     
     if(record.GetStatus() == XMSIPRegistrationRecord::Registered &&
-       proxyChanged == FALSE)
+       proxyChanged == false)
     {
       record.SetStatus(XMSIPRegistrationRecord::ToUnregister);
     }
@@ -96,7 +96,7 @@ void XMSIPEndPoint::UseRegistration(const PString & host,
                                     const PString & username,
                                     const PString & authorizationUsername,
                                     const PString & password,
-                                    BOOL proxyChanged)
+                                    bool proxyChanged)
 {
   PWaitAndSignal m(registrationListMutex);
   
@@ -115,7 +115,7 @@ void XMSIPEndPoint::UseRegistration(const PString & host,
     registration = username + '@' + host;
   }
   
-  if (proxyChanged == FALSE) {
+  if (proxyChanged == false) {
     // searching for a record with the same information
     // if found, marking this record as registered/needs to register.
     // if not, create a new record and add it to the list
@@ -149,7 +149,7 @@ void XMSIPEndPoint::UseRegistration(const PString & host,
   activeRegistrations.Append(record);
 }
 
-void XMSIPEndPoint::FinishRegistrationSetup(BOOL proxyChanged)
+void XMSIPEndPoint::FinishRegistrationSetup(bool proxyChanged)
 {
   if (proxyChanged) {
     // Unregister all registrations and re-register with the new proxy information
@@ -179,7 +179,7 @@ void XMSIPEndPoint::FinishRegistrationSetup(BOOL proxyChanged)
     }
     else if(record.GetStatus() == XMSIPRegistrationRecord::ToRegister)
     {
-      BOOL result = Register(GetRegistrarTimeToLive().GetSeconds(),
+      /*bool result = Register(GetRegistrarTimeToLive().GetSeconds(),
                              record.GetRegistration(),
                              record.GetAuthorizationUsername(),
                              record.GetPassword(),
@@ -188,15 +188,15 @@ void XMSIPEndPoint::FinishRegistrationSetup(BOOL proxyChanged)
                              PMaxTimeInterval,
                              proxyChanged);
       
-      if(result == FALSE && (record.GetStatus() != XMSIPRegistrationRecord::Failed))
+      if(result == false && (record.GetStatus() != XMSIPRegistrationRecord::Failed))
       {
         record.SetStatus(XMSIPRegistrationRecord::Failed);
         _XMHandleSIPRegistrationFailure(record.GetRegistration(), XMSIPStatusCode_NoNetworkInterfaces);
-      }
+      }*/
     }
   }
   
-  BOOL completed = TRUE;
+  bool completed = true;
   count = activeRegistrations.GetSize();
   for(i = 0; i < count; i++)
   {
@@ -204,12 +204,12 @@ void XMSIPEndPoint::FinishRegistrationSetup(BOOL proxyChanged)
     
     if(record.GetStatus() == XMSIPRegistrationRecord::ToRegister)
     {
-      completed = FALSE;
+      completed = false;
       break;
     }
   }
   
-  if(completed == TRUE)
+  if(completed == true)
   {
     _XMHandleSIPRegistrationSetupCompleted();
   }
@@ -219,7 +219,7 @@ void XMSIPEndPoint::HandleNetworkStatusChange()
 {
 }
 
-BOOL XMSIPEndPoint::UseProxy(const PString & hostname,
+bool XMSIPEndPoint::UseProxy(const PString & hostname,
 							 const PString & username,
 							 const PString & password)
 {
@@ -242,9 +242,9 @@ BOOL XMSIPEndPoint::UseProxy(const PString & hostname,
   SIPURL newProxy = GetProxy();
   
   if (newProxy != oldProxy) {
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
 void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
@@ -262,16 +262,16 @@ void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 
 void XMSIPEndPoint::OnRegistrationFailed(const PString & aor,
 										 SIP_PDU::StatusCodes reason,
-										 BOOL wasRegistering)
+										 bool wasRegistering)
 {
-  if(wasRegistering == FALSE)
+  if(wasRegistering == false)
   {
     return;
   }
   
   PWaitAndSignal m(registrationListMutex);
   
-  BOOL setupIsComplete = TRUE;
+  bool setupIsComplete = true;
   
   unsigned i;
   unsigned count = activeRegistrations.GetSize();
@@ -295,11 +295,11 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & aor,
     
     if(status == XMSIPRegistrationRecord::ToRegister)
     {
-      setupIsComplete = FALSE;
+      setupIsComplete = false;
     }
   }
   
-  if(setupIsComplete == TRUE)
+  if(setupIsComplete == true)
   {
     _XMHandleSIPRegistrationSetupCompleted();
     return;
@@ -307,9 +307,9 @@ void XMSIPEndPoint::OnRegistrationFailed(const PString & aor,
 }
 
 void XMSIPEndPoint::OnRegistered(const PString & aor,
-								 BOOL wasRegistering)
+								 bool wasRegistering)
 {
-  if(wasRegistering == FALSE)
+  if(wasRegistering == false)
   {
     return;
   }
@@ -317,7 +317,7 @@ void XMSIPEndPoint::OnRegistered(const PString & aor,
   PWaitAndSignal m(registrationListMutex);
   
   
-  BOOL setupIsComplete = TRUE;
+  bool setupIsComplete = true;
   
   unsigned i;
   unsigned count = activeRegistrations.GetSize();
@@ -345,11 +345,11 @@ void XMSIPEndPoint::OnRegistered(const PString & aor,
     
     if(record.GetStatus() == XMSIPRegistrationRecord::ToRegister)
     {
-      setupIsComplete = FALSE;
+      setupIsComplete = false;
     }
   }
   
-  if(setupIsComplete == TRUE)
+  if(setupIsComplete == true)
   {
     _XMHandleSIPRegistrationSetupCompleted();
   }

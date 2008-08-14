@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.8 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.9 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,28 +21,29 @@ class XMMediaStream : public OpalMediaStream
 	
 public:
 	XMMediaStream(XMConnection & conn,
-                  const OpalMediaFormat & mediaFormat,
-                  BOOL isSource);
+                const OpalMediaFormat & mediaFormat,
+                unsigned sessionID,
+                bool isSource);
 	~XMMediaStream();
 	
     virtual void OnPatchStart();
-    virtual BOOL Close();
-	virtual BOOL ReadPacket(RTP_DataFrame & packet);
-	virtual BOOL WritePacket(RTP_DataFrame & packet);
-	virtual BOOL IsSynchronous() const { return FALSE; }
-    virtual BOOL RequiresPatchThread() const { return FALSE; }
+    virtual bool Close();
+	virtual bool ReadPacket(RTP_DataFrame & packet);
+	virtual bool WritePacket(RTP_DataFrame & packet);
+	virtual bool IsSynchronous() const { return false; }
+    virtual bool RequiresPatchThread() const { return false; }
     
     static void SetTimeStamp(unsigned mediaID, unsigned timeStamp);
     static void AppendData(unsigned mediaID, void *data, unsigned lenght);
-    static void SendPacket(unsigned mediaID, BOOL setMarker);
+    static void SendPacket(unsigned mediaID, bool setMarker);
     static void HandleDidStopTransmitting(unsigned mediaID);
     
-    virtual BOOL ExecuteCommand(const OpalMediaCommand & command, BOOL isEndOfChain = FALSE);
+    virtual bool ExecuteCommand(const OpalMediaCommand & command, bool isEndOfChain = false);
     
 private:
     RTP_DataFrame dataFrame;
-    BOOL hasStarted;
-    BOOL isTerminated;
+    bool hasStarted;
+    bool isTerminated;
 };
 
 #endif // __XM_MEDIA_STREAM_H__

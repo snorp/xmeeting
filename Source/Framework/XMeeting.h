@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.h,v 1.12 2007/05/30 08:41:17 hfriederich Exp $
+ * $Id: XMeeting.h,v 1.13 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,7 +26,7 @@ void XMInitFramework(NSString *pTracePath);
  * (XMNotification_FrameworkDidClose)
  * After calling this function, it is no longer safe to use the
  * classes and methods of the XMeeting Framework.
- * Afther this notification has been posted, it is safe to terminate
+ * After this notification has been posted, it is safe to terminate
  * the application
  **/
 void XMCloseFramework();

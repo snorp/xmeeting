@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.21 2007/09/13 15:00:14 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.22 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -114,7 +114,7 @@ class XMH323VideoCapability : public H323VideoCapability
 	
 public:
 	
-	virtual BOOL IsValidCapabilityForSending() const = 0;
+	virtual bool IsValidCapabilityForSending() const = 0;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const = 0;
 };
 
@@ -128,11 +128,11 @@ public:
 	virtual Comparison Compare(const PObject & obj) const;
 	virtual unsigned GetSubType() const;
 	virtual PString GetFormatName() const;
-	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
-	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
-	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
+	virtual bool OnSendingPDU(H245_VideoCapability & pdu) const;
+	virtual bool OnSendingPDU(H245_VideoMode & pdu) const;
+	virtual bool OnReceivedPDU(const H245_VideoCapability & pdu);
 	
-	virtual BOOL IsValidCapabilityForSending() const;
+	virtual bool IsValidCapabilityForSending() const;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
     
     virtual void UpdateFormat(const OpalMediaFormat & mediaFormat);
@@ -149,33 +149,33 @@ class XM_H323_H263_Capability : public XMH323VideoCapability
 	
 public:
 	XM_H323_H263_Capability();
-	XM_H323_H263_Capability(BOOL isH263PlusCapability);
+	XM_H323_H263_Capability(bool isH263PlusCapability);
 	virtual PObject * Clone() const;
 	virtual Comparison Compare(const PObject & obj) const;
 	virtual unsigned GetSubType() const;
 	virtual PString GetFormatName() const;
-	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
-	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
-	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
+	virtual bool OnSendingPDU(H245_VideoCapability & pdu) const;
+	virtual bool OnSendingPDU(H245_VideoMode & pdu) const;
+	virtual bool OnReceivedPDU(const H245_VideoCapability & pdu);
     //virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
     //virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
-    //virtual BOOL HasMediaPacketizationParameters() const { return IsH263PlusCapability(); }
+    //virtual bool HasMediaPacketizationParameters() const { return IsH263PlusCapability(); }
 	//virtual void OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const;
 	//virtual void OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization);
 	
-	virtual BOOL IsValidCapabilityForSending() const;
+	virtual bool IsValidCapabilityForSending() const;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
     
     virtual void UpdateFormat(const OpalMediaFormat & mediaFormat);
 	
-	BOOL IsH263PlusCapability() const { return isH263PlusCapability; }
-    BOOL CanRFC2429() const { return canRFC2429; }
-    BOOL IsRFC2429() const { return isRFC2429; }
+	bool IsH263PlusCapability() const { return isH263PlusCapability; }
+    bool CanRFC2429() const { return canRFC2429; }
+    bool IsRFC2429() const { return isRFC2429; }
 	
 private :
         
-    void SetCanRFC2429(BOOL canRFC2429);
-    void SetIsRFC2429(BOOL isRFC2429);
+    void SetCanRFC2429(bool canRFC2429);
+    void SetIsRFC2429(bool isRFC2429);
     
     unsigned sqcifMPI;
 	unsigned qcifMPI;
@@ -191,9 +191,9 @@ private :
 	unsigned slowCif4MPI;
 	unsigned slowCif16MPI;
 	
-	BOOL isH263PlusCapability;
-    BOOL canRFC2429;
-    BOOL isRFC2429;
+	bool isH263PlusCapability;
+    bool canRFC2429;
+    bool isRFC2429;
 };
 
 class XM_H323_H263PLUS_Capability : public XM_H323_H263_Capability
@@ -215,14 +215,14 @@ public:
 	virtual Comparison Compare(const PObject & obj) const;
 	virtual unsigned GetSubType() const;
 	virtual PString GetFormatName() const;
-	virtual BOOL OnSendingPDU(H245_VideoCapability & pdu) const;
-	virtual BOOL OnSendingPDU(H245_VideoMode & pdu) const;
-	virtual BOOL OnReceivedPDU(const H245_VideoCapability & pdu);
+	virtual bool OnSendingPDU(H245_VideoCapability & pdu) const;
+	virtual bool OnSendingPDU(H245_VideoMode & pdu) const;
+	virtual bool OnReceivedPDU(const H245_VideoCapability & pdu);
 	
 	//virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
 	//virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
 	
-	virtual BOOL IsValidCapabilityForSending() const;
+	virtual bool IsValidCapabilityForSending() const;
 	virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
     
     virtual void UpdateFormat(const OpalMediaFormat & mediaFormat);
@@ -240,20 +240,20 @@ private:
 	WORD profile;
 	unsigned level;
     unsigned packetizationMode;
-    BOOL h264LimitedMode;
+    bool h264LimitedMode;
 };
 
 #pragma mark -
 #pragma mark SDP Capabilities
 
-class XM_SDP_H261_Capability : public SDPCapability
+/*class XM_SDP_H261_Capability : public SDPCapability
 {
     PCLASSINFO(XM_SDP_H261_Capability, SDPCapability);
     
 public:
     
-    virtual BOOL OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
-    virtual BOOL OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
+    virtual bool OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
+    virtual bool OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
                                const SDPMediaDescription & mediaDescription,
                                const SDPSessionDescription & sessionDescription);
 };
@@ -264,8 +264,8 @@ class XM_SDP_H263_Capability : public SDPCapability
     
 public:
     
-    virtual BOOL OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
-    virtual BOOL OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
+    virtual bool OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
+    virtual bool OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
                                const SDPMediaDescription & mediaDescription,
                                const SDPSessionDescription & sessionDescription);
 };
@@ -273,15 +273,15 @@ public:
 class XM_SDP_H263PLUS_Capability : public XM_SDP_H263_Capability
 {
     PCLASSINFO(XM_SDP_H263PLUS_Capability, XM_SDP_H263_Capability);
-};
+};*/
 
 #pragma mark -
 #pragma mark Packetization and Codec Option Functions
 
-BOOL _XMGetCanRFC2429(const OpalMediaFormat & mediaFormat);
-void _XMSetCanRFC2429(OpalMediaFormat & mediaFormat, BOOL canRFC2429);
-BOOL _XMGetIsRFC2429(const OpalMediaFormat & mediaFormat);
-void _XMSetIsRFC2429(OpalMediaFormat & mediaFormat, BOOL isRFC2429);
+bool _XMGetCanRFC2429(const OpalMediaFormat & mediaFormat);
+void _XMSetCanRFC2429(OpalMediaFormat & mediaFormat, bool canRFC2429);
+bool _XMGetIsRFC2429(const OpalMediaFormat & mediaFormat);
+void _XMSetIsRFC2429(OpalMediaFormat & mediaFormat, bool isRFC2429);
 
 unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile);
@@ -289,19 +289,19 @@ unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level);
 unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat);
 void _XMSetH264PacketizationMode(OpalMediaFormat & mediaFormat, unsigned packetizationMode);
-BOOL _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat);
-void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, BOOL enableH264LimitedMode);
+bool _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat);
+void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264LimitedMode);
 
 #pragma mark -
 #pragma mark Macros
 
 #define XM_REGISTER_FORMATS() \
-	static H323CapabilityFactory::Worker<XM_H323_H261_Capability> h261Factory(XM_MEDIA_FORMAT_H261, true); \
-    static H323CapabilityFactory::Worker<XM_H323_H263_Capability> h263Factory(XM_MEDIA_FORMAT_H263, true); \
-    static H323CapabilityFactory::Worker<XM_H323_H263PLUS_Capability> h263PlusFactory(XM_MEDIA_FORMAT_H263PLUS, true); \
-    static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
-    SDP_REGISTER_CAPABILITY(XM_SDP_H261_Capability, XM_MEDIA_FORMAT_H261); \
-    SDP_REGISTER_CAPABILITY(XM_SDP_H263_Capability, XM_MEDIA_FORMAT_H263); \
-    SDP_REGISTER_CAPABILITY(XM_SDP_H263PLUS_Capability, XM_MEDIA_FORMAT_H263PLUS); \
+  //static H323CapabilityFactory::Worker<XM_H323_H261_Capability> h261Factory(XM_MEDIA_FORMAT_H261, true); \
+  //static H323CapabilityFactory::Worker<XM_H323_H263_Capability> h263Factory(XM_MEDIA_FORMAT_H263, true); \
+  //static H323CapabilityFactory::Worker<XM_H323_H263PLUS_Capability> h263PlusFactory(XM_MEDIA_FORMAT_H263PLUS, true); \
+  //static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
+  //SDP_REGISTER_CAPABILITY(XM_SDP_H261_Capability, XM_MEDIA_FORMAT_H261); \
+  //SDP_REGISTER_CAPABILITY(XM_SDP_H263_Capability, XM_MEDIA_FORMAT_H263); \
+  //SDP_REGISTER_CAPABILITY(XM_SDP_H263PLUS_Capability, XM_MEDIA_FORMAT_H263PLUS); \
 
 #endif // __XM_MEDIA_FORMATS_H__

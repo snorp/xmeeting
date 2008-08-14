@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.21 2007/09/20 19:11:51 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.22 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,7 +43,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
   
   // network outlets
   IBOutlet NSPopUpButton *bandwidthLimitPopUp;
-  IBOutlet NSTextField *externalAddressField;
+  IBOutlet NSTextField *publicAddressField;
   IBOutlet NSButton *autoGetExternalAddressSwitch;
   IBOutlet NSTabView *stunServersTab;
   IBOutlet NSTableView *stunServersTable;

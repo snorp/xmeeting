@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.14 2007/04/10 19:04:32 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.15 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,24 +33,24 @@ public:
 	
 	virtual void OnCreatingINVITE(SIP_PDU & invite);
     
-    virtual BOOL OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
+    virtual bool OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
                                            const OpalMediaType & mediaType,
                                            SDPSessionDescription & sdpOut);
 	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
-												BOOL isSource);
+                                              bool isSource);
 	
     // Propagate opening of media streams to the Obj-C world
-	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
+	virtual bool OnOpenMediaStream(OpalMediaStream & stream);
 		
     // Overridden to circumvent the default Opal bandwidth management
-	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
+	virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
 	virtual unsigned GetBandwidthUsed() const { return 0; }
-	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return TRUE; }
+	virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
 	
     // Overridden to being able to send in-band DTMF
-	virtual BOOL SendUserInputTone(char tone, unsigned duration);
-    virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+	virtual bool SendUserInputTone(char tone, unsigned duration);
+    virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     
     void CleanUp();
     virtual void OnReleased();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.60 2007/09/27 21:13:10 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.61 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -816,7 +816,7 @@
   {
     if(doesAllowModifications == YES &&
        [callManager sipRegistrationFailReasonCount] > 0 &&
-       [callManager isCompletelyRegistered] == NO)
+       [callManager isCompletelySIPRegistered] == NO)
     {
       return YES;
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.h,v 1.4 2006/11/13 20:36:40 hfriederich Exp $
+ * $Id: XMPacketReassemblers.h,v 1.5 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,9 +20,9 @@ class XMRTPPacketReassembler : public PObject
 {
 	PCLASSINFO(XMRTPPacketReassembler, PObject);
 	
-	virtual BOOL IsFirstPacketOfFrame(XMRTPPacket *packet) = 0;
-	virtual BOOL CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength) = 0;
-	virtual BOOL CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength) = 0;
+	virtual bool IsFirstPacketOfFrame(XMRTPPacket *packet) = 0;
+	virtual bool CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength) = 0;
+	virtual bool CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength) = 0;
 };
 
 /**
@@ -32,9 +32,9 @@ class XMH261RTPPacketReassembler : public XMRTPPacketReassembler
 {
 	PCLASSINFO(XMH261RTPPacketReassembler, XMRTPPacketReassembler);
 	
-	virtual BOOL IsFirstPacketOfFrame(XMRTPPacket *packet);
-	virtual BOOL CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
-	virtual BOOL CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool IsFirstPacketOfFrame(XMRTPPacket *packet);
+	virtual bool CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
 };
 
 /**
@@ -44,9 +44,9 @@ class XMH263RTPPacketReassembler : public XMRTPPacketReassembler
 {
 	PCLASSINFO(XMH263RTPPacketReassembler, XMRTPPacketReassembler);
 	
-	virtual BOOL IsFirstPacketOfFrame(XMRTPPacket *packet);
-	virtual BOOL CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
-	virtual BOOL CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool IsFirstPacketOfFrame(XMRTPPacket *packet);
+	virtual bool CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
 };
 
 /**
@@ -56,9 +56,9 @@ class XMH263PlusRTPPacketReassembler : public XMRTPPacketReassembler
 {
 	PCLASSINFO(XMH263PlusRTPPacketReassembler, XMRTPPacketReassembler);
 	
-	virtual BOOL IsFirstPacketOfFrame(XMRTPPacket *packet);
-	virtual BOOL CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
-	virtual BOOL CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool IsFirstPacketOfFrame(XMRTPPacket *packet);
+	virtual bool CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
 };
 
 /**
@@ -68,9 +68,9 @@ class XMH264RTPPacketReassembler : public XMRTPPacketReassembler
 {
 	PCLASSINFO(XMH264RTPPacketReassembler, XMRTPPacketReassembler);
 	
-	virtual BOOL IsFirstPacketOfFrame(XMRTPPacket *packet);
-	virtual BOOL CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
-	virtual BOOL CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool IsFirstPacketOfFrame(XMRTPPacket *packet);
+	virtual bool CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
+	virtual bool CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength);
 };
 
 // 0: cannot determine

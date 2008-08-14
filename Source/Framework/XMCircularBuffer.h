@@ -1,5 +1,5 @@
 /*
- * $Id: XMCircularBuffer.h,v 1.5 2007/03/13 01:15:49 hfriederich Exp $
+ * $Id: XMCircularBuffer.h,v 1.6 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,8 @@
 
 #ifndef __XM_CIRCULAR_BUFFER_H__
 #define __XM_CIRCULAR_BUFFER_H__
+
+#include <ptlib.h>
 
 /**
  * Simple circular buffer for one producer and consumer with a head and a 
@@ -49,8 +51,8 @@ public:
 	 * written to the buffer. If lock is true, this function blocks
 	 * until all bytes have been written (or the buffer was *stopped*)
      **/
-	PINDEX Fill(const char* inbuf, PINDEX len, BOOL lock = true, 
-				BOOL overwrite = false);
+	PINDEX Fill(const char* inbuf, PINDEX len, bool lock = true, 
+				bool overwrite = false);
 
 
 	/** 
@@ -65,7 +67,7 @@ public:
      * This is to avoid deadlock-like situations if the source thread does not
      * fill the buffer over a longer period.
      **/
-	PINDEX Drain(char* outbuf, PINDEX len, BOOL lock = true, unsigned maxWaitTime = UINT_MAX);
+	PINDEX Drain(char* outbuf, PINDEX len, bool lock = true, unsigned maxWaitTime = UINT_MAX);
 	
 	/**
 	 * *Starts* / *Stops* the buffer as desired
@@ -76,12 +78,12 @@ public:
     /**
      * Returns if the buffer is currently full
      **/
-    BOOL Full();
+    bool Full();
     
     /**
      * Returns if the buffer is currently empty
      **/
-    BOOL Empty();
+    bool Empty();
     
     /**
      * Returns the number of bytes currently in the buffer
@@ -94,8 +96,8 @@ public:
     void SetDataRate(unsigned _dataRate) { dataRate = _dataRate; }
 
  private:
-    inline BOOL full() const;
-    inline BOOL empty() const;
+    inline bool full() const;
+    inline bool empty() const;
     inline PINDEX size() const;
     inline PINDEX free() const;
     
@@ -113,9 +115,9 @@ public:
     const PINDEX capacity;
     volatile PINDEX head;
     volatile PINDEX tail;
-    BOOL running;
-    BOOL error;
-    BOOL selfFilling;
+    bool running;
+    bool error;
+    bool selfFilling;
     unsigned selfFillingBytesRead;
     struct timeval selfFillingStartTime;
     

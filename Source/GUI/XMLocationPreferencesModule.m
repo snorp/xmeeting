@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.34 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.35 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -183,7 +183,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [actionButton sendActionOn:NSLeftMouseDownMask];
   [actionPopup selectItem: nil];
   
-  [externalAddressField setFormatter:[[[XMIPAddressFormatter alloc] init] autorelease]];
+  [publicAddressField setFormatter:[[[XMIPAddressFormatter alloc] init] autorelease]];
   [internationalDialingPrefixField setFormatter:[[[XMIDDPrefixFormatter alloc] init] autorelease]];
   
 }
@@ -838,7 +838,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   unsigned bandwidth = [currentLocation bandwidthLimit];
   [self _setTag:bandwidth forPopUp:bandwidthLimitPopUp];
   
-  obj = [currentLocation externalAddress];
+  obj = [currentLocation publicAddress];
   if(obj == nil)	// this means that the external address is automatically picked
   {
     state = NSOnState;
@@ -848,16 +848,16 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   {
     if ([obj isEqual:@""]) {
       state = NSMixedState;
-      [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")];
+      [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")];
     } else {
       state = NSOffState;
       if (obj == null) {
-        [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")];
+        [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")];
         obj = @"";
       }
     }
   }
-  [externalAddressField setStringValue:(NSString *)obj];
+  [publicAddressField setStringValue:(NSString *)obj];
   if (state == NSMixedState) {
     [autoGetExternalAddressSwitch setAllowsMixedState:YES];
   } else {
@@ -1003,7 +1003,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // saving the network section
   [currentLocation setBandwidthLimit:[self _extractTagFromPopUp:bandwidthLimitPopUp]];
   
-  obj = [externalAddressField stringValue];
+  obj = [publicAddressField stringValue];
   state = [autoGetExternalAddressSwitch state];
   if (state == NSMixedState) {
     obj = [NSNull null];
@@ -1292,29 +1292,29 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)_validateExternalAddressUserInterface
 {
   unsigned state = [autoGetExternalAddressSwitch state];
-  [externalAddressField setEnabled:(state == NSOffState ? YES : NO)];
+  [publicAddressField setEnabled:(state == NSOffState ? YES : NO)];
 		
   if(state == NSOnState)
   {
     XMUtils *utils = [XMUtils sharedInstance];
-    NSString *externalAddress = [utils externalAddress];
+    NSString *publicAddress = [utils publicAddress];
     NSString *displayString;
     
-    if(externalAddress == nil)
+    if(publicAddress == nil)
     {
-      [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"")];
+      [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"")];
       displayString = @"";
     }
     else
     {
-      displayString = externalAddress;
+      displayString = publicAddress;
     }
-    [externalAddressField setStringValue:displayString];
+    [publicAddressField setStringValue:displayString];
   }
   else if (state == NSOffState)
   {
     if (![currentLocation isKindOfClass:[XMMultipleLocationsWrapper class]]) {
-      [(NSTextFieldCell *)[externalAddressField cell] setPlaceholderString:@""];
+      [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:@""];
     }
   }
 }
@@ -1879,7 +1879,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 // String: If all locations have same manual external address
 // NSNull: If locations have different external addresses
 // @""   : If locations have different external addresses AND at least one location has nil external address
-- (NSString *)externalAddress
+- (NSString *)publicAddress
 {
   return (NSString *)[self _valueForKey:XMKey_PreferencesExternalAddress checkNil:YES nilObject:@""];
 }

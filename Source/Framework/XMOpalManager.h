@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.39 2007/10/03 07:22:42 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.40 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,7 +69,7 @@ public:
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
 	virtual void OnReleased(OpalConnection & connection);
-	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, BOOL requiresPatchThread = TRUE);
+	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, bool requiresPatchThread = true);
     
     void OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
     void OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
@@ -85,7 +85,7 @@ public:
     /* NAT methods */
 	void SetNATInformation(const PStringArray & stunServers,
 						   const PString & translationAddress,
-                           BOOL networkStatusChanged);
+                           bool networkStatusChanged);
 	
 	/* Audio setup methods */
 	void SetAudioPacketTime(unsigned audioPacketTime);
@@ -93,16 +93,16 @@ public:
 	unsigned GetCurrentAudioPacketTime();
     
     /* H.264 methods */
-    BOOL GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
-    void SetEnableH264LimitedMode(BOOL _enable) { enableH264LimitedMode = _enable; }
+    bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
+    void SetEnableH264LimitedMode(bool _enable) { enableH264LimitedMode = _enable; }
 	
 	/* getting /setting information about current call */
 	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
 	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier) const;
-	BOOL IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const;
+	bool IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const;
 	
 	/* User input mode information */
-	BOOL SetUserInputMode(XMUserInputMode userInputMode);
+	bool SetUserInputMode(XMUserInputMode userInputMode);
 	
 	/* Debug log information */
 	static void LogMessage(const PString & message);
@@ -115,8 +115,8 @@ public:
 private:
       
     void HandleSTUNInformation(PSTUNClient::NatTypes natType,
-                               const PString & externalAddress);
-    BOOL HasNetworkInterfaces() const;
+                               const PString & publicAddress);
+    bool HasNetworkInterfaces() const;
     
     PStringArray stunServers;
     
@@ -125,7 +125,7 @@ private:
 	unsigned defaultAudioPacketTime;
 	unsigned currentAudioPacketTime;
     
-    BOOL enableH264LimitedMode;
+    bool enableH264LimitedMode;
 	
     PMutex callInformationMutex;
 	PString connectionToken;

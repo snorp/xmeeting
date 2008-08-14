@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.h,v 1.8 2007/03/13 01:15:49 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.9 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,19 +50,19 @@ public:
 	 * Static Methods for changing devices / mute
 	 **/
 	static void SetPlayDevice(unsigned int deviceID);
-	static void SetPlayDeviceMuted(BOOL muteFlag);
+	static void SetPlayDeviceMuted(bool muteFlag);
 	static void SetRecordDevice(unsigned int deviceID);
-	static void SetRecordDeviceMuted(BOOL muteFlag);
+	static void SetRecordDeviceMuted(bool muteFlag);
 	
 	/**
 	 * Signal level metering
 	 **/
-	static void SetMeasureSignalLevels(BOOL flag);
+	static void SetMeasureSignalLevels(bool flag);
 	
 	/**
 	 * Audio Recording
 	 **/
-	static void SetRecordAudio(BOOL flag);
+	static void SetRecordAudio(bool flag);
 	
 	/**
 	 * Instructs both play and record channel to immediately stop playing.
@@ -97,35 +97,35 @@ public:
 	 * Please note that the device does not work properly
 	 * until SetBuffers() is also called after Open()
 	 **/
-	virtual BOOL Open(const PString & device,
+	virtual bool Open(const PString & device,
 					  PSoundChannel::Directions direction,
 					  unsigned numChannels = 1,
 					  unsigned sampleRate = 8000,
 					  unsigned bitsPerSample = 16);
-	virtual BOOL IsOpen() const;
+	virtual bool IsOpen() const;
 	
 	// Accessing the attributes
 	virtual unsigned GetChannels() const;
 	virtual unsigned GetSampleRate() const;
 	virtual unsigned GetSampleSize() const;
-	virtual BOOL SetFormat(unsigned numChannels = 1,
+	virtual bool SetFormat(unsigned numChannels = 1,
 						   unsigned sampleRate = 8000,
 						   unsigned bitsPerSample = 16);
 	
 	
-	virtual BOOL GetBuffers(PINDEX & size,
+	virtual bool GetBuffers(PINDEX & size,
 							PINDEX & count);
-	virtual BOOL SetBuffers(PINDEX size,
+	virtual bool SetBuffers(PINDEX size,
 							PINDEX count = 2);
 	
 	// Performing I/O
-	virtual BOOL Read(void *buffer, PINDEX length);
+	virtual bool Read(void *buffer, PINDEX length);
 	virtual PINDEX GetLastReadCount() const;
-	virtual BOOL Write(const void *buffer, PINDEX length);
+	virtual bool Write(const void *buffer, PINDEX length);
 	
-	virtual BOOL StartRecording();
-	virtual BOOL IsRecordBufferFull();
-	virtual BOOL AreAllRecordBuffersFull();
+	virtual bool StartRecording();
+	virtual bool IsRecordBufferFull();
+	virtual bool AreAllRecordBuffersFull();
 
 #pragma mark -
 #pragma mark Unimplemented Methods
@@ -133,17 +133,17 @@ public:
 	/**
 	 * Uninplemented PSoundChannel methods
 	 **/
-	virtual BOOL Abort();
-	virtual BOOL GetVolume(unsigned & volume);
-	virtual BOOL SetVolume(unsigned volume);
-	virtual BOOL PlaySound(const PSound & sound, BOOL wait);
-	virtual BOOL PlayFile(const PFilePath & file, BOOL wait);
-	virtual BOOL HasPlayCompleted();
-	virtual BOOL WaitForPlayCompletion();
-	virtual BOOL RecordSound(PSound & sound);
-	virtual BOOL RecordFile(const PFilePath & file);
-	virtual BOOL WaitForRecordBufferFull();
-	virtual BOOL WaitForAllRecordBuffersFull();
+	virtual bool Abort();
+	virtual bool GetVolume(unsigned & volume);
+	virtual bool SetVolume(unsigned volume);
+	virtual bool PlaySound(const PSound & sound, bool wait);
+	virtual bool PlayFile(const PFilePath & file, bool wait);
+	virtual bool HasPlayCompleted();
+	virtual bool WaitForPlayCompletion();
+	virtual bool RecordSound(PSound & sound);
+	virtual bool RecordFile(const PFilePath & file);
+	virtual bool WaitForRecordBufferFull();
+	virtual bool WaitForAllRecordBuffersFull();
 	
 private:
 
@@ -151,15 +151,15 @@ private:
 #pragma mark Private Methods
 	
 	void CommonConstruct();
-	BOOL OpenDevice(AudioDeviceID deviceID,
+	bool OpenDevice(AudioDeviceID deviceID,
 					unsigned numChannels = 1,
 					unsigned sampleRate = 8000,
 					unsigned bitsPerSample = 16);
 	void CloseDevice();
-	void SetDeviceMuted(BOOL muteFlag);
+	void SetDeviceMuted(bool muteFlag);
 	void Start();
 	void Stop();
-	void Restart(AudioDeviceID deviceID, BOOL startIfNeeded = TRUE);
+	void Restart(AudioDeviceID deviceID, bool startIfNeeded = true);
 	OSStatus StartAudioConversion();
 	OSStatus StopAudioConversion();
 	OSStatus SetupInputUnit();
@@ -206,11 +206,11 @@ private:
 	
 	// Instance variables
     PMutex editMutex;
-    BOOL isInputProxy;
+    bool isInputProxy;
     
 	Directions direction;
 	State state;
-	BOOL isMuted;
+	bool isMuted;
 	AudioUnit mAudioUnit;
 	AudioDeviceID mDeviceID;
 	AudioStreamBasicDescription hwASBD, pwlibASBD;

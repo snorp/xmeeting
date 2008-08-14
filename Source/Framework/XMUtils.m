@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.27 2008/08/09 12:32:09 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.28 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,7 +27,6 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 - (void)_cleanupCheckipFetching;
 - (void)_getLocalAddresses;
 - (void)_gotInformation;
-- (BOOL)_hasLocalAddress:(NSString *)localAddress;
 
 @end
 
@@ -131,7 +130,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   return networkInterfaces;
 }
 
-- (BOOL)_hasLocalAddress:(NSString *)address {
+- (BOOL)isLocalAddress:(NSString *)address {
   unsigned count = [networkInterfaces count];
   for (unsigned i = 0; i < count; i++) {
     XMNetworkInterface *interface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:i];
@@ -159,7 +158,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   if (natType == XMNATType_Error) {
     if (checkipPublicAddress == nil) {
       return XMNATType_Error;
-    } else if ([self _hasLocalAddress:checkipPublicAddress]) {
+    } else if ([self isLocalAddress:checkipPublicAddress]) {
       return XMNATType_NoNAT;
     }
     return XMNATType_UnknownNAT;
@@ -261,7 +260,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
     unsigned j;
     for (j = 0; j < addressCount; j++) {
       NSString *address = [interfaceAddresses objectAtIndex:j];
-      XMNetworkInterface *interface = [[XMNetworkInterface alloc] initWithIPAddress:address interface:interfaceName];
+      XMNetworkInterface *interface = [[XMNetworkInterface alloc] initWithIPAddress:address name:interfaceName];
       [interfaces addObject:interface];
     }
     
@@ -416,10 +415,10 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   return nil;
 }
 
-- (id)initWithIPAddress:(NSString *)theIPAddress interface:(NSString *)theInterface
+- (id)initWithIPAddress:(NSString *)theIPAddress name:(NSString *)interfaceName
 {
   ipAddress = [theIPAddress copy];
-  interface = [theInterface copy];
+  name = [interfaceName copy];
   return self;
 }
 
@@ -428,16 +427,16 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   return ipAddress;
 }
 
-- (NSString *)interface
+- (NSString *)name
 {
-  return interface;
+  return name;
 }
 
 - (BOOL)isEqual:(NSObject *)obj
 {
   if ([obj isKindOfClass:[XMNetworkInterface class]]) {
     XMNetworkInterface *networkInterface = (XMNetworkInterface *)obj;
-    return ([ipAddress isEqualToString:[networkInterface ipAddress]] && [interface isEqualToString:[networkInterface interface]]);
+    return ([ipAddress isEqualToString:[networkInterface ipAddress]] && [name isEqualToString:[networkInterface name]]);
   }
   return NO;
 }

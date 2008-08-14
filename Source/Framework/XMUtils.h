@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.26 2008/08/09 12:32:09 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.27 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,11 @@
 - (NSArray *)networkInterfaces;
 
 /**
+ * Returns whether the given IP address is a local address.
+ **/
+- (BOOL)isLocalAddress:(NSString *)address;
+
+/**
  * Returns the type of NAT detected.
  * The value returned may depend on the STUN settings of the currently
  * active preferences set in XMCallManager.
@@ -73,12 +78,12 @@
   
 @private
   NSString *ipAddress;
-  NSString *interface;
+  NSString *name;
 }
 
-- (id)initWithIPAddress:(NSString *)ipAddress interface:(NSString *)interface;
+- (id)initWithIPAddress:(NSString *)ipAddress name:(NSString *)name;
 - (NSString *)ipAddress;
-- (NSString *)interface;
+- (NSString *)name;
 
 @end
 

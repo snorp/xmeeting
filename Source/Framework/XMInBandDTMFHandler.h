@@ -1,5 +1,5 @@
 /*
- * $Id: XMInBandDTMFHandler.h,v 1.2 2006/11/12 11:11:59 hfriederich Exp $
+ * $Id: XMInBandDTMFHandler.h,v 1.3 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,7 +21,7 @@ public:
 	
 	XMInBandDTMFHandler();
 	
-	BOOL SendTone(char tone, unsigned duration);
+	bool SendTone(char tone, unsigned duration);
 	
 	const PNotifier & GetTransmitHandler() const;
 	

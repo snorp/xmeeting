@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.13 2007/05/09 14:58:21 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.14 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,12 +20,13 @@ static XMMediaStream *videoTransmitterStream = NULL;
 
 XMMediaStream::XMMediaStream(XMConnection & conn,
                              const OpalMediaFormat & mediaFormat,
-                             BOOL isSource)
-: OpalMediaStream(conn, mediaFormat, isSource),
+                             unsigned sessionID,
+                             bool isSource)
+: OpalMediaStream(conn, mediaFormat, sessionID, isSource),
   dataFrame((isSource ? 3000 : 0))
 {
-    hasStarted = FALSE;
-    isTerminated = FALSE;
+    hasStarted = false;
+    isTerminated = false;
 }
 
 XMMediaStream::~XMMediaStream()
@@ -36,11 +37,11 @@ void XMMediaStream::OnPatchStart()
 {
     if (IsSource()) {
         
-        PWaitAndSignal m(patchMutex);
+        //PWaitAndSignal m(patchMutex);
         
         // Ensure the code below runs just once.
         // Also avoid possible race conditions
-        if(hasStarted == TRUE || isTerminated == TRUE) {
+        if(hasStarted == true || isTerminated == true) {
             return;
         }
         
@@ -100,7 +101,7 @@ void XMMediaStream::OnPatchStart()
         }
         
         videoTransmitterStream = this;
-        hasStarted = TRUE;
+        hasStarted = true;
         
         dataFrame.SetPayloadSize(0);
         dataFrame.SetPayloadType(payloadType);
@@ -110,20 +111,20 @@ void XMMediaStream::OnPatchStart()
     }
 }
 
-BOOL XMMediaStream::Close()
+bool XMMediaStream::Close()
 {	
     if (IsSource())
     {
-        patchMutex.Wait();
-        if (hasStarted == TRUE) {
+        //patchMutex.Wait();
+        if (hasStarted == true) {
             _XMStopMediaTransmit(2);
         } else {
-            isTerminated = TRUE;
+            isTerminated = true;
         }
-        patchMutex.Signal();
+        //patchMutex.Signal();
         
         // Wait until the video system terminated
-        while(isTerminated == FALSE) {
+        while(isTerminated == false) {
             PThread::Sleep(10);
         }
     }
@@ -131,14 +132,14 @@ BOOL XMMediaStream::Close()
     return OpalMediaStream::Close();
 }
 
-BOOL XMMediaStream::ReadPacket(RTP_DataFrame & packet)
+bool XMMediaStream::ReadPacket(RTP_DataFrame & packet)
 {	
-	return FALSE;
+	return false;
 }
 
-BOOL XMMediaStream::WritePacket(RTP_DataFrame & packet)
+bool XMMediaStream::WritePacket(RTP_DataFrame & packet)
 {
-	return FALSE;
+	return false;
 }
 
 void XMMediaStream::SetTimeStamp(unsigned mediaID, unsigned timeStamp)
@@ -170,7 +171,7 @@ void XMMediaStream::AppendData(unsigned mediaID, void *data, unsigned length)
     dataFrame.SetPayloadSize(dataSize);
 }
 
-void XMMediaStream::SendPacket(unsigned mediaID, BOOL setMarker)
+void XMMediaStream::SendPacket(unsigned mediaID, bool setMarker)
 {
     if (videoTransmitterStream == NULL) {
         return;
@@ -191,18 +192,18 @@ void XMMediaStream::HandleDidStopTransmitting(unsigned mediaID)
         return;
     }
     
-    videoTransmitterStream->isTerminated = TRUE;
+    videoTransmitterStream->isTerminated = true;
     videoTransmitterStream = NULL;
 }
 
-BOOL XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
-                                   BOOL isEndOfChain)
+bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
+                                   bool isEndOfChain)
 {
-    if(isEndOfChain == TRUE) {
+    if(isEndOfChain == true) {
         if(PIsDescendant(&command, OpalVideoUpdatePicture)) {
             _XMUpdatePicture();
         }
-        return TRUE;
+        return true;
     }
-    return OpalMediaStream::ExecuteCommand(command, isEndOfChain);
+    return OpalMediaStream::ExecuteCommand(command/*, isEndOfChain*/);
 }

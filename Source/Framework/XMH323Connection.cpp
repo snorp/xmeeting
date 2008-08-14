@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.31 2007/08/05 13:14:36 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.32 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -67,18 +67,18 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
 {
 	// overridden to achieve better capability select behaviour for the video capabilities
 	
-	if(mediaType != OpalDefaultVideoMediaType)
+	/*if(mediaType != OpalDefaultVideoMediaType)
 	{
         // Use default capability selection
 		H323Connection::SelectDefaultLogicalChannel(mediaType);
 		return;
-	}
+	}*/
 	
-	if(FindChannel(mediaType, FALSE))
+	/*if(FindChannel(mediaType, false))
 	{
         // There exists already a channel for this media type
 		return;
-	}
+	}*/
     
     // Go through the list of local capabilities and search for matching remote capabilities.
     // Among these, pick the one that is ranked highest according to the CompareTo() implementation
@@ -111,7 +111,8 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
             }
         
             // Try to open a channel for the capability. If successful, we're done
-            unsigned sessionID = GetRTPSessionIDForMediaType(mediaType);
+            //unsigned sessionID = GetRTPSessionIDForMediaType(mediaType);
+            unsigned sessionID = 0;
             if(chosenCapability != NULL && OpenLogicalChannel(*chosenCapability, sessionID, H323Channel::IsTransmitter))
             {
                 break;
@@ -120,14 +121,14 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
 	}
 }
 
-BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
+bool XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 										  unsigned sessionID,
 										  H323Channel::Directions dir)
 {
     // Override default behaviour to add additional checks if the format is valid for
     // sending. Both the capability and the manager have to agree that it is possible
     // to send the media format described in the capability.
-	BOOL isValidCapability = TRUE;
+	bool isValidCapability = true;
 	if(PIsDescendant(&capability, XMH323VideoCapability))
 	{
 		XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
@@ -138,9 +139,9 @@ BOOL XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 		}
 	}
 	
-	if(isValidCapability == FALSE)
+	if(isValidCapability == false)
 	{
-		return FALSE;
+		return false;
 	}
 	
 	return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
@@ -151,45 +152,47 @@ H323_RTPChannel * XMH323Connection::CreateRTPChannel(const H323Capability & capa
                                                      RTP_Session & rtp,
                                                      unsigned sessionID)
 {
-    if(capability.GetMediaFormat().GetMediaType() != OpalDefaultVideoMediaType)
-    {
-        return H323Connection::CreateRTPChannel(capability, dir, rtp, sessionID);
-    }
+    //if(capability.GetMediaFormat().GetMediaType() != OpalDefaultVideoMediaType)
+    //{
+        //return H323Connection::CreateRTPChannel(capability, dir, rtp, sessionID);
+    //}
     
-    XMH323Channel * channel = new XMH323Channel(*this, capability, dir, rtp, sessionID);
-    return channel;
+    //XMH323Channel *channel = new XMH323Channel(*this, capability, dir, rtp, sessionID);
+    //return channel;
+  return NULL;
 }
 
-BOOL XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
+bool XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
 {
-    // Called if the remote party requests to close the channel.
-    // In contrast to the default Opal implementation, we actually
-    // DO close the channel. Don't know if this is a bug in Opal or not.
-	RemoveMediaStream(channel.GetMediaStream());
-	channel.Close();
-	return TRUE;
+  // Called if the remote party requests to close the channel.
+  // In contrast to the default Opal implementation, we actually
+  // DO close the channel. Don't know if this is a bug in Opal or not.
+  //RemoveMediaStream(channel.GetMediaStream());
+  //channel.Close();
+  return H323Connection::OnClosingLogicalChannel(channel);
+  //return true;
 }
 
-BOOL XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
+bool XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
 	if(!H323Connection::OnOpenMediaStream(mediaStream))
 	{
-		return FALSE;
+		return false;
 	}
     
     XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	
-	return TRUE;
+	return true;
 }
 
-BOOL XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
+bool XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
 	bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
     GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
-	return TRUE;
+	return true;
 }
 
-BOOL XMH323Connection::SendUserInputTone(char tone, unsigned duration)
+bool XMH323Connection::SendUserInputTone(char tone, unsigned duration)
 {
     // Separate RFC2833 is not implemented. Therefore it is used within
     // XMeeting to signal in-band DTMF
@@ -197,25 +200,25 @@ BOOL XMH323Connection::SendUserInputTone(char tone, unsigned duration)
 	   inBandDTMFHandler != NULL)
 	{
 		inBandDTMFHandler->SendTone(tone, duration);
-		return TRUE;
+		return true;
 	}
 	
 	return H323Connection::SendUserInputTone(tone, duration);
 }
 
-void XMH323Connection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+void XMH323Connection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 {
 	H323Connection::OnPatchMediaStream(isSource, patch);
 	
     // Add the in-band DTMF handler if this is an audio sending stream
-	if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
+	/*if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
 	{
 		if(inBandDTMFHandler == NULL)
 		{
 			inBandDTMFHandler = new XMInBandDTMFHandler();
 		}
 		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
-	}	
+	}	*/
 }
 
 void XMH323Connection::SetRemotePartyInfo(const H323SignalPDU & pdu)

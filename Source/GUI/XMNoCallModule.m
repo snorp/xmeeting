@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.51 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.52 2008/08/14 19:57:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -135,7 +135,7 @@
   contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
   
   XMCallProtocol initialCallProtocol = (XMCallProtocol)[[NSUserDefaults standardUserDefaults] integerForKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
-  if(initialCallProtocol == XMCallProtocol_UnknownProtocol)
+  if (initialCallProtocol == XMCallProtocol_UnknownProtocol)
   {
     initialCallProtocol = XMCallProtocol_H323;
   }
@@ -143,7 +143,7 @@
   [self _preferencesDidChange:nil];
   
   // determining in which state we currently are
-  if([[XMCallManager sharedInstance] doesAllowModifications])
+  if ([[XMCallManager sharedInstance] doesAllowModifications])
   {
     [self _didEndSubsystemSetup:nil];
   }
@@ -154,7 +154,7 @@
   
   BOOL showSelfView = [[NSUserDefaults standardUserDefaults] boolForKey:XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY];
   
-  if(showSelfView)
+  if (showSelfView)
   {
     [self performSelector:@selector(toggleShowSelfView:) withObject:nil afterDelay:0.0];
   }
@@ -170,8 +170,7 @@
 
 - (NSView *)contentView
 {
-  if(contentView == nil)
-  {
+  if (contentView == nil) {
     [NSBundle loadNibNamed:@"NoCallModule" owner:self];
   }
   return contentView;
@@ -182,8 +181,7 @@
   // if not already done, this triggers the loading of the nib file
   [self contentView];
   
-  if(doesShowSelfView == YES)
-  {
+  if (doesShowSelfView == YES) {
     return contentViewSizeWithSelfViewShown;
   }
   return contentViewSizeWithSelfViewHidden;
@@ -194,8 +192,7 @@
   // if not already done, this triggers the loading of the nib file
   [self contentView];
   
-  if(doesShowSelfView == YES)
-  {
+  if (doesShowSelfView == YES) {
     return contentViewMinSizeWithSelfViewShown;
   }
   return contentViewSizeWithSelfViewHidden;
@@ -206,8 +203,7 @@
   // if not already done, this triggers the loading of the nib file
   [self contentView];
   
-  if(doesShowSelfView == YES)
-  {
+  if (doesShowSelfView == YES) {
     return NSMakeSize(5000, 5000);
   }
   return contentViewSizeWithSelfViewHidden;
@@ -215,8 +211,7 @@
 
 - (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight
 {
-  if(doesShowSelfView == NO)
-  {
+  if (doesShowSelfView == NO) {
     return resizeDifference;
   }
   
@@ -233,21 +228,15 @@
   int calculatedWidthFromHeight = (int)XMGetVideoWidthForHeight(newHeight, XMVideoSize_CIF);
   int calculatedHeightFromWidth = (int)XMGetVideoHeightForWidth(availableWidth, XMVideoSize_CIF);
   
-  if(calculatedHeightFromWidth <= minimumVideoHeight)
-  {
+  if (calculatedHeightFromWidth <= minimumVideoHeight) {
     // set the height to the minimum height
     resizeDifference.height = minimumVideoHeight - currentVideoHeight;
-  }
-  else
-  {
-    if(calculatedWidthFromHeight < availableWidth)
-    {
+  } else {
+    if (calculatedWidthFromHeight < availableWidth) {
       // the height value takes precedence
       int widthDifference = availableWidth - calculatedWidthFromHeight;
       resizeDifference.width -= widthDifference;
-    }
-    else
-    {
+    } else {
       // the width value takes precedence
       int heightDifference = newHeight - calculatedHeightFromWidth;
       resizeDifference.height -= heightDifference;
@@ -264,8 +253,7 @@
 
 - (void)becomeInactiveModule
 {
-  if(doesShowSelfView == YES)
-  {
+  if (doesShowSelfView == YES) {
     contentViewSizeWithSelfViewShown = [contentView bounds].size;
   }
 }
@@ -283,8 +271,7 @@
 
 - (IBAction)toggleShowSelfView:(id)sender
 {
-  if(doesShowSelfView == NO)
-  {
+  if (doesShowSelfView == NO) {
     doesShowSelfView = YES;
     [[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
     
@@ -292,9 +279,7 @@
     [selfView display];
     
     [self _setupVideoDisplay];
-  }
-  else
-  {
+  } else {
     [selfView stopDisplayingLocalVideo];
     [selfView stopDisplayingNoVideo];
     [selfView setDrawsBorder:NO];
@@ -325,8 +310,7 @@
 
 - (IBAction)call:(id)sender
 {
-  if(isCalling == YES)
-  {
+  if (isCalling == YES) {
     // we are calling someone but the call has not yet been established
     // therefore, we simply hang up the call again
     [[XMCallManager sharedInstance] clearActiveCall];
@@ -339,8 +323,7 @@
   
   [callAddressField endEditing];
   id<XMCallAddress> callAddress = (id<XMCallAddress>)[callAddressField representedObject];
-  if(callAddress == nil)
-  {
+  if (callAddress == nil) {
     NSLog(@"ERROR: NO REPRESENTED OBJECT!");
     return;
   }
@@ -368,14 +351,11 @@
   // if the user either enters h323: or sip:, we set the
   // call protocol accordingly and remove the prefix from
   // the address
-  if([uncompletedString hasPrefixCaseInsensitive:@"h323:"])
-  {
+  if ([uncompletedString hasPrefixCaseInsensitive:@"h323:"]) {
     [self _setCallProtocol:XMCallProtocol_H323];
     [databaseField setStringValue:[uncompletedString substringFromIndex:5]];
     return [NSArray array];
-  }
-  else if([uncompletedString hasPrefixCaseInsensitive:@"sip:"])
-  {
+  } else if ([uncompletedString hasPrefixCaseInsensitive:@"sip:"]) {
     [self _setCallProtocol:XMCallProtocol_SIP];
     [databaseField setStringValue:[uncompletedString substringFromIndex:4]];
     return [NSArray array];
@@ -384,24 +364,19 @@
   NSArray *originalMatchedAddresses;
   unsigned newUncompletedStringLength = [uncompletedString length];
   
-  if(newUncompletedStringLength <= uncompletedStringLength)
-  {
+  if (newUncompletedStringLength <= uncompletedStringLength) {
     // there may be more valid records than up to now, therefore
     // throwing the cache away.
-    if(matchedAddresses != nil)
-    {
+    if (matchedAddresses != nil) {
       [matchedAddresses release];
       matchedAddresses = nil;
     }
   }
   
-  if(matchedAddresses == nil)
-  {
+  if (matchedAddresses == nil) {
     // do a fresh search on the database
     originalMatchedAddresses = [[callAddressManager addressesMatchingString:uncompletedString] retain];
-  }
-  else
-  {
+  } else {
     originalMatchedAddresses = matchedAddresses;
   }
   
@@ -412,12 +387,10 @@
   // at the correct place.
   unsigned i;
   unsigned count = [originalMatchedAddresses count];
-  for(i = 0; i < count; i++)
-  {
+  for (i = 0; i < count; i++) {
     id<XMCallAddress> callAddress = (id<XMCallAddress>)[originalMatchedAddresses objectAtIndex:i];
     NSString *completion = [callAddressManager completionStringForAddress:callAddress uncompletedString:uncompletedString];
-    if(completion != nil)
-    {
+    if (completion != nil) {
       [matchedAddresses addObject:callAddress];
       [completions addObject:completion];
     }
@@ -432,8 +405,7 @@
 {
   unsigned index = [completions indexOfObject:completedString];
   
-  if(index == NSNotFound)
-  {
+  if (index == NSNotFound) {
     XMSimpleAddressResource *simpleAddressResource = [[[XMSimpleAddressResource alloc] initWithAddress:completedString callProtocol:currentCallProtocol] autorelease];
     return simpleAddressResource;
   }
@@ -456,39 +428,27 @@
 {
   id representedObject = [databaseField representedObject];
   
-  if(representedObject != nil && [representedObject displayImage] != nil)
-  {
-    NSArray *records = [[XMCallAddressManager sharedInstance] alternativesForAddress:(id<XMCallAddress>)representedObject 
-                                                                       selectedIndex:selectedIndex];
+  if (representedObject != nil && [representedObject displayImage] != nil) {
+    NSArray *records = [[XMCallAddressManager sharedInstance] alternativesForAddress:(id<XMCallAddress>)representedObject selectedIndex:selectedIndex];
     
     return records;
-  }
-  else
-  {
+  } else {
     XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
     XMLocation *activeLocation = [preferencesManager activeLocation];
     BOOL enableH323 = [activeLocation enableH323];
     BOOL enableSIP = [activeLocation enableSIP];
     
-    if(enableH323 && enableSIP)
-    {
-      if(currentCallProtocol == XMCallProtocol_H323)
-      {
+    if (enableH323 && enableSIP) {
+      if (currentCallProtocol == XMCallProtocol_H323) {
         *selectedIndex = 0;
-      }
-      else
-      {
+      } else {
         *selectedIndex = 1;
       }
       return [NSArray arrayWithObjects:@"H.323", @"SIP", nil];
-    }
-    else if(enableH323)
-    {
+    } else if (enableH323) {
       *selectedIndex = 0;
       return [NSArray arrayWithObjects:@"H.323", nil];
-    }
-    else if(enableSIP)
-    {
+    } else if (enableSIP) {
       *selectedIndex = 0;
       return [NSArray arrayWithObjects:@"SIP", nil];
     }
@@ -501,18 +461,13 @@
 {
   id representedObject = [databaseField representedObject];
   
-  if(representedObject != nil && [representedObject displayImage] != nil)
-  {
+  if (representedObject != nil && [representedObject displayImage] != nil) {
     id<XMCallAddress> alternative = [[XMCallAddressManager sharedInstance] alternativeForAddress:(id<XMCallAddress>)representedObject 
                                                                                          atIndex:index];
     [databaseField setRepresentedObject:alternative];
-  }
-  else if([imageOption isEqualToString:@"H.323"])
-  {
+  } else if ([imageOption isEqualToString:@"H.323"]) {
     [self _setCallProtocol:XMCallProtocol_H323];
-  }
-  else
-  {
+  } else {
     [self _setCallProtocol:XMCallProtocol_SIP];
   }
 }
@@ -538,12 +493,9 @@
   BOOL enableH323 = [activeLocation enableH323];
   BOOL enableSIP = [activeLocation enableSIP];
   
-  if(enableH323 && !enableSIP)
-  {
+  if (enableH323 && !enableSIP) {
     [self _setCallProtocol:XMCallProtocol_H323];
-  }
-  else if(!enableH323 && enableSIP)
-  {
+  } else if (!enableH323 && enableSIP) {
     [self _setCallProtocol:XMCallProtocol_SIP];
   }
   
@@ -553,8 +505,7 @@
 
 - (void)_didChangeActiveLocation:(NSNotification *)notif
 {
-  if(doesShowSelfView == YES)
-  {
+  if (doesShowSelfView == YES) {
     [self _setupVideoDisplay];
   }
 }
@@ -590,8 +541,7 @@
 {
   XMCallManager *callManager = [XMCallManager sharedInstance];
   
-  if([callManager doesAllowModifications] == NO)
-  {
+  if ([callManager doesAllowModifications] == NO) {
     return;	// will be handled automatically if subsystem setup or call is finished
   }
   
@@ -606,8 +556,7 @@
   // user cannot clear the call
   
   id<XMCallAddress> activeCallAddress = [[XMCallAddressManager sharedInstance] activeCallAddress];
-  if ([activeCallAddress displayImage] == nil)
-  {
+  if ([activeCallAddress displayImage] == nil) {
     [self _setCallProtocol:[[activeCallAddress addressResource] callProtocol]];
   }
   [callAddressField setRepresentedObject:activeCallAddress];
@@ -660,9 +609,8 @@
   XMCallInfo *callInfo = [[XMCallManager sharedInstance] recentCallAtIndex:0];
   XMCallEndReason callEndReason = [callInfo callEndReason];
   NSString *idleString = nil;
-  if(callEndReason != XMCallEndReason_EndedByLocalUser &&
-     callEndReason != XMCallEndReason_EndedByLocalBusy)
-  {
+  if (callEndReason != XMCallEndReason_EndedByLocalUser &&
+     callEndReason != XMCallEndReason_EndedByLocalBusy) {
     idleString = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_NO_CALL_IDLE_WITH_REASON", @""), XMCallEndReasonString(callEndReason)];
   }
   [self _updateStatusInformation:idleString];
@@ -680,8 +628,7 @@
   // we're only interested in the situation when the client gets
   // unregistered from the gatekeeper immediately without being part
   // of a subsystem setup.
-  if([[XMCallManager sharedInstance] doesAllowModifications] == YES)
-  {
+  if ([[XMCallManager sharedInstance] doesAllowModifications] == YES) {
     [self _updateStatusInformation:nil];
   }
 }
@@ -696,13 +643,11 @@
 
 - (void)_clearCallEndReason:(NSTimer *)timer
 {
-  if(timer != callEndReasonTimer)
-  {
+  if (timer != callEndReasonTimer) {
     // should never happen
     return;
   }
-  if([[XMCallManager sharedInstance] doesAllowModifications] == YES)
-  {
+  if ([[XMCallManager sharedInstance] doesAllowModifications] == YES) {
     [self _updateStatusInformation:nil];
   }
   
@@ -711,8 +656,7 @@
 
 - (void)_invalidateCallEndReasonTimer
 {
-  if(callEndReasonTimer != nil)
-  {
+  if (callEndReasonTimer != nil) {
     [callEndReasonTimer invalidate];
     [callEndReasonTimer release];
     callEndReasonTimer = nil;
@@ -726,11 +670,10 @@
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   XMLocation *activeLocation = [preferencesManager activeLocation];
   
-  NSArray *localAddresses = [utils localAddresses];
-  unsigned localAddressCount = [localAddresses count];
+  NSArray *networkInterfaces = [utils networkInterfaces];
+  unsigned interfaceCount = [networkInterfaces count];
   
-  if(localAddressCount == 0)
-  {
+  if (interfaceCount == 0) {
     NSString *statusString = NSLocalizedString(@"XM_NO_CALL_NO_ADDRESS", @"");
     [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
     [semaphoreButton setToolTip:statusString];
@@ -743,24 +686,16 @@
   BOOL enableH323 = [activeLocation enableH323];
   BOOL enableSIP = [activeLocation enableSIP];
   
-  if(!isH323Listening && !isSIPListening)
-  {
+  if (!isH323Listening && !isSIPListening) {
     NSString *statusString = nil;
     
-    if(!enableH323 && !enableSIP)
-    {
+    if (!enableH323 && !enableSIP) {
       statusString = NSLocalizedString(@"XM_NO_CALL_NO_PROTOCOL", @"");
-    }
-    else if(enableH323 && enableSIP)
-    {
+    } else if (enableH323 && enableSIP) {
       statusString = NSLocalizedString(@"XM_NO_CALL_PROTOCOL_FAILURE", @"");
-    }
-    else if(enableH323)
-    {
+    } else if (enableH323) {
       statusString = NSLocalizedString(@"XM_NO_CALL_H323_FAILURE", @"");
-    }
-    else
-    {
+    } else {
       statusString = NSLocalizedString(@"XM_NO_CALL_SIP_FAILURE", @"");
     }
     
@@ -770,8 +705,7 @@
     return;
   }
 		
-  if(statusFieldString == nil)
-  {
+  if (statusFieldString == nil) {
     statusFieldString = NSLocalizedString(@"XM_NO_CALL_IDLE", @"");
   }
   [statusField setStringValue:statusFieldString];
@@ -779,48 +713,33 @@
   NSMutableString *toolTipText = [[NSMutableString alloc] initWithCapacity:100];
   
   BOOL isYellowSemaphore = NO;
-  if(enableH323 == YES)
-  {
-    if(isH323Listening == NO)
-    {
+  if (enableH323 == YES) {
+    if (isH323Listening == NO) {
       isYellowSemaphore = YES;
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_H323_FAILURE", @"")];
-    }
-    else if([activeLocation h323AccountTag] != 0)
-    {
+    } else if ([activeLocation h323AccountTag] != 0) {
       NSString *gatekeeperName = [callManager gatekeeperName];
-      if(gatekeeperName == nil) // using a gatekeeper but failed to register
-      {
+      if (gatekeeperName == nil) { // using a gatekeeper but failed to register
         isYellowSemaphore = YES;
         [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_GK_FAILURE", @"")];
-      }
-      else
-      {
+      } else {
         [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_GK_OK", @"")];
       }
-    }
-    else
-    {
+    } else {
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NO_GK", @"")];
     }
   }
   
-  if(enableSIP == YES)
-  {
-    if(isSIPListening == NO)
-    {
+  if (enableSIP == YES) {
+    if (isSIPListening == NO) {
       isYellowSemaphore = YES;
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_FAILURE", @"")];
-    }
-    else
-    {
+    } else {
       unsigned count = [[activeLocation sipAccountTags] count];
       
-      if (count != 0)
-      {
-        unsigned registrationCount = [callManager registrationCount];
-        if(registrationCount != count)
-        {
+      if (count != 0) {
+        unsigned registrationCount = [callManager sipRegistrationCount];
+        if (registrationCount != count) {
           isYellowSemaphore = YES;
           if (count == 1) {
             [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE", @"")];
@@ -829,66 +748,58 @@
           } else {
             [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE_SOME", @"")];
           }
-        }
-        else
-        {
+        } else {
           if (count == 1) {
             [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_OK", @"")];
           } else {
             [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_OK_MULTIPLE", @"")];
           }
         }
-      }
-      else
-      {
+      } else {
         [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_NO_REG", @"")];
       }
     }
   }
   
-  if(isYellowSemaphore == YES)
-  {
+  if (isYellowSemaphore == YES) {
     [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_yellow"]];
-  }
-  else
-  {
+  } else {
     [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_green"]];
   }
   
   // appending the network addresses to the tool tip
-  NSString *externalAddress = nil;
-  unsigned externalAddressIndex = NSNotFound;
-  externalAddress = [utils externalAddress];
+  NSString *publicAddress = nil;
+  unsigned publicAddressIndex = NSNotFound;
+  publicAddress = [utils publicAddress];
 		
-  if(externalAddress != nil) {
-    externalAddressIndex = [localAddresses indexOfObject:externalAddress];
+  if (publicAddress != nil) {
+    for (unsigned i = 0; i < interfaceCount; i++) {
+      XMNetworkInterface *iface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:i];
+      if ([[iface ipAddress] isEqualToString:publicAddress]) {
+        publicAddressIndex = i;
+        break;
+      }
+    }
   }
   
   [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NETWORK_ADDRESSES", @"")];
   
-  unsigned i;
-  for(i = 0; i < localAddressCount; i++)
-  {
-    NSString *address = (NSString *)[localAddresses objectAtIndex:i];
+  for (unsigned i = 0; i < interfaceCount; i++) {
+    NSString *address = (NSString *)[[networkInterfaces objectAtIndex:i] name];
     [toolTipText appendString:@"\n"];
     [toolTipText appendString:address];
     
-    if(i == externalAddressIndex)
-    {
+    if (i == publicAddressIndex) {
       [toolTipText appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
     }
   }
   
-  if(externalAddressIndex == NSNotFound)
-  {
-    if(externalAddress == nil)
-    {
+  if (publicAddressIndex == NSNotFound) {
+    if (publicAddress == nil) {
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_NO_EXTERNAL_ADDRESS", @"")];
-    }
-    else
-    {
+    } else {
       [toolTipText appendString:@"\n"];
-      [toolTipText appendString:externalAddress];
+      [toolTipText appendString:publicAddress];
       [toolTipText appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
     }
   }
@@ -900,12 +811,9 @@
 
 - (void)_setupVideoDisplay
 {
-  if([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
-  {
+  if ([[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES) {
     [selfView startDisplayingLocalVideo];
-  }
-  else
-  {
+  } else {
     [selfView setNoVideoImage:[NSImage imageNamed:@"no_video_screen"]];
     [selfView startDisplayingNoVideo];
   }
@@ -918,24 +826,18 @@
   }
   currentCallProtocol = callProtocol;
   
-  if(callProtocol == XMCallProtocol_H323)
-  {
+  if (callProtocol == XMCallProtocol_H323) {
     [callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL_H323"]];
-  }
-  else if(callProtocol == XMCallProtocol_SIP)
-  {
+  } else if (callProtocol == XMCallProtocol_SIP) {
     [callAddressField setDefaultImage:[NSImage imageNamed:@"DefaultURL_SIP"]];
   }
   
   id<XMCallAddress> representedObject = (id<XMCallAddress>)[callAddressField representedObject];
   
-  if ([representedObject isKindOfClass:[XMSimpleAddressResource class]])
-  {
+  if ([representedObject isKindOfClass:[XMSimpleAddressResource class]]) {
     XMSimpleAddressResource *resource = (XMSimpleAddressResource *)representedObject;
     [resource setCallProtocol:callProtocol];
-  }
-  else if (representedObject != nil)
-  {
+  } else if (representedObject != nil) {
     XMAddressResource *res = [representedObject addressResource];
     XMSimpleAddressResource *resource = [[XMSimpleAddressResource alloc] initWithAddress:[res address] callProtocol:callProtocol];
     [resource setDisplayString:[representedObject displayString]];

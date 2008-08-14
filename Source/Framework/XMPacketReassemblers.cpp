@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketReassemblers.cpp,v 1.10 2006/11/13 20:36:40 hfriederich Exp $
+ * $Id: XMPacketReassemblers.cpp,v 1.11 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,7 @@
 #include "XMPacketReassemblers.h"
 #include "XMCallbackBridge.h"
 
-BOOL XMH261RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
+bool XMH261RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
 	BYTE *data = packet->GetPayloadPtr();
 	
@@ -20,13 +20,13 @@ BOOL XMH261RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 	
 	if(gobn == 0 && mbap == 0)
 	{
-		return TRUE;
+		return true;
 	}
 	
-	return FALSE;
+	return false;
 }
 
-BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
+bool XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
@@ -48,7 +48,7 @@ BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		{
 			// prevent crashes if packet size too small.
 			// 4 bytes is the length of the H.261 payload header
-			return FALSE;
+			return false;
 		}
 		BYTE sbit = (data[0] >> 5) & 0x07;
 		ebit = (data[0] >> 2) & 0x07;
@@ -89,15 +89,15 @@ BOOL XMH261RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	
 	*outFrameLength = frameLength;
 	
-	return TRUE;
+	return true;
 }
 
-BOOL XMH261RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+bool XMH261RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
 {
-	return FALSE;
+	return false;
 }
 
-BOOL XMH263RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
+bool XMH263RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
 	// The first packet is always Mode A and starts with a picture start code
 	BYTE *data = packet->GetPayloadPtr();
@@ -108,13 +108,13 @@ BOOL XMH263RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 		// The picture start code is byte aligned
 		if(data[4] == 0 && data[5] == 0 && (data[6] & 0xfc) == 0x80)
 		{
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
-BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
+bool XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
@@ -129,7 +129,7 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		
 		if(dataLength <= 4)
 		{
-			return FALSE;
+			return false;
 		}
 		
 		BYTE f = (data[0] >> 7) & 0x01;
@@ -146,7 +146,7 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		{
 			if(dataLength <= 8)
 			{
-				return FALSE;
+				return false;
 			}
 			// Mode B
 			data += 8;
@@ -156,7 +156,7 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		{
 			if(dataLength <= 12)
 			{
-				return FALSE;
+				return false;
 			}
 			// Mode C
 			data += 12;
@@ -179,19 +179,19 @@ BOOL XMH263RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 			frameLength -= 1;
 		}
 		
-	} while(TRUE);
+	} while(true);
 	
 	*outFrameLength = frameLength;
 	
-	return TRUE;
+	return true;
 }
 
-BOOL XMH263RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+bool XMH263RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
 {
-	return FALSE;
+	return false;
 }
 
-BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
+bool XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
 	BYTE *data = packet->GetPayloadPtr();
 	
@@ -204,13 +204,13 @@ BOOL XMH263PlusRTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 	// a picture start code
 	if(p == 1 && (data[2+v+plen] & 0xfc) == 0x80)
 	{
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
+bool XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
 	PINDEX frameLength = 0;
@@ -222,7 +222,7 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 		
 		if(dataLength <= 2)
 		{
-			return FALSE;
+			return false;
 		}
 		
 		// extracting the P, V and PLEN fields
@@ -233,7 +233,7 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 		
 		if(dataLength <= (2+v+plen))
 		{
-			return FALSE;
+			return false;
 		}
 		if(p == 1)
 		{
@@ -273,7 +273,7 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 				
 				if(ufep == 0)
 				{
-					return FALSE;
+					return false;
 				}
 				
 				sourceFormat = (src[3] >> 4) & 0x07;
@@ -283,20 +283,20 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 				   ((src[5] & 0xe3) != 0) ||
 				   ((src[6] & 0x70) != 0x10))
 				{
-					return FALSE;
+					return false;
 				}
 				
 				BYTE pictureTypeCode = (src[5] >> 2) & 0x07;
 				if(pictureTypeCode > 1)
 				{
-					return FALSE;
+					return false;
 				}
 				
 				BYTE cpm = (src[6] >> 3) & 0x01;
 				if(cpm == 1)
 				{
 					//cout << "cannot transform frame since CPM is one" << endl;
-					return FALSE;
+					return false;
 				}
 				
 				BYTE pquant = (src[6] & 0x07) << 2;
@@ -332,15 +332,15 @@ BOOL XMH263PlusRTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *pac
 	} while(packet != NULL);
 	
 	*outFrameLength = frameLength;
-	return TRUE;
+	return true;
 }
 
-BOOL XMH263PlusRTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+bool XMH263PlusRTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
 {
-	return FALSE;
+	return false;
 }
 
-BOOL XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
+bool XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 {
 	// We only know for sure if this is the first packet of a packet group
 	// if the packet type yields and SPS packet.
@@ -349,12 +349,12 @@ BOOL XMH264RTPPacketReassembler::IsFirstPacketOfFrame(XMRTPPacket *packet)
 	
 	if(packetType == 7)
 	{
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
+bool XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *outFrameLength)
 {
 	XMRTPPacket *packet = packetListHead;
 	unsigned frameLength = 0;
@@ -365,7 +365,7 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		WORD dataLength = packet->GetPayloadSize();
 		if(dataLength <= 1)
 		{
-			return FALSE;
+			return false;
 		}
 		BYTE packetType = data[0] & 0x1f;
 		
@@ -432,7 +432,7 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 		{
 			if(dataLength <= 2)
 			{
-				return FALSE;
+				return false;
 			}
 			
 			// reading the NRI field
@@ -493,12 +493,12 @@ BOOL XMH264RTPPacketReassembler::CopyPacketsIntoFrameBuffer(XMRTPPacket *packetL
 	
 	*outFrameLength = frameLength;
 	
-	return TRUE;
+	return true;
 }
 
-BOOL XMH264RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
+bool XMH264RTPPacketReassembler::CopyIncompletePacketsIntoFrameBuffer(XMRTPPacket *packetListHead, BYTE *frameBuffer, PINDEX *frameLength)
 {
-	return FALSE;
+	return false;
 }
 
 int _XMDetermineH263PacketizationScheme(const BYTE *data, PINDEX length)

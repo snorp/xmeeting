@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.24 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.25 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -101,7 +101,7 @@
   
   unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
   
-  if(detailStatus & XM_SHOW_H323_DETAILS) {
+  if (detailStatus & XM_SHOW_H323_DETAILS) {
     showH323Details = YES;
     [h323Disclosure setState:NSOnState];
   } else {
@@ -109,7 +109,7 @@
     [h323Disclosure setState:NSOffState];
   }
   
-  if(detailStatus & XM_SHOW_SIP_DETAILS) {
+  if (detailStatus & XM_SHOW_SIP_DETAILS) {
     showSIPDetails = YES;
     [sipDisclosure setState:NSOnState];
   } else {
@@ -128,7 +128,7 @@
   
   NSRect frameRect = NSMakeRect(XM_BOX_X, XM_BOTTOM_SPACING, boxWidth, XM_HIDDEN_OFFSET);
   
-  if(showSIPDetails == YES) {
+  if (showSIPDetails == YES) {
     frameRect.size.height += sipBoxHeight + sipRegistrationsExtraHeight;
   } else {
     [sipBox setHidden:YES];
@@ -148,7 +148,7 @@
   frameRect.origin.y += XM_BOX_SPACING;
   frameRect.size.height = XM_HIDDEN_OFFSET;
   
-  if(showH323Details == YES)
+  if (showH323Details == YES)
   {
     frameRect.size.height += h323BoxHeight + h323AliasesExtraHeight;
   }
@@ -199,7 +199,7 @@
 
 - (NSView *)contentView
 {
-  if(contentView == nil)
+  if (contentView == nil)
   {
     [NSBundle loadNibNamed:@"Info" owner:self];
   }
@@ -214,13 +214,13 @@
   
   int heightDifference = addressExtraHeight;
   
-  if(showH323Details == NO)
+  if (showH323Details == NO)
   {
     heightDifference -= h323BoxHeight;
   } else {
     heightDifference += h323AliasesExtraHeight;
   }
-  if(showSIPDetails == NO)
+  if (showSIPDetails == NO)
   {
     heightDifference -= sipBoxHeight;
   } else {
@@ -247,7 +247,7 @@
 {
   showH323Details = !showH323Details;
   
-  if(showH323Details == NO)
+  if (showH323Details == NO)
   {
     [h323Box setHidden:YES];
   }
@@ -266,7 +266,7 @@
   [h323Disclosure setAutoresizingMask:NSViewMaxYMargin];
   [h323Title setAutoresizingMask:NSViewMaxYMargin];
   
-  if(showH323Details == YES)
+  if (showH323Details == YES)
   {
     [h323Box setHidden:NO];
   }
@@ -278,7 +278,7 @@
 {
   showSIPDetails = !showSIPDetails;
   
-  if(showSIPDetails == NO)
+  if (showSIPDetails == NO)
   {
     [sipBox setHidden:YES];
   }
@@ -305,7 +305,7 @@
   [sipDisclosure setAutoresizingMask:NSViewMaxYMargin];
   [sipTitle setAutoresizingMask:NSViewMaxYMargin];
   
-  if(showSIPDetails == YES)
+  if (showSIPDetails == YES)
   {
     [sipBox setHidden:NO];
   }
@@ -320,12 +320,10 @@
 {
   XMUtils *utils = [XMUtils sharedInstance];
   
-  NSArray *localAddresses = [utils localAddresses];
-  NSArray *localAddressInterfaces = [utils localAddressInterfaces];
-  unsigned localAddressCount = [localAddresses count];
+  NSArray *networkInterfaces = [utils networkInterfaces];
+  unsigned interfaceCount = [networkInterfaces count];
   
-  if(localAddressCount == 0)
-  {
+  if (interfaceCount == 0) {
     [ipAddressesField setStringValue:@""];
     [ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
     
@@ -339,30 +337,31 @@
   }
   
   NSMutableString *ipAddressString = [[NSMutableString alloc] initWithCapacity:30];
-  unsigned i;
+  XMNetworkInterface *iface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:0];
+  [ipAddressString appendString:[iface ipAddress]];
+  [ipAddressString appendString:@" ("];
+  [ipAddressString appendString:[iface name]];
+  [ipAddressString appendString:@")"];
   
-  NSString *stringToAppend = [[NSString alloc] initWithFormat:@"%@ (%@)", [localAddresses objectAtIndex:0],
-    [localAddressInterfaces objectAtIndex:0]];
-  [ipAddressString appendString:stringToAppend];
-  [stringToAppend release];
-  
-  for(i = 1; i < localAddressCount; i++)
-  {
-    NSString *stringToAppend = [[NSString alloc] initWithFormat:@"\n%@ (%@)", 
-      [localAddresses objectAtIndex:i],
-      [localAddressInterfaces objectAtIndex:i]];
-    [ipAddressString appendString:stringToAppend];
-    [stringToAppend release];
+  for (unsigned i = 1; i < interfaceCount; i++) {
+    iface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:i];
+    [ipAddressString appendString:@"\n"];
+    [ipAddressString appendString:[iface ipAddress]];
+    [ipAddressString appendString:@" ("];
+    [ipAddressString appendString:[iface name]];
+    [ipAddressString appendString:@")"];
   }
   
-  addressExtraHeight = (localAddressCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
+  // calculate extra height for the additional interfaces
+  addressExtraHeight = (interfaceCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
   
-  NSString *externalAddress = [utils externalAddress];
+  NSString *publicAddress = [utils publicAddress];
 		
-  if(externalAddress != nil && ![localAddresses containsObject:externalAddress])
-  {
+  // display public address only if local addresses don't contain the public address
+  // (i.e. behind a NAT)
+  if (publicAddress != nil && ![utils isLocalAddress:publicAddress]) {
     [ipAddressString appendString:@"\n"];
-    [ipAddressString appendString:externalAddress];
+    [ipAddressString appendString:publicAddress];
     [ipAddressString appendString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_SUFFIX", @"")];
     addressExtraHeight += XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
   }
@@ -377,19 +376,11 @@
   NSString *natTypeString = XMNATTypeString(natType);
   [natTypeField setStringValue:natTypeString];
   
-  if(natType == XMNATType_Error ||
-     natType == XMNATType_BlockedNAT)
-  {
+  if (natType == XMNATType_Error || natType == XMNATType_BlockedNAT) {
     [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
-  }
-  else if(natType == XMNATType_SymmetricNAT ||
-          natType == XMNATType_SymmetricFirewall ||
-          natType == XMNATType_PartialBlockedNAT)
-  {
+  } else if (natType == XMNATType_SymmetricNAT || natType == XMNATType_SymmetricFirewall || natType == XMNATType_PartialBlockedNAT) {
     [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow"]];
-  }
-  else
-  {
+  } else {
     [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
   }
   
@@ -410,12 +401,12 @@
   [terminalAliasViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
   [terminalAliasViews removeAllObjects];
   
-  if([activeLocation enableH323] == YES)
+  if ([activeLocation enableH323] == YES)
   {
     [h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
     [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
     
-    if([callManager isH323Listening] == YES)
+    if ([callManager isH323Listening] == YES)
     {
       unsigned h323AccountTag = [activeLocation h323AccountTag];
       NSString *terminalAlias = 0;
@@ -495,9 +486,9 @@
   [registrationViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
   [registrationViews removeAllObjects];
   
-  if([activeLocation enableSIP] == YES)
+  if ([activeLocation enableSIP] == YES)
   {
-    if([callManager isSIPListening] == YES)
+    if ([callManager isSIPListening] == YES)
     {
       [sipStatusField setStringValue:@"Online"];
       [sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
@@ -594,11 +585,11 @@
 {
   unsigned status = 0;
   
-  if(showH323Details == YES)
+  if (showH323Details == YES)
   {
     status += XM_SHOW_H323_DETAILS;
   }
-  if(showSIPDetails == YES)
+  if (showSIPDetails == YES)
   {
     status += XM_SHOW_SIP_DETAILS;
   }

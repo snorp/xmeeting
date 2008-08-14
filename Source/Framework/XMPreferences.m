@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferences.m,v 1.22 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMPreferences.m,v 1.23 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -139,7 +139,7 @@
   automaticallyAcceptIncomingCalls = NO;
   
   bandwidthLimit = 0;
-  externalAddress = nil;
+  publicAddress = nil;
   tcpPortBase = 30000;
   tcpPortMax = 30010;
   udpPortBase = 5000;
@@ -385,7 +385,7 @@
 {
   [userName release];
   
-  [externalAddress release];
+  [publicAddress release];
   [stunServers release];
   
   [audioCodecList release];
@@ -486,7 +486,7 @@
   } else if([key isEqualToString:XMKey_PreferencesBandwidthLimit]) {
     return [NSNumber numberWithUnsignedInt:[self bandwidthLimit]];
   } else if([key isEqualToString:XMKey_PreferencesExternalAddress]) {
-    return [self externalAddress];
+    return [self publicAddress];
   } else if([key isEqualToString:XMKey_PreferencesTCPPortBase]) {
     return [NSNumber numberWithUnsignedInt:[self tcpPortBase]];
   } else if([key isEqualToString:XMKey_PreferencesTCPPortMax]) {
@@ -651,17 +651,17 @@
   bandwidthLimit = limit;
 }
 
-- (NSString *)externalAddress
+- (NSString *)publicAddress
 {
-  return externalAddress;
+  return publicAddress;
 }
 
 - (void)setExternalAddress:(NSString *)string
 {
-  if(string != externalAddress)
+  if(string != publicAddress)
   {
-    NSString *old = externalAddress;
-    externalAddress = [string copy];
+    NSString *old = publicAddress;
+    publicAddress = [string copy];
     [old release];
   }
 }

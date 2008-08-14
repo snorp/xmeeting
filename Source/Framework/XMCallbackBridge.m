@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.31 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.32 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,12 +18,12 @@
 #pragma mark Setup Related Callbacks
 
 void _XMHandleSTUNInformation(XMNATType natType,
-							  const char *externalAddress)
+							  const char *publicAddress)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *address = [[NSString alloc] initWithCString:externalAddress encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleNATType:natType externalAddress:address];
+	NSString *address = [[NSString alloc] initWithCString:publicAddress encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleNATType:natType publicAddress:address];
 	[address release];
 	
 	[autoreleasePool release];

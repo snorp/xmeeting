@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.11 2007/03/28 07:25:18 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.12 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,46 +10,45 @@
 #define __XM_CONNECTION_H__
 
 #include <ptlib.h>
-#include <opal/connection.h>
+#include <opal/localep.h>
 #include "XMBridge.h"
 
 class XMEndPoint;
 class OpalH224Handler;
 class OpalH281Handler;
 
-class XMConnection : public OpalConnection
+class XMConnection : public OpalLocalConnection
 {
 	PCLASSINFO(XMConnection, OpalConnection);
 	
 public:
 	XMConnection(OpalCall & call,
-				 XMEndPoint & endPoint,
-				 const PString & token);
+				 XMEndPoint & endPoint);
 	~XMConnection();
 	
-    virtual BOOL OnIncomingConnection(unsigned int options, OpalConnection::StringOptions * stringOptions);
-	virtual BOOL SetUpConnection();
-	virtual BOOL SetAlerting(const PString & calleeName,
-							 BOOL withMedia);
-	virtual BOOL SetConnected();
+  virtual bool OnIncomingConnection(unsigned int options, OpalConnection::StringOptions * stringOptions);
+  virtual bool SetUpConnection();
+  virtual bool SetAlerting(const PString & calleeName,
+                           bool withMedia);
+	virtual bool SetConnected();
 	virtual OpalMediaFormatList GetMediaFormats() const;
     virtual void AdjustMediaFormatOptions(OpalMediaFormat & mediaFormat) const;
     
-    virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
+    virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
 	
 	void AcceptIncoming();
 	
-	virtual BOOL IsMediaBypassPossible(const OpalMediaType & mediaType) const { return FALSE; }
+	virtual bool IsMediaBypassPossible(const OpalMediaType & mediaType) const { return false; }
 	
 	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
-												BOOL isSource);
-    virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
-	virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+                                              unsigned sessionID,
+                                              bool isSource);
+    virtual bool OnOpenMediaStream(OpalMediaStream & stream);
+	virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     virtual void OnClosedMediaStream(const OpalMediaStream & stream);
-    PSoundChannel * CreateSoundChannel(BOOL isSource);
+    PSoundChannel * CreateSoundChannel(bool isSource);
 	
-	BOOL SendUserInputString(const PString & value);
-	virtual BOOL GetMediaInformation(const OpalMediaType & mediaType,  MediaInformation & info) const;
+	bool SendUserInputString(const PString & value);
 	
 	OpalH281Handler * GetH281Handler();
 	
@@ -57,7 +56,7 @@ private:
 		
 	OpalH224Handler * GetH224Handler();
     
-    BOOL enableVideo;
+    bool enableVideo;
 	
 	XMEndPoint & endpoint;
 	OpalH224Handler *h224Handler;

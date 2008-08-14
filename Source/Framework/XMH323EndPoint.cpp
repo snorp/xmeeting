@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.31 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.32 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,15 +32,15 @@ class XMH323Gatekeeper : public H323Gatekeeper
   
 public:
   XMH323Gatekeeper(XMH323EndPoint & endpoint, H323Transport * transport);
-  virtual BOOL MakeRequest(Request & request);
+  virtual bool MakeRequest(Request & request);
 };
 
-OPAL_REGISTER_H224_CAPABILITY();
+//OPAL_REGISTER_H224_CAPABILITY();
 
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager)
 {
-	isListening = FALSE;
+	isListening = false;
 	connectionToken = "";
 	
   // Don't use OPAL's bandwidth management system as this is not flexible enough
@@ -51,7 +51,7 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
   SetGatekeeperTimeToLive(PTimeInterval(0, 30));
 	
   // Make data streams work. This should be removed in OPAL
-	autoStartReceiveData = autoStartTransmitData = TRUE;
+	//autoStartReceiveData = autoStartTransmitData = true;
   
   // Manually register H.460 features as the plugin system seems not to work
   //features.AddFeature(new H460_FeatureStd18());
@@ -65,34 +65,28 @@ XMH323EndPoint::~XMH323EndPoint()
 
 #pragma mark Endpoint Setup
 
-BOOL XMH323EndPoint::EnableListeners(BOOL flag)
+bool XMH323EndPoint::EnableListeners(bool flag)
 {
-	BOOL result = TRUE;
+	bool result = true;
 	
-	if(flag == TRUE)
-	{
-		if(isListening == FALSE)
-		{
+	if (flag == true) {
+		if (isListening == false) {
 			result = StartListeners(GetDefaultListeners());
-			if(result == TRUE)
-			{
-				isListening = TRUE;
+			if (result == true) {
+				isListening = true;
 			}
 		}
-	}
-	else
-	{
-		if(isListening == TRUE)
-		{
+	} else {
+		if (isListening == true) {
 			RemoveListener(NULL);
-			isListening = FALSE;
+			isListening = false;
 		}
 	}
 	
 	return result;
 }
 
-BOOL XMH323EndPoint::IsListening()
+bool XMH323EndPoint::IsListening()
 {
 	return isListening;
 }
@@ -112,8 +106,8 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
     
     gatekeeperAddress = address;
     
-    PMutex & mutex = GetAliasNamesMutex();
-    mutex.Wait();
+    //PMutex & mutex = GetAliasNamesMutex();
+    //mutex.Wait();
     
     SetLocalUserName(terminalAlias1);
     if (!terminalAlias2.IsEmpty()) {
@@ -125,19 +119,19 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
       SetGatekeeperPassword(password, terminalAlias1);
     } else if (gatekeeper != NULL) {
       // Do a full RRQ with the updated terminal aliases
-      gatekeeper->OnTerminalAliasChanged();
+     // gatekeeper->OnTerminalAliasChanged();
     }
     
-    mutex.Signal();
+    //mutex.Signal();
     
     if (gatekeeper == NULL) {
-      BOOL result = UseGatekeeper(address);
-      if (result == FALSE) {
+      bool result = UseGatekeeper(address);
+      if (result == false) {
         if (gatekeeper == NULL) {
           // GRQ failed
           _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_GatekeeperNotFound);
         }
-      } else if (result == TRUE && gatekeeper != NULL) {
+      } else if (result == true && gatekeeper != NULL) {
         // When the initial OnRegistrationConfirm() is called, gatekeeper is still NULL.
         // Handle the RCF here
         HandleRegistrationConfirm();
@@ -159,7 +153,7 @@ void XMH323EndPoint::HandleRegistrationConfirm()
     PString gatekeeperName = gatekeeper->GetName();
     PStringList aliases = GetAliasNames();
     PStringStream aliasStream;
-    for(PINDEX i = 0; i < aliases.GetSize(); i++) {
+    for (PINDEX i = 0; i < aliases.GetSize(); i++) {
       if (i != 0) {
         aliasStream << "\n";
       }
@@ -179,7 +173,7 @@ void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 {
 	PSafePtr<H323Connection> connection = FindConnectionWithLock(connectionToken, PSafeReadOnly);
 	
-	if(connection != NULL)
+	if (connection != NULL)
 	{
 		unsigned roundTripDelay = connection->GetRoundTripDelay().GetMilliSeconds();
 		callStatistics->roundTripDelay = roundTripDelay;
@@ -231,7 +225,7 @@ void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 
 void XMH323EndPoint::OnReleased(OpalConnection & connection)
 {
-	if(connection.GetToken() == connectionToken)
+	if (connection.GetToken() == connectionToken)
 	{
 		XMOpalManager * manager = (XMOpalManager *)(&GetManager());
 		PString empty = "";
@@ -265,7 +259,7 @@ H323Connection * XMH323EndPoint::CreateConnection(OpalCall & call,
 #pragma mark -
 #pragma mark H.460 support
 
-BOOL XMH323EndPoint::OnSendFeatureSet(unsigned id, H225_FeatureSet & message)
+bool XMH323EndPoint::OnSendFeatureSet(unsigned id, H225_FeatureSet & message)
 {
 	return features.SendFeature(id, message);
 }
@@ -310,12 +304,12 @@ XMH323Gatekeeper::XMH323Gatekeeper(XMH323EndPoint & ep, H323Transport * transpor
 {
 }
 
-BOOL XMH323Gatekeeper::MakeRequest(Request & request)
+bool XMH323Gatekeeper::MakeRequest(Request & request)
 {
-  BOOL result = H323Gatekeeper::MakeRequest(request);
+  bool result = H323Gatekeeper::MakeRequest(request);
 
-  if(request.requestPDU.GetPDU().GetTag() == H225_RasMessage::e_registrationRequest) {
-    if (result == FALSE) {
+  if (request.requestPDU.GetPDU().GetTag() == H225_RasMessage::e_registrationRequest) {
+    if (result == false) {
       switch(request.responseResult) {
         case Request::AwaitingResponse:
         case Request::NoResponseReceived:

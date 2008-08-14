@@ -1,5 +1,5 @@
 /*
- * $Id: XMRFC2833Handler.h,v 1.2 2007/08/05 13:14:36 hfriederich Exp $
+ * $Id: XMRFC2833Handler.h,v 1.3 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_RFC2833_HANDLER_H__
 
 #include <ptlib.h>
+#include <opal/connection.h>
 #include <codec/rfc2833.h>
 
 class XMRFC2833Handler : public OpalRFC2833Proto
@@ -18,8 +19,8 @@ class XMRFC2833Handler : public OpalRFC2833Proto
 	
 public:
 	
-	XMRFC2833Handler(OpalConnection & connection,
-                     const PNotifier & notifier);
+	XMRFC2833Handler(OpalRTPConnection & connection,
+                   const PNotifier & notifier);
 	
 protected:
 	

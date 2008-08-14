@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.24 2007/08/05 13:14:36 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.25 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,22 +46,22 @@ XMSIPConnection::~XMSIPConnection()
 void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
 {
     /* Add bandwidth information to SDP */
-	if(invite.HasSDP()) {
+	/*if(invite.HasSDP()) {
 		SDPSessionDescription & sdp = invite.GetSDP();
 		unsigned bandwidth = bandwidthAvailable / 10;
         sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier());
         sdp.SetBandwidthValue(bandwidth);
-	}
+	}*/
 }
 
-BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
+bool XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
 												const OpalMediaType & mediaType,
 												SDPSessionDescription & sdpOut)
 {
 	// adjusting bandwidth information,
 	// taking the lower value of remote (if set)
 	// and own bandwidth limit
-	PString bandwidthModifier = sdpIn.GetBandwidthModifier();
+	/*PString bandwidthModifier = sdpIn.GetBandwidthModifier();
 	if(bandwidthModifier.IsEmpty())
 	{
 		bandwidthModifier = SDPSessionDescription::ConferenceTotalBandwidthModifier();
@@ -76,14 +76,15 @@ BOOL XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 	}
 	sdpOut.SetBandwidthValue(bandwidthAvailable/10);
 	
-    return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);
+    return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);*/
+  return false;
 }
 
 OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
-													 BOOL isSource)
+													 bool isSource)
 {
 	// Adjust some audio parameters if needed
-	const SDPMediaDescriptionList & mediaDescriptionList = remoteSDP.GetMediaDescriptions();
+	/*const SDPMediaDescriptionList & mediaDescriptionList = remoteSDP.GetMediaDescriptions();
 	for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
 	{
 		SDPMediaDescription & description = mediaDescriptionList[i];
@@ -98,29 +99,30 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		}
 	}
 	
-	return SIPConnection::CreateMediaStream(mediaFormat, isSource);
+	return SIPConnection::CreateMediaStream(mediaFormat, isSource);*/
+  return false;
 }
 
-BOOL XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
+bool XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
 	if(!SIPConnection::OnOpenMediaStream(mediaStream))
 	{
-		return FALSE;
+		return false;
 	}
     
     XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	
-	return TRUE;
+	return true;
 }
 
-BOOL XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
+bool XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
 	bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
     GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
-	return TRUE;
+	return true;
 }
 
-BOOL XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
+bool XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
 {
     // Separate RFC2833 is not implemented. Therefore it is used within
     // XMeeting to signal in-band DTMF
@@ -128,35 +130,35 @@ BOOL XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
 	   inBandDTMFHandler != NULL)
 	{
 		inBandDTMFHandler->SendTone(tone, duration);
-		return TRUE;
+		return true;
 	}
 	
 	return SIPConnection::SendUserInputTone(tone, duration);
 }
 
-void XMSIPConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+void XMSIPConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 {
 	SIPConnection::OnPatchMediaStream(isSource, patch);
 	
     // Add the in-band DTMF handler if this is an audio sending stream
-	if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
+	/*if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
 	{
 		if(inBandDTMFHandler == NULL)
 		{
 			inBandDTMFHandler = new XMInBandDTMFHandler();
 		}
 		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
-	}
+	}*/
 }
 
 void XMSIPConnection::CleanUp()
 {
     // Abort all pending transactions
-    PWaitAndSignal m(jobProcessingMutex);
+    /*PWaitAndSignal m(jobProcessingMutex);
     for (PINDEX i = transactions.GetSize(); i > 0; i--) {
         const PString & key = transactions.GetKeyAt(i-1);
         transactions[key].Abort();
-    }
+    }*/
 }
 
 void XMSIPConnection::OnReleased()

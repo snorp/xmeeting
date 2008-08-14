@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.46 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.47 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -765,7 +765,7 @@ enum {
   for (unsigned i = 0; i < count; i++) {
     XMNetworkInterface *networkInterface = (XMNetworkInterface *)[networkInterfaces objectAtIndex:i];
     if ([[networkInterface ipAddress] isEqualToString:localAddress]) {
-      localAddressInterface = [networkInterface interface];
+      localAddressInterface = [networkInterface name];
       found = YES;
       break;
     }

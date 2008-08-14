@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.34 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.35 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,7 +33,7 @@ extern "C" {
  * Reports NAT-Type and External Address
  **/
 void _XMHandleSTUNInformation(XMNATType natType,
-							  const char *externalAddress);
+							  const char *publicAddress);
 	
 #pragma mark -
 #pragma mark Call Related Callbacks

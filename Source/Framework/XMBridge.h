@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.46 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.47 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,14 +40,14 @@ extern "C" {
 #pragma mark Init & Startup/Stop functions
   
   /** 
-  * Calling this function initializes the whole OPAL system
-  * and makes it ready to be used.
-  * It is safe to call initOPAL() multiple times.
-  **/
+   * Calling this function initializes the whole OPAL system
+   * and makes it ready to be used.
+   * It is safe to call initOPAL() multiple times.
+   **/
   void _XMInitSubsystem(const char *pTracePath);
 	
   /**
-  * Closes the OPAL system
+   * Closes the OPAL system
    **/
   void _XMCloseSubsystem();
   
@@ -55,12 +55,12 @@ extern "C" {
 #pragma mark General Setup Functions
   
   /**
-    * sets the user name to be used.
+   * sets the user name to be used.
    **/
   void _XMSetUserName(const char *string);
   
   /**
-    * Returns the current user name
+   * Returns the current user name
    * The value is obtained call-by-reference.
    **/
   const char *_XMGetUserName();
@@ -69,12 +69,12 @@ extern "C" {
 #pragma mark Network setup functions
   
   /**
-    * sets the bandwidth limit to the value as specified
+   * sets the bandwidth limit to the value as specified
    **/
   void _XMSetBandwidthLimit(unsigned limit);
   
   /**
-    * Sets the NAT information to use to establish
+   * Sets the NAT information to use to establish
    * NAT traversal
    **/
   void _XMSetNATInformation(const char * const * stunServers,
@@ -82,7 +82,7 @@ extern "C" {
                             const char *translationAddress,
                             bool networkStatusChanged);
   /**
-    * defines which port ranges to use to establish
+   * defines which port ranges to use to establish
    * the media streams
    **/
   void _XMSetPortRanges(unsigned int udpPortMin,
@@ -93,10 +93,10 @@ extern "C" {
                         unsigned int rtpPortMax);
   
   /**
-    * Called when the available network interfaces change,
+   * Called when the available network interfaces change,
    * allowing it to re-do registrations etc
    **/
-  void _XMHandleNetworkStatusChange();
+  void _XMHandleNetworkConfigurationChange();
   
 #pragma mark -
 #pragma mark Audio Functions
@@ -127,7 +127,7 @@ extern "C" {
 #pragma mark Codec Functions
   
   /**
-    * Sets the ordered & disabled codec lists appropriately
+   * Sets the ordered & disabled codec lists appropriately
    **/
   void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount,
                     const char * const * disabledCodecs, unsigned disabledCodecCount);
@@ -136,17 +136,17 @@ extern "C" {
 #pragma mark H.323 Setup Functions
   
   /**
-    * makes the H.323 system listen and thereby ready for calls
+   * makes the H.323 system listen and thereby ready for calls
    **/
   bool _XMEnableH323Listeners(bool flag);
   
   /**
-    * Returns whether H.323 is currently enabled or not
+   * Returns whether H.323 is currently enabled or not
    **/
   bool _XMIsH323Enabled();
   
   /**
-    * enables/disables FastStart and H.245 tunneling through H.323
+   * enables/disables FastStart and H.245 tunneling through H.323
    **/
   void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel);
   
@@ -159,7 +159,7 @@ extern "C" {
                         const char *password);
   
   /**
-    * reports whether we are registered at a gk or not
+   * reports whether we are registered at a gk or not
    **/
   bool _XMIsRegisteredAtGatekeeper();
   

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.17 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.18 2008/08/14 19:57:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -386,7 +386,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	[stunServerField setStringValue:string];
 	
-	string = [location externalAddress];
+	string = [location publicAddress];
 	if(string == nil)
 	{
 		state = NSOnState;
@@ -396,7 +396,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	{	
 		state = NSOffState;
 	}
-	[externalAddressField setStringValue:string];
+	[publicAddressField setStringValue:string];
 	[automaticallyGetExternalAddressSwitch setState:state];
 	
 	[self _validateSTUNUserInterface];
@@ -437,9 +437,9 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	[utils startFetchingCheckipExternalAddress];
 	
-	[externalAddressField setStringValue:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
-	[externalAddressField setEnabled:NO];
-	externalAddressIsValid = NO;
+	[publicAddressField setStringValue:NSLocalizedString(@"XM_FETCHING_EXTERNAL_ADDRESS", @"")];
+	[publicAddressField setEnabled:NO];
+	publicAddressIsValid = NO;
 }
 
 - (IBAction)toggleAutoGetExternalAddress:(id)sender
@@ -1069,7 +1069,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	else
 	{
-		[location setExternalAddress:[externalAddressField stringValue]];
+		[location setExternalAddress:[publicAddressField stringValue]];
 	}*/
 }
 
@@ -1136,7 +1136,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	flag = ([useIPAddressTranslationRadioButton state] == NSOnState) ? YES : NO;
 	[location setUseAddressTranslation:flag];
 	
-	string = [externalAddressField stringValue];
+	string = [publicAddressField stringValue];
 	if([string isEqualToString:@""] || [automaticallyGetExternalAddressSwitch state] == NSOnState)
 	{
 		string = nil;
@@ -2084,16 +2084,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	/*int state = ([theLocation useAddressTranslation] == YES) ? NSOnState : NSOffState;
 	[useIPAddressTranslationSwitch setState:state];
 	
-	NSString *externalAddress = [theLocation externalAddress];
-	if(externalAddress == nil)
+	NSString *publicAddress = [theLocation publicAddress];
+	if(publicAddress == nil)
 	{
 		[automaticallyGetExternalAddressSwitch setState:NSOnState];
-		[externalAddressField setStringValue:@""];
+		[publicAddressField setStringValue:@""];
 	}
 	else
 	{
 		[automaticallyGetExternalAddressSwitch setState:NSOffState];
-		[externalAddressField setStringValue:externalAddress];
+		[publicAddressField setStringValue:publicAddress];
 	}
 	
 	if([keys containsObject:XMKey_PreferencesExternalAddress])
@@ -2121,7 +2121,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	else
 	{
 		[useIPAddressTranslationSwitch setEnabled:NO];
-		[externalAddressField setEnabled:NO];
+		[publicAddressField setEnabled:NO];
 		[automaticallyGetExternalAddressSwitch setEnabled:NO];
 		[updateExternalAddressButton setEnabled:NO];
 	}*/
@@ -2149,7 +2149,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 		
 		/*if([keys containsObject:XMKey_PreferencesExternalAddress])
 		{
-			[locationToChange setExternalAddress:[externalAddressField stringValue]];
+			[locationToChange setExternalAddress:[publicAddressField stringValue]];
 		}
 		else if([keys containsObject:XMKey_PreferencesUseAddressTranslation])
 		{
@@ -2163,7 +2163,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 			}
 			else
 			{
-				[locationToChange setExternalAddress:[externalAddressField stringValue]];
+				[locationToChange setExternalAddress:[publicAddressField stringValue]];
 			}
 		}*/
 	}
@@ -2177,7 +2177,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	
 	[bandwidthLimitPopUp setEnabled:YES];
 	//[useIPAddressTranslationSwitch setEnabled:YES];
-	//[externalAddressField setEnabled:YES];
+	//[publicAddressField setEnabled:YES];
 	//[automaticallyGetExternalAddressSwitch setEnabled:YES];
 	//[updateExternalAddressButton setEnabled:YES];
 }
@@ -2434,10 +2434,10 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)_didEndFetchingExternalAddress:(NSNotification *)notif
 {
-	NSString *externalAddress = [[XMUtils sharedInstance] checkipExternalAddress];
-	if(externalAddress != nil)
+	NSString *publicAddress = [[XMUtils sharedInstance] checkipExternalAddress];
+	if(publicAddress != nil)
 	{
-		[externalAddressField setStringValue:externalAddress];
+		[publicAddressField setStringValue:publicAddress];
 	}
 	[self _validateAddressTranslationUserInterface];
 }
@@ -2503,24 +2503,24 @@ static XMSetupAssistantManager *sharedInstance = nil;
 	}
 	else
 	{
-		[externalAddressField setEnabled:NO];
+		[publicAddressField setEnabled:NO];
 	}
 }
 
 - (void)_validateExternalAddressUserInterface
 {
 	BOOL flag = ([automaticallyGetExternalAddressSwitch state] == NSOffState) ? YES : NO;
-	[externalAddressField setEnabled:flag];
+	[publicAddressField setEnabled:flag];
 	
 	NSColor *textColor;
 	
 	if(flag == NO)
 	{
 		XMUtils *utils = [XMUtils sharedInstance];
-		NSString *externalAddress = [utils checkipExternalAddress];
+		NSString *publicAddress = [utils checkipExternalAddress];
 		NSString *displayString;
 		
-		if(externalAddress == nil)
+		if(publicAddress == nil)
 		{
 			if([utils isFetchingCheckipExternalAddress])
 			{
@@ -2531,27 +2531,27 @@ static XMSetupAssistantManager *sharedInstance = nil;
 				displayString = NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"");
 			}
 			textColor = [NSColor controlTextColor];
-			externalAddressIsValid = NO;
+			publicAddressIsValid = NO;
 		}
 		else
 		{
-			displayString = externalAddress;
+			displayString = publicAddress;
 			textColor = [NSColor controlTextColor];
-			externalAddressIsValid = YES;
+			publicAddressIsValid = YES;
 		}
 		
-		[externalAddressField setStringValue:displayString];
+		[publicAddressField setStringValue:displayString];
 	}
 	else
 	{
-		if(!externalAddressIsValid)
+		if(!publicAddressIsValid)
 		{
-			[externalAddressField setStringValue:@""];
+			[publicAddressField setStringValue:@""];
 		}
 		textColor = [NSColor controlTextColor];
 	}
 	
-	[externalAddressField setTextColor:textColor];
+	[publicAddressField setTextColor:textColor];
 }
 
 @end

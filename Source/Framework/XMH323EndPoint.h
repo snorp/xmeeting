@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.18 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.19 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,8 +25,8 @@ public:
 	virtual ~XMH323EndPoint();
 	
 	// Setup methods
-	BOOL EnableListeners(BOOL flag);
-	BOOL IsListening();
+	bool EnableListeners(bool flag);
+	bool IsListening();
 	void SetGatekeeper(const PString & address,
                      const PString & terminalAlias1, 
                      const PString & terminalAlias2,
@@ -56,7 +56,7 @@ public:
                                             OpalConnection::StringOptions * stringOptions = NULL);
 	
 	// H.460 support
-	virtual BOOL OnSendFeatureSet(unsigned, H225_FeatureSet &);
+	virtual bool OnSendFeatureSet(unsigned, H225_FeatureSet &);
   virtual void OnReceiveFeatureSet(unsigned, const H225_FeatureSet &);
   
   // Called when the framework is closing
@@ -65,8 +65,8 @@ public:
   void RemoveReleasingConnection(XMH323Connection * connection);
 	
 private:
-  BOOL isListening;
-	BOOL didRegisterAtGatekeeper;
+  bool isListening;
+	bool didRegisterAtGatekeeper;
   PString gatekeeperAddress;
 	//XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
   

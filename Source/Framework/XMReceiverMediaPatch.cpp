@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.32 2007/02/17 19:41:46 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.33 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,17 +92,17 @@ void XMReceiverMediaPatch::Main()
 	
 	// make sure the RTP session does NOT ignore out of order packets
 	OpalRTPMediaStream & rtpStream = (OpalRTPMediaStream &)source;
-	rtpStream.GetRtpSession().SetIgnoreOutOfOrderPackets(FALSE);
+	rtpStream.GetRtpSession().SetIgnoreOutOfOrderPackets(false);
 	
 	BYTE *frameBuffer = (BYTE *)malloc(sizeof(BYTE) * XM_FRAME_BUFFER_SIZE);
 	
 	// Read the first packet
-	BOOL firstReadSuccesful = source.ReadPacket(*(packets[0]));
+	bool firstReadSuccesful = source.ReadPacket(*(packets[0]));
     
     // Access the media format
     const OpalMediaFormat & mediaFormat = source.GetMediaFormat();
 	
-	if(firstReadSuccesful == TRUE)
+	if(firstReadSuccesful == true)
 	{
 		// Tell the media receiver to prepare processing packets
 		XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
@@ -167,10 +167,10 @@ void XMReceiverMediaPatch::Main()
 		_XMStartMediaReceiving(sessionID, codecIdentifier);
 		
 		// loop to receive packets and process them
-		do {
+		/*do {
 			inUse.Wait();
 			
-			BOOL processingSuccessful = TRUE;
+			bool processingSuccessful = true;
 			unsigned numberOfPacketsToRelease = 0;
 			
 			XMRTPPacket *packet = packets[packetIndex];
@@ -202,12 +202,12 @@ void XMReceiverMediaPatch::Main()
 					if(firstPacketOfPacketGroup != NULL)
 					{
 						// Try to process the old packet although not complete
-						BOOL result = TRUE;
+						bool result = true;
 						PINDEX frameBufferSize = 0;
 						
 						result = packetReassembler->CopyIncompletePacketsIntoFrameBuffer(firstPacketOfPacketGroup, frameBuffer, &frameBufferSize);
 						
-						if(result == TRUE)
+						if(result == true)
 						{
 							_XMProcessFrame(sessionID, frameBuffer, frameBufferSize);
 						}
@@ -215,7 +215,7 @@ void XMReceiverMediaPatch::Main()
 						firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 						firstPacketOfPacketGroup = NULL;
 						lastPacketOfPacketGroup = NULL;
-						processingSuccessful = FALSE;
+						processingSuccessful = false;
 						PTRACE(1, "XMeetingReceiverMediaPatch\tIncomplete old packet group");
 						
 						// There are (packetIndex + 1) packets in the buffer, but only the last one
@@ -266,7 +266,7 @@ void XMReceiverMediaPatch::Main()
 						
 						previousPacket = previousPacket->prev;
 						
-					} while(TRUE);
+					} while(true);
 				}
 				else
 				{
@@ -278,16 +278,16 @@ void XMReceiverMediaPatch::Main()
 			/////////////////////////////////////////////////////////
 			// checking whether the packet group is complete or not
 			/////////////////////////////////////////////////////////
-			BOOL packetGroupIsComplete = FALSE;
+			bool packetGroupIsComplete = false;
 			
 			WORD expectedSequenceNumber = firstSeqNrOfPacketGroup;
 			XMRTPPacket *thePacket = firstPacketOfPacketGroup;
 			
-			BOOL isFirstPacket = FALSE;
+			bool isFirstPacket = false;
 			
 			if(expectedSequenceNumber == thePacket->GetSequenceNumber())
 			{
-				isFirstPacket = TRUE;
+				isFirstPacket = true;
 			}
 			else
 			{
@@ -296,7 +296,7 @@ void XMReceiverMediaPatch::Main()
 				// of a packet group or not
 				isFirstPacket = packetReassembler->IsFirstPacketOfFrame(thePacket);
 			}
-			if(isFirstPacket == TRUE)
+			if(isFirstPacket == true)
 			{
 				expectedSequenceNumber = thePacket->GetSequenceNumber();
 				
@@ -312,16 +312,16 @@ void XMReceiverMediaPatch::Main()
 					{
 						// no more packets in the packet group.
 						// If the marker bit is set, we're complete
-						if(thePacket->GetMarker() == TRUE)
+						if(thePacket->GetMarker() == true)
 						{
-							packetGroupIsComplete = TRUE;
+							packetGroupIsComplete = true;
 						}
 						break;
 					}
 					
 					thePacket = thePacket->next;
 					
-				} while(TRUE);
+				} while(true);
 			}
 			
 			/////////////////////////////////////////////////////
@@ -330,26 +330,26 @@ void XMReceiverMediaPatch::Main()
 			// system.
 			/////////////////////////////////////////////////////
 			
-			if(packetGroupIsComplete == TRUE)
+			if(packetGroupIsComplete == true)
 			{
-				BOOL result = TRUE;
+				bool result = true;
 				PINDEX frameBufferSize = 0;
 				
 				result = packetReassembler->CopyPacketsIntoFrameBuffer(firstPacketOfPacketGroup, frameBuffer, &frameBufferSize);
 				
-				if(result == TRUE)
+				if(result == true)
 				{
 					result = _XMProcessFrame(sessionID, frameBuffer, frameBufferSize);
-					if(result == FALSE)
+					if(result == false)
 					{
 						PTRACE(1, "XMeetingReceiverMediaPatch\tDecompression of the frame failed");
-						processingSuccessful = FALSE;
+						processingSuccessful = false;
 					}
 				}
 				else
 				{
 					PTRACE(1, "XMeetingReceiverMediaPatch\tCould not copy packets into frame buffer");
-					processingSuccessful = FALSE;
+					processingSuccessful = false;
 				}
 				firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
 				firstPacketOfPacketGroup = NULL;
@@ -359,10 +359,10 @@ void XMReceiverMediaPatch::Main()
 				numberOfPacketsToRelease = packetIndex + 1;
 			}
 
-			if(processingSuccessful == FALSE)
+			if(processingSuccessful == false)
 			{
 				IssueVideoUpdatePictureCommand();
-                processingSuccessful = TRUE;
+                processingSuccessful = true;
 			}
 			
 			// Of not all packets can be released, the remaining packets are
@@ -406,7 +406,8 @@ void XMReceiverMediaPatch::Main()
 				break;
 			}
 			
-		} while(source.ReadPacket(*(packets[packetIndex])) == TRUE);
+		} while(source.ReadPacket(*(packets[packetIndex])) == true);
+    */
 		
 		// End the media processing
 		_XMStopMediaReceiving(sessionID);

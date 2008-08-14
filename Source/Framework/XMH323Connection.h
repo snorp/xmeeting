@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.20 2007/05/09 15:02:00 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.21 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,7 +35,7 @@ public:
 
 	virtual void SelectDefaultLogicalChannel(const OpalMediaType & mediaType);
 	
-	virtual BOOL OpenLogicalChannel(const H323Capability & capability,
+	virtual bool OpenLogicalChannel(const H323Capability & capability,
 									unsigned sessionID,
 									H323Channel::Directions dir);
     
@@ -44,19 +44,19 @@ public:
                                                RTP_Session & rtp,
                                                unsigned sessionID);
 	
-	virtual BOOL OnClosingLogicalChannel(H323Channel & channel);
+	virtual bool OnClosingLogicalChannel(H323Channel & channel);
 	
     // Propagate opening of media streams to the Obj-C world
-	virtual BOOL OnOpenMediaStream(OpalMediaStream & stream);
+	virtual bool OnOpenMediaStream(OpalMediaStream & stream);
 	
 	// Overridden to circumvent the default Opal bandwidth management
-	virtual BOOL SetBandwidthAvailable(unsigned newBandwidth, BOOL force = FALSE);
+	virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
 	virtual unsigned GetBandwidthUsed() const { return 0; }
-	virtual BOOL SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return TRUE; }
+	virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
 	
     // Overridden to being able to send in-band DTMF
-	virtual BOOL SendUserInputTone(char tone, unsigned duration);
-    virtual void OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch);
+	virtual bool SendUserInputTone(char tone, unsigned duration);
+    virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     
     // Customizing information
     virtual void SetRemotePartyInfo(const H323SignalPDU & pdu);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.7 2007/08/17 11:36:44 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.8 2008/08/14 19:57:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -105,10 +105,10 @@
   IBOutlet NSButton *useSTUNRadioButton;
   IBOutlet NSComboBox *stunServerField;
   IBOutlet NSButton *useIPAddressTranslationRadioButton;
-  IBOutlet NSTextField *externalAddressField;
+  IBOutlet NSTextField *publicAddressField;
   IBOutlet NSButton *updateExternalAddressButton;
   IBOutlet NSButton *automaticallyGetExternalAddressSwitch;
-  BOOL externalAddressIsValid;
+  BOOL publicAddressIsValid;
   IBOutlet NSButton *noneRadioButton;
   
   // h323Settings objects

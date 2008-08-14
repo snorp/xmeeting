@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.24 2007/08/05 13:14:36 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.25 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,24 +13,24 @@
 #include "XMMediaStream.h"
 #include "XMCallbackBridge.h"
 
+#include <ptlib.h>
 #include <opal/patch.h>
 #include <h224/h224handler.h>
 #include <h224/h281handler.h>
 
 XMConnection::XMConnection(OpalCall & call,
-						   XMEndPoint & theEndPoint,
-						   const PString & token)
-: OpalConnection(call, theEndPoint, token),
+						   XMEndPoint & theEndPoint)
+: OpalLocalConnection(call, theEndPoint, NULL),
   endpoint(theEndPoint),
   h261VideoFormat(XM_MEDIA_FORMAT_H261),
   h263VideoFormat(XM_MEDIA_FORMAT_H263),
   h263PlusVideoFormat(XM_MEDIA_FORMAT_H263PLUS),
   h264VideoFormat(XM_MEDIA_FORMAT_H264)
 {
-    if(theEndPoint.GetEnableSilenceSuppression())
+    /*if(theEndPoint.GetEnableSilenceSuppression())
     {
         silenceDetector = new OpalPCM16SilenceDetector;
-    }
+    }*/
     
     if(theEndPoint.GetEnableEchoCancellation())
     {
@@ -54,29 +54,31 @@ XMConnection::XMConnection(OpalCall & call,
 XMConnection::~XMConnection()
 {
 	if(h224Handler != NULL) {
-		h224Handler->RemoveClient(*h281Handler);
-		delete h281Handler;
-		delete h224Handler;
+		//h224Handler->RemoveClient(*h281Handler);
+		//delete h281Handler;
+		//delete h224Handler;
 		
 		h224Handler = NULL;
 		h281Handler = NULL;
 	}
 }
 
-BOOL XMConnection::OnIncomingConnection(unsigned int options, OpalConnection::StringOptions * stringOptions)
+bool XMConnection::OnIncomingConnection(unsigned int options, OpalConnection::StringOptions * stringOptions)
 {
     return endpoint.OnIncomingConnection(*this, options, stringOptions);
 }
 
-BOOL XMConnection::SetUpConnection()
+bool XMConnection::SetUpConnection()
 {
+  return OpalLocalConnection::SetUpConnection();
+  /*
 	if(ownerCall.GetConnection(0) == this) {
 		// We are A-Party
 		phase = SetUpPhase;
-        unsigned options = OpalConnection::AdjustMediaFormatOptionsEnable;
-		if(!OnIncomingConnection(options, NULL)) {
+//        unsigned options = OpalConnection::AdjustMediaFormatOptionsEnable;
+		if(!OnIncomingConnection(0, NULL)) {
 			Release(EndedByCallerAbort);
-			return FALSE;
+			return false;
 		}
 		
 		if(!ownerCall.OnSetUp(*this)) {
@@ -90,16 +92,16 @@ BOOL XMConnection::SetUpConnection()
             }
 			Release(callEndReason);
             XMOpalManager::GetManager()->HandleCallInitiationFailed((XMCallEndReason)callEndReason);
-			return FALSE;
+			return false;
 		}
 		
-		return TRUE;
+		return true;
 	}
 	else
 	{
 		PSafePtr<OpalConnection> otherConnection = ownerCall.GetOtherPartyConnection(*this);
 		if(otherConnection == NULL) {
-			return FALSE;
+			return false;
 		}
 		
         PSafePtr<OpalConnection> otherConn = ownerCall.GetOtherPartyConnection(*this);
@@ -115,22 +117,24 @@ BOOL XMConnection::SetUpConnection()
 			endpoint.OnShowIncoming(*this);
 			OnAlerting();
 		}
-		return TRUE;
-	}
+		return true;
+	}*/
 }
 
-BOOL XMConnection::SetAlerting(const PString & calleeName,
-							   BOOL withMedia)
+bool XMConnection::SetAlerting(const PString & calleeName,
+							   bool withMedia)
 {
-	phase = AlertingPhase;
+  return OpalLocalConnection::SetAlerting(calleeName,withMedia);
+	/*phase = AlertingPhase;
 	remotePartyName = calleeName;
 	endpoint.OnShowOutgoing(*this);
-	return TRUE;
+	return true;*/
 }
 
-BOOL XMConnection::SetConnected()
+bool XMConnection::SetConnected()
 {
-	if(mediaStreams.IsEmpty())
+  return OpalConnection::SetConnected();
+	/*if(mediaStreams.IsEmpty())
 	{
 		phase = ConnectedPhase;
 	}
@@ -140,7 +144,7 @@ BOOL XMConnection::SetConnected()
 		OnEstablished();
 	}
 	
-	return TRUE;
+	return true;*/
 }
 
 OpalMediaFormatList XMConnection::GetMediaFormats() const
@@ -149,7 +153,7 @@ OpalMediaFormatList XMConnection::GetMediaFormats() const
 	
 	mediaFormats += OpalPCM16;
 	
-	if(enableVideo == TRUE)
+	/*if(enableVideo == true)
 	{
 		mediaFormats += XM_MEDIA_FORMAT_H261;
         mediaFormats += XM_MEDIA_FORMAT_H263;
@@ -157,7 +161,7 @@ OpalMediaFormatList XMConnection::GetMediaFormats() const
         mediaFormats += XM_MEDIA_FORMAT_H264;
 	}
 	
-	mediaFormats += OpalH224;
+	mediaFormats += OpalH224;*/
 	
 	return mediaFormats;
 }
@@ -172,12 +176,12 @@ void XMConnection::AdjustMediaFormatOptions(OpalMediaFormat & mediaFormat) const
         mediaFormat.Merge(h263PlusVideoFormat);
     } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
         mediaFormat.Merge(h264VideoFormat);
-        BOOL enableH264LimitedMode = _XMGetEnableH264LimitedMode(h264VideoFormat);
+        bool enableH264LimitedMode = _XMGetEnableH264LimitedMode(h264VideoFormat);
         _XMSetEnableH264LimitedMode(mediaFormat, enableH264LimitedMode);
     }
 }
 
-BOOL XMConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
+bool XMConnection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
     bandwidthAvailable = std::min(XMOpalManager::GetManager()->GetBandwidthLimit(), newBandwidth);
     
@@ -187,12 +191,13 @@ BOOL XMConnection::SetBandwidthAvailable(unsigned newBandwidth, BOOL force)
     h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
     h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH263BandwidthLimit()));
     h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), std::min(videoLimit, XMOpalManager::GetH264BandwidthLimit()));
-    return TRUE;
+    return true;
 }
 
 void XMConnection::AcceptIncoming()
 {
-	if (!LockReadOnly())
+  //OpalConnection::AcceptIncoming();
+	/*if (!LockReadOnly())
 	{
 		return;
 	}
@@ -224,28 +229,29 @@ void XMConnection::AcceptIncoming()
 	UnlockReadWrite();
 	UnlockReadOnly();
 	
-	OnEstablished();
+	OnEstablished();*/
 }
 
 OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
-												  BOOL isSource)
+                                                  unsigned sessionID,
+                                                  bool isSource)
 {
-	if(mediaFormat.GetMediaType() == OpalDefaultVideoMediaType)
+	/*if(mediaFormat.GetMediaType() == OpalDefaultVideoMediaType)
 	{
 		return new XMMediaStream(*this, mediaFormat, isSource);
-	}
+	}*/
 	
-	if(mediaFormat == OpalH224)
+	/*if(mediaFormat == OpalH224)
 	{
 		OpalH224Handler *h224Handler = GetH224Handler();
 		return new OpalH224MediaStream(*this, *h224Handler, mediaFormat, isSource);
-	}
+	}*/
 	
 	// if not audio, use the default handling
-	if(mediaFormat.GetMediaType() != OpalDefaultAudioMediaType)
+	/*if(mediaFormat.GetMediaType() != OpalDefaultAudioMediaType)
 	{
 		return OpalConnection::CreateMediaStream(mediaFormat, isSource);
-	}
+	}*/
 	
 	// audio stream
 	PSoundChannel *soundChannel = CreateSoundChannel(isSource);
@@ -253,28 +259,28 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 	{
 		return NULL;
 	}
-	return new OpalAudioMediaStream(*this, mediaFormat, isSource, 2, soundChannel);
+	return new OpalAudioMediaStream(*this, mediaFormat, sessionID, isSource, 2, soundChannel);
 }
 
-BOOL XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
+bool XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
 	if(!OpalConnection::OnOpenMediaStream(mediaStream))
 	{
-		return FALSE;
+		return false;
 	}
 	
-	if (phase == ConnectedPhase)
+	/*if (phase == ConnectedPhase)
 	{
 		SetPhase(EstablishedPhase);
 		OnEstablished();
-	}
+	}*/
 	
-	return TRUE;
+	return true;
 }
 
-void XMConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
+void XMConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 {
-	if(patch.GetSource().GetMediaType() == OpalDefaultAudioMediaType)
+	/*if(patch.GetSource().GetMediaType() == OpalDefaultAudioMediaType)
 	{
 		if(isSource && silenceDetector != NULL) {
 			silenceDetector->SetParameters(endpoint.GetManager().GetSilenceDetectParams());
@@ -287,7 +293,7 @@ void XMConnection::OnPatchMediaStream(BOOL isSource, OpalMediaPatch & patch)
 			echoCanceler->SetClockRate(clockRate);
 			patch.AddFilter(isSource ? echoCanceler->GetReceiveHandler() : echoCanceler->GetSendHandler(), OpalPCM16);
 		}
-	}
+	}*/
 	
 	OpalConnection::OnPatchMediaStream(isSource, patch);
 }
@@ -298,36 +304,36 @@ void XMConnection::OnClosedMediaStream(const OpalMediaStream & stream)
     XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, stream);
 }
 
-PSoundChannel * XMConnection::CreateSoundChannel(BOOL isSource)
+PSoundChannel * XMConnection::CreateSoundChannel(bool isSource)
 {
 	return endpoint.CreateSoundChannel(*this, isSource);
 }
 
-BOOL XMConnection::SendUserInputString(const PString & value)
+bool XMConnection::SendUserInputString(const PString & value)
 {
 	// add handler here
-	return TRUE;
+	return true;
 }
 
-BOOL XMConnection::GetMediaInformation(const OpalMediaType & mediaType, MediaInformation & info) const
+/*bool XMConnection::GetMediaInformation(const OpalMediaType & mediaType, MediaInformation & info) const
 {
 	if(mediaType == OpalDefaultAudioMediaType)
 	{
 		// add RFC2833 payload code
 		info.payloadType = OpalRFC2833.GetPayloadType();
-		return TRUE;
+		return true;
 	}
 	
-	return TRUE;
-}
+	return true;
+}*/
 
 OpalH224Handler * XMConnection::GetH224Handler()
 {
 	if(h224Handler == NULL) {
-		h281Handler = new OpalH281Handler();
-		h224Handler = new OpalH224Handler();
-		h224Handler->AddClient(*h281Handler);
-		_XMHandleFECCChannelOpened();
+		//h281Handler = new OpalH281Handler();
+		//h224Handler = new OpalH224Handler();
+		//h224Handler->AddClient(*h281Handler);
+		//_XMHandleFECCChannelOpened();
 	}
 	
 	return h224Handler;

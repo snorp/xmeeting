@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.53 2007/10/03 07:22:41 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.54 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -58,8 +58,8 @@ void _XMSetNATInformation(const char * const *stunServers,
                           bool networkStatusChanged)
 {
   PStringArray servers = PStringArray(stunServerCount, stunServers, TRUE);
-  PString externalAddress = translationAddress;
-  XMOpalManager::GetManager()->SetNATInformation(servers, externalAddress, networkStatusChanged);
+  PString publicAddress = translationAddress;
+  XMOpalManager::GetManager()->SetNATInformation(servers, publicAddress, networkStatusChanged);
 }
 
 void _XMSetPortRanges(unsigned int udpPortMin, 
@@ -75,7 +75,7 @@ void _XMSetPortRanges(unsigned int udpPortMin,
   theManager->SetRtpIpPorts(rtpPortMin, rtpPortMax);
 }
 
-void _XMHandleNetworkStatusChange()
+void _XMHandleNetworkConfigurationChange()
 {
   //XMOpalManager::GetH323EndPoint()->HandleNetworkStatusChange();
   //XMOpalManager::GetSIPEndPoint()->HandleNetworkStatusChange();

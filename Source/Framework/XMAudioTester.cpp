@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioTester.cpp,v 1.2 2006/10/02 21:22:03 hfriederich Exp $
+ * $Id: XMAudioTester.cpp,v 1.3 2008/08/14 19:57:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,9 +54,9 @@ void XMAudioTester::Main()
 	unsigned counter = 0;
 	int numberOfReads = 50*delay;
 	
-	while(TRUE)
+	while(true)
 	{
-		if(stop == TRUE)
+		if(stop == true)
 		{
 			break;
 		}
@@ -84,7 +84,7 @@ void XMAudioTester::Start(unsigned delay)
 	if(audioTester == NULL)
 	{
 		audioTester = new XMAudioTester(delay);
-		audioTester->stop = FALSE;
+		audioTester->stop = false;
 		audioTester->Restart();
 	}
 }
@@ -95,7 +95,7 @@ void XMAudioTester::Stop()
 	
 	if(audioTester != NULL)
 	{
-		audioTester->stop = TRUE;
+		audioTester->stop = true;
 		audioTester->WaitForTermination();
 		delete audioTester;
 		audioTester = NULL;
