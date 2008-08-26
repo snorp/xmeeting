@@ -64,7 +64,6 @@
 		1AF9E4A409A07E3600094163 /* tools_24.tif in Resources */ = {isa = PBXBuildFile; fileRef = 1AF9E4A209A07E3600094163 /* tools_24.tif */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
-		D1010AB60C71F6D20010523E /* XMURLParser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1010AB40C71F6D20010523E /* XMURLParser.h */; };
 		D104D9660A0E5973000898F2 /* dial_pad_0_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D94E0A0E5973000898F2 /* dial_pad_0_down.tif */; };
 		D104D9670A0E5973000898F2 /* dial_pad_0.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D94F0A0E5973000898F2 /* dial_pad_0.tif */; };
 		D104D9680A0E5973000898F2 /* dial_pad_1_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D104D9500A0E5973000898F2 /* dial_pad_1_down.tif */; };
@@ -110,7 +109,6 @@
 		D10975460BAE7565007E8087 /* rpe.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975380BAE7565007E8087 /* rpe.c */; };
 		D10975470BAE7565007E8087 /* short_term.c in Sources */ = {isa = PBXBuildFile; fileRef = D10975390BAE7565007E8087 /* short_term.c */; };
 		D10975480BAE7565007E8087 /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = D109753A0BAE7565007E8087 /* table.c */; };
-		D10B8E070A512F3400003A33 /* manual.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DFD0A512E7500003A33 /* manual.html */; };
 		D10B8E0A0A512F5D00003A33 /* ab_gatekeeper.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DF80A512E7500003A33 /* ab_gatekeeper.png */; };
 		D10B8E0B0A512F5D00003A33 /* locations.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DF90A512E7500003A33 /* locations.png */; };
 		D10B8E0C0A512F5D00003A33 /* logo.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = D10B8DFA0A512E7500003A33 /* logo.tiff */; };
@@ -133,9 +131,6 @@
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
 		D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */; };
-		D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */; };
-		D13962170BF0BA2F00C76EFD /* XMH323URL.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D13962150BF0BA2F00C76EFD /* XMH323URL.h */; };
-		D13962B70BF0C9F100C76EFD /* XMSIPURL.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D13962B50BF0C9F100C76EFD /* XMSIPURL.h */; };
 		D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED450BBA382D008B3CBA /* libsasl2.dylib */; };
 		D13AED4B0BBA3854008B3CBA /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4A0BBA3854008B3CBA /* libssl.dylib */; };
 		D13AED4E0BBA38D4008B3CBA /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */; };
@@ -147,25 +142,11 @@
 		D14BBF390E3F7B43007B1A57 /* h460p.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D14BBF320E3F7B43007B1A57 /* h460p.cxx */; };
 		D14BBF3A0E3F7B43007B1A57 /* h460pres.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D14BBF330E3F7B43007B1A57 /* h460pres.cxx */; };
 		D14BBF3B0E3F7B43007B1A57 /* h460tm.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D14BBF340E3F7B43007B1A57 /* h460tm.cxx */; };
-		D14BBF450E3F7B6F007B1A57 /* h460.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF3D0E3F7B6F007B1A57 /* h460.h */; };
-		D14BBF460E3F7B6F007B1A57 /* h4601.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF3E0E3F7B6F007B1A57 /* h4601.h */; };
-		D14BBF470E3F7B6F007B1A57 /* h46018.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF3F0E3F7B6F007B1A57 /* h46018.h */; };
-		D14BBF480E3F7B6F007B1A57 /* h46019.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF400E3F7B6F007B1A57 /* h46019.h */; };
-		D14BBF490E3F7B6F007B1A57 /* h4609.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF410E3F7B6F007B1A57 /* h4609.h */; };
-		D14BBF4A0E3F7B6F007B1A57 /* h460p.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF420E3F7B6F007B1A57 /* h460p.h */; };
-		D14BBF4B0E3F7B6F007B1A57 /* h460pres.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF430E3F7B6F007B1A57 /* h460pres.h */; };
-		D14BBF4C0E3F7B6F007B1A57 /* h460tm.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF440E3F7B6F007B1A57 /* h460tm.h */; };
-		D14BBF600E3F7DF6007B1A57 /* localep.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D14BBF5F0E3F7DF6007B1A57 /* localep.h */; };
 		D14BBF650E3F7E28007B1A57 /* localep.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D14BBF640E3F7E28007B1A57 /* localep.cxx */; };
 		D154361D0C01FC22002A027E /* XMAddressBookPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */; };
 		D15436510C020535002A027E /* XMeetingABPlugin-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */; };
 		D15436520C020561002A027E /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
 		D15436650C02056D002A027E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
-		D15436F20C0ADF78002A027E /* psockbun.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15436F10C0ADF78002A027E /* psockbun.h */; };
-		D15437440C0B10F3002A027E /* audiorecord.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15437430C0B10F3002A027E /* audiorecord.h */; };
-		D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15437620C0B1331002A027E /* opalmixer.h */; };
-		D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15439280C0C4C09002A027E /* handlers.h */; };
-		D15F71C20E54B71B0006CB43 /* g711a1_plc.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15F71C10E54B71B0006CB43 /* g711a1_plc.h */; };
 		D15F71C40E54B7300006CB43 /* g711a1_plc.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F71C30E54B7300006CB43 /* g711a1_plc.cxx */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
 		D162158509F0F91600647E48 /* CallHistory_SIP.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158309F0F91600647E48 /* CallHistory_SIP.tiff */; };
@@ -180,12 +161,12 @@
 		D189803E082411AC007CD286 /* XMCodecDescriptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = D189803D082411AC007CD286 /* XMCodecDescriptions.plist */; };
 		D19628150924B4C1004892D0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D19628140924B4C1004892D0 /* Security.framework */; };
 		D1A02B26081E96D30018BD11 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1A02B24081E96D30018BD11 /* Preferences.nib */; };
-		D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1A24F2A0C6FD96000408CF7 /* XMIDDPrefixFormatter.h */; };
-		D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1A561020C6CA45A0086E6F6 /* XMIPAddressFormatter.h */; };
 		D1A562A10C6DA9460086E6F6 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A00C6DA9460086E6F6 /* Add.png */; };
 		D1A562A70C6DAA280086E6F6 /* Remove.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A60C6DAA280086E6F6 /* Remove.png */; };
 		D1A562AA0C6DAB420086E6F6 /* Action.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A90C6DAB420086E6F6 /* Action.png */; };
 		D1A5EE1609CB08E30063B926 /* DummyImage.gif in Resources */ = {isa = PBXBuildFile; fileRef = D1A5EE1509CB08E30063B926 /* DummyImage.gif */; };
+		D1AD1A680E6320F800143295 /* pvidfile.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1AD1A670E6320F800143295 /* pvidfile.h */; };
+		D1AD1A6A0E63212100143295 /* pvidfile.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1AD1A690E63212100143295 /* pvidfile.cxx */; };
 		D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */; };
 		D1B06A5C086A9C5E00563EDB /* Loudspeaker.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1B06A5A086A9C5E00563EDB /* Loudspeaker.tiff */; };
 		D1B06A5D086A9C5E00563EDB /* Microphone.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1B06A5B086A9C5E00563EDB /* Microphone.tiff */; };
@@ -203,11 +184,6 @@
 		D1C8FCD30A4407E600EF1A8C /* StillImageSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1C8FCD10A4407E600EF1A8C /* StillImageSettings.nib */; };
 		D1CE4B69083CDF3900B66B5D /* AddressBook.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1CE4B67083CDF3900B66B5D /* AddressBook.nib */; };
 		D1CE4B76083CE0FC00B66B5D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
-		D1D434840DC8B61F0065FD1C /* rtpconn.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D434820DC8B61F0065FD1C /* rtpconn.h */; };
-		D1D434850DC8B61F0065FD1C /* rtpep.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D434830DC8B61F0065FD1C /* rtpep.h */; };
-		D1D4348A0DC8B6730065FD1C /* h235_srtp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D434890DC8B6730065FD1C /* h235_srtp.h */; };
-		D1D4348E0DC8B6900065FD1C /* rfc4175.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D4348D0DC8B6900065FD1C /* rfc4175.h */; };
-		D1D434920DC8B6D20065FD1C /* zrtpudp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D434910DC8B6D20065FD1C /* zrtpudp.h */; };
 		D1D434BC0DC8B8C30065FD1C /* collect.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6079008F8F86B0034B47F /* collect.cxx */; };
 		D1D434BD0DC8B8C40065FD1C /* contain.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1B6079108F8F86B0034B47F /* contain.cxx */; };
 		D1D434BE0DC8B8C40065FD1C /* getdate.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = D1B6079208F8F86B0034B47F /* getdate.tab.c */; };
@@ -351,7 +327,6 @@
 		D1D435820DC8BC770065FD1C /* speex_preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = D10FD6560A7D49C700935B10 /* speex_preprocess.c */; };
 		D1D435860DC8BC940065FD1C /* rtpconn.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1D435840DC8BC940065FD1C /* rtpconn.cxx */; };
 		D1D435870DC8BC940065FD1C /* rtpep.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1D435850DC8BC940065FD1C /* rtpep.cxx */; };
-		D1D4358D0DC8BD400065FD1C /* sockagg.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D4358C0DC8BD400065FD1C /* sockagg.h */; };
 		D1D435900DC8BD680065FD1C /* sockagg.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1D4358F0DC8BD680065FD1C /* sockagg.cxx */; };
 		D1D435920DC8BD990065FD1C /* XMAudioTester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D10BDA490AC45832004320A8 /* XMAudioTester.cpp */; };
 		D1D435940DC8BD9B0065FD1C /* XMConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1971B8C08FA756700295E05 /* XMConnection.cpp */; };
@@ -374,7 +349,6 @@
 		D1D435A50DC8BDB20065FD1C /* XMSIPEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */; };
 		D1D435A60DC8BDB30065FD1C /* XMSoundChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */; };
 		D1D435A70DC8BDB40065FD1C /* XMURLParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1010AB30C71F6D20010523E /* XMURLParser.cpp */; };
-		D1D4362A0DC8C0280065FD1C /* mediatype.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1D436290DC8C0280065FD1C /* mediatype.h */; };
 		D1D439590DC8C6B10065FD1C /* XMBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D16334CA07A1C036003FD9C0 /* XMBridge.cpp */; };
 		D1D4395A0DC8C6B50065FD1C /* XMCallbackBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D18BF5F107AFA006000CF993 /* XMCallbackBridge.m */; };
 		D1D4395C0DC8C6DD0065FD1C /* XMPacketBuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = D1972B0008FC529C00295E05 /* XMPacketBuilder.c */; };
@@ -529,43 +503,6 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D10B8E050A512F0100003A33 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = English.lproj/Manual;
-			dstSubfolderSpec = 7;
-			files = (
-				D10B8E070A512F3400003A33 /* manual.html in CopyFiles */,
-				D1395EF20BEF76A700C76EFD /* XMAreaSelectionView.h in CopyFiles */,
-				D13962170BF0BA2F00C76EFD /* XMH323URL.h in CopyFiles */,
-				D13962B70BF0C9F100C76EFD /* XMSIPURL.h in CopyFiles */,
-				D15436F20C0ADF78002A027E /* psockbun.h in CopyFiles */,
-				D15437440C0B10F3002A027E /* audiorecord.h in CopyFiles */,
-				D15437630C0B1331002A027E /* opalmixer.h in CopyFiles */,
-				D154392A0C0C4C09002A027E /* handlers.h in CopyFiles */,
-				D1A561040C6CA45A0086E6F6 /* XMIPAddressFormatter.h in CopyFiles */,
-				D1A24F2C0C6FD96000408CF7 /* XMIDDPrefixFormatter.h in CopyFiles */,
-				D1010AB60C71F6D20010523E /* XMURLParser.h in CopyFiles */,
-				D1D434840DC8B61F0065FD1C /* rtpconn.h in CopyFiles */,
-				D1D434850DC8B61F0065FD1C /* rtpep.h in CopyFiles */,
-				D1D4348A0DC8B6730065FD1C /* h235_srtp.h in CopyFiles */,
-				D1D4348E0DC8B6900065FD1C /* rfc4175.h in CopyFiles */,
-				D1D434920DC8B6D20065FD1C /* zrtpudp.h in CopyFiles */,
-				D1D4358D0DC8BD400065FD1C /* sockagg.h in CopyFiles */,
-				D1D4362A0DC8C0280065FD1C /* mediatype.h in CopyFiles */,
-				D14BBF450E3F7B6F007B1A57 /* h460.h in CopyFiles */,
-				D14BBF460E3F7B6F007B1A57 /* h4601.h in CopyFiles */,
-				D14BBF470E3F7B6F007B1A57 /* h46018.h in CopyFiles */,
-				D14BBF480E3F7B6F007B1A57 /* h46019.h in CopyFiles */,
-				D14BBF490E3F7B6F007B1A57 /* h4609.h in CopyFiles */,
-				D14BBF4A0E3F7B6F007B1A57 /* h460p.h in CopyFiles */,
-				D14BBF4B0E3F7B6F007B1A57 /* h460pres.h in CopyFiles */,
-				D14BBF4C0E3F7B6F007B1A57 /* h460tm.h in CopyFiles */,
-				D14BBF600E3F7DF6007B1A57 /* localep.h in CopyFiles */,
-				D15F71C20E54B71B0006CB43 /* g711a1_plc.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D10B8E080A512F4A00003A33 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -577,6 +514,7 @@
 				D10B8E0C0A512F5D00003A33 /* logo.tiff in CopyFiles */,
 				D10B8E0D0A512F5D00003A33 /* mainwindow.png in CopyFiles */,
 				D10B8E0E0A512F5D00003A33 /* osd.png in CopyFiles */,
+				D1AD1A680E6320F800143295 /* pvidfile.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -993,6 +931,9 @@
 		D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMLocalVideoView.m; path = Source/GUI/XMLocalVideoView.m; sourceTree = "<group>"; };
 		D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMInspectorModule.m; path = Source/GUI/XMInspectorModule.m; sourceTree = "<group>"; };
 		D1A5EE1509CB08E30063B926 /* DummyImage.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = DummyImage.gif; path = Resources/Images/DummyImage.gif; sourceTree = "<group>"; };
+		D1AD190C0E630B1700143295 /* ptbuildopts.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ptbuildopts.h; sourceTree = "<group>"; };
+		D1AD1A670E6320F800143295 /* pvidfile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = pvidfile.h; sourceTree = "<group>"; };
+		D1AD1A690E63212100143295 /* pvidfile.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pvidfile.cxx; sourceTree = "<group>"; };
 		D1AF63D40A39415200CAF35F /* XMAppearancePreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAppearancePreferencesModule.h; path = Source/GUI/XMAppearancePreferencesModule.h; sourceTree = "<group>"; };
 		D1AF63D50A39415200CAF35F /* XMAppearancePreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAppearancePreferencesModule.m; path = Source/GUI/XMAppearancePreferencesModule.m; sourceTree = "<group>"; };
 		D1AF63DA0A39416700CAF35F /* XMAddressBookPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPreferencesModule.h; path = Source/GUI/XMAddressBookPreferencesModule.h; sourceTree = "<group>"; };
@@ -2208,30 +2149,33 @@
 		D1B6057D08F8F7A90034B47F /* ptlib */ = {
 			isa = PBXGroup;
 			children = (
-				D1B6062B08F8F8200034B47F /* Headers */,
-				D1B6058A08F8F7E30034B47F /* Source */,
+				D1B6062B08F8F8200034B47F /* include */,
+				D1B6058A08F8F7E30034B47F /* src */,
 			);
 			name = ptlib;
 			sourceTree = "<group>";
 		};
-		D1B6058A08F8F7E30034B47F /* Source */ = {
+		D1B6058A08F8F7E30034B47F /* src */ = {
 			isa = PBXGroup;
 			children = (
 				D1B6075808F8F86B0034B47F /* ptclib */,
 				D1B6078D08F8F86B0034B47F /* ptlib */,
 			);
-			name = Source;
+			name = src;
+			path = ../ptlib/src;
 			sourceTree = "<group>";
 		};
-		D1B6062B08F8F8200034B47F /* Headers */ = {
+		D1B6062B08F8F8200034B47F /* include */ = {
 			isa = PBXGroup;
 			children = (
 				D1B606C508F8F8410034B47F /* ptlib.h */,
+				D1AD190C0E630B1700143295 /* ptbuildopts.h */,
 				D1B6062E08F8F8410034B47F /* ptclib */,
 				D1B6065D08F8F8410034B47F /* ptlib */,
 				D1887E0B0A27B96900C938BB /* Patches */,
 			);
-			name = Headers;
+			name = include;
+			path = ../ptlib/include;
 			sourceTree = "<group>";
 		};
 		D1B6062E08F8F8410034B47F /* ptclib */ = {
@@ -2269,6 +2213,7 @@
 				D1B6064A08F8F8410034B47F /* pssl.h */,
 				D1B6064B08F8F8410034B47F /* pstun.h */,
 				D1B6064C08F8F8410034B47F /* ptts.h */,
+				D1AD1A670E6320F800143295 /* pvidfile.h */,
 				D1B6064D08F8F8410034B47F /* pwavfile.h */,
 				D1B6064E08F8F8410034B47F /* pxml.h */,
 				D1B6064F08F8F8410034B47F /* pxmlrpc.h */,
@@ -2436,6 +2381,7 @@
 				D1887D620A27A85500C938BB /* pssl.cxx */,
 				D1B6077808F8F86B0034B47F /* pstun.cxx */,
 				D1B6077908F8F86B0034B47F /* ptts.cxx */,
+				D1AD1A690E63212100143295 /* pvidfile.cxx */,
 				D1B6077B08F8F86B0034B47F /* pwavfile.cxx */,
 				D1B6077F08F8F86B0034B47F /* qchannel.cxx */,
 				D1B6078008F8F86B0034B47F /* random.cxx */,
@@ -3174,8 +3120,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				1A0AB04F09ACA47300DD66BD /* ShellScript */,
-				D10B8E050A512F0100003A33 /* CopyFiles */,
+				D1AD19370E630C2D00143295 /* ShellScript */,
 				D10B8E080A512F4A00003A33 /* CopyFiles */,
 				D1BD61C40A91042D007C8E46 /* CopyFiles */,
 				D1BD61C60A910474007C8E46 /* CopyFiles */,
@@ -3420,19 +3365,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1A0AB04F09ACA47300DD66BD /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "\nif [ $BUILD_STYLE == 'Deployment' ];\nthen\necho \"Stripping product\";\n/usr/bin/strip \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/${PRODUCT_NAME}\"\nelse\necho \"Product not stripped\";\nfi\n\nif [ $BUILD_STYLE == 'DevelopmentRelease' ];\nthen\necho \"Preparing DevelopmentRelease\";\n/usr/bin/strip -x \"${TARGET_BUILD_DIR}/pwlib.dylib\"\n/usr/bin/strip -x \"${TARGET_BUILD_DIR}/opal.dylib\"\ncp \"${TARGET_BUILD_DIR}/pwlib.dylib\" \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/pwlib.dylib\"\ncp \"${TARGET_BUILD_DIR}/opal.dylib\" \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/opal.dylib\"\nfi";
-		};
 		D126F5060BB16ED800044885 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3444,7 +3376,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../ptlib/include/ptbuildopts.h ];\nthen\necho \"PTLib: Running configure not needed\";\nelse\necho \"PTLib: Running configure\";\ncd ../ptlib\n./configure --enable-minsize \n#--enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\nautoconf\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PTLib: Running bison not needed\";\nelse\necho \"PTLib: Running bison\";\n/usr/bin/bison ../ptlib/src/ptlib/common/getdate.y -o ../ptlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../ptlib/include/ptbuildopts.h ];\nthen\necho \"PTLib: Running configure not needed\";\nelse\necho \"PTLib: Running configure\";\ncd ../ptlib\n./configure --enable-minsize --enable-video\n#--enable-h323 --enable-sasl --enable-openssl --enable-plugins --enable-http --enable-httpsvc --enable-configfile --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\nautoconf\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PTLib: Running bison not needed\";\nelse\necho \"PTLib: Running bison\";\n/usr/bin/bison ../ptlib/src/ptlib/common/getdate.y -o ../ptlib/src/ptlib/common/getdate.tab.c \nfi";
+		};
+		D1AD19370E630C2D00143295 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "if [ $BUILD_STYLE == 'Deployment' ];\nthen\n  echo \"Stripping product\";\n  /usr/bin/strip \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/${PRODUCT_NAME}\"\nelse\n  echo \"Product not stripped\";\nfi\n\nif [ $BUILD_STYLE == 'DevelopmentRelease' ];\nthen\n  echo \"Preparing DevelopmentRelease\";\n  /usr/bin/strip -x \"${TARGET_BUILD_DIR}/pwlib.dylib\"\n  /usr/bin/strip -x \"${TARGET_BUILD_DIR}/opal.dylib\"\n  cp \"${TARGET_BUILD_DIR}/pwlib.dylib\" \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/pwlib.dylib\"\n  cp \"${TARGET_BUILD_DIR}/opal.dylib\" \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents/MacOS/opal.dylib\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3713,6 +3658,7 @@
 				D14BBF3B0E3F7B43007B1A57 /* h460tm.cxx in Sources */,
 				D14BBF650E3F7E28007B1A57 /* localep.cxx in Sources */,
 				D15F71C40E54B7300006CB43 /* g711a1_plc.cxx in Sources */,
+				D1AD1A6A0E63212100143295 /* pvidfile.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

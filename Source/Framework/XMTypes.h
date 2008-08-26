@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.37 2007/09/27 21:13:11 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.38 2008/08/26 08:14:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,16 @@ typedef enum XMCallProtocol
 } XMCallProtocol;
 
 /**
+ * Defines the possible protocol status
+ **/
+typedef enum XMProtocolStatus
+{
+  XMProtocolStatus_Disabled = 0,
+  XMProtocolStatus_Enabled,
+  XMProtocolStatus_Error
+} XMProtocolStatus;
+
+/**
  * Defines some reasons why starting a call did fail
  **/
 typedef enum XMCallStartFailReason
@@ -79,62 +89,70 @@ typedef enum XMCallStatus
 
 /**
  * Defines the CallEnd reasons.
- * Note that this is a simple copy from the CallEndReason enum
- * in OpalConnection
+ * Note that this is a copy from the CallEndReason enum in OpalConnection,
+ * with some additional definitions (e.g. no network interfaces)
  **/
 typedef enum XMCallEndReason
 {
-  XMCallEndReason_EndedByLocalUser = 0,     /// Local endpoint application cleared call
-  XMCallEndReason_EndedByNoAccept,          /// Local endpoint did not accept call OnIncomingCall()=FALSE
-  XMCallEndReason_EndedByAnswerDenied,      /// Local endpoint declined to answer call
-  XMCallEndReason_EndedByRemoteUser,        /// Remote endpoint application cleared call
-  XMCallEndReason_EndedByRefusal,           /// Remote endpoint refused call
-  XMCallEndReason_EndedByNoAnswer,          /// Remote endpoint did not answer in required time
-  XMCallEndReason_EndedByCallerAbort,       /// Remote endpoint stopped calling
-  XMCallEndReason_EndedByTransportFail,     /// Transport error cleared call
-  XMCallEndReason_EndedByConnectFail,       /// Transport connection failed to establish call
-  XMCallEndReason_EndedByGatekeeper,        /// Gatekeeper has cleared call
-  XMCallEndReason_EndedByNoUser,            /// Call failed as could not find user (in GK)
-  XMCallEndReason_EndedByNoBandwidth,       /// Call failed as could not get enough bandwidth
-  XMCallEndReason_EndedByCapabilityExchange,/// Could not find common capabilities
-  XMCallEndReason_EndedByCallForwarded,     /// Call was forwarded using FACILITY message
-  XMCallEndReason_EndedBySecurityDenial,    /// Call failed a security check and was ended
-  XMCallEndReason_EndedByLocalBusy,         /// Local endpoint busy
-  XMCallEndReason_EndedByLocalCongestion,   /// Local endpoint congested
-  XMCallEndReason_EndedByRemoteBusy,        /// Remote endpoint busy
-  XMCallEndReason_EndedByRemoteCongestion,  /// Remote endpoint congested
-  XMCallEndReason_EndedByUnreachable,       /// Could not reach the remote party
-  XMCallEndReason_EndedByNoEndPoint,        /// The remote party is not running an endpoint
-  XMCallEndReason_EndedByHostOffline,       /// The remote party host off line
-  XMCallEndReason_EndedByTemporaryFailure,  /// The remote failed temporarily app may retry
-  XMCallEndReason_EndedByQ931Cause,         /// The remote ended the call with unmapped Q.931 cause code
-  XMCallEndReason_EndedByDurationLimit,     /// Call cleared due to an enforced duration limit
-  XMCallEndReason_EndedByInvalidConferenceID, /// Call cleared due to invalid conference ID
-  XMCallEndReason_EndedByNoNetworkInterfaces, /// No network interfaces present on the system
+  XMCallEndReason_EndedByLocalUser = 0,        /// Local endpoint application cleared call
+  XMCallEndReason_EndedByNoAccept,             /// Local endpoint did not accept call OnIncomingCall()=FALSE
+  XMCallEndReason_EndedByAnswerDenied,         /// Local endpoint declined to answer call
+  XMCallEndReason_EndedByRemoteUser,           /// Remote endpoint application cleared call
+  XMCallEndReason_EndedByRefusal,              /// Remote endpoint refused call
+  XMCallEndReason_EndedByNoAnswer,             /// Remote endpoint did not answer in required time
+  XMCallEndReason_EndedByCallerAbort,          /// Remote endpoint stopped calling
+  XMCallEndReason_EndedByTransportFail,        /// Transport error cleared call
+  XMCallEndReason_EndedByConnectFail,          /// Transport connection failed to establish call
+  XMCallEndReason_EndedByGatekeeper,           /// Gatekeeper has cleared call
+  XMCallEndReason_EndedByNoUser,               /// Call failed as could not find user (in GK)
+  XMCallEndReason_EndedByNoBandwidth,          /// Call failed as could not get enough bandwidth
+  XMCallEndReason_EndedByCapabilityExchange,   /// Could not find common capabilities
+  XMCallEndReason_EndedByCallForwarded,        /// Call was forwarded using FACILITY message
+  XMCallEndReason_EndedBySecurityDenial,       /// Call failed a security check and was ended
+  XMCallEndReason_EndedByLocalBusy,            /// Local endpoint busy
+  XMCallEndReason_EndedByLocalCongestion,      /// Local endpoint congested
+  XMCallEndReason_EndedByRemoteBusy,           /// Remote endpoint busy
+  XMCallEndReason_EndedByRemoteCongestion,     /// Remote endpoint congested
+  XMCallEndReason_EndedByUnreachable,          /// Could not reach the remote party
+  XMCallEndReason_EndedByNoEndPoint,           /// The remote party is not running an endpoint
+  XMCallEndReason_EndedByHostOffline,          /// The remote party host off line
+  XMCallEndReason_EndedByTemporaryFailure,     /// The remote failed temporarily app may retry
+  XMCallEndReason_EndedByQ931Cause,            /// The remote ended the call with unmapped Q.931 cause code
+  XMCallEndReason_EndedByDurationLimit,        /// Call cleared due to an enforced duration limit
+  XMCallEndReason_EndedByInvalidConferenceID,  /// Call cleared due to invalid conference ID
+  XMCallEndReason_EndedByNoDialTone,           /// Call cleared due to missing dial tone
+  XMCallEndReason_EndedByNoRingBackTone,       /// Call cleared due to missing ringback tone
+  XMCallEndReason_EndedByOutOfService,         /// Call cleared because the line is out of service, 
+  XMCallEndReason_EndedByAcceptingCallWaiting, /// Call cleared because another call is answered
+  XMCallEndReason_EndedByNoNetworkInterfaces,  /// No network interfaces present on the system
   XMCallEndReasonCount
 } XMCallEndReason;
 
 /**
  * Defines the various gatekeeper registration fail reasons
  **/
-typedef enum XMGatekeeperRegistrationFailReason
+typedef enum XMGatekeeperRegistrationStatus
 {
-  XMGatekeeperRegistrationFailReason_NoFailure = 0,
-  XMGatekeeperRegistrationFailReason_UnknownFailure,
-  XMGatekeeperRegistrationFailReason_GatekeeperNotFound,
-  XMGatekeeperRegistrationFailReason_DuplicateAlias,
-  XMGatekeeperRegistrationFailReason_SecurityDenied,
-  XMGatekeeperRegistrationFailReason_TransportError,
-  XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper,
-} XMGatekeeperRegistrationFailReason;
+  XMGatekeeperRegistrationStatus_NotRegistered = 0,
+  XMGatekeeperRegistrationStatus_SuccessfullyRegistered,
+  XMGatekeeperRegistrationStatus_UnknownRegistrationFailure,
+  XMGatekeeperRegistrationStatus_GatekeeperNotFound,
+  XMGatekeeperRegistrationStatus_DuplicateAlias,
+  XMGatekeeperRegistrationStatus_SecurityDenied,
+  XMGatekeeperRegistrationStatus_TransportError,
+  XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper,
+} XMGatekeeperRegistrationStatus;
 
 /**
- * Defines the various SIP registration fail reasons
+ * Defines the various SIP registration fail reasons.
+ * Note that this is a copy from the StatusCodes enum in SIP_PDU,
+ * with some additional status codes (e.g. no network interface)
  **/
 typedef enum XMSIPStatusCode
 {
-  XMSIPStatusCode_NoFailure                           =   0,
-  XMSIPStatusCode_NoNetworkInterfaces                 =   1,
+  XMSIPStatusCode_IllegalCode                         =   0,
+  XMSIPStatusCode_Local_TransportError                =   1,
+  XMSIPStatusCode_Local_BadTransportAddress           =   2,
   
   XMSIPStatusCode_Information_Trying                  = 100,
   XMSIPStatusCode_Information_Ringing                 = 180,
@@ -142,8 +160,8 @@ typedef enum XMSIPStatusCode
   XMSIPStatusCode_Information_Queued                  = 182,
   XMSIPStatusCode_Information_Session_Progress        = 183,
   
-  XMSIPStatusCode_Succesful_OK                        = 200,
-  XMSIPStatusCode_Succesful_Accepted                  = 202,
+  XMSIPStatusCode_Successful_OK                       = 200,
+  XMSIPStatusCode_Successful_Accepted                 = 202,
   
   XMSIPStatusCode_Redirection_MultipleChoices         = 300,
   XMSIPStatusCode_Redirection_MovedPermamently        = 301,
@@ -159,7 +177,7 @@ typedef enum XMSIPStatusCode
   XMSIPStatusCode_Failure_MethodNotAllowed            = 405,
   XMSIPStatusCode_Failure_NotAcceptable               = 406,
   XMSIPStatusCode_Failure_ProxyAuthenticationRequired = 407,
-  XMSIPStatusCode_Failure_RequestTimeout			  = 408,
+  XMSIPStatusCode_Failure_RequestTimeout			        = 408,
   XMSIPStatusCode_Failure_Conflict                    = 409,
   XMSIPStatusCode_Failure_Gone                        = 410,
   XMSIPStatusCode_Failure_LengthRequired              = 411,
@@ -194,7 +212,10 @@ typedef enum XMSIPStatusCode
   XMSIPStatusCode_GlobalFailure_BusyEverywhere        = 600,
   XMSIPStatusCode_GlobalFailure_Decline               = 603,
   XMSIPStatusCode_GlobalFailure_DoesNotExistAnywhere  = 604,
-  XMSIPStatusCode_GlobalFailure_NotAcceptable         = 606
+  XMSIPStatusCode_GlobalFailure_NotAcceptable         = 606,
+  
+  XMSIPStatusCode_Framework_NoNetworkInterfaces       = 700,
+  
 } XMSIPStatusCode;
 
 /**

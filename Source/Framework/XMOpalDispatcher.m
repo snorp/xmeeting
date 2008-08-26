@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.50 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.51 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,10 +22,6 @@ typedef enum _XMOpalDispatcherMessage
   
   // Setup messages
   _XMOpalDispatcherMessage_SetPreferences = 0x0100,
-  _XMOpalDispatcherMessage_RetryEnableH323,
-  _XMOpalDispatcherMessage_RetryGatekeeperRegistration,
-  _XMOpalDispatcherMessage_RetryEnableSIP,
-  _XMOpalDispatcherMessage_RetrySIPRegistrations,
   _XMOpalDispatcherMessage_HandleNetworkConfigurationChange,
   
   // Call Management messages
@@ -107,6 +103,7 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_waitForSubsystemSetupCompletion:(BOOL)verbose;
 
+- (void)_resyncSubsystem:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
 
 - (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
@@ -134,50 +131,6 @@ typedef enum _XMOpalDispatcherMessage
   NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, publicAddressData, networkConfigurationChangedData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SetPreferences withComponents:components];
-  
-  [components release];
-}
-
-+ (void)_retryEnableH323:(XMPreferences *)preferences
-{
-  NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-  
-  NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, nil];
-  
-  [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetryEnableH323 withComponents:components];
-  
-  [components release];
-}
-
-+ (void)_retryGatekeeperRegistration:(XMPreferences *)preferences
-{
-  NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-  
-  NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, nil];
-  
-  [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetryGatekeeperRegistration withComponents:components];
-  
-  [components release];
-}
-
-+ (void)_retryEnableSIP:(XMPreferences *)preferences
-{
-  NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-  
-  NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, nil];
-  
-  [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetryEnableSIP withComponents:components];
-  
-  [components release];
-}
-
-+ (void)_retrySIPRegistrations:(XMPreferences *)preferences
-{
-  NSData *preferencesData = [NSKeyedArchiver archivedDataWithRootObject:preferences];
-  
-  NSArray *components = [[NSArray alloc] initWithObjects:preferencesData, nil];
-  
-  [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RetrySIPRegistrations withComponents:components];
   
   [components release];
 }
@@ -526,8 +479,7 @@ typedef enum _XMOpalDispatcherMessage
 
 + (void)_sendMessage:(_XMOpalDispatcherMessage)message withComponents:(NSArray *)components
 {
-  if(_XMOpalDispatcherSharedInstance == nil)
-  {
+  if (_XMOpalDispatcherSharedInstance == nil) {
     NSLog(@"Attempt to send message to NIL OpalDispatcher");
     return;
   }
@@ -535,8 +487,7 @@ typedef enum _XMOpalDispatcherMessage
   NSPort *thePort = [_XMOpalDispatcherSharedInstance _receivePort];
   NSPortMessage *portMessage = [[NSPortMessage alloc] initWithSendPort:thePort receivePort:nil components:components];
   [portMessage setMsgid:(unsigned)message];
-  if([portMessage sendBeforeDate:[NSDate date]] == NO)
-  {
+  if ([portMessage sendBeforeDate:[NSDate date]] == NO) {
     NSLog(@"Sending the message failed (Dispatcher) %x", message);
   }
   [portMessage release];
@@ -557,9 +508,11 @@ typedef enum _XMOpalDispatcherMessage
   self = [super init];
   
   receivePort = [[NSPort port] retain];
+  currentPreferences = nil;
   
   callID = 0;
   
+  controlTimer = nil;
   callStatisticsUpdateIntervalTimer = nil;
   
   sipRegistrationWaitLock = [[NSLock alloc] init];
@@ -575,6 +528,10 @@ typedef enum _XMOpalDispatcherMessage
 - (void)dealloc
 {
   [receivePort release];
+  [currentPreferences release];
+  
+  [controlTimer release];
+  [callStatisticsUpdateIntervalTimer release];
   
   [sipRegistrationWaitLock release];
   
@@ -611,6 +568,9 @@ typedef enum _XMOpalDispatcherMessage
   // Signaling that the subsystem has initialized
   _XMSubsystemInitialized();
   
+  // start the control timer. The timer is invalidated/released within -handleShutdownMessage
+  controlTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(_resyncSubsystem:) userInfo:nil repeats:YES] retain];
+  
   // running the run loop
   [[NSRunLoop currentRunLoop] run];
   
@@ -626,25 +586,12 @@ typedef enum _XMOpalDispatcherMessage
 {
   _XMOpalDispatcherMessage message = (_XMOpalDispatcherMessage)[portMessage msgid];
   
-  switch(message)
-  {
+  switch (message) {
     case _XMOpalDispatcherMessage_Shutdown:
       [self _handleShutdownMessage];
       break;
     case _XMOpalDispatcherMessage_SetPreferences:
       [self _handleSetPreferencesMessage:[portMessage components]];
-      break;
-    case _XMOpalDispatcherMessage_RetryEnableH323:
-      [self _handleRetryEnableH323Message:[portMessage components]];
-      break;
-    case _XMOpalDispatcherMessage_RetryGatekeeperRegistration:
-      [self _handleRetryGatekeeperRegistrationMessage:[portMessage components]];
-      break;
-    case _XMOpalDispatcherMessage_RetryEnableSIP:
-      [self _handleRetryEnableSIPMessage:[portMessage components]];
-      break;
-    case _XMOpalDispatcherMessage_RetrySIPRegistrations:
-      [self _handleRetrySIPRegistrationsMessage:[portMessage components]];
       break;
     case _XMOpalDispatcherMessage_HandleNetworkConfigurationChange:
       [self _handleNetworkConfigurationChangeMessage];
@@ -716,8 +663,7 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleShutdownMessage
 {
-  if(callID != 0)
-  {
+  if (callID != 0) {
     // we have to terminate the call first
     // and we wait until the call is cleared before shutting down the system entirely
     [self _handleClearCallMessage:nil];
@@ -731,12 +677,13 @@ typedef enum _XMOpalDispatcherMessage
   [self _doPreferencesSetup:preferences publicAddress:nil networkConfigurationChanged:NO verbose:NO];
   [preferences release];
   
-  if(callStatisticsUpdateIntervalTimer != nil)
-  {
-    [callStatisticsUpdateIntervalTimer invalidate];
-    [callStatisticsUpdateIntervalTimer release];
-    callStatisticsUpdateIntervalTimer = nil;
-  }
+  // remove all timers
+  [controlTimer invalidate];
+  [controlTimer release];
+  controlTimer = nil;
+  [callStatisticsUpdateIntervalTimer invalidate];
+  [callStatisticsUpdateIntervalTimer release];
+  callStatisticsUpdateIntervalTimer = nil;
   
   // exiting from the run loop
   [[NSRunLoop currentRunLoop] removePort:receivePort forMode:NSDefaultRunLoopMode];
@@ -763,60 +710,6 @@ typedef enum _XMOpalDispatcherMessage
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
 
-- (void)_handleRetryEnableH323Message:(NSArray *)components
-{
-  NSData *preferencesData = (NSData *)[components objectAtIndex:0];
-  XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
-  
-  [self _doH323Setup:preferences verbose:YES];
-  
-  [self _waitForSubsystemSetupCompletion:NO];
-  
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
-}
-
-- (void)_handleRetryGatekeeperRegistrationMessage:(NSArray *)components
-{
-  NSData *preferencesData = (NSData *)[components objectAtIndex:0];
-  XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
-  
-  [self _doGatekeeperSetup:preferences verbose:YES];
-  
-  [self _waitForSubsystemSetupCompletion:NO];
-  
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
-                                                 withObject:nil
-                                              waitUntilDone:NO];
-}
-
-- (void)_handleRetryEnableSIPMessage:(NSArray *)components
-{
-  NSData *preferencesData = (NSData *)[components objectAtIndex:0];
-  XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
-  
-  [self _doSIPSetup:preferences verbose:YES];
-  
-  [self _waitForSubsystemSetupCompletion:YES];
-  
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
-                                                 withObject:nil
-                                              waitUntilDone:NO];
-}
-
-- (void)_handleRetrySIPRegistrationsMessage:(NSArray *)components
-{
-  NSData *preferencesData = (NSData *)[components objectAtIndex:0];
-  XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
-  
-  [self _doRegistrationSetup:preferences verbose:YES proxyChanged:NO];
-  
-  [self _waitForSubsystemSetupCompletion:YES];
-  
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd)
-                                                 withObject:nil
-                                              waitUntilDone:NO];
-}
-
 - (void)_handleNetworkConfigurationChangeMessage
 {
   _XMHandleNetworkConfigurationChange();
@@ -830,8 +723,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
   XMCallProtocol protocol = (XMCallProtocol)[number unsignedIntValue];
   
-  if(callID != 0)
-  {
+  if (callID != 0) {
     // This probably indicates that an incoming call arrived at exactly the same time than
     // the user tried to initiate this call. Since the incoming call arrived first,
     // we cannot call anyone at the moment
@@ -855,8 +747,7 @@ typedef enum _XMOpalDispatcherMessage
   XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
   NSString *publicAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:publicAddressData];
   
-  if(callID != 0)
-  {
+  if (callID != 0) {
     // This probably indicates that an incoming call arrived at exactly the same time than
     // the user tried to initiate this call. Since the incoming call arrived first,
     // we cannot call anyone at the moment
@@ -875,14 +766,12 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on IsAlerting: %d to currently %d", (int)theCallID, (int)callID);
     return;
   }
   
-  if(callID == UINT_MAX)
-  {
+  if (callID == UINT_MAX) {
     // we are shutting down anyway...
     return;
   }
@@ -905,20 +794,14 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if(callID != 0)
-  {
+  if (callID != 0) {
     NSLog(@"have already call ongoing");
     
-    if(theCallID > callID)
-    {
+    if (theCallID > callID) {
       NSLog(@"Incoming greater than callID");
-    }
-    else if(theCallID < callID)
-    {
+    } else if (theCallID < callID) {
       NSLog(@"INcoming less than callID");
-    }
-    else
-    {
+    } else {
       NSLog(@"Incoming EQUAL callID!!!!!");
     }
     return;
@@ -958,8 +841,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [idNumber unsignedIntValue];
   
-  if(theCallID != callID)
-  {
+  if (theCallID != callID) {
     NSLog(@"callID mismatch in accpetIncomingCall: %d to current %d", (int)theCallID, (int)callID);
     return;
   }
@@ -973,8 +855,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [idNumber unsignedIntValue];
   
-  if(theCallID != callID)
-  {
+  if (theCallID != callID) {
     NSLog(@"callID mismatch in rejectIncomingCall: %d to current %d", (int)theCallID, (int)callID);
     return;
   }
@@ -995,16 +876,14 @@ typedef enum _XMOpalDispatcherMessage
   NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:2];
   NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
   
-  if(theCallID != callID)
-  {
+  if (theCallID != callID) {
     NSLog(@"callID mismatch in callEstablished: %d to current %d", (int)theCallID, (int)callID);
     return;
   }
   
   NSArray *remotePartyInformations = nil;
   
-  if(isIncomingCall == NO)
-  {
+  if (isIncomingCall == NO) {
     const char *remoteName;
     const char *remoteNumber;
     const char *remoteAddress;
@@ -1044,14 +923,12 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleClearCallMessage:(NSArray *)messageComponents
 {
-  if(messageComponents != nil)
-  {
+  if (messageComponents != nil) {
     NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
     NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
     unsigned theCallID = [idNumber unsignedIntValue];
     
-    if(theCallID != callID)
-    {
+    if (theCallID != callID) {
       NSLog(@"callID mismatch in clearCall: %d to current %d", (int)theCallID, (int)callID);
       return;
     }
@@ -1067,8 +944,7 @@ typedef enum _XMOpalDispatcherMessage
   unsigned theCallID = [callIDNumber unsignedIntValue];
   
   // If call initiation fails, no callID is set (zero), don't log this
-  if((theCallID != callID) && (callID != UINT_MAX) && (callID != 0))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX) && (callID != 0)) {
     NSLog(@"callID mismatch in callCleared: %d to current %d", (int)theCallID, (int)callID);
     return;
   }
@@ -1082,15 +958,13 @@ typedef enum _XMOpalDispatcherMessage
                                                  withObject:callEndReason
                                               waitUntilDone:NO];
   
-  if(callID == UINT_MAX)
-  {
+  if (callID == UINT_MAX) {
     // the framework is closing
     callID = 0;
     [self _handleShutdownMessage];
   }
   
-  if(callStatisticsUpdateIntervalTimer != nil)
-  {
+  if (callStatisticsUpdateIntervalTimer != nil) {
     [callStatisticsUpdateIntervalTimer invalidate];
     [callStatisticsUpdateIntervalTimer release];
     callStatisticsUpdateIntervalTimer = nil;
@@ -1105,8 +979,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *callIDNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [callIDNumber unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"callID mismatch in callReleased: %d to current %d", (int)theCallID, (int)callID);
     return;
   }
@@ -1125,8 +998,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if(theCallID != callID)
-  {
+  if (theCallID != callID) {
     NSLog(@"CallID mismatch on AudioStreamOpened: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1138,13 +1010,10 @@ typedef enum _XMOpalDispatcherMessage
   number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
   BOOL isIncomingStream = [number boolValue];
   
-  if(isIncomingStream == YES)
-  {
+  if (isIncomingStream == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingAudioStreamOpened:) 
                                                    withObject:codec waitUntilDone:NO];
-  }
-  else
-  {
+  } else {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingAudioStreamOpened:)
                                                    withObject:codec waitUntilDone:NO];
   }
@@ -1156,8 +1025,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if(theCallID != 0 && theCallID != callID)
-  {
+  if (theCallID != 0 && theCallID != callID) {
     NSLog(@"CallID mismatch on VideoStreamOpened: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1183,8 +1051,7 @@ typedef enum _XMOpalDispatcherMessage
   
   NSString *sizeString = nil;
   
-  switch(videoSize)
-  {
+  switch(videoSize) {
     case XMVideoSize_SQCIF:
       sizeString = @" (SQCIF)";
       break;
@@ -1204,13 +1071,10 @@ typedef enum _XMOpalDispatcherMessage
   
   NSString *codecString = [[NSString alloc] initWithFormat:@"%@%@", codec, sizeString];
   
-  if(isIncomingStream == YES)
-  {
+  if (isIncomingStream == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingVideoStreamOpened:)
                                                    withObject:codecString waitUntilDone:NO];
-  }
-  else
-  {
+  } else {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingVideoStreamOpened:)
                                                    withObject:codecString waitUntilDone:NO];
   }
@@ -1224,8 +1088,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on MediaStreamClosed: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1234,13 +1097,10 @@ typedef enum _XMOpalDispatcherMessage
   number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
   BOOL isIncomingStream = [number boolValue];
   
-  if(isIncomingStream == YES)
-  {
+  if (isIncomingStream == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingAudioStreamClosed)
                                                    withObject:nil waitUntilDone:NO];
-  }
-  else
-  {
+  } else {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingAudioStreamClosed)
                                                    withObject:nil waitUntilDone:NO];
   }
@@ -1252,8 +1112,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on MediaStreamClosed: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1262,13 +1121,10 @@ typedef enum _XMOpalDispatcherMessage
   number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
   BOOL isIncomingStream = [number boolValue];
   
-  if(isIncomingStream == YES)
-  {
+  if (isIncomingStream == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingVideoStreamClosed)
                                                    withObject:nil waitUntilDone:NO];
-  }
-  else
-  {
+  } else {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleOutgoingVideoStreamClosed)
                                                    withObject:nil waitUntilDone:NO];
   }
@@ -1295,8 +1151,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1315,8 +1170,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1335,8 +1189,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1354,8 +1207,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
   unsigned theCallID = [number unsignedIntValue];
   
-  if((theCallID != callID) && (callID != UINT_MAX))
-  {
+  if ((theCallID != callID) && (callID != UINT_MAX)) {
     NSLog(@"CallID mismatch on StopCameraEvent: %d to actual %d", theCallID, callID);
     return;
   }
@@ -1369,7 +1221,9 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_doPreferencesSetup:(XMPreferences *)preferences publicAddress:(NSString *)suppliedExternalAddress
        networkConfigurationChanged:(BOOL)networkConfigurationChanged verbose:(BOOL)verbose
 {
-  unsigned i;
+  // retain the preferences, used for the resync timer
+  [currentPreferences release];
+  currentPreferences = [preferences retain];
   
   if (networkConfigurationChanged) {
     _XMHandleNetworkConfigurationChange();
@@ -1377,8 +1231,7 @@ typedef enum _XMOpalDispatcherMessage
   
   // ***** Adjusting the general settings ***** //
   NSString *theUserName = [preferences userName];
-  if(theUserName != nil)
-  {
+  if (theUserName != nil) {
     const char *userName;
     userName = [theUserName cStringUsingEncoding:NSASCIIStringEncoding];
     _XMSetUserName(userName);
@@ -1401,7 +1254,7 @@ typedef enum _XMOpalDispatcherMessage
   NSArray *stunServers = [preferences stunServers];
   unsigned numServers = [stunServers count];
   char const** servers = (char const**)malloc(numServers * sizeof(const char *));
-  for (i = 0; i < numServers; i++) {
+  for (unsigned i = 0; i < numServers; i++) {
     NSString *serverName = [stunServers objectAtIndex:i];
     const char *serverString = [serverName cStringUsingEncoding:NSASCIIStringEncoding];
     servers[i] = serverString;
@@ -1427,8 +1280,7 @@ typedef enum _XMOpalDispatcherMessage
   BOOL enableVideo = [preferences enableVideo];
   _XMSetEnableVideo(enableVideo);
   
-  if(enableVideo == YES)
-  {
+  if (enableVideo == YES) {
     [XMMediaTransmitter _setFrameGrabRate:[preferences videoFramesPerSecond]];
   }
   
@@ -1448,37 +1300,29 @@ typedef enum _XMOpalDispatcherMessage
   char const** orderedCodecs = (char const**)malloc(orderedCodecsBufferSize);
   char const** disabledCodecs = (char const**)malloc(disabledCodecsBufferSize);
   
-  for(i = 0; i < audioCodecCount; i++)
-  {
+  for (unsigned i = 0; i < audioCodecCount; i++) {
     XMPreferencesCodecListRecord *record = [preferences audioCodecListRecordAtIndex:i];
     XMCodecIdentifier identifier = [record identifier];
     const char *mediaFormatString = _XMMediaFormatForCodecIdentifier(identifier);
     
-    if([record isEnabled])
-    {
+    if ([record isEnabled]) {
       orderedCodecs[orderedCodecsCount] = mediaFormatString;
       orderedCodecsCount++;
-    }
-    else
-    {
+    } else {
       disabledCodecs[disabledCodecsCount] = mediaFormatString;
       disabledCodecsCount++;
     }
   }
   
-  for(i = 0; i < videoCodecCount; i++)
-  {
+  for (unsigned i = 0; i < videoCodecCount; i++) {
     XMPreferencesCodecListRecord *record = [preferences videoCodecListRecordAtIndex:i];
     XMCodecIdentifier identifier = [record identifier];
     const char *mediaFormatString = _XMMediaFormatForCodecIdentifier(identifier);
     
-    if([record isEnabled])
-    {
+    if ([record isEnabled]) {
       orderedCodecs[orderedCodecsCount] = mediaFormatString;
       orderedCodecsCount++;
-    }
-    else
-    {
+    } else {
       disabledCodecs[disabledCodecsCount] = mediaFormatString;
       disabledCodecsCount++;
     }
@@ -1502,33 +1346,34 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose
 {
-  if([preferences enableH323] == YES)
+  XMProtocolStatus protocolStatus;
+  
+  if ([preferences enableH323] == YES)
   {
-    if(_XMEnableH323Listeners(YES) == YES)
-    {
+    if (_XMEnableH323(YES) == YES) {
+      protocolStatus = XMProtocolStatus_Enabled;
+      
       _XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
       
       // setting up the gatekeeper
       [self _doGatekeeperSetup:preferences verbose:verbose];
+    } else { // Enabling the h323 subsystem failed
+      protocolStatus = XMProtocolStatus_Error;
     }
-    else
-    {
-      // Enabling the h323 subsystem failed
-      if(verbose == YES)
-      {
-        [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleH323EnablingFailure)
-                                                       withObject:nil
-                                                    waitUntilDone:NO];
-      }
-    }
-  } // H.323 disabled
-  else
-  {
+  } else { // h323 disabled
+    protocolStatus = XMProtocolStatus_Disabled;
+    
     // unregistering from the gk if registered
     _XMSetGatekeeper(NULL, NULL, NULL, NULL);
     
     // disabling the H.323 Listeners 
-    _XMEnableH323Listeners(NO);
+    _XMEnableH323(NO);
+  }
+  
+  if (verbose == YES) {
+    NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:protocolStatus];
+    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleH323ProtocolStatus:) withObject:number waitUntilDone:NO];
+    [number release];
   }
 }
 
@@ -1545,19 +1390,16 @@ typedef enum _XMOpalDispatcherMessage
   NSString *terminalAlias2 = [preferences gatekeeperTerminalAlias2];
   NSString *password = [preferences gatekeeperPassword];
   
-  if(address != nil)
-  {
+  if (address != nil) {
     gatekeeperAddress = [address cStringUsingEncoding:NSASCIIStringEncoding];
   }
   if (terminalAlias1 != nil) {
     gatekeeperTerminalAlias1 = [terminalAlias1 cStringUsingEncoding:NSASCIIStringEncoding];
   }
-  if(terminalAlias2 != nil)
-  {
+  if (terminalAlias2 != nil) {
     gatekeeperTerminalAlias2 = [terminalAlias2 cStringUsingEncoding:NSASCIIStringEncoding];
   }
-  if(password != nil)
-  {
+  if (password != nil) {
     gatekeeperPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
   }
     
@@ -1565,8 +1407,7 @@ typedef enum _XMOpalDispatcherMessage
   // The GK Registration may be a lengthy task, especially when
   // the registration fails since there is a timeout to wait
   // before ending the registration process with failure
-  if(terminalAlias1 != nil && verbose == YES)
-  {
+  if (terminalAlias1 != nil && verbose == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationProcessStart) 
                                                    withObject:nil
                                                 waitUntilDone:NO];
@@ -1578,7 +1419,7 @@ typedef enum _XMOpalDispatcherMessage
                    gatekeeperTerminalAlias2,
                    gatekeeperPassword);
   
-  /*if((failReason != XMGatekeeperRegistrationFailReason_NoFailure) && (verbose == YES))
+  /*if ((failReason != XMGatekeeperRegistrationFailReason_NoFailure) && (verbose == YES))
   {
     NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)failReason];
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationFailure:)
@@ -1587,8 +1428,7 @@ typedef enum _XMOpalDispatcherMessage
     [number release];
   }*/
   
-  if((terminalAlias1 != nil) && (verbose == YES))
-  {
+  if ((terminalAlias1 != nil) && (verbose == YES)) {
     // we did run a registration attempt. We inform the CallManager that the GK registration
     // process did end
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationProcessEnd) 
@@ -1599,12 +1439,10 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
 {
-  if([preferences enableSIP] == YES)
-  {
+  if ([preferences enableSIP] == YES) {
     BOOL proxyInfoChanged = NO;
     
-    if(_XMEnableSIPListeners(YES) == YES)
-    {
+    if (_XMEnableSIPListeners(YES) == YES) {
       NSString *host = [preferences sipProxyHost];
       NSString *username = [preferences sipProxyUsername];
       NSString *password = [preferences sipProxyPassword];
@@ -1616,19 +1454,14 @@ typedef enum _XMOpalDispatcherMessage
       proxyInfoChanged = _XMSetSIPProxy(proxyHost, proxyUsername, proxyPassword);
       
       [self _doRegistrationSetup:preferences verbose:verbose proxyChanged:proxyInfoChanged];
-    }
-    else
-    {
-      if(verbose == YES)
-      {
+    } else {
+      if (verbose == YES) {
         [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPEnablingFailure)
                                                        withObject:nil
                                                     waitUntilDone:NO];
       }
     }
-  }
-  else // SIP disabled
-  {
+  } else { // SIP disabled
     _XMSetSIPProxy(NULL, NULL, NULL);
     
     // unregistering if needed
@@ -1651,8 +1484,7 @@ typedef enum _XMOpalDispatcherMessage
   
   [sipRegistrationWaitLock lock];
   
-  if(verbose == YES)
-  {
+  if (verbose == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationProcessStart)
                                                    withObject:nil
                                                 waitUntilDone:NO];
@@ -1660,11 +1492,9 @@ typedef enum _XMOpalDispatcherMessage
   
   _XMPrepareRegistrationSetup(proxyInfoChanged);
   
-  for(i = 0; i < count; i++)
-  {
+  for (i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[records objectAtIndex:i];
-    if(![record isKindOfClass:[XMPreferencesRegistrationRecord class]])
-    {
+    if (![record isKindOfClass:[XMPreferencesRegistrationRecord class]]) {
       continue;
     }
     
@@ -1678,8 +1508,7 @@ typedef enum _XMOpalDispatcherMessage
     NSString *authorizationUsername = [record authorizationUsername];
     NSString *password = [record password];
     
-    if(username != nil)
-    {
+    if (username != nil) {
       registrationDomain = [domain cStringUsingEncoding:NSASCIIStringEncoding];
       registrationUsername = [username cStringUsingEncoding:NSASCIIStringEncoding];
       registrationAuthorizationUsername = [authorizationUsername cStringUsingEncoding:NSASCIIStringEncoding];
@@ -1699,8 +1528,7 @@ typedef enum _XMOpalDispatcherMessage
   [sipRegistrationWaitLock lock];
   [sipRegistrationWaitLock unlock];
   
-  if(verbose == YES)
-  {
+  if (verbose == YES) {
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationProcessEnd)
                                                    withObject:nil
                                                 waitUntilDone:NO];
@@ -1730,9 +1558,9 @@ typedef enum _XMOpalDispatcherMessage
   [arr release];
 }
 
-- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason
+- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationStatus)failReason
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)reason];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)failReason];
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationFailure:)
                                                  withObject:number
                                               waitUntilDone:NO];
@@ -1782,6 +1610,18 @@ typedef enum _XMOpalDispatcherMessage
 #pragma mark -
 #pragma mark Methods fired by Timers
 
+- (void)_resyncSubsystem:(NSTimer *)timer
+{
+  if (currentPreferences == nil) {
+    return;
+  }
+  
+  // retry to enable H.323 if it previously failed
+  if ([currentPreferences enableH323] && _XMIsH323Enabled() == NO) {
+    [self _doH323Setup:currentPreferences verbose:YES];
+  }
+}
+
 - (void)_updateCallStatistics:(NSTimer *)timer
 {
   XMCallStatistics *callStatistics = [[XMCallStatistics alloc] _init];
@@ -1802,24 +1642,20 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
 {
-  if((protocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO))
-  {
+  if ((protocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO)) {
     // Trying to make a H.323 call but H.323 isn't enabled
     [self _sendCallStartFailReason:XMCallStartFailReason_H323NotEnabled address:address];
     return;
   }
-  if((protocol == XMCallProtocol_H323) && XMIsPhoneNumber(address) && (_XMIsRegisteredAtGatekeeper() == NO))
-  {
+  if ((protocol == XMCallProtocol_H323) && XMIsPhoneNumber(address) && (_XMIsRegisteredAtGatekeeper() == NO)) {
     [self _sendCallStartFailReason:XMCallStartFailReason_GatekeeperRequired address:address];
     return;
   }
-  if((protocol == XMCallProtocol_SIP) && (_XMIsSIPEnabled() == NO))
-  {
+  if ((protocol == XMCallProtocol_SIP) && (_XMIsSIPEnabled() == NO)) {
     [self _sendCallStartFailReason:XMCallStartFailReason_SIPNotEnabled address:address];
     return;
   }
-  if((protocol == XMCallProtocol_SIP) && XMIsPhoneNumber(address) && (_XMIsSIPRegistered() == NO))
-  {
+  if ((protocol == XMCallProtocol_SIP) && XMIsPhoneNumber(address) && (_XMIsSIPRegistered() == NO)) {
     [self _sendCallStartFailReason:XMCallStartFailReason_SIPRegistrationRequired address:address];
     return;
   }
@@ -1832,23 +1668,18 @@ typedef enum _XMOpalDispatcherMessage
   XMCallEndReason endReason;
   callID = _XMInitiateCall(protocol, addressString, origAddressString, &endReason);
   
-  if(callID == 0)
-  {
+  if (callID == 0) {
     XMCallStartFailReason failReason = XMCallStartFailReason_UnknownFailure;
-    if (endReason == XMCallEndReason_EndedByTransportFail)
-    {
+    if (endReason == XMCallEndReason_EndedByTransportFail) {
       failReason = XMCallStartFailReason_TransportFail;
     }
-    if (endReason == XMCallEndReason_EndedByNoNetworkInterfaces)
-    {
+    if (endReason == XMCallEndReason_EndedByNoNetworkInterfaces) {
       failReason = XMCallStartFailReason_NoNetworkInterfaces;
     }
     
     // Initiating the call failed
     [self _sendCallStartFailReason:failReason address:address];
-  }
-  else
-  {
+  } else {
     XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
                                                       protocol:protocol
                                                     remoteName:nil
@@ -1881,20 +1712,17 @@ typedef enum _XMOpalDispatcherMessage
 
 - (NSString *)_adjustedAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol
 {
-  if (callProtocol == XMCallProtocol_H323 && _XMIsRegisteredAtGatekeeper() == YES)
-  {
+  if (callProtocol == XMCallProtocol_H323 && _XMIsRegisteredAtGatekeeper() == YES) {
     // Try to do DNS lookups. This is needed to workaround problems with
     // DNS addresses and Gatekeepers in recent versions of OPAL
     NSHost *host = [NSHost hostWithName:address];
     NSArray *addresses = [host addresses];
     unsigned count = [addresses count];
     unsigned i;
-    for(i = 0; i < count; i++)
-    {
+    for (i = 0; i < count; i++) {
       NSString *resolvedAddress = [addresses objectAtIndex:i];
       // at the moment only IPv4 addresses are accepted
-      if(XMIsIPAddress(resolvedAddress))
-      {
+      if (XMIsIPAddress(resolvedAddress)) {
         return resolvedAddress;
       }
     }

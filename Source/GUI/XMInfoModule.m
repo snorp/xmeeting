@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.25 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.26 2008/08/26 08:14:08 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -93,10 +93,7 @@
                              name:XMNotification_CallManagerDidEndSubsystemSetup
                            object:nil];
   [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
-                             name:XMNotification_CallManagerDidRegisterAtGatekeeper
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
-                             name:XMNotification_CallManagerDidUnregisterFromGatekeeper
+                             name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus
                            object:nil];
   
   unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
@@ -406,7 +403,7 @@
     [h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
     [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
     
-    if ([callManager isH323Listening] == YES)
+    if ([callManager isH323Enabled] == YES)
     {
       unsigned h323AccountTag = [activeLocation h323AccountTag];
       NSString *terminalAlias = 0;
@@ -488,7 +485,7 @@
   
   if ([activeLocation enableSIP] == YES)
   {
-    if ([callManager isSIPListening] == YES)
+    if ([callManager isSIPEnabled] == YES)
     {
       [sipStatusField setStringValue:@"Online"];
       [sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
@@ -499,11 +496,11 @@
         unsigned i;
         for (i = 0; i < numSIPAccounts; i++) {
           unsigned tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
-          XMSIPStatusCode status = [callManager sipRegistrationFailReasonAtIndex:i];
+          XMSIPStatusCode status = [callManager sipRegistrationStatusAtIndex:i];
           XMSIPAccount *account = [preferencesManager sipAccountWithTag:tag];
           NSString *string = [account registration];
           BOOL okay = YES;
-          if (status != XMSIPStatusCode_NoFailure) {
+          if (status != XMSIPStatusCode_Successful_OK) {
             okay = NO;
           }
           if (i == 0) {

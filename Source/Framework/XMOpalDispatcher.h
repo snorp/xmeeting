@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.22 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.23 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,9 +21,11 @@
 
 @private
   NSPort *receivePort;
+  XMPreferences *currentPreferences;
   
   unsigned callID;
   
+  NSTimer *controlTimer;
   NSTimer *callStatisticsUpdateIntervalTimer;
   
   NSLock *sipRegistrationWaitLock;
@@ -31,10 +33,6 @@
 }
 
 + (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress networkConfigurationChanged:(BOOL)networkConfigurationChanged;
-+ (void)_retryEnableH323:(XMPreferences *)preferences;
-+ (void)_retryGatekeeperRegistration:(XMPreferences *)preferences;
-+ (void)_retryEnableSIP:(XMPreferences *)preferences;
-+ (void)_retrySIPRegistrations:(XMPreferences *)preferences;
 + (void)_handleNetworkConfigurationChange;
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
@@ -96,7 +94,7 @@
 	// called every time the Framework (re-)registers at a gatekeeper
 - (void)_handleGatekeeperRegistration:(NSString *)gatekeeperName aliases:(NSArray *)gkAliases;
 
-- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationFailReason)reason;
+- (void)_handleGatekeeperRegistrationFailure:(XMGatekeeperRegistrationStatus)failReason;
 
 - (void)_handleGatekeeperUnregistration;
 

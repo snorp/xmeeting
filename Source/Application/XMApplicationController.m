@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.61 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.62 2008/08/26 08:14:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -99,7 +99,7 @@
   // Initialize the framework
   BOOL enablePTrace = [XMPreferencesManager enablePTrace];
   NSString *pTracePath = nil;
-  if(enablePTrace == YES)
+  if (enablePTrace == YES)
   {
     pTracePath = [XMPreferencesManager pTraceFilePath];
   }
@@ -144,7 +144,7 @@
                              name:XMNotification_CallRecorderDidGetError object:nil];
   
   // depending on wheter preferences are in the system, the setup assistant is shown or not.
-  if([XMPreferencesManager doesHavePreferences] == YES)
+  if ([XMPreferencesManager doesHavePreferences] == YES)
   {
     [self performSelector:@selector(_setupApplication) withObject:nil afterDelay:0.0];
   }
@@ -194,26 +194,6 @@
   [[XMVideoManager sharedInstance] updateInputDeviceList];
 }
 
-- (IBAction)retryEnableH323:(id)sender
-{
-  [[XMCallManager sharedInstance] retryEnableH323];
-}
-
-- (IBAction)retryGatekeeperRegistration:(id)sender
-{
-  [[XMCallManager sharedInstance] retryGatekeeperRegistration];
-}
-
-- (IBAction)retryEnableSIP:(id)sender
-{
-  [[XMCallManager sharedInstance] retryEnableSIP];
-}
-
-- (IBAction)retrySIPRegistration:(id)sender
-{
-  [[XMCallManager sharedInstance] retrySIPRegistrations];
-}
-
 - (IBAction)updateNetworkInformation:(id)sender
 {
   XMUtils *utils = [XMUtils sharedInstance];
@@ -246,7 +226,7 @@
 {
   XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
   
-  if([mainWindowController isFullScreen])
+  if ([mainWindowController isFullScreen])
   {
     return;
   }
@@ -261,7 +241,7 @@
 {
   XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
   
-  if([mainWindowController isFullScreen] == NO)
+  if ([mainWindowController isFullScreen] == NO)
   {
     return;
   }
@@ -338,13 +318,13 @@
   NSString *pboardString;
   
   types = [pboard types];
-  if(![types containsObject:NSStringPboardType])
+  if (![types containsObject:NSStringPboardType])
   {
     *error = @"No pboard string";
     return;
   }
   pboardString = [pboard stringForType:NSStringPboardType];
-  if(!pboardString)
+  if (!pboardString)
   {
     *error = @"No pboard string";
     return;
@@ -360,7 +340,7 @@
 {
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   
-  if([preferencesManager searchAddressBookDatabase] == YES)
+  if ([preferencesManager searchAddressBookDatabase] == YES)
   {
     [[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
   }
@@ -381,7 +361,7 @@
   BOOL enterFullScreen = NO;
   
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-  if([[preferencesManager activeLocation] enableVideo] == YES &&
+  if ([[preferencesManager activeLocation] enableVideo] == YES &&
      [preferencesManager automaticallyEnterFullScreen] == YES)
   {
     enterFullScreen = YES;
@@ -392,7 +372,7 @@
 
 - (void)_didClearCall:(NSNotification *)notif
 {	
-  if(activeAlert != nil)
+  if (activeAlert != nil)
   {
     [NSApp abortModal];
   }
@@ -435,7 +415,7 @@
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
-  if(activeAlert != nil)
+  if (activeAlert != nil)
   {
     [NSApp abortModal];
   }
@@ -469,7 +449,7 @@
   // show main window on call
   [[XMMainWindowController sharedInstance] showMainWindow];
   
-  if([preferencesManager alertIncomingCalls] == YES)
+  if ([preferencesManager alertIncomingCalls] == YES)
   {
     alertType = [preferencesManager incomingCallAlertType];
     
@@ -492,7 +472,7 @@
   XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
   
   // make sure no other alerts are present
-  if(activeAlert != nil)
+  if (activeAlert != nil)
   {
     [NSApp abortModal];
   }
@@ -501,11 +481,11 @@
   
   int result = [(XMIncomingCallAlert *)activeAlert runModal];
   
-  if(result == NSAlertFirstButtonReturn)
+  if (result == NSAlertFirstButtonReturn)
   {
     [[XMCallManager sharedInstance] acceptIncomingCall];
   }
-  else if(result == NSAlertSecondButtonReturn)
+  else if (result == NSAlertSecondButtonReturn)
   {
     [[XMCallManager sharedInstance] rejectIncomingCall];
   }
@@ -578,14 +558,8 @@
   
   [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
   [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
   
-  int result = [(NSAlert *)activeAlert runModal];
-  
-  if(result == NSAlertSecondButtonReturn)
-  {
-    [[XMCallManager sharedInstance] retryEnableH323];
-  }
+  [(NSAlert *)activeAlert runModal];
   
   [activeAlert release];
   activeAlert = nil;
@@ -602,22 +576,22 @@
   XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
   NSString *host = [h323Account gatekeeperHost];
   
-  XMGatekeeperRegistrationFailReason failReason = [callManager gatekeeperRegistrationFailReason];
-  NSString *reasonText = XMGatekeeperRegistrationFailReasonString(failReason);
+  XMGatekeeperRegistrationStatus failReason = [callManager gatekeeperRegistrationStatus];
+  NSString *reasonText = XMGatekeeperRegistrationStatusString(failReason);
   NSString *suggestionText;
   
   switch(failReason)
   {
-    case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
+    case XMGatekeeperRegistrationStatus_GatekeeperNotFound:
       suggestionText = NSLocalizedString(@"XM_GK_NOT_FOUND_SUGGESTION", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_DuplicateAlias:
+    case XMGatekeeperRegistrationStatus_DuplicateAlias:
       suggestionText = NSLocalizedString(@"XM_GK_DUPLICATE_ALIAS_SUGGESTION", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_SecurityDenied:
+    case XMGatekeeperRegistrationStatus_SecurityDenied:
       suggestionText = NSLocalizedString(@"XM_GK_SECURITY_DENIED_SUGGESTION", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper:
+    case XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper:
       suggestionText = NSLocalizedString(@"XM_GK_UNREG_BY_GK_SUGGESTION", @"");
       break;
     default:
@@ -634,14 +608,8 @@
   
   [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
   [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
   
-  int result = [(NSAlert *)activeAlert runModal];
-  
-  if(result == NSAlertSecondButtonReturn)
-  {
-    [[XMCallManager sharedInstance] retryGatekeeperRegistration];
-  }
+  [(NSAlert *)activeAlert runModal];
   
   [activeAlert release];
   activeAlert = nil;
@@ -656,14 +624,8 @@
   
   [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
   [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
   
-  int result = [(NSAlert *)activeAlert runModal];
-  
-  if(result == NSAlertSecondButtonReturn)
-  {
-    [[XMCallManager sharedInstance] retryEnableSIP];
-  }
+  [(NSAlert *)activeAlert runModal];
   
   [activeAlert release];
   activeAlert = nil;
@@ -680,7 +642,7 @@
   unsigned sipAccountTag = [(NSNumber *)[[activeLocation sipAccountTags] objectAtIndex:index] unsignedIntValue];
   XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
   NSString *domain = [sipAccount domain];
-  XMSIPStatusCode failReason = [callManager sipRegistrationFailReasonAtIndex:index];
+  XMSIPStatusCode failReason = [callManager sipRegistrationStatusAtIndex:index];
   
   NSString *reasonText = XMSIPStatusCodeString(failReason);
   
@@ -713,12 +675,7 @@
   [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
   
-  int result = [(NSAlert *)activeAlert runModal];
-  
-  if(result == NSAlertSecondButtonReturn)
-  {
-    [[XMCallManager sharedInstance] retrySIPRegistrations];
-  }
+  [(NSAlert *)activeAlert runModal];
   
   [activeAlert release];
   activeAlert = nil;
@@ -768,7 +725,7 @@
 
 - (void)sound:(NSSound *)sound didFinishPlaying:(BOOL)didFinish
 {
-  if(didFinish == YES && alertType == XMIncomingCallAlertType_Ringing)
+  if (didFinish == YES && alertType == XMIncomingCallAlertType_Ringing)
   {
     [sound play];
   }	
@@ -781,52 +738,9 @@
 {
   int tag = [menuItem tag];
   XMCallManager *callManager = [XMCallManager sharedInstance];
-  BOOL doesAllowModifications = [callManager doesAllowModifications];
   
-  if(tag == 310) // retry enable H.323
-  {
-    if(doesAllowModifications == YES &&
-       [callManager isH323Listening] == NO &&
-       [[[XMPreferencesManager sharedInstance] activeLocation] enableH323] == YES)
-    {
-      return YES;
-    }
-    return NO;
-  }
-  else if(tag == 311) // retry GK Registration
-  {
-    if(doesAllowModifications == YES &&
-       [callManager gatekeeperRegistrationFailReason] != XMGatekeeperRegistrationFailReason_NoFailure)
-    {
-      return YES;
-    }
-    return NO;
-  }
-  else if(tag == 320) // retry Enable SIP
-  {
-    if(doesAllowModifications == YES &&
-       [callManager isSIPListening] == NO &&
-       [[[XMPreferencesManager sharedInstance] activeLocation] enableSIP] == YES)
-    {
-      return YES;
-    }
-    return NO;
-  }
-  else if(tag == 321) // retry SIP registration
-  {
-    if(doesAllowModifications == YES &&
-       [callManager sipRegistrationFailReasonCount] > 0 &&
-       [callManager isCompletelySIPRegistered] == NO)
-    {
-      return YES;
-    }
-    return NO;
-  }
-  else if(tag == 430)
-  {
-    if([callManager isInCall] &&
-       [[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES)
-    {
+  if (tag == 430) { // Full screen
+    if ([callManager isInCall] && [[[XMPreferencesManager sharedInstance] activeLocation] enableVideo] == YES) {
       return YES;
     }
     
@@ -900,7 +814,7 @@
   [preferencesManager setSIPAccounts:sipAccounts];
   [preferencesManager setLocations:locations];
   
-  if([locations count] != 0)
+  if ([locations count] != 0)
   {
     [preferencesManager synchronizeAndNotify];
   }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.17 2007/09/27 21:13:10 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.18 2008/08/26 08:14:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,23 +15,16 @@ NSString *XMByteString(unsigned bytes)
 {
   double value;
   
-  if(bytes > (1024 * 1024 * 1024)) //GByte size
-  {
+  if (bytes > (1024 * 1024 * 1024)) { //GByte size
     value = bytes / (double)(1024 * 1024 * 1024);
     return [NSString stringWithFormat:@"%4.1f GB", value];
-  }
-  else if(bytes > (1024 * 1024))
-  {
+  } else if (bytes > (1024 * 1024)) {
     value = bytes / (double)(1024 * 1024);
     return [NSString stringWithFormat:@"%4.1f MB", value];
-  }
-  else if(bytes > 1024)
-  {
+  } else if (bytes > 1024) {
     value = bytes / (double)1024;
     return [NSString stringWithFormat:@"%4.1f KB", value];
-  }
-  else
-  {
+  } else {
     return [NSString stringWithFormat:@"%d Bytes", bytes];
   }
 }
@@ -42,12 +35,9 @@ NSString *XMTimeString(unsigned time)
   unsigned minutes = (time / 60) - (60 * hours);
   unsigned seconds = time % 60;
   
-  if(hours > 0)
-  {
+  if (hours > 0) {
     return [NSString stringWithFormat:@"%d:%02d:%02d", hours, minutes, seconds];
-  }
-  else
-  {
+  } else {
     return [NSString stringWithFormat:@"%d:%02d", minutes, seconds];
   }
 }
@@ -61,8 +51,7 @@ NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
 {
   NSString *reasonString;
   
-  switch(callEndReason)
-  {
+  switch (callEndReason) {
     case XMCallEndReason_EndedByLocalUser:
       reasonString = NSLocalizedString(@"XM_CALL_END_USER_CLEARED", @"");
       break;
@@ -131,43 +120,54 @@ NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
 		
 }
 
-NSString *XMGatekeeperRegistrationFailReasonString(XMGatekeeperRegistrationFailReason failReason)
+NSString *XMGatekeeperRegistrationStatusString(XMGatekeeperRegistrationStatus status)
 {
-  NSString *failReasonString;
+  NSString *statusString;
   
-  switch(failReason)
-  {
-    case XMGatekeeperRegistrationFailReason_GatekeeperNotFound:
-      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_NOT_FOUND", @"");
+  switch (status) {
+    case XMGatekeeperRegistrationStatus_NotRegistered:
+      statusString = NSLocalizedString(@"XM_GK_NOT_REGISTERED", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_DuplicateAlias:
-      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_DUPLICATE_ALIAS", @"");
+    case XMGatekeeperRegistrationStatus_SuccessfullyRegistered:
+      statusString = NSLocalizedString(@"XM_GK_REG_SUCCESSFUL", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_SecurityDenied:
-      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_SECURITY_DENIED", @"");
+    case XMGatekeeperRegistrationStatus_GatekeeperNotFound:
+      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_NOT_FOUND", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_TransportError:
-      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_TRANSPORT_ERROR", @"");
+    case XMGatekeeperRegistrationStatus_DuplicateAlias:
+      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_DUPLICATE_ALIAS", @"");
       break;
-    case XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper:
-      failReasonString = NSLocalizedString(@"XM_GK_REG_FAILED_UNREG_BY_GK", @"");
+    case XMGatekeeperRegistrationStatus_SecurityDenied:
+      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_SECURITY_DENIED", @"");
+      break;
+    case XMGatekeeperRegistrationStatus_TransportError:
+      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_TRANSPORT_ERROR", @"");
+      break;
+    case XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper:
+      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_UNREG_BY_GK", @"");
       break;
     default:
-      failReasonString = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), failReason];
+      statusString = [NSString stringWithFormat:NSLocalizedString(@"XM_UNKNOWN_REASON", @""), status];
       break;
   }
   
-  return failReasonString;
+  return statusString;
 }
 
 NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
 {
   NSString *statusCodeString;
   
-  switch(statusCode)
+  switch (statusCode)
   {
-    case XMSIPStatusCode_NoFailure:
-      statusCodeString = @"No Failure";
+    case XMSIPStatusCode_IllegalCode:
+      statusCodeString = @"<Illegal Status Code>";
+      break;
+    case XMSIPStatusCode_Local_TransportError:
+      statusCodeString = @"<Local Transport Error>";
+      break;
+    case XMSIPStatusCode_Local_BadTransportAddress:
+      statusCodeString = @"<Bad Transport Address>";
       break;
     case XMSIPStatusCode_Information_Trying:
       statusCodeString = @"100 Trying";
@@ -185,10 +185,10 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
       statusCodeString = @"183 Session Progress";
       break;
       
-    case XMSIPStatusCode_Succesful_OK:
+    case XMSIPStatusCode_Successful_OK:
       statusCodeString = @"200 OK";
       break;
-    case XMSIPStatusCode_Succesful_Accepted:
+    case XMSIPStatusCode_Successful_Accepted:
       statusCodeString = @"202 Accepted";
       break;
       
@@ -337,7 +337,7 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
       statusCodeString = @"606 Not Acceptable";
       break;
       
-    case XMSIPStatusCode_NoNetworkInterfaces:
+    case XMSIPStatusCode_Framework_NoNetworkInterfaces:
       statusCodeString = NSLocalizedString(@"XM_NO_NETWORK_INTERFACES", @"");
       break;
       
@@ -352,8 +352,7 @@ NSArray *XMDefaultSTUNServers()
 {
   static NSArray *servers = nil;
   
-  if(servers == nil)
-  {
+  if (servers == nil) {
     NSBundle *bundle = [NSBundle mainBundle];
     NSString *filePath = [bundle pathForResource:XM_STUN_SERVERS_FILE_NAME
                                           ofType:XM_STUN_SERVERS_FILE_TYPE];
@@ -366,8 +365,7 @@ NSArray *XMDefaultSTUNServers()
                                                                     format:NULL
                                                           errorDescription:&errorString];
     
-    if(servers == nil)
-    {
+    if (servers == nil) {
       [NSException raise:XMException_InternalConsistencyFailure format:@"Coulnd't load STUN Servers (%@)", errorString];
       return nil;
     }
@@ -380,7 +378,7 @@ NSArray *XMDefaultSTUNServers()
 
 NSString *XMNATTypeString(XMNATType type)
 {
-  switch(type) {
+  switch (type) {
     
     case XMNATType_Error:
       return @"<Error>";
@@ -413,18 +411,14 @@ NSString *XMNATTypeString(XMNATType type)
 {
   unsigned length = [prefix length];
   
-  if(length > [self length])
-  {
+  if (length > [self length]) {
     return NO;
   }
   
   NSRange searchRange = NSMakeRange(0, length);
   
-  NSRange prefixRange = [self rangeOfString:prefix
-                                    options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
-                                      range:searchRange];
-  if(prefixRange.location != NSNotFound)
-  {
+  NSRange prefixRange = [self rangeOfString:prefix options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch) range:searchRange];
+  if (prefixRange.location != NSNotFound) {
     return YES;
   }
   

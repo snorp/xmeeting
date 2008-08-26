@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.32 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.33 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -273,7 +273,7 @@ void _XMHandleGatekeeperRegistration(const char *gatekeeperName, const char *gat
 	[autoreleasePool release];
 }
 
-void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason reason)
+void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus reason)
 {
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
   

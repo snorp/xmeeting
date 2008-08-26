@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.33 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.34 2008/08/26 08:14:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,18 +28,26 @@ NSString *XMNotification_CallManagerDidReceiveIncomingCall = @"XMeetingCallManag
 NSString *XMNotification_CallManagerDidEstablishCall = @"XMeetingCallManagerDidEstablishCallNotification";
 NSString *XMNotification_CallManagerDidClearCall = @"XMeetingCallManagerDidClearCallNotification";
 
+NSString *XMNotification_CallManagerDidEnableH323 = @"XMeetingCallManagerDidEnableH323Notification";
+NSString *XMNotification_CallManagerDidDisableH323 = @"XMeetingCallManagerDidDisableH323Notification";
 NSString *XMNotification_CallManagerDidNotEnableH323 = @"XMeetingCallManagerDidNotEnableH323Notification";
+NSString *XMNotification_CallManagerDidChangeH323Status = @"XMeetingCallManagerDidChangeH323StatusNotification";
 NSString *XMNotification_CallManagerDidStartGatekeeperRegistrationProcess = @"XMeetingCallManagerDidStartGatekeeperRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidEndGatekeeperRegistrationProcess = @"XMeetingCallManagerDidEndGatekeeperRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidRegisterAtGatekeeper = @"XMeetingCallManagerDidRegisterAtGatekeeperNotification";
 NSString *XMNotification_CallManagerDidUnregisterFromGatekeeper = @"XMeetingCallManagerDidUnregisterFromGatekeeperNotification";
 NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper = @"XMeetingCallManagerDidNotRegisterAtGatekeeperNotification";
+NSString *XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus = @"XMeetingCallManagerDidChangeGatekeeperRegistrationStatusNotification";
+NSString *XMNotification_CallManagerDidEnableSIP = @"XMeetingCallManagerDidEnableSIPNotification";
+NSString *XMNotification_CallManagerDidDisableSIP = @"XMeetingCallMangagerDidDisableSIPNotification";
 NSString *XMNotification_CallManagerDidNotEnableSIP = @"XMeetingCallManagerDidNotEnableSIPNotification";
+NSString *XMNotification_CallManagerDidChangeSIPStatus = @"XMeetingCallManagerDidChangeSIPStatusNotification";
 NSString *XMNotification_CallManagerDidStartSIPRegistrationProcess = @"XMeetingCallManagerDidStartSIPRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess = @"XMeetingCallManagerDidEndSIPRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidSIPRegister = @"XMeetingCallManagerDidSIPRegisterNotification";
 NSString *XMNotification_CallManagerDidSIPUnregister = @"XMeetingCallManagerDidSIPUnregister";
 NSString *XMNotification_CallManagerDidNotSIPRegister = @"XMeetingCallManagerDidNotSIPRegister";
+NSString *XMNotification_CallManagerDidChangeSIPRegistrationStatus = @"XMeetingCallManagerDidChangeSIPRegistrationStatusNotification";
 
 NSString *XMNotification_CallManagerDidOpenOutgoingAudioStream = @"XMeetingCallManagerDidOpenOutgoingAudioStreamNotification";
 NSString *XMNotification_CallManagerDidOpenIncomingAudioStream = @"XMeetingCallManagerDidOpenIncomingAudioStreamNotification";

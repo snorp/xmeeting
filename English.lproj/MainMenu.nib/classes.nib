@@ -4,10 +4,6 @@
         {
             ACTIONS = {
                 enterFullScreen = id; 
-                retryEnableH323 = id; 
-                retryEnableSIP = id; 
-                retryGatekeeperRegistration = id; 
-                retrySIPRegistration = id; 
                 showContacts = id; 
                 showInspector = id; 
                 showMainWindow = id; 

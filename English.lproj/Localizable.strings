@@ -22,14 +22,15 @@
 "XM_CALL_FAILED_TRANSPORT_FAIL" = "Could not connect to remote party";
 
 "XM_ENABLE_H323_FAILED_MESSAGE" = "Enabling H.323 Failed";
-"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls";
+"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls.";
 
 "XM_GK_REG_FAILED_MESSAGE" = "Gatekeeper Registration Failed";
-"XM_GK_REG_FAILED_INFO_TEXT" = "Unable to register at gatekeeper \"%@\" (%@). You will not be able to use H.323 IDs (alias names, phone numbers) when making a call. %@";
+"XM_GK_REG_FAILED_INFO_TEXT" = "Unable to register at gatekeeper \"%@\" (%@). You will not be able to use H.323 IDs (alias names, phone numbers) when making a call. %@.\n\nXMeeting will automatically try to register again.";
 "XM_GK_NOT_FOUND_SUGGESTION" = "\nPlease check your internet connection and the H.323 account settings.";
 "XM_GK_DUPLICATE_ALIAS_SUGGESTION" = "\n\nSomeone else is already registered with the H.323 IDs you're provided. If XMeeting previously crashed, you may have to wait some time until you can re-register. Otherwise check your H.323 account settings and contact the responsible Gatekeeper administrator.";
 "XM_GK_SECURITY_DENIED_SUGGESTION" = "\nPlease check the H.323 account settings (user alias and password) or contact the responsible Gatekeeper administrator.";
-"XM_GK_UNREG_BY_GK_SUGGESTION" = "\n\nXMeeting will automatically try to re-register.";
+"XM_GK_NOT_REGISTERED" = "Not using a Gatekeeper";
+"XM_GK_REG_SUCCESSFUL" = "Registration successful";
 "XM_GK_REG_FAILED_NOT_FOUND" = "Gatekeeper not found";
 "XM_GK_REG_FAILED_DUPLICATE_ALIAS" = "Gatekeeper rejected registration - duplicate alias";
 "XM_GK_REG_FAILED_SECURITY_DENIED" = "Gatekeeper rejected registration - security denial";

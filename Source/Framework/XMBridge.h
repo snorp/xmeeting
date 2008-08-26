@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.47 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.48 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -138,7 +138,7 @@ extern "C" {
   /**
    * makes the H.323 system listen and thereby ready for calls
    **/
-  bool _XMEnableH323Listeners(bool flag);
+  bool _XMEnableH323(bool flag);
   
   /**
    * Returns whether H.323 is currently enabled or not

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.54 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.55 2008/08/26 08:14:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -169,7 +169,7 @@ void _XMSetCodecs(const char * const * orderedCodecs, unsigned orderedCodecCount
 #pragma mark -
 #pragma mark H.323 Functions
 
-bool _XMEnableH323Listeners(bool flag)
+bool _XMEnableH323(bool flag)
 {
   return XMOpalManager::GetH323EndPoint()->EnableListeners(flag);
 }

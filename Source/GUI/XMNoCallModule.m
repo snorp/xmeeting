@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.52 2008/08/14 19:57:06 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.53 2008/08/26 08:14:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,51 +81,19 @@
   // First, register for notifications
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   
-  [notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
-                             name:XMNotification_PreferencesManagerDidChangePreferences
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didChangeActiveLocation:)
-                             name:XMNotification_PreferencesManagerDidChangeActiveLocation
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
-                             name:XMNotification_CallManagerDidStartSubsystemSetup
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:)
-                             name:XMNotification_CallManagerDidEndSubsystemSetup
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:)
-                             name:XMNotification_UtilsDidUpdateNetworkInformation
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
-                             name:XMNotification_CallManagerDidStartCallInitiation
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didStartCalling:)
-                             name:XMNotification_CallManagerDidStartCalling
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
-                             name:XMNotification_CallManagerDidNotStartCalling
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_isRingingAtRemoteParty:)
-                             name:XMNotification_CallManagerDidStartRingingAtRemoteParty
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
-                             name:XMNotification_CallManagerDidReceiveIncomingCall
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didClearCall:)
-                             name:XMNotification_CallManagerDidClearCall
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:)
-                             name:XMNotification_CallManagerDidRegisterAtGatekeeper
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:)
-                             name:XMNotification_CallManagerDidNotRegisterAtGatekeeper
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:)
-                             name:XMNotification_CallManagerDidUnregisterFromGatekeeper
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:)
-                             name:XMNotification_AddressBookManagerDidChangeDatabase
-                           object:nil];
+  [notificationCenter addObserver:self selector:@selector(_preferencesDidChange:) name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeActiveLocation:) name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:) name:XMNotification_CallManagerDidStartSubsystemSetup object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didEndSubsystemSetup:) name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didUpdateNetworkAddresses:) name:XMNotification_UtilsDidUpdateNetworkInformation object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:) name:XMNotification_CallManagerDidStartCallInitiation object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didStartCalling:) name:XMNotification_CallManagerDidStartCalling object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotStartCalling:) name:XMNotification_CallManagerDidNotStartCalling object:nil];
+  [notificationCenter addObserver:self selector:@selector(_isRingingAtRemoteParty:) name:XMNotification_CallManagerDidStartRingingAtRemoteParty object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:) name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didClearCall:) name:XMNotification_CallManagerDidClearCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:) name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:nil];
+  [notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:) name:XMNotification_AddressBookManagerDidChangeDatabase object:nil];
 		
   contentViewSizeWithSelfViewHidden = [contentView frame].size;
   contentViewMinSizeWithSelfViewShown = contentViewSizeWithSelfViewHidden;
@@ -135,27 +103,22 @@
   contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
   
   XMCallProtocol initialCallProtocol = (XMCallProtocol)[[NSUserDefaults standardUserDefaults] integerForKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
-  if (initialCallProtocol == XMCallProtocol_UnknownProtocol)
-  {
+  if (initialCallProtocol == XMCallProtocol_UnknownProtocol) {
     initialCallProtocol = XMCallProtocol_H323;
   }
   [self _setCallProtocol:initialCallProtocol];
   [self _preferencesDidChange:nil];
   
   // determining in which state we currently are
-  if ([[XMCallManager sharedInstance] doesAllowModifications])
-  {
+  if ([[XMCallManager sharedInstance] doesAllowModifications]) {
     [self _didEndSubsystemSetup:nil];
-  }
-  else
-  {
+  } else {
     [self _didStartSubsystemSetup:nil];
   }
   
   BOOL showSelfView = [[NSUserDefaults standardUserDefaults] boolForKey:XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY];
   
-  if (showSelfView)
-  {
+  if (showSelfView) {
     [self performSelector:@selector(toggleShowSelfView:) withObject:nil afterDelay:0.0];
   }
 }
@@ -681,12 +644,12 @@
     return;
   }
   
-  BOOL isH323Listening = [callManager isH323Listening];
-  BOOL isSIPListening = [callManager isSIPListening];
+  BOOL isH323Enabled = [callManager isH323Enabled];
+  BOOL isSIPEnabled = [callManager isSIPEnabled];
   BOOL enableH323 = [activeLocation enableH323];
   BOOL enableSIP = [activeLocation enableSIP];
   
-  if (!isH323Listening && !isSIPListening) {
+  if (!isH323Enabled && !isSIPEnabled) {
     NSString *statusString = nil;
     
     if (!enableH323 && !enableSIP) {
@@ -714,7 +677,7 @@
   
   BOOL isYellowSemaphore = NO;
   if (enableH323 == YES) {
-    if (isH323Listening == NO) {
+    if (isH323Enabled == NO) {
       isYellowSemaphore = YES;
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_H323_FAILURE", @"")];
     } else if ([activeLocation h323AccountTag] != 0) {
@@ -731,7 +694,7 @@
   }
   
   if (enableSIP == YES) {
-    if (isSIPListening == NO) {
+    if (isSIPEnabled == NO) {
       isYellowSemaphore = YES;
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_FAILURE", @"")];
     } else {

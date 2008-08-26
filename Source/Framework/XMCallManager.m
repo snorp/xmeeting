@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.47 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.48 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,13 +29,6 @@ enum {
   InCall,
   TerminatingCall,
   WaitingForCheckipAddress,
-};
-
-// Listening State
-enum {
-  NotListening,
-  Listening,
-  Error,
 };
 
 // System Sleep State
@@ -113,17 +106,17 @@ enum {
   
   gatekeeperName = nil;
   terminalAliases = nil;
-  gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+  gatekeeperRegistrationStatus = XMGatekeeperRegistrationStatus_NotRegistered;
   
   sipRegistrations = [[NSMutableArray alloc] initWithCapacity:1];
-  sipRegistrationFailReasons = [[NSMutableArray alloc] initWithCapacity:1];
+  sipRegistrationStates = [[NSMutableArray alloc] initWithCapacity:1];
   
   recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
   
   networkConfigurationChanged = YES;
   systemSleepStatus = Awake;
-  h323ListeningStatus = NotListening;
-  sipListeningStatus = NotListening;
+  h323ProtocolStatus = XMProtocolStatus_Disabled;
+  sipProtocolStatus = XMProtocolStatus_Disabled;
   
   pTracePath = [path copy];
   
@@ -160,8 +153,8 @@ enum {
   [sipRegistrations release];
   sipRegistrations = nil;
   
-  [sipRegistrationFailReasons release];
-  sipRegistrationFailReasons = nil;
+  [sipRegistrationStates release];
+  sipRegistrationStates = nil;
 
   [recentCalls release];
   recentCalls = nil;
@@ -188,14 +181,24 @@ enum {
   return (state == Ready);
 }
 
-- (BOOL)isH323Listening
+- (BOOL)isH323Enabled
 {
-  return (h323ListeningStatus == Listening);
+  return (h323ProtocolStatus == XMProtocolStatus_Enabled);
 }
 
-- (BOOL)isSIPListening
+- (XMProtocolStatus)h323ProtocolStatus
 {
-  return (sipListeningStatus == Listening);
+  return h323ProtocolStatus;
+}
+
+- (BOOL)isSIPEnabled
+{
+  return (sipProtocolStatus == XMProtocolStatus_Enabled);
+}
+
+- (XMProtocolStatus)sipProtocolStatus
+{
+  return sipProtocolStatus;
 }
 
 - (XMPreferences *)activePreferences
@@ -351,9 +354,9 @@ enum {
   return terminalAliases;
 }
 
-- (XMGatekeeperRegistrationFailReason)gatekeeperRegistrationFailReason
+- (XMGatekeeperRegistrationStatus)gatekeeperRegistrationStatus
 {
-  return gatekeeperRegistrationFailReason;
+  return gatekeeperRegistrationStatus;
 }
 
 /*- (void)retryEnableH323
@@ -439,7 +442,7 @@ enum {
 
 - (BOOL)isCompletelySIPRegistered
 {
-  unsigned count = [sipRegistrationFailReasons count];
+  unsigned count = [sipRegistrationStates count];
   if (count == 0) {
     return NO;
   }
@@ -448,9 +451,9 @@ enum {
   
   unsigned i;
   for (i = 0; i < count; i++) {
-    NSNumber *number = (NSNumber *)[sipRegistrationFailReasons objectAtIndex:i];
+    NSNumber *number = (NSNumber *)[sipRegistrationStates objectAtIndex:i];
     XMSIPStatusCode failReason = (XMSIPStatusCode)[number unsignedIntValue];
-    if (failReason != XMSIPStatusCode_NoFailure) {
+    if (failReason != XMSIPStatusCode_Successful_OK) {
       didRegisterAll = NO;
       break;
     }
@@ -475,20 +478,20 @@ enum {
   return [sipRegistrationsCopy autorelease];
 }
 
-- (unsigned)sipRegistrationFailReasonCount
+- (unsigned)sipRegistrationStatusCount
 {
-  return [sipRegistrationFailReasons count];
+  return [sipRegistrationStates count];
 }
 
-- (XMSIPStatusCode)sipRegistrationFailReasonAtIndex:(unsigned)index
+- (XMSIPStatusCode)sipRegistrationStatusAtIndex:(unsigned)index
 {
-  NSNumber *number = (NSNumber *)[sipRegistrationFailReasons objectAtIndex:index];
+  NSNumber *number = (NSNumber *)[sipRegistrationStates objectAtIndex:index];
   return (XMSIPStatusCode)[number unsignedIntValue];
 }
 
-- (NSArray *)sipRegistrationFailReasons
+- (NSArray *)sipRegistrationStates
 {
-  NSArray *copy = [sipRegistrationFailReasons copy];
+  NSArray *copy = [sipRegistrationStates copy];
   return [copy autorelease];
 }
 
@@ -629,22 +632,7 @@ enum {
 #pragma mark Framework Methods
 
 - (void)_handleSubsystemSetupEnd
-{	
-  // update the listening status variables to reflect
-  BOOL enableH323 = [activePreferences enableH323];
-  if (enableH323 == YES && h323ListeningStatus != Error) {
-    h323ListeningStatus = Listening;
-  } else if (enableH323 == NO) {
-    h323ListeningStatus = NotListening;
-  }
-  
-  BOOL enableSIP = [activePreferences enableSIP];
-  if (enableSIP == YES && sipListeningStatus != Error) {
-    sipListeningStatus = Listening;
-  } else if (enableSIP == NO) {
-    sipListeningStatus = NotListening;
-  }
-  
+{
   // if the subsystem setup was done right after a call
   // ended, it's time to go back into the Ready state
   if (needsSubsystemSetupAfterCallEnd == YES) {
@@ -656,15 +644,14 @@ enum {
     [activeCall release];
     activeCall = nil;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidClearCall
-                                                        object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidClearCall object:self];
     
   } else if (state == SubsystemSetup) { // protect against multiple invocations
     state = Ready;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
   }
   
-  // if system is going to sleep, tell that is okay
+  // if system is going to sleep, tell that it is okay
   if (systemSleepStatus == EnterSleep) {
     systemSleepStatus = Asleep;
   }
@@ -909,11 +896,30 @@ enum {
   }
 }
 
-- (void)_handleH323EnablingFailure
+- (void)_handleH323ProtocolStatus:(NSNumber *)number;
 {
-  if (h323ListeningStatus != Error) { // only post a notification if the status changes
-    h323ListeningStatus = Error;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableH323 object:self];
+  XMProtocolStatus protocolStatus = (XMProtocolStatus)[number unsignedIntValue];
+  
+  if (h323ProtocolStatus != protocolStatus) {
+    h323ProtocolStatus = protocolStatus;
+    
+    NSString *notification = nil;
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    
+    switch (h323ProtocolStatus) {
+      case XMProtocolStatus_Enabled:
+        notification = XMNotification_CallManagerDidEnableH323;
+        break;
+      case XMProtocolStatus_Disabled:
+        notification = XMNotification_CallManagerDidDisableH323;
+        break;
+      case XMProtocolStatus_Error:
+        notification = XMNotification_CallManagerDidNotEnableH323;
+        break;
+    }
+    
+    [notificationCenter postNotificationName:notification object:self];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeH323Status object:self];
   }
 }
 
@@ -940,9 +946,11 @@ enum {
     [terminalAliases release];
     terminalAliases = [aliases copy];
   
-    gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+    gatekeeperRegistrationStatus = XMGatekeeperRegistrationStatus_SuccessfullyRegistered;
   
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidRegisterAtGatekeeper object:self];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidRegisterAtGatekeeper object:self];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:self];
   }
 }
 
@@ -958,9 +966,11 @@ enum {
   [terminalAliases release];
   terminalAliases = nil;
   
-  gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
+  gatekeeperRegistrationStatus = XMGatekeeperRegistrationStatus_NotRegistered;
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidUnregisterFromGatekeeper object:self];
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidUnregisterFromGatekeeper object:self];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:self];
 }
 
 - (void)_handleGatekeeperRegistrationFailure:(NSNumber *)failReason
@@ -968,26 +978,46 @@ enum {
   [gatekeeperName release];
   gatekeeperName = nil;
   
-  XMGatekeeperRegistrationFailReason theGatekeeperRegistrationFailReason = (XMGatekeeperRegistrationFailReason)[failReason unsignedIntValue];
+  XMGatekeeperRegistrationStatus theGatekeeperRegistrationStatus = (XMGatekeeperRegistrationStatus)[failReason unsignedIntValue];
   
-  if (gatekeeperRegistrationFailReason != theGatekeeperRegistrationFailReason) {
-    if (gatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper &&
-        theGatekeeperRegistrationFailReason == XMGatekeeperRegistrationFailReason_GatekeeperNotFound) {
-      // Special case: GK unregistered, went offline. Don't post a notification for the second time
+  if (gatekeeperRegistrationStatus != theGatekeeperRegistrationStatus) {
+    if (gatekeeperRegistrationStatus == XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper &&
+        theGatekeeperRegistrationStatus == XMGatekeeperRegistrationStatus_GatekeeperNotFound) {
+      // Special case: GK unregistered first, went offline afterwards. Don't post a notification for the second time
       return;
     }
     
-    gatekeeperRegistrationFailReason = theGatekeeperRegistrationFailReason;
+    gatekeeperRegistrationStatus = theGatekeeperRegistrationStatus;
   
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:self];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:self];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:self];
   }
 }
 
-- (void)_handleSIPEnablingFailure
+- (void)_handleSIPProtocolStatus:(NSNumber *)number
 {
-  if (sipListeningStatus != Error) { // only post this notification once
-    sipListeningStatus = Error;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotEnableSIP object:self];
+  XMProtocolStatus protocolStatus = (XMProtocolStatus)[number unsignedIntValue];
+  
+  if (sipProtocolStatus != protocolStatus) {
+    sipProtocolStatus = protocolStatus;
+    NSString *notification = nil;
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    
+    switch (h323ProtocolStatus) {
+      case XMProtocolStatus_Enabled:
+        notification = XMNotification_CallManagerDidEnableSIP;
+        break;
+      case XMProtocolStatus_Disabled:
+        notification = XMNotification_CallManagerDidDisableSIP;
+        break;
+      case XMProtocolStatus_Error:
+        notification = XMNotification_CallManagerDidNotEnableSIP;
+        break;
+    }
+    
+    [notificationCenter postNotificationName:notification object:self];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPStatus object:self];
   }
 }
 
@@ -1029,11 +1059,13 @@ enum {
   count = [sipRegistrations count];
   [sipRegistrations addObject:registration];
   
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_NoFailure];
-  [sipRegistrationFailReasons replaceObjectAtIndex:searchIndex withObject:number];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_Successful_OK];
+  [sipRegistrationStates replaceObjectAtIndex:searchIndex withObject:number];
   [number release];
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidSIPRegister object:[NSNumber numberWithUnsignedInt:count]];
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidSIPRegister object:[NSNumber numberWithUnsignedInt:count]];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
 }
 
 - (void)_handleSIPUnregistration:(NSString *)registration
@@ -1043,9 +1075,12 @@ enum {
   if (index == NSNotFound) {
     return;
   }
+  
   [sipRegistrations removeObjectAtIndex:index];
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidSIPUnregister object:registration];
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidSIPUnregister object:registration];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
 }
 
 - (void)_handleSIPRegistrationFailure:(NSArray *)info
@@ -1078,9 +1113,11 @@ enum {
     return;
   }
   
-  [sipRegistrationFailReasons replaceObjectAtIndex:searchIndex withObject:failReason];
+  [sipRegistrationStates replaceObjectAtIndex:searchIndex withObject:failReason];
   
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidNotSIPRegister object:[NSNumber numberWithUnsignedInt:searchIndex]];
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidNotSIPRegister object:[NSNumber numberWithUnsignedInt:searchIndex]];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
 }
 
 - (void)_networkConfigurationChanged
@@ -1111,13 +1148,12 @@ enum {
   
   automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
 
-  gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
-  [sipRegistrationFailReasons removeAllObjects];
+  [sipRegistrationStates removeAllObjects];
   
   unsigned count = [[preferences sipRegistrationRecords] count];
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMSIPStatusCode_NoFailure];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMSIPStatusCode_Successful_OK];
   for (unsigned i = 0; i < count; i++) {
-    [sipRegistrationFailReasons addObject:number];
+    [sipRegistrationStates addObject:number];
   }
   [number release];
   
@@ -1131,16 +1167,6 @@ enum {
   
   NSString *publicAddress = nil;
   publicAddress = [_XMUtilsSharedInstance _checkipPublicAddress];
-  
-  // resetting the H323 listening status if an error previously
-  if (h323ListeningStatus == Error) {
-    h323ListeningStatus = NotListening;
-  }
-  
-  // resetting the SIP listening status if an error previously
-  if (sipListeningStatus == Error) {
-    sipListeningStatus = NotListening;
-  }
   
   // preparations complete
   [XMOpalDispatcher _setPreferences:preferences publicAddress:publicAddress networkConfigurationChanged:networkConfigurationChanged];

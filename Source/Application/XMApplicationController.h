@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.h,v 1.22 2007/08/17 11:36:40 hfriederich Exp $
+ * $Id: XMApplicationController.h,v 1.23 2008/08/26 08:14:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,10 +59,6 @@
 - (IBAction)showPreferences:(id)sender;
 
 - (IBAction)updateDeviceLists:(id)sender;
-- (IBAction)retryEnableH323:(id)sender;
-- (IBAction)retryGatekeeperRegistration:(id)sender;
-- (IBAction)retryEnableSIP:(id)sender;
-- (IBAction)retrySIPRegistration:(id)sender;
 - (IBAction)updateNetworkInformation:(id)sender;
 
 - (IBAction)showMainWindow:(id)sender;

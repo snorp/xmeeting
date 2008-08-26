@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.35 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.36 2008/08/26 08:14:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,11 +94,26 @@ extern NSString *XMNotification_CallManagerDidEstablishCall;
 extern NSString *XMNotification_CallManagerDidClearCall;
 
 /**
+ * Posted when the Framework did enable the H.323 protocol.
+ **/
+extern NSString *XMNotification_CallManagerDidEnableH323;
+
+/**
+ * Posted when the Framework did disable the H.323 protocol
+ **/
+extern NSString *XMNotification_CallManagerDidDisableH323;
+
+/**
  * Posted when the Framework couldn't enable the H323 subsystem. This
  * normally indicates problems like the H.323 listener ports not open
  * and so on
  **/
 extern NSString *XMNotification_CallManagerDidNotEnableH323;
+
+/**
+ * Posted whenever the H323 protocol status changes
+ **/
+extern NSString *XMNotification_CallManagerDidChangeH323Status;
 
 /**
  * Posted when the Framework did start registering at a gatekeeper.
@@ -128,10 +143,30 @@ extern NSString *XMNotification_CallManagerDidUnregisterFromGatekeeper;
 extern NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper;
 
 /**
- * Posted when the Framwork couldn't enable the SIP subsystem. This normally
+ * Posted whenever the gatekeeper registration status changes
+ **/
+extern NSString *XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus;
+
+/**
+ * Posted when the Framework did enable the SIP protocol
+ **/
+extern NSString *XMNotification_CallManagerDidEnableSIP;
+
+/**
+ * Posted when the Framework did disable the SIP protocol
+ **/
+extern NSString *XMNotification_CallManagerDidDisableSIP;
+
+/**
+ * Posted when the Framework couldn't enable the SIP subsystem. This normally
  * indicates problems like the SIP ports not open and so on
  **/
 extern NSString *XMNotification_CallManagerDidNotEnableSIP;
+
+/**
+ * Posted whenever the SIP protocol status changes
+ **/
+extern NSString *XMNotification_CallManagerDidChangeSIPStatus;
 
 /**
  * Posted when the Framwork did start registering at SIP registrars.
@@ -160,6 +195,11 @@ extern NSString *XMNotification_CallManagerDidSIPUnregister;
  * Posted when the Framework failed to register at the registrar
  **/
 extern NSString *XMNotification_CallManagerDidNotSIPRegister;
+
+/**
+ * Posted when the SIP registration status changes
+ **/
+extern NSString *XMNotification_CallManagerDidChangeSIPRegistrationStatus;
 
 /**
  * Posted when the appropriate media stream is opened

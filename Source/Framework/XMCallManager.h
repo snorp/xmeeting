@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.31 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.32 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,14 +39,14 @@
   XMCallStartFailReason callStartFailReason;
   BOOL canSendCameraEvents;
   
-  // h.323 variables
+  // H.323 variables
   NSString *gatekeeperName;
   NSArray *terminalAliases;
-  XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
+  XMGatekeeperRegistrationStatus gatekeeperRegistrationStatus;
   
   // SIP variables
   NSMutableArray *sipRegistrations;
-  NSMutableArray *sipRegistrationFailReasons;
+  NSMutableArray *sipRegistrationStates;
   
   // call history
   NSMutableArray *recentCalls;
@@ -54,8 +54,8 @@
   // Tracking system state
   BOOL networkConfigurationChanged;
   unsigned systemSleepStatus;
-  unsigned h323ListeningStatus;
-  unsigned sipListeningStatus;
+  XMProtocolStatus h323ProtocolStatus;
+  XMProtocolStatus sipProtocolStatus;
   
   // Framework initialization
   NSString *pTracePath;
@@ -74,11 +74,24 @@
 - (BOOL)doesAllowModifications;
 
 /**
- * Returns whether we are currently listening on the specified protocol. Which
- * protocols are enabled is by defined in the active XMPreferences instance
+ * Returns whether H.323 is enabled
  **/
-- (BOOL)isH323Listening;
-- (BOOL)isSIPListening;
+- (BOOL)isH323Enabled;
+
+/**
+ * Returns the current protocol status of H.323 (enabled, disabled, error)
+ **/
+- (XMProtocolStatus)h323ProtocolStatus;
+
+/**
+ * Returns whether SIP is enabled
+ **/
+- (BOOL)isSIPEnabled;
+
+/**
+ * Returns the current protocol status of SIP (enabled, disabled, error)
+ **/
+- (XMProtocolStatus)sipProtocolStatus;
 
 /**
  * Returns the currently active preferences
@@ -183,10 +196,10 @@
 - (NSArray *)terminalAliases;
 
 /**
- * Returns the reason indicating what caused the gatekeeper registration
- * to fail
+ * Returns the current gatekeeper registration status.
+ * Also indicates an error reason in case the registration failed.
  **/
-- (XMGatekeeperRegistrationFailReason)gatekeeperRegistrationFailReason;
+- (XMGatekeeperRegistrationStatus)gatekeeperRegistrationStatus;
 
 #pragma mark SIP-specific methods
 
@@ -213,23 +226,23 @@
 - (NSArray *)sipRegistrations;
 
 /**
- * Returns the number of registration fail reason records the manager
+ * Returns the number of registration status records the manager
  * currently has. This is the same number as the number of registrars
  * specified in the active XMPreferences instance.
  **/
-- (unsigned)sipRegistrationFailReasonCount;
+- (unsigned)sipRegistrationStatusCount;
 
 /**
  * Returns the registration fail reason for the particular registration at index.
  **/
-- (XMSIPStatusCode)sipRegistrationFailReasonAtIndex:(unsigned)index;
+- (XMSIPStatusCode)sipRegistrationStatusAtIndex:(unsigned)index;
 
 /**
  * Returns the status of the registrations provided.
  * If there client has no registrations in the current preferences set,
  * an empty array is returned.
  **/
-- (NSArray *)sipRegistrationFailReasons;
+- (NSArray *)sipRegistrationStates;
 
 #pragma mark InCall functionality
 

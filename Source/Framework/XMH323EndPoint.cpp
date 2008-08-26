@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.32 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.33 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -129,7 +129,7 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
       if (result == false) {
         if (gatekeeper == NULL) {
           // GRQ failed
-          _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_GatekeeperNotFound);
+          _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_GatekeeperNotFound);
         }
       } else if (result == true && gatekeeper != NULL) {
         // When the initial OnRegistrationConfirm() is called, gatekeeper is still NULL.
@@ -315,9 +315,9 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
         case Request::NoResponseReceived:
           if (GetRegistrationFailReason() == H323Gatekeeper::UnregisteredByGatekeeper) {
             // GK unregistered client and obviously went offlie afterwards
-            _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_UnregisteredByGatekeeper);
+            _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper);
           } else {
-            _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_GatekeeperNotFound);
+            _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_GatekeeperNotFound);
           }
           break;
           
@@ -327,15 +327,15 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
           switch(request.rejectReason) {
             
             case H225_RegistrationRejectReason::e_invalidCallSignalAddress :
-              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_TransportError);
+              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_TransportError);
               break;
               
             case H225_RegistrationRejectReason::e_duplicateAlias :
-              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_DuplicateAlias);
+              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_DuplicateAlias);
               break;
               
             case H225_RegistrationRejectReason::e_securityDenial :
-              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_SecurityDenied);
+              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_SecurityDenied);
               break;
               
             case H225_RegistrationRejectReason::e_discoveryRequired:
@@ -344,13 +344,13 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
               break;
               
             default:
-              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_UnknownFailure);
+              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_UnknownRegistrationFailure);
               break;
           }
           break;
           
         case Request::BadCryptoTokens:
-          _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationFailReason_SecurityDenied);
+          _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_SecurityDenied);
           break;
           
         default:

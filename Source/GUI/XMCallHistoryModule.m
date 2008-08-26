@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.28 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.29 2008/08/26 08:14:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -452,8 +452,8 @@
     gkHost = NSLocalizedString(@"XM_UNKNOWN", @"");
   }
   
-  XMGatekeeperRegistrationFailReason failReason = [[XMCallManager sharedInstance] gatekeeperRegistrationFailReason];
-  NSString *failReasonString = XMGatekeeperRegistrationFailReasonString(failReason);
+  XMGatekeeperRegistrationStatus failReason = [[XMCallManager sharedInstance] gatekeeperRegistrationStatus];
+  NSString *failReasonString = XMGatekeeperRegistrationStatusString(failReason);
   
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_REG_FAILURE", @""),
     gkHost, failReasonString];
@@ -471,7 +471,7 @@
 - (void)_didSIPRegister:(NSNotification *)notif
 {
   unsigned index = [(NSNumber *)[notif object] unsignedIntValue];
-  NSString *sipRegistrationName = [[[XMCallManager sharedInstance] registrationAtIndex:index] retain];
+  NSString *sipRegistrationName = [[[XMCallManager sharedInstance] sipRegistrationAtIndex:index] retain];
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REGISTRATION", @""), sipRegistrationName];
   [self _logText:logText date:nil];
   [logText release];
@@ -500,7 +500,7 @@
     sipRegistration = NSLocalizedString(@"XM_UNKNOWN", @"");
   }
   
-  XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationFailReasonAtIndex:index];
+  XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationStatusAtIndex:index];
   NSString *failReasonString = XMSIPStatusCodeString(failReason);
 		
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE", @""),

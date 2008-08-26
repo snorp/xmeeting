@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.46 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.47 2008/08/26 08:14:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -110,8 +110,8 @@ void _XMCheckCloseStatus();
 
 #pragma mark H.323 callbacks
 
-// called every time enabling the H.323 stack failed
-- (void)_handleH323EnablingFailure;
+// feedback about the H323 protocol status
+- (void)_handleH323ProtocolStatus:(NSNumber *)protocolStatus;
 
 // Called when the Framework starts the gatekeeper registration
 // process. This might be a lengthy task
@@ -132,8 +132,8 @@ void _XMCheckCloseStatus();
 
 #pragma mark SIP callbacks
 
-// Called every time enabling the SIP stack failed
-- (void)_handleSIPEnablingFailure;
+// feedback about the SIP protocol status
+- (void)_handleSIPProtocolStatus:(NSNumber *)protocolStatus;
 
 // called every time when the framework starts a SIP registration
 // process, trying to register at possibly multiple registrars.
