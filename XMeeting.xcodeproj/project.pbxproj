@@ -2113,6 +2113,8 @@
 		D1B4CC21082F4E0E00A444E1 /* Window Management */ = {
 			isa = PBXGroup;
 			children = (
+				D1ECCD330834923D008EBAE3 /* XMNoCallModule.h */,
+				D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */,
 				D1CE4B60083CDED900B66B5D /* XMAddressBookModule.h */,
 				D1639478083E234D00F7FD83 /* XMCallHistoryModule.h */,
 				D10E45420AADEC40009EA376 /* XMCallRecorderModule.h */,
@@ -2124,7 +2126,6 @@
 				D1B06A76086AA28A00563EDB /* XMLocalAudioVideoModule.h */,
 				D1B4CC28082F4E6800A444E1 /* XMMainWindowController.h */,
 				D1ECCD0308348C4E008EBAE3 /* XMMainWindowModule.h */,
-				D1ECCD330834923D008EBAE3 /* XMNoCallModule.h */,
 				D1639463083E1A0F00F7FD83 /* XMStatisticsModule.h */,
 				D1ECCBF60833DDD5008EBAE3 /* XMTextChatModule.h */,
 				D1B4CFD40833911600A444E1 /* XMZeroConfModule.h */,
@@ -2138,7 +2139,6 @@
 				D1A5E9E309C9C69F0063B926 /* XMInspectorModule.m */,
 				D1B06A77086AA28A00563EDB /* XMLocalAudioVideoModule.m */,
 				D1B4CC29082F4E6800A444E1 /* XMMainWindowController.m */,
-				D1ECCD340834923D008EBAE3 /* XMNoCallModule.m */,
 				D1639464083E1A0F00F7FD83 /* XMStatisticsModule.m */,
 				D1ECCBF70833DDD5008EBAE3 /* XMTextChatModule.m */,
 				D1B4CFD50833911600A444E1 /* XMZeroConfModule.m */,

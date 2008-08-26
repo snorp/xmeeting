@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.53 2008/08/26 08:14:08 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.54 2008/08/26 13:58:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,7 @@
 - (void)_isRingingAtRemoteParty:(NSNotification *)notif;
 - (void)_didReceiveIncomingCall:(NSNotification *)notif;
 - (void)_didClearCall:(NSNotification *)notif;
+- (void)_didChangeProtocolStatus:(NSNotification *)notif;
 - (void)_didChangeGatekeeperStatus:(NSNotification *)notif;
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
 
@@ -92,6 +93,8 @@
   [notificationCenter addObserver:self selector:@selector(_isRingingAtRemoteParty:) name:XMNotification_CallManagerDidStartRingingAtRemoteParty object:nil];
   [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:) name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
   [notificationCenter addObserver:self selector:@selector(_didClearCall:) name:XMNotification_CallManagerDidClearCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeProtocolStatus:) name:XMNotification_CallManagerDidChangeH323Status object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeProtocolStatus:) name:XMNotification_CallManagerDidChangeSIPStatus object:nil];
   [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:) name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:nil];
   [notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:) name:XMNotification_AddressBookManagerDidChangeDatabase object:nil];
 		
@@ -504,11 +507,12 @@
 {
   XMCallManager *callManager = [XMCallManager sharedInstance];
   
-  if ([callManager doesAllowModifications] == NO) {
-    return;	// will be handled automatically if subsystem setup or call is finished
+  // only update the status if the call manager allows notifications.
+  // if the manager is doing a subsystem setup, the status will be
+  // updated once the setup is complete
+  if ([callManager doesAllowModifications]) {  
+    [self _updateStatusInformation:nil];
   }
-  
-  [self _updateStatusInformation:nil];
 }
 
 - (void)_didStartCallInitiation:(NSNotification *)notif
@@ -584,6 +588,16 @@
                                                        userInfo:nil repeats:NO] retain];
   
   isCalling = NO;
+}
+
+- (void)_didChangeProtocolStatus:(NSNotification *)notif
+{
+  // only update the status window if the call manager allows modifications.
+  // If the manager is doing a subsystem setup, the status will be updated
+  // once the setup is complete
+  if ([[XMCallManager sharedInstance] doesAllowModifications]) {
+    [self _updateStatusInformation:nil];
+  }
 }
 
 - (void)_didChangeGatekeeperStatus:(NSNotification *)notif
