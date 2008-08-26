@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.55 2008/08/26 08:14:06 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.56 2008/08/26 14:16:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -202,7 +202,7 @@ bool _XMIsRegisteredAtGatekeeper()
 #pragma mark -
 #pragma mark SIP Setup Functions
 
-bool _XMEnableSIPListeners(bool flag)
+bool _XMEnableSIP(bool flag)
 {
   return XMOpalManager::GetSIPEndPoint()->EnableListeners(flag);
 }

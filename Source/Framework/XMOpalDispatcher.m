@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.51 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.52 2008/08/26 14:16:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1439,10 +1439,14 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
 {
+  XMProtocolStatus protocolStatus;
+  
   if ([preferences enableSIP] == YES) {
     BOOL proxyInfoChanged = NO;
     
-    if (_XMEnableSIPListeners(YES) == YES) {
+    if (_XMEnableSIP(YES) == YES) {
+      protocolStatus = XMProtocolStatus_Enabled;
+      
       NSString *host = [preferences sipProxyHost];
       NSString *username = [preferences sipProxyUsername];
       NSString *password = [preferences sipProxyPassword];
@@ -1455,13 +1459,11 @@ typedef enum _XMOpalDispatcherMessage
       
       [self _doRegistrationSetup:preferences verbose:verbose proxyChanged:proxyInfoChanged];
     } else {
-      if (verbose == YES) {
-        [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPEnablingFailure)
-                                                       withObject:nil
-                                                    waitUntilDone:NO];
-      }
+      protocolStatus = XMProtocolStatus_Error;
     }
   } else { // SIP disabled
+    protocolStatus = XMProtocolStatus_Disabled;
+    
     _XMSetSIPProxy(NULL, NULL, NULL);
     
     // unregistering if needed
@@ -1470,7 +1472,13 @@ typedef enum _XMOpalDispatcherMessage
     _XMFinishRegistrationSetup(NO);
     
     // disabling the SIP Listeners
-    _XMEnableSIPListeners(NO);
+    _XMEnableSIP(NO);
+  }
+  
+  if (verbose == YES) {
+    NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:protocolStatus];
+    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPProtocolStatus:) withObject:number waitUntilDone:NO];
+    [number release];
   }
 }
 
@@ -1619,6 +1627,11 @@ typedef enum _XMOpalDispatcherMessage
   // retry to enable H.323 if it previously failed
   if ([currentPreferences enableH323] && _XMIsH323Enabled() == NO) {
     [self _doH323Setup:currentPreferences verbose:YES];
+  }
+  
+  // retry to enable SIP if it previously failed
+  if ([currentPreferences enableSIP] && _XMIsSIPEnabled() == NO) {
+    [self _doSIPSetup:currentPreferences verbose:YES];
   }
 }
 

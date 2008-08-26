@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.48 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.49 2008/08/26 14:16:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -166,7 +166,7 @@ extern "C" {
 #pragma mark -
 #pragma mark SIP Setup Functions
   
-  bool _XMEnableSIPListeners(bool enable);
+  bool _XMEnableSIP(bool enable);
   
   bool _XMIsSIPEnabled();
   
