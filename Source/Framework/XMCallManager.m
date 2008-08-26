@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.48 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.49 2008/08/26 13:46:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1144,6 +1144,14 @@ enum {
   if (state == Ready) { // only post the notification once
     state = SubsystemSetup;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup object:self];
+  }
+  
+  // reset any error states
+  if (h323ProtocolStatus == XMProtocolStatus_Error) {
+    h323ProtocolStatus = XMProtocolStatus_Disabled;
+  }
+  if (sipProtocolStatus == XMProtocolStatus_Error) {
+    sipProtocolStatus = XMProtocolStatus_Disabled;
   }
   
   automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];

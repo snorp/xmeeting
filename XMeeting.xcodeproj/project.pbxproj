@@ -2069,10 +2069,11 @@
 		D1AF73E0084D02E400D50883 /* Application Management */ = {
 			isa = PBXGroup;
 			children = (
+				D163336307A01BD5003FD9C0 /* XMApplicationController.h */,
+				D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */,
 				D1AF744B084DA1BE00D50883 /* XMAddressBookCallAddressProvider.h */,
 				D1EF068C091756FA008A8974 /* XMAddressBookManager.h */,
 				D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */,
-				D163336307A01BD5003FD9C0 /* XMApplicationController.h */,
 				D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */,
 				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
 				D1BA7630086B4848007E6CEC /* XMCallHistoryCallAddressProvider.h */,
@@ -2086,7 +2087,6 @@
 				D1AF744C084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m */,
 				D1EF068D091756FA008A8974 /* XMAddressBookManager.m */,
 				D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */,
-				D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */,
 				D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */,
 				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
 				D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */,

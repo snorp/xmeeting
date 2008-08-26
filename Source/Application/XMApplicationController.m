@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.62 2008/08/26 08:14:06 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.63 2008/08/26 13:46:56 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,9 +56,9 @@
 
   // handle errors
 - (void)_didNotStartCalling:(NSNotification *)notif;
-- (void)_didNotEnableH323:(NSNotification *)notif;
+- (void)_didChangeH323Status:(NSNotification *)notif;
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif;
-- (void)_didNotEnableSIP:(NSNotification *)notif;
+- (void)_didChangeSIPStatus:(NSNotification *)notif;
 - (void)_sipRegistrationDidFail:(NSNotification *)notif;
 - (void)_didStartSubsystemSetup:(NSNotification *)notif;
 - (void)_videoManagerDidGetError:(NSNotification *)notif;
@@ -99,8 +99,7 @@
   // Initialize the framework
   BOOL enablePTrace = [XMPreferencesManager enablePTrace];
   NSString *pTracePath = nil;
-  if (enablePTrace == YES)
-  {
+  if (enablePTrace == YES) {
     pTracePath = [XMPreferencesManager pTraceFilePath];
   }
   XMInitFramework(pTracePath);
@@ -116,40 +115,24 @@
   // registering for notifications
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   
-  [notificationCenter addObserver:self selector:@selector(_preferencesDidChange:)
-                             name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:)
-                             name:XMNotification_CallManagerDidStartSubsystemSetup object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
-                             name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
-                             name:XMNotification_CallManagerDidEstablishCall object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didClearCall:)
-                             name:XMNotification_CallManagerDidClearCall object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
-                             name:XMNotification_CallManagerDidNotStartCalling object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotEnableH323:)
-                             name:XMNotification_CallManagerDidNotEnableH323 object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:)
-                             name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotEnableSIP:)
-                             name:XMNotification_CallManagerDidNotEnableSIP object:nil];
-  [notificationCenter addObserver:self selector:@selector(_sipRegistrationDidFail:)
-                             name:XMNotification_CallManagerDidNotSIPRegister object:nil];
-  [notificationCenter addObserver:self selector:@selector(_frameworkDidClose:)
-                             name:XMNotification_FrameworkDidClose object:nil];
-  [notificationCenter addObserver:self selector:@selector(_videoManagerDidGetError:)
-                             name:XMNotification_VideoManagerDidGetError object:nil];
-  [notificationCenter addObserver:self selector:@selector(_callRecorderDidGetError:)
-                             name:XMNotification_CallRecorderDidGetError object:nil];
+  [notificationCenter addObserver:self selector:@selector(_preferencesDidChange:) name:XMNotification_PreferencesManagerDidChangePreferences object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didStartSubsystemSetup:) name:XMNotification_CallManagerDidStartSubsystemSetup object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:) name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didEstablishCall:) name:XMNotification_CallManagerDidEstablishCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didClearCall:) name:XMNotification_CallManagerDidClearCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotStartCalling:) name:XMNotification_CallManagerDidNotStartCalling object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeH323Status:) name:XMNotification_CallManagerDidChangeH323Status object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:) name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeSIPStatus:) name:XMNotification_CallManagerDidChangeSIPStatus object:nil];
+  [notificationCenter addObserver:self selector:@selector(_sipRegistrationDidFail:) name:XMNotification_CallManagerDidNotSIPRegister object:nil];
+  [notificationCenter addObserver:self selector:@selector(_frameworkDidClose:) name:XMNotification_FrameworkDidClose object:nil];
+  [notificationCenter addObserver:self selector:@selector(_videoManagerDidGetError:) name:XMNotification_VideoManagerDidGetError object:nil];
+  [notificationCenter addObserver:self selector:@selector(_callRecorderDidGetError:) name:XMNotification_CallRecorderDidGetError object:nil];
   
   // depending on wheter preferences are in the system, the setup assistant is shown or not.
-  if ([XMPreferencesManager doesHavePreferences] == YES)
-  {
+  if ([XMPreferencesManager doesHavePreferences] == YES) {
     [self performSelector:@selector(_setupApplication) withObject:nil afterDelay:0.0];
-  }
-  else
-  {
+  } else {
     [self performSelector:@selector(_showSetupAssistant) withObject:nil afterDelay:0.0];
   }
   
@@ -226,8 +209,7 @@
 {
   XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
   
-  if ([mainWindowController isFullScreen])
-  {
+  if ([mainWindowController isFullScreen]) {
     return;
   }
   [XMInspectorController setFullScreen:YES];
@@ -241,8 +223,7 @@
 {
   XMMainWindowController *mainWindowController = [XMMainWindowController sharedInstance];
   
-  if ([mainWindowController isFullScreen] == NO)
-  {
+  if ([mainWindowController isFullScreen] == NO) {
     return;
   }
   
@@ -277,8 +258,7 @@
 {
   XMSetupAssistantManager *manager = [XMSetupAssistantManager sharedInstance];
   
-  if (![manager isWindowLoaded] || ![[manager window] isVisible])
-  {
+  if (![manager isWindowLoaded] || ![[manager window] isVisible]) {
     [[XMMainWindowController sharedInstance] showMainWindow];
   }
   return YES;
@@ -318,14 +298,12 @@
   NSString *pboardString;
   
   types = [pboard types];
-  if (![types containsObject:NSStringPboardType])
-  {
+  if (![types containsObject:NSStringPboardType]) {
     *error = @"No pboard string";
     return;
   }
   pboardString = [pboard stringForType:NSStringPboardType];
-  if (!pboardString)
-  {
+  if (!pboardString) {
     *error = @"No pboard string";
     return;
   }
@@ -340,12 +318,9 @@
 {
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   
-  if ([preferencesManager searchAddressBookDatabase] == YES)
-  {
+  if ([preferencesManager searchAddressBookDatabase] == YES) {
     [[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
-  }
-  else
-  {
+  } else {
     [[XMAddressBookCallAddressProvider sharedInstance] setActiveCallAddressProvider:NO];
   }
 }
@@ -362,8 +337,7 @@
   
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   if ([[preferencesManager activeLocation] enableVideo] == YES &&
-     [preferencesManager automaticallyEnterFullScreen] == YES)
-  {
+     [preferencesManager automaticallyEnterFullScreen] == YES) {
     enterFullScreen = YES;
   }
   
@@ -372,8 +346,7 @@
 
 - (void)_didClearCall:(NSNotification *)notif
 {	
-  if (activeAlert != nil)
-  {
+  if (isDisplayingAlert) {
     [NSApp abortModal];
   }
   [[XMMainWindowController sharedInstance] showModule:noCallModule fullScreen:NO];
@@ -389,10 +362,15 @@
   [self performSelector:@selector(_displayCallStartFailedAlert:) withObject:address afterDelay:0.0];
 }
 
-- (void)_didNotEnableH323:(NSNotification *)notif
+- (void)_didChangeH323Status:(NSNotification *)notif
 {
-  // same as _didNotStartCalling
-  [self performSelector:@selector(_displayEnableH323FailedAlert) withObject:nil afterDelay:0.0];
+  if ([[XMCallManager sharedInstance] h323ProtocolStatus] == XMProtocolStatus_Error) {
+    // display alert, same as _didNotStartCalling
+    [self performSelector:@selector(_displayEnableH323FailedAlert) withObject:nil afterDelay:0.0];
+  } else if (h323ProtocolAlert != nil) {
+    // hide the alert about H.323 not being enabled
+    [NSApp abortModal];
+  }
 }
 
 - (void)_didNotRegisterAtGatekeeper:(NSNotification *)notif
@@ -401,10 +379,15 @@
   [self performSelector:@selector(_displayGatekeeperRegistrationFailedAlert) withObject:nil afterDelay:0.0];
 }
 
-- (void)_didNotEnableSIP:(NSNotification *)notif
+- (void)_didChangeSIPStatus:(NSNotification *)notif
 {
-  // same as _didNotStartCalling
-  [self performSelector:@selector(_displayEnableSIPFailedAlert) withObject:nil afterDelay:0.0];
+  if ([[XMCallManager sharedInstance] sipProtocolStatus] == XMProtocolStatus_Error) {
+    // display alert, same as _didNotStartCalling
+    [self performSelector:@selector(_displayEnableSIPFailedAlert) withObject:nil afterDelay:0.0];
+  } else if (sipProtocolAlert != nil) {
+    // hide the alert about SIP not being enabled
+    [NSApp abortModal];
+  }
 }
 
 - (void)_sipRegistrationDidFail:(NSNotification *)notif
@@ -415,8 +398,7 @@
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
-  if (activeAlert != nil)
-  {
+  if (isDisplayingAlert) {
     [NSApp abortModal];
   }
 }
@@ -449,12 +431,10 @@
   // show main window on call
   [[XMMainWindowController sharedInstance] showMainWindow];
   
-  if ([preferencesManager alertIncomingCalls] == YES)
-  {
+  if ([preferencesManager alertIncomingCalls] == YES) {
     alertType = [preferencesManager incomingCallAlertType];
     
-    switch(alertType)
-    {
+    switch (alertType) {
       case XMIncomingCallAlertType_Ringing:
       case XMIncomingCallAlertType_RingOnce:
         incomingCallSound = [[NSSound soundNamed:@"Ringer.aiff"] retain];
@@ -472,26 +452,23 @@
   XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
   
   // make sure no other alerts are present
-  if (activeAlert != nil)
-  {
+  if (isDisplayingAlert) {
     [NSApp abortModal];
   }
   
-  activeAlert = [[XMIncomingCallAlert alloc] initWithCallInfo:activeCall];
+  XMIncomingCallAlert *alert = [[XMIncomingCallAlert alloc] initWithCallInfo:activeCall];
   
-  int result = [(XMIncomingCallAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  int result = [alert runModal];
+  isDisplayingAlert = NO;
   
-  if (result == NSAlertFirstButtonReturn)
-  {
+  if (result == NSAlertFirstButtonReturn) {
     [[XMCallManager sharedInstance] acceptIncomingCall];
-  }
-  else if (result == NSAlertSecondButtonReturn)
-  {
+  } else if (result == NSAlertSecondButtonReturn) {
     [[XMCallManager sharedInstance] rejectIncomingCall];
   }
   
-  [activeAlert release];
-  activeAlert = nil;
+  [alert release];
   [incomingCallSound stop];
   [incomingCallSound release];
   incomingCallSound = nil;
@@ -499,17 +476,16 @@
 
 - (void)_displayCallStartFailedAlert:(NSString *)address
 {
-  activeAlert = [[NSAlert alloc] init];
+  NSAlert *alert = [[NSAlert alloc] init];
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_CALL_FAILED_MESSAGE", @"")];
+  [alert setMessageText:NSLocalizedString(@"XM_CALL_FAILED_MESSAGE", @"")];
   
   NSString *informativeTextFormat = NSLocalizedString(@"XM_CALL_FAILED_INFO_TEXT", @"");
   NSString *failReasonText;
   
   XMCallStartFailReason failReason = [[XMCallManager sharedInstance] callStartFailReason];
   
-  switch(failReason)
-  {
+  switch (failReason) {
     case XMCallStartFailReason_H323NotEnabled:
       failReasonText = NSLocalizedString(@"XM_CALL_FAILED_H323_NOT_ENABLED", @"");
       break;
@@ -537,37 +513,40 @@
   }
   
   NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, address, failReasonText];
-  [(NSAlert *)activeAlert setInformativeText:informativeText];
+  [alert setInformativeText:informativeText];
   [informativeText release];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [alert setAlertStyle:NSInformationalAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  [alert runModal];
+  isDisplayingAlert = NO;
   
-  [activeAlert release];
-  activeAlert = nil;
+  [alert release];
 }
 
 - (void)_displayEnableH323FailedAlert
 {
-  activeAlert = [[NSAlert alloc] init];
+  h323ProtocolAlert = [[NSAlert alloc] init];
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_MESSAGE", @"")];
-  [(NSAlert *)activeAlert setInformativeText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_INFO_TEXT", @"")];
+  [h323ProtocolAlert setMessageText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_MESSAGE", @"")];
+  [h323ProtocolAlert setInformativeText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_INFO_TEXT", @"")];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [h323ProtocolAlert setAlertStyle:NSInformationalAlertStyle];
+  [h323ProtocolAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  [h323ProtocolAlert runModal];
+  isDisplayingAlert = NO;
   
-  [activeAlert release];
-  activeAlert = nil;
+  [h323ProtocolAlert release];
+  h323ProtocolAlert = nil;
 }
 
 - (void)_displayGatekeeperRegistrationFailedAlert
 {
-  activeAlert = [[NSAlert alloc] init];
+  NSAlert *alert = [[NSAlert alloc] init];
   
   XMCallManager *callManager = [XMCallManager sharedInstance];
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
@@ -580,8 +559,7 @@
   NSString *reasonText = XMGatekeeperRegistrationStatusString(failReason);
   NSString *suggestionText;
   
-  switch(failReason)
-  {
+  switch (failReason) {
     case XMGatekeeperRegistrationStatus_GatekeeperNotFound:
       suggestionText = NSLocalizedString(@"XM_GK_NOT_FOUND_SUGGESTION", @"");
       break;
@@ -599,41 +577,42 @@
       break;
   }
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_GK_REG_FAILED_MESSAGE", @"")];
+  [alert setMessageText:NSLocalizedString(@"XM_GK_REG_FAILED_MESSAGE", @"")];
   NSString *informativeTextFormat = NSLocalizedString(@"XM_GK_REG_FAILED_INFO_TEXT", @"");
   
   NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
-  [(NSAlert *)activeAlert setInformativeText:informativeText];
+  [alert setInformativeText:informativeText];
   [informativeText release];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [alert setAlertStyle:NSInformationalAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  [alert runModal];
+  isDisplayingAlert = NO;
   
-  [activeAlert release];
-  activeAlert = nil;
+  [alert release];
 }
 
 - (void)_displayEnableSIPFailedAlert
 {
-  activeAlert = [[NSAlert alloc] init];
+  sipProtocolAlert = [[NSAlert alloc] init];
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_MESSAGE", @"")];
-  [(NSAlert *)activeAlert setInformativeText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_INFO_TEXT", @"")];
+  [sipProtocolAlert setMessageText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_MESSAGE", @"")];
+  [sipProtocolAlert setInformativeText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_INFO_TEXT", @"")];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [sipProtocolAlert setAlertStyle:NSInformationalAlertStyle];
+  [sipProtocolAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  [sipProtocolAlert runModal];
   
-  [activeAlert release];
-  activeAlert = nil;
+  [sipProtocolAlert release];
+  sipProtocolAlert = nil;
 }
 
 - (void)_displaySIPRegistrationFailedAlert:(NSNumber *)indexNumber
 {
-  activeAlert = [[NSAlert alloc] init];
+  NSAlert *alert = [[NSAlert alloc] init];
   
   XMCallManager *callManager = [XMCallManager sharedInstance];
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
@@ -648,8 +627,7 @@
   
   NSString *suggestionText;
   
-  switch(failReason)
-  {
+  switch (failReason) {
     case XMSIPStatusCode_Failure_UnAuthorized:
       suggestionText = NSLocalizedString(@"XM_SIP_UN_AUTHORIZED_SUGGESTION", @"");
       break;
@@ -664,69 +642,70 @@
       break;
   }
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_SIP_REG_FAILED_MESSAGE", @"")];
+  [alert setMessageText:NSLocalizedString(@"XM_SIP_REG_FAILED_MESSAGE", @"")];
   NSString *informativeTextFormat = NSLocalizedString(@"XM_SIP_REG_FAILED_INFO_TEXT", @"");
   
   NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, domain, reasonText, suggestionText];
-  [(NSAlert *)activeAlert setInformativeText:informativeText];
+  [alert setInformativeText:informativeText];
   [informativeText release];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
+  [alert setAlertStyle:NSInformationalAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [alert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  [alert runModal];
+  isDisplayingAlert = NO;
   
-  [activeAlert release];
-  activeAlert = nil;
+  [alert release];
 }
 
 - (void)_displayVideoManagerErrorAlert
 {
   NSString *errorDescription = [[XMVideoManager sharedInstance] errorDescription];
-  if (errorDescription == nil)
-  {
+  if (errorDescription == nil) {
     errorDescription = @"";
   }
   
-  activeAlert = [[NSAlert alloc] init];
+  NSAlert *alert = [[NSAlert alloc] init];
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @"")];
-  [(NSAlert *)activeAlert setInformativeText:errorDescription];
+  [alert setMessageText:NSLocalizedString(@"XM_VIDEO_DEVICE_PROBLEM_MESSAGE", @"")];
+  [alert setInformativeText:errorDescription];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [alert setAlertStyle:NSInformationalAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  [alert runModal];
+  isDisplayingAlert = NO;
   
-  [activeAlert release];
-  activeAlert = nil;
+  [alert release];
 }
 
 - (void)_displayCallRecorderErrorAlert
 {
-  activeAlert = [[NSAlert alloc] init];
+  NSAlert *alert = [[NSAlert alloc] init];
   NSString *errorDescription = [[XMCallRecorder sharedInstance] errorDescription];
   
-  [(NSAlert *)activeAlert setMessageText:NSLocalizedString(@"XM_CALL_RECORDER_ERROR_MESSAGE", @"")];
+  [alert setMessageText:NSLocalizedString(@"XM_CALL_RECORDER_ERROR_MESSAGE", @"")];
   NSString *infoTextFormat = NSLocalizedString(@"XM_CALL_RECORDER_ERROR_INFO_TEXT", @"");
   NSString *infoText = [[NSString alloc] initWithFormat:infoTextFormat, errorDescription];
-  [(NSAlert *)activeAlert setInformativeText:infoText];
+  [alert setInformativeText:infoText];
   [infoText release];
   
-  [(NSAlert *)activeAlert setAlertStyle:NSInformationalAlertStyle];
-  [(NSAlert *)activeAlert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [alert setAlertStyle:NSInformationalAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
-  [(NSAlert *)activeAlert runModal];
+  isDisplayingAlert = YES;
+  [alert runModal];
+  isDisplayingAlert = NO;
   
-  [activeAlert release];
-  activeAlert = nil;
+  [alert release];
 }
 
 - (void)sound:(NSSound *)sound didFinishPlaying:(BOOL)didFinish
 {
-  if (didFinish == YES && alertType == XMIncomingCallAlertType_Ringing)
-  {
+  if (didFinish == YES && alertType == XMIncomingCallAlertType_Ringing) {
     [sound play];
   }	
 }
@@ -814,8 +793,7 @@
   [preferencesManager setSIPAccounts:sipAccounts];
   [preferencesManager setLocations:locations];
   
-  if ([locations count] != 0)
-  {
+  if ([locations count] != 0) {
     [preferencesManager synchronizeAndNotify];
   }
   
@@ -823,7 +801,9 @@
   [[XMMainWindowController sharedInstance] showMainWindow];
   [[XMMainWindowController sharedInstance] showModule:noCallModule fullScreen:NO];
   
-  activeAlert = nil;
+  isDisplayingAlert = NO;
+  h323ProtocolAlert = nil;
+  sipProtocolAlert = nil;
   incomingCallSound = nil;
   
   // Enable the services menu

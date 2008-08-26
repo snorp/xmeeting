@@ -22,7 +22,7 @@
 "XM_CALL_FAILED_TRANSPORT_FAIL" = "Could not connect to remote party";
 
 "XM_ENABLE_H323_FAILED_MESSAGE" = "Enabling H.323 Failed";
-"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls.";
+"XM_ENABLE_H323_FAILED_INFO_TEXT" = "Unable to enable the H.323 subsystem.\nThere is probably another H.323 application running.\nYou will not be able to make H.323 calls.\n\nPlease close any other H.323 applications, XMeeting will automatically retry to enable the H.323 subsystem.";
 
 "XM_GK_REG_FAILED_MESSAGE" = "Gatekeeper Registration Failed";
 "XM_GK_REG_FAILED_INFO_TEXT" = "Unable to register at gatekeeper \"%@\" (%@). You will not be able to use H.323 IDs (alias names, phone numbers) when making a call. %@.\n\nXMeeting will automatically try to register again.";
