@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.64 2008/08/27 10:20:35 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.65 2008/08/27 21:22:39 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -584,9 +584,15 @@
   }
   
   [alert setMessageText:NSLocalizedString(@"XM_GK_REG_FAILED_MESSAGE", @"")];
-  NSString *informativeTextFormat = NSLocalizedString(@"XM_GK_REG_FAILED_INFO_TEXT", @"");
   
-  NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
+  NSString *informativeText;
+  if (host != nil) {
+    NSString *informativeTextFormat = NSLocalizedString(@"XM_GK_REG_FAILED_INFO_TEXT", @"");
+    informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, host, reasonText, suggestionText];
+  } else {
+    NSString *informativeTextFormat = NSLocalizedString(@"XM_GK_REG_FAILED_AUTO_DISCOVERY_INFO_TEXT", @"");
+    informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, reasonText, suggestionText];
+  }
   [alert setInformativeText:informativeText];
   [informativeText release];
   

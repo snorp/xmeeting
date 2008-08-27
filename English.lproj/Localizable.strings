@@ -26,6 +26,7 @@
 
 "XM_GK_REG_FAILED_MESSAGE" = "Gatekeeper Registration Failed";
 "XM_GK_REG_FAILED_INFO_TEXT" = "Unable to register at gatekeeper \"%@\" (%@). You will not be able to use H.323 IDs (alias names, phone numbers) when making a call. %@.\n\nXMeeting will automatically try to register again.";
+"XM_GK_REG_FAILED_AUTO_DISCOVERY_INFO_TEXT" = "Unable to register at a gatekeeper (%@). You will not be able to use H.323 IDs (alias names, phone numbers) when making a call. %@.\n\nXMeeting will automatically try to register again.";
 "XM_GK_NOT_FOUND_SUGGESTION" = "\nPlease check your internet connection and the H.323 account settings.";
 "XM_GK_DUPLICATE_ALIAS_SUGGESTION" = "\n\nSomeone else is already registered with the H.323 IDs you're provided. If XMeeting previously crashed, you may have to wait some time until you can re-register. Otherwise check your H.323 account settings and contact the responsible Gatekeeper administrator.";
 "XM_GK_SECURITY_DENIED_SUGGESTION" = "\nPlease check the H.323 account settings (user alias and password) or contact the responsible Gatekeeper administrator.";

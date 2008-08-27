@@ -165,7 +165,6 @@
 		D1A562A70C6DAA280086E6F6 /* Remove.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A60C6DAA280086E6F6 /* Remove.png */; };
 		D1A562AA0C6DAB420086E6F6 /* Action.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A562A90C6DAB420086E6F6 /* Action.png */; };
 		D1A5EE1609CB08E30063B926 /* DummyImage.gif in Resources */ = {isa = PBXBuildFile; fileRef = D1A5EE1509CB08E30063B926 /* DummyImage.gif */; };
-		D1AD1A680E6320F800143295 /* pvidfile.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1AD1A670E6320F800143295 /* pvidfile.h */; };
 		D1AD1A6A0E63212100143295 /* pvidfile.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1AD1A690E63212100143295 /* pvidfile.cxx */; };
 		D1AF64600A3947FC00CAF35F /* appearancePreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */; };
 		D1B06A5C086A9C5E00563EDB /* Loudspeaker.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D1B06A5A086A9C5E00563EDB /* Loudspeaker.tiff */; };
@@ -514,7 +513,6 @@
 				D10B8E0C0A512F5D00003A33 /* logo.tiff in CopyFiles */,
 				D10B8E0D0A512F5D00003A33 /* mainwindow.png in CopyFiles */,
 				D10B8E0E0A512F5D00003A33 /* osd.png in CopyFiles */,
-				D1AD1A680E6320F800143295 /* pvidfile.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1991,12 +1989,12 @@
 		D15F721E0E54BADA0006CB43 /* H323 */ = {
 			isa = PBXGroup;
 			children = (
+				D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */,
+				D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */,
 				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
 				D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */,
-				D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */,
 				D1EEDEB50992514A000BF113 /* XMH323Channel.h */,
 				D14F9A390914C673002486B2 /* XMH323Connection.h */,
-				D1DE52ED07C6474100343A8D /* XMH323EndPoint.h */,
 			);
 			name = H323;
 			sourceTree = "<group>";
@@ -2158,8 +2156,8 @@
 		D1B6058A08F8F7E30034B47F /* src */ = {
 			isa = PBXGroup;
 			children = (
-				D1B6075808F8F86B0034B47F /* ptclib */,
 				D1B6078D08F8F86B0034B47F /* ptlib */,
+				D1B6075808F8F86B0034B47F /* ptclib */,
 			);
 			name = src;
 			path = ../ptlib/src;
@@ -2170,8 +2168,8 @@
 			children = (
 				D1B606C508F8F8410034B47F /* ptlib.h */,
 				D1AD190C0E630B1700143295 /* ptbuildopts.h */,
-				D1B6062E08F8F8410034B47F /* ptclib */,
 				D1B6065D08F8F8410034B47F /* ptlib */,
+				D1B6062E08F8F8410034B47F /* ptclib */,
 				D1887E0B0A27B96900C938BB /* Patches */,
 			);
 			name = include;
@@ -2464,8 +2462,8 @@
 		D1CEE10608F901DB007E4ABE /* opal */ = {
 			isa = PBXGroup;
 			children = (
-				D1CEE1FD08F90230007E4ABE /* Headers */,
-				D1CEE20008F90240007E4ABE /* Source */,
+				D1CEE1FD08F90230007E4ABE /* include */,
+				D1CEE20008F90240007E4ABE /* src */,
 			);
 			name = opal;
 			sourceTree = "<group>";
@@ -2603,7 +2601,7 @@
 			path = ../opal/include/sip;
 			sourceTree = SOURCE_ROOT;
 		};
-		D1CEE1FD08F90230007E4ABE /* Headers */ = {
+		D1CEE1FD08F90230007E4ABE /* include */ = {
 			isa = PBXGroup;
 			children = (
 				D1CEE11208F9022B007E4ABE /* asn */,
@@ -2615,10 +2613,11 @@
 				D1F0B78609DC4867005D0464 /* h224 */,
 				D14BBF3C0E3F7B6F007B1A57 /* h460 */,
 			);
-			name = Headers;
+			name = include;
+			path = ../opal/include;
 			sourceTree = "<group>";
 		};
-		D1CEE20008F90240007E4ABE /* Source */ = {
+		D1CEE20008F90240007E4ABE /* src */ = {
 			isa = PBXGroup;
 			children = (
 				D1CEE20108F90261007E4ABE /* asn */,
@@ -2630,7 +2629,8 @@
 				D1F0B77F09DC4834005D0464 /* h224 */,
 				D14BBF2D0E3F7B43007B1A57 /* h460 */,
 			);
-			name = Source;
+			name = src;
+			path = ../opal/src;
 			sourceTree = "<group>";
 		};
 		D1CEE20108F90261007E4ABE /* asn */ = {
