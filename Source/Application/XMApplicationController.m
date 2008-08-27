@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.63 2008/08/26 13:46:56 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.64 2008/08/27 10:20:35 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -528,6 +528,12 @@
 
 - (void)_displayEnableH323FailedAlert
 {
+  // possible race condition: If the H.323 error is resolved before this dialog is shown,
+  // nothing has to be done.
+  if ([[XMCallManager sharedInstance] h323ProtocolStatus] != XMProtocolStatus_Error) {
+    return;
+  }
+  
   h323ProtocolAlert = [[NSAlert alloc] init];
   
   [h323ProtocolAlert setMessageText:NSLocalizedString(@"XM_ENABLE_H323_FAILED_MESSAGE", @"")];
@@ -596,6 +602,12 @@
 
 - (void)_displayEnableSIPFailedAlert
 {
+  // possible race condition: If the SIP error is resolved before this dialog is shown,
+  // nothing has to be done.
+  if ([[XMCallManager sharedInstance] sipProtocolStatus] != XMProtocolStatus_Error) {
+    return;
+  }
+  
   sipProtocolAlert = [[NSAlert alloc] init];
   
   [sipProtocolAlert setMessageText:NSLocalizedString(@"XM_ENABLE_SIP_FAILED_MESSAGE", @"")];
