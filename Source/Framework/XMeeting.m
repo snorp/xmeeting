@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.16 2007/09/25 12:12:02 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.17 2008/08/28 09:40:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuickTime/QuickTime.h>
+#import <unistd.h>
 
 #import "XMeeting.h"
 #import "XMPrivate.h"
@@ -146,8 +147,8 @@ void _XMThreadExit() {
     
     _XMInitializedStatus = XM_FRAMEWORK_NOT_INITIALIZED;
     
-    usleep(200000);
-    
+    usleep(200*1000); // Wait 200 ms to let the subsystem do more cleanup
+
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_FrameworkDidClose object:nil];
   }
 }
