@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.66 2008/08/28 11:07:21 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.67 2008/08/28 15:15:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -574,9 +574,6 @@
       break;
     case XMGatekeeperRegistrationStatus_SecurityDenial:
       suggestionText = NSLocalizedString(@"XM_GK_SECURITY_DENIAL_SUGGESTION", @"");
-      break;
-    case XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper:
-      suggestionText = NSLocalizedString(@"XM_GK_UNREG_BY_GK_SUGGESTION", @"");
       break;
     default:
       suggestionText = @"";

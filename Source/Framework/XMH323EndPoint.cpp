@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.34 2008/08/28 11:07:22 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.35 2008/08/28 15:15:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,6 +126,24 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
   if (block == true) {
     DoSetGatekeeper(address, terminalAlias1, terminalAlias2, password);
   } else {
+    // if a gatekeeper is present, only force re-registration in for the following
+    // fail reasons:
+    // - InvalidListener
+    // - DuplicateAlias
+    // - SecurityDenied
+    // In the other cases, the subsystem will automatically try to re-register
+    if (gatekeeper != NULL) {
+      H323Gatekeeper::RegistrationFailReasons failReason = gatekeeper->GetRegistrationFailReason();
+      
+      switch (failReason) {
+        case H323Gatekeeper::InvalidListener:
+        case H323Gatekeeper::DuplicateAlias:
+        case H323Gatekeeper::SecurityDenied:
+          break; // continue;
+        default:
+          return; // don't force re-register
+      }
+    }
     // Run a separate thread for the registration
     hasGkRegistrationThread = true;
     new XMH323GkRegistrationThread(this, address, terminalAlias1, terminalAlias2, password);
