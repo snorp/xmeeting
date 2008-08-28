@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.35 2008/08/28 15:15:18 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.36 2008/08/28 20:07:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -165,6 +165,7 @@ void XMH323EndPoint::DoSetGatekeeper(const PString & address,
     
     gatekeeperAddress = address;
     
+    // update the alias names list
     {
       PWaitAndSignal m(GetAliasNamesMutex());
       SetLocalUserName(terminalAlias1);

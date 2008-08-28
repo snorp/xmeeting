@@ -1818,6 +1818,7 @@
 			isa = PBXGroup;
 			children = (
 				D15F721E0E54BADA0006CB43 /* H323 */,
+				D1AD249C0E67342100143295 /* SIP */,
 				D1972B0008FC529C00295E05 /* XMPacketBuilder.c */,
 				D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */,
 				D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */,
@@ -1838,7 +1839,6 @@
 				D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */,
 				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
 				D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */,
-				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D1010AB30C71F6D20010523E /* XMURLParser.cpp */,
 				D10BDA540AC4668C004320A8 /* XMAudioTester.h */,
@@ -1856,7 +1856,6 @@
 				D14B04130B06020B001AB527 /* XMRFC2833Handler.h */,
 				D147D6050970342B005DE11C /* XMRTPPacket.h */,
 				D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */,
-				D1FD475509B650D500EB517B /* XMSIPEndPoint.h */,
 				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1010AB40C71F6D20010523E /* XMURLParser.h */,
 			);
@@ -2062,6 +2061,15 @@
 				1A348FA40984E4210033FA95 /* XMOSDVideoView.m */,
 			);
 			name = "Video Display";
+			sourceTree = "<group>";
+		};
+		D1AD249C0E67342100143295 /* SIP */ = {
+			isa = PBXGroup;
+			children = (
+				D1FD475509B650D500EB517B /* XMSIPEndPoint.h */,
+				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
+			);
+			name = SIP;
 			sourceTree = "<group>";
 		};
 		D1AF73E0084D02E400D50883 /* Application Management */ = {

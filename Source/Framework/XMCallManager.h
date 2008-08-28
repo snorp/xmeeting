@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.32 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.33 2008/08/28 20:07:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,6 +43,7 @@
   NSString *gatekeeperName;
   NSArray *terminalAliases;
   XMGatekeeperRegistrationStatus gatekeeperRegistrationStatus;
+  XMGatekeeperRegistrationStatus gatekeeperRegistrationStatusBeforeSubsystemSetup;
   
   // SIP variables
   NSMutableArray *sipRegistrations;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.50 2008/08/28 11:07:21 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.51 2008/08/28 20:07:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -359,98 +359,18 @@ enum {
   return gatekeeperRegistrationStatus;
 }
 
-/*- (void)retryEnableH323
-{
-  if (callManagerStatus == XM_CALL_MANAGER_READY &&
-     h323ListeningStatus == XM_H323_ERROR && 
-     activePreferences != nil &&
-     [activePreferences enableH323] == YES)
-  {
-    h323ListeningStatus = XM_H323_NOT_LISTENING;
-    
-    callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
-                                                        object:self];
-    
-    [XMOpalDispatcher _retryEnableH323:activePreferences];
-  }
-  else
-  {
-    NSString *exceptionReason;
-    
-    if (callManagerStatus != XM_CALL_MANAGER_READY)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
-    }
-    else if ([self isH323Listening] == YES)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfH323Listening;
-    }
-    else if (activePreferences == nil)
-    {
-      exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
-    }
-    else
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfH323Disabled;
-    }
-    
-    [NSException raise:XMException_InvalidAction format:exceptionReason];
-  }
-}
-
-- (void)retryGatekeeperRegistration
-{
-  if (callManagerStatus == XM_CALL_MANAGER_READY &&
-     gatekeeperName == nil && 
-     activePreferences != nil &&
-     [activePreferences gatekeeperTerminalAlias1] != nil)
-  {
-    callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
-                                                        object:self];
-    gatekeeperRegistrationFailReason = XMGatekeeperRegistrationFailReason_NoFailure;
-    [XMOpalDispatcher _retryGatekeeperRegistration:activePreferences];
-  }
-  else
-  {
-    NSString *exceptionReason;
-    
-    if (callManagerStatus != XM_CALL_MANAGER_READY)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
-    }
-    else if (gatekeeperName != nil)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfGatekeeperRegistered;
-    }
-    else if (activePreferences == nil)
-    {
-      exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
-    }
-    else
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfGatekeeperDisabled;
-    }
-    
-    [NSException raise:XMException_InvalidAction format:exceptionReason];
-  }
-}*/
-
 #pragma mark -
 #pragma mark SIP specific Methods
 
 - (BOOL)isCompletelySIPRegistered
 {
   unsigned count = [sipRegistrationStates count];
-  if (count == 0) {
+  if (count == 0) { // no registrations at all
     return NO;
   }
   
   BOOL didRegisterAll = YES;
-  
-  unsigned i;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     NSNumber *number = (NSNumber *)[sipRegistrationStates objectAtIndex:i];
     XMSIPStatusCode failReason = (XMSIPStatusCode)[number unsignedIntValue];
     if (failReason != XMSIPStatusCode_Successful_OK) {
@@ -495,45 +415,7 @@ enum {
   return [copy autorelease];
 }
 
-/*- (void)retryEnableSIP {
-  if (callManagerStatus == XM_CALL_MANAGER_READY &&
-     sipListeningStatus == XM_SIP_ERROR && 
-     activePreferences != nil &&
-     [activePreferences enableSIP] == YES)
-  {
-    sipListeningStatus = XM_SIP_NOT_LISTENING;
-    
-    callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
-                                                        object:self];
-    
-    [XMOpalDispatcher _retryEnableSIP:activePreferences];
-  }
-  else
-  {
-    NSString *exceptionReason;
-    
-    if (callManagerStatus != XM_CALL_MANAGER_READY)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
-    }
-    else if ([self isSIPListening] == YES)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPListening;
-    }
-    else if (activePreferences == nil)
-    {
-      exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
-    }
-    else
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPDisabled;
-    }
-    
-    [NSException raise:XMException_InvalidAction format:exceptionReason];
-  }
-}
-
+/*
 - (void)retrySIPRegistrations
 {
   if (callManagerStatus == XM_CALL_MANAGER_READY &&
@@ -649,6 +531,16 @@ enum {
   } else if (state == SubsystemSetup) { // protect against multiple invocations
     state = Ready;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
+  }
+  
+  // if the gatekeeper registration status did not change, but remains in an error state, still post a notification.
+  // parameters may have changed, but registration was still not successful
+  if (gatekeeperRegistrationStatus == gatekeeperRegistrationStatusBeforeSubsystemSetup &&
+      gatekeeperRegistrationStatus != XMGatekeeperRegistrationStatus_NotRegistered &&
+      gatekeeperRegistrationStatus != XMGatekeeperRegistrationStatus_SuccessfullyRegistered) {
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:self];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:self];
   }
   
   // if system is going to sleep, tell that it is okay
@@ -974,6 +866,7 @@ enum {
     if (gatekeeperRegistrationStatus == XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper &&
         theGatekeeperRegistrationStatus == XMGatekeeperRegistrationStatus_GatekeeperNotFound) {
       // Special case: GK unregistered first, went offline afterwards. Don't post a notification for the second time
+      gatekeeperRegistrationStatus = theGatekeeperRegistrationStatus;
       return;
     }
     
@@ -1082,9 +975,8 @@ enum {
   NSArray *records = [activePreferences sipRegistrationRecords];
   unsigned searchIndex = NSNotFound;
   unsigned count = [records count];
-  unsigned i;
   
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[records objectAtIndex:i];
     if (![record isKindOfClass:[XMPreferencesRegistrationRecord class]]) { // protect against illegal classes
       continue;
@@ -1143,6 +1035,10 @@ enum {
   if (sipProtocolStatus == XMProtocolStatus_Error) {
     sipProtocolStatus = XMProtocolStatus_Disabled;
   }
+  
+  // store the current GK registration status. The status may be updated at any time, but a notification is only sent when the
+  // status actually changes. However, each subsystem setup should trigger a notification.
+  gatekeeperRegistrationStatusBeforeSubsystemSetup = gatekeeperRegistrationStatus;
   
   automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
 
