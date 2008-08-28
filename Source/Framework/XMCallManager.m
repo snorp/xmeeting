@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.49 2008/08/26 13:46:56 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.50 2008/08/28 11:07:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -921,16 +921,6 @@ enum {
     [notificationCenter postNotificationName:notification object:self];
     [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeH323Status object:self];
   }
-}
-
-- (void)_handleGatekeeperRegistrationProcessStart
-{
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartGatekeeperRegistrationProcess object:self];
-}
-
-- (void)_handleGatekeeperRegistrationProcessEnd
-{
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndGatekeeperRegistrationProcess object:self];
 }
 
 - (void)_handleGatekeeperRegistration:(NSArray *)objects

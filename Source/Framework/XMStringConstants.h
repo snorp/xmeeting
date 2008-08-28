@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.36 2008/08/26 08:14:08 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.37 2008/08/28 11:07:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -114,17 +114,6 @@ extern NSString *XMNotification_CallManagerDidNotEnableH323;
  * Posted whenever the H323 protocol status changes
  **/
 extern NSString *XMNotification_CallManagerDidChangeH323Status;
-
-/**
- * Posted when the Framework did start registering at a gatekeeper.
- * This can be a lengthy task
- **/
-extern NSString *XMNotification_CallManagerDidStartGatekeeperRegistrationProcess;
-
-/**
- * Posted when the Framework did end the gatekeeper registration task
- **/
-extern NSString *XMNotification_CallManagerDidEndGatekeeperRegistrationProcess;
 
 /**
  * Posted when the Framework sucessfully registered at a gatekeeper.

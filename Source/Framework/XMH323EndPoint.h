@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.19 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.20 2008/08/28 11:07:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,23 +24,31 @@ public:
 	XMH323EndPoint(OpalManager & manager);
 	virtual ~XMH323EndPoint();
 	
-	// Setup methods
+	// Protocol
 	bool EnableListeners(bool flag);
-	bool IsListening();
+	bool IsListening() const { return isListening; }
+  
+  // Gk Registration
 	void SetGatekeeper(const PString & address,
                      const PString & terminalAlias1, 
                      const PString & terminalAlias2,
-                     const PString & password);
-  void HandleRegistrationConfirm();
+                     const PString & password,
+                     bool block);
+  void DoSetGatekeeper(const PString & address,
+                       const PString & terminalAlias1,
+                       const PString & terminalAlias2,
+                       const PString & password);
+  void HandleGkRegistrationThreadFinished();
+  void HandleRegistrationConfirm() const;
 	void HandleNetworkStatusChange();
+  virtual H323Gatekeeper * CreateGatekeeper(H323Transport * transport);
+	virtual void OnRegistrationConfirm();
+  PMutex & GetAliasNamesMutex() { return aliasNamesMutex; }
 	
 	// obtaining call statistics
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
 	
 	// overriding some callbacks
-  virtual H323Gatekeeper * CreateGatekeeper(H323Transport * transport);
-	virtual void OnRegistrationConfirm();
-	virtual void OnRegistrationReject();
 	
 	virtual void OnEstablished(OpalConnection & connection);
   virtual void OnReleased(OpalConnection & connection);
@@ -66,9 +74,9 @@ public:
 	
 private:
   bool isListening;
-	bool didRegisterAtGatekeeper;
   PString gatekeeperAddress;
-	//XMGatekeeperRegistrationFailReason gatekeeperRegistrationFailReason;
+  bool hasGkRegistrationThread;
+  PMutex aliasNamesMutex;
   
   PMutex releasingConnectionsMutex;
   PList<XMH323Connection> releasingConnections;

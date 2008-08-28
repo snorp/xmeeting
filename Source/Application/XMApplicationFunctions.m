@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.18 2008/08/26 08:14:06 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.19 2008/08/28 11:07:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -137,8 +137,8 @@ NSString *XMGatekeeperRegistrationStatusString(XMGatekeeperRegistrationStatus st
     case XMGatekeeperRegistrationStatus_DuplicateAlias:
       statusString = NSLocalizedString(@"XM_GK_REG_FAILED_DUPLICATE_ALIAS", @"");
       break;
-    case XMGatekeeperRegistrationStatus_SecurityDenied:
-      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_SECURITY_DENIED", @"");
+    case XMGatekeeperRegistrationStatus_SecurityDenial:
+      statusString = NSLocalizedString(@"XM_GK_REG_FAILED_SECURITY_DENIAL", @"");
       break;
     case XMGatekeeperRegistrationStatus_TransportError:
       statusString = NSLocalizedString(@"XM_GK_REG_FAILED_TRANSPORT_ERROR", @"");

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.34 2008/08/26 08:14:08 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.35 2008/08/28 11:07:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,8 +32,6 @@ NSString *XMNotification_CallManagerDidEnableH323 = @"XMeetingCallManagerDidEnab
 NSString *XMNotification_CallManagerDidDisableH323 = @"XMeetingCallManagerDidDisableH323Notification";
 NSString *XMNotification_CallManagerDidNotEnableH323 = @"XMeetingCallManagerDidNotEnableH323Notification";
 NSString *XMNotification_CallManagerDidChangeH323Status = @"XMeetingCallManagerDidChangeH323StatusNotification";
-NSString *XMNotification_CallManagerDidStartGatekeeperRegistrationProcess = @"XMeetingCallManagerDidStartGatekeeperRegistrationProcessNotification";
-NSString *XMNotification_CallManagerDidEndGatekeeperRegistrationProcess = @"XMeetingCallManagerDidEndGatekeeperRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidRegisterAtGatekeeper = @"XMeetingCallManagerDidRegisterAtGatekeeperNotification";
 NSString *XMNotification_CallManagerDidUnregisterFromGatekeeper = @"XMeetingCallManagerDidUnregisterFromGatekeeperNotification";
 NSString *XMNotification_CallManagerDidNotRegisterAtGatekeeper = @"XMeetingCallManagerDidNotRegisterAtGatekeeperNotification";

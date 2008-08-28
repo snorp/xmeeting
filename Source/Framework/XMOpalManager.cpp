@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.63 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.64 2008/08/28 11:07:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -137,9 +137,6 @@ XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 
 void XMOpalManager::HandleNetworkStatusChange()
 {
-  cout << "WAIT" << endl;
-  usleep(5000000);
-  cout << "DONE" << endl;
   PInterfaceMonitor::GetInstance().RefreshInterfaceList();
 }
 

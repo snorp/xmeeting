@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.65 2008/08/27 21:22:39 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.66 2008/08/28 11:07:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -572,8 +572,8 @@
     case XMGatekeeperRegistrationStatus_DuplicateAlias:
       suggestionText = NSLocalizedString(@"XM_GK_DUPLICATE_ALIAS_SUGGESTION", @"");
       break;
-    case XMGatekeeperRegistrationStatus_SecurityDenied:
-      suggestionText = NSLocalizedString(@"XM_GK_SECURITY_DENIED_SUGGESTION", @"");
+    case XMGatekeeperRegistrationStatus_SecurityDenial:
+      suggestionText = NSLocalizedString(@"XM_GK_SECURITY_DENIAL_SUGGESTION", @"");
       break;
     case XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper:
       suggestionText = NSLocalizedString(@"XM_GK_UNREG_BY_GK_SUGGESTION", @"");

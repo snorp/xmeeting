@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.33 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.34 2008/08/28 11:07:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,6 +33,29 @@ class XMH323Gatekeeper : public H323Gatekeeper
 public:
   XMH323Gatekeeper(XMH323EndPoint & endpoint, H323Transport * transport);
   virtual bool MakeRequest(Request & request);
+  virtual bool OnReceiveRegistrationConfirm(const H225_RegistrationConfirm &);
+  
+private:
+  XMH323EndPoint & ep;
+};
+
+class XMH323GkRegistrationThread : public PThread
+{
+  PCLASSINFO(XMH323GkRegistrationThread, PThread);
+  
+public:
+  XMH323GkRegistrationThread(XMH323EndPoint *ep,
+                             const PString & address,
+                             const PString & terminalAlias1,
+                             const PString & terminalAlias2,
+                             const PString & password);
+  virtual void Main();
+private:
+    XMH323EndPoint *ep;
+  PString address;
+  PString terminalAlias1;
+  PString terminalAlias2;
+  PString password;
 };
 
 //OPAL_REGISTER_H224_CAPABILITY();
@@ -41,6 +64,9 @@ XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager)
 {
 	isListening = false;
+  gatekeeperAddress = "";
+  hasGkRegistrationThread = false;
+  
 	connectionToken = "";
 	
   // Don't use OPAL's bandwidth management system as this is not flexible enough
@@ -86,15 +112,30 @@ bool XMH323EndPoint::EnableListeners(bool flag)
 	return result;
 }
 
-bool XMH323EndPoint::IsListening()
-{
-	return isListening;
-}
-
 void XMH323EndPoint::SetGatekeeper(const PString & address,
                                    const PString & terminalAlias1,
                                    const PString & terminalAlias2,
-                                   const PString & password)
+                                   const PString & password,
+                                   bool block)
+{
+  // wait until any running GK registration thread did finish
+  while (hasGkRegistrationThread) {
+    usleep(100*1000); // wait 100 ms
+  }
+  
+  if (block == true) {
+    DoSetGatekeeper(address, terminalAlias1, terminalAlias2, password);
+  } else {
+    // Run a separate thread for the registration
+    hasGkRegistrationThread = true;
+    new XMH323GkRegistrationThread(this, address, terminalAlias1, terminalAlias2, password);
+  }
+}
+
+void XMH323EndPoint::DoSetGatekeeper(const PString & address,
+                                     const PString & terminalAlias1,
+                                     const PString & terminalAlias2,
+                                     const PString & password)
 {
   // Use a gatekeeper if terminalAlias1 is not empty
   if (!terminalAlias1.IsEmpty()) {
@@ -106,12 +147,12 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
     
     gatekeeperAddress = address;
     
-    //PMutex & mutex = GetAliasNamesMutex();
-    //mutex.Wait();
-    
-    SetLocalUserName(terminalAlias1);
-    if (!terminalAlias2.IsEmpty()) {
-      AddAliasName(terminalAlias2);
+    {
+      PWaitAndSignal m(GetAliasNamesMutex());
+      SetLocalUserName(terminalAlias1);
+      if (!terminalAlias2.IsEmpty()) {
+        AddAliasName(terminalAlias2);
+      }
     }
     
     if (!password.IsEmpty()) {
@@ -119,10 +160,8 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
       SetGatekeeperPassword(password, terminalAlias1);
     } else if (gatekeeper != NULL) {
       // Do a full RRQ with the updated terminal aliases
-     // gatekeeper->OnTerminalAliasChanged();
+      gatekeeper->OnTerminalAliasChanged();
     }
-    
-    //mutex.Signal();
     
     if (gatekeeper == NULL) {
       bool result = UseGatekeeper(address);
@@ -143,11 +182,17 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
       RemoveGatekeeper();
       _XMHandleGatekeeperUnregistration();
     }
+    PWaitAndSignal m(GetAliasNamesMutex());
     SetLocalUserName(GetManager().GetDefaultUserName());
   }
 }
 
-void XMH323EndPoint::HandleRegistrationConfirm()
+void XMH323EndPoint::HandleGkRegistrationThreadFinished()
+{
+  hasGkRegistrationThread = false;
+}
+
+void XMH323EndPoint::HandleRegistrationConfirm() const
 {
   if (gatekeeper != NULL) {
     PString gatekeeperName = gatekeeper->GetName();
@@ -167,6 +212,17 @@ void XMH323EndPoint::HandleNetworkStatusChange()
 {
 }
 
+H323Gatekeeper * XMH323EndPoint::CreateGatekeeper(H323Transport * transport)
+{
+  return new XMH323Gatekeeper(*this, transport);
+}
+
+void XMH323EndPoint::OnRegistrationConfirm()
+{
+	H323EndPoint::OnRegistrationConfirm();  
+  HandleRegistrationConfirm();
+}
+
 #pragma mark Getting call statistics
 										
 void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
@@ -183,22 +239,6 @@ void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
 }
 
 #pragma mark Overriding Callbacks
-
-H323Gatekeeper * XMH323EndPoint::CreateGatekeeper(H323Transport * transport)
-{
-  return new XMH323Gatekeeper(*this, transport);
-}
-
-void XMH323EndPoint::OnRegistrationConfirm()
-{
-	H323EndPoint::OnRegistrationConfirm();  
-  HandleRegistrationConfirm();
-}
-
-void XMH323EndPoint::OnRegistrationReject()
-{
-	H323EndPoint::OnRegistrationReject();
-}
 
 void XMH323EndPoint::OnEstablished(OpalConnection & connection)
 {
@@ -299,8 +339,9 @@ void XMH323EndPoint::RemoveReleasingConnection(XMH323Connection * connection)
 #pragma mark -
 #pragma mark XMH323Gatekeeper methods
 
-XMH323Gatekeeper::XMH323Gatekeeper(XMH323EndPoint & ep, H323Transport * transport)
-: H323Gatekeeper(ep, transport)
+XMH323Gatekeeper::XMH323Gatekeeper(XMH323EndPoint & theEp, H323Transport * transport)
+: H323Gatekeeper(theEp, transport),
+  ep(theEp)
 {
 }
 
@@ -314,14 +355,14 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
         case Request::AwaitingResponse:
         case Request::NoResponseReceived:
           if (GetRegistrationFailReason() == H323Gatekeeper::UnregisteredByGatekeeper) {
-            // GK unregistered client and obviously went offlie afterwards
+            // GK unregistered client and obviously went offline afterwards
             _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper);
           } else {
             _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_GatekeeperNotFound);
           }
           break;
           
-        // notify registration failures here as H323EndPoint::OnReceivedRegistrationReject()
+        // notify registration failures here as H323EndPoint::OnRegistrationReject()
         // is called without updated registrationFailReason info
         case Request::RejectReceived:
           switch(request.rejectReason) {
@@ -335,7 +376,7 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
               break;
               
             case H225_RegistrationRejectReason::e_securityDenial :
-              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_SecurityDenied);
+              _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_SecurityDenial);
               break;
               
             case H225_RegistrationRejectReason::e_discoveryRequired:
@@ -350,7 +391,7 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
           break;
           
         case Request::BadCryptoTokens:
-          _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_SecurityDenied);
+          _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus_SecurityDenial);
           break;
           
         default:
@@ -361,4 +402,34 @@ bool XMH323Gatekeeper::MakeRequest(Request & request)
   }
   
   return result;
+}
+
+bool XMH323Gatekeeper::OnReceiveRegistrationConfirm(const H225_RegistrationConfirm & confirm) {
+  // possible race condition since RCF may cause additional aliases to be added
+  PWaitAndSignal m(ep.GetAliasNamesMutex());
+  return H323Gatekeeper::OnReceiveRegistrationConfirm(confirm);
+}
+
+#pragma mark -
+#pragma mark XMH323GkRegistrationThread methods
+
+XMH323GkRegistrationThread::XMH323GkRegistrationThread(XMH323EndPoint *theEp,
+                                                       const PString & theAddress,
+                                                       const PString & theTerminalAlias1,
+                                                       const PString & theTerminalAlias2,
+                                                       const PString & thePassword)
+: PThread(10000), // stack size no longer used apparently
+  ep(theEp),
+  address(theAddress),
+  terminalAlias1(theTerminalAlias1),
+  terminalAlias2(theTerminalAlias2),
+  password(thePassword)
+{
+  Resume();
+}
+
+void XMH323GkRegistrationThread::Main() 
+{
+  ep->DoSetGatekeeper(address, terminalAlias1, terminalAlias2, password);
+  ep->HandleGkRegistrationThreadFinished();
 }

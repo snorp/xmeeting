@@ -1,5 +1,5 @@
 /*
- * $Id: XMTypes.h,v 1.38 2008/08/26 08:14:08 hfriederich Exp $
+ * $Id: XMTypes.h,v 1.39 2008/08/28 11:07:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -138,7 +138,7 @@ typedef enum XMGatekeeperRegistrationStatus
   XMGatekeeperRegistrationStatus_UnknownRegistrationFailure,
   XMGatekeeperRegistrationStatus_GatekeeperNotFound,
   XMGatekeeperRegistrationStatus_DuplicateAlias,
-  XMGatekeeperRegistrationStatus_SecurityDenied,
+  XMGatekeeperRegistrationStatus_SecurityDenial,
   XMGatekeeperRegistrationStatus_TransportError,
   XMGatekeeperRegistrationStatus_UnregisteredByGatekeeper,
 } XMGatekeeperRegistrationStatus;

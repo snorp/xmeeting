@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.17 2008/08/28 09:40:48 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.18 2008/08/28 11:07:25 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,8 +37,7 @@ XMCallRecorder *_XMCallRecorderSharedInstance = nil;
 void XMInitFramework(NSString *pTracePath)
 {
   if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZING ||
-     _XMInitializedStatus == XM_FRAMEWORK_INITIALIZED)
-  {
+     _XMInitializedStatus == XM_FRAMEWORK_INITIALIZED) {
     // The Framework is already initialized
     return;
   }
@@ -74,9 +73,8 @@ void _XMLaunchFramework(NSString *pTracePath)
   // starting the MediaTransmitter Thread
   [NSThread detachNewThreadSelector:@selector(_runMediaTransmitterThread) toTarget:_XMMediaTransmitterSharedInstance withObject:nil];
   
-  while (_XMInitializedStatus != XM_FRAMEWORK_INITIALIZED)
-  {
-    usleep(10000);
+  while (_XMInitializedStatus != XM_FRAMEWORK_INITIALIZED) {
+    usleep(10*1000); // wait until the framework did initialize
   }
   
   // This has to be done after the framework has initialized since the list of available codecs
@@ -88,8 +86,7 @@ void _XMLaunchFramework(NSString *pTracePath)
 
 void XMCloseFramework()
 {
-  if(_XMInitializedStatus != XM_FRAMEWORK_INITIALIZED)
-  {
+  if (_XMInitializedStatus != XM_FRAMEWORK_INITIALIZED) {
     // The Framework is already closed
     return;
   }
@@ -119,8 +116,7 @@ void _XMSubsystemInitialized()
 void _XMThreadExit() {
   _XMInitializedStatus++;
   
-  if(_XMInitializedStatus == XM_FRAMEWORK_ALL_THREADS_CLOSED)
-  {
+  if(_XMInitializedStatus == XM_FRAMEWORK_ALL_THREADS_CLOSED) {
     [_XMUtilsSharedInstance release];
     _XMUtilsSharedInstance = nil;
     

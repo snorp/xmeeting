@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.47 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.48 2008/08/28 11:07:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -112,14 +112,6 @@ void _XMCheckCloseStatus();
 
 // feedback about the H323 protocol status
 - (void)_handleH323ProtocolStatus:(NSNumber *)protocolStatus;
-
-// Called when the Framework starts the gatekeeper registration
-// process. This might be a lengthy task
-- (void)_handleGatekeeperRegistrationProcessStart;
-
-// Called when the framework ends the gatekeeper registration
-// process.
-- (void)_handleGatekeeperRegistrationProcessEnd;
 
 // Called every time the Framework registers at a gatekeeper
 - (void)_handleGatekeeperRegistration:(NSArray *)objects;

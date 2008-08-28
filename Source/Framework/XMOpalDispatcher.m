@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.52 2008/08/26 14:16:47 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.53 2008/08/28 11:07:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,8 +96,8 @@ typedef enum _XMOpalDispatcherMessage
             publicAddress:(NSString *)publicAddress
        networkConfigurationChanged:(BOOL)networkConfigurationChanged
                     verbose:(BOOL)verbose;
-- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose;
-- (void)_doGatekeeperSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
+- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose block:(BOOL)block;
+- (void)_doGatekeeperSetup:(XMPreferences *)preferences block:(BOOL)block;
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
 - (void)_doRegistrationSetup:(XMPreferences *)preferences verbose:(BOOL)verbose proxyChanged:(BOOL)proxyChanged;
 
@@ -109,6 +109,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
 - (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address;
 - (NSString *)_adjustedAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
+- (void)_runGatekeeperSetup:(XMPreferences *)preferences;
 
 @end
 
@@ -569,7 +570,7 @@ typedef enum _XMOpalDispatcherMessage
   _XMSubsystemInitialized();
   
   // start the control timer. The timer is invalidated/released within -handleShutdownMessage
-  controlTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(_resyncSubsystem:) userInfo:nil repeats:YES] retain];
+  controlTimer = [[NSTimer scheduledTimerWithTimeInterval:20.0 target:self selector:@selector(_resyncSubsystem:) userInfo:nil repeats:YES] retain];
   
   // running the run loop
   [[NSRunLoop currentRunLoop] run];
@@ -1341,10 +1342,10 @@ typedef enum _XMOpalDispatcherMessage
   [self _doSIPSetup:preferences verbose:verbose];
   
   // ***** Adjusting the H.323 Preferences ***** //
-  [self _doH323Setup:preferences verbose:verbose];
+  [self _doH323Setup:preferences verbose:verbose block:YES];
 }
 
-- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose
+- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose block:(BOOL)block
 {
   XMProtocolStatus protocolStatus;
   
@@ -1356,7 +1357,7 @@ typedef enum _XMOpalDispatcherMessage
       _XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
       
       // setting up the gatekeeper
-      [self _doGatekeeperSetup:preferences verbose:verbose];
+      [self _doGatekeeperSetup:preferences block:block];
     } else { // Enabling the h323 subsystem failed
       protocolStatus = XMProtocolStatus_Error;
     }
@@ -1364,7 +1365,7 @@ typedef enum _XMOpalDispatcherMessage
     protocolStatus = XMProtocolStatus_Disabled;
     
     // unregistering from the gk if registered
-    _XMSetGatekeeper(NULL, NULL, NULL, NULL);
+    _XMSetGatekeeper(NULL, NULL, NULL, NULL, block);
     
     // disabling the H.323 Listeners 
     _XMEnableH323(NO);
@@ -1377,8 +1378,7 @@ typedef enum _XMOpalDispatcherMessage
   }
 }
 
-- (void)_doGatekeeperSetup:(XMPreferences *)preferences 
-                   verbose:(BOOL)verbose
+- (void)_doGatekeeperSetup:(XMPreferences *)preferences block:(BOOL)block
 {
   const char *gatekeeperAddress = "";
   const char *gatekeeperTerminalAlias1 = "";
@@ -1402,39 +1402,13 @@ typedef enum _XMOpalDispatcherMessage
   if (password != nil) {
     gatekeeperPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
   }
-    
-  // inform the CallManager about the gk notification start
-  // The GK Registration may be a lengthy task, especially when
-  // the registration fails since there is a timeout to wait
-  // before ending the registration process with failure
-  if (terminalAlias1 != nil && verbose == YES) {
-    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationProcessStart) 
-                                                   withObject:nil
-                                                waitUntilDone:NO];
-  }
   
   // the result of this operation will be handled through callbacks
   _XMSetGatekeeper(gatekeeperAddress, 
                    gatekeeperTerminalAlias1, 
                    gatekeeperTerminalAlias2,
-                   gatekeeperPassword);
-  
-  /*if ((failReason != XMGatekeeperRegistrationFailReason_NoFailure) && (verbose == YES))
-  {
-    NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)failReason];
-    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationFailure:)
-                                                   withObject:number
-                                                waitUntilDone:NO];
-    [number release];
-  }*/
-  
-  if ((terminalAlias1 != nil) && (verbose == YES)) {
-    // we did run a registration attempt. We inform the CallManager that the GK registration
-    // process did end
-    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperRegistrationProcessEnd) 
-                                                   withObject:nil
-                                                waitUntilDone:NO];
-  }
+                   gatekeeperPassword,
+                   block);
 }
 
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
@@ -1624,14 +1598,22 @@ typedef enum _XMOpalDispatcherMessage
     return;
   }
   
+  BOOL enableH323 = [currentPreferences enableH323];
+  BOOL enableSIP = [currentPreferences enableSIP];
+  BOOL useGatekeeper = ([currentPreferences gatekeeperTerminalAlias1] != nil);
+  
   // retry to enable H.323 if it previously failed
-  if ([currentPreferences enableH323] && _XMIsH323Enabled() == NO) {
-    [self _doH323Setup:currentPreferences verbose:YES];
+  if (enableH323 && _XMIsH323Enabled() == NO) {
+    [self _doH323Setup:currentPreferences verbose:YES block:NO];
+  }
+  // retry to register at the gatekeeper if it previously failed
+  else if (enableH323 && useGatekeeper && _XMIsRegisteredAtGatekeeper() == NO) {
+    [self _doGatekeeperSetup:currentPreferences block:NO];
   }
   
   // retry to enable SIP if it previously failed
-  if ([currentPreferences enableSIP] && _XMIsSIPEnabled() == NO) {
-    [self _doSIPSetup:currentPreferences verbose:YES];
+  if (enableSIP && _XMIsSIPEnabled() == NO) {
+    [self _doSIPSetup:currentPreferences verbose:YES]; 
   }
 }
 
