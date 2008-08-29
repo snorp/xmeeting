@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.64 2008/08/28 11:07:23 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.65 2008/08/29 08:46:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -625,7 +625,7 @@ void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
           SetTranslationAddress(theTranslationAddress);
           HandleSTUNInformation(natType, PString());
         }
-        interfaceMonitor = new InterfaceMonitor(stun);
+        //interfaceMonitor = new InterfaceMonitor(stun);
         return;
 				
       default:
