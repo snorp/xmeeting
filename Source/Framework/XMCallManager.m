@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.52 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.53 2008/08/29 10:43:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -985,11 +985,15 @@ enum {
     return;
   }
   
-  [sipRegistrationStates replaceObjectAtIndex:searchIndex withObject:failReason];
+  // only post the notification if the registration status changes
+  NSNumber *currentFailReason = (NSNumber *)[sipRegistrationStates objectAtIndex:searchIndex];
+  if (![currentFailReason isEqual:failReason]) {
+    [sipRegistrationStates replaceObjectAtIndex:searchIndex withObject:failReason];
   
-  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-  [notificationCenter postNotificationName:XMNotification_CallManagerDidNotSIPRegister object:[NSNumber numberWithUnsignedInt:searchIndex]];
-  [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidNotSIPRegister object:[NSNumber numberWithUnsignedInt:searchIndex]];
+    [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
+  }
 }
 
 - (void)_networkConfigurationChanged
