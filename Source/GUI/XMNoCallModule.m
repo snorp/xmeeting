@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.54 2008/08/26 13:58:25 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.55 2008/08/29 10:42:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -42,6 +42,7 @@
 - (void)_didClearCall:(NSNotification *)notif;
 - (void)_didChangeProtocolStatus:(NSNotification *)notif;
 - (void)_didChangeGatekeeperStatus:(NSNotification *)notif;
+- (void)_didChangeSIPRegistrationStatus:(NSNotification *)notif;
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif;
 
 - (void)_clearCallEndReason:(NSTimer *)timer;
@@ -96,6 +97,7 @@
   [notificationCenter addObserver:self selector:@selector(_didChangeProtocolStatus:) name:XMNotification_CallManagerDidChangeH323Status object:nil];
   [notificationCenter addObserver:self selector:@selector(_didChangeProtocolStatus:) name:XMNotification_CallManagerDidChangeSIPStatus object:nil];
   [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:) name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeSIPRegistrationStatus:) name:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:nil];
   [notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:) name:XMNotification_AddressBookManagerDidChangeDatabase object:nil];
 		
   contentViewSizeWithSelfViewHidden = [contentView frame].size;
@@ -602,9 +604,17 @@
 
 - (void)_didChangeGatekeeperStatus:(NSNotification *)notif
 {
-  // we're only interested in the situation when the client gets
-  // unregistered from the gatekeeper immediately without being part
-  // of a subsystem setup.
+  // we're only interested in the situation when the gatekeeper registration
+  // status changes without the user having triggered a subsystem setup
+  if ([[XMCallManager sharedInstance] doesAllowModifications] == YES) {
+    [self _updateStatusInformation:nil];
+  }
+}
+
+- (void)_didChangeSIPRegistrationStatus:(NSNotification *)notif
+{
+  // we're only interested in the situation when the SIP registration
+  // status changes without the user having triggered a subsystem setup
   if ([[XMCallManager sharedInstance] doesAllowModifications] == YES) {
     [self _updateStatusInformation:nil];
   }
