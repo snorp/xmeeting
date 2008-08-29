@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.53 2008/08/29 10:43:29 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.54 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -414,44 +414,6 @@ enum {
   NSArray *copy = [sipRegistrationStates copy];
   return [copy autorelease];
 }
-
-/*
-- (void)retrySIPRegistrations
-{
-  if (callManagerStatus == XM_CALL_MANAGER_READY &&
-     [self isCompletelyRegistered] == NO && 
-     activePreferences != nil &&
-     [[activePreferences sipRegistrationRecords] count] != 0)
-  {
-    callManagerStatus = XM_CALL_MANAGER_SUBSYSTEM_SETUP;
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSubsystemSetup
-                                                        object:self];
-    [XMOpalDispatcher _retrySIPRegistrations:activePreferences];
-  }
-  else
-  {
-    NSString *exceptionReason;
-    
-    if (callManagerStatus != XM_CALL_MANAGER_READY)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfInSubsystemSetupOrInCall;
-    }
-    else if ([self isCompletelyRegistered] == YES)
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfCompletelySIPRegistered;
-    }
-    else if (activePreferences == nil)
-    {
-      exceptionReason = XMExceptionReason_InvalidParameterMustNotBeNil;
-    }
-    else
-    {
-      exceptionReason = XMExceptionReason_CallManagerInvalidActionIfSIPDisabled;
-    }
-    
-    [NSException raise:XMException_InvalidAction format:exceptionReason];
-  }
-}*/
 
 #pragma mark -
 #pragma mark InCall Methods

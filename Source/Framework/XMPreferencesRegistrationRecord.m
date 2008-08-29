@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesRegistrationRecord.m,v 1.2 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMPreferencesRegistrationRecord.m,v 1.3 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -197,9 +197,6 @@
 	NSString *old = authorizationUsername;
 	authorizationUsername = [theAuthorizationUsername copy];
 	[old release];
-  
-  [aor release];
-  aor = nil;
 }
 
 - (NSString *)password
@@ -212,35 +209,12 @@
 	NSString *old = password;
 	password = [thePassword copy];
 	[old release];
-  
-  [aor release];
-  aor = nil;
 }
 
 - (NSString *)addressOfRecord
 {
   if (aor == nil) {
-    if (username == nil) { // sanity check
-      return nil;
-    }
-    unsigned atLocation = [username rangeOfString:@"@"].location;
-    
-    if (atLocation == NSNotFound && domain == nil) {
-      return nil;
-    }
-    
-    // Use same procedure as the AOR calculation in SIPEndPoint::GetAddressOfRecord()
-    NSMutableString *str = [[NSMutableString alloc] init];
-    [str appendString:username];
-    if (atLocation != NSNotFound && domain != nil) {
-      [str appendString:@";proxy="];
-      [str appendString:domain];
-    } else {
-      [str appendString:@"@"];
-      [str appendString:domain];
-    }
-    aor = [str copy];
-    [str release];
+    aor = XMCreateAddressOfRecord(domain, username);
   }
   return aor;
 }

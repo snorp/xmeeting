@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.h,v 1.7 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMSIPAccount.h,v 1.8 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -35,6 +35,8 @@ extern NSString *XMKey_SIPAccountPassword;
   NSString *authorizationUsername;
   BOOL didSetPassword;
   NSString *password;
+  
+  NSString *aor;
 }
 
 - (id)init;
@@ -59,7 +61,7 @@ extern NSString *XMKey_SIPAccountPassword;
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;
 
-- (NSString *)registration;
+- (NSString *)addressOfRecord;
 
 @end
 

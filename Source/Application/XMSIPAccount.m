@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.m,v 1.5 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMSIPAccount.m,v 1.6 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,23 +40,19 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
   Class stringClass = [NSString class];
   
   obj = [dictionary objectForKey:XMKey_SIPAccountName];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setName:(NSString *)obj];
   }
   obj = [dictionary objectForKey:XMKey_SIPAccountDomain];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setDomain:(NSString *)obj];
   }
   obj = [dictionary objectForKey:XMKey_SIPAccountUsername];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setUsername:(NSString *)obj];
   }
   obj = [dictionary objectForKey:XMKey_SIPAccountAuthorizationUsername];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setAuthorizationUsername:(NSString *)obj];
   }
   
@@ -85,8 +81,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
   
   static unsigned nextTag = 0;
   
-  if(theTag == 0)
-  {
+  if (theTag == 0) {
     theTag = ++nextTag;
   }
   
@@ -97,6 +92,8 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
   authorizationUsername = nil;
   didSetPassword = NO;
   password = nil;
+  
+  aor = nil;
   
   [[XMPreferencesManager sharedInstance] addPasswordObject:self];
   
@@ -123,20 +120,16 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 {
   NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:3];
   
-  if(name != nil)
-  {
+  if (name != nil) {
     [dictionary setObject:name forKey:XMKey_SIPAccountName];
   }
-  if(domain != nil)
-  {
+  if (domain != nil) {
     [dictionary setObject:domain forKey:XMKey_SIPAccountDomain];
   }
-  if(username != nil)
-  {
+  if (username != nil) {
     [dictionary setObject:username forKey:XMKey_SIPAccountUsername];
   }
-  if(authorizationUsername != nil)
-  {
+  if (authorizationUsername != nil) {
     [dictionary setObject:authorizationUsername forKey:XMKey_SIPAccountAuthorizationUsername];
   }
   
@@ -158,8 +151,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 - (void)setName:(NSString *)theName
 {
-  if(name != theName)
-  {
+  if (name != theName) {
     NSString *old = name;
     name = [theName copy];
     [old release];
@@ -173,11 +165,13 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 - (void)setDomain:(NSString *)theDomain
 {
-  if(domain != theDomain)
-  {
+  if (domain != theDomain) {
     NSString *old = domain;
     domain = [theDomain copy];
     [old release];
+    
+    [aor release];
+    aor = nil;
   }
 }
 
@@ -188,11 +182,13 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 - (void)setUsername:(NSString *)theUsername
 {
-  if(username != theUsername)
-  {
+  if (username != theUsername) {
     NSString *old = username;
     username = [theUsername copy];
     [old release];
+    
+    [aor release];
+    aor = nil;
   }
 }
 
@@ -203,8 +199,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 - (void)setAuthorizationUsername:(NSString *)theAuthorizationUsername
 {
-  if(authorizationUsername != theAuthorizationUsername)
-  {
+  if (authorizationUsername != theAuthorizationUsername) {
     NSString *old = authorizationUsername;
     authorizationUsername = [theAuthorizationUsername copy];
     [old release];
@@ -221,8 +216,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 
 - (void)setPassword:(NSString *)thePassword
 {
-  if(password != thePassword)
-  {
+  if (password != thePassword) {
     NSString *old = password;
     password = [thePassword copy];
     [old release];
@@ -248,15 +242,12 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
   return XMPasswordObjectType_SIPAccount;
 }
 
-- (NSString *)registration
+- (NSString *)addressOfRecord
 {
-  if (username != nil && [username rangeOfString:@"@"].location != NSNotFound) {
-    return username;
+  if (aor == nil) {
+    aor = XMCreateAddressOfRecord(domain, username);
   }
-  if (username == nil || domain == nil) {
-    return nil;
-  }
-  return [NSString stringWithFormat:@"%@@%@", username, domain];
+  return aor;
 }
 
 @end

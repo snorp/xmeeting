@@ -2080,11 +2080,27 @@
 			name = Preferences;
 			sourceTree = "<group>";
 		};
+		D1AD29170E680E0C00143295 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */,
+				D1A02880081CBCC00018BD11 /* XMPreferencesManager.m */,
+				D1A02893081CBED00018BD11 /* XMLocation.h */,
+				D1A02894081CBED00018BD11 /* XMLocation.m */,
+				D1BB8B5C09BA2767000897D9 /* XMH323Account.h */,
+				D1BB8B5D09BA2767000897D9 /* XMH323Account.m */,
+				D1BB8BB009BA5F0A000897D9 /* XMSIPAccount.h */,
+				D1BB8BB109BA5F0A000897D9 /* XMSIPAccount.m */,
+			);
+			name = Preferences;
+			sourceTree = "<group>";
+		};
 		D1AF73E0084D02E400D50883 /* Application Management */ = {
 			isa = PBXGroup;
 			children = (
 				D163336307A01BD5003FD9C0 /* XMApplicationController.h */,
 				D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */,
+				D1AD29170E680E0C00143295 /* Preferences */,
 				D1AF744B084DA1BE00D50883 /* XMAddressBookCallAddressProvider.h */,
 				D1EF068C091756FA008A8974 /* XMAddressBookManager.h */,
 				D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */,
@@ -2092,11 +2108,7 @@
 				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
 				D1BA7630086B4848007E6CEC /* XMCallHistoryCallAddressProvider.h */,
 				D1BA7664086BEC5E007E6CEC /* XMCallHistoryRecord.h */,
-				D1BB8B5C09BA2767000897D9 /* XMH323Account.h */,
-				D1A02893081CBED00018BD11 /* XMLocation.h */,
-				D1A0287F081CBCC00018BD11 /* XMPreferencesManager.h */,
 				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */,
-				D1BB8BB009BA5F0A000897D9 /* XMSIPAccount.h */,
 				D1BD63A20A950B6B007C8E46 /* XMURICommand.h */,
 				D1AF744C084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m */,
 				D1EF068D091756FA008A8974 /* XMAddressBookManager.m */,
@@ -2105,11 +2117,7 @@
 				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
 				D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */,
 				D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */,
-				D1BB8B5D09BA2767000897D9 /* XMH323Account.m */,
-				D1A02894081CBED00018BD11 /* XMLocation.m */,
-				D1A02880081CBCC00018BD11 /* XMPreferencesManager.m */,
 				D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */,
-				D1BB8BB109BA5F0A000897D9 /* XMSIPAccount.m */,
 				D1BD63A30A950B6C007C8E46 /* XMURICommand.m */,
 			);
 			name = "Application Management";

@@ -42,7 +42,7 @@
 "XM_ENABLE_SIP_FAILED_INFO_TEXT" = "Unable to enable the SIP subsystem.";
 
 "XM_SIP_REG_FAILED_MESSAGE" = "SIP Registration Failed";
-"XM_SIP_REG_FAILED_INFO_TEXT" = "Unable to register as \"%@\" (%@). %@";
+"XM_SIP_REG_FAILED_INFO_TEXT" = "Unable to register as \"%@\" (%@). Other clients will not be able to call you with this address. %@\n\nXMeeting will automatically try to register again.";
 "XM_SIP_UN_AUTHORIZED_SUGGESTION" = "Please check your username and password settings.";
 "XM_SIP_NOT_ACCEPTABLE_SUGGESTION" = "Please check your network settings.";
 "XM_SIP_BAD_GATEWAY_SUGGESTION" = "Please check your settings.";

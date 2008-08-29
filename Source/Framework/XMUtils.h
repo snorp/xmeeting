@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.27 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.28 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -130,5 +130,11 @@ float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize);
  * Logs the message given by string to the debug log
  **/
 void XMLogMessage(NSString *message);
+
+/**
+ * Constructs an address-of-record string based on host and username.
+ * The caller must explicitly release the returned string.
+ **/
+NSString *XMCreateAddressOfRecord(NSString *host, NSString *username);
 
 #endif // __XM_UTILS_H__

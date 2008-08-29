@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.68 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.69 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -635,9 +635,12 @@
   unsigned index = [indexNumber unsignedIntValue];
   unsigned sipAccountTag = [(NSNumber *)[[activeLocation sipAccountTags] objectAtIndex:index] unsignedIntValue];
   XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:sipAccountTag];
-  NSString *domain = [sipAccount domain];
-  XMSIPStatusCode failReason = [callManager sipRegistrationStatusAtIndex:index];
+  NSString *aor = [sipAccount addressOfRecord];
+  if (aor == nil) {
+    aor = NSLocalizedString(@"XM_UNKNOWN", @"");
+  }
   
+  XMSIPStatusCode failReason = [callManager sipRegistrationStatusAtIndex:index];
   NSString *reasonText = XMSIPStatusCodeString(failReason);
   
   NSString *suggestionText;
@@ -660,7 +663,7 @@
   [alert setMessageText:NSLocalizedString(@"XM_SIP_REG_FAILED_MESSAGE", @"")];
   NSString *informativeTextFormat = NSLocalizedString(@"XM_SIP_REG_FAILED_INFO_TEXT", @"");
   
-  NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, domain, reasonText, suggestionText];
+  NSString *informativeText = [[NSString alloc] initWithFormat:informativeTextFormat, aor, reasonText, suggestionText];
   [alert setInformativeText:informativeText];
   [informativeText release];
   

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.29 2008/08/26 08:14:08 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.30 2008/08/29 11:32:30 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -60,66 +60,38 @@
   
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   
-  [notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:)
-                             name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
+  [notificationCenter addObserver:self selector:@selector(_activeLocationDidChange:) name:XMNotification_PreferencesManagerDidChangeActiveLocation object:nil];
   
-  [notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:)
-                             name:XMNotification_CallManagerDidStartCallInitiation object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didStartCalling:)
-                             name:XMNotification_CallManagerDidStartCalling object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotStartCalling:)
-                             name:XMNotification_CallManagerDidNotStartCalling object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:)
-                             name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didEstablishCall:)
-                             name:XMNotification_CallManagerDidEstablishCall object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didClearCall:)
-                             name:XMNotification_CallManagerDidClearCall object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotEnableH323:)
-                             name:XMNotification_CallManagerDidNotEnableH323 object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didRegisterAtGatekeeper:)
-                             name:XMNotification_CallManagerDidRegisterAtGatekeeper object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:)
-                             name:XMNotification_CallManagerDidUnregisterFromGatekeeper object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:)
-                             name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotEnableSIP:)
-                             name:XMNotification_CallManagerDidNotEnableSIP object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didSIPRegister:)
-                             name:XMNotification_CallManagerDidSIPRegister object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didSIPUnregister:)
-                             name:XMNotification_CallManagerDidSIPUnregister object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didNotSIPRegister:)
-                             name:XMNotification_CallManagerDidNotSIPRegister object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didStartCallInitiation:) name:XMNotification_CallManagerDidStartCallInitiation object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didStartCalling:) name:XMNotification_CallManagerDidStartCalling object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotStartCalling:) name:XMNotification_CallManagerDidNotStartCalling object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didReceiveIncomingCall:) name:XMNotification_CallManagerDidReceiveIncomingCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didEstablishCall:) name:XMNotification_CallManagerDidEstablishCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didClearCall:) name:XMNotification_CallManagerDidClearCall object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotEnableH323:) name:XMNotification_CallManagerDidNotEnableH323 object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didRegisterAtGatekeeper:) name:XMNotification_CallManagerDidRegisterAtGatekeeper object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didUnregisterFromGatekeeper:) name:XMNotification_CallManagerDidUnregisterFromGatekeeper object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotRegisterAtGatekeeper:) name:XMNotification_CallManagerDidNotRegisterAtGatekeeper object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotEnableSIP:) name:XMNotification_CallManagerDidNotEnableSIP object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didSIPRegister:) name:XMNotification_CallManagerDidSIPRegister object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didSIPUnregister:) name:XMNotification_CallManagerDidSIPUnregister object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didNotSIPRegister:) name:XMNotification_CallManagerDidNotSIPRegister object:nil];
   
-  [notificationCenter addObserver:self selector:@selector(_didOpenOutgoingAudioStream:)
-                             name:XMNotification_CallManagerDidOpenOutgoingAudioStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didOpenIncomingAudioStream:)
-                             name:XMNotification_CallManagerDidOpenIncomingAudioStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didOpenOutgoingVideoStream:)
-                             name:XMNotification_CallManagerDidOpenOutgoingVideoStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didOpenIncomingVideoStream:)
-                             name:XMNotification_CallManagerDidOpenIncomingVideoStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didCloseOutgoingAudioStream:)
-                             name:XMNotification_CallManagerDidCloseOutgoingAudioStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didCloseIncomingAudioStream:)
-                             name:XMNotification_CallManagerDidCloseIncomingAudioStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didCloseOutgoingVideoStream:)
-                             name:XMNotification_CallManagerDidCloseOutgoingVideoStream object:nil];
-  [notificationCenter addObserver:self selector:@selector(_didCloseIncomingVideoStream:)
-                             name:XMNotification_CallManagerDidCloseIncomingVideoStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didOpenOutgoingAudioStream:) name:XMNotification_CallManagerDidOpenOutgoingAudioStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didOpenIncomingAudioStream:) name:XMNotification_CallManagerDidOpenIncomingAudioStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didOpenOutgoingVideoStream:) name:XMNotification_CallManagerDidOpenOutgoingVideoStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didOpenIncomingVideoStream:) name:XMNotification_CallManagerDidOpenIncomingVideoStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didCloseOutgoingAudioStream:) name:XMNotification_CallManagerDidCloseOutgoingAudioStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didCloseIncomingAudioStream:) name:XMNotification_CallManagerDidCloseIncomingAudioStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didCloseOutgoingVideoStream:) name:XMNotification_CallManagerDidCloseOutgoingVideoStream object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didCloseIncomingVideoStream:) name:XMNotification_CallManagerDidCloseIncomingVideoStream object:nil];
   
-  [notificationCenter addObserver:self selector:@selector(_didChangeVideoInputDevice:)
-                             name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
+  [notificationCenter addObserver:self selector:@selector(_didChangeVideoInputDevice:) name:XMNotification_VideoManagerDidChangeSelectedInputDevice object:nil];
   
   didLogIncomingCall = NO;
-  
   locationName = nil;
-  
   gatekeeperName = nil;
-  
   callAddress = nil;
-  
   contentView = nil;
   
   // causing some logs to appear immediately
@@ -132,23 +104,17 @@
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   
-  if(locationName != nil)
-  {
+  if (locationName != nil) {
     [locationName release];
   }
-  
-  if(gatekeeperName != nil)
-  {
+  if (gatekeeperName != nil) {
     [gatekeeperName release];
   }
-  
-  if(videoDevice != nil)
-  {
+  if (videoDevice != nil) {
     [videoDevice release];
   }
   
-  if(callAddress != nil)
-  {
+  if (callAddress != nil) {
     [callAddress release];
   }
   
@@ -190,8 +156,7 @@
 
 - (NSView *)contentView
 {
-  if(contentView == nil)
-  {
+  if (contentView == nil) {
     [NSBundle loadNibNamed:@"CallHistoryModule" owner:self];
   }
   
@@ -241,8 +206,7 @@
   
   NSString *activeLocationName = [activeLocation name];
   
-  if(![locationName isEqualToString:activeLocationName])
-  {
+  if (![locationName isEqualToString:activeLocationName]) {
     NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH", @""), activeLocationName];
 	
     [self _logText:logText date:nil];
@@ -256,8 +220,7 @@
 
 - (void)_didStartCallInitiation:(NSNotification *)notif
 {
-  if(callAddress != nil)
-  {
+  if (callAddress != nil) {
     [callAddress release];
     callAddress = nil;
   }
@@ -273,12 +236,9 @@
   XMCallProtocol callProtocol = [activeCall protocol];
   NSString *callProtocolString;
   
-  if(callProtocol == XMCallProtocol_H323)
-  {
+  if (callProtocol == XMCallProtocol_H323) {
     callProtocolString = @"H.323";
-  }
-  else
-  {
+  } else {
     callProtocolString = @"SIP";
   }
   
@@ -298,12 +258,9 @@
   NSString *addressString = [addressResource address];
   XMCallProtocol callProtocol = [addressResource callProtocol];
   NSString *protocolString;
-  if(callProtocol == XMCallProtocol_H323)
-  {
+  if (callProtocol == XMCallProtocol_H323) {
     protocolString = @"H.323";
-  }
-  else
-  {
+  } else {
     protocolString = @"SIP";
   }
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_CALL_FAILED", @""), addressString, protocolString];
@@ -324,12 +281,9 @@
   XMCallProtocol callProtocol = [activeCall protocol];
   NSString *protocolString;
   
-  if(callProtocol == XMCallProtocol_H323)
-  {
+  if (callProtocol == XMCallProtocol_H323) {
     protocolString = @"H.323";
-  }
-  else
-  {
+  } else {
     protocolString = @"SIP";
   }
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_INCOMING_CALL", @""), remoteName, protocolString];
@@ -345,24 +299,19 @@
 {
   XMCallInfo *activeCall = [[XMCallManager sharedInstance] activeCall];
   
-  if([activeCall isOutgoingCall] == NO && didLogIncomingCall == NO)
-  {
+  if ([activeCall isOutgoingCall] == NO && didLogIncomingCall == NO) {
     [self _didReceiveIncomingCall:notif];
   }
   
   NSString *localAddress = [activeCall localAddress];
   NSString *localAddressInterface = [activeCall localAddressInterface];
   
-  if(localAddress == nil)
-  {
+  if (localAddress == nil) {
     localAddress = NSLocalizedString(@"XM_UNKNOWN", @"");
   }
-  if(localAddressInterface == nil || [localAddressInterface isEqualToString:@"<UNK>"])
-  {
+  if (localAddressInterface == nil || [localAddressInterface isEqualToString:@"<UNK>"]) {
     localAddressInterface = NSLocalizedString(@"XM_UNKNOWN", @"");
-  }
-  else if([localAddressInterface isEqualToString:@"<EXT>"])
-  {
+  } else if ([localAddressInterface isEqualToString:@"<EXT>"]) {
     localAddressInterface = NSLocalizedString(@"XM_EXTERNAL_ADDRESS", @"");
   }
   
@@ -386,12 +335,10 @@
   
   NSString *remoteName = [activeCall remoteName];
   
-  if(remoteName == nil)
-  {
+  if (remoteName == nil) {
     remoteName = [activeCall callAddress];
     
-    if(remoteName == nil)
-    {
+    if (remoteName == nil) {
       remoteName = NSLocalizedString(@"XM_UNKNOWN", @"");
     }
   }
@@ -415,8 +362,7 @@
 
 - (void)_didRegisterAtGatekeeper:(NSNotification *)notif
 {
-  if(gatekeeperName != nil)
-  {
+  if (gatekeeperName != nil) {
     [gatekeeperName release];
     gatekeeperName = nil;
   }
@@ -447,8 +393,7 @@
   XMH323Account *h323Account = [preferencesManager h323AccountWithTag:[activeLocation h323AccountTag]];
   
   NSString *gkHost = [h323Account gatekeeperHost];
-  if(gkHost == nil)
-  {
+  if (gkHost == nil) {
     gkHost = NSLocalizedString(@"XM_UNKNOWN", @"");
   }
   
@@ -494,17 +439,16 @@
   unsigned tag = [(NSNumber *)[[activeLocation sipAccountTags] objectAtIndex:index] unsignedIntValue];
   XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:tag];
   
-  NSString *sipRegistration = [sipAccount registration];
-  if(sipRegistration == nil)
-  {
-    sipRegistration = NSLocalizedString(@"XM_UNKNOWN", @"");
+  NSString *aor = [sipAccount addressOfRecord];
+  if (aor == nil) {
+    aor = NSLocalizedString(@"XM_UNKNOWN", @"");
   }
   
   XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationStatusAtIndex:index];
   NSString *failReasonString = XMSIPStatusCodeString(failReason);
 		
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE", @""),
-    sipRegistration, failReasonString];
+    aor, failReasonString];
   
   [self _logText:logText date:nil];
   
@@ -595,8 +539,7 @@
 {
   NSString *selectedDevice = [[XMVideoManager sharedInstance] selectedInputDevice];
   
-  if(![videoDevice isEqualToString:selectedDevice])
-  {
+  if (![videoDevice isEqualToString:selectedDevice]) {
     NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_VIDEO_DEVICE_SWITCH", @""), selectedDevice];
     
     [self _logText:logText date:nil];
@@ -616,15 +559,13 @@
   [self contentView];
   
   // fetching the current date
-  if(date == nil)
-  {
+  if (date == nil) {
     date = [[NSDate alloc] init];
     createdDate = YES;
   }
   NSString *dateString = [date descriptionWithCalendarFormat:XMDateFormatString() timeZone:nil locale:nil];
   
-  if(createdDate == YES)
-  {
+  if (createdDate == YES) {
     [date release];
   }
   

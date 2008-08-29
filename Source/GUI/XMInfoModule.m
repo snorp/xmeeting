@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.26 2008/08/26 08:14:08 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.27 2008/08/29 11:32:30 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -85,16 +85,10 @@
   
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   
-  [notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:)
-                             name:XMNotification_UtilsDidUpdateNetworkInformation
-                           object:nil];
+  [notificationCenter addObserver:self selector:@selector(_updateNetworkStatus:) name:XMNotification_UtilsDidUpdateNetworkInformation object:nil];
   
-  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
-                             name:XMNotification_CallManagerDidEndSubsystemSetup
-                           object:nil];
-  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:)
-                             name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus
-                           object:nil];
+  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:) name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+  [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:) name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:nil];
   
   unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
   
@@ -145,12 +139,9 @@
   frameRect.origin.y += XM_BOX_SPACING;
   frameRect.size.height = XM_HIDDEN_OFFSET;
   
-  if (showH323Details == YES)
-  {
+  if (showH323Details == YES) {
     frameRect.size.height += h323BoxHeight + h323AliasesExtraHeight;
-  }
-  else
-  {
+  } else {
     [h323Box setHidden:YES];
   }
   [h323Box setFrame:frameRect];
@@ -211,14 +202,12 @@
   
   int heightDifference = addressExtraHeight;
   
-  if (showH323Details == NO)
-  {
+  if (showH323Details == NO) {
     heightDifference -= h323BoxHeight;
   } else {
     heightDifference += h323AliasesExtraHeight;
   }
-  if (showSIPDetails == NO)
-  {
+  if (showSIPDetails == NO) {
     heightDifference -= sipBoxHeight;
   } else {
     heightDifference += sipRegistrationsExtraHeight;
@@ -244,8 +233,7 @@
 {
   showH323Details = !showH323Details;
   
-  if (showH323Details == NO)
-  {
+  if (showH323Details == NO) {
     [h323Box setHidden:YES];
   }
   
@@ -263,8 +251,7 @@
   [h323Disclosure setAutoresizingMask:NSViewMaxYMargin];
   [h323Title setAutoresizingMask:NSViewMaxYMargin];
   
-  if (showH323Details == YES)
-  {
+  if (showH323Details == YES) {
     [h323Box setHidden:NO];
   }
   
@@ -275,8 +262,7 @@
 {
   showSIPDetails = !showSIPDetails;
   
-  if (showSIPDetails == NO)
-  {
+  if (showSIPDetails == NO) {
     [sipBox setHidden:YES];
   }
   
@@ -302,8 +288,7 @@
   [sipDisclosure setAutoresizingMask:NSViewMaxYMargin];
   [sipTitle setAutoresizingMask:NSViewMaxYMargin];
   
-  if (showSIPDetails == YES)
-  {
+  if (showSIPDetails == YES) {
     [sipBox setHidden:NO];
   }
   
@@ -398,13 +383,11 @@
   [terminalAliasViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
   [terminalAliasViews removeAllObjects];
   
-  if ([activeLocation enableH323] == YES)
-  {
+  if ([activeLocation enableH323] == YES) {
     [h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
     [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
     
-    if ([callManager isH323Enabled] == YES)
-    {
+    if ([callManager isH323Enabled] == YES) {
       unsigned h323AccountTag = [activeLocation h323AccountTag];
       NSString *terminalAlias = 0;
       if (h323AccountTag != 0) {
@@ -422,9 +405,7 @@
           
           NSArray *aliases = [callManager terminalAliases];
           unsigned numAliases = [aliases count];
-          unsigned i;
-        
-          for (i = 0; i < numAliases; i++) {
+          for (unsigned i = 0; i < numAliases; i++) {
             NSString *alias = (NSString *)[aliases objectAtIndex:i];
             if (i == 0) {
               [terminalAliasField setTextColor:[NSColor controlTextColor]];
@@ -483,28 +464,22 @@
   [registrationViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
   [registrationViews removeAllObjects];
   
-  if ([activeLocation enableSIP] == YES)
-  {
-    if ([callManager isSIPEnabled] == YES)
-    {
+  if ([activeLocation enableSIP] == YES) {
+    if ([callManager isSIPEnabled] == YES) {
       [sipStatusField setStringValue:@"Online"];
       [sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
       
       NSArray *sipAccountTags = [activeLocation sipAccountTags];
       unsigned numSIPAccounts = [sipAccountTags count];
       if ([sipAccountTags count] != 0) {
-        unsigned i;
-        for (i = 0; i < numSIPAccounts; i++) {
+        for (unsigned i = 0; i < numSIPAccounts; i++) {
           unsigned tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
           XMSIPStatusCode status = [callManager sipRegistrationStatusAtIndex:i];
           XMSIPAccount *account = [preferencesManager sipAccountWithTag:tag];
-          NSString *string = [account registration];
-          BOOL okay = YES;
-          if (status != XMSIPStatusCode_Successful_OK) {
-            okay = NO;
-          }
+          NSString *aor = [account addressOfRecord];
+          BOOL okay = (status == XMSIPStatusCode_Successful_OK ? YES : NO);
           if (i == 0) {
-            [registrationField setStringValue:string];
+            [registrationField setStringValue:aor];
             if (okay) {
               [registrationSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
             } else {
@@ -517,7 +492,7 @@
             frame.origin.y -= (i*XM_REGISTRATION_INFO_HEIGHT);
             [textField setFrame:frame];
             [sipBox addSubview:textField];
-            [textField setStringValue:string];
+            [textField setStringValue:aor];
             [registrationViews addObject:textField];
             [textField release];
             
@@ -582,12 +557,10 @@
 {
   unsigned status = 0;
   
-  if (showH323Details == YES)
-  {
+  if (showH323Details == YES) {
     status += XM_SHOW_H323_DETAILS;
   }
-  if (showSIPDetails == YES)
-  {
+  if (showSIPDetails == YES) {
     status += XM_SHOW_SIP_DETAILS;
   }
   

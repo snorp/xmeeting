@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.28 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.29 2008/08/29 11:32:29 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,7 @@
 #import "XMUtils.h"
 #import "XMPrivate.h"
 #import "XMStringConstants.h"
+#import "XMBridge.h"
 
 NSString *XMString_DynamicStoreName = @"XMeeting";
 NSString *XMString_DynamicStoreNotificationKey = @"State:/Network/Interface/.+/IPv4";
@@ -146,8 +147,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
 
 - (XMNATType)natType
 {	
-  if ([networkInterfaces count] == 0)
-  {
+  if ([networkInterfaces count] == 0) {
     // we have no network interface!
     return XMNATType_Error;
   }
@@ -231,8 +231,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   NSArray *keys = (NSArray *)SCDynamicStoreCopyKeyList(dynamicStore, (CFStringRef)@"State:/Network/Service/[^/]+/IPv4");
   
   unsigned count = [keys count];
-  unsigned i;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     NSString *key = (NSString *)[keys objectAtIndex:i];
     
     // obtaining the address
@@ -257,8 +256,7 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
     }
     
     unsigned addressCount = [interfaceAddresses count];
-    unsigned j;
-    for (j = 0; j < addressCount; j++) {
+    for (unsigned j = 0; j < addressCount; j++) {
       NSString *address = [interfaceAddresses objectAtIndex:j];
       XMNetworkInterface *interface = [[XMNetworkInterface alloc] initWithIPAddress:address name:interfaceName];
       [interfaces addObject:interface];
@@ -452,9 +450,8 @@ BOOL XMIsPhoneNumber(NSString *string)
   NSScanner *scanner = [[NSScanner alloc] initWithString:string];
   BOOL result = NO;
   
-  if ([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
-  {
-	result = YES;
+  if ([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd]) {
+    result = YES;
   }
   
   [scanner release];
@@ -468,9 +465,8 @@ BOOL XMIsPlainPhoneNumber(NSString *string)
   NSScanner *scanner = [[NSScanner alloc] initWithString:string];
   BOOL result = NO;
   
-  if ([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd])
-  {
-	result = YES;
+  if ([scanner scanCharactersFromSet:charSet intoString:nil] && [scanner isAtEnd]) {
+    result = YES;
   }
   
   [scanner release];
@@ -486,12 +482,11 @@ BOOL XMIsIPAddress(NSString *address)
   
   BOOL isIPAddress = NO;
   
-  if ([scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
-	 [scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
-	 [scanner scanInt:&byte] && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
-	 [scanner scanInt:&byte] && (byte < 256) && [scanner isAtEnd])
-  {
-	isIPAddress = YES;
+  if ([scanner scanInt:&byte] && (byte >= 0) && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+      [scanner scanInt:&byte] && (byte >= 0) && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+      [scanner scanInt:&byte] && (byte >= 0) && (byte < 256) && [scanner scanString:@"." intoString:nil] &&
+      [scanner scanInt:&byte] && (byte >= 0) && (byte < 256) && [scanner isAtEnd]) {
+    isIPAddress = YES;
   }
   
   [scanner release];
@@ -503,33 +498,33 @@ NSSize XMVideoSizeToDimensions(XMVideoSize videoSize)
 {
   switch (videoSize)
   {
-	case XMVideoSize_SQCIF:
-	  return NSMakeSize(128, 96);
-	case XMVideoSize_QCIF:
-	  return NSMakeSize(176, 144);
-	case XMVideoSize_CIF:
-	  return NSMakeSize(352, 288);
-	case XMVideoSize_4CIF:
-	  return NSMakeSize(704, 576);
-	case XMVideoSize_16CIF:
-	  return NSMakeSize(1408, 1152);
-	default:
-	  return NSMakeSize(0, 0);
+    case XMVideoSize_SQCIF:
+      return NSMakeSize(128, 96);
+    case XMVideoSize_QCIF:
+      return NSMakeSize(176, 144);
+    case XMVideoSize_CIF:
+      return NSMakeSize(352, 288);
+    case XMVideoSize_4CIF:
+      return NSMakeSize(704, 576);
+    case XMVideoSize_16CIF:
+      return NSMakeSize(1408, 1152);
+    default:
+      return NSMakeSize(0, 0);
   }
 }
 
 XMVideoSize XMDimensionsToVideoSize(NSSize size)
 {
   if (size.width == 128 && size.height == 96)
-	return XMVideoSize_SQCIF;
+    return XMVideoSize_SQCIF;
   if (size.width == 176 && size.height == 144)
-	return XMVideoSize_QCIF;
+    return XMVideoSize_QCIF;
   if (size.width == 352 && size.height == 288)
-	return XMVideoSize_CIF;
+    return XMVideoSize_CIF;
   if (size.width == 704 && size.height == 576)
-	return XMVideoSize_4CIF;
+    return XMVideoSize_4CIF;
   if (size.width == 1408 && size.height == 1152)
-	return XMVideoSize_16CIF;
+    return XMVideoSize_16CIF;
   
   return XMVideoSize_NoVideo;
 }
@@ -537,38 +532,30 @@ XMVideoSize XMDimensionsToVideoSize(NSSize size)
 float XMGetVideoHeightForWidth(float width, XMVideoSize videoSize)
 {
   if (videoSize == XMVideoSize_NoVideo ||
-	 videoSize == XMVideoSize_Custom) // when video size is custom, the aspect ration cannot be determined without looking at the video frames
-  {
-	return 0;
+      videoSize == XMVideoSize_Custom)  {// when video size is custom, the aspect ratio cannot be determined without looking at the video frames
+    return 0;
   }
 		
-  if (videoSize == XMVideoSize_SQCIF)
-  {
-	// 4:3 aspect ratio
-	return width * (3.0 / 4.0);
-  }
-  else
-  {
-	// 9:11 aspect ratio
-	return width * (9.0 / 11.0);
+  if (videoSize == XMVideoSize_SQCIF) {
+    // 4:3 aspect ratio
+    return width * (3.0 / 4.0);
+  } else {
+    // 9:11 aspect ratio
+    return width * (9.0 / 11.0);
   }
 }
 
 float XMGetVideoWidthForHeight(float height, XMVideoSize videoSize)
 {
-  if (videoSize == XMVideoSize_NoVideo)
-  {
-	return 0;
+  if (videoSize == XMVideoSize_NoVideo) {
+    return 0;
   }
-  if (videoSize == XMVideoSize_SQCIF)
-  {
-	// 4:3 aspect ratio
-	return height * (4.0 / 3.0);
-  }
-  else
-  {
-	// 11:9 aspect ratio
-	return height * (11.0 / 9.0);
+  if (videoSize == XMVideoSize_SQCIF) {
+    // 4:3 aspect ratio
+    return height * (4.0 / 3.0);
+  } else {
+    // 11:9 aspect ratio
+    return height * (11.0 / 9.0);
   }
 }
 
@@ -582,4 +569,30 @@ void XMLogMessage(NSString *message)
 void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedKeys, void *info)
 {
   [_XMUtilsSharedInstance updateNetworkInformation];
+}
+
+NSString *XMCreateAddressOfRecord(NSString *host, NSString *username)
+{
+  if (username == nil) { // sanity check
+    return nil;
+  }
+  unsigned atLocation = [username rangeOfString:@"@"].location;
+  
+  if (atLocation == NSNotFound && host == nil) {
+    return nil;
+  }
+  
+  // Use same procedure as the AOR calculation in SIPEndPoint::GetAddressOfRecord()
+  NSMutableString *str = [[NSMutableString alloc] init];
+  [str appendString:username];
+  if (atLocation != NSNotFound && host != nil) {
+    [str appendString:@";proxy="];
+    [str appendString:host];
+  } else {
+    [str appendString:@"@"];
+    [str appendString:host];
+  }
+  NSString *aor = [str copy];
+  [str release];
+  return aor;
 }
