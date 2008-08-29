@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.51 2008/08/28 20:07:18 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.52 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -904,20 +904,9 @@ enum {
   }
 }
 
-- (void)_handleSIPRegistrationProcessStart
-{
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidStartSIPRegistrationProcess object:self];
-}
-
-- (void)_handleSIPRegistrationProcessEnd
-{
-  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSIPRegistrationProcess object:self];
-}
-
-- (void)_handleSIPRegistration:(NSString *)registration
+- (void)_handleSIPRegistration:(NSString *)addressOfRecord
 {	
   NSArray *registrationRecords = [activePreferences sipRegistrationRecords];
-  
   unsigned searchIndex = NSNotFound;
   unsigned count = [registrationRecords count];
   for (unsigned i = 0; i < count; i++) {
@@ -926,21 +915,21 @@ enum {
       continue;
     }
     
-    NSString *reg = [record registration];
+    NSString *aor = [record addressOfRecord];
     
-    if ([reg isEqualToString:registration]) {
+    if ([aor isEqualToString:addressOfRecord]) {
       searchIndex = i;
       break;
     }
   }
   
   if (searchIndex == NSNotFound) {
-    NSLog(@"REGISTRATION NOT FOUND IN REGISTRATIONS");
+    NSLog(@"REGISTRATION NOT FOUND IN REGISTRATIONS (HANDLE REGISTRATION)");
     return;
   }
   
   count = [sipRegistrations count];
-  [sipRegistrations addObject:registration];
+  [sipRegistrations addObject:addressOfRecord];
   
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_Successful_OK];
   [sipRegistrationStates replaceObjectAtIndex:searchIndex withObject:number];
@@ -951,47 +940,48 @@ enum {
   [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
 }
 
-- (void)_handleSIPUnregistration:(NSString *)registration
+- (void)_handleSIPUnregistration:(NSString *)addressOfRecord
 {	
-  unsigned index = [sipRegistrations indexOfObject:registration];
-  
+  unsigned index = [sipRegistrations indexOfObject:addressOfRecord];
   if (index == NSNotFound) {
+    NSLog(@"REGISTRATION NOT FOUND WHEN HANDLING UNREGISTRATION");
     return;
   }
   
   [sipRegistrations removeObjectAtIndex:index];
   
+  // There is no corresponding record in the sipRegistrationStates array
+  
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-  [notificationCenter postNotificationName:XMNotification_CallManagerDidSIPUnregister object:registration];
+  [notificationCenter postNotificationName:XMNotification_CallManagerDidSIPUnregister object:addressOfRecord];
   [notificationCenter postNotificationName:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:self];
 }
 
 - (void)_handleSIPRegistrationFailure:(NSArray *)info
 {
   // extracting information from the array
-  NSString *registration = (NSString *)[info objectAtIndex:0];
+  NSString *addressOfRecord = (NSString *)[info objectAtIndex:0];
   NSNumber *failReason = (NSNumber *)[info objectAtIndex:1];
   
   NSArray *records = [activePreferences sipRegistrationRecords];
   unsigned searchIndex = NSNotFound;
   unsigned count = [records count];
-  
   for (unsigned i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[records objectAtIndex:i];
     if (![record isKindOfClass:[XMPreferencesRegistrationRecord class]]) { // protect against illegal classes
       continue;
     }
     
-    NSString *reg = [record registration];
+    NSString *aor = [record addressOfRecord];
     
-    if ([reg isEqualToString:registration]) {
+    if ([aor isEqualToString:addressOfRecord]) {
       searchIndex = i;
       break;
     }
   }
   
   if (searchIndex == NSNotFound) {
-    NSLog(@"OBJECT NOT FOUND ON SIP REGISTRATION FAILURE");
+    NSLog(@"REGISTRATION NOT FOUND IN REGISTRATIONS (HANDLE REGISTRATION FAILURE)");
     return;
   }
   
@@ -1039,11 +1029,8 @@ enum {
   // store the current GK registration status. The status may be updated at any time, but a notification is only sent when the
   // status actually changes. However, each subsystem setup should trigger a notification.
   gatekeeperRegistrationStatusBeforeSubsystemSetup = gatekeeperRegistrationStatus;
-  
-  automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
 
   [sipRegistrationStates removeAllObjects];
-  
   unsigned count = [[preferences sipRegistrationRecords] count];
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)XMSIPStatusCode_Successful_OK];
   for (unsigned i = 0; i < count; i++) {
@@ -1058,6 +1045,8 @@ enum {
     // we continue this job when the public address fetch task is finished
     return;
   }
+  
+  automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
   
   NSString *publicAddress = nil;
   publicAddress = [_XMUtilsSharedInstance _checkipPublicAddress];

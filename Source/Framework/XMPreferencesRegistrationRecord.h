@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesRegistrationRecord.h,v 1.2 2007/08/17 11:36:42 hfriederich Exp $
+ * $Id: XMPreferencesRegistrationRecord.h,v 1.3 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,6 +18,8 @@
   NSString *username;
   NSString *authorizationUsername;
   NSString *password;
+  
+  NSString *aor;
 
 }
 
@@ -35,7 +37,7 @@
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;
 
-- (NSString *)registration;
+- (NSString *)addressOfRecord;
 
 @end
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.23 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.24 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,7 +29,7 @@
   NSTimer *callStatisticsUpdateIntervalTimer;
   
   NSLock *sipRegistrationWaitLock;
-	
+  BOOL doesWaitForSIPRegistrationCompletion;
 }
 
 + (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress networkConfigurationChanged:(BOOL)networkConfigurationChanged;
@@ -98,11 +98,11 @@
 
 - (void)_handleGatekeeperUnregistration;
 
-- (void)_handleSIPRegistration:(NSString *)registration;
+- (void)_handleSIPRegistration:(NSString *)aor;
 
-- (void)_handleSIPUnregistration:(NSString *)registration;
+- (void)_handleSIPUnregistration:(NSString *)aor;
 
-- (void)_handleSIPRegistrationFailure:(NSString *)registration failReason:(XMSIPStatusCode)failReason;
+- (void)_handleSIPRegistrationFailure:(NSString *)aor failReason:(XMSIPStatusCode)failReason;
 
 	// called every time the Framework completes SIP Registration
   // may be called on any thread

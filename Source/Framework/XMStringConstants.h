@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.h,v 1.37 2008/08/28 11:07:23 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.38 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -156,17 +156,6 @@ extern NSString *XMNotification_CallManagerDidNotEnableSIP;
  * Posted whenever the SIP protocol status changes
  **/
 extern NSString *XMNotification_CallManagerDidChangeSIPStatus;
-
-/**
- * Posted when the Framwork did start registering at SIP registrars.
- * This can be a lengthy task
- **/
-extern NSString *XMNotification_CallManagerDidStartSIPRegistrationProcess;
-
-/**
- * Posted when the Framework finished registereing at SIP registrars
- **/
-extern NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess;
 
 /**
  * Posted when the Framwork succesfully registered at a SIP registrar.

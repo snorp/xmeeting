@@ -1747,6 +1747,7 @@
 			children = (
 				D1FE29CE07AFF4FB004337C9 /* XMPrivate.h */,
 				D1B353220E4DB16000C47DB5 /* Utils */,
+				D1AD25710E67D38800143295 /* Preferences */,
 				D14BBF9F0E3F84C8007B1A57 /* Call Management */,
 				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
 				D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */,
@@ -1762,9 +1763,6 @@
 				D1FE4EC408ED55F900AAFF98 /* XMMediaTransmitter.h */,
 				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
 				D1972B0208FC529C00295E05 /* XMPacketBuilderDispatch.h */,
-				D163381B07A4E739003FD9C0 /* XMPreferences.h */,
-				D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */,
-				D102A36209E5268D0050239C /* XMPreferencesRegistrationRecord.h */,
 				D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */,
 				D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */,
 				D12077B60A011A0900179B6C /* XMRTPH263PlusPacketizer.h */,
@@ -1791,9 +1789,6 @@
 				D13962160BF0BA2F00C76EFD /* XMH323URL.m */,
 				D19722EB08FB127600295E05 /* XMMediaReceiver.m */,
 				D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */,
-				D163381C07A4E739003FD9C0 /* XMPreferences.m */,
-				D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */,
-				D102A36309E5268D0050239C /* XMPreferencesRegistrationRecord.m */,
 				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
 				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
 				D13962B60BF0C9F100C76EFD /* XMSIPURL.m */,
@@ -2070,6 +2065,19 @@
 				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
 			);
 			name = SIP;
+			sourceTree = "<group>";
+		};
+		D1AD25710E67D38800143295 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				D163381B07A4E739003FD9C0 /* XMPreferences.h */,
+				D163381C07A4E739003FD9C0 /* XMPreferences.m */,
+				D1F61477086D454F00FDD4F0 /* XMPreferencesCodecListRecord.h */,
+				D1F61478086D454F00FDD4F0 /* XMPreferencesCodecListRecord.m */,
+				D102A36209E5268D0050239C /* XMPreferencesRegistrationRecord.h */,
+				D102A36309E5268D0050239C /* XMPreferencesRegistrationRecord.m */,
+			);
+			name = Preferences;
 			sourceTree = "<group>";
 		};
 		D1AF73E0084D02E400D50883 /* Application Management */ = {
@@ -2612,12 +2620,12 @@
 		D1CEE1FD08F90230007E4ABE /* include */ = {
 			isa = PBXGroup;
 			children = (
-				D1CEE11208F9022B007E4ABE /* asn */,
-				D1CEE12808F9022B007E4ABE /* codec */,
 				D1CEE13B08F9022B007E4ABE /* h323 */,
+				D1CEE18008F9022B007E4ABE /* sip */,
 				D1CEE16B08F9022B007E4ABE /* opal */,
 				D1CEE17D08F9022B007E4ABE /* rtp */,
-				D1CEE18008F9022B007E4ABE /* sip */,
+				D1CEE12808F9022B007E4ABE /* codec */,
+				D1CEE11208F9022B007E4ABE /* asn */,
 				D1F0B78609DC4867005D0464 /* h224 */,
 				D14BBF3C0E3F7B6F007B1A57 /* h460 */,
 			);
@@ -2628,12 +2636,12 @@
 		D1CEE20008F90240007E4ABE /* src */ = {
 			isa = PBXGroup;
 			children = (
-				D1CEE20108F90261007E4ABE /* asn */,
-				D1CEE23008F90262007E4ABE /* codec */,
-				D1CEE34708F90263007E4ABE /* opal */,
 				D1CEE31B08F90262007E4ABE /* h323 */,
 				D1FD47CA09B6544B00EB517B /* sip */,
+				D1CEE34708F90263007E4ABE /* opal */,
 				D1CEE35608F90263007E4ABE /* rtp */,
+				D1CEE23008F90262007E4ABE /* codec */,
+				D1CEE20108F90261007E4ABE /* asn */,
 				D1F0B77F09DC4834005D0464 /* h224 */,
 				D14BBF2D0E3F7B43007B1A57 /* h460 */,
 			);

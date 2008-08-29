@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.19 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.20 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,7 +15,6 @@
 
 #include "XMTypes.h"
 
-class XMSIPOptions;
 class XMSIPConnection;
 
 class XMSIPRegistrationRecord : public PObject
@@ -24,7 +23,7 @@ class XMSIPRegistrationRecord : public PObject
   
 public:
   
-  XMSIPRegistrationRecord(const PString & registration,
+  XMSIPRegistrationRecord(const PString & addressOfRecord,
                           const PString & authorizationUsername,
                           const PString & password);
   ~XMSIPRegistrationRecord();
@@ -37,8 +36,9 @@ public:
     ToRemove
   };
   
-  const PString & GetRegistration() const { return registration; }
+  const PString & GetAddressOfRecord() const { return addressOfRecord; }
   const PString & GetAuthorizationUsername() const { return authorizationUsername; }
+  void SetAuthorizationUsername(const PString & _authorizationUsername) { authorizationUsername = _authorizationUsername; }
   const PString & GetPassword() const { return password; }
   void SetPassword(const PString & _password) { password = _password; }
   Status GetStatus() const { return status; }
@@ -46,7 +46,7 @@ public:
   
 private:
     
-    PString registration;
+  PString addressOfRecord;
   PString authorizationUsername;
   PString password;
   Status status;
@@ -60,9 +60,14 @@ public:
   XMSIPEndPoint(OpalManager & manager);
   virtual ~XMSIPEndPoint();
   
+  // Protocol
   bool EnableListeners(bool enable);
-  bool IsListening();
+  bool IsListening() const { return isListening; }
+  bool UseProxy(const PString & hostname,
+                const PString & username,
+                const PString & password);
   
+  // Registrations
   void PrepareRegistrationSetup(bool proxyChanged);
   void UseRegistration(const PString & host,
                        const PString & username,
@@ -70,20 +75,15 @@ public:
                        const PString & password,
                        bool proxyChanged);
   void FinishRegistrationSetup(bool proxyChanged);
-  
-  void HandleNetworkStatusChange();
-  
-  bool UseProxy(const PString & hostname,
-                const PString & username,
-                const PString & password);
-  
-  void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
-  
   virtual void OnRegistrationFailed(const PString & aor,
                                     SIP_PDU::StatusCodes reason,
                                     bool wasRegistering);
   virtual void OnRegistered(const PString & aor,
                             bool wasRegistering);
+  
+  void HandleNetworkStatusChange();
+  
+  void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
   
   virtual void OnEstablished(OpalConnection & connection);
   virtual void OnReleased(OpalConnection & connection);
@@ -105,6 +105,9 @@ public:
   void RemoveReleasingConnection(XMSIPConnection * connection);
   
 private:
+  static PString GetAddressOfRecord(const PString & host, const PString & username);
+  void CheckRegistrationProcess();
+  
 	bool isListening;
   
   PString connectionToken;

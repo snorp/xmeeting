@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.33 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.34 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -294,35 +294,35 @@ void _XMHandleGatekeeperUnregistration()
 #pragma mark -
 #pragma mark SIP specific Callbacks
 
-void _XMHandleSIPRegistration(const char *_registration)
+void _XMHandleSIPRegistration(const char *_aor)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
     
-	NSString *registration = [[NSString alloc] initWithCString:_registration encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistration:registration];
-	[registration release];
+	NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistration:aor];
+	[aor release];
     
 	[autoreleasePool release];
 }
 
-void _XMHandleSIPUnregistration(const char *_registration)
+void _XMHandleSIPUnregistration(const char *_aor)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *registration = [[NSString alloc] initWithCString:_registration encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPUnregistration:registration];
-	[registration release];
+	NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPUnregistration:aor];
+	[aor release];
 	
 	[autoreleasePool release];
 }
 
-void _XMHandleSIPRegistrationFailure(const char *_registration, XMSIPStatusCode failReason)
+void _XMHandleSIPRegistrationFailure(const char *_aor, XMSIPStatusCode failReason)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *registration = [[NSString alloc] initWithCString:_registration encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:registration failReason:failReason];
-	[registration release];
+	NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:aor failReason:failReason];
+	[aor release];
 	
 	[autoreleasePool release];
 }

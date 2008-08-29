@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.67 2008/08/28 15:15:18 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.68 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -666,7 +666,6 @@
   
   [alert setAlertStyle:NSInformationalAlertStyle];
   [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
-  [alert addButtonWithTitle:NSLocalizedString(@"Retry", @"")];
   
   isDisplayingAlert = YES;
   [alert runModal];

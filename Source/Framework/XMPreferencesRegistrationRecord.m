@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesRegistrationRecord.m,v 1.1 2007/05/30 08:43:16 hfriederich Exp $
+ * $Id: XMPreferencesRegistrationRecord.m,v 1.2 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,7 @@
 	username = nil;
 	authorizationUsername = nil;
 	password = nil;
+  aor = nil;
 	
 	return self;
 }
@@ -34,28 +35,26 @@
 	Class stringClass = [NSString class];
 	
 	NSString *string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordDomain];
-	if(string && [string isKindOfClass:stringClass])
-	{
+	if (string && [string isKindOfClass:stringClass]) {
 		domain = [string retain];
 	}
 	
 	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordUsername];
-	if(string && [string isKindOfClass:stringClass])
-	{
+	if (string && [string isKindOfClass:stringClass]) {
 		username = [string retain];
 	}
 	
 	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername];
-	if(string && [string isKindOfClass:stringClass])
-	{
+	if (string && [string isKindOfClass:stringClass]) {
 		authorizationUsername = [string retain];
 	}
 	
 	string = (NSString *)[dictionary objectForKey:XMKey_PreferencesRegistrationRecordPassword];
-	if(string && [string isKindOfClass:stringClass])
-	{
+	if (string && [string isKindOfClass:stringClass]) {
 		password = [string retain];
 	}
+  
+  aor = nil;
 	
 	return self;
 }
@@ -63,19 +62,18 @@
 - (id)initWithCoder:(NSCoder *)coder
 {	self = [super init];
 	
-	if([coder allowsKeyedCoding]) // use keyed coding
-	{
+	if ([coder allowsKeyedCoding]) { // use keyed coding
 		[self setDomain:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordDomain]];
 		[self setUsername:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordUsername]];
 		[self setAuthorizationUsername:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername]];
 		[self setPassword:(NSString *)[coder decodeObjectForKey:XMKey_PreferencesRegistrationRecordPassword]];
-	}
-	else // raise an exception
-	{
+	} else { // raise an exception
 		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 		[self release];
 		return nil;
 	}
+  
+  aor = nil;
 	
 	return self;	
 }
@@ -94,15 +92,12 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	if([coder allowsKeyedCoding])
-	{
+	if ([coder allowsKeyedCoding]) {
 		[coder encodeObject:[self domain] forKey:XMKey_PreferencesRegistrationRecordDomain];
 		[coder encodeObject:[self username] forKey:XMKey_PreferencesRegistrationRecordUsername];
 		[coder encodeObject:[self authorizationUsername] forKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername];
 		[coder encodeObject:[self password] forKey:XMKey_PreferencesRegistrationRecordPassword];
-	}
-	else
-	{
+	} else {
 		[NSException raise:XMException_UnsupportedCoder format:XMExceptionReason_UnsupportedCoder];
 	}
 }
@@ -112,23 +107,20 @@
 
 - (BOOL)isEqual:(id)object
 {
-	if(object == self)
-	{
+	if (object == self) {
 		return YES;
 	}
 	
-	if(![object isKindOfClass:[self class]])
-	{
+	if (![object isKindOfClass:[self class]]) {
 		return NO;
 	}
 	
 	XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)object;
 	
-	if([[self domain] isEqualToString:[record domain]] &&
-	   [[self username] isEqualToString:[record username]] &&
-	   [[self authorizationUsername] isEqualToString:[record authorizationUsername]] &&
-	   [[self password] isEqualToString:[record password]])
-	{
+	if ([[self domain] isEqualToString:[record domain]] &&
+	    [[self username] isEqualToString:[record username]] &&
+	    [[self authorizationUsername] isEqualToString:[record authorizationUsername]] &&
+	    [[self password] isEqualToString:[record password]]) {
 		return YES;
 	}
 	
@@ -140,26 +132,22 @@
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:4];
 	
 	NSString *string = [self domain];
-	if(string)
-	{
+	if (string) {
 		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordDomain];
 	}
 	
 	string = [self username];
-	if(string)
-	{
+	if (string) {
 		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordUsername];
 	}
 	
 	string = [self authorizationUsername];
-	if(string)
-	{
+	if (string) {
 		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordAuthorizationUsername];
 	}
 	
 	string = [self password];
-	if(string)
-	{
+	if (string) {
 		[dict setObject:string forKey:XMKey_PreferencesRegistrationRecordPassword];
 	}
 	
@@ -179,6 +167,9 @@
 	NSString *old = domain;
 	domain = [theDomain copy];
 	[old release];
+  
+  [aor release];
+  aor = nil;
 }
 
 - (NSString *)username
@@ -191,6 +182,9 @@
 	NSString *old = username;
 	username = [theUsername copy];
 	[old release];
+  
+  [aor release];
+  aor = nil;
 }
 
 - (NSString *)authorizationUsername
@@ -203,6 +197,9 @@
 	NSString *old = authorizationUsername;
 	authorizationUsername = [theAuthorizationUsername copy];
 	[old release];
+  
+  [aor release];
+  aor = nil;
 }
 
 - (NSString *)password
@@ -215,17 +212,37 @@
 	NSString *old = password;
 	password = [thePassword copy];
 	[old release];
+  
+  [aor release];
+  aor = nil;
 }
 
-- (NSString *)registration
+- (NSString *)addressOfRecord
 {
-    if (username != nil && [username rangeOfString:@"@"].location != NSNotFound) {
-        return username;
+  if (aor == nil) {
+    if (username == nil) { // sanity check
+      return nil;
     }
-    if (username == nil || domain == nil) {
-        return nil;
+    unsigned atLocation = [username rangeOfString:@"@"].location;
+    
+    if (atLocation == NSNotFound && domain == nil) {
+      return nil;
     }
-    return [NSString stringWithFormat:@"%@@%@", username, domain];
+    
+    // Use same procedure as the AOR calculation in SIPEndPoint::GetAddressOfRecord()
+    NSMutableString *str = [[NSMutableString alloc] init];
+    [str appendString:username];
+    if (atLocation != NSNotFound && domain != nil) {
+      [str appendString:@";proxy="];
+      [str appendString:domain];
+    } else {
+      [str appendString:@"@"];
+      [str appendString:domain];
+    }
+    aor = [str copy];
+    [str release];
+  }
+  return aor;
 }
 
 @end

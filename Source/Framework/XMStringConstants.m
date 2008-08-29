@@ -1,5 +1,5 @@
 /*
- * $Id: XMStringConstants.m,v 1.35 2008/08/28 11:07:23 hfriederich Exp $
+ * $Id: XMStringConstants.m,v 1.36 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,8 +40,6 @@ NSString *XMNotification_CallManagerDidEnableSIP = @"XMeetingCallManagerDidEnabl
 NSString *XMNotification_CallManagerDidDisableSIP = @"XMeetingCallMangagerDidDisableSIPNotification";
 NSString *XMNotification_CallManagerDidNotEnableSIP = @"XMeetingCallManagerDidNotEnableSIPNotification";
 NSString *XMNotification_CallManagerDidChangeSIPStatus = @"XMeetingCallManagerDidChangeSIPStatusNotification";
-NSString *XMNotification_CallManagerDidStartSIPRegistrationProcess = @"XMeetingCallManagerDidStartSIPRegistrationProcessNotification";
-NSString *XMNotification_CallManagerDidEndSIPRegistrationProcess = @"XMeetingCallManagerDidEndSIPRegistrationProcessNotification";
 NSString *XMNotification_CallManagerDidSIPRegister = @"XMeetingCallManagerDidSIPRegisterNotification";
 NSString *XMNotification_CallManagerDidSIPUnregister = @"XMeetingCallManagerDidSIPUnregister";
 NSString *XMNotification_CallManagerDidNotSIPRegister = @"XMeetingCallManagerDidNotSIPRegister";

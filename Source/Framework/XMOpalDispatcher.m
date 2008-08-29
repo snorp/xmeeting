@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.53 2008/08/28 11:07:22 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.54 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -99,9 +99,9 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose block:(BOOL)block;
 - (void)_doGatekeeperSetup:(XMPreferences *)preferences block:(BOOL)block;
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
-- (void)_doRegistrationSetup:(XMPreferences *)preferences verbose:(BOOL)verbose proxyChanged:(BOOL)proxyChanged;
+- (void)_doRegistrationSetup:(XMPreferences *)preferences proxyChanged:(BOOL)proxyChanged;
 
-- (void)_waitForSubsystemSetupCompletion:(BOOL)verbose;
+- (void)_waitForSubsystemSetupCompletion;
 
 - (void)_resyncSubsystem:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
@@ -706,7 +706,7 @@ typedef enum _XMOpalDispatcherMessage
   
   [self _doPreferencesSetup:preferences publicAddress:publicAddress networkConfigurationChanged:networkConfigurationChanged verbose:YES];
   
-  [self _waitForSubsystemSetupCompletion:YES];
+  [self _waitForSubsystemSetupCompletion];
   
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSubsystemSetupEnd) withObject:nil waitUntilDone:NO];
 }
@@ -757,6 +757,7 @@ typedef enum _XMOpalDispatcherMessage
   }
   
   [self _doPreferencesSetup:preferences publicAddress:publicAddress networkConfigurationChanged:NO verbose:NO];
+  [self _waitForSubsystemSetupCompletion];
   
   [self _initiateCallToAddress:address protocol:callProtocol];	
 }
@@ -1421,17 +1422,16 @@ typedef enum _XMOpalDispatcherMessage
     if (_XMEnableSIP(YES) == YES) {
       protocolStatus = XMProtocolStatus_Enabled;
       
+      // Update the proxy information
       NSString *host = [preferences sipProxyHost];
       NSString *username = [preferences sipProxyUsername];
       NSString *password = [preferences sipProxyPassword];
-      
       const char *proxyHost = [host cStringUsingEncoding:NSASCIIStringEncoding];
       const char *proxyUsername = [username cStringUsingEncoding:NSASCIIStringEncoding];
       const char *proxyPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
-      
       proxyInfoChanged = _XMSetSIPProxy(proxyHost, proxyUsername, proxyPassword);
       
-      [self _doRegistrationSetup:preferences verbose:verbose proxyChanged:proxyInfoChanged];
+      [self _doRegistrationSetup:preferences proxyChanged:proxyInfoChanged];
     } else {
       protocolStatus = XMProtocolStatus_Error;
     }
@@ -1456,25 +1456,16 @@ typedef enum _XMOpalDispatcherMessage
   }
 }
 
-- (void)_doRegistrationSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
-                proxyChanged:(BOOL)proxyInfoChanged
+- (void)_doRegistrationSetup:(XMPreferences *)preferences proxyChanged:(BOOL)proxyInfoChanged
 {
   NSArray *records = [preferences sipRegistrationRecords];
-  
-  unsigned i;
   unsigned count = [records count];
   
-  [sipRegistrationWaitLock lock];
-  
-  if (verbose == YES) {
-    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationProcessStart)
-                                                   withObject:nil
-                                                waitUntilDone:NO];
-  }
+  [sipRegistrationWaitLock lock]; // will be unlocked from within -_handleRegistrationSetupCompleted
   
   _XMPrepareRegistrationSetup(proxyInfoChanged);
   
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[records objectAtIndex:i];
     if (![record isKindOfClass:[XMPreferencesRegistrationRecord class]]) {
       continue;
@@ -1503,18 +1494,12 @@ typedef enum _XMOpalDispatcherMessage
   _XMFinishRegistrationSetup(proxyInfoChanged);
 }
 
-- (void)_waitForSubsystemSetupCompletion:(BOOL)verbose
+- (void)_waitForSubsystemSetupCompletion
 {
   // Since the SIP Registration performs asynchronously,
   // we wait here until this task has completed
   [sipRegistrationWaitLock lock];
   [sipRegistrationWaitLock unlock];
-  
-  if (verbose == YES) {
-    [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationProcessEnd)
-                                                   withObject:nil
-                                                waitUntilDone:NO];
-  }
 }
 
 #pragma mark -
@@ -1551,29 +1536,23 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleGatekeeperUnregistration
 {
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperUnregistration)
-                                                 withObject:nil
-                                              waitUntilDone:NO];
+  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperUnregistration) withObject:nil waitUntilDone:NO];
 }
 
-- (void)_handleSIPRegistration:(NSString *)registration
+- (void)_handleSIPRegistration:(NSString *)aor
 {
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistration:)
-                                                 withObject:registration
-                                              waitUntilDone:NO];
+  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistration:) withObject:aor waitUntilDone:NO];
 }
 
-- (void)_handleSIPUnregistration:(NSString *)registration
+- (void)_handleSIPUnregistration:(NSString *)aor
 {
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPUnregistration:)
-                                                 withObject:registration
-                                              waitUntilDone:NO];
+  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPUnregistration:) withObject:aor waitUntilDone:NO];
 }
 
-- (void)_handleSIPRegistrationFailure:(NSString *)registration failReason:(XMSIPStatusCode)failReason
+- (void)_handleSIPRegistrationFailure:(NSString *)aor failReason:(XMSIPStatusCode)failReason
 {
   NSNumber *errorNumber = [[NSNumber alloc] initWithUnsignedInt:failReason];
-  NSArray *array = [[NSArray alloc] initWithObjects:registration, errorNumber, nil];
+  NSArray *array = [[NSArray alloc] initWithObjects:aor, errorNumber, nil];
   
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationFailure:)
                                                  withObject:array

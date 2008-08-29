@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.36 2008/08/28 20:07:18 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.37 2008/08/29 08:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,7 +51,7 @@ public:
                              const PString & password);
   virtual void Main();
 private:
-    XMH323EndPoint *ep;
+  XMH323EndPoint *ep;
   PString address;
   PString terminalAlias1;
   PString terminalAlias2;
@@ -61,14 +61,12 @@ private:
 //OPAL_REGISTER_H224_CAPABILITY();
 
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
-: H323EndPoint(manager)
-{
-	isListening = false;
-  gatekeeperAddress = "";
-  hasGkRegistrationThread = false;
-  
-	connectionToken = "";
-	
+: H323EndPoint(manager),
+  isListening(false),
+  gatekeeperAddress(""),
+  hasGkRegistrationThread(false),
+  connectionToken("")
+{	
   // Don't use OPAL's bandwidth management system as this is not flexible enough
   // for our purposes
 	SetInitialBandwidth(UINT_MAX);
