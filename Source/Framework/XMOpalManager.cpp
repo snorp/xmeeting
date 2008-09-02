@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.65 2008/08/29 08:46:33 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.66 2008/09/02 23:55:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,12 +38,12 @@ static XMSIPEndPoint *sipEndPointInstance = NULL;
 
 void XMOpalManager::InitOpal(const PString & pTracePath)
 {	
-  if(theProcess == NULL)
+  if (theProcess == NULL)
   {
     PProcess::PreInitialise(0, 0, 0);
     theProcess = new XMProcess;
     
-    if(pTracePath != NULL)
+    if (pTracePath != NULL)
     {
       PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
     }
@@ -101,12 +101,19 @@ XMOpalManager::XMOpalManager()
   AddRouteEntry("h323:.* = xm:<da>");
   AddRouteEntry("xm:.*   = sip:<da>");
   AddRouteEntry("sip:.*  = xm:<da>");
+  
+  stun = new XMSTUNClient();
+  interfaceMonitor = new XMInterfaceMonitor(*this);
 }
 
 XMOpalManager::~XMOpalManager()
 {
   h323EndPointInstance->CleanUp();
   sipEndPointInstance->CleanUp();
+  
+  // ensure the STUN update thread has finished
+  natMutex.Wait();
+  natMutex.Signal();
 }
 
 #pragma mark -
@@ -130,14 +137,6 @@ XMH323EndPoint * XMOpalManager::GetH323EndPoint()
 XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 {
   return sipEndPointInstance;
-}
-
-#pragma mark -
-#pragma mark Handling network status changes
-
-void XMOpalManager::HandleNetworkStatusChange()
-{
-  PInterfaceMonitor::GetInstance().RefreshInterfaceList();
 }
 
 #pragma mark -
@@ -217,25 +216,25 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
   
   bool isValid = false;
   
-  if(connectionToken == "") // current connection token is empty
+  if (connectionToken == "") // current connection token is empty
   {
 	connectionToken = theConnectionToken;
 	callProtocol = theCallProtocol;
 	isValid = true;
   }
-  else if(connectionToken == theConnectionToken) // same connection token
+  else if (connectionToken == theConnectionToken) // same connection token
   {
 	isValid = true;
   }
   
-  if(isValid == true) // if valid, update information
+  if (isValid == true) // if valid, update information
   {
 	remoteName = theRemoteName;
 	remoteNumber = theRemoteNumber;
 	remoteAddress = theRemoteAddress;
 	remoteApplication = theRemoteApplication;
 	
-	if(remoteName == "" &&
+	if (remoteName == "" &&
 	   remoteNumber == "" &&
 	   remoteAddress == "" &&
 	   remoteApplication == "") // empty information, clear connection token / call protocol
@@ -351,7 +350,7 @@ void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
   }
   
   session = connection.GetSession(OpalDefaultVideoMediaType);
-  if(session != NULL)
+  if (session != NULL)
   {
 	callStatistics->videoPacketsSent = session->GetPacketsSent();
 	callStatistics->videoBytesSent = session->GetOctetsSent();
@@ -407,7 +406,7 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
   // in the call dictionary.
   bool isIncomingCall = true;
   OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
-  if(PIsDescendant(&endPoint, XMEndPoint))
+  if (PIsDescendant(&endPoint, XMEndPoint))
   {
 	isIncomingCall = false;
   }
@@ -415,7 +414,7 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
   // Determine the IP address this call is running on.
   // We need to have the other connection as the local XMConnection instance
   PSafePtr<OpalConnection> connection;
-  if(isIncomingCall)
+  if (isIncomingCall)
   {
 	connection = call.GetConnection(0);
   }
@@ -426,7 +425,7 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
   PIPSocket::Address address(0);
   connection->GetTransport().GetLocalAddress().GetIpAddress(address);
   
-  if(address.IsValid())
+  if (address.IsValid())
   {
 	_XMHandleCallEstablished(callID, isIncomingCall, address.AsString());
   }
@@ -511,12 +510,12 @@ void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, cons
   unsigned callID = connection.GetCall().GetToken().AsUnsigned();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-  /*if(mediaType == OpalDefaultVideoMediaType)
+  /*if (mediaType == OpalDefaultVideoMediaType)
   {
 	// The incoming video stream (source for OPAL) is treated as being open as soon the
 	// first data is decoded and the exact parameters of the stream are
 	// known.
-	if(stream.IsSink())
+	if (stream.IsSink())
 	{
 	  XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
 	  const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
@@ -524,7 +523,7 @@ void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, cons
 	  _XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, false, 0, 0);
 	}
   }
-  else if(mediaType == OpalDefaultAudioMediaType)
+  else if (mediaType == OpalDefaultAudioMediaType)
   {
 	_XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
   }*/
@@ -538,11 +537,11 @@ void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, co
   unsigned callID = connection.GetCall().GetToken().AsUnsigned();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-  /*if(mediaType == OpalDefaultVideoMediaType) 
+  /*if (mediaType == OpalDefaultVideoMediaType) 
   {
 	_XMHandleVideoStreamClosed(callID, stream.IsSource());
   }
-  else if(mediaType == OpalDefaultAudioMediaType)
+  else if (mediaType == OpalDefaultAudioMediaType)
   {
 	_XMHandleAudioStreamClosed(callID, stream.IsSource());
   }*/
@@ -553,8 +552,7 @@ void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, co
 
 void XMOpalManager::SetUserName(const PString & username)
 {
-  // Forwards this information to the endpoints.
-  
+  // Forwards this information to the endpoints
   OpalManager::SetDefaultUserName(username);
   GetH323EndPoint()->SetDefaultDisplayName(username);
   GetSIPEndPoint()->SetDefaultDisplayName(username);
@@ -563,90 +561,108 @@ void XMOpalManager::SetUserName(const PString & username)
 #pragma mark -
 #pragma mark Network Setup Methods
 
-void XMOpalManager::SetNATInformation(const PStringArray & theStunServers,
-                                      const PString & theTranslationAddress,
-                                      bool networkStatusChanged)
+void XMOpalManager::HandleNetworkConfigurationChange()
 {
-  // Don't re-fetch the STUN information if the network status didn't change
-  if (networkStatusChanged == false && stunServers.Compare(theStunServers) == PObject::EqualTo) {
+  PInterfaceMonitor::GetInstance().RefreshInterfaceList();
+  
+  // Also update the STUN information. Do this in a separate
+  // thread to avoid blocking the OpalDispatcher thread
+  PWaitAndSignal m(natMutex);
+  new XMSTUNUpdateThread(*this);
+}
+
+void XMOpalManager::SetNATInformation(const PStringArray & _stunServers,
+                                      const PString & _publicAddress)
+{
+  PWaitAndSignal m(natMutex);
+  
+  XMSTUNClient *stunClient = (XMSTUNClient *)stun;
+  
+  // update the public address
+  publicAddress = _publicAddress;
+  if (stunClient->GetEnabled() == false) {
+    SetTranslationAddress(publicAddress);
+  }
+  
+  // Don't re-fetch the NAT type if the STUN server list didn't change
+  if (stunClient->GetEnabled() == true && stunServers.Compare(_stunServers) == PObject::EqualTo) {
     return;
   }
   
-  stunServers = theStunServers;
+  stunServers = _stunServers;
   
-  //
-  // In case STUN works as expected, use it. In case of failures,
-  // SymmetricNAT, SymmetricFirewall, PartialBlockedNAT, dont' use
-  // STUN but rather rely on the translationAddress feature only.
-  // In case of STUN problems, connections MAY still work this way.
-  //
-  if(stun != NULL) {
-	  delete stun;
-    delete interfaceMonitor;
-	  stun = NULL;
-    interfaceMonitor = NULL;
-  }
+  SetupNatTraversal();
+}
+
+void XMOpalManager::UpdateSTUNInformation()
+{
+  PWaitAndSignal m(natMutex);
+  stun->InvalidateCache();
+  SetupNatTraversal();
+}
+
+void XMOpalManager::SetupNatTraversal()
+{
   
+  XMSTUNClient *stunClient = (XMSTUNClient *)stun;
+  
+  // Don't try the STUN servers if there are no network interfaces present,
+  // as this only leads to timeouts
   if (!HasNetworkInterfaces()) {
     PTRACE(3, "No usable network interfaces present, don't use STUN");
+    stunClient->SetEnabled(false);
     HandleSTUNInformation(PSTUNClient::UnknownNat, PString());
     return;
   }
-
+  
+  // iterate through the stun servers list
   for (PINDEX i = 0; i < stunServers.GetSize(); i++) {
     const PString & stunServer = stunServers[i];
     PTRACE(3, "Trying STUN server " << stunServer);
-    stun = new PSTUNClient(stunServer, GetUDPPortBase(), GetUDPPortMax(),
-                           GetRtpIpPortBase(), GetRtpIpPortMax());
-    PSTUNClient::NatTypes natType = stun->GetNatType();
-	  
-    switch(natType) {
-      
+    stunClient->SetServer(stunServer);
+    PSTUNClient::NatTypes natType = stunClient->GetNatType();
+    
+    switch (natType) {
       case PSTUNClient::UnknownNat:
       case PSTUNClient::BlockedNat:
-        // Communication with STUN server was not successful.
+        // Communication with STUN server was not successful
         // Try next STUN server
         PTRACE(3, "Connection to STUN server unsuccessful. Trying next server");
         continue;
         
-      case PSTUNClient::ConeNat:
-      case PSTUNClient::RestrictedNat:
-      case PSTUNClient::PortRestrictedNat:
-      case PSTUNClient::OpenNat:
-        // STUN does work in these cases
-        stun->GetExternalAddress(translationAddress);
+        // NAT detection successful, external address known. Special cases like
+        // SymmetricNat, etc. are handled at a lower level by circumventing STUN
+      default:
+        stunClient->GetExternalAddress(translationAddress);
         if (GetTranslationAddress().IsValid()) {
           const PString & address = GetTranslationAddress().AsString();
           HandleSTUNInformation(natType, address);
-        } else {
-          // something wrong here
-          delete stun;
-          stun = NULL;
-          SetTranslationAddress(theTranslationAddress);
-          HandleSTUNInformation(natType, PString());
+          stunClient->SetEnabled(true);
+          return;
+        } else { // should not happen
+          PTRACE(3, "Invalid external address reported by STUN server. Trying next server");
+          continue;
         }
-        //interfaceMonitor = new InterfaceMonitor(stun);
-        return;
-				
-      default:
-        
-        // STUN does not work: Use the traditional address translation feature
-        PIPSocket::Address stunExternalAddress;
-        stun->GetExternalAddress(stunExternalAddress);
-        delete stun;
-        stun = NULL;
-        SetTranslationAddress(theTranslationAddress);
-        HandleSTUNInformation(natType, stunExternalAddress.AsString());
-        return;
     }
   }
-	
-  // No STUN servers availalbe: Use the traditional address translation feature
-  PTRACE(3, "No valid STUN server found, using translationAddress " << theTranslationAddress);
-  delete stun;
-  stun = NULL;
-  SetTranslationAddress(theTranslationAddress);
-  HandleSTUNInformation(PSTUNClient::UnknownNat, "");
+  
+  // No useful STUN servers availale: Use the traditional address translation only
+  stunClient->SetEnabled(false);
+  SetTranslationAddress(publicAddress);
+  HandleSTUNInformation(PSTUNClient::UnknownNat, PString());
+}
+
+void XMOpalManager::HandlePublicAddressUpdate(const PString & _publicAddress)
+{
+  PWaitAndSignal m(natMutex);
+  
+  publicAddress = _publicAddress;
+  
+  // update the translation address if needed
+  XMSTUNClient *stunClient = (XMSTUNClient *)stun;
+  if (stunClient->GetEnabled() == false) {
+    SetTranslationAddress(publicAddress);
+  }
 }
 
 void XMOpalManager::HandleSTUNInformation(PSTUNClient::NatTypes natType,
@@ -681,11 +697,11 @@ void XMOpalManager::SetCurrentAudioPacketTime(unsigned audioPacketTime)
 
 unsigned XMOpalManager::GetCurrentAudioPacketTime()
 {
-  if(currentAudioPacketTime != 0) // remote party signaled special value
+  if (currentAudioPacketTime != 0) // remote party signaled special value
   {
 	return currentAudioPacketTime;
   }
-  if(defaultAudioPacketTime != 0) // user defined special value
+  if (defaultAudioPacketTime != 0) // user defined special value
   {
 	return defaultAudioPacketTime;
   }
@@ -699,7 +715,7 @@ unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier code
 {
   // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. If at all, only I-frames should be
   // sent.
-  if(codecIdentifier == XMCodecIdentifier_H263 && remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
+  if (codecIdentifier == XMCodecIdentifier_H263 && remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
   {
 	// zero key frame interval means sending only I-frames
 	return 0;
@@ -789,4 +805,40 @@ unsigned XMOpalManager::GetH263BandwidthLimit()
 unsigned XMOpalManager::GetH264BandwidthLimit()
 {
   return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH264Bitrate());
+}
+
+#pragma mark -
+#pragma mark STUN Classes
+
+XMOpalManager::XMInterfaceMonitor::XMInterfaceMonitor(OpalManager & manager)
+: OpalManager::InterfaceMonitor(manager)
+{
+}
+
+void XMOpalManager::XMInterfaceMonitor::OnAddInterface(const PIPSocket::InterfaceEntry & entry)
+{
+  // do nothing here, as STUN updates are handled separately
+}
+
+void XMOpalManager::XMInterfaceMonitor::OnRemoveInterface(const PIPSocket::InterfaceEntry & entry)
+{
+  // do nothing here, as STUN updates are handled separately
+}
+
+XMOpalManager::XMSTUNClient::XMSTUNClient()
+: PSTUNClient(),
+  enabled(false)
+{
+}
+
+XMOpalManager::XMSTUNUpdateThread::XMSTUNUpdateThread(XMOpalManager & _manager)
+: PThread(10000), // stack size no longer used apparently
+  manager(_manager)
+{
+  Resume();
+}
+
+void XMOpalManager::XMSTUNUpdateThread::Main()
+{
+  manager.UpdateSTUNInformation();
 }

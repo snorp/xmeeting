@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.50 2008/08/28 11:07:21 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.51 2008/09/02 23:55:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,6 +69,12 @@ extern "C" {
 #pragma mark Network setup functions
   
   /**
+   * Called when the available network interfaces change,
+   * allowing it to re-do registrations etc
+   **/
+  void _XMHandleNetworkConfigurationChange();
+  
+  /**
    * sets the bandwidth limit to the value as specified
    **/
   void _XMSetBandwidthLimit(unsigned limit);
@@ -79,8 +85,13 @@ extern "C" {
    **/
   void _XMSetNATInformation(const char * const * stunServers,
                             unsigned stunServerCount,
-                            const char *translationAddress,
-                            bool networkStatusChanged);
+                            const char *publicAddress);
+  
+  /**
+    * Called whenever the checkip public address changes
+   **/
+  void _XMHandlePublicAddressUpdate(const char *publicAddress);
+    
   /**
    * defines which port ranges to use to establish
    * the media streams
@@ -91,12 +102,6 @@ extern "C" {
                         unsigned int tcpPortMax,
                         unsigned int rtpPortMin,
                         unsigned int rtpPortMax);
-  
-  /**
-   * Called when the available network interfaces change,
-   * allowing it to re-do registrations etc
-   **/
-  void _XMHandleNetworkConfigurationChange();
   
 #pragma mark -
 #pragma mark Audio Functions

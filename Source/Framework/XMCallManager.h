@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.33 2008/08/28 20:07:18 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.34 2008/09/02 23:55:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,7 +53,6 @@
   NSMutableArray *recentCalls;
   
   // Tracking system state
-  BOOL networkConfigurationChanged;
   unsigned systemSleepStatus;
   XMProtocolStatus h323ProtocolStatus;
   XMProtocolStatus sipProtocolStatus;

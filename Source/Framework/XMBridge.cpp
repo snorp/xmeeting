@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.57 2008/08/28 11:07:21 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.58 2008/09/02 23:55:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -52,14 +52,24 @@ void _XMSetBandwidthLimit(unsigned limit)
   XMOpalManager::GetManager()->SetBandwidthLimit(limit);
 }
 
+void _XMHandleNetworkConfigurationChange()
+{
+  XMOpalManager::GetManager()->HandleNetworkConfigurationChange();
+}
+
 void _XMSetNATInformation(const char * const *stunServers,
                           unsigned stunServerCount,
-                          const char *translationAddress,
-                          bool networkStatusChanged)
+                          const char *_publicAddress)
 {
   PStringArray servers = PStringArray(stunServerCount, stunServers, TRUE);
-  PString publicAddress = translationAddress;
-  XMOpalManager::GetManager()->SetNATInformation(servers, publicAddress, networkStatusChanged);
+  PString publicAddress = _publicAddress;
+  XMOpalManager::GetManager()->SetNATInformation(servers, publicAddress);
+}
+
+void _XMHandlePublicAddressUpdate(const char *_publicAddress)
+{
+  PString publicAddress = _publicAddress;
+  XMOpalManager::GetManager()->HandlePublicAddressUpdate(publicAddress);
 }
 
 void _XMSetPortRanges(unsigned int udpPortMin, 
@@ -73,13 +83,6 @@ void _XMSetPortRanges(unsigned int udpPortMin,
   theManager->SetUDPPorts(udpPortMin, udpPortMax);
   theManager->SetTCPPorts(tcpPortMin, tcpPortMax);
   theManager->SetRtpIpPorts(rtpPortMin, rtpPortMax);
-}
-
-void _XMHandleNetworkConfigurationChange()
-{
-  //XMOpalManager::GetH323EndPoint()->HandleNetworkStatusChange();
-  //XMOpalManager::GetSIPEndPoint()->HandleNetworkStatusChange();
-  XMOpalManager::GetManager()->HandleNetworkStatusChange();
 }
 
 #pragma mark -

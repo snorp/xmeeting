@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.40 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.41 2008/09/02 23:55:09 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,62 +39,62 @@ public:
 	static XMSIPEndPoint * GetSIPEndPoint();
 	static XMEndPoint * GetCallEndPoint();
   
-  /* Handle network status changes */
-  void HandleNetworkStatusChange();
+  /* Handle network configuration changes */
+  void HandleNetworkConfigurationChange();
+  
+  /* NAT methods */
+	void SetNATInformation(const PStringArray & stunServers,
+                         const PString & publicAddress);
+  void HandlePublicAddressUpdate(const PString & publicAddress);
     
-    /* Initiating a call */
-    unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, 
-                          const char *origAddressString, XMCallEndReason * callEndReason);
-    void HandleCallInitiationFailed(XMCallEndReason endReason);
+  /* Initiating a call */
+  unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, 
+                        const char *origAddressString, XMCallEndReason * callEndReason);
+  void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
 	/* getting/setting call information */
-    void LockCallInformation();
-    void UnlockCallInformation();
+  void LockCallInformation();
+  void UnlockCallInformation();
 	void GetCallInformation(PString & remoteName,
-							PString & remoteNumber,
-							PString & remoteAddress,
-							PString & remoteApplication) const;
+                          PString & remoteNumber,
+                          PString & remoteAddress,
+                          PString & remoteApplication) const;
 	void SetCallInformation(const PString & connectionToken,
-							const PString & remoteName,
-							const PString & remoteNumber,
-							const PString & remoteAddress,
-							const PString & remoteApplication,
-							XMCallProtocol callProtocol);
+                          const PString & remoteName,
+                          const PString & remoteNumber,
+                          const PString & remoteAddress,
+                          const PString & remoteApplication,
+                          XMCallProtocol callProtocol);
 	
 	/* getting call statistics */
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
-    static void ExtractCallStatistics(const OpalConnection & connection,
-                                      XMCallStatisticsRecord *callStatistics);
+  static void ExtractCallStatistics(const OpalConnection & connection,
+                                    XMCallStatisticsRecord *callStatistics);
 	
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
 	virtual void OnReleased(OpalConnection & connection);
 	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, bool requiresPatchThread = true);
     
-    void OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
-    void OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
+  void OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
+  void OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
 	
 	/* General setup methods */
 	void SetUserName(const PString & name);
 
 	/* Bandwidth usage */
-    unsigned GetBandwidthLimit() const { return bandwidthLimit; }
+  unsigned GetBandwidthLimit() const { return bandwidthLimit; }
 	void SetBandwidthLimit(unsigned limit) { bandwidthLimit = limit; }
 	unsigned GetVideoBandwidthLimit() const { return bandwidthLimit - 64000; }
-	
-    /* NAT methods */
-	void SetNATInformation(const PStringArray & stunServers,
-						   const PString & translationAddress,
-                           bool networkStatusChanged);
 	
 	/* Audio setup methods */
 	void SetAudioPacketTime(unsigned audioPacketTime);
 	void SetCurrentAudioPacketTime(unsigned audioPacketTime);
 	unsigned GetCurrentAudioPacketTime();
     
-    /* H.264 methods */
-    bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
-    void SetEnableH264LimitedMode(bool _enable) { enableH264LimitedMode = _enable; }
+  /* H.264 methods */
+  bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
+  void SetEnableH264LimitedMode(bool _enable) { enableH264LimitedMode = _enable; }
 	
 	/* getting /setting information about current call */
 	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
@@ -107,36 +107,74 @@ public:
 	/* Debug log information */
 	static void LogMessage(const PString & message);
     
-    /* Convenience function to define current codec bandwidth limits */
-    static unsigned GetH261BandwidthLimit();
-    static unsigned GetH263BandwidthLimit();
-    static unsigned GetH264BandwidthLimit();
+  /* Convenience function to define current codec bandwidth limits */
+  static unsigned GetH261BandwidthLimit();
+  static unsigned GetH263BandwidthLimit();
+  static unsigned GetH264BandwidthLimit();
 	
 private:
-      
-    void HandleSTUNInformation(PSTUNClient::NatTypes natType,
+  void UpdateSTUNInformation();
+  void SetupNatTraversal();
+  void HandleSTUNInformation(PSTUNClient::NatTypes natType,
                                const PString & publicAddress);
-    bool HasNetworkInterfaces() const;
+  bool HasNetworkInterfaces() const;
+  
+  class XMInterfaceMonitor : public OpalManager::InterfaceMonitor
+  {
+    PCLASSINFO(XMInterfaceMonitor, OpalManager::InterfaceMonitor);
     
-    PStringArray stunServers;
+    public:
+      XMInterfaceMonitor(OpalManager & manager);
+      void OnAddInterface(const PIPSocket::InterfaceEntry & entry);
+      void OnRemoveInterface(const PIPSocket::InterfaceEntry & entry);
+  };
+  
+  class XMSTUNClient : public PSTUNClient
+  {
+    PCLASSINFO(XMSTUNClient, PSTUNClient);
     
-    unsigned bandwidthLimit;
+    public:
+      XMSTUNClient();
+      bool GetEnabled() const { return enabled; }
+      void SetEnabled(bool _enabled) { enabled = _enabled; } 
+      //virtual bool GetInterfaceAddress(PIPSocket::Address & internalAddress);
+    
+    private:
+      bool enabled;
+  };
+  
+  class XMSTUNUpdateThread : public PThread
+  {
+    PCLASSINFO(XMSTUNUpdateThread, PThread);
+    
+    public:
+      XMSTUNUpdateThread(XMOpalManager & manager);
+      virtual void Main();
+    private:
+      XMOpalManager & manager;
+  };
+  
+  PStringArray stunServers;
+  PString publicAddress;
+  PMutex natMutex;
+  
+  unsigned bandwidthLimit;
 	
 	unsigned defaultAudioPacketTime;
 	unsigned currentAudioPacketTime;
-    
-    bool enableH264LimitedMode;
+  
+  bool enableH264LimitedMode;
 	
-    PMutex callInformationMutex;
+  PMutex callInformationMutex;
 	PString connectionToken;
 	PString remoteName;
 	PString remoteNumber;
 	PString remoteAddress;
 	PString remoteApplication;
-    PString origRemoteAddress;
+  PString origRemoteAddress;
 	XMCallProtocol callProtocol;
     
-    XMCallEndReason *callEndReason;
+  XMCallEndReason *callEndReason;
 };
 
 #endif // __XM_OPAL_MANAGER_H__

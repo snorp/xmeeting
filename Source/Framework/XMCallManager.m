@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.54 2008/08/29 11:32:29 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.55 2008/09/02 23:55:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,7 +113,6 @@ enum {
   
   recentCalls = [[NSMutableArray alloc] initWithCapacity:10];
   
-  networkConfigurationChanged = YES;
   systemSleepStatus = Awake;
   h323ProtocolStatus = XMProtocolStatus_Disabled;
   sipProtocolStatus = XMProtocolStatus_Disabled;
@@ -961,7 +960,6 @@ enum {
 - (void)_networkConfigurationChanged
 {
   if (systemSleepStatus == Awake) {
-    networkConfigurationChanged = YES;
     [XMOpalDispatcher _handleNetworkConfigurationChange];
   }
 }
@@ -971,6 +969,12 @@ enum {
   if (state == WaitingForCheckipAddress) {
     state = SubsystemSetup;
     [self _doSubsystemSetupWithPreferences:activePreferences];
+  } else if (state != SubsystemSetup) {
+    NSString *checkipPublicAddress = [_XMUtilsSharedInstance _checkipPublicAddress];
+    if (checkipPublicAddress != nil && [activePreferences publicAddress] == nil) {
+      // address changed, and no 'fixed' public address is to be used
+      [XMOpalDispatcher _handlePublicAddressUpdate:checkipPublicAddress];
+    }
   }
 }
 
@@ -1014,12 +1018,10 @@ enum {
   
   automaticallyAcceptIncomingCalls = [preferences automaticallyAcceptIncomingCalls];
   
-  NSString *publicAddress = nil;
-  publicAddress = [_XMUtilsSharedInstance _checkipPublicAddress];
+  NSString *checkipPublicAddress = [_XMUtilsSharedInstance _checkipPublicAddress];
   
   // preparations complete
-  [XMOpalDispatcher _setPreferences:preferences publicAddress:publicAddress networkConfigurationChanged:networkConfigurationChanged];
-  networkConfigurationChanged = NO;
+  [XMOpalDispatcher _setPreferences:preferences publicAddress:checkipPublicAddress];
 }
 
 - (void)_initiateCall:(XMAddressResource *)addressResource
@@ -1137,7 +1139,7 @@ enum {
   systemSleepStatus = Awake;
 
   // update the network information and re-register
-  networkConfigurationChanged = YES;
+  [XMOpalDispatcher _handleNetworkConfigurationChange];
   [self _doSubsystemSetupWithPreferences:activePreferences];
 }
 

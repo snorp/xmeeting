@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.24 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.25 2008/09/02 23:55:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,8 +32,9 @@
   BOOL doesWaitForSIPRegistrationCompletion;
 }
 
-+ (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress networkConfigurationChanged:(BOOL)networkConfigurationChanged;
++ (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress;
 + (void)_handleNetworkConfigurationChange;
++ (void)_handlePublicAddressUpdate:(NSString *)publicAddress;
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
 + (void)_initiateSpecificCallToAddress:(NSString *)address 

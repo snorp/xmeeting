@@ -1812,6 +1812,8 @@
 		D1013A0707CA9B670041BCDB /* OPAL */ = {
 			isa = PBXGroup;
 			children = (
+				D163350907A1C576003FD9C0 /* XMOpalManager.h */,
+				D163350A07A1C576003FD9C0 /* XMOpalManager.cpp */,
 				D15F721E0E54BADA0006CB43 /* H323 */,
 				D1AD249C0E67342100143295 /* SIP */,
 				D1972B0008FC529C00295E05 /* XMPacketBuilder.c */,
@@ -1826,7 +1828,6 @@
 				D1971A5E08FA453F00295E05 /* XMMediaFormats.cpp */,
 				D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */,
 				D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */,
-				D163350A07A1C576003FD9C0 /* XMOpalManager.cpp */,
 				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
 				D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */,
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
@@ -1844,7 +1845,6 @@
 				D1971A5D08FA453F00295E05 /* XMMediaFormats.h */,
 				D1971F0A08FAB3F400295E05 /* XMMediaStream.h */,
 				D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */,
-				D163350907A1C576003FD9C0 /* XMOpalManager.h */,
 				D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */,
 				D163364E07A456C4003FD9C0 /* XMProcess.h */,
 				D197216908FADEE300295E05 /* XMReceiverMediaPatch.h */,
@@ -3400,7 +3400,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ -f ../ptlib/include/ptbuildopts.h ];\nthen\necho \"PTLib: Running configure not needed\";\nelse\necho \"PTLib: Running configure\";\ncd ../ptlib\n./configure --enable-minsize --enable-video --enable-sasl --enable-openssl --enable-plugins\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PTLib: Running bison not needed\";\nelse\necho \"PTLib: Running bison\";\n/usr/bin/bison ../ptlib/src/ptlib/common/getdate.y -o ../ptlib/src/ptlib/common/getdate.tab.c \nfi";
+			shellScript = "if [ -f ../ptlib/include/ptbuildopts.h ];\nthen\necho \"PTLib: Running configure not needed\";\nelse\necho \"PTLib: Running configure\";\ncd ../ptlib\n./configure --enable-minsize --enable-video --enable-sasl --enable-openssl --enable-plugins --enable-resolver\n\ncd ../XMeeting\nfi\n\nif [ -f ../opal/include/opal/buildopts.h ]\nthen\necho \"OPAL: running configure not needed\";\nelse\necho \"OPAL: running configure\";\ncd ../opal\n./configure --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --disable-rfc4175\ncd ../XMeeting\nfi\n\nif [ -f ../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\necho \"PTLib: Running bison not needed\";\nelse\necho \"PTLib: Running bison\";\n/usr/bin/bison ../ptlib/src/ptlib/common/getdate.y -o ../ptlib/src/ptlib/common/getdate.tab.c \nfi";
 		};
 		D1AD19370E630C2D00143295 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
