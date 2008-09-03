@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.67 2008/09/03 01:19:33 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.68 2008/09/03 22:30:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -104,6 +104,7 @@ XMOpalManager::XMOpalManager()
   
   stun = new XMSTUNClient();
   interfaceMonitor = new XMInterfaceMonitor(*this);
+  interfaceUpdateThread = NULL;
 }
 
 XMOpalManager::~XMOpalManager()
@@ -111,9 +112,10 @@ XMOpalManager::~XMOpalManager()
   h323EndPointInstance->CleanUp();
   sipEndPointInstance->CleanUp();
   
-  // ensure the STUN update thread has finished
-  natMutex.Wait();
-  natMutex.Signal();
+  if (interfaceUpdateThread != NULL) {
+    interfaceUpdateThread->WaitForTermination();
+    delete interfaceUpdateThread;
+  }
 }
 
 #pragma mark -
@@ -563,12 +565,19 @@ void XMOpalManager::SetUserName(const PString & username)
 
 void XMOpalManager::HandleNetworkConfigurationChange()
 {
-  PInterfaceMonitor::GetInstance().RefreshInterfaceList();
-  
-  // Also update the STUN information. Do this in a separate
-  // thread to avoid blocking the OpalDispatcher thread
-  PWaitAndSignal m(natMutex);
-  new XMSTUNUpdateThread(*this);
+  // When the interfaces change, the STUN values should be updated
+  // If there is a BlockedNat in between, the update task takes quite some time.
+  // However, the STUN information should be updated BEFORE other parties
+  // (gatekeepers, reigstrations) update themselves. Therefore, the STUN
+  // has to be updated before they get informed about the interface changes.
+  //
+  // On the other side, the OpalDispatcher thread should not block for a long
+  // time. Hence, the interface update is done in a separate thread
+  if (interfaceUpdateThread != NULL) {
+    interfaceUpdateThread->WaitForTermination();
+    delete interfaceUpdateThread;
+  }
+  interfaceUpdateThread = new XMInterfaceUpdateThread(*this);
 }
 
 void XMOpalManager::SetNATInformation(const PStringArray & _stunServers,
@@ -591,20 +600,20 @@ void XMOpalManager::SetNATInformation(const PStringArray & _stunServers,
   
   stunServers = _stunServers;
   
-  SetupNatTraversal();
+  SetupNATTraversal();
 }
 
-void XMOpalManager::UpdateSTUNInformation()
+void XMOpalManager::UpdateNetworkInterfaces()
 {
   PWaitAndSignal m(natMutex);
-  stun->InvalidateCache();
-  SetupNatTraversal();
+  PInterfaceMonitor::GetInstance().RefreshInterfaceList();
 }
 
-void XMOpalManager::SetupNatTraversal()
+void XMOpalManager::SetupNATTraversal()
 {
   
   XMSTUNClient *stunClient = (XMSTUNClient *)stun;
+  stun->InvalidateCache();
   
   // Don't try the STUN servers if there are no network interfaces present,
   // as this only leads to timeouts
@@ -810,19 +819,20 @@ unsigned XMOpalManager::GetH264BandwidthLimit()
 #pragma mark -
 #pragma mark STUN Classes
 
-XMOpalManager::XMInterfaceMonitor::XMInterfaceMonitor(OpalManager & manager)
-: OpalManager::InterfaceMonitor(manager)
+XMOpalManager::XMInterfaceMonitor::XMInterfaceMonitor(XMOpalManager & _manager)
+: OpalManager::InterfaceMonitor(_manager),
+  manager(_manager)
 {
 }
 
 void XMOpalManager::XMInterfaceMonitor::OnAddInterface(const PIPSocket::InterfaceEntry & entry)
 {
-  // do nothing here, as STUN updates are handled separately
+  manager.SetupNATTraversal();
 }
 
 void XMOpalManager::XMInterfaceMonitor::OnRemoveInterface(const PIPSocket::InterfaceEntry & entry)
 {
-  // do nothing here, as STUN updates are handled separately
+  manager.SetupNATTraversal();
 }
 
 XMOpalManager::XMSTUNClient::XMSTUNClient()
@@ -831,17 +841,17 @@ XMOpalManager::XMSTUNClient::XMSTUNClient()
 {
 }
 
-XMOpalManager::XMSTUNUpdateThread::XMSTUNUpdateThread(XMOpalManager & _manager)
-: PThread(10000), // stack size no longer used apparently
+XMOpalManager::XMInterfaceUpdateThread::XMInterfaceUpdateThread(XMOpalManager & _manager)
+: PThread(10000, NoAutoDeleteThread), // stack size no longer used apparently
   manager(_manager)
 {
   Resume();
 }
 
-void XMOpalManager::XMSTUNUpdateThread::Main()
+void XMOpalManager::XMInterfaceUpdateThread::Main()
 {
   // The DNS lookup using gethostbyname() apparently does not yet work right after
   // the interfaces have come up. Wait some time and hope it works afterwards.
   PThread::Sleep(100);
-  manager.UpdateSTUNInformation();
+  manager.UpdateNetworkInterfaces();
 }

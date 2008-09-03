@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.41 2008/09/02 23:55:09 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.42 2008/09/03 22:30:14 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,8 +113,8 @@ public:
   static unsigned GetH264BandwidthLimit();
 	
 private:
-  void UpdateSTUNInformation();
-  void SetupNatTraversal();
+  void UpdateNetworkInterfaces();
+  void SetupNATTraversal();
   void HandleSTUNInformation(PSTUNClient::NatTypes natType,
                                const PString & publicAddress);
   bool HasNetworkInterfaces() const;
@@ -124,9 +124,11 @@ private:
     PCLASSINFO(XMInterfaceMonitor, OpalManager::InterfaceMonitor);
     
     public:
-      XMInterfaceMonitor(OpalManager & manager);
+      XMInterfaceMonitor(XMOpalManager & manager);
       void OnAddInterface(const PIPSocket::InterfaceEntry & entry);
       void OnRemoveInterface(const PIPSocket::InterfaceEntry & entry);
+    private:
+      XMOpalManager & manager;
   };
   
   class XMSTUNClient : public PSTUNClient
@@ -143,12 +145,12 @@ private:
       bool enabled;
   };
   
-  class XMSTUNUpdateThread : public PThread
+  class XMInterfaceUpdateThread : public PThread
   {
-    PCLASSINFO(XMSTUNUpdateThread, PThread);
+    PCLASSINFO(XMInterfaceUpdateThread, PThread);
     
     public:
-      XMSTUNUpdateThread(XMOpalManager & manager);
+      XMInterfaceUpdateThread(XMOpalManager & manager);
       virtual void Main();
     private:
       XMOpalManager & manager;
@@ -156,6 +158,7 @@ private:
   
   PStringArray stunServers;
   PString publicAddress;
+  XMInterfaceUpdateThread *interfaceUpdateThread;
   PMutex natMutex;
   
   unsigned bandwidthLimit;
