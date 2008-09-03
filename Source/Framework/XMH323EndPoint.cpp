@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.37 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.38 2008/09/03 22:28:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,12 +26,21 @@
 
 #pragma mark Init & Deallocation
 
+class XMOpalTransportUDP : public OpalTransportUDP
+{
+  PCLASSINFO(XMOpalTransportUDP, OpalTransportUDP);
+  
+public:
+  XMOpalTransportUDP(OpalEndPoint & endpoint, PIPSocket::Address binding = PIPSocket::GetDefaultIpAny(), WORD port = 0, bool reuseAddr = false);
+};
+
 class XMH323Gatekeeper : public H323Gatekeeper
 {
   PCLASSINFO(XMH323Gatekeeper, H323Gatekeeper);
   
 public:
   XMH323Gatekeeper(XMH323EndPoint & endpoint, H323Transport * transport);
+  virtual H323Transport * CreateTransport(PIPSocket::Address binding = PIPSocket::GetDefaultIpAny(), WORD port = 0, bool reuseAddr = false);
   virtual bool MakeRequest(Request & request);
   virtual bool OnReceiveRegistrationConfirm(const H225_RegistrationConfirm &);
   
@@ -44,14 +53,14 @@ class XMH323GkRegistrationThread : public PThread
   PCLASSINFO(XMH323GkRegistrationThread, PThread);
   
 public:
-  XMH323GkRegistrationThread(XMH323EndPoint *ep,
+  XMH323GkRegistrationThread(XMH323EndPoint & ep,
                              const PString & address,
                              const PString & terminalAlias1,
                              const PString & terminalAlias2,
                              const PString & password);
   virtual void Main();
 private:
-  XMH323EndPoint *ep;
+  XMH323EndPoint & ep;
   PString address;
   PString terminalAlias1;
   PString terminalAlias2;
@@ -144,7 +153,7 @@ void XMH323EndPoint::SetGatekeeper(const PString & address,
     }
     // Run a separate thread for the registration
     hasGkRegistrationThread = true;
-    new XMH323GkRegistrationThread(this, address, terminalAlias1, terminalAlias2, password);
+    new XMH323GkRegistrationThread(*this, address, terminalAlias1, terminalAlias2, password);
   }
 }
 
@@ -231,7 +240,10 @@ void XMH323EndPoint::HandleNetworkStatusChange()
 
 H323Gatekeeper * XMH323EndPoint::CreateGatekeeper(H323Transport * transport)
 {
-  return new XMH323Gatekeeper(*this, transport);
+  // use a custom XMOpalTransportUDP instance to ensure the underlying socket bundle
+  // uses a NAT method (probably STUN)
+  delete transport;
+  return new XMH323Gatekeeper(*this, new XMOpalTransportUDP(*this));
 }
 
 void XMH323EndPoint::OnRegistrationConfirm()
@@ -356,10 +368,28 @@ void XMH323EndPoint::RemoveReleasingConnection(XMH323Connection * connection)
 #pragma mark -
 #pragma mark XMH323Gatekeeper methods
 
+XMOpalTransportUDP::XMOpalTransportUDP(OpalEndPoint & endpoint, PIPSocket::Address binding, WORD port, bool reuseAddr)
+: OpalTransportUDP(endpoint, binding, port)
+{
+  if (writeChannel) {
+    PMonitoredSocketsPtr bundle = ((PMonitoredSocketChannel *)writeChannel)->GetMonitoredSockets();
+    
+    // reopen the bundle's socket with STUN nat traversal
+    bundle->Close();
+    bundle->SetNatMethod(endpoint.GetManager().GetSTUN());
+    bundle->Open(port);
+  }
+}
+
 XMH323Gatekeeper::XMH323Gatekeeper(XMH323EndPoint & theEp, H323Transport * transport)
 : H323Gatekeeper(theEp, transport),
   ep(theEp)
 {
+}
+
+OpalTransport * XMH323Gatekeeper::CreateTransport(PIPSocket::Address binding, WORD port, bool reuseAddr)
+{
+  return new XMOpalTransportUDP(endpoint, binding, port, reuseAddr);
 }
 
 bool XMH323Gatekeeper::MakeRequest(Request & request)
@@ -430,23 +460,23 @@ bool XMH323Gatekeeper::OnReceiveRegistrationConfirm(const H225_RegistrationConfi
 #pragma mark -
 #pragma mark XMH323GkRegistrationThread methods
 
-XMH323GkRegistrationThread::XMH323GkRegistrationThread(XMH323EndPoint *theEp,
-                                                       const PString & theAddress,
-                                                       const PString & theTerminalAlias1,
-                                                       const PString & theTerminalAlias2,
-                                                       const PString & thePassword)
+XMH323GkRegistrationThread::XMH323GkRegistrationThread(XMH323EndPoint  & _ep,
+                                                       const PString & _address,
+                                                       const PString & _terminalAlias1,
+                                                       const PString & _terminalAlias2,
+                                                       const PString & _password)
 : PThread(10000), // stack size no longer used apparently
-  ep(theEp),
-  address(theAddress),
-  terminalAlias1(theTerminalAlias1),
-  terminalAlias2(theTerminalAlias2),
-  password(thePassword)
+  ep(_ep),
+  address(_address),
+  terminalAlias1(_terminalAlias1),
+  terminalAlias2(_terminalAlias2),
+  password(_password)
 {
   Resume();
 }
 
 void XMH323GkRegistrationThread::Main() 
 {
-  ep->DoSetGatekeeper(address, terminalAlias1, terminalAlias2, password);
-  ep->HandleGkRegistrationThreadFinished();
+  ep.DoSetGatekeeper(address, terminalAlias1, terminalAlias2, password);
+  ep.HandleGkRegistrationThreadFinished();
 }
