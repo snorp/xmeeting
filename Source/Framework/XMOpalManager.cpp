@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.66 2008/09/02 23:55:09 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.67 2008/09/03 01:19:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -840,5 +840,8 @@ XMOpalManager::XMSTUNUpdateThread::XMSTUNUpdateThread(XMOpalManager & _manager)
 
 void XMOpalManager::XMSTUNUpdateThread::Main()
 {
+  // The DNS lookup using gethostbyname() apparently does not yet work right after
+  // the interfaces have come up. Wait some time and hope it works afterwards.
+  PThread::Sleep(100);
   manager.UpdateSTUNInformation();
 }
