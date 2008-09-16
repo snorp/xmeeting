@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.58 2008/09/02 23:55:08 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.59 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -192,10 +192,9 @@ void _XMSetH323Functionality(bool enableFastStart, bool enableH245Tunnel)
 void _XMSetGatekeeper(const char *address, 
                       const char *terminalAlias1, 
                       const char *terminalAlias2,
-                      const char *password,
-                      bool block)
+                      const char *password)
 {
-  XMOpalManager::GetH323EndPoint()->SetGatekeeper(address, terminalAlias1, terminalAlias2, password, block);
+  XMOpalManager::GetH323EndPoint()->SetGatekeeper(address, terminalAlias1, terminalAlias2, password);
 }
 
 bool _XMIsRegisteredAtGatekeeper()

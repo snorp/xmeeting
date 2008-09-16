@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.51 2008/09/02 23:55:08 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.52 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -161,8 +161,7 @@ extern "C" {
   void _XMSetGatekeeper(const char *address, 
                         const char *terminalAlias1, 
                         const char *terminalAlias2,
-                        const char *password,
-                        bool block);
+                        const char *password);
   
   /**
    * reports whether we are registered at a gk or not

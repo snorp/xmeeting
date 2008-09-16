@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.68 2008/09/03 22:30:14 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.69 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -87,9 +87,10 @@ XMOpalManager::XMOpalManager()
   
   callEndReason = NULL;
   
-  // Create an interface monitor which does NOT run a monitor thread
-  PInterfaceMonitor *monitor = new PInterfaceMonitor(0, false);
-  monitor->SetInterfaceFilter(new XMInterfaceFilter());
+  // do NOT run the interfac monitor update thread, as we're doing this through callbacks from the system. 
+  // Also use a custom interface filter to ensure that only ever one interface is used.
+  PInterfaceMonitor::GetInstance().SetRunMonitorThread(false);
+  PInterfaceMonitor::GetInstance().SetInterfaceFilter(new XMInterfaceFilter());
   
   OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
   SetEchoCancelParams(params);

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.34 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.35 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -291,6 +291,15 @@ void _XMHandleGatekeeperUnregistration()
 	[autoreleasePool release];
 }
 
+void _XMHandleGatekeeperRegistrationComplete()
+{
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistrationComplete];
+	
+	[autoreleasePool release];
+}
+
 #pragma mark -
 #pragma mark SIP specific Callbacks
 
@@ -327,11 +336,11 @@ void _XMHandleSIPRegistrationFailure(const char *_aor, XMSIPStatusCode failReaso
 	[autoreleasePool release];
 }
 
-void _XMHandleSIPRegistrationSetupCompleted()
+void _XMHandleSIPRegistrationComplete()
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[_XMOpalDispatcherSharedInstance _handleRegistrationSetupCompleted];
+	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationComplete];
 	
 	[autoreleasePool release];
 }

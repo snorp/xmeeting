@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.20 2008/08/28 11:07:22 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.21 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,18 +32,13 @@ public:
 	void SetGatekeeper(const PString & address,
                      const PString & terminalAlias1, 
                      const PString & terminalAlias2,
-                     const PString & password,
-                     bool block);
-  void DoSetGatekeeper(const PString & address,
-                       const PString & terminalAlias1,
-                       const PString & terminalAlias2,
-                       const PString & password);
-  void HandleGkRegistrationThreadFinished();
-  void HandleRegistrationConfirm() const;
-	void HandleNetworkStatusChange();
+                     const PString & password);
+  void HandleRegistrationConfirm();
+  void HandleRegistrationFailure(XMGatekeeperRegistrationStatus status);
+  void HandleUnregistration();
   virtual H323Gatekeeper * CreateGatekeeper(H323Transport * transport);
 	virtual void OnRegistrationConfirm();
-  PMutex & GetAliasNamesMutex() { return aliasNamesMutex; }
+  PMutex & GetGatekeeperMutex() { return gatekeeperMutex; }
 	
 	// obtaining call statistics
 	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
@@ -73,10 +68,11 @@ public:
   void RemoveReleasingConnection(XMH323Connection * connection);
 	
 private:
+  
   bool isListening;
   PString gatekeeperAddress;
-  bool hasGkRegistrationThread;
-  PMutex aliasNamesMutex;
+  bool notifyGkRegistrationComplete;
+  PMutex gatekeeperMutex;
   
   PMutex releasingConnectionsMutex;
   PList<XMH323Connection> releasingConnections;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.25 2008/09/02 23:55:08 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.26 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,7 @@
   NSTimer *controlTimer;
   NSTimer *callStatisticsUpdateIntervalTimer;
   
+  NSLock *gatekeeperRegistrationWaitLock;
   NSLock *sipRegistrationWaitLock;
   BOOL doesWaitForSIPRegistrationCompletion;
 }
@@ -105,9 +106,13 @@
 
 - (void)_handleSIPRegistrationFailure:(NSString *)aor failReason:(XMSIPStatusCode)failReason;
 
-	// called every time the Framework completes SIP Registration
+  // called every time the Framework completes the Gatekeeper registration
   // may be called on any thread
-- (void)_handleRegistrationSetupCompleted;
+- (void)_handleGatekeeperRegistrationComplete;
+
+	// called every time the Framework completes the SIP registration
+  // may be called on any thread
+- (void)_handleSIPRegistrationComplete;
 
 @end
 

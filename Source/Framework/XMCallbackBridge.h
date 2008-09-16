@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.36 2008/08/26 08:14:07 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.37 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -175,6 +175,7 @@ void _XMHandleAudioTestEnd();
 void _XMHandleGatekeeperRegistration(const char *gatekeeperName, const char *gatekeeperAliases);
 void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus failure);
 void _XMHandleGatekeeperUnregistration();
+void _XMHandleGatekeeperRegistrationComplete();
 
 #pragma mark -
 #pragma mark SIP specific callbacks
@@ -182,7 +183,7 @@ void _XMHandleGatekeeperUnregistration();
 void _XMHandleSIPRegistration(const char *registration);
 void _XMHandleSIPUnregistration(const char *registration);
 void _XMHandleSIPRegistrationFailure(const char *registration, XMSIPStatusCode failReason);
-void _XMHandleSIPRegistrationSetupCompleted();
+void _XMHandleSIPRegistrationComplete();
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.55 2008/09/02 23:55:08 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.56 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -93,8 +93,8 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_doPreferencesSetup:(XMPreferences *)preferences 
               publicAddress:(NSString *)publicAddress
                     verbose:(BOOL)verbose;
-- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose block:(BOOL)block;
-- (void)_doGatekeeperSetup:(XMPreferences *)preferences block:(BOOL)block;
+- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose;
+- (void)_doGatekeeperSetup:(XMPreferences *)preferences;
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose;
 - (void)_doRegistrationSetup:(XMPreferences *)preferences proxyChanged:(BOOL)proxyChanged;
 
@@ -521,6 +521,7 @@ typedef enum _XMOpalDispatcherMessage
   controlTimer = nil;
   callStatisticsUpdateIntervalTimer = nil;
   
+  gatekeeperRegistrationWaitLock = [[NSLock alloc] init];
   sipRegistrationWaitLock = [[NSLock alloc] init];
   
   return self;
@@ -539,6 +540,7 @@ typedef enum _XMOpalDispatcherMessage
   [controlTimer release];
   [callStatisticsUpdateIntervalTimer release];
   
+  [gatekeeperRegistrationWaitLock release];
   [sipRegistrationWaitLock release];
   
   [super dealloc];
@@ -1351,10 +1353,10 @@ typedef enum _XMOpalDispatcherMessage
   [self _doSIPSetup:preferences verbose:verbose];
   
   // ***** Adjusting the H.323 Preferences ***** //
-  [self _doH323Setup:preferences verbose:verbose block:YES];
+  [self _doH323Setup:preferences verbose:verbose];
 }
 
-- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose block:(BOOL)block
+- (void)_doH323Setup:(XMPreferences *)preferences verbose:(BOOL)verbose
 {
   XMProtocolStatus protocolStatus;
   
@@ -1366,7 +1368,7 @@ typedef enum _XMOpalDispatcherMessage
       _XMSetH323Functionality([preferences enableFastStart], [preferences enableH245Tunnel]);
       
       // setting up the gatekeeper
-      [self _doGatekeeperSetup:preferences block:block];
+      [self _doGatekeeperSetup:preferences];
     } else { // Enabling the h323 subsystem failed
       protocolStatus = XMProtocolStatus_Error;
     }
@@ -1374,7 +1376,8 @@ typedef enum _XMOpalDispatcherMessage
     protocolStatus = XMProtocolStatus_Disabled;
     
     // unregistering from the gk if registered
-    _XMSetGatekeeper(NULL, NULL, NULL, NULL, block);
+    [gatekeeperRegistrationWaitLock lock]; // will be unlocked from another thread
+    _XMSetGatekeeper(NULL, NULL, NULL, NULL);
     
     // disabling the H.323 Listeners 
     _XMEnableH323(NO);
@@ -1387,7 +1390,7 @@ typedef enum _XMOpalDispatcherMessage
   }
 }
 
-- (void)_doGatekeeperSetup:(XMPreferences *)preferences block:(BOOL)block
+- (void)_doGatekeeperSetup:(XMPreferences *)preferences
 {
   const char *gatekeeperAddress = "";
   const char *gatekeeperTerminalAlias1 = "";
@@ -1413,11 +1416,11 @@ typedef enum _XMOpalDispatcherMessage
   }
   
   // the result of this operation will be handled through callbacks
+  [gatekeeperRegistrationWaitLock lock]; // will be unlocked from another thread
   _XMSetGatekeeper(gatekeeperAddress, 
                    gatekeeperTerminalAlias1, 
                    gatekeeperTerminalAlias2,
-                   gatekeeperPassword,
-                   block);
+                   gatekeeperPassword);
 }
 
 - (void)_doSIPSetup:(XMPreferences *)preferences verbose:(BOOL)verbose
@@ -1469,7 +1472,7 @@ typedef enum _XMOpalDispatcherMessage
   NSArray *records = [preferences sipRegistrationRecords];
   unsigned count = [records count];
   
-  [sipRegistrationWaitLock lock]; // will be unlocked from within -_handleRegistrationSetupCompleted
+  [sipRegistrationWaitLock lock]; // will be unlocked from within -_handleSIPRegistrationSetupComplete
   
   _XMPrepareRegistrationSetup(proxyInfoChanged);
   
@@ -1504,8 +1507,10 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_waitForSubsystemSetupCompletion
 {
-  // Since the SIP Registration performs asynchronously,
+  // Since the registrations perform asynchronously,
   // we wait here until this task has completed
+  [gatekeeperRegistrationWaitLock lock];
+  [gatekeeperRegistrationWaitLock unlock];
   [sipRegistrationWaitLock lock];
   [sipRegistrationWaitLock unlock];
 }
@@ -1571,7 +1576,12 @@ typedef enum _XMOpalDispatcherMessage
   [errorNumber release];
 }
 
-- (void)_handleRegistrationSetupCompleted
+- (void)_handleGatekeeperRegistrationComplete
+{
+  [gatekeeperRegistrationWaitLock unlock];
+}
+
+- (void)_handleSIPRegistrationComplete
 {
   [sipRegistrationWaitLock unlock];
 }
@@ -1591,12 +1601,10 @@ typedef enum _XMOpalDispatcherMessage
   
   // retry to enable H.323 if it previously failed
   if (enableH323 && _XMIsH323Enabled() == NO) {
-    [self _doH323Setup:currentPreferences verbose:YES block:NO];
+    [self _doH323Setup:currentPreferences verbose:YES];
   }
-  // retry to register at the gatekeeper if it previously failed
-  else if (enableH323 && useGatekeeper && _XMIsRegisteredAtGatekeeper() == NO) {
-    [self _doGatekeeperSetup:currentPreferences block:NO];
-  }
+  // if the gatekeeper registration fails, the OPAL gatekeeper code will automatically try
+  // to re-register
   
   // retry to enable SIP if it previously failed
   if (enableSIP && _XMIsSIPEnabled() == NO) {

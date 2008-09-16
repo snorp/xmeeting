@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.39 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.40 2008/09/16 23:16:05 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -288,7 +288,7 @@ void XMSIPEndPoint::CheckRegistrationProcess()
   }
   
   if (completed == true) {
-    _XMHandleSIPRegistrationSetupCompleted();
+    _XMHandleSIPRegistrationComplete();
   }
 }
 
