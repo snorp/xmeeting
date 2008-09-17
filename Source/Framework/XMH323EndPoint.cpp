@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.39 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.40 2008/09/17 21:22:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,7 +39,10 @@ protected:
   virtual bool DiscoverGatekeeper();
   
 private:
+  void CheckDoesUseSTUN();
+  
   XMH323EndPoint & ep;
+  bool doesUseSTUN;
 };
 
 class XMH323GkRegistrationThread : public PThread
@@ -343,10 +346,28 @@ XMH323Gatekeeper::XMH323Gatekeeper(XMH323EndPoint & theEp, H323Transport * trans
 : H323Gatekeeper(theEp, transport),
   ep(theEp)
 {
+  CheckDoesUseSTUN();
 }
 
 bool XMH323Gatekeeper::DiscoverGatekeeper()
 {
+  if (!doesUseSTUN) {
+    CheckDoesUseSTUN();
+    if (doesUseSTUN) {
+      // previously, STUN couldn't be used, but now it seems to work
+      // all existing UDP sockets of the transport aren't PSTUNUDPSockets.
+      // recreate the underlying transport to get working STUN udp sockets
+      OpalTransportAddress remoteAddress = transport->GetRemoteAddress();
+      delete transport;
+      transport = new H323TransportUDP(ep);
+      if (!transport->ConnectTo(remoteAddress)) {
+        return false;
+      }
+      if (!StartChannel()) {
+        return false;
+      }
+    }
+  }
   bool result = H323Gatekeeper::DiscoverGatekeeper();
   
   if (!result) {
@@ -433,4 +454,21 @@ bool XMH323Gatekeeper::OnReceiveRegistrationConfirm(const H225_RegistrationConfi
   // possible race condition since RCF may cause additional aliases to be added
   PWaitAndSignal m(ep.GetGatekeeperMutex());
   return H323Gatekeeper::OnReceiveRegistrationConfirm(confirm);
+}
+
+void XMH323Gatekeeper::CheckDoesUseSTUN()
+{
+  PSTUNClient *stunClient = ep.GetManager().GetSTUNClient();
+  PSTUNClient::NatTypes natType = stunClient->GetNatType();
+  
+  switch(natType) {
+    case PSTUNClient::UnknownNat :
+    case PSTUNClient::SymmetricFirewall :
+    case PSTUNClient::PortRestrictedNat :
+    case PSTUNClient::SymmetricNat : // not sure if this is really needed
+      doesUseSTUN = false;
+      return;
+    default:
+      doesUseSTUN = true;
+  }
 }
