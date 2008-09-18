@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.69 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.70 2008/09/18 23:08:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,13 +38,11 @@ static XMSIPEndPoint *sipEndPointInstance = NULL;
 
 void XMOpalManager::InitOpal(const PString & pTracePath)
 {	
-  if (theProcess == NULL)
-  {
+  if (theProcess == NULL) {
     PProcess::PreInitialise(0, 0, 0);
     theProcess = new XMProcess;
     
-    if (pTracePath != NULL)
-    {
+    if (pTracePath != NULL) {
       PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
     }
     
@@ -78,16 +76,16 @@ XMOpalManager::XMOpalManager()
   defaultAudioPacketTime = 0;
   currentAudioPacketTime = 0;
   
-  connectionToken = "";
+  currentCallToken = "";
   remoteName = "";
   remoteNumber = "";
   remoteAddress = "";
   remoteApplication = "";
   origRemoteAddress = "";
   
-  callEndReason = NULL;
+  callEndReason = XMCallEndReasonCount;
   
-  // do NOT run the interfac monitor update thread, as we're doing this through callbacks from the system. 
+  // do NOT run the interface monitor update thread, as we're doing this through callbacks from the system. 
   // Also use a custom interface filter to ensure that only ever one interface is used.
   PInterfaceMonitor::GetInstance().SetRunMonitorThread(false);
   PInterfaceMonitor::GetInstance().SetInterfaceFilter(new XMInterfaceFilter());
@@ -145,52 +143,82 @@ XMSIPEndPoint * XMOpalManager::GetSIPEndPoint()
 #pragma mark -
 #pragma mark Initiating a call
 
-unsigned XMOpalManager::InitiateCall(XMCallProtocol protocol, 
-                                     const char * remoteParty, 
-                                     const char * origAddressString,
-                                     XMCallEndReason * _callEndReason)
+void XMOpalManager::InitiateCall(XMCallProtocol protocol, 
+                                 const char * remoteParty, 
+                                 const char * origAddressString)
 {
-  PString token;
-  unsigned callID = 0;
-  
-  if (!HasNetworkInterfaces()) {
-    *_callEndReason = XMCallEndReason_EndedByNoNetworkInterfaces;
-    return callID;
-  }
-  
-  
-  callEndReason = _callEndReason;
-  bool returnValue = GetCallEndPoint()->StartCall(protocol, remoteParty, token);
-  callEndReason = NULL;
-  
-  if (returnValue == true)
+  // sanity check, should not happen
   {
-	callID = token.AsUnsigned();
-	
-	origRemoteAddress = origAddressString;
+    PWaitAndSignal m(callMutex);
+    if (currentCallToken != "") {
+      _XMHandleCallStartInfo(NULL, XMCallEndReasonCount);
+      return;
+    }
   }
   
-  return callID;
+  // Attempting to call without any network interfaces may lead to nasty error messages
+  // and blocking timeouts
+  if (!HasNetworkInterfaces()) {
+    _XMHandleCallStartInfo(NULL, XMCallEndReason_EndedByNoNetworkInterfaces);
+    return;
+  }
+
+  // prepare A and B party
+  PString partyB;
+  switch (protocol) {
+    case XMCallProtocol_H323:
+      partyB = "h323:";
+      break;
+    case XMCallProtocol_SIP:
+      partyB = "sip:";
+      break;  
+    default: // should not happen, serious logic error
+      _XMHandleCallStartInfo(NULL, XMCallEndReasonCount);
+      return;
+  }
+  PString partyA = "xm:*";
+  partyB += remoteParty;
+  SetCallProtocol(protocol);
+    
+  // Start the call
+  callMutex.Wait();
+  bool success = SetUpCall(partyA, partyB, currentCallToken);
+  callMutex.Signal();
+  
+  if (success) {
+    origRemoteAddress = origAddressString;
+    _XMHandleCallStartInfo(currentCallToken, XMCallEndReasonCount);
+  } else {
+    _XMHandleCallStartInfo(NULL, callEndReason);
+  }
 }
 
 void XMOpalManager::HandleCallInitiationFailed(XMCallEndReason endReason)
 {
-  if (callEndReason != NULL) {
-	*callEndReason = endReason;
-  }
+  callEndReason = endReason;
 }
 
 #pragma mark -
 #pragma mark Getting / Setting Call Information
 
+bool XMOpalManager::SetCurrentCallToken(const PString & callToken)
+{
+  PWaitAndSignal m(callMutex);
+  if (currentCallToken != "") {
+    return false;
+  }
+  currentCallToken = callToken;
+  return true;
+}
+
 void XMOpalManager::LockCallInformation()
 {
-  callInformationMutex.Wait();
+  callMutex.Wait();
 }
 
 void XMOpalManager::UnlockCallInformation()
 {
-  callInformationMutex.Signal();
+  callMutex.Signal();
 }
 
 void XMOpalManager::GetCallInformation(PString & theRemoteName,
@@ -215,7 +243,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 									   const PString & theRemoteApplication,
 									   XMCallProtocol theCallProtocol)
 {
-  PWaitAndSignal m(callInformationMutex);
+  /*PWaitAndSignal m(callMutex);
   
   bool isValid = false;
   
@@ -246,7 +274,7 @@ void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
 	  origRemoteAddress = "";
 	  callProtocol = XMCallProtocol_UnknownProtocol;
 	}
-  }
+  }*/
 }
 
 #pragma mark -
@@ -402,95 +430,96 @@ void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
 
 void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {
-  unsigned callID = call.GetToken().AsUnsigned();
+  const PString & callToken = call.GetToken();
   
   // Determine if we were originating the call or not, by looking at
-  // the class of the endpoint associated with the first connection
+  // the prefix of the endpoint associated with the first connection
   // in the call dictionary.
   bool isIncomingCall = true;
-  OpalEndPoint & endPoint = call.GetConnection(0, PSafeReadOnly)->GetEndPoint();
-  if (PIsDescendant(&endPoint, XMEndPoint))
-  {
-	isIncomingCall = false;
+  const PString & prefix = call.GetConnection(0)->GetEndPoint().GetPrefixName();
+  if (prefix == XM_LOCAL_ENDPOINT_PREFIX) {
+    isIncomingCall = false;
   }
   
   // Determine the IP address this call is running on.
   // We need to have the other connection as the local XMConnection instance
   PSafePtr<OpalConnection> connection;
-  if (isIncomingCall)
-  {
-	connection = call.GetConnection(0);
-  }
-  else
-  {
-	connection = call.GetConnection(1);
+  if (isIncomingCall) {
+    connection = call.GetConnection(0);
+  } else {
+    connection = call.GetConnection(1);
   }
   PIPSocket::Address address(0);
   connection->GetTransport().GetLocalAddress().GetIpAddress(address);
   
-  if (address.IsValid())
-  {
-	_XMHandleCallEstablished(callID, isIncomingCall, address.AsString());
+  PString addressString = "";
+  if (address.IsValid()) {
+    addressString = address.AsString();
   }
-  else
-  {
-	_XMHandleCallEstablished(callID, isIncomingCall, "");
-  }
+  _XMHandleCallEstablished(callToken, isIncomingCall, addressString);
   OpalManager::OnEstablishedCall(call);
 }
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
-  unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+  // inform the framework, that a call has ended, if the released
+  // connection is an XMConnection instance.
+  // also provide the framework with informations about the local address
+  // (useful for call statistics)
+  
+  const PString & callToken = connection.GetCall().GetToken();
   
   if (PIsDescendant(&connection, XMConnection)) {
+    // If the other connection still exists, determine which local address was used
+    PSafePtr<OpalConnection> otherConnection = connection.GetOtherPartyConnection();
+    if (otherConnection != NULL) {
+      ExtractLocalAddress(callToken, otherConnection);
+    }
 	
-	// If the other connection still exists, determine which local address was used
-	PSafePtr<OpalConnection> otherConnection = connection.GetCall().GetOtherPartyConnection(connection);
-	if (otherConnection != NULL) {
-	  OpalTransport *transport = &(otherConnection->GetTransport());
-	  if (transport != NULL) {
-		PIPSocket::Address address(0);
-		OpalTransportAddress transportAddress = transport->GetLocalAddress();
-		transportAddress.GetIpAddress(address);
-		if (address.IsValid()) {
-		  _XMHandleLocalAddress(callID, address.AsString());
-		} else {
-		  _XMHandleLocalAddress(callID, "");
-		}
-	  }
-	}
+    // obtain the call end reason
+    XMCallEndReason endReason = (XMCallEndReason)connection.GetCallEndReason();
 	
-	XMCallEndReason endReason = (XMCallEndReason)connection.GetCallEndReason();
+    // complete the released callback before notifying the framework
+    OpalManager::OnReleased(connection);
 	
-	OpalManager::OnReleased(connection);
-	
-	// Notifying the obj-c world that the call has ended
-	_XMHandleCallCleared(callID, endReason);
-	currentAudioPacketTime = 0;
+    // Notify the framework that the call has ended
+    _XMHandleCallCleared(callToken, endReason);
+    
+    // reset the current call token and other variables
+    PWaitAndSignal m(callMutex);
+    if (currentCallToken == callToken) {
+      currentCallToken = "";
+    }
+    currentAudioPacketTime = 0;
 	
   } else {
 	
-	PSafePtr<OpalConnection> otherConnection = connection.GetCall().GetOtherPartyConnection(connection);
+    // obtain the XMConnection instance
+    PSafePtr<OpalConnection> otherConnection = connection.GetCall().GetOtherPartyConnection(connection);
 	
-	// If the XMConnection instance still exists, this connection is released first.
-	// Determine which local address was used, as this cannot be done when the other connection is released,
-	// since then this connection has already been removed
-	if (otherConnection != NULL) {
-	  OpalTransport *transport = &(connection.GetTransport());
-	  if (transport != NULL) {
-		PIPSocket::Address address(0);
-		OpalTransportAddress transportAddress = transport->GetLocalAddress();
-		transportAddress.GetIpAddress(address);
-		if (address.IsValid()) {
-		  _XMHandleLocalAddress(callID, address.AsString());
-		} else {
-		  _XMHandleLocalAddress(callID, "");
-		}
-	  }
-	}
+    // If the XMConnection instance still exists, the non-XMConnection instance is released first.
+    // extract the local address here, as this cannot be done when the XMConnection instance is released,
+    // since by then the current connection has already been removed.
+    if (otherConnection != NULL) { // first release
+      ExtractLocalAddress(callToken, &connection);
+    }
 	
-	OpalManager::OnReleased(connection);
+    OpalManager::OnReleased(connection);
+  }
+}
+
+void XMOpalManager::ExtractLocalAddress(const PString & callToken, OpalConnection *connection)
+{
+  OpalTransport *transport = &(connection->GetTransport()); // don't use the reference, as the transport may be NULL
+  if (transport != NULL) {
+    PIPSocket::Address address;
+    OpalTransportAddress transportAddress = transport->GetLocalAddress();
+    transportAddress.GetIpAddress(address);
+    PString addressString = "";
+    if (address.IsValid()) {
+      addressString = address.AsString();
+    }
+    _XMHandleLocalAddress(callToken, addressString);
   }
 }
 

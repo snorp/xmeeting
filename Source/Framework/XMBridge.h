@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.52 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.53 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -195,24 +195,21 @@ extern "C" {
   
   // This function causes the OPAL system to call the specified
   // remote party, using the specified protocol.
-  // The return value is the callID for this call, or zero if the call
-  // failed. A non-zero return value does not mean that the call was 
-  // successful in itself, only that the attempt to call the remote
-  // party was successful. The result of the call will then be reported
-  // back through callbacks.
+  // Returns true if a call attempt was successfully started. This does
+  // not mean that the call is successful in itself. The final result
+  // of the call will be reported back through other callbacks.
   // In case the initiation of the call failed, the reason will be passed
   // back through failReason
-  unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, 
-                           const char *origAddressString, XMCallEndReason *failReason);
+  void _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, const char *origAddressString);
   
   // Causes the OPAL system to accept the incoming call
-  void _XMAcceptIncomingCall(unsigned callID);
+  void _XMAcceptIncomingCall(const char *callToken);
   
   // Causes the OPAL system to reject the incomgin call
-  void _XMRejectIncomingCall(unsigned callID);
+  void _XMRejectIncomingCall(const char *callToken);
   
   // Causes the OPAL system to clear the existing call
-  void _XMClearCall(unsigned callID);
+  void _XMClearCall(const char *callToken);
   
   // These functions provide additional information about the remote party. 
   // Note that calling this function is only safe when the call is established
@@ -222,24 +219,24 @@ extern "C" {
   // safe!
   void _XMLockCallInformation();
   void _XMUnlockCallInformation();
-  void _XMGetCallInformation(unsigned callID,
+  void _XMGetCallInformation(const char *callToken,
                              const char** remoteName, 
                              const char** remoteNumber,
                              const char** remoteAddress, 
                              const char** remoteApplication);
   
   // Provides the relevant statistics data
-  void _XMGetCallStatistics(unsigned callID,
+  void _XMGetCallStatistics(const char *callToken,
                             XMCallStatisticsRecord *callStatistics);
   
 #pragma mark -
 #pragma mark InCall Functions
   
   bool _XMSetUserInputMode(XMUserInputMode userInputMode);
-  bool _XMSendUserInputTone(unsigned callID, const char tone);
-  bool _XMSendUserInputString(unsigned callID, const char *string);
-  bool _XMStartCameraEvent(unsigned callID, XMCameraEvent cameraEvent);
-  void _XMStopCameraEvent(unsigned callID);
+  bool _XMSendUserInputTone(const char *callToken, const char tone);
+  bool _XMSendUserInputString(const char *callToken, const char *string);
+  bool _XMStartCameraEvent(const char *callToken, XMCameraEvent cameraEvent);
+  void _XMStopCameraEvent(const char *callToken);
   
 #pragma mark -
 #pragma mark MediaTransmitter Functions

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.56 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.57 2008/09/18 23:08:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,8 @@
 #import "XMBridge.h"
 
 #import <unistd.h>
+
+NSString *SHUTDOWN_CALL_TOKEN = @"<Shutdown>";
 
 typedef enum _XMOpalDispatcherMessage
 {
@@ -103,7 +105,7 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_resyncSubsystem:(NSTimer *)timer;
 - (void)_updateCallStatistics:(NSTimer *)timer;
 
-- (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
+- (void)_doInitiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
 - (void)_sendCallStartFailReason:(XMCallStartFailReason)reason address:(NSString *)address;
 - (NSString *)_adjustedAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol;
 - (void)_runGatekeeperSetup:(XMPreferences *)preferences;
@@ -184,20 +186,17 @@ typedef enum _XMOpalDispatcherMessage
   [components release];
 }
 
-+ (void)_callIsAlerting:(unsigned)callID
++ (void)_callIsAlerting:(NSString *)callToken
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
-  
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, nil];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallIsAlerting withComponents:components];
   
   [components release];
 }
 
-+ (void)_incomingCall:(unsigned)callID
++ (void)_incomingCall:(NSString *)callToken
              protocol:(XMCallProtocol)protocol
            remoteName:(NSString *)remoteName
          remoteNumber:(NSString *)remoteNumber
@@ -205,11 +204,9 @@ typedef enum _XMOpalDispatcherMessage
     remoteApplication:(NSString *)remoteApplication
          localAddress:(NSString *)localAddress
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *callData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *callData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)protocol];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)protocol];
   NSData *protocolData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
@@ -228,125 +225,109 @@ typedef enum _XMOpalDispatcherMessage
   [components release];
 }
 
-+ (void)_acceptIncomingCall:(unsigned)callID
++ (void)_acceptIncomingCall:(NSString *)callToken
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_AcceptIncomingCall withComponents:components];
   
   [components release];
 }
 
-+ (void)_rejectIncomingCall:(unsigned)callID
++ (void)_rejectIncomingCall:(NSString *)callToken
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_RejectIncomingCall withComponents:components];
   
   [components release];
 }
 
-+ (void)_callEstablished:(unsigned)callID incoming:(BOOL)isIncomingCall localAddress:(NSString *)localAddress
++ (void)_callEstablished:(NSString *)callToken incoming:(BOOL)isIncomingCall localAddress:(NSString *)localAddress
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithBool:isIncomingCall];
+  NSNumber *number = [[NSNumber alloc] initWithBool:isIncomingCall];
   NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
   NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, addressData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, incomingData, addressData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallEstablished withComponents:components];
   
   [components release];
 }
 
-+ (void)_clearCall:(unsigned)callID
++ (void)_clearCall:(NSString *)callToken
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_ClearCall withComponents:components];
   
   [components release];
 }
 
-+ (void)_callCleared:(unsigned)callID reason:(XMCallEndReason)callEndReason
++ (void)_callCleared:(NSString *)callToken reason:(XMCallEndReason)callEndReason
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)callEndReason];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:(unsigned)callEndReason];
   NSData *callEndReasonData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, callEndReasonData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, callEndReasonData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallCleared withComponents:components];
   
   [components release];
 }
 
-+ (void)_callReleased:(unsigned)callID localAddress:(NSString *)localAddress
++ (void)_callReleased:(NSString *)callToken localAddress:(NSString *)localAddress
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
   NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, addressData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, addressData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallReleased withComponents:components];
   
   [components release];
 }
 
-+ (void)_audioStreamOpened:(unsigned)callID codec:(NSString *)codec incoming:(BOOL)isIncomingStream
++ (void)_audioStreamOpened:(NSString *)callToken codec:(NSString *)codec incoming:(BOOL)isIncomingStream
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
   NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:codec];
   
-  number = [[NSNumber alloc] initWithBool:isIncomingStream];
+  NSNumber *number = [[NSNumber alloc] initWithBool:isIncomingStream];
   NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, incomingData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, codecData, incomingData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_AudioStreamOpened withComponents:components];
   
   [components release];
 }
 
-+ (void)_videoStreamOpened:(unsigned)callID codec:(NSString *)codec size:(XMVideoSize)videoSize incoming:(BOOL)isIncomingStream
++ (void)_videoStreamOpened:(NSString *)callToken codec:(NSString *)codec size:(XMVideoSize)videoSize incoming:(BOOL)isIncomingStream
                      width:(unsigned)width height:(unsigned)height
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
   NSData *codecData = [NSKeyedArchiver archivedDataWithRootObject:codec];
   
-  number = [[NSNumber alloc] initWithUnsignedInt:videoSize];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:videoSize];
   NSData *sizeData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
@@ -362,41 +343,37 @@ typedef enum _XMOpalDispatcherMessage
   NSData *heightData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, codecData, sizeData, incomingData, widthData, heightData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, codecData, sizeData, incomingData, widthData, heightData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_VideoStreamOpened withComponents:components];
   
   [components release];
 }
 
-+ (void)_audioStreamClosed:(unsigned)callID incoming:(BOOL)isIncomingStream
++ (void)_audioStreamClosed:(NSString *)callToken incoming:(BOOL)isIncomingStream
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithBool:isIncomingStream];
+  NSNumber *number = [[NSNumber alloc] initWithBool:isIncomingStream];
   NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, incomingData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_AudioStreamClosed withComponents:components];
   
   [components release];
 }
 
-+ (void)_videoStreamClosed:(unsigned)callID incoming:(BOOL)isIncomingStream
++ (void)_videoStreamClosed:(NSString *)callToken incoming:(BOOL)isIncomingStream
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithBool:isIncomingStream];
+  NSNumber *number = [[NSNumber alloc] initWithBool:isIncomingStream];
   NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, incomingData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, incomingData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_VideoStreamClosed withComponents:components];
   
@@ -421,62 +398,54 @@ typedef enum _XMOpalDispatcherMessage
   [components release];
 }
 
-+ (void)_sendUserInputToneForCall:(unsigned)callID tone:(char)tone
++ (void)_sendUserInputToneForCall:(NSString *)callToken tone:(char)tone
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithChar:tone];
+  NSNumber *number = [[NSNumber alloc] initWithChar:tone];
   NSData *toneData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, toneData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, toneData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SendUserInputTone withComponents:components];
   
   [components release];
 }
 
-+ (void)_sendUserInputStringForCall:(unsigned)callID string:(NSString *)string
++ (void)_sendUserInputStringForCall:(NSString *)callToken string:(NSString *)string
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
   NSData *stringData = [NSKeyedArchiver archivedDataWithRootObject:string];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, stringData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, stringData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_SendUserInputString withComponents:components];
   
   [components release];
 }
 
-+ (void)_startCameraEventForCall:(unsigned)callID event:(XMCameraEvent)event
++ (void)_startCameraEventForCall:(NSString *)callToken event:(XMCameraEvent)event
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  number = [[NSNumber alloc] initWithUnsignedInt:event];
+  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:event];
   NSData *eventData = [NSKeyedArchiver archivedDataWithRootObject:number];
   [number release];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, eventData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, eventData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_StartCameraEvent withComponents:components];
   
   [components release];
 }
 
-+ (void)_stopCameraEventForCall:(unsigned)callID
++ (void)_stopCameraEventForCall:(NSString *)callToken
 {
-  NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:callID];
-  NSData *idData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
+  NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
   
-  NSArray *components = [[NSArray alloc] initWithObjects:idData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_StopCameraEvent withComponents:components];
   
@@ -516,7 +485,7 @@ typedef enum _XMOpalDispatcherMessage
   receivePort = [[NSPort port] retain];
   currentPreferences = nil;
   
-  callID = 0;
+  callToken = nil;
   
   controlTimer = nil;
   callStatisticsUpdateIntervalTimer = nil;
@@ -674,11 +643,11 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleShutdownMessage
 {
-  if (callID != 0) {
+  if (callToken != nil) {
     // we have to terminate the call first
     // and we wait until the call is cleared before shutting down the system entirely
     [self _handleClearCallMessage:nil];
-    callID = UINT_MAX;
+    callToken = SHUTDOWN_CALL_TOKEN;
     return;
   }
   
@@ -739,7 +708,7 @@ typedef enum _XMOpalDispatcherMessage
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
   XMCallProtocol protocol = (XMCallProtocol)[number unsignedIntValue];
   
-  if (callID != 0) {
+  if (callToken != nil) {
     // This probably indicates that an incoming call arrived at exactly the same time than
     // the user tried to initiate this call. Since the incoming call arrived first,
     // we cannot call anyone at the moment
@@ -747,7 +716,7 @@ typedef enum _XMOpalDispatcherMessage
     return;
   }
   
-  [self _initiateCallToAddress:address protocol:protocol];
+  [self _doInitiateCallToAddress:address protocol:protocol];
 }
 
 - (void)_handleInitiateSpecificCallMessage:(NSArray *)messageComponents
@@ -763,7 +732,7 @@ typedef enum _XMOpalDispatcherMessage
   XMPreferences *preferences = (XMPreferences *)[NSKeyedUnarchiver unarchiveObjectWithData:preferencesData];
   NSString *publicAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:publicAddressData];
   
-  if (callID != 0) {
+  if (callToken != nil) {
     // This probably indicates that an incoming call arrived at exactly the same time than
     // the user tried to initiate this call. Since the incoming call arrived first,
     // we cannot call anyone at the moment
@@ -774,22 +743,20 @@ typedef enum _XMOpalDispatcherMessage
   [self _doPreferencesSetup:preferences publicAddress:publicAddress verbose:NO];
   [self _waitForSubsystemSetupCompletion];
   
-  [self _initiateCallToAddress:address protocol:callProtocol];	
+  [self _doInitiateCallToAddress:address protocol:callProtocol];	
 }
 
 - (void)_handleCallIsAlertingMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
-  
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on IsAlerting: %d to currently %d", (int)theCallID, (int)callID);
-    return;
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
   }
   
-  if (callID == UINT_MAX) {
-    // we are shutting down anyway...
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on IsAlerting: %@ to currently %@", _callToken, callToken);
     return;
   }
   
@@ -800,7 +767,12 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleIncomingCallMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
+  if (callToken != nil) {
+    NSLog(@"have already call ongoing");
+    return;
+  }
+  
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
   NSData *protocolData = (NSData *)[messageComponents objectAtIndex:1];
   NSData *remoteNameData = (NSData *)[messageComponents objectAtIndex:2];
   NSData *remoteNumberData = (NSData *)[messageComponents objectAtIndex:3];
@@ -808,25 +780,12 @@ typedef enum _XMOpalDispatcherMessage
   NSData *remoteApplicationData = (NSData *)[messageComponents objectAtIndex:5];
   NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:6];
   
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
-  if (callID != 0) {
-    NSLog(@"have already call ongoing");
-    
-    if (theCallID > callID) {
-      NSLog(@"Incoming greater than callID");
-    } else if (theCallID < callID) {
-      NSLog(@"INcoming less than callID");
-    } else {
-      NSLog(@"Incoming EQUAL callID!!!!!");
-    }
-    return;
-  }
+  [callToken release];
+  callToken = [_callToken retain];
   
-  callID = theCallID;
-  
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
   XMCallProtocol protocol = (XMCallProtocol)[number unsignedIntValue];
   
   NSString *remoteName = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteNameData];
@@ -835,15 +794,15 @@ typedef enum _XMOpalDispatcherMessage
   NSString *remoteApplication = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteApplicationData];
   NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
   
-  XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
-                                                    protocol:protocol
-                                                  remoteName:remoteName
-                                                remoteNumber:remoteNumber
-                                               remoteAddress:remoteAddress
-                                           remoteApplication:remoteApplication
-                                                 callAddress:nil
-                                                localAddress:localAddress
-                                                  callStatus:XMCallStatus_Incoming];
+  XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallToken:callToken
+                                                       protocol:protocol
+                                                     remoteName:remoteName
+                                                   remoteNumber:remoteNumber
+                                                  remoteAddress:remoteAddress
+                                              remoteApplication:remoteApplication
+                                                    callAddress:nil
+                                                   localAddress:localAddress
+                                                     callStatus:XMCallStatus_Incoming];
   
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleIncomingCall:)
                                                  withObject:callInfo
@@ -854,37 +813,46 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleAcceptIncomingCallMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [idNumber unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if (theCallID != callID) {
-    NSLog(@"callID mismatch in accpetIncomingCall: %d to current %d", (int)theCallID, (int)callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch in accpetIncomingCall: %@ to current %@", _callToken, callToken);
     return;
   }
   
-  _XMAcceptIncomingCall(callID);
+  _XMAcceptIncomingCall([callToken cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void)_handleRejectIncomingCallMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [idNumber unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if (theCallID != callID) {
-    NSLog(@"callID mismatch in rejectIncomingCall: %d to current %d", (int)theCallID, (int)callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch in rejectIncomingCall: %@ to current %@", _callToken, callToken);
     return;
   }
   
-  _XMRejectIncomingCall(callID);
+  _XMRejectIncomingCall([callToken cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void)_handleCallEstablishedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [idNumber unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
+  
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
   NSData *incomingData = (NSData *)[messageComponents objectAtIndex:1];
   NSNumber *incomingNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:incomingData];
@@ -893,8 +861,8 @@ typedef enum _XMOpalDispatcherMessage
   NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:2];
   NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
   
-  if (theCallID != callID) {
-    NSLog(@"callID mismatch in callEstablished: %d to current %d", (int)theCallID, (int)callID);
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch in callEstablished: %@ to current %@", _callToken, callToken);
     return;
   }
   
@@ -907,7 +875,7 @@ typedef enum _XMOpalDispatcherMessage
     const char *remoteApplication;
     
     _XMLockCallInformation();
-    _XMGetCallInformation(callID, &remoteName, &remoteNumber, &remoteAddress, &remoteApplication);
+    _XMGetCallInformation([callToken cStringUsingEncoding:NSASCIIStringEncoding], &remoteName, &remoteNumber, &remoteAddress, &remoteApplication);
     
     NSString *remoteNameString = [[NSString alloc] initWithCString:remoteName encoding:NSASCIIStringEncoding];
     NSString *remoteNumberString = [[NSString alloc] initWithCString:remoteNumber encoding:NSASCIIStringEncoding];
@@ -941,43 +909,45 @@ typedef enum _XMOpalDispatcherMessage
 - (void)_handleClearCallMessage:(NSArray *)messageComponents
 {
   if (messageComponents != nil) {
-    NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-    NSNumber *idNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-    unsigned theCallID = [idNumber unsignedIntValue];
+    if (callToken == SHUTDOWN_CALL_TOKEN) {
+      return; // shutting down anyway...
+    }
     
-    if (theCallID != callID) {
-      NSLog(@"callID mismatch in clearCall: %d to current %d", (int)theCallID, (int)callID);
+    NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+    NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+    
+    if (![callToken isEqualToString:_callToken]) {
+      NSLog(@"call token mismatch in clearCall: %@ to current %@", _callToken, callToken);
       return;
     }
   }
   
-  _XMClearCall(callID);
+  _XMClearCall([callToken cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void)_handleCallClearedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *callIDNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [callIDNumber unsignedIntValue];
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
-  // If call initiation fails, no callID is set (zero), don't log this
-  if ((theCallID != callID) && (callID != UINT_MAX) && (callID != 0)) {
-    NSLog(@"callID mismatch in callCleared: %d to current %d", (int)theCallID, (int)callID);
+  // If call initiation fails, no call token is set (nil), don't log this
+  if (callToken != nil && callToken != SHUTDOWN_CALL_TOKEN && ![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch in callCleared: %@ to current %@", _callToken, callToken);
     return;
   }
   
   _XMStopAudio();
   
   NSData *callEndReasonData = (NSData *)[messageComponents objectAtIndex:1];
-  NSNumber *callEndReason = [NSKeyedUnarchiver unarchiveObjectWithData:callEndReasonData];
+  NSNumber *callEndReasonNumber = [NSKeyedUnarchiver unarchiveObjectWithData:callEndReasonData];
   
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallCleared:)
-                                                 withObject:callEndReason
+                                                 withObject:callEndReasonNumber
                                               waitUntilDone:NO];
   
-  if (callID == UINT_MAX) {
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
     // the framework is closing
-    callID = 0;
+    callToken = nil;
     [self _handleShutdownMessage];
   }
   
@@ -987,17 +957,20 @@ typedef enum _XMOpalDispatcherMessage
     callStatisticsUpdateIntervalTimer = nil;
   }
   
-  callID = 0;
+  callToken = nil;
 }
 
 - (void)_handleCallReleasedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *callIDNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [callIDNumber unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"callID mismatch in callReleased: %d to current %d", (int)theCallID, (int)callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch in callReleased: %@ to current %@", _callToken, callToken);
     return;
   }
   
@@ -1011,12 +984,15 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleAudioStreamOpenedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if (theCallID != callID) {
-    NSLog(@"CallID mismatch on AudioStreamOpened: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on AudioStreamOpened: %@ to actual %@", _callToken, callToken);
     return;
   }
   
@@ -1024,7 +1000,7 @@ typedef enum _XMOpalDispatcherMessage
   NSString *codec = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:codecData];
   
   NSData *directionData = (NSData *)[messageComponents objectAtIndex:2];
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
   BOOL isIncomingStream = [number boolValue];
   
   if (isIncomingStream == YES) {
@@ -1038,12 +1014,15 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleVideoStreamOpenedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if (theCallID != 0 && theCallID != callID) {
-    NSLog(@"CallID mismatch on VideoStreamOpened: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (callToken != nil && callToken != SHUTDOWN_CALL_TOKEN && ![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on VideoStreamOpened: %@ to actual %@", _callToken, callToken);
     return;
   }
   
@@ -1051,7 +1030,7 @@ typedef enum _XMOpalDispatcherMessage
   NSString *codec = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:codecData];
   
   NSData *sizeData = (NSData *)[messageComponents objectAtIndex:2];
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:sizeData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:sizeData];
   XMVideoSize videoSize = (XMVideoSize)[number unsignedIntValue];
   
   NSData *directionData = (NSData *)[messageComponents objectAtIndex:3];
@@ -1101,17 +1080,20 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleAudioStreamClosedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on MediaStreamClosed: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on MediaStreamClosed: %@ to actual %@", _callToken, callToken);
     return;
   }
   
   NSData *directionData = (NSData *)[messageComponents objectAtIndex:1];
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
   BOOL isIncomingStream = [number boolValue];
   
   if (isIncomingStream == YES) {
@@ -1125,17 +1107,20 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleVideoStreamClosedMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on MediaStreamClosed: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on MediaStreamClosed: %@ to actual %@", _callToken, callToken);
     return;
   }
   
   NSData *directionData = (NSData *)[messageComponents objectAtIndex:1];
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:directionData];
   BOOL isIncomingStream = [number boolValue];
   
   if (isIncomingStream == YES) {
@@ -1164,72 +1149,82 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleSendUserInputToneMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on SendUserInputTone: %@ to actual %@", _callToken, callToken);
     return;
   }
   
   NSData *toneData = (NSData *)[messageComponents objectAtIndex:1];
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:toneData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:toneData];
   char tone = [number charValue];
   
-  _XMSendUserInputTone(theCallID, tone);
+  _XMSendUserInputTone([callToken cStringUsingEncoding:NSASCIIStringEncoding], tone);
   
 }
 
 - (void)_handleSendUserInputStringMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on SendUserInputString: %@ to actual %@", _callToken, callToken);
     return;
   }
   
   NSData *stringData = (NSData *)[messageComponents objectAtIndex:1];
   NSString *string = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:stringData];
   
-  const char *theString = [string cStringUsingEncoding:NSASCIIStringEncoding];
-  
-  _XMSendUserInputString(theCallID, theString);
+  _XMSendUserInputString([callToken cStringUsingEncoding:NSASCIIStringEncoding], [string cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void)_handleStartCameraEventMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on StartCameraEvent: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on StartCameraEvent: %@ to actual %@", _callToken, callToken);
     return;
   }
   
   NSData *eventData = (NSData *)[messageComponents objectAtIndex:1];
-  number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:eventData];
+  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:eventData];
   XMCameraEvent cameraEvent = (XMCameraEvent)[number unsignedIntValue];
   
-  _XMStartCameraEvent(theCallID, cameraEvent);
+  _XMStartCameraEvent([callToken cStringUsingEncoding:NSASCIIStringEncoding], cameraEvent);
 }
 
 - (void)_handleStopCameraEventMessage:(NSArray *)messageComponents
 {
-  NSData *idData = (NSData *)[messageComponents objectAtIndex:0];
-  NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:idData];
-  unsigned theCallID = [number unsignedIntValue];
+  if (callToken == SHUTDOWN_CALL_TOKEN) {
+    return; // shutting down anyway...
+  }
   
-  if ((theCallID != callID) && (callID != UINT_MAX)) {
-    NSLog(@"CallID mismatch on StopCameraEvent: %d to actual %d", theCallID, callID);
+  NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
+  NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on StopCameraEvent: %@ to actual %@", _callToken, callToken);
     return;
   }
   
-  _XMStopCameraEvent(theCallID);
+  _XMStopCameraEvent([callToken cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 #pragma mark -
@@ -1586,6 +1581,13 @@ typedef enum _XMOpalDispatcherMessage
   [sipRegistrationWaitLock unlock];
 }
 
+- (void)_handleCallStartToken:(NSString *)_callToken callEndReason:(XMCallEndReason)_callEndReason
+{
+  // call token must be nil
+  callToken = [_callToken copy];
+  callEndReason = _callEndReason;
+}
+
 #pragma mark -
 #pragma mark Methods fired by Timers
 
@@ -1597,7 +1599,6 @@ typedef enum _XMOpalDispatcherMessage
   
   BOOL enableH323 = [currentPreferences enableH323];
   BOOL enableSIP = [currentPreferences enableSIP];
-  BOOL useGatekeeper = ([currentPreferences gatekeeperTerminalAlias1] != nil);
   
   // retry to enable H.323 if it previously failed
   if (enableH323 && _XMIsH323Enabled() == NO) {
@@ -1616,7 +1617,7 @@ typedef enum _XMOpalDispatcherMessage
 {
   XMCallStatistics *callStatistics = [[XMCallStatistics alloc] _init];
   
-  _XMGetCallStatistics(callID, [callStatistics _callStatisticsRecord]);
+  _XMGetCallStatistics([callToken cStringUsingEncoding:NSASCIIStringEncoding], [callStatistics _callStatisticsRecord]);
   
   [XMMediaTransmitter _setVideoBytesSent:[callStatistics _callStatisticsRecord]->videoBytesSent];
   
@@ -1630,8 +1631,9 @@ typedef enum _XMOpalDispatcherMessage
 #pragma mark -
 #pragma mark Private Helper Methods
 
-- (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
+- (void)_doInitiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol
 {
+  // sanity checks. They are done here since the exact subsystem status is known only here
   if ((protocol == XMCallProtocol_H323) && (_XMIsH323Enabled() == NO)) {
     // Trying to make a H.323 call but H.323 isn't enabled
     [self _sendCallStartFailReason:XMCallStartFailReason_H323NotEnabled address:address];
@@ -1655,30 +1657,30 @@ typedef enum _XMOpalDispatcherMessage
   
   const char *addressString = [adjustedAddress cStringUsingEncoding:NSASCIIStringEncoding];
   const char *origAddressString = [address cStringUsingEncoding:NSASCIIStringEncoding];
-  XMCallEndReason endReason;
-  callID = _XMInitiateCall(protocol, addressString, origAddressString, &endReason);
   
-  if (callID == 0) {
+  _XMInitiateCall(protocol, addressString, origAddressString); // will set the call token through a callback
+  
+  if (callToken == nil) {
     XMCallStartFailReason failReason = XMCallStartFailReason_UnknownFailure;
-    if (endReason == XMCallEndReason_EndedByTransportFail) {
+    if (callEndReason == XMCallEndReason_EndedByTransportFail) {
       failReason = XMCallStartFailReason_TransportFail;
-    }
-    if (endReason == XMCallEndReason_EndedByNoNetworkInterfaces) {
+    } else if (callEndReason == XMCallEndReason_EndedByNoNetworkInterfaces) {
       failReason = XMCallStartFailReason_NoNetworkInterfaces;
     }
     
     // Initiating the call failed
     [self _sendCallStartFailReason:failReason address:address];
   } else {
-    XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallID:callID
-                                                      protocol:protocol
-                                                    remoteName:nil
-                                                  remoteNumber:nil
-                                                 remoteAddress:nil
-                                             remoteApplication:nil
-                                                   callAddress:address
-                                                  localAddress:nil
-                                                    callStatus:XMCallStatus_Calling];
+    // the missing information is added later on, when the remote party details are known
+    XMCallInfo *callInfo = [[XMCallInfo alloc] _initWithCallToken:callToken
+                                                         protocol:protocol
+                                                       remoteName:nil
+                                                     remoteNumber:nil
+                                                    remoteAddress:nil
+                                                remoteApplication:nil
+                                                      callAddress:address
+                                                     localAddress:nil
+                                                       callStatus:XMCallStatus_Calling];
     
     [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallInitiated:)
                                                    withObject:callInfo

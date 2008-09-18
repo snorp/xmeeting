@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.42 2008/09/03 22:30:14 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.43 2008/09/18 23:08:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,11 +48,12 @@ public:
   void HandlePublicAddressUpdate(const PString & publicAddress);
     
   /* Initiating a call */
-  unsigned InitiateCall(XMCallProtocol protocol, const char * remoteParty, 
-                        const char *origAddressString, XMCallEndReason * callEndReason);
+  void InitiateCall(XMCallProtocol protocol, const char * remoteParty, 
+                        const char *origAddressString);
   void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
 	/* getting/setting call information */
+  bool SetCurrentCallToken(const PString & callToken); // only used for incoming calls
   void LockCallInformation();
   void UnlockCallInformation();
 	void GetCallInformation(PString & remoteName,
@@ -118,6 +119,7 @@ private:
   void HandleSTUNInformation(PSTUNClient::NatTypes natType,
                                const PString & publicAddress);
   bool HasNetworkInterfaces() const;
+  void ExtractLocalAddress(const PString & callToken, OpalConnection * connection);
   
   class XMInterfaceMonitor : public OpalManager::InterfaceMonitor
   {
@@ -139,7 +141,6 @@ private:
       XMSTUNClient();
       bool GetEnabled() const { return enabled; }
       void SetEnabled(bool _enabled) { enabled = _enabled; } 
-      //virtual bool GetInterfaceAddress(PIPSocket::Address & internalAddress);
     
     private:
       bool enabled;
@@ -168,8 +169,8 @@ private:
   
   bool enableH264LimitedMode;
 	
-  PMutex callInformationMutex;
-	PString connectionToken;
+  PMutex callMutex;
+  PString currentCallToken;
 	PString remoteName;
 	PString remoteNumber;
 	PString remoteAddress;
@@ -177,7 +178,8 @@ private:
   PString origRemoteAddress;
 	XMCallProtocol callProtocol;
     
-  XMCallEndReason *callEndReason;
+  // used during InitiateCall()
+  XMCallEndReason callEndReason;
 };
 
 #endif // __XM_OPAL_MANAGER_H__

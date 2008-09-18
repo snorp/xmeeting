@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.h,v 1.14 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMCallInfo.h,v 1.15 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,7 +24,7 @@
 @interface XMCallInfo : NSObject {
 	
 @private
-  unsigned callID;	//identifier for the call token in OPAL
+  NSString *callToken;	//the call token in OPAL
   
   XMCallProtocol protocol;
   NSString *remoteName;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.55 2008/09/02 23:55:08 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.56 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -281,8 +281,7 @@ enum {
     return;
   }
   
-  unsigned callID = [activeCall _callID];
-  [XMOpalDispatcher _acceptIncomingCall:callID];
+  [XMOpalDispatcher _acceptIncomingCall:[activeCall _callToken]];
 }
 
 - (void)rejectIncomingCall
@@ -297,8 +296,7 @@ enum {
     return;
   }
   
-  unsigned callID = [activeCall _callID];
-  [XMOpalDispatcher _rejectIncomingCall:callID];
+  [XMOpalDispatcher _rejectIncomingCall:[activeCall _callToken]];
 }
 
 - (void)clearActiveCall
@@ -314,9 +312,8 @@ enum {
   
   state = TerminatingCall;
   
-  unsigned callID = [activeCall _callID];
   [activeCall _setCallStatus:XMCallStatus_Terminating];
-  [XMOpalDispatcher _clearCall:callID];
+  [XMOpalDispatcher _clearCall:[activeCall _callToken]];
 }
 
 - (unsigned)recentCallsCount
@@ -429,8 +426,7 @@ enum {
     return;
   }
   
-  unsigned callID = [activeCall _callID];
-  [XMOpalDispatcher _sendUserInputToneForCall:callID tone:tone];
+  [XMOpalDispatcher _sendUserInputToneForCall:[activeCall _callToken] tone:tone];
 }
 
 - (void)sendUserInputString:(NSString *)string
@@ -440,8 +436,7 @@ enum {
     return;
   }
   
-  unsigned callID = [activeCall _callID];
-  [XMOpalDispatcher _sendUserInputStringForCall:callID string:string];
+  [XMOpalDispatcher _sendUserInputStringForCall:[activeCall _callToken] string:string];
 }
 
 - (BOOL)canSendCameraEvents
@@ -456,8 +451,7 @@ enum {
     return;
   }
   
-  unsigned callID = [activeCall _callID];
-  [XMOpalDispatcher _startCameraEventForCall:callID event:cameraEvent];
+  [XMOpalDispatcher _startCameraEventForCall:[activeCall _callToken] event:cameraEvent];
 }
 
 - (void)stopCameraEvent
@@ -467,8 +461,7 @@ enum {
     return;
   }
   
-  unsigned callID = [activeCall _callID];
-  [XMOpalDispatcher _stopCameraEventForCall:callID];
+  [XMOpalDispatcher _stopCameraEventForCall:[activeCall _callToken]];
 }
 
 #pragma mark -
@@ -558,7 +551,7 @@ enum {
   state = InCall;
   
   if (automaticallyAcceptIncomingCalls == YES) {
-    [XMOpalDispatcher _acceptIncomingCall:[activeCall _callID]];
+    [XMOpalDispatcher _acceptIncomingCall:[activeCall _callToken]];
   } else {
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidReceiveIncomingCall object:self];
   }

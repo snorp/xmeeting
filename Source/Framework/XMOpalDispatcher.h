@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.26 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.27 2008/09/18 23:08:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,8 @@
   NSPort *receivePort;
   XMPreferences *currentPreferences;
   
-  unsigned callID;
+  NSString *callToken;
+  XMCallEndReason callEndReason; // used during -_doInitiateCall
   
   NSTimer *controlTimer;
   NSTimer *callStatisticsUpdateIntervalTimer;
@@ -39,51 +40,51 @@
 
 + (void)_initiateCallToAddress:(NSString *)address protocol:(XMCallProtocol)protocol;
 + (void)_initiateSpecificCallToAddress:(NSString *)address 
-							  protocol:(XMCallProtocol)protocol
-						   preferences:(XMPreferences *)preferences 
-					   publicAddress:(NSString *)publicAddress;
-+ (void)_callIsAlerting:(unsigned)callID;
-+ (void)_incomingCall:(unsigned)callID
-			 protocol:(XMCallProtocol)callProtocol
-		   remoteName:(NSString *)remoteName
-		 remoteNumber:(NSString *)remoteNumber
-		remoteAddress:(NSString *)remoteAddress
-	remoteApplication:(NSString *)remoteApplication
-		 localAddress:(NSString *)localAddress;
-+ (void)_acceptIncomingCall:(unsigned)callID;
-+ (void)_rejectIncomingCall:(unsigned)callID;
-+ (void)_callEstablished:(unsigned)callID 
-				incoming:(BOOL)isIncomingCall
-			localAddress:(NSString *)localAddress;
-+ (void)_clearCall:(unsigned)callID;
-+ (void)_callCleared:(unsigned)callID reason:(XMCallEndReason)callEndReason;
-+ (void)_callReleased:(unsigned)callID localAddress:(NSString *)localAddress;
+                              protocol:(XMCallProtocol)protocol
+                           preferences:(XMPreferences *)preferences 
+                         publicAddress:(NSString *)publicAddress;
++ (void)_callIsAlerting:(NSString *)callToken;
++ (void)_incomingCall:(NSString *)callToken
+             protocol:(XMCallProtocol)callProtocol
+           remoteName:(NSString *)remoteName
+         remoteNumber:(NSString *)remoteNumber
+        remoteAddress:(NSString *)remoteAddress
+    remoteApplication:(NSString *)remoteApplication
+         localAddress:(NSString *)localAddress;
++ (void)_acceptIncomingCall:(NSString *)callToken;
++ (void)_rejectIncomingCall:(NSString *)callToken;
++ (void)_callEstablished:(NSString *)callToken 
+                incoming:(BOOL)isIncomingCall
+            localAddress:(NSString *)localAddress;
++ (void)_clearCall:(NSString *)callToken;
++ (void)_callCleared:(NSString *)callToken reason:(XMCallEndReason)callEndReason;
++ (void)_callReleased:(NSString *)callToken localAddress:(NSString *)localAddress;
 
-+ (void)_audioStreamOpened:(unsigned)callID 
-					 codec:(NSString *)codec
-				  incoming:(BOOL)isIncomingStream;
-+ (void)_videoStreamOpened:(unsigned)callID 
-					 codec:(NSString *)codec 
-					  size:(XMVideoSize)videoSize
-				  incoming:(BOOL)isIncomingStream
-					 width:(unsigned)width
-					height:(unsigned)height;
++ (void)_audioStreamOpened:(NSString *)callToken 
+                     codec:(NSString *)codec
+                  incoming:(BOOL)isIncomingStream;
++ (void)_videoStreamOpened:(NSString *)callToken 
+                     codec:(NSString *)codec 
+                      size:(XMVideoSize)videoSize
+                  incoming:(BOOL)isIncomingStream
+                     width:(unsigned)width
+                    height:(unsigned)height;
 
-+ (void)_audioStreamClosed:(unsigned)callID
-				  incoming:(BOOL)isIncomingStream;
-+ (void)_videoStreamClosed:(unsigned)callID 
-				  incoming:(BOOL)isIncomingStream;
++ (void)_audioStreamClosed:(NSString *)callToken
+                  incoming:(BOOL)isIncomingStream;
++ (void)_videoStreamClosed:(NSString *)callToken 
+                  incoming:(BOOL)isIncomingStream;
 
 + (void)_feccChannelOpened;
 
 + (void)_setUserInputMode:(XMUserInputMode)userInputMode;
-+ (void)_sendUserInputToneForCall:(unsigned)callID
-							 tone:(char)tone;
-+ (void)_sendUserInputStringForCall:(unsigned)callID
-							 string:(NSString *)string;
-+ (void)_startCameraEventForCall:(unsigned)callID 
-						   event:(XMCameraEvent)event;
-+ (void)_stopCameraEventForCall:(unsigned)callID;
++ (void)_sendUserInputToneForCall:(NSString *)callToken
+                             tone:(char)tone;
++ (void)_sendUserInputStringForCall:(NSString *)callToken
+                             string:(NSString *)string;
++ (void)_startCameraEventForCall:(NSString *)callToken 
+                           event:(XMCameraEvent)event;
++ (void)_stopCameraEventForCall:(NSString *)callToken;
 
 - (id)_init;
 - (void)_close;
@@ -113,6 +114,8 @@
 	// called every time the Framework completes the SIP registration
   // may be called on any thread
 - (void)_handleSIPRegistrationComplete;
+
+- (void)_handleCallStartToken:(NSString *)callToken callEndReason:(XMCallEndReason)callEndReason;
 
 @end
 

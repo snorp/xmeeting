@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.59 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.60 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -79,6 +79,8 @@ void _XMSetPortRanges(unsigned int udpPortMin,
                       unsigned int rtpPortMin,
                       unsigned int rtpPortMax)
 {
+  tcpPortMin = 22;
+  tcpPortMax = 22;
   XMOpalManager *theManager = XMOpalManager::GetManager();
   theManager->SetUDPPorts(udpPortMin, udpPortMax);
   theManager->SetTCPPorts(tcpPortMin, tcpPortMax);
@@ -249,25 +251,23 @@ bool _XMIsSIPRegistered()
 #pragma mark -
 #pragma mark Call Management functions
 
-unsigned _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, 
-                         const char *origAddressString, XMCallEndReason *endReason)
+void _XMInitiateCall(XMCallProtocol protocol, const char *remoteParty, const char *origAddressString)
 {	
-  return XMOpalManager::GetManager()->InitiateCall(protocol, remoteParty, origAddressString, endReason);
+  XMOpalManager::GetManager()->InitiateCall(protocol, remoteParty, origAddressString);
 }
 
-void _XMAcceptIncomingCall(unsigned callID)
+void _XMAcceptIncomingCall(const char *callToken)
 {
-  XMOpalManager::GetCallEndPoint()->AcceptIncomingCall();
+  XMOpalManager::GetCallEndPoint()->DoAcceptIncomingCall(callToken);
 }
 
-void _XMRejectIncomingCall(unsigned callID)
+void _XMRejectIncomingCall(const char *callToken)
 {
-  XMOpalManager::GetCallEndPoint()->RejectIncomingCall();
+  XMOpalManager::GetCallEndPoint()->DoRejectIncomingCall(callToken);
 }
 
-void _XMClearCall(unsigned callID)
+void _XMClearCall(const char *callToken)
 {
-  PString callToken = PString(callID);
   XMOpalManager::GetCallEndPoint()->ClearCall(callToken);
 }
 
@@ -281,7 +281,7 @@ void _XMUnlockCallInformation()
   XMOpalManager::GetManager()->UnlockCallInformation();
 }
 
-void _XMGetCallInformation(unsigned callID,
+void _XMGetCallInformation(const char *callToken,
                            const char** remoteName, 
                            const char** remoteNumber,
                            const char** remoteAddress, 
@@ -300,7 +300,7 @@ void _XMGetCallInformation(unsigned callID,
   *remoteApplication = appStr;
 }
 
-void _XMGetCallStatistics(unsigned callID,
+void _XMGetCallStatistics(const char *callToken,
                           XMCallStatisticsRecord *callStatistics)
 {
   XMOpalManager::GetManager()->GetCallStatistics(callStatistics);
@@ -314,28 +314,28 @@ bool _XMSetUserInputMode(XMUserInputMode userInputMode)
   return XMOpalManager::GetManager()->SetUserInputMode(userInputMode);
 }
 
-bool _XMSendUserInputTone(unsigned callID, const char tone)
+bool _XMSendUserInputTone(const char *_callToken, const char tone)
 {
-  PString callIDString = PString(callID);
-  return XMOpalManager::GetCallEndPoint()->SendUserInputTone(callIDString, tone);
+  PString callToken = _callToken;
+  return XMOpalManager::GetCallEndPoint()->SendUserInputTone(callToken, tone);
 }
 
-bool _XMSendUserInputString(unsigned callID, const char *string)
+bool _XMSendUserInputString(const char *_callToken, const char *string)
 {
-  PString callIDString = PString(callID);
-  return XMOpalManager::GetCallEndPoint()->SendUserInputString(callIDString, string);
+  PString callToken = _callToken;
+  return XMOpalManager::GetCallEndPoint()->SendUserInputString(callToken, string);
 }
 
-bool _XMStartCameraEvent(unsigned callID, XMCameraEvent cameraEvent)
+bool _XMStartCameraEvent(const char *_callToken, XMCameraEvent cameraEvent)
 {
-  PString callIDString = PString(callID);
-  return XMOpalManager::GetCallEndPoint()->StartCameraEvent(callIDString, cameraEvent);
+  PString callToken = _callToken;
+  return XMOpalManager::GetCallEndPoint()->StartCameraEvent(callToken, cameraEvent);
 }
 
-void _XMStopCameraEvent(unsigned callID)
+void _XMStopCameraEvent(const char *_callToken)
 {
-  PString callIDString = PString(callID);
-  return XMOpalManager::GetCallEndPoint()->StopCameraEvent(callIDString);
+  PString callToken = _callToken;
+  return XMOpalManager::GetCallEndPoint()->StopCameraEvent(callToken);
 }
 
 #pragma mark -

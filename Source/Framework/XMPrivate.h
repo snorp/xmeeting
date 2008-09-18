@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.49 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.50 2008/09/18 23:08:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -150,18 +150,18 @@ void _XMCheckCloseStatus();
 
 @interface XMCallInfo (FrameworkMethods)
 
-- (id)_initWithCallID:(unsigned)callID
-			 protocol:(XMCallProtocol)protocol
-		   remoteName:(NSString *)remoteName
-		 remoteNumber:(NSString *)remoteNumber
-		remoteAddress:(NSString *)remoteAddress
-	remoteApplication:(NSString *)remoteApplication
-		  callAddress:(NSString *)callAddress
-		 localAddress:(NSString *)localAddress
-		   callStatus:(XMCallStatus)status;
+- (id)_initWithCallToken:(NSString *)callToken
+                protocol:(XMCallProtocol)protocol
+              remoteName:(NSString *)remoteName
+            remoteNumber:(NSString *)remoteNumber
+           remoteAddress:(NSString *)remoteAddress
+       remoteApplication:(NSString *)remoteApplication
+             callAddress:(NSString *)callAddress
+            localAddress:(NSString *)localAddress
+              callStatus:(XMCallStatus)status;
 
-- (unsigned)_callID;
-- (void)_setCallID:(unsigned)theCallID;
+- (NSString *)_callToken;
+- (void)_setCallToken:(NSString *)theCallToken;
 
 - (void)_setCallStatus:(XMCallStatus)status;
 - (void)_setCallEndReason:(XMCallEndReason)endReason;

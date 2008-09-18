@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.37 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.38 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,65 +37,70 @@ void _XMHandleSTUNInformation(XMNATType natType,
 	
 #pragma mark -
 #pragma mark Call Related Callbacks
+
+/**
+ * callback information when calling _XMInitiateCall()
+ **/
+void _XMHandleCallStartInfo(const char *callToken, XMCallEndReason endReason);
 	
 /**
  * Indicates that the outgoing call is ringing at the remote party
  **/
-void _XMHandleCallIsAlerting(unsigned callID);
+void _XMHandleCallIsAlerting(const char *callToken);
 
 /**
  * If there is an incoming call and autoanswer is off,
  * this callback is called which forwards the request
  * to the Cocoa/Objective-C world
  **/
-void _XMHandleIncomingCall(unsigned callID, 
-						   XMCallProtocol protocol,
-						   const char *remoteName, 
-						   const char *remoteNumber, 
-						   const char *remoteAddress,
-						   const char *remoteApplication,
-						   const char *localAddress);
+void _XMHandleIncomingCall(const char *callToken, 
+                           XMCallProtocol protocol,
+                           const char *remoteName, 
+                           const char *remoteNumber, 
+                           const char *remoteAddress,
+                           const char *remoteApplication,
+                           const char *localAddress);
 
 /**
  * This function is called every time a call is established,
  * supplying the callID
  **/
-void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall, const char *address);
+void _XMHandleCallEstablished(const char *callToken, bool isIncomingCall, const char *address);
 
 /**
  * This function is called every time a call was ended,
  * supplying the callID and the CallEndReason.
  **/
-void _XMHandleCallCleared(unsigned callID, XMCallEndReason callEndReason);
+void _XMHandleCallCleared(const char *callToken, XMCallEndReason callEndReason);
 
 /**
  * Reports the local interface used when the call is released
  **/
-void _XMHandleLocalAddress(unsigned callID, const char *localAddress);
+void _XMHandleLocalAddress(const char *callToken, const char *localAddress);
 
 /**
  * This function is called every time a new audio stream is opened.
  **/
-void _XMHandleAudioStreamOpened(unsigned callID, const char *codec, bool isIncomingStream);
+void _XMHandleAudioStreamOpened(const char *callToken, const char *codec, bool isIncomingStream);
 
 /**
  * This function is called every time a new video stream is opened.
  **/
-void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, 
-								XMVideoSize videoSize, 
-								bool isIncomingStream,
-								unsigned videoWidth,
-								unsigned videoHeight);
+void _XMHandleVideoStreamOpened(const char *callToken, const char *codec, 
+                                XMVideoSize videoSize, 
+                                bool isIncomingStream,
+                                unsigned videoWidth,
+                                unsigned videoHeight);
 
 /**
  * This function is called every time an existing audio stream is closed.
  **/
-void _XMHandleAudioStreamClosed(unsigned callID, bool isIncomingStream);
+void _XMHandleAudioStreamClosed(const char *callToken, bool isIncomingStream);
 
 /**
  * This function is called every time an existing video stream is closed.
  **/
-void _XMHandleVideoStreamClosed(unsigned callID, bool IsIncomingStream);
+void _XMHandleVideoStreamClosed(const char *callToken, bool IsIncomingStream);
 
 /**
  * This function is called every time a FECC channel is opened

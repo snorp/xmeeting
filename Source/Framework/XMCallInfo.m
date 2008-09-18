@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallInfo.m,v 1.10 2008/08/09 12:32:10 hfriederich Exp $
+ * $Id: XMCallInfo.m,v 1.11 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,29 +22,29 @@
 	return nil;
 }
 
-- (id)_initWithCallID:(unsigned)theID 
-             protocol:(XMCallProtocol)theProtocol
-           remoteName:(NSString *)theRemoteName 
-         remoteNumber:(NSString *)theRemoteNumber
-        remoteAddress:(NSString *)theRemoteAddress
-    remoteApplication:(NSString *)theRemoteApplication
-          callAddress:(NSString *)theCallAddress
-         localAddress:(NSString *)theLocalAddress
-           callStatus:(XMCallStatus)theStatus;
+- (id)_initWithCallToken:(NSString *)_callToken
+                protocol:(XMCallProtocol)_protocol
+              remoteName:(NSString *)_remoteName 
+            remoteNumber:(NSString *)_remoteNumber
+           remoteAddress:(NSString *)_remoteAddress
+       remoteApplication:(NSString *)_remoteApplication
+             callAddress:(NSString *)_callAddress
+            localAddress:(NSString *)_localAddress
+              callStatus:(XMCallStatus)_status;
 {
 	self = [super init];
 	
-	callID = theID;
-	protocol = theProtocol;
+	callToken = [_callToken copy];
+	protocol = _protocol;
 
-	remoteName = [theRemoteName copy];
-	remoteNumber = [theRemoteNumber copy];
-	remoteAddress = [theRemoteAddress copy];
-	remoteApplication = [theRemoteApplication copy];
-	callAddress = [theCallAddress copy];
-	localAddress = [theLocalAddress copy];
+	remoteName = [_remoteName copy];
+	remoteNumber = [_remoteNumber copy];
+	remoteAddress = [_remoteAddress copy];
+	remoteApplication = [_remoteApplication copy];
+	callAddress = [_callAddress copy];
+	localAddress = [_localAddress copy];
 	localAddressInterface = nil;
-	callStatus = theStatus;
+	callStatus = _status;
 	
 	// setting the end reason to an impossible value
 	callEndReason = XMCallEndReasonCount;
@@ -98,6 +98,8 @@
 
 - (void)dealloc
 {
+  [callToken release];
+  
 	[remoteName release];
 	[remoteNumber release];
 	[remoteAddress release];
@@ -382,55 +384,57 @@
 
 #pragma mark Private Methods
 
-- (unsigned)_callID
+- (NSString *)_callToken
 {
-	return callID;
+	return callToken;
 }
 
-- (void)_setCallID:(unsigned)theCallID
+- (void)_setCallToken:(NSString *)_callToken
 {
-	callID = theCallID;
+  NSString *old = callToken;
+  callToken = [_callToken copy];
+	[old release];
 }
 
-- (void)_setRemoteName:(NSString *)theName
+- (void)_setRemoteName:(NSString *)_remoteName
 {
 	NSString *old = remoteName;
-	remoteName = [theName copy];
+	remoteName = [_remoteName copy];
 	[old release];
 }
 
-- (void)_setRemoteNumber:(NSString *)theNumber
+- (void)_setRemoteNumber:(NSString *)_remoteNumber
 {
 	NSString *old = remoteNumber;
-	remoteNumber = [theNumber copy];
+	remoteNumber = [_remoteNumber copy];
 	[old release];
 }
 
-- (void)_setRemoteAddress:(NSString *)theAddress
+- (void)_setRemoteAddress:(NSString *)_remoteAddress
 {
 	NSString *old = remoteAddress;
-	remoteAddress = [theAddress copy];
+	remoteAddress = [_remoteAddress copy];
 	[old release];
 }
 
-- (void)_setRemoteApplication:(NSString *)theApplication
+- (void)_setRemoteApplication:(NSString *)_remoteApplication
 {
 	NSString *old = remoteApplication;
-	remoteApplication = [theApplication copy];
+	remoteApplication = [_remoteApplication copy];
 	[old release];
 }
 
-- (void)_setLocalAddress:(NSString *)theLocalAddress
+- (void)_setLocalAddress:(NSString *)_localAddress
 {
 	NSString *old = localAddress;
-	localAddress = [theLocalAddress copy];
+	localAddress = [_localAddress copy];
 	[old release];
 }
 
-- (void)_setLocalAddressInterface:(NSString *)theInterface
+- (void)_setLocalAddressInterface:(NSString *)_localAddressInterface
 {
 	NSString *old = localAddressInterface;
-	localAddressInterface = [theInterface copy];
+	localAddressInterface = [_localAddressInterface copy];
 	[old release];
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.35 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.36 2008/09/18 23:08:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,137 +18,180 @@
 #pragma mark Setup Related Callbacks
 
 void _XMHandleSTUNInformation(XMNATType natType,
-							  const char *publicAddress)
+                              const char *publicAddress)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *address = [[NSString alloc] initWithCString:publicAddress encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleNATType:natType publicAddress:address];
-	[address release];
+  NSString *address = [[NSString alloc] initWithCString:publicAddress encoding:NSASCIIStringEncoding];
+  [_XMOpalDispatcherSharedInstance _handleNATType:natType publicAddress:address];
+  [address release];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 #pragma mark -
 #pragma mark Call Related Callbacks
 
-void _XMHandleCallIsAlerting(unsigned callID)
+void _XMHandleCallStartInfo(const char *_callToken, XMCallEndReason endReason)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	[XMOpalDispatcher _callIsAlerting:callID];
-	
-	[autoreleasePool release];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+    
+  NSString *callToken = nil;
+  if (_callToken != NULL) {
+    callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  }
+  
+  [_XMOpalDispatcherSharedInstance _handleCallStartToken:callToken callEndReason:endReason];
+  
+  [callToken release];
+  
+  [autoreleasePool release];
 }
 
-void _XMHandleIncomingCall(unsigned callID, 
-						   XMCallProtocol protocol,
-						   const char *remoteName,
-						   const char *remoteNumber,
-						   const char *remoteAddress,
-						   const char *remoteApplication,
-						   const char *theLocalAddress)
+void _XMHandleCallIsAlerting(const char *_callToken)
+{
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  
+  [XMOpalDispatcher _callIsAlerting:callToken];
+  
+  [callToken release];
+	
+  [autoreleasePool release];
+}
+
+void _XMHandleIncomingCall(const char *_callToken, 
+                           XMCallProtocol protocol,
+                           const char *_remoteName,
+                           const char *_remoteNumber,
+                           const char *_remoteAddress,
+                           const char *_remoteApplication,
+                           const char *_localAddress)
+{
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  NSString *remoteName = [[NSString alloc] initWithCString:_remoteName encoding:NSASCIIStringEncoding];
+  NSString *remoteNumber = [[NSString alloc] initWithCString:_remoteNumber encoding:NSASCIIStringEncoding];
+  NSString *remoteAddress = [[NSString alloc] initWithCString:_remoteAddress encoding:NSASCIIStringEncoding];
+  NSString *remoteApplication = [[NSString alloc] initWithCString:_remoteApplication encoding:NSASCIIStringEncoding];
+  NSString *localAddress = [[NSString alloc] initWithCString:_localAddress encoding:NSASCIIStringEncoding];
+	
+  [XMOpalDispatcher _incomingCall:callToken
+                         protocol:protocol
+                       remoteName:remoteName
+                     remoteNumber:remoteNumber
+                    remoteAddress:remoteAddress
+                remoteApplication:remoteApplication
+                     localAddress:localAddress];
+
+  [callToken release];
+  [remoteName release];
+  [remoteNumber release];
+  [remoteAddress release];
+  [remoteApplication release];
+  [localAddress release];
+	
+  [autoreleasePool release];
+}
+
+void _XMHandleCallEstablished(const char *_callToken, bool isIncomingCall, const char *_localAddress)
+{
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+	
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  NSString *localAddress = [[NSString alloc] initWithCString:_localAddress encoding:NSASCIIStringEncoding];
+	
+  [XMOpalDispatcher _callEstablished:callToken incoming:isIncomingCall localAddress:localAddress];
+	
+  [callToken release];
+  [localAddress release];
+	
+  [autoreleasePool release];
+}
+
+void _XMHandleCallCleared(const char *_callToken, XMCallEndReason endReason)
+{
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+	
+  [XMOpalDispatcher _callCleared:callToken reason:endReason];
+  
+  [callToken release];
+	
+  [autoreleasePool release];
+}
+
+void _XMHandleLocalAddress(const char *_callToken, const char *_localAddress)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *name = [[NSString alloc] initWithCString:remoteName encoding:NSASCIIStringEncoding];
-	NSString *number = [[NSString alloc] initWithCString:remoteNumber encoding:NSASCIIStringEncoding];
-	NSString *address = [[NSString alloc] initWithCString:remoteAddress encoding:NSASCIIStringEncoding];
-	NSString *application = [[NSString alloc] initWithCString:remoteApplication encoding:NSASCIIStringEncoding];
-	NSString *localAddress = [[NSString alloc] initWithCString:theLocalAddress encoding:NSASCIIStringEncoding];
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  NSString *localAddress = [[NSString alloc] initWithCString:_localAddress encoding:NSASCIIStringEncoding];
+  
+	[XMOpalDispatcher _callReleased:callToken localAddress:localAddress];
 	
-	[XMOpalDispatcher _incomingCall:callID
-						   protocol:protocol
-						 remoteName:name
-					   remoteNumber:number
-					  remoteAddress:address
-				  remoteApplication:application
-					   localAddress:localAddress];
-
-	[name release];
-	[number release];
-	[address release];
-	[application release];
+  [callToken release];
 	[localAddress release];
 	
 	[autoreleasePool release];
 }
 
-void _XMHandleCallEstablished(unsigned callID, bool isIncomingCall, const char *localAddress)
+void _XMHandleAudioStreamOpened(const char *_callToken, const char *_codec, bool isIncomingStream)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *addressString = [[NSString alloc] initWithCString:localAddress encoding:NSASCIIStringEncoding];
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  NSString *codec = [[NSString alloc] initWithCString:_codec encoding:NSASCIIStringEncoding];
 	
-	[XMOpalDispatcher _callEstablished:callID incoming:isIncomingCall localAddress:addressString];
+  [XMOpalDispatcher _audioStreamOpened:callToken codec:codec incoming:isIncomingStream];
 	
-	[addressString release];
+  [callToken release];
+  [codec release];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
-void _XMHandleCallCleared(unsigned callID, XMCallEndReason endReason)
+void _XMHandleVideoStreamOpened(const char *_callToken, const char *_codec, XMVideoSize videoSize, bool isIncomingStream,
+                                unsigned videoWidth, unsigned videoHeight)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMOpalDispatcher _callCleared:callID reason:endReason];
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  NSString *codec = [[NSString alloc] initWithCString:_codec encoding:NSASCIIStringEncoding];
 	
-	[autoreleasePool release];
+  [XMOpalDispatcher _videoStreamOpened:callToken codec:codec size:videoSize incoming:isIncomingStream width:videoWidth height:videoHeight];
+	
+  [callToken release];
+  [codec release];
+	
+  [autoreleasePool release];
 }
 
-void _XMHandleLocalAddress(unsigned callID, const char *localAddress)
+void _XMHandleAudioStreamClosed(const char *_callToken, bool isIncomingStream)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
 	
-	NSString *addressString = [[NSString alloc] initWithCString:localAddress encoding:NSASCIIStringEncoding];
-	
-	[XMOpalDispatcher _callReleased:callID localAddress:addressString];
-	
-	[addressString release];
-	
-	[autoreleasePool release];
-}
-
-void _XMHandleAudioStreamOpened(unsigned callID, const char *codec, bool isIncomingStream)
-{
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	
-	NSString *codecString = [[NSString alloc] initWithCString:codec encoding:NSASCIIStringEncoding];
-	
-	[XMOpalDispatcher _audioStreamOpened:callID codec:codecString incoming:isIncomingStream];
-	
-	[codecString release];
-	
-	[autoreleasePool release];
-}
-
-void _XMHandleVideoStreamOpened(unsigned callID, const char *codec, XMVideoSize videoSize, bool isIncomingStream,
-								unsigned videoWidth, unsigned videoHeight)
-{
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	
-	NSString *codecString = [[NSString alloc] initWithCString:codec encoding:NSASCIIStringEncoding];
-	
-	[XMOpalDispatcher _videoStreamOpened:callID codec:codecString size:videoSize incoming:isIncomingStream width:videoWidth height:videoHeight];
-	
-	[codecString release];
-	
-	[autoreleasePool release];
-}
-
-void _XMHandleAudioStreamClosed(unsigned callID, bool isIncomingStream)
-{
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-	
-	[XMOpalDispatcher _audioStreamClosed:callID incoming:isIncomingStream];
+	[XMOpalDispatcher _audioStreamClosed:callToken incoming:isIncomingStream];
+  
+  [callToken release];
 
 	[autoreleasePool release];
 }
 
-void _XMHandleVideoStreamClosed(unsigned callID, bool isIncomingStream)
+void _XMHandleVideoStreamClosed(const char *_callToken, bool isIncomingStream)
 {
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  
+  NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
 	
-	[XMOpalDispatcher _videoStreamClosed:callID incoming:isIncomingStream];
+	[XMOpalDispatcher _videoStreamClosed:callToken incoming:isIncomingStream];
+  
+  [callToken release];
 	
 	[autoreleasePool release];
 }
