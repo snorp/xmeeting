@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.40 2008/09/17 21:22:11 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.41 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,8 +69,7 @@ private:
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager),
   isListening(false),
-  gatekeeperAddress(""),
-  connectionToken("")
+  gatekeeperAddress("")
 {	
   // Don't use OPAL's bandwidth management system as this is not flexible enough
   // for our purposes
@@ -226,77 +225,19 @@ void XMH323EndPoint::OnRegistrationConfirm()
   HandleRegistrationConfirm();
 }
 
-#pragma mark Getting call statistics
-										
-void XMH323EndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
-{
-	PSafePtr<H323Connection> connection = FindConnectionWithLock(connectionToken, PSafeReadOnly);
-	
-	if (connection != NULL)
-	{
-		unsigned roundTripDelay = connection->GetRoundTripDelay().GetMilliSeconds();
-		callStatistics->roundTripDelay = roundTripDelay;
-        
-    XMOpalManager::ExtractCallStatistics(*connection, callStatistics);
-	}
-}
-
 #pragma mark Overriding Callbacks
 
-void XMH323EndPoint::OnEstablished(OpalConnection & connection)
-{
-	XMOpalManager * manager = (XMOpalManager *)(&GetManager());
-	
-	connectionToken = connection.GetToken();
-    
-    const PString & remotePartyName = connection.GetRemotePartyName();
-    const PString & remotePartyNumber = connection.GetRemotePartyNumber();
-    const PString & remotePartyApplication = connection.GetRemoteApplication();
-    
-    const H323Transport *signallingChannel = ((H323Connection & )connection).GetSignallingChannel();
-    const PString & remotePartyAddress = signallingChannel->GetRemoteAddress().GetHostName();
-	
-	manager->SetCallInformation(connectionToken,
-								remotePartyName,
-								remotePartyNumber,
-								remotePartyAddress,
-								remotePartyApplication,
-								XMCallProtocol_H323);
-	
-	H323EndPoint::OnEstablished(connection);
-}
-
-void XMH323EndPoint::OnReleased(OpalConnection & connection)
-{
-	if (connection.GetToken() == connectionToken)
-	{
-		XMOpalManager * manager = (XMOpalManager *)(&GetManager());
-		PString empty = "";
-
-		manager->SetCallInformation(connectionToken,
-									empty,
-									empty,
-									empty,
-									empty,
-									XMCallProtocol_H323);
-	
-		connectionToken = "";
-	}
-	
-	H323EndPoint::OnReleased(connection);
-}
-
 H323Connection * XMH323EndPoint::CreateConnection(OpalCall & call,
-												  const PString & token,
-												  void * userData,
-												  OpalTransport & transport,
-												  const PString & alias,
-												  const H323TransportAddress & address,
-												  H323SignalPDU * setupPDU,
-												  unsigned options,
+                                                  const PString & token,
+                                                  void * userData,
+                                                  OpalTransport & transport,
+                                                  const PString & alias,
+                                                  const H323TransportAddress & address,
+                                                  H323SignalPDU * setupPDU,
+                                                  unsigned options,
                                                   OpalConnection::StringOptions * stringOptions)
 {
-	return new XMH323Connection(call, *this, token, alias, address, options, stringOptions);
+  return new XMH323Connection(call, *this, token, alias, address, options, stringOptions);
 }
 
 #pragma mark -
@@ -315,28 +256,24 @@ void XMH323EndPoint::OnReceiveFeatureSet(unsigned id, const H225_FeatureSet & me
 #pragma mark -
 #pragma mark Clean Up
 
-void XMH323EndPoint::CleanUp()
+void XMH323EndPoint::CleanUp() 
 {
-    PWaitAndSignal m(releasingConnectionsMutex);
-    
-    for (PINDEX i = 0; i < releasingConnections.GetSize(); i++)
-    {
-        releasingConnections[i].CleanUp();
-    }
+  PWaitAndSignal m(releasingConnectionsMutex);
+  for (PINDEX i = 0; i < releasingConnections.GetSize(); i++) {
+    releasingConnections[i].CleanUp();
+  }
 }
 
 void XMH323EndPoint::AddReleasingConnection(XMH323Connection * connection)
 {
-    PWaitAndSignal m(releasingConnectionsMutex);
-    
-    releasingConnections.Append(connection);
+  PWaitAndSignal m(releasingConnectionsMutex);
+  releasingConnections.Append(connection);
 }
 
 void XMH323EndPoint::RemoveReleasingConnection(XMH323Connection * connection)
 {
-    PWaitAndSignal m(releasingConnectionsMutex);
-    
-    releasingConnections.Remove(connection);
+  PWaitAndSignal m(releasingConnectionsMutex);
+  releasingConnections.Remove(connection);
 }
 
 #pragma mark -

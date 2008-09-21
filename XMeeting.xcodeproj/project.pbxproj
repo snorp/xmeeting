@@ -1817,6 +1817,7 @@
 				D15F721E0E54BADA0006CB43 /* H323 */,
 				D1AD249C0E67342100143295 /* SIP */,
 				D103B7250E81ACCD0026B236 /* Local */,
+				D1BE22540E86D8F800552D60 /* Media */,
 				D1972B0008FC529C00295E05 /* XMPacketBuilder.c */,
 				D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */,
 				D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */,
@@ -1824,7 +1825,6 @@
 				D10BDA490AC45832004320A8 /* XMAudioTester.cpp */,
 				D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */,
 				D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */,
-				D1971A5E08FA453F00295E05 /* XMMediaFormats.cpp */,
 				D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */,
 				D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */,
 				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
@@ -1833,13 +1833,11 @@
 				D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */,
 				D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */,
 				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
-				D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */,
 				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D1010AB30C71F6D20010523E /* XMURLParser.cpp */,
 				D10BDA540AC4668C004320A8 /* XMAudioTester.h */,
 				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
 				D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */,
-				D1971A5D08FA453F00295E05 /* XMMediaFormats.h */,
 				D1971F0A08FAB3F400295E05 /* XMMediaStream.h */,
 				D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */,
 				D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */,
@@ -1847,7 +1845,6 @@
 				D197216908FADEE300295E05 /* XMReceiverMediaPatch.h */,
 				D14B04130B06020B001AB527 /* XMRFC2833Handler.h */,
 				D147D6050970342B005DE11C /* XMRTPPacket.h */,
-				D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */,
 				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1010AB40C71F6D20010523E /* XMURLParser.h */,
 			);
@@ -2071,6 +2068,8 @@
 			children = (
 				D1FD475509B650D500EB517B /* XMSIPEndPoint.h */,
 				D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */,
+				D19FFB0F09D92E46000E88F4 /* XMSIPConnection.h */,
+				D19FFB1009D92E46000E88F4 /* XMSIPConnection.cpp */,
 			);
 			name = SIP;
 			sourceTree = "<group>";
@@ -2489,6 +2488,15 @@
 				D1BD61CE0A9104B2007C8E46 /* osd.png */,
 			);
 			path = images;
+			sourceTree = "<group>";
+		};
+		D1BE22540E86D8F800552D60 /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				D1971A5D08FA453F00295E05 /* XMMediaFormats.h */,
+				D1971A5E08FA453F00295E05 /* XMMediaFormats.cpp */,
+			);
+			name = Media;
 			sourceTree = "<group>";
 		};
 		D1CEE10608F901DB007E4ABE /* opal */ = {

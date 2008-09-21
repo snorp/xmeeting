@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.20 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.21 2008/09/21 19:37:33 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,11 +82,6 @@ public:
                             bool wasRegistering);
   
   void HandleNetworkStatusChange();
-  
-  void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
-  
-  virtual void OnEstablished(OpalConnection & connection);
-  virtual void OnReleased(OpalConnection & connection);
   
   virtual SIPConnection * CreateConnection(OpalCall & call,
                                            const PString & token,

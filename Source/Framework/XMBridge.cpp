@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.60 2008/09/18 23:08:49 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.61 2008/09/21 19:37:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -261,9 +261,9 @@ void _XMAcceptIncomingCall(const char *callToken)
   XMOpalManager::GetCallEndPoint()->DoAcceptIncomingCall(callToken);
 }
 
-void _XMRejectIncomingCall(const char *callToken)
+void _XMRejectIncomingCall(const char *callToken, bool isBusy)
 {
-  XMOpalManager::GetCallEndPoint()->DoRejectIncomingCall(callToken);
+  XMOpalManager::GetCallEndPoint()->DoRejectIncomingCall(callToken, isBusy);
 }
 
 void _XMClearCall(const char *callToken)
@@ -271,39 +271,10 @@ void _XMClearCall(const char *callToken)
   XMOpalManager::GetCallEndPoint()->ClearCall(callToken);
 }
 
-void _XMLockCallInformation()
-{
-  XMOpalManager::GetManager()->LockCallInformation();
-}
-
-void _XMUnlockCallInformation()
-{
-  XMOpalManager::GetManager()->UnlockCallInformation();
-}
-
-void _XMGetCallInformation(const char *callToken,
-                           const char** remoteName, 
-                           const char** remoteNumber,
-                           const char** remoteAddress, 
-                           const char** remoteApplication)
-{
-  PString nameStr;
-  PString numberStr;
-  PString addressStr;
-  PString appStr;
-  
-  XMOpalManager::GetManager()->GetCallInformation(nameStr, numberStr, addressStr, appStr);
-  
-  *remoteName = nameStr;
-  *remoteNumber = numberStr;
-  *remoteAddress = addressStr;
-  *remoteApplication = appStr;
-}
-
 void _XMGetCallStatistics(const char *callToken,
                           XMCallStatisticsRecord *callStatistics)
 {
-  XMOpalManager::GetManager()->GetCallStatistics(callStatistics);
+  XMOpalManager::GetManager()->GetCallStatistics(callToken, callStatistics);
 }
 
 #pragma mark -

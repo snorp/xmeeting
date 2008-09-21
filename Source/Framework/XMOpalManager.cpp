@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.70 2008/09/18 23:08:50 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.71 2008/09/21 19:37:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,13 +76,6 @@ XMOpalManager::XMOpalManager()
   defaultAudioPacketTime = 0;
   currentAudioPacketTime = 0;
   
-  currentCallToken = "";
-  remoteName = "";
-  remoteNumber = "";
-  remoteAddress = "";
-  remoteApplication = "";
-  origRemoteAddress = "";
-  
   callEndReason = XMCallEndReasonCount;
   
   // do NOT run the interface monitor update thread, as we're doing this through callbacks from the system. 
@@ -147,15 +140,6 @@ void XMOpalManager::InitiateCall(XMCallProtocol protocol,
                                  const char * remoteParty, 
                                  const char * origAddressString)
 {
-  // sanity check, should not happen
-  {
-    PWaitAndSignal m(callMutex);
-    if (currentCallToken != "") {
-      _XMHandleCallStartInfo(NULL, XMCallEndReasonCount);
-      return;
-    }
-  }
-  
   // Attempting to call without any network interfaces may lead to nasty error messages
   // and blocking timeouts
   if (!HasNetworkInterfaces()) {
@@ -178,16 +162,15 @@ void XMOpalManager::InitiateCall(XMCallProtocol protocol,
   }
   PString partyA = "xm:*";
   partyB += remoteParty;
-  SetCallProtocol(protocol);
     
   // Start the call
   callMutex.Wait();
-  bool success = SetUpCall(partyA, partyB, currentCallToken);
+  PString callToken;
+  bool success = SetUpCall(partyA, partyB, callToken);
   callMutex.Signal();
   
   if (success) {
-    origRemoteAddress = origAddressString;
-    _XMHandleCallStartInfo(currentCallToken, XMCallEndReasonCount);
+    _XMHandleCallStartInfo(callToken, XMCallEndReasonCount);
   } else {
     _XMHandleCallStartInfo(NULL, callEndReason);
   }
@@ -199,230 +182,160 @@ void XMOpalManager::HandleCallInitiationFailed(XMCallEndReason endReason)
 }
 
 #pragma mark -
-#pragma mark Getting / Setting Call Information
+#pragma mark Getting remote application info
 
-bool XMOpalManager::SetCurrentCallToken(const PString & callToken)
+PString XMOpalManager::GetRemoteApplicationString(const OpalProductInfo & info)
 {
-  PWaitAndSignal m(callMutex);
-  if (currentCallToken != "") {
-    return false;
-  }
-  currentCallToken = callToken;
-  return true;
-}
-
-void XMOpalManager::LockCallInformation()
-{
-  callMutex.Wait();
-}
-
-void XMOpalManager::UnlockCallInformation()
-{
-  callMutex.Signal();
-}
-
-void XMOpalManager::GetCallInformation(PString & theRemoteName,
-									   PString & theRemoteNumber,
-									   PString & theRemoteAddress,
-									   PString & theRemoteApplication) const
-{
-  theRemoteName = remoteName;
-  theRemoteNumber = remoteNumber;
-  if (origRemoteAddress != "") {
-	theRemoteAddress = origRemoteAddress;
-  } else {
-	theRemoteAddress = remoteAddress;
-  }
-  theRemoteApplication = remoteApplication;
-}
-
-void XMOpalManager::SetCallInformation(const PString & theConnectionToken,
-									   const PString & theRemoteName,
-									   const PString & theRemoteNumber,
-									   const PString & theRemoteAddress,
-									   const PString & theRemoteApplication,
-									   XMCallProtocol theCallProtocol)
-{
-  /*PWaitAndSignal m(callMutex);
-  
-  bool isValid = false;
-  
-  if (connectionToken == "") // current connection token is empty
-  {
-	connectionToken = theConnectionToken;
-	callProtocol = theCallProtocol;
-	isValid = true;
-  }
-  else if (connectionToken == theConnectionToken) // same connection token
-  {
-	isValid = true;
-  }
-  
-  if (isValid == true) // if valid, update information
-  {
-	remoteName = theRemoteName;
-	remoteNumber = theRemoteNumber;
-	remoteAddress = theRemoteAddress;
-	remoteApplication = theRemoteApplication;
-	
-	if (remoteName == "" &&
-	   remoteNumber == "" &&
-	   remoteAddress == "" &&
-	   remoteApplication == "") // empty information, clear connection token / call protocol
-	{
-	  connectionToken = "";
-	  origRemoteAddress = "";
-	  callProtocol = XMCallProtocol_UnknownProtocol;
-	}
-  }*/
+  return info.name + ", " + info.version;
 }
 
 #pragma mark -
 #pragma mark Getting Call Statistics
 
-void XMOpalManager::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
+void XMOpalManager::GetCallStatistics(const PString & callToken, XMCallStatisticsRecord *callStatistics)
 {
-  // The endpoints (either H.323 or SIP) contain the RTP statistics.
-  // Find out which endpoint to ask
-  switch(callProtocol)
-  {
-	case XMCallProtocol_H323:
-	  GetH323EndPoint()->GetCallStatistics(callStatistics);
-	  break;
-	case XMCallProtocol_SIP:
-	  GetSIPEndPoint()->GetCallStatistics(callStatistics);
-	  break;
-	default: // should not happen actually
-	  return;
+  PSafePtr<OpalCall> call = FindCallWithLock(callToken);
+  if (call == NULL) {
+    return;
   }
   
-  PTRACE(3, "XMeeting Call Statistics:" <<
-		 "\nroundTripDelay:          " << callStatistics->roundTripDelay <<
-		 "\naudioPacketsSent:        " << callStatistics->audioPacketsSent <<
-		 "\naudioBytesSent:          " << callStatistics->audioBytesSent <<
-		 "\naudioMininumSendTime:    " << callStatistics->audioMinimumSendTime <<
-		 "\naudioAverageSendTime:    " << callStatistics->audioAverageSendTime <<
-		 "\naudioMaximumSendTime:    " << callStatistics->audioMaximumSendTime <<
-		 "\naudioPacketsReceived:    " << callStatistics->audioPacketsReceived <<
-		 "\naudioBytesReceived:      " << callStatistics->audioBytesReceived <<
-		 "\naudioMinimumReceiveTime: " << callStatistics->audioMinimumReceiveTime <<
-		 "\naudioAverageReceiveTime: " << callStatistics->audioAverageReceiveTime <<
-		 "\naudioMaximumReceiveTime: " << callStatistics->audioMaximumReceiveTime <<
-		 "\naudioPacketsLost:        " << callStatistics->audioPacketsLost <<
-		 "\naudioPacketsOutOfOrder:  " << callStatistics->audioPacketsOutOfOrder <<
-		 "\naudioPaketsTooLate:      " << callStatistics->audioPacketsTooLate <<
-		 "\naudioAverageJitterTime:  " << callStatistics->audioAverageJitterTime <<
-		 "\naudioMaximumJitterTime:  " << callStatistics->audioMaximumJitterTime <<
-		 "\naudioJitterBufferSize:   " << callStatistics->audioJitterBufferSize <<
-		 "\nvideoPacketsSent:        " << callStatistics->videoPacketsSent <<
-		 "\nvideoBytesSent:          " << callStatistics->videoBytesSent <<
-		 "\nvideoMininumSendTime:    " << callStatistics->videoMinimumSendTime <<
-		 "\nvideoAverageSendTime:    " << callStatistics->videoAverageSendTime <<
-		 "\nvideoMaximumSendTime:    " << callStatistics->videoMaximumSendTime <<
-		 "\nvideoPacketsReceived:    " << callStatistics->videoPacketsReceived <<
-		 "\nvideoBytesReceived:      " << callStatistics->videoBytesReceived <<
-		 "\nvideoMinimumReceiveTime: " << callStatistics->videoMinimumReceiveTime <<
-		 "\nvideoAverageReceiveTime: " << callStatistics->videoAverageReceiveTime <<
-		 "\nvideoMaximumReceiveTime: " << callStatistics->videoMaximumReceiveTime <<
-		 "\nvideoPacketsLost:        " << callStatistics->videoPacketsLost <<
-		 "\nvideoPacketsOutOfOrder:  " << callStatistics->videoPacketsOutOfOrder <<
-		 "\nvideoPaketsTooLate:      " << callStatistics->videoPacketsTooLate <<
-		 "\nvideoAverageJitterTime:  " << callStatistics->videoAverageJitterTime <<
-		 "\nvideoMaximumJitterTime:  " << callStatistics->videoMaximumJitterTime);
-}
-
-void XMOpalManager::ExtractCallStatistics(const OpalConnection & connection,
-                                          XMCallStatisticsRecord *callStatistics)
-{
+  // obtain the other connection than the XMConnection instance
+  PSafePtr<OpalConnection> connection = call->GetConnection(0);
+  if (PSafePtrCast<OpalConnection, XMConnection>(connection) != NULL) { // need to take the other connection
+    connection = call->GetConnection(1);
+  }
+  
+  // H.323 also has round trip delay information
+  PSafePtr<H323Connection> h323Connection = PSafePtrCast<OpalConnection, H323Connection>(connection);
+  if (h323Connection != NULL) {
+    callStatistics->roundTripDelay = h323Connection->GetRoundTripDelay().GetMilliSeconds();
+  } else {
+    callStatistics->roundTripDelay = UINT_MAX;
+  }
+  
   /*RTP_Session *session = connection.GetSession(OpalDefaultAudioMediaType);
   if (session != NULL)
   {
-	callStatistics->audioPacketsSent = session->GetPacketsSent();
-	callStatistics->audioBytesSent = session->GetOctetsSent();
-	callStatistics->audioMinimumSendTime = session->GetMinimumSendTime();
-	callStatistics->audioAverageSendTime = session->GetAverageSendTime();
-	callStatistics->audioMaximumSendTime = session->GetMaximumSendTime();
-	
-	callStatistics->audioPacketsReceived = session->GetPacketsReceived();
-	callStatistics->audioBytesReceived = session->GetOctetsReceived();
-	callStatistics->audioMinimumReceiveTime = session->GetMinimumReceiveTime();
-	callStatistics->audioAverageReceiveTime = session->GetAverageReceiveTime();
-	callStatistics->audioMaximumReceiveTime = session->GetMaximumReceiveTime();
-	
-	callStatistics->audioPacketsLost = session->GetPacketsLost();
-	callStatistics->audioPacketsOutOfOrder = session->GetPacketsOutOfOrder();
-	callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
-	
-	callStatistics->audioAverageJitterTime = session->GetAvgJitterTime();
-	callStatistics->audioMaximumJitterTime = session->GetMaxJitterTime();
-	callStatistics->audioJitterBufferSize = session->GetJitterBufferSize();
+    callStatistics->audioPacketsSent = session->GetPacketsSent();
+    callStatistics->audioBytesSent = session->GetOctetsSent();
+    callStatistics->audioMinimumSendTime = session->GetMinimumSendTime();
+    callStatistics->audioAverageSendTime = session->GetAverageSendTime();
+    callStatistics->audioMaximumSendTime = session->GetMaximumSendTime();
+    
+    callStatistics->audioPacketsReceived = session->GetPacketsReceived();
+    callStatistics->audioBytesReceived = session->GetOctetsReceived();
+    callStatistics->audioMinimumReceiveTime = session->GetMinimumReceiveTime();
+    callStatistics->audioAverageReceiveTime = session->GetAverageReceiveTime();
+    callStatistics->audioMaximumReceiveTime = session->GetMaximumReceiveTime();
+    
+    callStatistics->audioPacketsLost = session->GetPacketsLost();
+    callStatistics->audioPacketsOutOfOrder = session->GetPacketsOutOfOrder();
+    callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
+    
+    callStatistics->audioAverageJitterTime = session->GetAvgJitterTime();
+    callStatistics->audioMaximumJitterTime = session->GetMaxJitterTime();
+    callStatistics->audioJitterBufferSize = session->GetJitterBufferSize();
   } 
   else 
   {
-	callStatistics->audioPacketsSent = UINT_MAX;
-	callStatistics->audioBytesSent = UINT_MAX;
-	callStatistics->audioMinimumSendTime = UINT_MAX;
-	callStatistics->audioAverageSendTime = UINT_MAX;
-	callStatistics->audioMaximumSendTime = UINT_MAX;
-	
-	callStatistics->audioPacketsReceived = UINT_MAX;
-	callStatistics->audioBytesReceived = UINT_MAX;
-	callStatistics->audioMinimumReceiveTime = UINT_MAX;
-	callStatistics->audioAverageReceiveTime = UINT_MAX;
-	callStatistics->audioMaximumReceiveTime = UINT_MAX;
-	
-	callStatistics->audioPacketsLost = UINT_MAX;
-	callStatistics->audioPacketsOutOfOrder = UINT_MAX;
-	callStatistics->audioPacketsTooLate = UINT_MAX;
-	
-	callStatistics->audioAverageJitterTime = UINT_MAX;
-	callStatistics->audioMaximumJitterTime = UINT_MAX;
-	callStatistics->audioJitterBufferSize = UINT_MAX;
+    callStatistics->audioPacketsSent = UINT_MAX;
+    callStatistics->audioBytesSent = UINT_MAX;
+    callStatistics->audioMinimumSendTime = UINT_MAX;
+    callStatistics->audioAverageSendTime = UINT_MAX;
+    callStatistics->audioMaximumSendTime = UINT_MAX;
+    
+    callStatistics->audioPacketsReceived = UINT_MAX;
+    callStatistics->audioBytesReceived = UINT_MAX;
+    callStatistics->audioMinimumReceiveTime = UINT_MAX;
+    callStatistics->audioAverageReceiveTime = UINT_MAX;
+    callStatistics->audioMaximumReceiveTime = UINT_MAX;
+    
+    callStatistics->audioPacketsLost = UINT_MAX;
+    callStatistics->audioPacketsOutOfOrder = UINT_MAX;
+    callStatistics->audioPacketsTooLate = UINT_MAX;
+    
+    callStatistics->audioAverageJitterTime = UINT_MAX;
+    callStatistics->audioMaximumJitterTime = UINT_MAX;
+    callStatistics->audioJitterBufferSize = UINT_MAX;
   }
   
   session = connection.GetSession(OpalDefaultVideoMediaType);
   if (session != NULL)
   {
-	callStatistics->videoPacketsSent = session->GetPacketsSent();
-	callStatistics->videoBytesSent = session->GetOctetsSent();
-	callStatistics->videoMinimumSendTime = session->GetMinimumSendTime();
-	callStatistics->videoAverageSendTime = session->GetAverageSendTime();
-	callStatistics->videoMaximumSendTime = session->GetMaximumSendTime();
-	
-	callStatistics->videoPacketsReceived = session->GetPacketsReceived();
-	callStatistics->videoBytesReceived = session->GetOctetsReceived();
-	callStatistics->videoMinimumReceiveTime = session->GetMinimumReceiveTime();
-	callStatistics->videoAverageReceiveTime = session->GetAverageReceiveTime();
-	callStatistics->videoMaximumReceiveTime = session->GetMaximumReceiveTime();
-	
-	callStatistics->videoPacketsLost = session->GetPacketsLost();
-	callStatistics->videoPacketsOutOfOrder = session->GetPacketsOutOfOrder();
-	callStatistics->videoPacketsTooLate = session->GetPacketsTooLate();
-	
-	callStatistics->videoAverageJitterTime = session->GetAvgJitterTime();
-	callStatistics->videoMaximumJitterTime = session->GetMaxJitterTime();
+    callStatistics->videoPacketsSent = session->GetPacketsSent();
+    callStatistics->videoBytesSent = session->GetOctetsSent();
+    callStatistics->videoMinimumSendTime = session->GetMinimumSendTime();
+    callStatistics->videoAverageSendTime = session->GetAverageSendTime();
+    callStatistics->videoMaximumSendTime = session->GetMaximumSendTime();
+    
+    callStatistics->videoPacketsReceived = session->GetPacketsReceived();
+    callStatistics->videoBytesReceived = session->GetOctetsReceived();
+    callStatistics->videoMinimumReceiveTime = session->GetMinimumReceiveTime();
+    callStatistics->videoAverageReceiveTime = session->GetAverageReceiveTime();
+    callStatistics->videoMaximumReceiveTime = session->GetMaximumReceiveTime();
+    
+    callStatistics->videoPacketsLost = session->GetPacketsLost();
+    callStatistics->videoPacketsOutOfOrder = session->GetPacketsOutOfOrder();
+    callStatistics->videoPacketsTooLate = session->GetPacketsTooLate();
+    
+    callStatistics->videoAverageJitterTime = session->GetAvgJitterTime();
+    callStatistics->videoMaximumJitterTime = session->GetMaxJitterTime();
   }
   else
   {
-	callStatistics->videoPacketsSent = UINT_MAX;
-	callStatistics->videoBytesSent = UINT_MAX;
-	callStatistics->videoMinimumSendTime = UINT_MAX;
-	callStatistics->videoAverageSendTime = UINT_MAX;
-	callStatistics->videoMaximumSendTime = UINT_MAX;
-	
-	callStatistics->videoPacketsReceived = UINT_MAX;
-	callStatistics->videoBytesReceived = UINT_MAX;
-	callStatistics->videoMinimumReceiveTime = UINT_MAX;
-	callStatistics->videoAverageReceiveTime = UINT_MAX;
-	callStatistics->videoMaximumReceiveTime = UINT_MAX;
+    callStatistics->videoPacketsSent = UINT_MAX;
+    callStatistics->videoBytesSent = UINT_MAX;
+    callStatistics->videoMinimumSendTime = UINT_MAX;
+    callStatistics->videoAverageSendTime = UINT_MAX;
+    callStatistics->videoMaximumSendTime = UINT_MAX;
     
-	callStatistics->videoPacketsLost = UINT_MAX;
-	callStatistics->videoPacketsOutOfOrder = UINT_MAX;
-	callStatistics->videoPacketsTooLate = UINT_MAX;
-	
-	callStatistics->videoAverageJitterTime = UINT_MAX;
-	callStatistics->videoMaximumJitterTime = UINT_MAX;
+    callStatistics->videoPacketsReceived = UINT_MAX;
+    callStatistics->videoBytesReceived = UINT_MAX;
+    callStatistics->videoMinimumReceiveTime = UINT_MAX;
+    callStatistics->videoAverageReceiveTime = UINT_MAX;
+    callStatistics->videoMaximumReceiveTime = UINT_MAX;
+    
+    callStatistics->videoPacketsLost = UINT_MAX;
+    callStatistics->videoPacketsOutOfOrder = UINT_MAX;
+    callStatistics->videoPacketsTooLate = UINT_MAX;
+    
+    callStatistics->videoAverageJitterTime = UINT_MAX;
+    callStatistics->videoMaximumJitterTime = UINT_MAX;
   }*/
+  
+  PTRACE(3, "XMeeting Call Statistics:" <<
+         "\nroundTripDelay:          " << callStatistics->roundTripDelay <<
+         "\naudioPacketsSent:        " << callStatistics->audioPacketsSent <<
+         "\naudioBytesSent:          " << callStatistics->audioBytesSent <<
+         "\naudioMininumSendTime:    " << callStatistics->audioMinimumSendTime <<
+         "\naudioAverageSendTime:    " << callStatistics->audioAverageSendTime <<
+         "\naudioMaximumSendTime:    " << callStatistics->audioMaximumSendTime <<
+         "\naudioPacketsReceived:    " << callStatistics->audioPacketsReceived <<
+         "\naudioBytesReceived:      " << callStatistics->audioBytesReceived <<
+         "\naudioMinimumReceiveTime: " << callStatistics->audioMinimumReceiveTime <<
+         "\naudioAverageReceiveTime: " << callStatistics->audioAverageReceiveTime <<
+         "\naudioMaximumReceiveTime: " << callStatistics->audioMaximumReceiveTime <<
+         "\naudioPacketsLost:        " << callStatistics->audioPacketsLost <<
+         "\naudioPacketsOutOfOrder:  " << callStatistics->audioPacketsOutOfOrder <<
+         "\naudioPaketsTooLate:      " << callStatistics->audioPacketsTooLate <<
+         "\naudioAverageJitterTime:  " << callStatistics->audioAverageJitterTime <<
+         "\naudioMaximumJitterTime:  " << callStatistics->audioMaximumJitterTime <<
+         "\naudioJitterBufferSize:   " << callStatistics->audioJitterBufferSize <<
+         "\nvideoPacketsSent:        " << callStatistics->videoPacketsSent <<
+         "\nvideoBytesSent:          " << callStatistics->videoBytesSent <<
+         "\nvideoMininumSendTime:    " << callStatistics->videoMinimumSendTime <<
+         "\nvideoAverageSendTime:    " << callStatistics->videoAverageSendTime <<
+         "\nvideoMaximumSendTime:    " << callStatistics->videoMaximumSendTime <<
+         "\nvideoPacketsReceived:    " << callStatistics->videoPacketsReceived <<
+         "\nvideoBytesReceived:      " << callStatistics->videoBytesReceived <<
+         "\nvideoMinimumReceiveTime: " << callStatistics->videoMinimumReceiveTime <<
+         "\nvideoAverageReceiveTime: " << callStatistics->videoAverageReceiveTime <<
+         "\nvideoMaximumReceiveTime: " << callStatistics->videoMaximumReceiveTime <<
+         "\nvideoPacketsLost:        " << callStatistics->videoPacketsLost <<
+         "\nvideoPacketsOutOfOrder:  " << callStatistics->videoPacketsOutOfOrder <<
+         "\nvideoPaketsTooLate:      " << callStatistics->videoPacketsTooLate <<
+         "\nvideoAverageJitterTime:  " << callStatistics->videoAverageJitterTime <<
+         "\nvideoMaximumJitterTime:  " << callStatistics->videoMaximumJitterTime);
 }
 
 #pragma mark -
@@ -432,22 +345,14 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 {
   const PString & callToken = call.GetToken();
   
-  // Determine if we were originating the call or not, by looking at
-  // the prefix of the endpoint associated with the first connection
-  // in the call dictionary.
-  bool isIncomingCall = true;
-  const PString & prefix = call.GetConnection(0)->GetEndPoint().GetPrefixName();
-  if (prefix == XM_LOCAL_ENDPOINT_PREFIX) {
-    isIncomingCall = false;
-  }
-  
   // Determine the IP address this call is running on.
-  // We need to have the other connection as the local XMConnection instance
+  // the connection instance other than the local XMConnection instance is required
+  const PString & prefix = call.GetConnection(0)->GetEndPoint().GetPrefixName();
   PSafePtr<OpalConnection> connection;
-  if (isIncomingCall) {
-    connection = call.GetConnection(0);
-  } else {
+  if (prefix == XM_LOCAL_ENDPOINT_PREFIX) {
     connection = call.GetConnection(1);
+  } else {
+    connection = call.GetConnection(0);
   }
   PIPSocket::Address address(0);
   connection->GetTransport().GetLocalAddress().GetIpAddress(address);
@@ -456,7 +361,14 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
   if (address.IsValid()) {
     addressString = address.AsString();
   }
-  _XMHandleCallEstablished(callToken, isIncomingCall, addressString);
+  
+  _XMHandleCallEstablished(callToken, 
+                           connection->GetRemotePartyName(),
+                           connection->GetRemotePartyNumber(),
+                           connection->GetRemotePartyAddress(),
+                           XMOpalManager::GetRemoteApplicationString(connection->GetRemoteProductInfo()),
+                           addressString);
+  
   OpalManager::OnEstablishedCall(call);
 }
 
@@ -485,11 +397,7 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
     // Notify the framework that the call has ended
     _XMHandleCallCleared(callToken, endReason);
     
-    // reset the current call token and other variables
-    PWaitAndSignal m(callMutex);
-    if (currentCallToken == callToken) {
-      currentCallToken = "";
-    }
+    // reset some per-call variables
     currentAudioPacketTime = 0;
 	
   } else {
@@ -754,13 +662,13 @@ unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier code
 {
   // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. If at all, only I-frames should be
   // sent.
-  if (codecIdentifier == XMCodecIdentifier_H263 && remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
+  /*if (codecIdentifier == XMCodecIdentifier_H263 && remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
   {
 	// zero key frame interval means sending only I-frames
 	return 0;
-  }
+  }*/
   
-  switch (callProtocol)
+  /*switch (callProtocol) // call protocol no longer stored
   {
 	case XMCallProtocol_H323:
 	  return 200;
@@ -768,21 +676,23 @@ unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier code
 	  return 60; // SIP currently lacks the possibility to send videoFastUpdate requests
 	default:
 	  return 0;
-  }
+  }*/
+  return 0;
 }
 
 bool XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const
 {
-  if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
+  /*if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
   {
 	// Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. Disable sending
 	// H.263 to this MGC for now.
-	if (remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
+	/*if (remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
 	{
 	  return false;
 	}
   }
-  return true;
+  return true;*/
+    return true;
 }
 
 #pragma mark -

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.25 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.26 2008/09/21 19:37:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -163,8 +163,8 @@ void XMSIPConnection::CleanUp()
 
 void XMSIPConnection::OnReleased()
 {
-    XMSIPEndPoint * sipEndPoint = XMOpalManager::GetSIPEndPoint();
-    sipEndPoint->AddReleasingConnection(this);
-    SIPConnection::OnReleased();
-    sipEndPoint->RemoveReleasingConnection(this);
+  XMSIPEndPoint * sipEndPoint = XMOpalManager::GetSIPEndPoint();
+  sipEndPoint->AddReleasingConnection(this);
+  SIPConnection::OnReleased();
+  sipEndPoint->RemoveReleasingConnection(this);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.21 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.22 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,14 +40,7 @@ public:
 	virtual void OnRegistrationConfirm();
   PMutex & GetGatekeeperMutex() { return gatekeeperMutex; }
 	
-	// obtaining call statistics
-	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
-	
 	// overriding some callbacks
-	
-	virtual void OnEstablished(OpalConnection & connection);
-  virtual void OnReleased(OpalConnection & connection);
-	
 	virtual H323Connection * CreateConnection(OpalCall & call,
                                             const PString & token,
                                             void * userData,
@@ -70,14 +63,13 @@ public:
 private:
   
   bool isListening;
+  
   PString gatekeeperAddress;
   bool notifyGkRegistrationComplete;
   PMutex gatekeeperMutex;
   
   PMutex releasingConnectionsMutex;
   PList<XMH323Connection> releasingConnections;
-	
-	PString connectionToken;
 };
 
 #endif // __XM_H323_END_POINT_H__

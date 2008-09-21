@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.57 2008/09/18 23:08:50 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.58 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -247,17 +247,22 @@ typedef enum _XMOpalDispatcherMessage
   [components release];
 }
 
-+ (void)_callEstablished:(NSString *)callToken incoming:(BOOL)isIncomingCall localAddress:(NSString *)localAddress
++ (void)_callEstablished:(NSString *)callToken 
+              remoteName:(NSString *)remoteName
+            remoteNumber:(NSString *)remoteNumber
+           remoteAddress:(NSString *)remoteAddress
+       remoteApplication:(NSString *)remoteApplication
+            localAddress:(NSString *)localAddress
 {
   NSData *tokenData = [NSKeyedArchiver archivedDataWithRootObject:callToken];
+  NSData *remoteNameData = [NSKeyedArchiver archivedDataWithRootObject:remoteName];
+  NSData *remoteNumberData = [NSKeyedArchiver archivedDataWithRootObject:remoteNumber];
+  NSData *remoteAddressData = [NSKeyedArchiver archivedDataWithRootObject:remoteAddress];
+  NSData *remoteApplicationData = [NSKeyedArchiver archivedDataWithRootObject:remoteApplication];
+  NSData *localAddressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
   
-  NSNumber *number = [[NSNumber alloc] initWithBool:isIncomingCall];
-  NSData *incomingData = [NSKeyedArchiver archivedDataWithRootObject:number];
-  [number release];
-  
-  NSData *addressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
-  
-  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, incomingData, addressData, nil];
+  NSArray *components = [[NSArray alloc] initWithObjects:tokenData, remoteNameData, remoteNumberData, 
+    remoteAddressData, remoteApplicationData, localAddressData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_CallEstablished withComponents:components];
   
@@ -767,11 +772,6 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleIncomingCallMessage:(NSArray *)messageComponents
 {
-  if (callToken != nil) {
-    NSLog(@"have already call ongoing");
-    return;
-  }
-  
   NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
   NSData *protocolData = (NSData *)[messageComponents objectAtIndex:1];
   NSData *remoteNameData = (NSData *)[messageComponents objectAtIndex:2];
@@ -781,6 +781,12 @@ typedef enum _XMOpalDispatcherMessage
   NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:6];
   
   NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
+  
+  if (callToken != nil) {
+    _XMLogMessage("Incoming call while already in call");
+    _XMRejectIncomingCall([_callToken cStringUsingEncoding:NSASCIIStringEncoding], true);
+    return;
+  }
   
   [callToken release];
   callToken = [_callToken retain];
@@ -842,7 +848,7 @@ typedef enum _XMOpalDispatcherMessage
     return;
   }
   
-  _XMRejectIncomingCall([callToken cStringUsingEncoding:NSASCIIStringEncoding]);
+  _XMRejectIncomingCall([callToken cStringUsingEncoding:NSASCIIStringEncoding], false);
 }
 
 - (void)_handleCallEstablishedMessage:(NSArray *)messageComponents
@@ -854,11 +860,19 @@ typedef enum _XMOpalDispatcherMessage
   NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
   NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
-  NSData *incomingData = (NSData *)[messageComponents objectAtIndex:1];
-  NSNumber *incomingNumber = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:incomingData];
-  BOOL isIncomingCall = [incomingNumber boolValue];
+  NSData *remoteNameData = (NSData *)[messageComponents objectAtIndex:1];
+  NSString *remoteName = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteNameData];
   
-  NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:2];
+  NSData *remoteNumberData = (NSData *)[messageComponents objectAtIndex:2];
+  NSString *remoteNumber = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteNumberData];
+  
+  NSData *remoteAddressData = (NSData *)[messageComponents objectAtIndex:3];
+  NSString *remoteAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteAddressData];
+  
+  NSData *remoteApplicationData = (NSData *)[messageComponents objectAtIndex:4];
+  NSString *remoteApplication = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:remoteApplicationData];
+  
+  NSData *localAddressData = (NSData *)[messageComponents objectAtIndex:5];
   NSString *localAddress = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:localAddressData];
   
   if (![callToken isEqualToString:_callToken]) {
@@ -866,32 +880,7 @@ typedef enum _XMOpalDispatcherMessage
     return;
   }
   
-  NSArray *remotePartyInformations = nil;
-  
-  if (isIncomingCall == NO) {
-    const char *remoteName;
-    const char *remoteNumber;
-    const char *remoteAddress;
-    const char *remoteApplication;
-    
-    _XMLockCallInformation();
-    _XMGetCallInformation([callToken cStringUsingEncoding:NSASCIIStringEncoding], &remoteName, &remoteNumber, &remoteAddress, &remoteApplication);
-    
-    NSString *remoteNameString = [[NSString alloc] initWithCString:remoteName encoding:NSASCIIStringEncoding];
-    NSString *remoteNumberString = [[NSString alloc] initWithCString:remoteNumber encoding:NSASCIIStringEncoding];
-    NSString *remoteAddressString = [[NSString alloc] initWithCString:remoteAddress encoding:NSASCIIStringEncoding];
-    NSString *remoteApplicationString = [[NSString alloc] initWithCString:remoteApplication encoding:NSASCIIStringEncoding];
-    
-    _XMUnlockCallInformation();
-    
-    remotePartyInformations = [[NSArray alloc] initWithObjects:remoteNameString, remoteNumberString, remoteAddressString,
-      remoteApplicationString, localAddress, nil];
-    
-    [remoteNameString release];
-    [remoteNumberString release];
-    [remoteAddressString release];
-    [remoteApplicationString release];
-  }
+  NSArray *remotePartyInformations = [[NSArray alloc] initWithObjects:remoteName, remoteNumber, remoteAddress, remoteApplication, localAddress, nil];
   
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleCallEstablished:)
                                                  withObject:remotePartyInformations
@@ -932,7 +921,7 @@ typedef enum _XMOpalDispatcherMessage
   
   // If call initiation fails, no call token is set (nil), don't log this
   if (callToken != nil && callToken != SHUTDOWN_CALL_TOKEN && ![callToken isEqualToString:_callToken]) {
-    NSLog(@"call token mismatch in callCleared: %@ to current %@", _callToken, callToken);
+    // might happen if an incoming call arrives during an ongoing call
     return;
   }
   
@@ -969,8 +958,7 @@ typedef enum _XMOpalDispatcherMessage
   NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
   NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
-  if (![callToken isEqualToString:_callToken]) {
-    NSLog(@"call token mismatch in callReleased: %@ to current %@", _callToken, callToken);
+  if (![callToken isEqualToString:_callToken]) { // might happen if incoming calls arrive during an ongoing call
     return;
   }
   

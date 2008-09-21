@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.40 2008/09/16 23:16:05 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.41 2008/09/21 19:37:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -296,66 +296,6 @@ void XMSIPEndPoint::HandleNetworkStatusChange()
 {
 }
 
-void XMSIPEndPoint::GetCallStatistics(XMCallStatisticsRecord *callStatistics)
-{
-  PSafePtr<SIPConnection> connection = GetSIPConnectionWithLock(connectionToken, PSafeReadOnly);
-  
-  if (connection != NULL)
-  {
-    // not supported at the moment
-    callStatistics->roundTripDelay = UINT_MAX;
-    
-    XMOpalManager::ExtractCallStatistics(*connection, callStatistics);
-  }
-}
-
-void XMSIPEndPoint::OnEstablished(OpalConnection & connection)
-{
-  XMOpalManager *manager = (XMOpalManager *)(&GetManager());
-  
-  connectionToken = connection.GetToken();
-  
-  SIPURL remoteURL = SIPURL(connection.GetRemotePartyAddress());
-  const PString & username = remoteURL.GetUserName();
-  const PString & host = remoteURL.GetHostName();
-  PString remoteAddress;
-  
-  if (username != "") {
-    remoteAddress = username + "@" + host;
-  } else {
-    remoteAddress = host;
-  }
-  
-  manager->SetCallInformation(connectionToken,
-                              connection.GetRemotePartyName(),
-                              "",
-                              remoteAddress,
-                              connection.GetRemoteApplication(),
-                              XMCallProtocol_SIP);
-  
-  SIPEndPoint::OnEstablished(connection);
-}
-
-void XMSIPEndPoint::OnReleased(OpalConnection & connection)
-{
-  if (connection.GetToken() == connectionToken)
-  {
-    XMOpalManager *manager = (XMOpalManager *)(&GetManager());
-    PString empty = "";
-	
-    manager->SetCallInformation(connectionToken,
-                                empty,
-                                empty,
-                                empty,
-                                empty,
-                                XMCallProtocol_SIP);
-	
-    connectionToken = "";
-  }
-  
-  SIPEndPoint::OnReleased(connection);
-}
-
 SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
 												const PString & token,
 												void * userData,
@@ -400,26 +340,21 @@ SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
 void XMSIPEndPoint::CleanUp()
 {
   // Clean up all connections
-{
   PWaitAndSignal m(releasingConnectionsMutex);
-  for (PINDEX i = 0; i < releasingConnections.GetSize(); i++)
-  {
+  for (PINDEX i = 0; i < releasingConnections.GetSize(); i++) {
     releasingConnections[i].CleanUp();
   }
-}
 }
 
 void XMSIPEndPoint::AddReleasingConnection(XMSIPConnection * connection)
 {
   PWaitAndSignal m(releasingConnectionsMutex);
-  
   releasingConnections.Append(connection);
 }
 
 void XMSIPEndPoint::RemoveReleasingConnection(XMSIPConnection * connection)
 {
   PWaitAndSignal m(releasingConnectionsMutex);
-  
   releasingConnections.Remove(connection);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.38 2008/09/18 23:08:49 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.39 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,13 +63,18 @@ void _XMHandleIncomingCall(const char *callToken,
 
 /**
  * This function is called every time a call is established,
- * supplying the callID
+ * supplying the callToken and remote party information
  **/
-void _XMHandleCallEstablished(const char *callToken, bool isIncomingCall, const char *address);
+void _XMHandleCallEstablished(const char *callToken,
+                              const char *remoteName,
+                              const char *remoteNumber,
+                              const char *remoteAddress,
+                              const char *remoteApplication,
+                              const char *localAddress);
 
 /**
  * This function is called every time a call was ended,
- * supplying the callID and the CallEndReason.
+ * supplying the callToken and the CallEndReason.
  **/
 void _XMHandleCallCleared(const char *callToken, XMCallEndReason callEndReason);
 

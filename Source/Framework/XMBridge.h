@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.53 2008/09/18 23:08:49 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.54 2008/09/21 19:37:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -206,24 +206,10 @@ extern "C" {
   void _XMAcceptIncomingCall(const char *callToken);
   
   // Causes the OPAL system to reject the incomgin call
-  void _XMRejectIncomingCall(const char *callToken);
+  void _XMRejectIncomingCall(const char *callToken, bool isBusy);
   
   // Causes the OPAL system to clear the existing call
   void _XMClearCall(const char *callToken);
-  
-  // These functions provide additional information about the remote party. 
-  // Note that calling this function is only safe when the call is established
-  // Before calling XMGetCallInformation(), the call information has to be locked.
-  // Afterwards, the call information has to be unlocked again.
-  // Dereferencing the pointers after the call information has been unlocked is not
-  // safe!
-  void _XMLockCallInformation();
-  void _XMUnlockCallInformation();
-  void _XMGetCallInformation(const char *callToken,
-                             const char** remoteName, 
-                             const char** remoteNumber,
-                             const char** remoteAddress, 
-                             const char** remoteApplication);
   
   // Provides the relevant statistics data
   void _XMGetCallStatistics(const char *callToken,

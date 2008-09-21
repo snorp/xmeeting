@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.56 2008/09/18 23:08:49 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.57 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -561,23 +561,19 @@ enum {
 {
   [activeCall _setCallStatus:XMCallStatus_Active];
   
-  // the remote party information is not known before if there is an outgoing call:
-  // update the information here
-  if ([activeCall isOutgoingCall]) {
-    NSString *remoteName = (NSString *)[remotePartyInformations objectAtIndex:0];
-    NSString *remoteNumber = (NSString *)[remotePartyInformations objectAtIndex:1];
-    NSString *remoteAddress = (NSString *)[remotePartyInformations objectAtIndex:2];
-    NSString *remoteApplication = (NSString *)[remotePartyInformations objectAtIndex:3];
-    NSString *localAddress = (NSString *)[remotePartyInformations objectAtIndex:4];
+  NSString *remoteName = (NSString *)[remotePartyInformations objectAtIndex:0];
+  NSString *remoteNumber = (NSString *)[remotePartyInformations objectAtIndex:1];
+  NSString *remoteAddress = (NSString *)[remotePartyInformations objectAtIndex:2];
+  NSString *remoteApplication = (NSString *)[remotePartyInformations objectAtIndex:3];
+  NSString *localAddress = (NSString *)[remotePartyInformations objectAtIndex:4];
     
-    [activeCall _setRemoteName:remoteName];
-    [activeCall _setRemoteNumber:remoteNumber];
-    [activeCall _setRemoteAddress:remoteAddress];
-    [activeCall _setRemoteApplication:remoteApplication];
-    [activeCall _setLocalAddress:localAddress];
+  [activeCall _setRemoteName:remoteName];
+  [activeCall _setRemoteNumber:remoteNumber];
+  [activeCall _setRemoteAddress:remoteAddress];
+  [activeCall _setRemoteApplication:remoteApplication];
+  [activeCall _setLocalAddress:localAddress];
     
-    [XMCallManager _updateLocalAddressInterfaceForCall:activeCall];
-  }
+  [XMCallManager _updateLocalAddressInterfaceForCall:activeCall];
   
   [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEstablishCall
                                                       object:self];

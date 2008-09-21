@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.32 2008/09/18 23:08:50 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.33 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -56,10 +56,6 @@ bool XMEndPoint::OnOutgoingCall(const OpalLocalConnection & connection)
 bool XMEndPoint::OnIncomingCall(OpalLocalConnection & connection)
 {
   const PString & callToken = connection.GetCall().GetToken();
-  if (!XMOpalManager::GetManager()->SetCurrentCallToken(callToken)) { // another call is already active
-    connection.Release(OpalConnection::EndedByNoAccept);
-    return false; // there is already a call ongoing
-  }
   
   // sanity check, should not happen
   XMCallProtocol callProtocol = GetCallProtocolForCall(connection);
@@ -71,9 +67,9 @@ bool XMEndPoint::OnIncomingCall(OpalLocalConnection & connection)
   // determine the IP address this connection runs on
   PIPSocket::Address address(0);
   connection.GetCall().GetOtherPartyConnection(connection)->GetTransport().GetLocalAddress().GetIpAddress(address);
-  PString localAddress = address.AsString();
-  if (!address.IsValid()) {
-    localAddress = "";
+  PString localAddress = "";
+  if (address.IsValid()) {
+    localAddress = address.AsString();
   }
     
   _XMHandleIncomingCall(callToken,
@@ -81,7 +77,7 @@ bool XMEndPoint::OnIncomingCall(OpalLocalConnection & connection)
                         connection.GetRemotePartyName(),
                         connection.GetRemotePartyNumber(),
                         connection.GetRemotePartyAddress(),
-                        connection.GetRemoteApplication(),
+                        XMOpalManager::GetRemoteApplicationString(connection.GetRemoteProductInfo()),
                         localAddress);
   
   return true;
@@ -129,13 +125,16 @@ void XMEndPoint::DoAcceptIncomingCall(const PString & callToken)
   }
 }
 
-void XMEndPoint::DoRejectIncomingCall(const PString & callToken)
+void XMEndPoint::DoRejectIncomingCall(const PString & callToken, bool isBusy)
 {
 	PSafePtr<OpalLocalConnection> connection = GetLocalConnectionWithLock(callToken, PSafeReadOnly);
 	if (connection != NULL) {
     if (connection->GetCall().GetConnection(0) != connection) { // ensure it really is an incoming call
 		  XMCallProtocol callProtocol = GetCallProtocolForCall(*connection);
-		  OpalConnection::CallEndReason callEndReason = GetCallRejectionReasonForCallProtocol(callProtocol);
+      OpalConnection::CallEndReason callEndReason = OpalConnection::EndedByNoAccept;
+      if (!isBusy) {
+        callEndReason = GetCallRejectionReasonForCallProtocol(callProtocol);
+      }
 		  connection->Release(callEndReason);
     }
 	} else {

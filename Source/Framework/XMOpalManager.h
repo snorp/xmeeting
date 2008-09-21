@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.43 2008/09/18 23:08:50 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.44 2008/09/21 19:37:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -43,34 +43,18 @@ public:
   void HandleNetworkConfigurationChange();
   
   /* NAT methods */
-	void SetNATInformation(const PStringArray & stunServers,
-                         const PString & publicAddress);
+	void SetNATInformation(const PStringArray & stunServers, const PString & publicAddress);
   void HandlePublicAddressUpdate(const PString & publicAddress);
     
   /* Initiating a call */
-  void InitiateCall(XMCallProtocol protocol, const char * remoteParty, 
-                        const char *origAddressString);
+  void InitiateCall(XMCallProtocol protocol, const char * remoteParty, const char *origAddressString);
   void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
-	/* getting/setting call information */
-  bool SetCurrentCallToken(const PString & callToken); // only used for incoming calls
-  void LockCallInformation();
-  void UnlockCallInformation();
-	void GetCallInformation(PString & remoteName,
-                          PString & remoteNumber,
-                          PString & remoteAddress,
-                          PString & remoteApplication) const;
-	void SetCallInformation(const PString & connectionToken,
-                          const PString & remoteName,
-                          const PString & remoteNumber,
-                          const PString & remoteAddress,
-                          const PString & remoteApplication,
-                          XMCallProtocol callProtocol);
+	/* getting remote applcation info */
+  static PString GetRemoteApplicationString(const OpalProductInfo & info);
 	
 	/* getting call statistics */
-	void GetCallStatistics(XMCallStatisticsRecord *callStatistics);
-  static void ExtractCallStatistics(const OpalConnection & connection,
-                                    XMCallStatisticsRecord *callStatistics);
+	void GetCallStatistics(const PString & callToken, XMCallStatisticsRecord *callStatistics);
 	
 	/* overriding some callbacks */
 	virtual void OnEstablishedCall(OpalCall & call);
@@ -98,7 +82,6 @@ public:
   void SetEnableH264LimitedMode(bool _enable) { enableH264LimitedMode = _enable; }
 	
 	/* getting /setting information about current call */
-	void SetCallProtocol(XMCallProtocol theCallProtocol) { callProtocol = theCallProtocol; }
 	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier) const;
 	bool IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const;
 	
@@ -170,13 +153,6 @@ private:
   bool enableH264LimitedMode;
 	
   PMutex callMutex;
-  PString currentCallToken;
-	PString remoteName;
-	PString remoteNumber;
-	PString remoteAddress;
-	PString remoteApplication;
-  PString origRemoteAddress;
-	XMCallProtocol callProtocol;
     
   // used during InitiateCall()
   XMCallEndReason callEndReason;

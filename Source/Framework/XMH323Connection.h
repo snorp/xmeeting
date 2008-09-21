@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.21 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.22 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,12 +23,12 @@ class XMH323Connection : public H323Connection
 public:
 	
 	XMH323Connection(OpalCall & call,
-					 H323EndPoint & endpoint,
-					 const PString & token,
-					 const PString & alias,
-					 const H323TransportAddress & address,
-					 unsigned options = 0,
-                     OpalConnection::StringOptions * stringOptions = NULL);
+                   H323EndPoint & endpoint,
+                   const PString & token,
+                   const PString & alias,
+                   const H323TransportAddress & address,
+                   unsigned options = 0,
+                   OpalConnection::StringOptions * stringOptions = NULL);
 	~XMH323Connection();
 	
 	virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
@@ -58,16 +58,13 @@ public:
 	virtual bool SendUserInputTone(char tone, unsigned duration);
     virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     
-    // Customizing information
-    virtual void SetRemotePartyInfo(const H323SignalPDU & pdu);
-    
-    // Improved clean up when closing the framework
-    void CleanUp();
-    virtual void CleanUpOnCallEnd();
+  // Improved clean up when closing the framework
+  void CleanUp();
+  virtual void CleanUpOnCallEnd();
 	
 private:
 	
-    unsigned initialBandwidth;
+  unsigned initialBandwidth;
 	XMInBandDTMFHandler * inBandDTMFHandler;
 };
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.18 2008/09/18 23:08:50 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.19 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,7 +46,7 @@ public:
   
   // Call Management & Information
   void DoAcceptIncomingCall(const PString & callToken);
-	void DoRejectIncomingCall(const PString & callToken);
+	void DoRejectIncomingCall(const PString & callToken, bool isBusy);
   
   virtual OpalMediaFormatList GetMediaFormats() const { return OpalMediaFormatList(); }
 	virtual PSoundChannel * CreateSoundChannel(const XMConnection & connection, bool isSource);

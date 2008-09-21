@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.36 2008/09/18 23:08:49 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.37 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -96,16 +96,34 @@ void _XMHandleIncomingCall(const char *_callToken,
   [autoreleasePool release];
 }
 
-void _XMHandleCallEstablished(const char *_callToken, bool isIncomingCall, const char *_localAddress)
+void _XMHandleCallEstablished(const char *_callToken, 
+                              const char *_remoteName,
+                              const char *_remoteNumber,
+                              const char *_remoteAddress,
+                              const char *_remoteApplication,
+                              const char *_localAddress)
 {
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
   NSString *callToken = [[NSString alloc] initWithCString:_callToken encoding:NSASCIIStringEncoding];
+  NSString *remoteName = [[NSString alloc] initWithCString:_remoteName encoding:NSASCIIStringEncoding];
+  NSString *remoteNumber = [[NSString alloc] initWithCString:_remoteNumber encoding:NSASCIIStringEncoding];
+  NSString *remoteAddress = [[NSString alloc] initWithCString:_remoteAddress encoding:NSASCIIStringEncoding];
+  NSString *remoteApplication = [[NSString alloc] initWithCString:_remoteApplication encoding:NSASCIIStringEncoding];
   NSString *localAddress = [[NSString alloc] initWithCString:_localAddress encoding:NSASCIIStringEncoding];
 	
-  [XMOpalDispatcher _callEstablished:callToken incoming:isIncomingCall localAddress:localAddress];
+  [XMOpalDispatcher _callEstablished:callToken 
+                          remoteName:remoteName 
+                        remoteNumber:remoteNumber
+                       remoteAddress:remoteAddress
+                   remoteApplication:remoteApplication
+                        localAddress:localAddress];
 	
   [callToken release];
+  [remoteName release];
+  [remoteNumber release];
+  [remoteAddress release];
+  [remoteApplication release];
   [localAddress release];
 	
   [autoreleasePool release];

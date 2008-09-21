@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.32 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.33 2008/09/21 19:37:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -221,38 +221,20 @@ void XMH323Connection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 	}	*/
 }
 
-void XMH323Connection::SetRemotePartyInfo(const H323SignalPDU & pdu)
-{
-    PString newNumber;
-    if (pdu.GetQ931().GetCalledPartyNumber(newNumber)) {
-        remotePartyNumber = newNumber;
-    }
-    
-    PString remoteHostName = signallingChannel->GetRemoteAddress().GetHostName();
-    PString newRemotePartyName = pdu.GetQ931().GetDisplayName();
-    if (newRemotePartyName.IsEmpty() || newRemotePartyName == remoteHostName) {
-        remotePartyName = remoteHostName;
-    } else {
-        remotePartyName = newRemotePartyName;
-    }
-    
-    PTRACE(3, "H225\tSet remote party name: \"" << remotePartyName << '"');
-}
-
 void XMH323Connection::CleanUp()
 {
-    // The normal timeout for the endSession command is 10s, which is acceptable
-    // in the normal case. However, if the framework is to be closed, we don't
-    // want to wait that long
-    endSessionReceived.Signal();
+  // The normal timeout for the endSession command is 10s, which is acceptable
+  // in the normal case. However, if the framework is to be closed, we don't
+  // want to wait that long
+  endSessionReceived.Signal();
 }
 
 void XMH323Connection::CleanUpOnCallEnd()
 {
-    // Since CleanUpOnCallEnd() may block for a while, we're storing
-    // a reference to this connection in the end point.
-    XMH323EndPoint * h323EndPoint = XMOpalManager::GetH323EndPoint();
-    h323EndPoint->AddReleasingConnection(this);
-    H323Connection::CleanUpOnCallEnd();
-    h323EndPoint->RemoveReleasingConnection(this);
+  // Since CleanUpOnCallEnd() may block for a while, we're storing
+  // a reference to this connection in the end point.
+  XMH323EndPoint * h323EndPoint = XMOpalManager::GetH323EndPoint();
+  h323EndPoint->AddReleasingConnection(this);
+  H323Connection::CleanUpOnCallEnd();
+  h323EndPoint->RemoveReleasingConnection(this);
 }

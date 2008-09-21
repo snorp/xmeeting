@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.15 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.16 2008/09/21 19:37:32 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,12 +52,12 @@ public:
 	virtual bool SendUserInputTone(char tone, unsigned duration);
     virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     
-    void CleanUp();
-    virtual void OnReleased();
+  void CleanUp();
+  virtual void OnReleased();
 	
 private:
 	
-    unsigned initialBandwidth;
+  unsigned initialBandwidth;
 	XMInBandDTMFHandler *inBandDTMFHandler;
 };
 
