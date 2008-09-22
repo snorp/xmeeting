@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.41 2008/09/21 19:37:32 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.42 2008/09/22 22:56:48 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,7 +64,7 @@ bool XMSIPEndPoint::UseProxy(const PString & hostname,
   
   PString adjustedUsername;
   
-  PINDEX location = username.Find('@');
+  unsigned location = username.Find('@');
   if (location != P_MAX_INDEX) {
     adjustedUsername = username.Left(location);
   } else {
@@ -341,7 +341,7 @@ void XMSIPEndPoint::CleanUp()
 {
   // Clean up all connections
   PWaitAndSignal m(releasingConnectionsMutex);
-  for (PINDEX i = 0; i < releasingConnections.GetSize(); i++) {
+  for (unsigned i = 0; i < releasingConnections.GetSize(); i++) {
     releasingConnections[i].CleanUp();
   }
 }

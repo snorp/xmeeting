@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.33 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.34 2008/09/22 22:56:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -50,7 +50,7 @@ void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 	
 	const H323Capabilities & localCaps = GetLocalCapabilities();
 
-	for(PINDEX i = 0; i < localCaps.GetSize(); i++)
+	for (unsigned i = 0; i < localCaps.GetSize(); i++)
 	{
 		H323Capability & h323Capability = localCaps[i];
 		
@@ -82,14 +82,14 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
     
     // Go through the list of local capabilities and search for matching remote capabilities.
     // Among these, pick the one that is ranked highest according to the CompareTo() implementation
-	for(PINDEX i = 0; i < localCapabilities.GetSize(); i++)
+	for(unsigned i = 0; i < localCapabilities.GetSize(); i++)
 	{
 		H323Capability & localCapability = localCapabilities[i];
         if(PIsDescendant(&localCapability, XMH323VideoCapability)) // Should always be true
         {
             XMH323VideoCapability & localVideoCapability = (XMH323VideoCapability &)localCapability;
             XMH323VideoCapability *chosenCapability = NULL;
-            for(PINDEX j = 0; j < remoteCapabilities.GetSize(); j++)
+            for(unsigned j = 0; j < remoteCapabilities.GetSize(); j++)
             {
                 H323Capability & remoteCapability = remoteCapabilities[j];
                 // The two capabilities must be equal (Compare() must return EqualTo)

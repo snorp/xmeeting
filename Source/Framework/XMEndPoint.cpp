@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.33 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.34 2008/09/22 22:56:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,30 +84,17 @@ bool XMEndPoint::OnIncomingCall(OpalLocalConnection & connection)
 }
 
 PSoundChannel * XMEndPoint::CreateSoundChannel(const XMConnection & connection,
-											   bool isSource)
+                                               bool isSource)
 {
-	PString deviceName;
+  PString deviceName = isSource ? XMInputSoundChannelDevice : XMSoundChannelDevice;
+  PSoundChannel * soundChannel = new PSoundChannel();
 	
-	if (isSource)
-	{
-		deviceName = XMInputSoundChannelDevice;
-	}
-	else
-	{
-		deviceName = XMSoundChannelDevice;
-	}
+  if (soundChannel->Open(deviceName, isSource ? PSoundChannel::Recorder : PSoundChannel::Player, 1, 8000, 16)) {
+    return soundChannel;
+  }
 	
-	PSoundChannel * soundChannel = new PSoundChannel();
-	
-	if (soundChannel->Open(deviceName,
-						  isSource ? PSoundChannel::Recorder : PSoundChannel::Player,
-						  1, 8000, 16))
-	{
-		return soundChannel;
-	}
-	
-	delete soundChannel;
-	return NULL;
+  delete soundChannel;
+  return NULL;
 }
 
 #pragma mark -

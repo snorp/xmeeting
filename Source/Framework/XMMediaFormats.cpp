@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.31 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.32 2008/09/22 22:56:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1178,8 +1178,8 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	}
 	
 	const H245_ArrayOf_GenericParameter & h264Collapsing = h264.m_collapsing;
-	PINDEX size = h264Collapsing.GetSize();
-	PINDEX i;
+	unsigned size = h264Collapsing.GetSize();
+	unsigned i;
 	for(i = 0; i < size; i++)
 	{
 		const H245_GenericParameter & parameter = h264Collapsing[i];

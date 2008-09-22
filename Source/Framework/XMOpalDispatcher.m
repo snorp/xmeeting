@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.58 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.59 2008/09/22 22:56:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -217,8 +217,7 @@ typedef enum _XMOpalDispatcherMessage
   NSData *localAddressData = [NSKeyedArchiver archivedDataWithRootObject:localAddress];
   
   NSArray *components = [[NSArray alloc] initWithObjects:callData, protocolData, nameData,
-    numberData, addressData, applicationData, 
-    localAddressData, nil];
+    numberData, addressData, applicationData, localAddressData, nil];
   
   [XMOpalDispatcher _sendMessage:_XMOpalDispatcherMessage_IncomingCall withComponents:components];
   
@@ -789,7 +788,7 @@ typedef enum _XMOpalDispatcherMessage
   }
   
   [callToken release];
-  callToken = [_callToken retain];
+  callToken = [_callToken copy];
   
   NSNumber *number = (NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:protocolData];
   XMCallProtocol protocol = (XMCallProtocol)[number unsignedIntValue];

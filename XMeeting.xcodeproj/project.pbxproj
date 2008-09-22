@@ -1823,7 +1823,6 @@
 				D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */,
 				D198B482097636F300180551 /* XMRTPH264Packetizer.c */,
 				D10BDA490AC45832004320A8 /* XMAudioTester.cpp */,
-				D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */,
 				D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */,
 				D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */,
 				D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */,
@@ -1833,10 +1832,8 @@
 				D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */,
 				D14B04140B06020B001AB527 /* XMRFC2833Handler.cpp */,
 				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
-				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
 				D1010AB30C71F6D20010523E /* XMURLParser.cpp */,
 				D10BDA540AC4668C004320A8 /* XMAudioTester.h */,
-				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
 				D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */,
 				D1971F0A08FAB3F400295E05 /* XMMediaStream.h */,
 				D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */,
@@ -1845,7 +1842,6 @@
 				D197216908FADEE300295E05 /* XMReceiverMediaPatch.h */,
 				D14B04130B06020B001AB527 /* XMRFC2833Handler.h */,
 				D147D6050970342B005DE11C /* XMRTPPacket.h */,
-				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
 				D1010AB40C71F6D20010523E /* XMURLParser.h */,
 			);
 			name = OPAL;
@@ -2495,6 +2491,10 @@
 			children = (
 				D1971A5D08FA453F00295E05 /* XMMediaFormats.h */,
 				D1971A5E08FA453F00295E05 /* XMMediaFormats.cpp */,
+				D1B409D80879B42100C9EF33 /* XMSoundChannel.h */,
+				D1B409D90879B42100C9EF33 /* XMSoundChannel.cpp */,
+				D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */,
+				D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */,
 			);
 			name = Media;
 			sourceTree = "<group>";

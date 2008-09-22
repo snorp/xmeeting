@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.71 2008/09/21 19:37:32 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.72 2008/09/22 22:56:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -213,95 +213,96 @@ void XMOpalManager::GetCallStatistics(const PString & callToken, XMCallStatistic
     callStatistics->roundTripDelay = UINT_MAX;
   }
   
-  /*RTP_Session *session = connection.GetSession(OpalDefaultAudioMediaType);
-  if (session != NULL)
-  {
-    callStatistics->audioPacketsSent = session->GetPacketsSent();
-    callStatistics->audioBytesSent = session->GetOctetsSent();
-    callStatistics->audioMinimumSendTime = session->GetMinimumSendTime();
-    callStatistics->audioAverageSendTime = session->GetAverageSendTime();
-    callStatistics->audioMaximumSendTime = session->GetMaximumSendTime();
+  PSafePtr<OpalRTPConnection> rtpConnection = PSafePtrCast<OpalConnection, OpalRTPConnection>(connection);
+  
+  // sanity check
+  if (rtpConnection == NULL) {
+    return;
+  }
+  
+  RTP_Session *session = rtpConnection->GetSession(OpalMediaFormat::DefaultAudioSessionID);
+  if (session != NULL) {
+    callStatistics->audioPacketsSent        = session->GetPacketsSent();
+    callStatistics->audioBytesSent          = session->GetOctetsSent();
+    callStatistics->audioMinimumSendTime    = session->GetMinimumSendTime();
+    callStatistics->audioAverageSendTime    = session->GetAverageSendTime();
+    callStatistics->audioMaximumSendTime    = session->GetMaximumSendTime();
     
-    callStatistics->audioPacketsReceived = session->GetPacketsReceived();
-    callStatistics->audioBytesReceived = session->GetOctetsReceived();
+    callStatistics->audioPacketsReceived    = session->GetPacketsReceived();
+    callStatistics->audioBytesReceived      = session->GetOctetsReceived();
     callStatistics->audioMinimumReceiveTime = session->GetMinimumReceiveTime();
     callStatistics->audioAverageReceiveTime = session->GetAverageReceiveTime();
     callStatistics->audioMaximumReceiveTime = session->GetMaximumReceiveTime();
     
-    callStatistics->audioPacketsLost = session->GetPacketsLost();
-    callStatistics->audioPacketsOutOfOrder = session->GetPacketsOutOfOrder();
-    callStatistics->audioPacketsTooLate = session->GetPacketsTooLate();
+    callStatistics->audioPacketsLost        = session->GetPacketsLost();
+    callStatistics->audioPacketsOutOfOrder  = session->GetPacketsOutOfOrder();
+    callStatistics->audioPacketsTooLate     = session->GetPacketsTooLate();
     
-    callStatistics->audioAverageJitterTime = session->GetAvgJitterTime();
-    callStatistics->audioMaximumJitterTime = session->GetMaxJitterTime();
-    callStatistics->audioJitterBufferSize = session->GetJitterBufferSize();
-  } 
-  else 
-  {
-    callStatistics->audioPacketsSent = UINT_MAX;
-    callStatistics->audioBytesSent = UINT_MAX;
-    callStatistics->audioMinimumSendTime = UINT_MAX;
-    callStatistics->audioAverageSendTime = UINT_MAX;
-    callStatistics->audioMaximumSendTime = UINT_MAX;
+    callStatistics->audioAverageJitterTime  = session->GetAvgJitterTime();
+    callStatistics->audioMaximumJitterTime  = session->GetMaxJitterTime();
+    callStatistics->audioJitterBufferSize   = session->GetJitterBufferSize();
+  } else {
+    callStatistics->audioPacketsSent        = UINT_MAX;
+    callStatistics->audioBytesSent          = UINT_MAX;
+    callStatistics->audioMinimumSendTime    = UINT_MAX;
+    callStatistics->audioAverageSendTime    = UINT_MAX;
+    callStatistics->audioMaximumSendTime    = UINT_MAX;
     
-    callStatistics->audioPacketsReceived = UINT_MAX;
-    callStatistics->audioBytesReceived = UINT_MAX;
+    callStatistics->audioPacketsReceived    = UINT_MAX;
+    callStatistics->audioBytesReceived      = UINT_MAX;
     callStatistics->audioMinimumReceiveTime = UINT_MAX;
     callStatistics->audioAverageReceiveTime = UINT_MAX;
     callStatistics->audioMaximumReceiveTime = UINT_MAX;
     
-    callStatistics->audioPacketsLost = UINT_MAX;
-    callStatistics->audioPacketsOutOfOrder = UINT_MAX;
-    callStatistics->audioPacketsTooLate = UINT_MAX;
+    callStatistics->audioPacketsLost        = UINT_MAX;
+    callStatistics->audioPacketsOutOfOrder  = UINT_MAX;
+    callStatistics->audioPacketsTooLate     = UINT_MAX;
     
-    callStatistics->audioAverageJitterTime = UINT_MAX;
-    callStatistics->audioMaximumJitterTime = UINT_MAX;
-    callStatistics->audioJitterBufferSize = UINT_MAX;
+    callStatistics->audioAverageJitterTime  = UINT_MAX;
+    callStatistics->audioMaximumJitterTime  = UINT_MAX;
+    callStatistics->audioJitterBufferSize   = UINT_MAX;
   }
   
-  session = connection.GetSession(OpalDefaultVideoMediaType);
-  if (session != NULL)
-  {
-    callStatistics->videoPacketsSent = session->GetPacketsSent();
-    callStatistics->videoBytesSent = session->GetOctetsSent();
-    callStatistics->videoMinimumSendTime = session->GetMinimumSendTime();
-    callStatistics->videoAverageSendTime = session->GetAverageSendTime();
-    callStatistics->videoMaximumSendTime = session->GetMaximumSendTime();
+  session = rtpConnection->GetSession(OpalMediaFormat::DefaultVideoSessionID);
+  if (session != NULL) {
+    callStatistics->videoPacketsSent        = session->GetPacketsSent();
+    callStatistics->videoBytesSent          = session->GetOctetsSent();
+    callStatistics->videoMinimumSendTime    = session->GetMinimumSendTime();
+    callStatistics->videoAverageSendTime    = session->GetAverageSendTime();
+    callStatistics->videoMaximumSendTime    = session->GetMaximumSendTime();
     
-    callStatistics->videoPacketsReceived = session->GetPacketsReceived();
-    callStatistics->videoBytesReceived = session->GetOctetsReceived();
+    callStatistics->videoPacketsReceived    = session->GetPacketsReceived();
+    callStatistics->videoBytesReceived      = session->GetOctetsReceived();
     callStatistics->videoMinimumReceiveTime = session->GetMinimumReceiveTime();
     callStatistics->videoAverageReceiveTime = session->GetAverageReceiveTime();
     callStatistics->videoMaximumReceiveTime = session->GetMaximumReceiveTime();
     
-    callStatistics->videoPacketsLost = session->GetPacketsLost();
-    callStatistics->videoPacketsOutOfOrder = session->GetPacketsOutOfOrder();
-    callStatistics->videoPacketsTooLate = session->GetPacketsTooLate();
+    callStatistics->videoPacketsLost        = session->GetPacketsLost();
+    callStatistics->videoPacketsOutOfOrder  = session->GetPacketsOutOfOrder();
+    callStatistics->videoPacketsTooLate     = session->GetPacketsTooLate();
     
-    callStatistics->videoAverageJitterTime = session->GetAvgJitterTime();
-    callStatistics->videoMaximumJitterTime = session->GetMaxJitterTime();
-  }
-  else
-  {
-    callStatistics->videoPacketsSent = UINT_MAX;
-    callStatistics->videoBytesSent = UINT_MAX;
-    callStatistics->videoMinimumSendTime = UINT_MAX;
-    callStatistics->videoAverageSendTime = UINT_MAX;
-    callStatistics->videoMaximumSendTime = UINT_MAX;
+    callStatistics->videoAverageJitterTime  = session->GetAvgJitterTime();
+    callStatistics->videoMaximumJitterTime  = session->GetMaxJitterTime();
+  } else {
+    callStatistics->videoPacketsSent        = UINT_MAX;
+    callStatistics->videoBytesSent          = UINT_MAX;
+    callStatistics->videoMinimumSendTime    = UINT_MAX;
+    callStatistics->videoAverageSendTime    = UINT_MAX;
+    callStatistics->videoMaximumSendTime    = UINT_MAX;
     
-    callStatistics->videoPacketsReceived = UINT_MAX;
-    callStatistics->videoBytesReceived = UINT_MAX;
+    callStatistics->videoPacketsReceived    = UINT_MAX;
+    callStatistics->videoBytesReceived      = UINT_MAX;
     callStatistics->videoMinimumReceiveTime = UINT_MAX;
     callStatistics->videoAverageReceiveTime = UINT_MAX;
     callStatistics->videoMaximumReceiveTime = UINT_MAX;
     
-    callStatistics->videoPacketsLost = UINT_MAX;
-    callStatistics->videoPacketsOutOfOrder = UINT_MAX;
-    callStatistics->videoPacketsTooLate = UINT_MAX;
+    callStatistics->videoPacketsLost        = UINT_MAX;
+    callStatistics->videoPacketsOutOfOrder  = UINT_MAX;
+    callStatistics->videoPacketsTooLate     = UINT_MAX;
     
-    callStatistics->videoAverageJitterTime = UINT_MAX;
-    callStatistics->videoMaximumJitterTime = UINT_MAX;
-  }*/
+    callStatistics->videoAverageJitterTime  = UINT_MAX;
+    callStatistics->videoMaximumJitterTime  = UINT_MAX;
+  }
   
   PTRACE(3, "XMeeting Call Statistics:" <<
          "\nroundTripDelay:          " << callStatistics->roundTripDelay <<
@@ -563,7 +564,7 @@ void XMOpalManager::SetupNATTraversal()
   }
   
   // iterate through the stun servers list
-  for (PINDEX i = 0; i < stunServers.GetSize(); i++) {
+  for (unsigned i = 0; i < stunServers.GetSize(); i++) {
     const PString & stunServer = stunServers[i];
     PTRACE(3, "Trying STUN server " << stunServer);
     stunClient->SetServer(stunServer);

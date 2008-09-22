@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.41 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.42 2008/09/22 22:56:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,7 +180,7 @@ void XMH323EndPoint::HandleRegistrationConfirm()
     PString gatekeeperName = gatekeeper->GetName();
     PStringList aliases = GetAliasNames();
     PStringStream aliasStream;
-    for (PINDEX i = 0; i < aliases.GetSize(); i++) {
+    for (unsigned i = 0; i < aliases.GetSize(); i++) {
       if (i != 0) {
         aliasStream << "\n";
       }
@@ -259,7 +259,7 @@ void XMH323EndPoint::OnReceiveFeatureSet(unsigned id, const H225_FeatureSet & me
 void XMH323EndPoint::CleanUp() 
 {
   PWaitAndSignal m(releasingConnectionsMutex);
-  for (PINDEX i = 0; i < releasingConnections.GetSize(); i++) {
+  for (unsigned i = 0; i < releasingConnections.GetSize(); i++) {
     releasingConnections[i].CleanUp();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.26 2008/09/18 23:08:50 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.27 2008/09/22 22:56:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -147,11 +147,10 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 	{
 		return OpalConnection::CreateMediaStream(mediaFormat, isSource);
 	}*/
-	
-	// audio stream
+  
+ 	// audio stream
 	PSoundChannel *soundChannel = CreateSoundChannel(isSource);
-	if (soundChannel == NULL)
-	{
+	if (soundChannel == NULL) {
 		return NULL;
 	}
 	return new OpalAudioMediaStream(*this, mediaFormat, sessionID, isSource, 2, soundChannel);
