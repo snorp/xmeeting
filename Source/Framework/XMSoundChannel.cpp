@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.cpp,v 1.14 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMSoundChannel.cpp,v 1.15 2008/09/23 07:06:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,7 +13,7 @@
 #include "XMCallbackBridge.h"
 
 #define checkStatus( err, location ) \
-if(err) {\
+if (err) {\
 	PTRACE(1, "XMSoundChannelError: " << err << " (" << location << ")"); \
 }
 
@@ -31,172 +31,163 @@ PCREATE_SOUND_PLUGIN(XMSoundChannel, XMSoundChannel);
 static PMutex deviceEditMutex;
 
 // static variables
-static XMSoundChannel *activePlayDevice = NULL;
-static AudioDeviceID activePlayDeviceID = kAudioDeviceUnknown;
-static bool activePlayDeviceIsMuted = false; 
-static XMSoundChannel *recordDevice = NULL;
-static bool runInputDevice = false;
-static bool recordAudio = false;
-static AudioDeviceID recordDeviceID = kAudioDeviceUnknown;
-static bool recordDeviceIsMuted = false;
-static bool measureSignalLevels = false;
-static int inputSignalLevelCounter = 0;
+static XMSoundChannel *activePlayDevice        = NULL;
+static AudioDeviceID   activePlayDeviceID      = kAudioDeviceUnknown;
+static bool            activePlayDeviceIsMuted = false; 
+static XMSoundChannel *recordDevice            = NULL;
+static bool            runInputDevice          = false;
+static bool            recordAudio             = false;
+static AudioDeviceID   recordDeviceID          = kAudioDeviceUnknown;
+static bool            recordDeviceIsMuted     = false;
+static bool            measureSignalLevels     = false;
+static int             inputSignalLevelCounter = 0;
 
 #pragma mark -
 #pragma mark Static Methods
 
 void XMSoundChannel::Init()
 {
-	deviceEditMutex.Wait(); // should not be needed, but one never knows...
+  deviceEditMutex.Wait(); // should not be needed, but one never knows...
 	
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	UInt32 deviceIDSize = sizeof(AudioDeviceID);
+  UInt32 deviceIDSize = sizeof(AudioDeviceID);
 	
-	// define default audio devices to start with
-	err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-								   &deviceIDSize,
-								   &activePlayDeviceID);
-	checkStatus(err, 50);
+  // define default audio devices to start with
+  err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
+                                 &deviceIDSize,
+                                 &activePlayDeviceID);
+  checkStatus(err, 50);
 	
-	err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
-								   &deviceIDSize,
-								   &recordDeviceID);
-	checkStatus(err, 51);
+  err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
+                                 &deviceIDSize,
+                                 &recordDeviceID);
+  checkStatus(err, 51);
 	
-	// Start the singleton record device that is always present (but not always running).
-	// This is needed to enable input metering
-	PString deviceName = XMSoundChannelDevice;
-	recordDevice = new XMSoundChannel(deviceName, PSoundChannel::Recorder,
-									  1, 8000, 16);
-	recordDevice->SetBuffers(320, 2); // always needed before running
+  // Start the singleton record device that is always present (but not always running).
+  // This is needed to enable input metering
+  PString deviceName = XMSoundChannelDevice;
+  recordDevice = new XMSoundChannel(deviceName, PSoundChannel::Recorder, 1, 8000, 16);
+  recordDevice->SetBuffers(320, 2); // always needed before running
 	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::DoClose()
 {
-	deviceEditMutex.Wait();
+  deviceEditMutex.Wait();
 	
-	StopChannels();
-	if(recordDevice != NULL) {
-		recordDevice->Stop();
-		delete recordDevice;
-		recordDevice = NULL;
-	}
+  StopChannels();
+  if (recordDevice != NULL) {
+    recordDevice->Stop();
+    delete recordDevice;
+    recordDevice = NULL;
+  }
 	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetPlayDevice(unsigned int device)
 {
-	deviceEditMutex.Wait();
+  deviceEditMutex.Wait();
 	
-	AudioDeviceID deviceID = (AudioDeviceID)device;
+  AudioDeviceID deviceID = (AudioDeviceID)device;
+  if (activePlayDeviceID != deviceID) {
+    activePlayDeviceID = deviceID;
+		if (activePlayDevice) {
+      activePlayDevice->Restart(activePlayDeviceID);
+    }
+  }
+  // changing the play device removes the mute state
+  activePlayDeviceIsMuted = false;
 	
-	if(activePlayDeviceID != deviceID)
-	{
-		activePlayDeviceID = deviceID;
-		
-		if(activePlayDevice)
-		{
-			activePlayDevice->Restart(activePlayDeviceID);
-		}
-	}
-	
-	activePlayDeviceIsMuted = false;
-	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetPlayDeviceMuted(bool muteFlag)
 {
-	deviceEditMutex.Wait();
+  deviceEditMutex.Wait();
 	
-	if(activePlayDevice != NULL)
-	{
-		activePlayDevice->SetDeviceMuted(muteFlag);
-	}
+  if (activePlayDevice != NULL) {
+    activePlayDevice->SetDeviceMuted(muteFlag);
+  }
+  activePlayDeviceIsMuted = muteFlag;
 	
-	activePlayDeviceIsMuted = muteFlag;
-	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetRecordDevice(unsigned int device)
 {
-	deviceEditMutex.Wait();
+  deviceEditMutex.Wait();
 	
-	AudioDeviceID deviceID = (AudioDeviceID)device;
-	
-	if(recordDeviceID != deviceID)
-	{
-		recordDeviceID = deviceID;
-		
+  AudioDeviceID deviceID = (AudioDeviceID)device;
+  if (recordDeviceID != deviceID) {
+    recordDeviceID = deviceID;
 		recordDevice->Restart(recordDeviceID, false);
-	}
-	
+  }
+  // changing the record device removes the mute state
 	recordDeviceIsMuted = false;
 	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetRecordDeviceMuted(bool muteFlag)
 {
-	deviceEditMutex.Wait();
+  deviceEditMutex.Wait();
 	
-	if(recordDevice != NULL)
-	{
-		recordDevice->SetDeviceMuted(muteFlag);
-	}
-	
+  if (recordDevice != NULL) {
+    recordDevice->SetDeviceMuted(muteFlag);
+  }
 	recordDeviceIsMuted = muteFlag;
 	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetMeasureSignalLevels(bool flag)
 {
-	deviceEditMutex.Wait();
+  deviceEditMutex.Wait();
 	
-	measureSignalLevels = flag;
-	if(measureSignalLevels == true)
-	{
-		recordDevice->Start();
-	}
-	else if(runInputDevice == false && recordAudio == false)
-	{
-		recordDevice->Stop();
-	}
+  // to measure the signal levels, the input device has to run.
+  // stop the input device again if no call is onging and no audio
+  // is recorded
+  measureSignalLevels = flag;
+  if (measureSignalLevels == true) {
+    recordDevice->Start();
+  } else if (runInputDevice == false && recordAudio == false) {
+    recordDevice->Stop();
+  }
 	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::SetRecordAudio(bool flag)
-{
-	deviceEditMutex.Wait();
+{  
+  deviceEditMutex.Wait();
 	
-	recordAudio = flag;
-	if(recordAudio == true)
-	{
+  // to record audio, the input device has to run obviously.
+  // stop the input device again, if no call is ongoing and no
+  // signal levels are recorded
+  recordAudio = flag;
+  if (recordAudio == true) {
 		recordDevice->Start();
-	}
-	else if(runInputDevice == false && measureSignalLevels == false)
-	{
-		recordDevice->Stop();
-	}
+	} else if (runInputDevice == false && measureSignalLevels == false) {
+    recordDevice->Stop();
+  }
 	
-	deviceEditMutex.Signal();
+  deviceEditMutex.Signal();
 }
 
 void XMSoundChannel::StopChannels()
 {
-	deviceEditMutex.Wait();
-	if(activePlayDevice != NULL)
-	{
-		activePlayDevice->Stop();
+  deviceEditMutex.Wait();
+  
+  // the record device is handled separately, as this device
+  // might be otherwise active (call recording, signal level metering)
+  if (activePlayDevice != NULL) {
+    activePlayDevice->Stop();
 	}
-	deviceEditMutex.Signal();
+  
+  deviceEditMutex.Signal();
 }
 
 #pragma mark -
@@ -204,292 +195,263 @@ void XMSoundChannel::StopChannels()
 
 XMSoundChannel::XMSoundChannel()
 {
-	CommonConstruct();
+  CommonConstruct();
 }
 
 XMSoundChannel::XMSoundChannel(const PString & device,
-							   PSoundChannel::Directions direction,
-							   unsigned numChannels,
-							   unsigned sampleRate,
-							   unsigned bitsPerSample)
+                               PSoundChannel::Directions direction,
+                               unsigned numChannels,
+                               unsigned sampleRate,
+                               unsigned bitsPerSample)
 {
-	CommonConstruct();	
-	Open(device, direction, numChannels, sampleRate, bitsPerSample);
+  CommonConstruct();	
+  Open(device, direction, numChannels, sampleRate, bitsPerSample);
 }
 
 XMSoundChannel::~XMSoundChannel()
 {
-	PWaitAndSignal m(deviceEditMutex);
+  PWaitAndSignal m(deviceEditMutex);
 	
-	if(direction == Player)
-	{	
-		// detach the activePlayDevice pointer
-		activePlayDevice = NULL;
-	}
-	else if(isInputProxy == true)
-	{
-		runInputDevice = false;
-		if(measureSignalLevels == false && recordAudio == false)
-		{
-			recordDevice->Stop();
-		}
+  if (direction == Player) {	
+    // detach the activePlayDevice pointer
+    activePlayDevice = NULL;
+  } else if (isInputProxy == true) {
+    runInputDevice = false;
+    if (measureSignalLevels == false && recordAudio == false) {
+      recordDevice->Stop();
+    }
 	}
 	
-	PWaitAndSignal m2(editMutex);
+  PWaitAndSignal m2(editMutex);
 	
-	// Closing the device, freeing all buffers
-	CloseDevice();
+  // Closing the device, freeing all buffers
+  CloseDevice();
 }
 
 PString XMSoundChannel::GetDefaultDevice(PSoundChannel::Directions direction)
 {
-	return XMSoundChannelDevice;
+  return XMSoundChannelDevice;
 }
 
 PStringList XMSoundChannel::GetDeviceNames(PSoundChannel::Directions direction)
 {
-	PStringList devices;
+  PStringList devices;
 	
-	devices.AppendString(XMSoundChannelDevice);
-	devices.AppendString(XMInputSoundChannelDevice);
+  devices.AppendString(XMSoundChannelDevice);
+  devices.AppendString(XMInputSoundChannelDevice);
 	
-	return devices;
+  return devices;
 }
 
 bool XMSoundChannel::Open(const PString & deviceName,
-						  PSoundChannel::Directions direction,
-						  unsigned numChannels,
-						  unsigned sampleRate,
-						  unsigned bitsPerSample)
+                          PSoundChannel::Directions direction,
+                          unsigned numChannels,
+                          unsigned sampleRate,
+                          unsigned bitsPerSample)
 {	
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(deviceName == XMInputSoundChannelDevice)
-	{
-		// This instance is just a thin 'proxy'
-		// that forwards all requests to the singleton
-		// record device already present
-		isInputProxy = true;
-        this->direction = direction;
-		os_handle = 8;
-		state = format_set_;
-		runInputDevice = true;
-		recordDevice->Start();
-		return true;
-	}
+  if (deviceName == XMInputSoundChannelDevice) {
+    // This instance is just a thin 'proxy'
+    // that forwards all requests to the singleton
+    // record device already present
+    isInputProxy = true;
+    this->direction = direction;
+    os_handle = 8;
+    state = format_set_;
+    runInputDevice = true;
+    recordDevice->Start();
+    return true;
+  }
 	
-	if(direction == Player)
-	{
-		activePlayDevice = this;
-		isMuted = activePlayDeviceIsMuted;
-	}
-	else
-	{
-		isMuted = recordDeviceIsMuted;
-	}
+  // if it is a Play device, store a reference
+  // to the play device
+  if (direction == Player) {
+    deviceEditMutex.Wait();
+    activePlayDevice = this;
+    deviceEditMutex.Signal();
+    isMuted = activePlayDeviceIsMuted;
+  } else {
+    isMuted = recordDeviceIsMuted;
+  }
 	
-	if(deviceName != XMSoundChannelDevice)
-	{
-		// an error, should not happen!
-		mDeviceID = kAudioDeviceUnknown;
-		return false;
-	}
-	else
-	{
-		// set direction of device
-		this->direction = direction;
+  if (deviceName != XMSoundChannelDevice) {
+    // an error, should not happen!
+    mDeviceID = kAudioDeviceUnknown;
+    return false;
+  } else {
+    // set direction of device
+    this->direction = direction;
 		
-		AudioDeviceID deviceID;
+    AudioDeviceID deviceID;
 		
-		// determine which audio device to take
-		deviceEditMutex.Wait();
-		if(direction == Player)
-		{
-			deviceID = activePlayDeviceID;
-		}
-		else
-		{
-			deviceID = recordDeviceID;
-		}
-		deviceEditMutex.Signal();
+    // determine which audio device to take
+    deviceEditMutex.Wait();
+    if (direction == Player) {
+      deviceID = activePlayDeviceID;
+    } else {
+      deviceID = recordDeviceID;
+    }
+    deviceEditMutex.Signal();
 		
-		return OpenDevice(deviceID, numChannels, sampleRate, bitsPerSample);
-	}
+    return OpenDevice(deviceID, numChannels, sampleRate, bitsPerSample);
+  }
 }
 
 bool XMSoundChannel::IsOpen() const
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy == true)
-	{
-		return true;
-	}
-	return os_handle >= 0;
+  if (isInputProxy == true) {
+    return true;
+  }
+  return os_handle >= 0;
 }
 
 unsigned XMSoundChannel::GetChannels() const
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy == true)
-	{
-		return recordDevice->GetChannels();
-	}
-	if(state >= format_set_)
-	{
-		return pwlibASBD.mChannelsPerFrame;
-	}
-	return 0;
+  if (isInputProxy == true) {
+    return recordDevice->GetChannels();
+  }
+  if (state >= format_set_) {
+    return ptlibASBD.mChannelsPerFrame;
+  }
+  return 0;
 }
 
 unsigned XMSoundChannel::GetSampleRate() const
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy == true)
-	{
-		return recordDevice->GetSampleRate();
-	}
-	if(state >= format_set_)
-	{
-		return (unsigned)(pwlibASBD.mSampleRate);
-	}
-	return 0;
+  if (isInputProxy == true) {
+    return recordDevice->GetSampleRate();
+  }
+  if (state >= format_set_) {
+    return (unsigned)(ptlibASBD.mSampleRate);
+  }
+  return 0;
 }
 
 unsigned XMSoundChannel::GetSampleSize() const
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy == true)
-	{
-		return recordDevice->GetSampleSize();
-	}
-	if(state >= format_set_)
-	{
-		return (unsigned)(pwlibASBD.mBitsPerChannel);
-	}
-	return 0;
+  if (isInputProxy == true) {
+    return recordDevice->GetSampleSize();
+  }
+  if (state >= format_set_) {
+    return (unsigned)(ptlibASBD.mBitsPerChannel);
+  }
+  return 0;
 }
 
-bool XMSoundChannel::SetFormat(unsigned numChannels,
-							   unsigned sampleRate,
-							   unsigned bitsPerSample)
+bool XMSoundChannel::SetFormat(unsigned numChannels, unsigned sampleRate, unsigned bitsPerSample)
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	// Currently, only 8kHz, 16-bit linear PCM (mono) is supported
-	PAssert((sampleRate == 8000 && numChannels == 1 && bitsPerSample == 16), PUnsupportedFeature);
+  // Currently, only 8kHz, 16-bit linear PCM (mono) is supported
+  PAssert((sampleRate == 8000 && numChannels == 1 && bitsPerSample == 16), PUnsupportedFeature);
 	
-	// input proxies just forward to the singleton instance
-	if(isInputProxy)
-	{
-		return true;
-	}
+  // input proxies just forward to the singleton instance
+  if (isInputProxy) {
+    return true;
+  }
 	
-	if(state != open_)
-	{
-		return false;
-	}
+  // logic sanity checks
+  if (state != open_) {
+    PTRACE(1, "Attempt to set format on non-open XMSoundChannel instance");
+    return false;
+  }
 	
-	/*
-	 * Setup the pwlibASBD
-	 */
-	memset((void *)&pwlibASBD, 0, sizeof(AudioStreamBasicDescription)); 
+  /*
+   * Setup the ptlibASBD
+   */
+	memset((void *)&ptlibASBD, 0, sizeof(AudioStreamBasicDescription)); 
 	
-	/* pwlibASBD->mReserved */
-	pwlibASBD.mFormatID          = kAudioFormatLinearPCM;
-	pwlibASBD.mFormatFlags       = kLinearPCMFormatFlagIsSignedInteger;
-	pwlibASBD.mFormatFlags      |= kLinearPCMFormatFlagIsNonInterleaved; 
+  /* ptlibASBD->mReserved */
+  ptlibASBD.mFormatID          = kAudioFormatLinearPCM;
+  ptlibASBD.mFormatFlags       = kLinearPCMFormatFlagIsSignedInteger;
+  ptlibASBD.mFormatFlags      |= kLinearPCMFormatFlagIsNonInterleaved; 
 #if PBYTE_ORDER == PBIG_ENDIAN
-	pwlibASBD.mFormatFlags      |= kLinearPCMFormatFlagIsBigEndian;
+  ptlibASBD.mFormatFlags      |= kLinearPCMFormatFlagIsBigEndian;
 #endif
-	pwlibASBD.mSampleRate        = sampleRate;
-	pwlibASBD.mChannelsPerFrame  = numChannels;
-	pwlibASBD.mBitsPerChannel    = bitsPerSample;
-	pwlibASBD.mBytesPerFrame     = bitsPerSample / 8;
-	pwlibASBD.mFramesPerPacket   = 1;
-	pwlibASBD.mBytesPerPacket    = pwlibASBD.mBytesPerFrame;
+  ptlibASBD.mSampleRate        = sampleRate;
+  ptlibASBD.mChannelsPerFrame  = numChannels;
+  ptlibASBD.mBitsPerChannel    = bitsPerSample;
+  ptlibASBD.mBytesPerFrame     = bitsPerSample / 8;
+  ptlibASBD.mFramesPerPacket   = 1;
+  ptlibASBD.mBytesPerPacket    = ptlibASBD.mBytesPerFrame;
     
-    // dummy device needs nothing to set up
-	if(mDeviceID == kAudioDeviceUnknown)
-	{
-		state = format_set_;
-		return true;
-	}
+  // dummy device needs nothing to set up
+  if (mDeviceID == kAudioDeviceUnknown) {
+    state = format_set_;
+    return true;
+  }
 	
-	OSStatus err;
-	if(direction == Player)
-	{
-		err = MatchHALOutputFormat();
-	}
-	else
-	{
-		err = MatchHALInputFormat();
-	}
-	checkStatus(err, 1);
+  OSStatus err;
+  if (direction == Player) {
+    err = MatchHALOutputFormat();
+  } else {
+    err = MatchHALInputFormat();
+  }
+  checkStatus(err, 1);
 	
-	/*
-	 * Sample Rate Conversion (SRC)
-	 * Create AudioConverters, input/output buffers, compute conversion rate 
-	 */
+  /*
+   * Sample Rate Conversion (SRC)
+   * Create AudioConverters, input/output buffers, compute conversion rate 
+   */
 	
-	// how many samples has the output device compared to pwlib sample rate?
-	rateTimes8kHz  = hwASBD.mSampleRate / pwlibASBD.mSampleRate;
+  // how many samples has the output device compared to pwlib sample rate?
+  rateTimes8kHz  = hwASBD.mSampleRate / ptlibASBD.mSampleRate;
 	
-	/*
-	 * Create Converter for Sample Rate conversion
-	 */
-	if (direction == Player)
-	{
-		err = AudioConverterNew(&pwlibASBD, &hwASBD, &converter);
-	}
-	else
-	{
-		err = AudioConverterNew(&hwASBD, &pwlibASBD, &converter);
-	}
-	checkStatus(err, 2);
+  /*
+   * Create Converter for Sample Rate conversion
+   */
+  if (direction == Player) {
+    err = AudioConverterNew(&ptlibASBD, &hwASBD, &converter);
+  } else {
+    err = AudioConverterNew(&hwASBD, &ptlibASBD, &converter);
+  }
+  checkStatus(err, 2);
 	
-	// Bluetooth devices record at 8kHz. They don't need any
-	// sample rate conversion. Don't set the Quality and
-	// prime method quantities as they're not supported by this
-	// converter anyway
-	if(hwASBD.mSampleRate != pwlibASBD.mSampleRate)
-	{
-		UInt32 quality = kAudioConverterQuality_Max;
-		err = AudioConverterSetProperty(converter,
-										kAudioConverterSampleRateConverterQuality,
-										sizeof(UInt32),
-										&quality);
-		checkStatus(err, 3);
+  // Bluetooth devices record at 8kHz. They don't need any
+  // sample rate conversion. Don't set the Quality and
+  // prime method quantities as they're not supported by this
+  // converter anyway
+  if (hwASBD.mSampleRate != ptlibASBD.mSampleRate) {
+    UInt32 quality = kAudioConverterQuality_Max;
+    err = AudioConverterSetProperty(converter,
+                                    kAudioConverterSampleRateConverterQuality,
+                                    sizeof(UInt32),
+                                    &quality);
+    checkStatus(err, 3);
 		
-		// trying compute number of requested data more predictably also 
-		// for the first request
-		UInt32 primeMethod = kConverterPrimeMethod_None;
-		err = AudioConverterSetProperty(converter,
-										kAudioConverterPrimeMethod,
-										sizeof(UInt32),
-										&primeMethod);
-		checkStatus(err, 4);
-	}
+    // trying compute number of requested data more predictably also 
+    // for the first request
+    UInt32 primeMethod = kConverterPrimeMethod_None;
+    err = AudioConverterSetProperty(converter,
+                                    kAudioConverterPrimeMethod,
+                                    sizeof(UInt32),
+                                    &primeMethod);
+    checkStatus(err, 4);
+  }
 	
-	state = format_set_;
-	return true;
+  state = format_set_;
+  return true;
 }
 
-bool XMSoundChannel::GetBuffers(PINDEX & size,
-								PINDEX & count)
+bool XMSoundChannel::GetBuffers(PINDEX & size, PINDEX & count)
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy)
-	{
-		return recordDevice->GetBuffers(size, count);
-	}
-	size = bufferSizeBytes;
-	count = bufferCount;
-	return true;
+  if (isInputProxy) {
+    return recordDevice->GetBuffers(size, count);
+  }
+  size = bufferSizeBytes;
+  count = bufferCount;
+  return true;
 }
 
 /**
@@ -503,243 +465,219 @@ bool XMSoundChannel::GetBuffers(PINDEX & size,
  * count:   Number of buffers
  *
  **/
-bool XMSoundChannel::SetBuffers(PINDEX bufferSize,
-								PINDEX bufferCount)
+bool XMSoundChannel::SetBuffers(PINDEX bufferSize, PINDEX bufferCount)
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	if(isInputProxy)
-	{
-		return true; // not needed for thin proxies
-	}
+  if (isInputProxy) {
+    return true; // not needed for thin proxies
+  }
 
-	// validity checks
-	PAssert((bufferSize > 0 && bufferCount > 0 && bufferCount < 65536), PInvalidParameter);
-	if(state != format_set_)
-	{
-		return false;
-	}
+  // validity checks
+  PAssert((bufferSize > 0 && bufferCount > 0 && bufferCount < 65536), PInvalidParameter);
+  if (state != format_set_) {
+    return false;
+  }
 	
-	this->bufferSizeBytes = bufferSize;
-	this->bufferCount = bufferCount;
+  this->bufferSizeBytes = bufferSize;
+  this->bufferCount = bufferCount;
 	
-	if(mDeviceID == kAudioDeviceUnknown)
-	{
-		state = buffer_set_;
-		return true;
-	}
+  if (mDeviceID == kAudioDeviceUnknown) {
+    state = buffer_set_;
+    return true;
+  }
 	
-	mCircularBuffer = new XMCircularBuffer(bufferSize * bufferCount);
+  mCircularBuffer = new XMCircularBuffer(bufferSize * bufferCount);
 	
-	/** Register callback function */
-	err = CallbackSetup();
-    checkStatus(err, 7);
+  /** Register callback function */
+  err = CallbackSetup();
+  checkStatus(err, 7);
 	
-	if (direction == Player) {
-		UInt32 propertySize = sizeof(UInt32);
-		err = AudioConverterGetProperty(converter,
-										kAudioConverterPropertyCalculateInputBufferSize,
-										&propertySize,
-										&bufferSizeBytes);
-		checkStatus(err, 6);
-		converter_buffer_size = bufferSizeBytes;
-	} else {        UInt32 bufferSizeFrames;
-        UInt32 propertySize;
+  if (direction == Player) {
+    UInt32 propertySize = sizeof(UInt32);
+    err = AudioConverterGetProperty(converter,
+                                    kAudioConverterPropertyCalculateInputBufferSize,
+                                    &propertySize,
+                                    &bufferSizeBytes);
+    checkStatus(err, 6);
+    converter_buffer_size = bufferSizeBytes;
+  } else { 
+    UInt32 bufferSizeFrames;
+    UInt32 propertySize;
         
-        // Try to obtain the variable frame size
-        propertySize = sizeof(UInt32);
-        err = AudioDeviceGetProperty( mDeviceID,
-                                      0, // output channel
-                                      true, // is input
-                                      kAudioDevicePropertyUsesVariableBufferFrameSizes,
-                                      &propertySize,
-                                      &bufferSizeFrames);
-        if (err != noErr)
-        {
-            // Variable size didn't work out. Take fixed size
-            propertySize = sizeof(UInt32);
-            err = AudioDeviceGetProperty( mDeviceID,
-                                          0, // output channel
-                                          true, // is input
-                                          kAudioDevicePropertyBufferFrameSize,
-                                          &propertySize,
-                                          &bufferSizeFrames);
-            checkStatus(err, 5);
-        }
+    // Try to obtain the variable frame size
+    propertySize = sizeof(UInt32);
+    err = AudioDeviceGetProperty(mDeviceID,
+                                 0, // output channel
+                                 true, // is input
+                                 kAudioDevicePropertyUsesVariableBufferFrameSizes,
+                                 &propertySize,
+                                 &bufferSizeFrames);
+    if (err != noErr) {
+      // Variable size didn't work out. Take fixed size
+      propertySize = sizeof(UInt32);
+      err = AudioDeviceGetProperty(mDeviceID,
+                                   0, // output channel
+                                   true, // is input
+                                   kAudioDevicePropertyBufferFrameSize,
+                                   &propertySize,
+                                   &bufferSizeFrames);
+      checkStatus(err, 5);
+    }
         
-		// on each turn the device spits out bufferSizeBytes bytes
-		// the input ringbuffer has at most MIN_INPUT_FILL frames in it 
-		// if all other frames were converted during the last callback
-		converter_buffer_size = (bufferSizeFrames + 2 * XM_MIN_INPUT_FILL) * hwASBD.mBytesPerFrame;
-	}
-	converter_buffer = (char*)malloc(converter_buffer_size);
+    // on each turn the device spits out bufferSizeBytes bytes
+    // the input ringbuffer has at most MIN_INPUT_FILL frames in it 
+    // if all other frames were converted during the last callback
+    converter_buffer_size = (bufferSizeFrames + 2 * XM_MIN_INPUT_FILL) * hwASBD.mBytesPerFrame;
+  }
+  converter_buffer = (char*)malloc(converter_buffer_size);
 	
-	/** In case of Recording we need a couple of buffers more */
-	if(direction == Recorder){
-		SetupAdditionalRecordBuffers();
-	}
+  /** In case of Recording we need a couple of buffers more */
+  if (direction == Recorder) {
+    SetupAdditionalRecordBuffers();
+  }
 	
-	/*
-	 * AU Setup, allocates necessary buffers... 
-	 */
-	err = AudioUnitInitialize(mAudioUnit);
+  /*
+   * AU Setup, allocates necessary buffers... 
+   */
+  err = AudioUnitInitialize(mAudioUnit);
 	
-	state = buffer_set_;
+  state = buffer_set_;
 	
-	return true;
+  return true;
 }
 
-bool XMSoundChannel::Read(void *buffer,
-						  PINDEX length)
+bool XMSoundChannel::Read(void *buffer, PINDEX length)
 {
     
-	// input proxies just forward to the singleton instance
-	if(isInputProxy)
-	{
-		bool result = recordDevice->Read(buffer, length);
-		return result;
-	}
+  // input proxies just forward to the singleton instance
+  if (isInputProxy) {
+    bool result = recordDevice->Read(buffer, length);
+    return result;
+  }
 	
-	if(state < buffer_set_)
-	{
-		return false;
-	}
+  if (state < buffer_set_) {
+    return false;
+  }
 	
-	if(isMuted == true || mDeviceID == kAudioDeviceUnknown)
-	{
-        // Siimply fill the buffer with zeros
-        lastReadCount =  length; 
-		bzero(buffer, length);
+  if (isMuted == true || mDeviceID == kAudioDeviceUnknown) {
+    // Simply fill the buffer with zeros
+    lastReadCount =  length;  
+    bzero(buffer, length);
         
-        // Determine how long to sleep. 
-        // This is required to obtain the correct target data rate.
-        struct timeval currentTime;
-        gettimeofday(&currentTime, NULL);
-        muteBytesRead += length;
-        unsigned bytesPerSecond = pwlibASBD.mSampleRate * pwlibASBD.mBytesPerFrame;
-        unsigned millisecondsSinceStart = (unsigned)(float(muteBytesRead) * 1000 /(float)bytesPerSecond);
-        unsigned timeElapsed = ((currentTime.tv_sec - muteStartTime.tv_sec) * 1000) +
-                               ((currentTime.tv_usec - muteStartTime.tv_usec) / 1000);
-        int timeToWait = millisecondsSinceStart - timeElapsed;
+    // Determine how long to sleep. 
+    // This is required to obtain the correct target data rate.
+    struct timeval currentTime;
+    gettimeofday(&currentTime, NULL);
+    muteBytesRead += length;
+    unsigned bytesPerSecond = ptlibASBD.mSampleRate * ptlibASBD.mBytesPerFrame;
+    unsigned millisecondsSinceStart = (unsigned)(float(muteBytesRead) * 1000 /(float)bytesPerSecond);
+    unsigned timeElapsed = ((currentTime.tv_sec - muteStartTime.tv_sec) * 1000) + ((currentTime.tv_usec - muteStartTime.tv_usec) / 1000);
+    int timeToWait = millisecondsSinceStart - timeElapsed;
         
-        if (timeToWait > 0) {
-            // Sleep the desired amount
-            usleep(1000 * timeToWait);
-        }
+    if (timeToWait > 0) {
+      // Sleep the desired amount
+      usleep(1000 * timeToWait);
+    }
 
-		return true; 
-	}
+    return true; 
+  }
 	
-    // wait at most half a second
-	lastReadCount = mCircularBuffer->Drain((char*)buffer, length, true, 500);
+  // wait at most half a second
+  lastReadCount = mCircularBuffer->Drain((char*)buffer, length, true, 500);
 	
-	return true;
+  return true;
 }
 
 PINDEX XMSoundChannel::GetLastReadCount() const
 {
-	if(isInputProxy)
-	{
-		return recordDevice->GetLastReadCount();
-	}
-	return lastReadCount;
+  if (isInputProxy) {
+    return recordDevice->GetLastReadCount();
+  }
+  return lastReadCount;
 }
 
 bool XMSoundChannel::Write(const void *buffer,
-						   PINDEX length)
+                           PINDEX length)
 {
-	if(isInputProxy)
-	{
-		return false;
-	}
-	if(state < buffer_set_)
-	{
-		return false;
+  // sanity checks
+  if (isInputProxy || state < buffer_set_) {
+    return false;
 	}
 	
-	if(isMuted == true || mDeviceID == kAudioDeviceUnknown)
-	{
-		lastWriteCount =  length; 
-
-		return true;  
-	}
+  // if muted or no device, don't write anything
+  if (isMuted == true || mDeviceID == kAudioDeviceUnknown) {
+    lastWriteCount =  length; 
+    return true;  
+  }
 	
-	// Start the device before putting data into the buffer
-	// Otherwise the thread could be locked in case the buffer is full
-	// and the device is not running and draining the buffer
-	if(state == buffer_set_)
-	{
-		OSStatus err = StartAudioConversion();
-		checkStatus(err, 8);
-	} 
+  // Start the device before putting data into the buffer
+  // Otherwise the thread could be locked in case the buffer is full
+  // and the device is not running and draining the buffer
+  if (state == buffer_set_) {
+    OSStatus err = StartAudioConversion();
+    checkStatus(err, 8);  
+  } 
 	
-	// Write to circular buffer with locking 
-	lastWriteCount = mCircularBuffer->Fill((const char*)buffer, length, true);
+  // Write to circular buffer with locking 
+  lastWriteCount = mCircularBuffer->Fill((const char*)buffer, length, true);
 	
-	_XMHandleRemoteAudioFrames((void *)buffer, (length/2));
+  _XMHandleRemoteAudioFrames((void *)buffer, (length/2));
 	
-	return true;
+  return true;
 }
 
 bool XMSoundChannel::StartRecording()
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy)
-	{
-		return true;
-	}
-	if(state != buffer_set_){
-		
+  if (isInputProxy) {
+    return true;
+  }
+  if (state != buffer_set_) {
 		return false;
-	}
+  }
 	
-	return true;
+  return true;
 }
 
 bool XMSoundChannel::IsRecordBufferFull()
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy)
-	{
-		return recordDevice->IsRecordBufferFull();
-	}
-	PAssert(direction == Recorder, PInvalidParameter);
+  if (isInputProxy) {
+    return recordDevice->IsRecordBufferFull();
+  }
+  PAssert(direction == Recorder, PInvalidParameter);
 	
-	if(state != buffer_set_)
-	{
-		return false;
-	}
+  if (state != buffer_set_) {
+    return false;
+  }
 	
-	if(isMuted == true || mDeviceID == kAudioDeviceUnknown)
-	{
-		return true;
-	}
+  // always indicate a full buffer if the mic is muted
+  if (isMuted == true || mDeviceID == kAudioDeviceUnknown) {
+    return true;
+  }
 	
-	return (mCircularBuffer->Size() > bufferSizeBytes);
+  return (mCircularBuffer->Size() > bufferSizeBytes);
 }
 
 bool XMSoundChannel::AreAllRecordBuffersFull()
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	if(isInputProxy)
-	{
-		return recordDevice->AreAllRecordBuffersFull();
-	}
-	PAssert(direction == Recorder, PInvalidParameter);
+  if (isInputProxy) {
+    return recordDevice->AreAllRecordBuffersFull();
+  }
+  PAssert(direction == Recorder, PInvalidParameter);
 	
-	if(state != buffer_set_|| 
-	   isMuted == true || 
-	   mDeviceID == kAudioDeviceUnknown)
-	{
-		return false;
-	}
+  if (state != buffer_set_|| isMuted == true || mDeviceID == kAudioDeviceUnknown) {
+    return false;
+  }
 	
-	return (mCircularBuffer->Full());
+  return mCircularBuffer->Full();
 }
 
 #pragma mark -
@@ -747,323 +685,305 @@ bool XMSoundChannel::AreAllRecordBuffersFull()
 
 bool XMSoundChannel::Abort()
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::GetVolume(unsigned & volume)
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::SetVolume(unsigned volume)
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
-bool XMSoundChannel::PlaySound(const PSound & sound,
-							   bool wait)
+bool XMSoundChannel::PlaySound(const PSound & sound, bool wait)
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
-bool XMSoundChannel::PlayFile(const PFilePath & file,
-							  bool wait)
+bool XMSoundChannel::PlayFile(const PFilePath & file, bool wait)
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::HasPlayCompleted()
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::WaitForPlayCompletion()
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::RecordSound(PSound & sound)
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::RecordFile(const PFilePath & file)
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::WaitForRecordBufferFull()
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 bool XMSoundChannel::WaitForAllRecordBuffersFull()
 {
-	PAssert(0, PUnimplementedFunction);
-	return false;
+  PAssert(0, PUnimplementedFunction);
+  return false;
 }
 
 #pragma mark -
 #pragma mark Private Methods
 
+inline unsigned XMSoundChannel::min(unsigned a, unsigned b)
+{
+  return (a < b) ? a : b;
+}
+
 void XMSoundChannel::CommonConstruct()
 {
-    os_handle = -1; // member of PSoundChannel
+  os_handle = -1; // member of PSoundChannel
     
-    isInputProxy = false;
-    direction = Player;
-    state = init_;
-	isMuted = false;
-	mAudioUnit = NULL;
-	mDeviceID = kAudioDeviceUnknown;
-	converter = NULL;
-	mCircularBuffer = NULL; 
-	rateTimes8kHz = 0;
-	bufferSizeBytes = 0;
-	bufferCount = 0;
-    muteBytesRead = 0;
-    muteStartTime.tv_sec = 0;
-    muteStartTime.tv_usec = 0;
-	converter_buffer = NULL;
-	converter_buffer_size = 0;
-	mInputCircularBuffer = NULL;
-	mInputBufferList = NULL;
-	mOutputBufferList = NULL;
-	mRecordOutputBufferSize = 0;
+  isInputProxy = false;
+  direction = Player;
+  state = init_;
+  isMuted = false;
+  mAudioUnit = NULL;
+  mDeviceID = kAudioDeviceUnknown;
+  converter = NULL;
+  mCircularBuffer = NULL; 
+  rateTimes8kHz = 0;
+  bufferSizeBytes = 0;
+  bufferCount = 0;
+  muteBytesRead = 0;
+  muteStartTime.tv_sec = 0;
+  muteStartTime.tv_usec = 0;
+  converter_buffer = NULL;
+  converter_buffer_size = 0;
+  mInputCircularBuffer = NULL;
+  mInputBufferList = NULL;
+  mOutputBufferList = NULL;
+  mRecordOutputBufferSize = 0;
 }
 
 bool XMSoundChannel::OpenDevice(AudioDeviceID deviceID, 
-								unsigned numChannels, 
-								unsigned sampleRate,
-								unsigned bitsPerSample)
+                                unsigned numChannels, 
+                                unsigned sampleRate,
+                                unsigned bitsPerSample)
 {
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	mDeviceID = deviceID;
+  mDeviceID = deviceID;
 	
-	if(mDeviceID == kAudioDeviceUnknown)
-	{
-		// dummy device, always returning zero buffers
-		os_handle = 8;
-		state = format_set_;
-        muteBytesRead = 0;
-        gettimeofday(&muteStartTime, NULL);
-		return true;
-	}
+  if (mDeviceID == kAudioDeviceUnknown) {
+    // dummy device, always returning zero buffers
+    os_handle = 8;
+    state = format_set_;
+    muteBytesRead = 0;
+    gettimeofday(&muteStartTime, NULL);
+    return true;
+  }
 	
-	// setup the underlying audio units
-	if(direction == Player)
-	{
-		err = SetupOutputUnit();
-	}
-	else
-	{
-		err = SetupInputUnit();
-	}
-	checkStatus(err, 11);
+  // setup the underlying audio units
+  if (direction == Player) {
+    err = SetupOutputUnit();
+  } else {
+    err = SetupInputUnit();
+  }
+  checkStatus(err, 11);
 	
-	os_handle = 8;	// tell IsOpen() that the channel is open
+  os_handle = 8;	// tell IsOpen() that the channel is open
 	
-	// adjusting state
-	state = open_;
+  // adjusting state
+  state = open_;
 	
-	// Set the format
-	bool result = SetFormat(numChannels, sampleRate, bitsPerSample);
+  // Set the format
+  bool result = SetFormat(numChannels, sampleRate, bitsPerSample);
 	
-	return result;
+  return result;
 }
 
 void XMSoundChannel::CloseDevice()
 {
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	if(mDeviceID != kAudioDeviceUnknown)
-	{
-		State curr(state);
+  if (mDeviceID != kAudioDeviceUnknown) {
+    State curr(state);
 	
-		/* OutputUnit also for input device,
-		 * Stop everything before deallocating buffers
-		 */
-		switch(curr) {
-			case running_:
-				err = StopAudioConversion();
-				checkStatus(err, 27);
-				/* fall through */
-			case buffer_set_:
-				/* check for all buffers unconditionally */
-				err = AudioUnitUninitialize(mAudioUnit);
-				checkStatus(err, 28);
-				/* fall through */
-			case format_set_:
-				err = AudioConverterDispose(converter);
-				checkStatus(err, 29);
-				/* fall through */
-			case open_:
-				err = CloseComponent(mAudioUnit);
-				checkStatus(err, 30);
-				/* fall through */
-			case init_:
-				/* nop */;
-		}
-	}
+    /* OutputUnit also for input device,
+     * Stop everything before deallocating buffers
+     */
+    switch(curr) {
+      case running_:
+        err = StopAudioConversion();
+        checkStatus(err, 27);
+        /* fall through */
+      case buffer_set_:
+        /* check for all buffers unconditionally */
+        err = AudioUnitUninitialize(mAudioUnit);
+        checkStatus(err, 28);
+        /* fall through */
+      case format_set_:
+        err = AudioConverterDispose(converter);
+        checkStatus(err, 29);
+        /* fall through */
+      case open_:
+        err = CloseComponent(mAudioUnit);
+        checkStatus(err, 30);
+        /* fall through */
+      case init_:
+        /* nop */;
+    }
+  }
 	
-	/* now free all buffers */
-	if(this->converter_buffer != NULL)
-	{
-		free(this->converter_buffer);
-		this->converter_buffer = NULL;
-	}
-	if(this->mCircularBuffer != NULL)
-	{
-		delete this->mCircularBuffer;
-		this->mCircularBuffer = NULL;
-	}
-	if(mInputCircularBuffer !=NULL) 
-	{
-		delete mInputCircularBuffer;
-		mInputCircularBuffer = NULL;
-	}
-	if(this->mInputBufferList != NULL)
-	{
-		free(this->mInputBufferList);
-		this->mInputBufferList = NULL;
-	}
-	if(this->mOutputBufferList != NULL)
-	{
-		free(this->mOutputBufferList);
-		this->mOutputBufferList = NULL;
-	}
+  /* now free all buffers */
+  if (this->converter_buffer != NULL) {
+    free(this->converter_buffer);
+    this->converter_buffer = NULL;
+  }
+  if (this->mCircularBuffer != NULL) {
+    delete this->mCircularBuffer;
+    this->mCircularBuffer = NULL;
+  }
+  if (mInputCircularBuffer !=NULL) {
+    delete mInputCircularBuffer;
+    mInputCircularBuffer = NULL;
+  }
+  if (this->mInputBufferList != NULL) {
+    free(this->mInputBufferList);
+    this->mInputBufferList = NULL;
+  }
+  if (this->mOutputBufferList != NULL) {
+    free(this->mOutputBufferList);
+    this->mOutputBufferList = NULL;
+  }
 	
-	// reset the state
-	state = init_;
+  // reset the state
+  state = init_;
 	
-	// tell IsOpen() that the channel is closed.
-	os_handle = -1;
+  // tell IsOpen() that the channel is closed.
+  os_handle = -1;
 }
 
 void XMSoundChannel::SetDeviceMuted(bool muteFlag)
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-    if (muteFlag != isMuted)
-    {
-        if(muteFlag == false)
-        {
-            isMuted = false;
-            StartAudioConversion();
-        }
-        else
-        {
-            muteBytesRead = 0;
-            gettimeofday(&muteStartTime, NULL);
-            isMuted = true;
-            StopAudioConversion();
-        }
+  if (muteFlag != isMuted) {
+    if (muteFlag == false) {
+      isMuted = false;
+      StartAudioConversion();
+    } else {
+      muteBytesRead = 0;
+      gettimeofday(&muteStartTime, NULL);
+      isMuted = true;
+      StopAudioConversion();
     }
+  }
 }
 
 void XMSoundChannel::Start()
 {
-	PWaitAndSignal m(editMutex);
-	StartAudioConversion();
+  PWaitAndSignal m(editMutex);
+  StartAudioConversion();
 }
 
 void XMSoundChannel::Stop()
 {
-	PWaitAndSignal m(editMutex);
-	StopAudioConversion();
+  PWaitAndSignal m(editMutex);
+  StopAudioConversion();
 }
 
 void XMSoundChannel::Restart(AudioDeviceID deviceID, bool startIfNeeded)
 {
-	PWaitAndSignal m(editMutex);
+  PWaitAndSignal m(editMutex);
 	
-	int currentState = state;
+  int currentState = state;
 	
-	PINDEX size;
-	PINDEX count;
-	unsigned numChannels = GetChannels();
-	unsigned sampleRate = GetSampleRate();
-	unsigned bitsPerSample = GetSampleSize();
-	GetBuffers(size, count);
+  PINDEX size;
+  PINDEX count;
+  unsigned numChannels = GetChannels();
+  unsigned sampleRate = GetSampleRate();
+  unsigned bitsPerSample = GetSampleSize();
+  GetBuffers(size, count);
 	
-	// Close the existing device
-	CloseDevice();
+  // Close the existing device
+  CloseDevice();
 		
-	// Resequencing the restart using the new device ID
-	OpenDevice(deviceID, numChannels, sampleRate, bitsPerSample);
-	SetBuffers(size, count);
+  // Resequencing the restart using the new device ID
+  OpenDevice(deviceID, numChannels, sampleRate, bitsPerSample);
+  SetBuffers(size, count);
 	
-	if(currentState == running_ || startIfNeeded == true)
-	{
-		StartAudioConversion();
-	}
+  if (currentState == running_ || startIfNeeded == true) {
+    StartAudioConversion();
+  }
 }
 
 OSStatus XMSoundChannel::StartAudioConversion()
 {
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	if(state == buffer_set_)
-	{
-		state = running_;
+  if (state == buffer_set_) {
+    state = running_;
 	
-		if(mCircularBuffer != NULL)
-		{
-            mCircularBuffer->SetDataRate(pwlibASBD.mBytesPerFrame * pwlibASBD.mSampleRate);
-			mCircularBuffer->Restart();
-		}
-		if(mInputCircularBuffer != NULL)
-		{
-			mInputCircularBuffer->Restart();
-		}
+    if (mCircularBuffer != NULL) {
+      mCircularBuffer->SetDataRate(ptlibASBD.mBytesPerFrame * ptlibASBD.mSampleRate);
+      mCircularBuffer->Restart();
+    }
+    if (mInputCircularBuffer != NULL) {
+      mInputCircularBuffer->Restart();
+    }
 		
-		// starting the AudioOutputUnit
-		err = AudioOutputUnitStart(mAudioUnit);
-		checkStatus(err, 98);
-	}
+    // starting the AudioOutputUnit
+    err = AudioOutputUnitStart(mAudioUnit);
+    checkStatus(err, 98);
+  }
 	
-	return err;
+  return err;
 }
 
 OSStatus XMSoundChannel::StopAudioConversion()
 {
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	if(mDeviceID == kAudioDeviceUnknown)
-	{
-		return noErr;
-	}
+  if (mDeviceID == kAudioDeviceUnknown) {
+    return noErr;
+  }
 
-	if(mCircularBuffer != NULL)
-	{
-		mCircularBuffer->Stop();
-	}
-	if(mInputCircularBuffer != NULL)
-	{
-		mInputCircularBuffer->Stop();
-	}
+  if (mCircularBuffer != NULL) {
+    mCircularBuffer->Stop();
+  }
+  if (mInputCircularBuffer != NULL) {
+    mInputCircularBuffer->Stop();
+  }
 	
-	// stopping the audioOutputUnit
-	err = AudioOutputUnitStop(mAudioUnit);
-	checkStatus(err, 99);
+  // stopping the audioOutputUnit
+  err = AudioOutputUnitStop(mAudioUnit);
+  checkStatus(err, 99);
 	
-	state = buffer_set_;
+  state = buffer_set_;
 	
-	usleep(1000*20);	// about the time of one callback, ensures that the
-						// audio processing thread did end
+  usleep(1000*20);	// about the time of one callback, ensures that the
+                    // audio processing thread did end
 	
-	return err;
+  return err;
 }
 
 /*
@@ -1073,44 +993,43 @@ OSStatus XMSoundChannel::StopAudioConversion()
  */
 OSStatus XMSoundChannel::SetupInputUnit()
 {
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	Component comp;            
-	ComponentDescription desc;
+  Component comp;            
+  ComponentDescription desc;
 	
-	//There are several different types of Audio Units.
-	//Some audio units serve as Outputs, Mixers, or DSP
-	//units. See AUComponent.h for listing
-	desc.componentType = kAudioUnitType_Output;
+  //There are several different types of Audio Units.
+  //Some audio units serve as Outputs, Mixers, or DSP
+  //units. See AUComponent.h for listing
+  desc.componentType = kAudioUnitType_Output;
 	
-	//Every Component has a subType, which will give a clearer picture
-	//of what this components function will be.
-	desc.componentSubType = kAudioUnitSubType_HALOutput;
+  //Every Component has a subType, which will give a clearer picture
+  //of what this components function will be.
+  desc.componentSubType = kAudioUnitSubType_HALOutput;
 	
-	//all Audio Units in AUComponent.h must use 
-	//"kAudioUnitManufacturer_Apple" as the Manufacturer
-	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-	desc.componentFlags = 0;
-	desc.componentFlagsMask = 0;
+  //all Audio Units in AUComponent.h must use 
+  //"kAudioUnitManufacturer_Apple" as the Manufacturer
+  desc.componentManufacturer = kAudioUnitManufacturer_Apple;
+  desc.componentFlags = 0;
+  desc.componentFlagsMask = 0;
 	
-	//Finds a component that meets the desc spec's
-	comp = FindNextComponent(NULL, &desc);
-	if (comp == NULL)
-	{
-		return kAudioCodecUnspecifiedError;
-	}
+  //Finds a component that meets the desc spec's
+  comp = FindNextComponent(NULL, &desc);
+  if (comp == NULL) {
+    return kAudioCodecUnspecifiedError;
+  }
 	
-	//gains access to the services provided by the component
-	err = OpenAComponent(comp, &mAudioUnit);
-	checkStatus(err, 12);
+  //gains access to the services provided by the component
+  err = OpenAComponent(comp, &mAudioUnit);
+  checkStatus(err, 12);
 	
-	err = EnableIO();
-	checkStatus(err, 13);
+  err = EnableIO();
+  checkStatus(err, 13);
 	
-	err= SetDeviceAsCurrent();
-	checkStatus(err, 14);
+  err= SetDeviceAsCurrent();
+  checkStatus(err, 14);
 	
-	return err;
+  return err;
 }
 
 /*
@@ -1121,33 +1040,33 @@ OSStatus XMSoundChannel::SetupInputUnit()
  */
 OSStatus XMSoundChannel::EnableIO()
 {
-	OSStatus err = noErr;
-	UInt32 enableIO;
+  OSStatus err = noErr;
+  UInt32 enableIO;
 	
-	///////////////
-	//ENABLE IO (INPUT)
-	//You must enable the Audio Unit (AUHAL) for input and disable output 
-	//BEFORE setting the AUHAL's current device.
+  ///////////////
+  //ENABLE IO (INPUT)
+  //You must enable the Audio Unit (AUHAL) for input and disable output 
+  //BEFORE setting the AUHAL's current device.
 	
-	//Enable input on the AUHAL
-	enableIO = 1;
-	err =  AudioUnitSetProperty(mAudioUnit,
-								kAudioOutputUnitProperty_EnableIO,
-								kAudioUnitScope_Input,
-								1, // input element
-								&enableIO,
-								sizeof(enableIO));
-	checkStatus(err, 15);
+  //Enable input on the AUHAL
+  enableIO = 1;
+  err =  AudioUnitSetProperty(mAudioUnit,
+                              kAudioOutputUnitProperty_EnableIO,
+                              kAudioUnitScope_Input,
+                              1, // input element
+                              &enableIO,
+                              sizeof(enableIO));
+  checkStatus(err, 15);
 	
-	//disable Output on the AUHAL
-	enableIO = 0;
-	err = AudioUnitSetProperty(mAudioUnit,
-							   kAudioOutputUnitProperty_EnableIO,
-							   kAudioUnitScope_Output,
-							   0,   //output element
-							   &enableIO,
-							   sizeof(enableIO));
-	return err;
+  //disable Output on the AUHAL
+  enableIO = 0;
+  err = AudioUnitSetProperty(mAudioUnit,
+                             kAudioOutputUnitProperty_EnableIO,
+                             kAudioUnitScope_Output,
+                             0,   //output element
+                             &enableIO,
+                             sizeof(enableIO));
+  return err;
 }
 
 /*
@@ -1156,51 +1075,49 @@ OSStatus XMSoundChannel::EnableIO()
  * data.
  */
 OSStatus XMSoundChannel::SetupOutputUnit(){
-	OSStatus err;
+  OSStatus err;
 	
-	//An Audio Unit is a OS component
-	//The component description must be setup, then used to 
-	//initialize an AudioUnit
-	ComponentDescription desc;  
+  //An Audio Unit is a OS component
+  //The component description must be setup, then used to 
+  //initialize an AudioUnit
+  ComponentDescription desc;  
 	
-	desc.componentType = kAudioUnitType_Output;
-	desc.componentSubType = kAudioUnitSubType_HALOutput;
-	//desc.componentSubType = kAudioUnitSubType_DefaultOutput;
-	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-	desc.componentFlags = 0;
-	desc.componentFlagsMask = 0;
+  desc.componentType = kAudioUnitType_Output;
+  desc.componentSubType = kAudioUnitSubType_HALOutput;
+  desc.componentManufacturer = kAudioUnitManufacturer_Apple;
+  desc.componentFlags = 0;
+  desc.componentFlagsMask = 0;
 	
-	//Finds an component that meets the desc spec's 
-	Component comp = FindNextComponent(NULL, &desc);  
-	if (comp == NULL) return kAudioCodecUnspecifiedError;
+  //Finds an component that meets the desc spec's 
+  Component comp = FindNextComponent(NULL, &desc);  
+  if (comp == NULL) return kAudioCodecUnspecifiedError;
     
-	//gains access to the services provided by the component
-	err = OpenAComponent(comp, &mAudioUnit);  
-	checkStatus(err, 16);
+  //gains access to the services provided by the component
+  err = OpenAComponent(comp, &mAudioUnit);  
+  checkStatus(err, 16);
 	
-	//enableIO not needed, because output is default
-	
-	err = SetDeviceAsCurrent();
-	return err;
+  //enableIO not needed, because output is default
+  err = SetDeviceAsCurrent();
+  return err;
 }
 
 OSStatus XMSoundChannel::SetDeviceAsCurrent()
 {                       
-	OSStatus err = noErr;
+  OSStatus err = noErr;
 	
-	// Set the Current Device to the AUHAL.
-	// this should be done only after IO has been enabled on the AUHAL.
-	// This means the direction selected, to make sure the ASBD for the proper
-	// direction is requested
-	err = AudioUnitSetProperty(mAudioUnit,
-							   kAudioOutputUnitProperty_CurrentDevice,
-							   kAudioUnitScope_Global,
-							   0,  
-							   &mDeviceID,
-							   sizeof(mDeviceID));
-	checkStatus(err, 18);
+  // Set the Current Device to the AUHAL.
+  // this should be done only after IO has been enabled on the AUHAL.
+  // This means the direction selected, to make sure the ASBD for the proper
+  // direction is requested
+  err = AudioUnitSetProperty(mAudioUnit,
+                             kAudioOutputUnitProperty_CurrentDevice,
+                             kAudioUnitScope_Global,
+                             0,  
+                             &mDeviceID,
+                             sizeof(mDeviceID));
+  checkStatus(err, 18);
 	
-	return err;
+  return err;
 }
 
 /* 
@@ -1232,51 +1149,51 @@ OSStatus XMSoundChannel::SetDeviceAsCurrent()
  */ 
 OSStatus XMSoundChannel::MatchHALOutputFormat()
 {
-	OSStatus err = noErr;
-	UInt32 size = sizeof (AudioStreamBasicDescription);
+  OSStatus err = noErr;
+  UInt32 size = sizeof (AudioStreamBasicDescription);
 	
-	memset(&hwASBD, 0, size);
+  memset(&hwASBD, 0, size);
 	
-	//Get the current stream format of the output
-	err = AudioUnitGetProperty (mAudioUnit,
-								kAudioUnitProperty_StreamFormat,
-								kAudioUnitScope_Output,
-								0,  // output bus 
-								&hwASBD,
-								&size);
-	checkStatus(err, 19);  
+  //Get the current stream format of the output
+  err = AudioUnitGetProperty (mAudioUnit,
+                              kAudioUnitProperty_StreamFormat,
+                              kAudioUnitScope_Output,
+                              0,  // output bus 
+                              &hwASBD,
+                              &size);
+  checkStatus(err, 19);  
 	
-	// make sure it is non-interleaved
-	bool isInterleaved = !(hwASBD.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
+  // make sure it is non-interleaved
+  bool isInterleaved = !(hwASBD.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
 	
-	hwASBD.mFormatFlags |= kAudioFormatFlagIsNonInterleaved; 
-	if(isInterleaved){
-		// so its only one buffer containing all data, according to 
-		// list.apple.com: You only multiply out by mChannelsPerFrame 
-		// if you are doing interleaved.
-		hwASBD.mBytesPerPacket /= hwASBD.mChannelsPerFrame;
-		hwASBD.mBytesPerFrame  /= hwASBD.mChannelsPerFrame;
-	}
+  hwASBD.mFormatFlags |= kAudioFormatFlagIsNonInterleaved; 
+  if (isInterleaved){
+    // so its only one buffer containing all data, according to 
+    // list.apple.com: You only multiply out by mChannelsPerFrame 
+    // if you are doing interleaved.
+    hwASBD.mBytesPerPacket /= hwASBD.mChannelsPerFrame;
+    hwASBD.mBytesPerFrame  /= hwASBD.mChannelsPerFrame;
+  }
 	
-	//Set the stream format of the output to match the input
-	err = AudioUnitSetProperty(mAudioUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Input,
-							   0,
-							   &hwASBD,
-							   size);
+  //Set the stream format of the output to match the input
+  err = AudioUnitSetProperty(mAudioUnit,
+                             kAudioUnitProperty_StreamFormat,
+                             kAudioUnitScope_Input,
+                             0,
+                             &hwASBD,
+                             size);
 	
 	
-	// make sure we really know the current format
-	size = sizeof (AudioStreamBasicDescription);
-	err = AudioUnitGetProperty(mAudioUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Input,
-							   0,  // input bus
-							   &hwASBD,
-							   &size);
+  // make sure we really know the current format
+  size = sizeof (AudioStreamBasicDescription);
+  err = AudioUnitGetProperty(mAudioUnit,
+                             kAudioUnitProperty_StreamFormat,
+                             kAudioUnitScope_Input,
+                             0,  // input bus
+                             &hwASBD,
+                             &size);
 	
-	return err;
+  return err;
 }
 
 
@@ -1287,92 +1204,88 @@ OSStatus XMSoundChannel::MatchHALOutputFormat()
  */ 
 OSStatus XMSoundChannel::MatchHALInputFormat()
 {
-	OSStatus err = noErr;
-	AudioStreamBasicDescription& asbd = hwASBD;
-	UInt32 size = sizeof (AudioStreamBasicDescription);
+  OSStatus err = noErr;
+  AudioStreamBasicDescription& asbd = hwASBD;
+  UInt32 size = sizeof (AudioStreamBasicDescription);
 	
-	memset(&asbd, 0, size);
+  memset(&asbd, 0, size);
 	
-	//Get the current stream format of the output
-	err = AudioUnitGetProperty(mAudioUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Input,
-							   1,  // input bus/
-							   &asbd,
-							   &size);
+  //Get the current stream format of the output
+  err = AudioUnitGetProperty(mAudioUnit,
+                             kAudioUnitProperty_StreamFormat,
+                             kAudioUnitScope_Input,
+                             1,  // input bus/
+                             &asbd,
+                             &size);
 	
-	/*
-	 * make it one-channel, non-interleaved, keeping same sample rate 
-	 */
-	bool isInterleaved = !(asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved); 
+  /*
+   * make it one-channel, non-interleaved, keeping same sample rate 
+   */
+  bool isInterleaved = !(asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved); 
 	
-	// mFormatID -> assume lpcm !!!
-	asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
+  // mFormatID -> assume lpcm !!!
+  asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
 	
-	if(isInterleaved)
-	{
-		// so it's only one buffer containing all channels, according to 
-		//list.apple.com: You only multiple out by mChannelsPerFrame 
-		//if you are doing interleaved.
-		asbd.mBytesPerPacket /= asbd.mChannelsPerFrame;
-		asbd.mBytesPerFrame  /= asbd.mChannelsPerFrame;
-	}
+  if (isInterleaved) {
+    // so it's only one buffer containing all channels, according to 
+    //list.apple.com: You only multiple out by mChannelsPerFrame 
+    //if you are doing interleaved.
+    asbd.mBytesPerPacket /= asbd.mChannelsPerFrame;
+    asbd.mBytesPerFrame  /= asbd.mChannelsPerFrame;
+  }
 	
-	asbd.mChannelsPerFrame = 1;
+  asbd.mChannelsPerFrame = 1;
 	
-	// Set it to output side of input bus
-	size = sizeof (AudioStreamBasicDescription);
-	err = AudioUnitSetProperty(mAudioUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Output,
-							   1,  // input bus
-							   &asbd,
-							   size);
-	checkStatus(err, 20);
+  // Set it to output side of input bus
+  size = sizeof (AudioStreamBasicDescription);
+  err = AudioUnitSetProperty(mAudioUnit,
+                             kAudioUnitProperty_StreamFormat,
+                             kAudioUnitScope_Output,
+                             1,  // input bus
+                             &asbd,
+                             size);
+  checkStatus(err, 20);
 	
-	// make sure we really know the current format
-	size = sizeof(AudioStreamBasicDescription);
-	err = AudioUnitGetProperty(mAudioUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Output,
-							   1,  // input bus
-							   &hwASBD,
-							   &size);
+  // make sure we really know the current format
+  size = sizeof(AudioStreamBasicDescription);
+  err = AudioUnitGetProperty(mAudioUnit,
+                             kAudioUnitProperty_StreamFormat,
+                             kAudioUnitScope_Output,
+                             1,  // input bus
+                             &hwASBD,
+                             &size);
 	
-	return err;
+  return err;
 }
 
 OSStatus XMSoundChannel::CallbackSetup()
 {
-	OSStatus err = noErr;
-	AURenderCallbackStruct callback;
+  OSStatus err = noErr;
+  AURenderCallbackStruct callback;
 	
-	callback.inputProcRefCon = this;
-	if (direction == Recorder) 
-	{
-		callback.inputProc = RecordProc;
-		/* kAudioOutputUnit stands for both Microphone/Speaker */
-		err = AudioUnitSetProperty(mAudioUnit,
-								   kAudioOutputUnitProperty_SetInputCallback,
-								   kAudioUnitScope_Global,
-								   0,
-								   &callback,
-								   sizeof(callback));
+  callback.inputProcRefCon = this;
+  if (direction == Recorder) {
+    callback.inputProc = RecordProc;
+    /* kAudioOutputUnit stands for both Microphone/Speaker */
+    err = AudioUnitSetProperty(mAudioUnit,
+                               kAudioOutputUnitProperty_SetInputCallback,
+                               kAudioUnitScope_Global,
+                               0,
+                               &callback,
+                               sizeof(callback));
 		
-	}
-	else 
-	{
-		callback.inputProc = PlayRenderProc;
-		err = AudioUnitSetProperty(mAudioUnit, 
-								   kAudioUnitProperty_SetRenderCallback,
-								   kAudioUnitScope_Input,
-								   0,
-								   &callback,
-								   sizeof(callback));
-	}
+  } else {
+    callback.inputProc = PlayRenderProc;
+    err = AudioUnitSetProperty(mAudioUnit, 
+                               kAudioUnitProperty_SetRenderCallback,
+                               kAudioUnitScope_Input,
+                               0,
+                               &callback,
+                               sizeof(callback));
+  }
 	
-	checkStatus(err, 21);
-	return err;
+  checkStatus(err, 21);
+  return err;
 }
 
 /*
@@ -1396,7 +1309,7 @@ OSStatus XMSoundChannel::CallbackSetup()
  * be sure about how many data the converter is going to ask exactly, 
  * sometimes it might be 102, 106.. This is especially true in case of the 
  * first request, where it might ask some additional data depending on 
- * PrimeMethod that garantuees smoth resampling at the border.
+ * PrimeMethod that garantuees smooth resampling at the border.
  *
  * To summarize, when the AudioUnit device is ready to handle more data, it 
  * calls its callback function, within these functions the data is processed or 
@@ -1413,298 +1326,278 @@ OSStatus XMSoundChannel::CallbackSetup()
  *  format and do not need individual description
  */
 OSStatus XMSoundChannel::ComplexBufferFillPlayback(AudioConverterRef inAudioConverter,
-												   UInt32 *ioNumberDataPackets,
-												   AudioBufferList *ioData,
-												   AudioStreamPacketDescription **outDataPacketDesc,
-												   void *inUserData)
+                                                   UInt32 *ioNumberDataPackets,
+                                                   AudioBufferList *ioData,
+                                                   AudioStreamPacketDescription **outDataPacketDesc,
+                                                   void *inUserData)
 {
-	OSStatus err = noErr;
-	XMSoundChannel *This = static_cast<XMSoundChannel*>(inUserData);
+  OSStatus err = noErr;
+  XMSoundChannel *This = static_cast<XMSoundChannel*>(inUserData);
 	
-	AudioStreamBasicDescription pwlibASBD = This->pwlibASBD;
-	XMCircularBuffer* circBuf = This->mCircularBuffer;
+  AudioStreamBasicDescription ptlibASBD = This->ptlibASBD;
+  XMCircularBuffer* circBuf = This->mCircularBuffer;
 	
-	// output might stop in case there is a complete buffer underrun!!!
-	UInt32 minPackets = MIN(*ioNumberDataPackets, circBuf->Size() / pwlibASBD.mBytesPerPacket);
-	UInt32 outBytes = minPackets* pwlibASBD.mBytesPerPacket;
+  // output might stop in case there is a complete buffer underrun!!!
+  UInt32 minPackets = min(*ioNumberDataPackets, circBuf->Size() / ptlibASBD.mBytesPerPacket);
+  UInt32 outBytes = minPackets* ptlibASBD.mBytesPerPacket;
 	
-	if(outBytes > This->converter_buffer_size)
-	{
-		// doesn't matter converter will ask right again for remaining data
-		// converter buffer multiple of packet size
-		outBytes = This->converter_buffer_size;
-	}
+  if (outBytes > This->converter_buffer_size) {
+    // doesn't matter converter will ask right again for remaining data
+    // converter buffer multiple of packet size
+    outBytes = This->converter_buffer_size;
+  }
 	
-	// dequeue data from circular buffer, without locking(false)
-	outBytes = circBuf->Drain(This->converter_buffer, outBytes, false);
+  // dequeue data from circular buffer, without locking(false)
+  outBytes = circBuf->Drain(This->converter_buffer, outBytes, false);
 	
-	UInt32 reqBytes = *ioNumberDataPackets * pwlibASBD.mBytesPerPacket;
-	if(outBytes < reqBytes && outBytes < This->converter_buffer_size) 
-	{
-		reqBytes = MIN(reqBytes, This->converter_buffer_size);
+  UInt32 reqBytes = *ioNumberDataPackets * ptlibASBD.mBytesPerPacket;
+  if (outBytes < reqBytes && outBytes < This->converter_buffer_size) {
+    reqBytes = min(reqBytes, This->converter_buffer_size);
 		
-		bzero(This->converter_buffer + outBytes, reqBytes - outBytes );
-		outBytes = reqBytes;
-	}
+    bzero(This->converter_buffer + outBytes, reqBytes - outBytes );
+    outBytes = reqBytes;
+  }
 	
-	// fill structure that gets returned to converter
-	ioData->mBuffers[0].mData = (char*)This->converter_buffer;
-	ioData->mBuffers[0].mDataByteSize = outBytes;
+  // fill structure that gets returned to converter
+  ioData->mBuffers[0].mData = (char*)This->converter_buffer;
+  ioData->mBuffers[0].mDataByteSize = outBytes;
 	
-	*ioNumberDataPackets = outBytes / pwlibASBD.mBytesPerPacket;
+  *ioNumberDataPackets = outBytes / ptlibASBD.mBytesPerPacket;
 	
-	return err;
+  return err;
 }
 
 /* 
  * Callback function called by the converter to fetch more date 
  */
 OSStatus XMSoundChannel::ComplexBufferFillRecord(AudioConverterRef inAudioConverter,
-												 UInt32 *ioNumberDataPackets,
-												 AudioBufferList *ioData,
-												 AudioStreamPacketDescription **outDataPacketDesc,
-												 void *inUserData)
+                                                 UInt32 *ioNumberDataPackets,
+                                                 AudioBufferList *ioData,
+                                                 AudioStreamPacketDescription **outDataPacketDesc,
+                                                 void *inUserData)
 {
-	OSStatus err = noErr;
-	XMSoundChannel *This = static_cast<XMSoundChannel *>(inUserData);
-	XMCircularBuffer* inCircBuf = This->mInputCircularBuffer;
-	AudioStreamBasicDescription& hwASBD = This->hwASBD;
+  OSStatus err = noErr;
+  XMSoundChannel *This = static_cast<XMSoundChannel *>(inUserData);
+  XMCircularBuffer* inCircBuf = This->mInputCircularBuffer;
+  AudioStreamBasicDescription& hwASBD = This->hwASBD;
 	
-	// make sure it's always a multiple of packets
-	UInt32 minPackets = MIN(*ioNumberDataPackets, inCircBuf->Size() / hwASBD.mBytesPerPacket );
-	UInt32 ioBytes = minPackets * hwASBD.mBytesPerPacket;
+  // make sure it's always a multiple of packets
+  UInt32 minPackets = min(*ioNumberDataPackets, inCircBuf->Size() / hwASBD.mBytesPerPacket );
+  UInt32 ioBytes = minPackets * hwASBD.mBytesPerPacket;
 	
-	if(ioBytes > This->converter_buffer_size)
-	{
-		ioBytes = This->converter_buffer_size;
-	}
+  if (ioBytes > This->converter_buffer_size) {
+    ioBytes = This->converter_buffer_size;
+  }
 	
-	ioBytes = inCircBuf->Drain((char*)This->converter_buffer, ioBytes, false);
+  ioBytes = inCircBuf->Drain((char*)This->converter_buffer, ioBytes, false);
 	
-	if(ioBytes  != minPackets * hwASBD.mBytesPerPacket) {
-		// no more a multiple of packet problably !!!
-		//PTRACE(1, "Failed to fetch the computed number of packets");
-	}
+  ioData->mBuffers[0].mData = This->converter_buffer;
+  ioData->mBuffers[0].mDataByteSize = ioBytes;
 	
-	ioData->mBuffers[0].mData = This->converter_buffer;
-	ioData->mBuffers[0].mDataByteSize = ioBytes;
+  // assuming non-interleaved or mono 
+  *ioNumberDataPackets = ioBytes / hwASBD.mBytesPerPacket;
 	
-	// assuming non-interleaved or mono 
-	*ioNumberDataPackets = ioBytes / hwASBD.mBytesPerPacket;
-	
-	return err;
+  return err;
 }
 
 /*
  * CoreAudio Player callback function
  */
 OSStatus XMSoundChannel::PlayRenderProc(void *inRefCon,
-										AudioUnitRenderActionFlags* ioActionFlags,
-										const struct AudioTimeStamp* TimeStamp,
-										UInt32 inBusNumber,
-										UInt32 inNumberFrames,
-										struct AudioBufferList* ioData)
+                                        AudioUnitRenderActionFlags* ioActionFlags,
+                                        const struct AudioTimeStamp* TimeStamp,
+                                        UInt32 inBusNumber,
+                                        UInt32 inNumberFrames,
+                                        struct AudioBufferList* ioData)
 {  
-	OSStatus err = noErr;
-	XMSoundChannel*This = static_cast<XMSoundChannel *>(inRefCon);
+  OSStatus err = noErr;
+  XMSoundChannel*This = static_cast<XMSoundChannel *>(inRefCon);
 	
-	if( This->state != running_) {
-		return noErr;
-	}
+  if ( This->state != running_) {
+    return noErr;
+  }
 	
-	err = AudioConverterFillComplexBuffer(This->converter,
-										  XMSoundChannel::ComplexBufferFillPlayback, 
-										  This, 
-										  &inNumberFrames, // should be packets
-										  ioData,
-										  NULL /*outPacketDescription*/);
-	checkStatus(err, 22);
+  err = AudioConverterFillComplexBuffer(This->converter,
+                                        XMSoundChannel::ComplexBufferFillPlayback, 
+                                        This, 
+                                        &inNumberFrames, // should be packets
+                                        ioData,
+                                        NULL /*outPacketDescription*/);
+  checkStatus(err, 22);
 	
 	
-	/* now that cpu intensive work is done, make stereo from mono
-		* assume non-interleaved ==> 1 buffer per channel */
-	UInt32 len = ioData->mBuffers[0].mDataByteSize;
-	if(len > 0 && This->state == running_)
-	{
-		unsigned i = 1;
-		while(i < ioData->mNumberBuffers) 
-		{
-			memcpy(ioData->mBuffers[i].mData, ioData->mBuffers[0].mData, len);  
-			ioData->mBuffers[i].mDataByteSize = len;
-			i++;
-		}
-	}
+  /* now that cpu intensive work is done, make stereo from mono
+   * assume non-interleaved ==> 1 buffer per channel */
+  UInt32 len = ioData->mBuffers[0].mDataByteSize;
+  if (len > 0 && This->state == running_) {
+    unsigned i = 1;
+    while(i < ioData->mNumberBuffers) {
+      memcpy(ioData->mBuffers[i].mData, ioData->mBuffers[0].mData, len);  
+      ioData->mBuffers[i].mDataByteSize = len;
+      i++;
+    }
+  }
 	
-	return err;
+  return err;
 }
 
 OSStatus XMSoundChannel::RecordProc(void *inRefCon,
-									AudioUnitRenderActionFlags *ioActionFlags,
-									const AudioTimeStamp *inTimeStamp,
-									UInt32 inBusNumber,
-									UInt32 inNumberFrames,
-									AudioBufferList *ioData)
+                                    AudioUnitRenderActionFlags *ioActionFlags,
+                                    const AudioTimeStamp *inTimeStamp,
+                                    UInt32 inBusNumber,
+                                    UInt32 inNumberFrames,
+                                    AudioBufferList *ioData)
 {	
-	OSStatus err = noErr;
-	XMSoundChannel *This = static_cast<XMSoundChannel *>(inRefCon);
-	XMCircularBuffer* inCircBuf   = This->mInputCircularBuffer;
-	AudioStreamBasicDescription asbd = This->hwASBD;
+  OSStatus err = noErr;
+  XMSoundChannel *This = static_cast<XMSoundChannel *>(inRefCon);
+  XMCircularBuffer* inCircBuf   = This->mInputCircularBuffer;
+  AudioStreamBasicDescription asbd = This->hwASBD;
 	
-	if(This->state != running_)
-	{
-		return noErr;
-	}
+  if (This->state != running_) {
+    return noErr;
+  }
 	
-    // protection against buffer overflow
-	if( This->converter_buffer_size < inNumberFrames * asbd.mFramesPerPacket)
-	{
-		inNumberFrames = This->converter_buffer_size / asbd.mFramesPerPacket;
-	}
+  // protection against buffer overflow
+  if ( This->converter_buffer_size < inNumberFrames * asbd.mFramesPerPacket) {
+    inNumberFrames = This->converter_buffer_size / asbd.mFramesPerPacket;
+  }
 	
-	/* fetch the data from the microphone or other input device */
-	AudioBufferList*  inputData =  This->mInputBufferList;
-	err= AudioUnitRender(This->mAudioUnit,
-						 ioActionFlags,
-						 inTimeStamp, 
-						 inBusNumber,
-						 inNumberFrames, //# of frames  requested
-						 inputData);// Audio Buffer List to hold data    
-	checkStatus(err, 23);
+  /* fetch the data from the microphone or other input device */
+  AudioBufferList*  inputData =  This->mInputBufferList;
+  err = AudioUnitRender(This->mAudioUnit,
+                        ioActionFlags,
+                        inTimeStamp, 
+                        inBusNumber,
+                        inNumberFrames, //# of frames  requested
+                        inputData);// Audio Buffer List to hold data    
+  checkStatus(err, 23);
 		
-	/* in any case reduce to mono by taking only the first buffer */
-	AudioBuffer *audio_buf = &inputData->mBuffers[0];
-	inCircBuf->Fill((char *)audio_buf->mData, audio_buf->mDataByteSize, 
-						false, true); // do not wait, overwrite oldest frames 
+  /* in any case reduce to mono by taking only the first buffer */
+  AudioBuffer *audio_buf = &inputData->mBuffers[0];
+  inCircBuf->Fill((char *)audio_buf->mData, audio_buf->mDataByteSize, false, true); // do not wait, overwrite oldest frames 
 		
-	/*
-	 * Sample Rate Conversion(SRC)
-	 */
-	unsigned int frames = inCircBuf->Size() / This->hwASBD.mBytesPerFrame;
+  /*
+   * Sample Rate Conversion(SRC)
+   */
+  unsigned int frames = inCircBuf->Size() / This->hwASBD.mBytesPerFrame;
 		
-	/* given the number of Microphone frames how many 8kHz frames are
-	 * to expect, keeping a minimum buffer fill of XM_MIN_INPUT_FILL frames to 
-	 * have some data handy in case the converter requests more Data */
-	if(frames > XM_MIN_INPUT_FILL)
-	{
-		UInt32 pullFrames = int(float(frames-XM_MIN_INPUT_FILL)/This->rateTimes8kHz);
-		UInt32 pullBytes = MIN( This->converter_buffer_size, pullFrames * This->pwlibASBD.mBytesPerFrame);
+  /* given the number of Microphone frames how many 8kHz frames are
+   * to expect, keeping a minimum buffer fill of XM_MIN_INPUT_FILL frames to 
+   * have some data handy in case the converter requests more Data */
+  if (frames > XM_MIN_INPUT_FILL) {
+    UInt32 pullFrames = int(float(frames-XM_MIN_INPUT_FILL)/This->rateTimes8kHz);
+    UInt32 pullBytes = min( This->converter_buffer_size, pullFrames * This->ptlibASBD.mBytesPerFrame);
 			
-		UInt32 pullPackets = pullBytes / This->pwlibASBD.mBytesPerPacket;
+    UInt32 pullPackets = pullBytes / This->ptlibASBD.mBytesPerPacket;
 			
-		/* now pull the frames through the converter */
-		AudioBufferList* outputData = This->mOutputBufferList;
-		err = AudioConverterFillComplexBuffer(This->converter,
-											  XMSoundChannel::ComplexBufferFillRecord, 
-											  This, 
-											  &pullPackets, 
-											  outputData, 
-											  NULL /*outPacketDescription*/);
-		checkStatus(err, 24);
+    /* now pull the frames through the converter */
+    AudioBufferList* outputData = This->mOutputBufferList;
+    err = AudioConverterFillComplexBuffer(This->converter,
+                                          XMSoundChannel::ComplexBufferFillRecord, 
+                                          This, 
+                                          &pullPackets, 
+                                          outputData, 
+                                          NULL /*outPacketDescription*/);
+    checkStatus(err, 24);
 			
-		/* put the converted data into the main CircularBuffer for later 
-		 * fetching by the public Read function */
-		audio_buf = &outputData->mBuffers[0];
-		This->mCircularBuffer->Fill((char*)audio_buf->mData, 
-									audio_buf->mDataByteSize, 
-									false, true); // do not wait, overwrite oldest frames
+    /* put the converted data into the main CircularBuffer for later 
+     * fetching by the public Read function */
+    audio_buf = &outputData->mBuffers[0];
+    This->mCircularBuffer->Fill((char*)audio_buf->mData,  audio_buf->mDataByteSize, false, true); // do not wait, overwrite oldest frames
 		
-		_XMHandleLocalAudioFrames(audio_buf->mData, (audio_buf->mDataByteSize/2));
+    _XMHandleLocalAudioFrames(audio_buf->mData, (audio_buf->mDataByteSize/2));
 		
-		/* Doing a (primitive) form of level metering: if the measureInputLevel flag is
-		 * set, calculate the average of the absolute values of the samples just processed. 
-		 * This uses the same  algorithm as OpalPCM16SilenceDetector::GetAverageSignalLevel() */
-		if(measureSignalLevels == true) 
-		{
-			if(inputSignalLevelCounter % 4 == 0)
-			{
-				int sum = 0;
-				PINDEX samples = audio_buf->mDataByteSize/2;
-				const short *pcm = (const short *)audio_buf->mData;
-				const short *end = pcm + samples;
-				while (pcm != end) {
-					if(*pcm < 0) {
-						sum -= *pcm++;
-					} else {
-						sum += *pcm++;
-					}
-				}
+    /* Doing a (primitive) form of level metering: if the measureInputLevel flag is
+     * set, calculate the average of the absolute values of the samples just processed. 
+     * This uses the same  algorithm as OpalPCM16SilenceDetector::GetAverageSignalLevel() */
+    if (measureSignalLevels == true) {
+      if (inputSignalLevelCounter % 4 == 0) {
+        int sum = 0;
+        PINDEX samples = audio_buf->mDataByteSize/2;
+        const short *pcm = (const short *)audio_buf->mData;
+        const short *end = pcm + samples;
+        while (pcm != end) {
+          if (*pcm < 0) {
+            sum -= *pcm++;
+          } else {
+            sum += *pcm++;
+          }
+        }
 			
-				int intLevel = sum/samples;
+        int intLevel = sum/samples;
 			
-				// convert it to logarithmic scale
-				intLevel = linear2ulaw(intLevel) ^ 0xff;
+        // convert it to logarithmic scale
+        intLevel = linear2ulaw(intLevel) ^ 0xff;
 			
-				// filter out some noise
-				if(intLevel < 15) {
-					intLevel = 0;
-				}
+        // clip away some noise
+        if (intLevel < 15) {
+          intLevel = 0;
+        }
 			
-				// transform it into double and normalizing it
-				// signed 8-bit integer: maximum is 128
-				double doubleLevel = (intLevel / 128.0);
-				_XMHandleAudioInputLevel(doubleLevel);
-			}
-		}
-		inputSignalLevelCounter++;
-	}
+        // transform it into double and normalizing it
+        // signed 8-bit integer: maximum is 128
+        double doubleLevel = (intLevel / 128.0);
+        _XMHandleAudioInputLevel(doubleLevel);
+      }
+    }
+    inputSignalLevelCounter++;
+  }
 
-	return err;
+  return err;
 }
 
 OSStatus XMSoundChannel::SetupAdditionalRecordBuffers()
 {
-	OSStatus err = noErr;
-    UInt32 propertySize;
+  OSStatus err = noErr;
+  UInt32 propertySize;
 	
-	//calculate size of ABL given the last field, assum non-interleaved 
-	UInt32 mChannelsPerFrame = hwASBD.mChannelsPerFrame;
-	UInt32 propsize = (UInt32) &(((AudioBufferList *)0)->mBuffers[mChannelsPerFrame]);
+  //calculate size of ABL given the last field, assum non-interleaved 
+  UInt32 mChannelsPerFrame = hwASBD.mChannelsPerFrame;
+  UInt32 propsize = (UInt32) &(((AudioBufferList *)0)->mBuffers[mChannelsPerFrame]);
 	
-	//malloc buffer lists
-	mInputBufferList = (AudioBufferList *)malloc(propsize);
-	mInputBufferList->mNumberBuffers = hwASBD.mChannelsPerFrame;
+  //malloc buffer lists
+  mInputBufferList = (AudioBufferList *)malloc(propsize);
+  mInputBufferList->mNumberBuffers = hwASBD.mChannelsPerFrame;
 	
-	//pre-malloc buffers for AudioBufferLists
-	for(UInt32 i =0; i< mInputBufferList->mNumberBuffers ; i++) 
-	{
-		mInputBufferList->mBuffers[i].mNumberChannels = 1;
-		mInputBufferList->mBuffers[i].mDataByteSize = converter_buffer_size;
-		mInputBufferList->mBuffers[i].mData = malloc(converter_buffer_size);
-	}
+  //pre-malloc buffers for AudioBufferLists
+  for (UInt32 i = 0; i < mInputBufferList->mNumberBuffers; i++) {
+    mInputBufferList->mBuffers[i].mNumberChannels = 1;
+    mInputBufferList->mBuffers[i].mDataByteSize = converter_buffer_size;
+    mInputBufferList->mBuffers[i].mData = malloc(converter_buffer_size);
+  }
 	
-	/** allocate ringbuffer to cache data before passing them to the converter */
-	// take only one buffer -> mono, use double buffering
-	mInputCircularBuffer = new XMCircularBuffer(converter_buffer_size * 2);
+  /** allocate ringbuffer to cache data before passing them to the converter */
+  // take only one buffer -> mono, use double buffering
+  mInputCircularBuffer = new XMCircularBuffer(converter_buffer_size * 2);
 	
-	/* 
-	 * Build buffer list that is passed to the Converter to be filled with 
-	 * the converted frames.
-	 */
-	// given the number of input bytes how many bytes to expect at the output?
-	UInt32 bufferSizeBytes = converter_buffer_size;
-	propertySize = sizeof(UInt32);
-	err = AudioConverterGetProperty(converter,
-									kAudioConverterPropertyCalculateOutputBufferSize,
-									&propertySize,
-									&bufferSizeBytes);
-	checkStatus(err, 26);
+  /* 
+   * Build buffer list that is passed to the Converter to be filled with 
+   * the converted frames.
+   */
+  // given the number of input bytes how many bytes to expect at the output?
+  UInt32 bufferSizeBytes = converter_buffer_size;
+  propertySize = sizeof(UInt32);
+  err = AudioConverterGetProperty(converter,
+                                  kAudioConverterPropertyCalculateOutputBufferSize,
+                                  &propertySize,
+                                  &bufferSizeBytes);
+  checkStatus(err, 26);
 	
-	//calculate number of buffers from channels
-	mChannelsPerFrame = pwlibASBD.mChannelsPerFrame;
-	propsize = (UInt32) &(((AudioBufferList *)0)->mBuffers[mChannelsPerFrame]);
+  //calculate number of buffers from channels
+  mChannelsPerFrame = ptlibASBD.mChannelsPerFrame;
+  propsize = (UInt32) &(((AudioBufferList *)0)->mBuffers[mChannelsPerFrame]);
 	
-	//malloc buffer lists
-	mOutputBufferList = (AudioBufferList *)malloc(propsize);
-	mOutputBufferList->mNumberBuffers = pwlibASBD.mChannelsPerFrame;
+  //malloc buffer lists
+  mOutputBufferList = (AudioBufferList *)malloc(propsize);
+  mOutputBufferList->mNumberBuffers = ptlibASBD.mChannelsPerFrame;
 	
-	//pre-malloc buffers for AudioBufferLists
-	for(UInt32 i =0; i< mOutputBufferList->mNumberBuffers ; i++)
-	{
-		mOutputBufferList->mBuffers[i].mNumberChannels = 1;
-		mOutputBufferList->mBuffers[i].mDataByteSize = bufferSizeBytes;
-		mOutputBufferList->mBuffers[i].mData = malloc(bufferSizeBytes);
-	}
-	mRecordOutputBufferSize = bufferSizeBytes;
+  //pre-malloc buffers for AudioBufferLists
+  for (UInt32 i = 0; i < mOutputBufferList->mNumberBuffers; i++) {
+    mOutputBufferList->mBuffers[i].mNumberChannels = 1;
+    mOutputBufferList->mBuffers[i].mDataByteSize = bufferSizeBytes;
+    mOutputBufferList->mBuffers[i].mData = malloc(bufferSizeBytes);
+  }
+  mRecordOutputBufferSize = bufferSizeBytes;
 	
-	return err;
+  return err;
 }

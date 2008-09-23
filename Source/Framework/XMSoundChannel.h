@@ -1,5 +1,5 @@
 /*
- * $Id: XMSoundChannel.h,v 1.10 2008/09/22 22:56:48 hfriederich Exp $
+ * $Id: XMSoundChannel.h,v 1.11 2008/09/23 07:06:58 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,7 +15,7 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <AudioUnit/AudioUnit.h>
 
-// needed by lists.h of pwlib, unfortunately also defined in previous
+// needed by lists.h of ptlib, unfortunately also defined in previous
 // includes from Apple
 #undef nil
 
@@ -77,7 +77,7 @@ public:
   /**
    * Constructors
    **/
-	XMSoundChannel(); // This constructor is used by PWLib
+	XMSoundChannel(); // This constructor is used by PTLib
 	XMSoundChannel(const PString & device,
 				   PSoundChannel::Directions dir,
 				   unsigned numChannels,
@@ -149,6 +149,8 @@ private:
 
 #pragma mark -
 #pragma mark Private Methods
+    
+  static inline unsigned min(unsigned a, unsigned b);
 	
   void CommonConstruct();
   bool OpenDevice(AudioDeviceID deviceID,
@@ -213,7 +215,7 @@ private:
   bool isMuted;
   AudioUnit mAudioUnit;
   AudioDeviceID mDeviceID;
-  AudioStreamBasicDescription hwASBD, pwlibASBD;
+  AudioStreamBasicDescription hwASBD, ptlibASBD;
 	
   AudioConverterRef converter;
   XMCircularBuffer *mCircularBuffer;
