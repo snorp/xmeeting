@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.30 2007/08/14 10:56:39 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.31 2008/09/24 06:52:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,6 +24,7 @@ NSString *XMKey_PreferencesManagerUserName = @"XMeeting_UserName";
 NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls = @"XMeeting_AutomaticallyAcceptIncomingCalls";
 NSString *XMKey_PreferencesManagerEnablePTrace = @"XMeeting_EnablePTrace";
 NSString *XMKey_PreferencesManagerPTraceFilePath = @"XMeeting_PTraceFilePath";
+NSString *XMKey_PreferencesManagerLogCallStatistics = @"XMeeting_LogCallStatistics";
 NSString *XMKey_PreferencesManagerAutomaticallyEnterFullScreen = @"XMeeting_AutomaticallyEnterFullScreen";
 NSString *XMKey_PreferencesManagerShowSelfViewMirrored = @"XMeeting_ShowSelfViewMirrored";
 NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls = @"XMeeting_AutomaticallyHideInCallControls";
@@ -106,6 +107,11 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 + (void)setPTraceFilePath:(NSString *)path
 {
   [[NSUserDefaults standardUserDefaults] setObject:path forKey:XMKey_PreferencesManagerPTraceFilePath];
+}
+
++ (BOOL)logCallStatistics
+{
+  return [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_PreferencesManagerLogCallStatistics];
 }
 
 #pragma mark -

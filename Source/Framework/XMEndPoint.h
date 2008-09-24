@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.19 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.20 2008/09/24 06:52:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -52,7 +52,6 @@ public:
 	virtual PSoundChannel * CreateSoundChannel(const XMConnection & connection, bool isSource);
 	
 	// InCall Methods
-	virtual void SetSendUserInputMode(OpalConnection::SendUserInputModes mode);
 	bool SendUserInputTone(PString & callID, const char tone);
 	bool SendUserInputString(PString & callID, const PString & string);
 	bool StartCameraEvent(PString & callID, XMCameraEvent cameraEvent);	

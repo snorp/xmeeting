@@ -1,5 +1,5 @@
 /*
- * $Id: XMInBandDTMFHandler.h,v 1.3 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMInBandDTMFHandler.h,v 1.4 2008/09/24 06:52:42 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,26 +15,25 @@
 
 class XMInBandDTMFHandler : public PObject
 {
-	PCLASSINFO(XMInBandDTMFHandler, PObject);
+  PCLASSINFO(XMInBandDTMFHandler, PObject);
 	
 public:
 	
-	XMInBandDTMFHandler();
+  XMInBandDTMFHandler();
 	
-	bool SendTone(char tone, unsigned duration);
+  bool SendTone(char tone, unsigned duration);
 	
-	const PNotifier & GetTransmitHandler() const;
+  const PNotifier & GetTransmitHandler() const;
 	
 protected:
-    PDECLARE_NOTIFIER(RTP_DataFrame, XMInBandDTMFHandler, TransmitPacket);
+  PDECLARE_NOTIFIER(RTP_DataFrame, XMInBandDTMFHandler, TransmitPacket);
 	
-	PNotifier transmitHandler;
+  PNotifier transmitHandler;
 	
 private:
-	PMutex mutex;
-	PTones * tones;
-	unsigned startTimestamp;
-	
+  PMutex mutex;
+  PTones * tones;
+  unsigned startTimestamp;
 };
 
 #endif // __XM_IN_BAND_DTMF_HANDLER_H__

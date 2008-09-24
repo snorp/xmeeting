@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.72 2008/09/22 22:56:48 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.73 2008/09/24 06:52:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,7 @@ static XMEndPoint *callEndPointInstance = NULL;
 static XMH323EndPoint *h323EndPointInstance = NULL;
 static XMSIPEndPoint *sipEndPointInstance = NULL;
 
-void XMOpalManager::InitOpal(const PString & pTracePath)
+void XMOpalManager::InitOpal(const PString & pTracePath, bool logCallStatistics)
 {	
   if (theProcess == NULL) {
     PProcess::PreInitialise(0, 0, 0);
@@ -46,7 +46,7 @@ void XMOpalManager::InitOpal(const PString & pTracePath)
       PTrace::Initialise(5, pTracePath, PTrace::Timestamp|PTrace::Thread|PTrace::FileAndLine);
     }
     
-    managerInstance = new XMOpalManager();
+    managerInstance = new XMOpalManager(logCallStatistics);
     callEndPointInstance = new XMEndPoint(*managerInstance);
     h323EndPointInstance = new XMH323EndPoint(*managerInstance);
     sipEndPointInstance = new XMSIPEndPoint(*managerInstance);
@@ -69,7 +69,8 @@ void XMOpalManager::CloseOpal()
   XMSoundChannel::DoClose();
 }
 
-XMOpalManager::XMOpalManager()
+XMOpalManager::XMOpalManager(bool _logCallStatistics)
+: logCallStatistics(_logCallStatistics)
 {	
   bandwidthLimit = XM_MAX_BANDWIDTH;
   
@@ -304,7 +305,8 @@ void XMOpalManager::GetCallStatistics(const PString & callToken, XMCallStatistic
     callStatistics->videoMaximumJitterTime  = UINT_MAX;
   }
   
-  PTRACE(3, "XMeeting Call Statistics:" <<
+  PTRACE_IF(3, logCallStatistics,
+         "XMeeting Call Statistics:" <<
          "\nroundTripDelay:          " << callStatistics->roundTripDelay <<
          "\naudioPacketsSent:        " << callStatistics->audioPacketsSent <<
          "\naudioBytesSent:          " << callStatistics->audioBytesSent <<

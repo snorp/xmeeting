@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationController.m,v 1.69 2008/08/29 11:32:29 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.70 2008/09/24 06:52:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -102,7 +102,8 @@
   if (enablePTrace == YES) {
     pTracePath = [XMPreferencesManager pTraceFilePath];
   }
-  XMInitFramework(pTracePath);
+  BOOL logCallStatistics = [XMPreferencesManager logCallStatistics];
+  XMInitFramework(pTracePath, logCallStatistics);
   
   return self;
 }

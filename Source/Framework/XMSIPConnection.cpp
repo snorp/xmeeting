@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.26 2008/09/21 19:37:32 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.27 2008/09/24 06:52:43 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,7 +15,6 @@
 #include <codec/rfc2833.h>
 #include "XMOpalManager.h"
 #include "XMMediaFormats.h"
-#include "XMRFC2833Handler.h"
 #include "XMSIPEndPoint.h"
 
 XMSIPConnection::XMSIPConnection(OpalCall & call,
@@ -30,17 +29,13 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 {
 	initialBandwidth = (XMOpalManager::GetManager()->GetBandwidthLimit() / 100);
     bandwidthAvailable = initialBandwidth;
-    
-    // Delete the default RFC2833 handler and replace it with our own implementation
-	delete rfc2833Handler;
-	rfc2833Handler = new XMRFC2833Handler(*this, PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
 	
-	inBandDTMFHandler = NULL;
+  inBandDTMFHandler = NULL;
 }
 
 XMSIPConnection::~XMSIPConnection()
 {
-    delete inBandDTMFHandler;
+  delete inBandDTMFHandler;
 }
 
 void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
@@ -124,31 +119,27 @@ bool XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 
 bool XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
 {
-    // Separate RFC2833 is not implemented. Therefore it is used within
-    // XMeeting to signal in-band DTMF
-	if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 &&
-	   inBandDTMFHandler != NULL)
-	{
-		inBandDTMFHandler->SendTone(tone, duration);
-		return true;
-	}
+  // Separate RFC2833 is not implemented. Therefore it is used within
+  // XMeeting to signal in-band DTMF
+  if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 && inBandDTMFHandler != NULL) {
+    inBandDTMFHandler->SendTone(tone, duration);
+    return true;
+  }
 	
-	return SIPConnection::SendUserInputTone(tone, duration);
+  return SIPConnection::SendUserInputTone(tone, duration);
 }
 
 void XMSIPConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 {
-	SIPConnection::OnPatchMediaStream(isSource, patch);
+  SIPConnection::OnPatchMediaStream(isSource, patch);
 	
-    // Add the in-band DTMF handler if this is an audio sending stream
-	/*if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
-	{
-		if(inBandDTMFHandler == NULL)
-		{
-			inBandDTMFHandler = new XMInBandDTMFHandler();
-		}
-		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
-	}*/
+  // Add the in-band DTMF handler if this is an audio sending stream
+  if(!isSource && patch.GetSource().GetMediaFormat().GetDefaultSessionID() == OpalMediaFormat::DefaultAudioSessionID) {
+    if(inBandDTMFHandler == NULL) {
+      inBandDTMFHandler = new XMInBandDTMFHandler();
+    }
+    patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+  }
 }
 
 void XMSIPConnection::CleanUp()

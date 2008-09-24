@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.34 2008/09/22 22:56:47 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.35 2008/09/24 06:52:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,31 +17,26 @@
 #include "XMH323EndPoint.h"
 #include "XMH323Channel.h"
 #include "XMBridge.h"
-#include "XMRFC2833Handler.h"
 
 XMH323Connection::XMH323Connection(OpalCall & call,
-								   H323EndPoint & endPoint,
-								   const PString & token,
-								   const PString & alias,
-								   const H323TransportAddress & address,
-								   unsigned options,
+                                   H323EndPoint & endPoint,
+                                   const PString & token,
+                                   const PString & alias,
+                                   const H323TransportAddress & address,
+                                   unsigned options,
                                    OpalConnection::StringOptions * stringOptions)
 : H323Connection(call, endPoint, token, alias, address, options, stringOptions)
 {	
-	// setting correct initial bandwidth
-    initialBandwidth = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
-    bandwidthAvailable = initialBandwidth;
+  // setting correct initial bandwidth
+  initialBandwidth = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
+  bandwidthAvailable = initialBandwidth;
 	
-    // Delete the default RFC2833 handler and replace it with our own implementation
-	delete rfc2833Handler;
-	rfc2833Handler = new XMRFC2833Handler(*this, PCREATE_NOTIFIER(OnUserInputInlineRFC2833));
-	
-	inBandDTMFHandler = NULL;
+  inBandDTMFHandler = NULL;
 }
 
 XMH323Connection::~XMH323Connection()
 {
-    delete inBandDTMFHandler;
+  delete inBandDTMFHandler;
 }
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
@@ -82,7 +77,7 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
     
     // Go through the list of local capabilities and search for matching remote capabilities.
     // Among these, pick the one that is ranked highest according to the CompareTo() implementation
-	for(unsigned i = 0; i < localCapabilities.GetSize(); i++)
+	/*for(unsigned i = 0; i < localCapabilities.GetSize(); i++)
 	{
 		H323Capability & localCapability = localCapabilities[i];
         if(PIsDescendant(&localCapability, XMH323VideoCapability)) // Should always be true
@@ -118,7 +113,7 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
                 break;
             }
         }
-	}
+	}*/
 }
 
 bool XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
@@ -194,31 +189,27 @@ bool XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 
 bool XMH323Connection::SendUserInputTone(char tone, unsigned duration)
 {
-    // Separate RFC2833 is not implemented. Therefore it is used within
-    // XMeeting to signal in-band DTMF
-	if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 &&
-	   inBandDTMFHandler != NULL)
-	{
-		inBandDTMFHandler->SendTone(tone, duration);
-		return true;
-	}
+  // Separate RFC2833 is not implemented. Therefore it is used within
+  // XMeeting to signal in-band DTMF
+  if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 && inBandDTMFHandler != NULL) {
+    inBandDTMFHandler->SendTone(tone, duration);
+    return true;
+  }
 	
-	return H323Connection::SendUserInputTone(tone, duration);
+  return H323Connection::SendUserInputTone(tone, duration);
 }
 
 void XMH323Connection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 {
-	H323Connection::OnPatchMediaStream(isSource, patch);
+  H323Connection::OnPatchMediaStream(isSource, patch);
 	
-    // Add the in-band DTMF handler if this is an audio sending stream
-	/*if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalDefaultAudioMediaType)
-	{
-		if(inBandDTMFHandler == NULL)
-		{
-			inBandDTMFHandler = new XMInBandDTMFHandler();
-		}
-		patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
-	}	*/
+  // Add the in-band DTMF handler if this is an audio sending stream
+  if(!isSource && patch.GetSource().GetMediaFormat().GetDefaultSessionID() == OpalMediaFormat::DefaultAudioSessionID) {
+    if(inBandDTMFHandler == NULL) {
+      inBandDTMFHandler = new XMInBandDTMFHandler();
+    }
+    patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+  }
 }
 
 void XMH323Connection::CleanUp()

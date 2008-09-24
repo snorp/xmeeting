@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.54 2008/09/21 19:37:28 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.55 2008/09/24 06:52:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -44,7 +44,7 @@ extern "C" {
    * and makes it ready to be used.
    * It is safe to call initOPAL() multiple times.
    **/
-  void _XMInitSubsystem(const char *pTracePath);
+  void _XMInitSubsystem(const char *pTracePath, bool logCallStatistics);
 	
   /**
    * Closes the OPAL system

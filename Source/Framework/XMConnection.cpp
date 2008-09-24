@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.27 2008/09/22 22:56:47 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.28 2008/09/24 06:52:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -156,22 +156,6 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 	return new OpalAudioMediaStream(*this, mediaFormat, sessionID, isSource, 2, soundChannel);
 }
 
-bool XMConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
-{
-	if (!OpalConnection::OnOpenMediaStream(mediaStream))
-	{
-		return false;
-	}
-	
-	/*if (phase == ConnectedPhase)
-	{
-		SetPhase(EstablishedPhase);
-		OnEstablished();
-	}*/
-	
-	return true;
-}
-
 void XMConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 {
 	/*if (patch.GetSource().GetMediaType() == OpalDefaultAudioMediaType)
@@ -194,19 +178,13 @@ void XMConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 
 void XMConnection::OnClosedMediaStream(const OpalMediaStream & stream)
 {
-    OpalConnection::OnClosedMediaStream(stream);
-    XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, stream);
+  OpalConnection::OnClosedMediaStream(stream);
+  XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, stream);
 }
 
 PSoundChannel * XMConnection::CreateSoundChannel(bool isSource)
 {
 	return endpoint.CreateSoundChannel(*this, isSource);
-}
-
-bool XMConnection::SendUserInputString(const PString & value)
-{
-	// add handler here
-	return true;
 }
 
 /*bool XMConnection::GetMediaInformation(const OpalMediaType & mediaType, MediaInformation & info) const

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.28 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.29 2008/09/24 06:52:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,6 +32,8 @@
   NSLock *gatekeeperRegistrationWaitLock;
   NSLock *sipRegistrationWaitLock;
   BOOL doesWaitForSIPRegistrationCompletion;
+  
+  BOOL logCallStatistics;
 }
 
 + (void)_setPreferences:(XMPreferences *)preferences publicAddress:(NSString *)publicAddress;
@@ -92,6 +94,7 @@
 - (id)_init;
 - (void)_close;
 
+- (void)_setLogCallStatistics:(BOOL)logCallStatistics;
 - (void)_runOpalDispatcherThread:(NSString *)pTracePath;
 
 	// called every time the STUN information is updated

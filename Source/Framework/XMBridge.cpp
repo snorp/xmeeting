@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.61 2008/09/21 19:37:27 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.62 2008/09/24 06:52:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -21,9 +21,9 @@
 
 using namespace std;
 
-void _XMInitSubsystem(const char *pTracePath)
+void _XMInitSubsystem(const char *pTracePath, bool logCallStatistics)
 {
-  XMOpalManager::InitOpal(pTracePath);
+  XMOpalManager::InitOpal(pTracePath, logCallStatistics);
 }
 
 void _XMCloseSubsystem()

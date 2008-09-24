@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.57 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.58 2008/09/24 06:52:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -90,7 +90,7 @@ enum {
   return nil;
 }
 
-- (id)_initWithPTracePath:(NSString *)path
+- (id)_initWithPTracePath:(NSString *)path logCallStatistics:(BOOL)_logCallStatistics
 {
   self = [super init];
   
@@ -118,6 +118,7 @@ enum {
   sipProtocolStatus = XMProtocolStatus_Disabled;
   
   pTracePath = [path copy];
+  logCallStatistics = _logCallStatistics;
   
   // Registering notifications
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -1098,7 +1099,7 @@ enum {
 - (void)_didFinishLaunching:(NSNotification *)notif
 {
   // Now it's time to launch the framework
-  _XMLaunchFramework(pTracePath);
+  _XMLaunchFramework(pTracePath, logCallStatistics);
 }
 
 - (void)_willSleep:(NSNotification *)notif

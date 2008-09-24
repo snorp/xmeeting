@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.h,v 1.13 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMeeting.h,v 1.14 2008/09/24 06:52:43 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,7 @@
  * been posted. Otherwise, one might experience that the application
  * no longer responds to user events or does draw on screen at all.
  **/
-void XMInitFramework(NSString *pTracePath);
+void XMInitFramework(NSString *pTracePath, BOOL logCallStatistics);
 
 /**
  * Call this method when you want to shutdown the XMeeting framework.

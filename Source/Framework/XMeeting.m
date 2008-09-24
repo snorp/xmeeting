@@ -1,5 +1,5 @@
 /*
- * $Id: XMeeting.m,v 1.18 2008/08/28 11:07:25 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.19 2008/09/24 06:52:43 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,7 +34,7 @@ XMMediaTransmitter *_XMMediaTransmitterSharedInstance = nil;
 XMMediaReceiver *_XMMediaReceiverSharedInstance = nil;
 XMCallRecorder *_XMCallRecorderSharedInstance = nil;
 
-void XMInitFramework(NSString *pTracePath)
+void XMInitFramework(NSString *pTracePath, BOOL logCallStatistics)
 {
   if(_XMInitializedStatus == XM_FRAMEWORK_INITIALIZING ||
      _XMInitializedStatus == XM_FRAMEWORK_INITIALIZED) {
@@ -44,10 +44,10 @@ void XMInitFramework(NSString *pTracePath)
   
   _XMInitializedStatus = XM_FRAMEWORK_INITIALIZING;
   
-  _XMCallManagerSharedInstance = [[XMCallManager alloc] _initWithPTracePath:pTracePath];
+  _XMCallManagerSharedInstance = [[XMCallManager alloc] _initWithPTracePath:pTracePath logCallStatistics:logCallStatistics];
 }
 
-void _XMLaunchFramework(NSString *pTracePath)
+void _XMLaunchFramework(NSString *pTracePath, BOOL logCallStatistics)
 {
   // Set the PWLIBPLUGINDIR environment variable to the plugins directory of XMeeting, or PWLib
   // will search the entire filesystem for pugins before starting up...
@@ -68,6 +68,7 @@ void _XMLaunchFramework(NSString *pTracePath)
   _XMCallRecorderSharedInstance = [[XMCallRecorder alloc] _init];
   
   // starting the OpalDispatcher Thread
+  [_XMOpalDispatcherSharedInstance _setLogCallStatistics:logCallStatistics];
   [NSThread detachNewThreadSelector:@selector(_runOpalDispatcherThread:) toTarget:_XMOpalDispatcherSharedInstance withObject:pTracePath];
   
   // starting the MediaTransmitter Thread

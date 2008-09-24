@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.59 2008/09/22 22:56:47 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.60 2008/09/24 06:52:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -535,6 +535,11 @@ typedef enum _XMOpalDispatcherMessage
 #pragma mark -
 #pragma mark OpalDispatcherThread Methods
 
+- (void)_setLogCallStatistics:(BOOL)_logCallStatistics
+{
+  logCallStatistics = _logCallStatistics;
+}
+
 - (void)_runOpalDispatcherThread:(NSString *)pTracePath
 {
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
@@ -544,7 +549,7 @@ typedef enum _XMOpalDispatcherMessage
   
   // Initiating the OPAL subsystem
   const char *pathString = [pTracePath cStringUsingEncoding:NSASCIIStringEncoding];
-  _XMInitSubsystem(pathString);
+  _XMInitSubsystem(pathString, logCallStatistics);
   
   // Signaling that the subsystem has initialized
   _XMSubsystemInitialized();

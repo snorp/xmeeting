@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.34 2008/09/22 22:56:47 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.35 2008/09/24 06:52:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -132,64 +132,35 @@ void XMEndPoint::DoRejectIncomingCall(const PString & callToken, bool isBusy)
 #pragma mark -
 #pragma mark InCall Methods
 
-void XMEndPoint::SetSendUserInputMode(OpalConnection::SendUserInputModes mode)
-{
-	/*PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
-	if (connection == NULL)
-	{
-		return;
-	}
-	
-	PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
-	if (otherConnection != NULL)
-	{
-		otherConnection->SetSendUserInputMode(mode);
-	}*/
-}
-
-bool XMEndPoint::SendUserInputTone(PString & callID, const char tone)
+bool XMEndPoint::SendUserInputTone(PString & callToken, const char tone)
 {	
-	OpalConnection *otherConnection;
-	// Send the user input tone while the connection isn't locked
-	// to prevent deadlock/timeout problems when using the SIP INFO method
-	{
-		/*PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
-		if (connection == NULL)
-		{
-			return false;
-		}
-		
-		PSafePtr<OpalConnection> theConnection = connection->GetCall().GetOtherPartyConnection(*connection);
-		if (theConnection == NULL)
-		{
-			return false;
-		}*/
-		//otherConnection = theConnection;
-	}
-	
-	//return otherConnection->SendUserInputTone(tone, 240);
-  return false;
+  PSafePtr<OpalLocalConnection> connection = GetLocalConnectionWithLock(callToken, PSafeReadOnly);
+  if (connection == NULL) {
+    return false;
+  }
+  
+  PSafePtr<OpalConnection> otherConnection = connection->GetOtherPartyConnection();
+  if (otherConnection == NULL) {
+    return false;
+  }
+  
+  otherConnection->SetSendUserInputMode(defaultSendUserInputMode);
+  return otherConnection->SendUserInputTone(tone, 240);
 }
 
-bool XMEndPoint::SendUserInputString(PString & callID, const PString & string)
+bool XMEndPoint::SendUserInputString(PString & callToken, const PString & string)
 {
-	OpalConnection *otherConnection;
-	// Send the user input string while the connection isn't locked
-	// to prevent deadlock/timeout problems when using the SIP INFO method
-	{
-		/*PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
-		if (connection == NULL)
-		{
-			return false;
-		}
-	
-		PSafePtr<OpalConnection> otherConnection = connection->GetCall().GetOtherPartyConnection(*connection);
-		if (otherConnection == NULL)
-		{
-			return false;
-		}*/
-	}
-	
+  PSafePtr<OpalLocalConnection> connection = GetLocalConnectionWithLock(callToken, PSafeReadOnly);
+  if (connection == NULL) {
+    return false;
+  }
+  
+  PSafePtr<OpalConnection> otherConnection = connection->GetOtherPartyConnection();
+  if (otherConnection == NULL) {
+    return false;
+  }
+  
+  otherConnection->SetSendUserInputMode(defaultSendUserInputMode);
 	return otherConnection->SendUserInputString(string);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.h,v 1.34 2008/09/02 23:55:08 hfriederich Exp $
+ * $Id: XMCallManager.h,v 1.35 2008/09/24 06:52:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -59,6 +59,7 @@
   
   // Framework initialization
   NSString *pTracePath;
+  BOOL logCallStatistics;
 }
 
 /**

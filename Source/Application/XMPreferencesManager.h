@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.19 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.20 2008/09/24 06:52:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,7 @@ extern NSString *XMKey_PreferencesManagerUserName;
 extern NSString *XMKey_PreferencesManagerAutomaticallyAcceptIncomingCall;
 extern NSString *XMKey_PreferencesManagerEnablePTrace;
 extern NSString *XMKey_PreferencesManagerPTraceFilePath;
+extern NSString *XMKey_PreferencesManagerLogCallStatistics;
 extern NSString *XMKey_PreferencesManagerAutomaticallyEnterFullScreen;
 extern NSString *XMKey_PreferencesManagerShowSelfViewMirrored;
 extern NSString *XMKey_PreferencesManagerAutomaticallyHideInCallControls;
@@ -119,6 +120,9 @@ typedef enum XMIncomingCallAlertType
 
 + (NSString *)pTraceFilePath;
 + (void)setPTraceFilePath:(NSString *)path;
+
++ (BOOL)logCallStatistics;
+// This property can only be set externally
 
 /**
  * Instructs XMPreferencesManager to synchronize the UserDefaults
