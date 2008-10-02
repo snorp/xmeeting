@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.21 2008/09/21 19:37:33 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.22 2008/10/02 07:50:22 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,7 +92,7 @@ public:
                                            unsigned int options = 0,
                                            OpalConnection::StringOptions * stringOptions = NULL);
   
-  virtual SIPURL GetDefaultRegisteredPartyName();
+  virtual SIPURL GetDefaultRegisteredPartyName(const OpalTransport & transport);
   
   // Called when framework is closing
   void CleanUp();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.27 2008/09/24 06:52:43 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.28 2008/10/02 07:50:22 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -134,7 +134,7 @@ void XMSIPConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
   SIPConnection::OnPatchMediaStream(isSource, patch);
 	
   // Add the in-band DTMF handler if this is an audio sending stream
-  if(!isSource && patch.GetSource().GetMediaFormat().GetDefaultSessionID() == OpalMediaFormat::DefaultAudioSessionID) {
+  if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalMediaType::Audio()) {
     if(inBandDTMFHandler == NULL) {
       inBandDTMFHandler = new XMInBandDTMFHandler();
     }

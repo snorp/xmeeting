@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.42 2008/09/22 22:56:48 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.43 2008/10/02 07:50:22 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -172,7 +172,8 @@ void XMSIPEndPoint::FinishRegistrationSetup(bool proxyChanged)
       params.m_password = record.GetPassword();
       params.m_expire = GetRegistrarTimeToLive().GetSeconds();
       
-      bool result = Register(params);
+      PString dummy; // TODO: Need proper aor handling
+      bool result = Register(params, dummy);
       
       if (result == false && (record.GetStatus() != XMSIPRegistrationRecord::Failed)) {
         // special condition in case no network interfaces are present
@@ -308,7 +309,7 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
   return new XMSIPConnection(call, *this, token, destination, transport, options, stringOptions);
 }
 
-SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
+SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName(const OpalTransport & transport)
 {
   // If using a proxy, use the proxy user name and domain name
   SIPURL proxyURL = GetProxy();
@@ -318,7 +319,7 @@ SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName()
   }
   
   // Get the superclass's implementation
-  SIPURL url = SIPEndPoint::GetDefaultRegisteredPartyName();
+  SIPURL url = SIPEndPoint::GetDefaultRegisteredPartyName(transport);
   
   // If the superclass returns IP "0.0.0.0", make the
   // OpalTransportAddress empty. This in turn indicates

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.35 2008/09/24 06:52:41 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.36 2008/10/02 07:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,21 +41,20 @@ XMH323Connection::~XMH323Connection()
 
 void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
 {
-	H323Connection::OnSendCapabilitySet(pdu);
+  // TODO: Recheck if this still is necessary
+  /*H323Connection::OnSendCapabilitySet(pdu);
 	
-	const H323Capabilities & localCaps = GetLocalCapabilities();
+  const H323Capabilities & localCaps = GetLocalCapabilities();
 
-	for (unsigned i = 0; i < localCaps.GetSize(); i++)
-	{
-		H323Capability & h323Capability = localCaps[i];
+  for (unsigned i = 0; i < localCaps.GetSize(); i++) {
+    H323Capability & h323Capability = localCaps[i];
 		
-        // Override default Opal behaviour to obtain better NetMeeting compatibility
-		if(PIsDescendant(&h323Capability, H323AudioCapability)) 
-		{
-			H323AudioCapability & audioCap = (H323AudioCapability &)h323Capability;
-			audioCap.SetTxFramesInPacket(30);
-		}
-	}
+    // Override default Opal behaviour to obtain better NetMeeting compatibility
+    if(PIsDescendant(&h323Capability, H323AudioCapability)) {
+      H323AudioCapability & audioCap = (H323AudioCapability &)h323Capability;
+      audioCap.SetTxFramesInPacket(30);
+    }
+  }*/
 }
 
 void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaType)
@@ -204,7 +203,7 @@ void XMH323Connection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
   H323Connection::OnPatchMediaStream(isSource, patch);
 	
   // Add the in-band DTMF handler if this is an audio sending stream
-  if(!isSource && patch.GetSource().GetMediaFormat().GetDefaultSessionID() == OpalMediaFormat::DefaultAudioSessionID) {
+  if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalMediaType::Audio()) {
     if(inBandDTMFHandler == NULL) {
       inBandDTMFHandler = new XMInBandDTMFHandler();
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.73 2008/09/24 06:52:42 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.74 2008/10/02 07:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,8 +84,11 @@ XMOpalManager::XMOpalManager(bool _logCallStatistics)
   PInterfaceMonitor::GetInstance().SetRunMonitorThread(false);
   PInterfaceMonitor::GetInstance().SetInterfaceFilter(new XMInterfaceFilter());
   
-  OpalEchoCanceler::Params params(OpalEchoCanceler::Cancelation);
-  SetEchoCancelParams(params);
+  OpalSilenceDetector::Params silenceDetectParams(OpalSilenceDetector::FixedSilenceDetection, 8);
+  SetSilenceDetectParams(silenceDetectParams);
+  
+  OpalEchoCanceler::Params echoCancelerParams(OpalEchoCanceler::Cancelation);
+  SetEchoCancelParams(echoCancelerParams);
   
   SetAutoStartTransmitVideo(true);
   SetAutoStartReceiveVideo(true);
@@ -221,7 +224,7 @@ void XMOpalManager::GetCallStatistics(const PString & callToken, XMCallStatistic
     return;
   }
   
-  RTP_Session *session = rtpConnection->GetSession(OpalMediaFormat::DefaultAudioSessionID);
+  RTP_Session *session = rtpConnection->GetSession(H323Capability::DefaultAudioSessionID);
   if (session != NULL) {
     callStatistics->audioPacketsSent        = session->GetPacketsSent();
     callStatistics->audioBytesSent          = session->GetOctetsSent();
@@ -264,7 +267,7 @@ void XMOpalManager::GetCallStatistics(const PString & callToken, XMCallStatistic
     callStatistics->audioJitterBufferSize   = UINT_MAX;
   }
   
-  session = rtpConnection->GetSession(OpalMediaFormat::DefaultVideoSessionID);
+  session = rtpConnection->GetSession(H323Capability::DefaultVideoSessionID);
   if (session != NULL) {
     callStatistics->videoPacketsSent        = session->GetPacketsSent();
     callStatistics->videoBytesSent          = session->GetOctetsSent();

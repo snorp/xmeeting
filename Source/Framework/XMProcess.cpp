@@ -1,5 +1,5 @@
 /*
- * $Id: XMProcess.cpp,v 1.10 2008/09/22 22:26:09 hfriederich Exp $
+ * $Id: XMProcess.cpp,v 1.11 2008/10/02 07:50:22 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,7 +9,7 @@
 #include "XMProcess.h"
 
 // keep PTLib-linking happy
-namespace PWLibStupidOSXHacks {
+namespace PWLibStupidLinkerHacks {
   int loadFakeVideoStuff;
   int loadCoreAudioStuff;
 }
