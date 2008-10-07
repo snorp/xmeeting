@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.14 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.15 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,10 +23,10 @@ XMMediaStream::XMMediaStream(XMConnection & conn,
                              unsigned sessionID,
                              bool isSource)
 : OpalMediaStream(conn, mediaFormat, sessionID, isSource),
-  dataFrame((isSource ? 3000 : 0))
+  dataFrame((isSource ? 3000 : 0)),
+  hasStarted(false),
+  isTerminated(false)
 {
-    hasStarted = false;
-    isTerminated = false;
 }
 
 XMMediaStream::~XMMediaStream()
@@ -35,168 +35,164 @@ XMMediaStream::~XMMediaStream()
 
 void XMMediaStream::OnPatchStart()
 {
-    if (IsSource()) {
+  if (IsSource()) {
         
-        //PWaitAndSignal m(patchMutex);
-        
-        // Ensure the code below runs just once.
-        // Also avoid possible race conditions
-        if(hasStarted == true || isTerminated == true) {
-            return;
-        }
-        
-        // Adjust the local media format
-        mediaFormat = mediaPatch->GetSinkFormat();
-        
-        RTP_DataFrame::PayloadTypes payloadType = mediaFormat.GetPayloadType();
-        
-        unsigned frameTime = mediaFormat.GetFrameTime();
-        unsigned framesPerSecond = (unsigned)round((double)OpalMediaFormat::VideoClockRate / (double)frameTime);
-        framesPerSecond = std::min((unsigned)XM_MAX_FPS, framesPerSecond);
-        
-        unsigned bitrate = mediaFormat.GetBandwidth();
-        bitrate = std::min(bitrate, XMOpalManager::GetManager()->GetVideoBandwidthLimit());
-        
-        unsigned flags = 0;
-        
-        XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
-        XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-        
-        if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
-           videoSize == XMVideoSize_NoVideo) 
-        {
-            // Shouldn't actually happen
-            return;
-        }
-        
-        if(codecIdentifier == XMCodecIdentifier_H263)
-        {
-            // If we're  sending H.263, we need to know which
-            // format to send. The payload code is submitted in the
-            // flags parameter
-            flags = payloadType;
-            
-            if(payloadType == RTP_DataFrame::H263)
-            {
-                cout << "Sending RFC2190" << endl;
-            }
-            else
-            {
-                cout << "Sending RFC2429" << endl;
-            }
-        }
-        else if(codecIdentifier == XMCodecIdentifier_H264)
-        {
-            if(_XMGetH264PacketizationMode(mediaFormat) == XM_H264_PACKETIZATION_MODE_SINGLE_NAL)
-            {
-                // We send only at a limited bitrate to avoid too many
-                // NAL units which are TOO big to fit
-                if(bitrate > 320000)
-                {
-                    bitrate = 320000;
-                }
-            }
-            
-            flags = (_XMGetH264PacketizationMode(mediaFormat) << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
-        }
-        
-        videoTransmitterStream = this;
-        hasStarted = true;
-        
-        dataFrame.SetPayloadSize(0);
-        dataFrame.SetPayloadType(payloadType);
-        
-        unsigned keyframeInterval = XMOpalManager::GetManager()->GetKeyFrameIntervalForCurrentCall(codecIdentifier);
-        _XMStartMediaTransmit(2, codecIdentifier, videoSize, framesPerSecond, bitrate, keyframeInterval, flags);
+    PSafeLockReadWrite safeLock(*this);
+    if (!safeLock.IsLocked()) {
+      return;
     }
+      
+    // Ensure the code below runs just once.
+    // Also avoid possible race conditions
+    if(hasStarted == true || isTerminated == true) {
+      return;
+    }
+        
+    // Adjust the local media format
+    mediaFormat = mediaPatch->GetSource().GetMediaFormat();
+      
+    RTP_DataFrame::PayloadTypes payloadType = mediaFormat.GetPayloadType();
+        
+    unsigned frameTime = mediaFormat.GetFrameTime();
+    unsigned framesPerSecond = (unsigned)round((double)OpalMediaFormat::VideoClockRate / (double)frameTime);
+    framesPerSecond = std::min((unsigned)XM_MAX_FPS, framesPerSecond);
+        
+    unsigned bitrate = mediaFormat.GetBandwidth();
+    bitrate = std::min(bitrate, XMOpalManager::GetManager()->GetVideoBandwidthLimit());
+        
+    unsigned flags = 0;
+        
+    XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
+    XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+        
+    if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
+       videoSize == XMVideoSize_NoVideo) 
+    {
+      // Shouldn't actually happen
+      return;
+    }
+        
+    if(codecIdentifier == XMCodecIdentifier_H263) {
+      // If we're  sending H.263, we need to know which
+      // format to send. The payload code is submitted in the
+      // flags parameter
+      flags = payloadType;
+            
+      if(payloadType == RTP_DataFrame::H263) {
+        cout << "Sending RFC2190" << endl;
+      } else {
+        cout << "Sending RFC2429" << endl;
+      }
+    } else if(codecIdentifier == XMCodecIdentifier_H264) {
+      if(_XMGetH264PacketizationMode(mediaFormat) == XM_H264_PACKETIZATION_MODE_SINGLE_NAL) {
+        // We send only at a limited bitrate to avoid too many
+        // NAL units which are TOO big to fit
+        if(bitrate > 320000) {
+          bitrate = 320000;
+        }
+      }
+        
+      flags = (_XMGetH264PacketizationMode(mediaFormat) << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
+    }
+        
+    videoTransmitterStream = this;
+    hasStarted = true;
+        
+    dataFrame.SetPayloadSize(0);
+    dataFrame.SetPayloadType(payloadType);
+        
+    unsigned keyframeInterval = XMOpalManager::GetManager()->GetKeyFrameIntervalForCurrentCall(codecIdentifier);
+    _XMStartMediaTransmit(2, codecIdentifier, videoSize, framesPerSecond, bitrate, keyframeInterval, flags);
+  }
 }
 
 bool XMMediaStream::Close()
 {	
-    if (IsSource())
-    {
-        //patchMutex.Wait();
-        if (hasStarted == true) {
-            _XMStopMediaTransmit(2);
-        } else {
-            isTerminated = true;
-        }
-        //patchMutex.Signal();
-        
-        // Wait until the video system terminated
-        while(isTerminated == false) {
-            PThread::Sleep(10);
-        }
+  if (IsSource()) {
+    if (!LockReadWrite()) {
+      return false;
     }
+    if (hasStarted == true) {
+      _XMStopMediaTransmit(2);
+    } else {
+      isTerminated = true;
+    }
+    UnlockReadWrite();
+        
+    // Wait until the video system terminated
+    while(isTerminated == false) {
+      PThread::Sleep(10);
+    }
+  }
     
-    return OpalMediaStream::Close();
+  return OpalMediaStream::Close();
 }
 
 bool XMMediaStream::ReadPacket(RTP_DataFrame & packet)
 {	
-	return false;
+  return false;
 }
 
 bool XMMediaStream::WritePacket(RTP_DataFrame & packet)
 {
-	return false;
+  return false;
 }
 
 void XMMediaStream::SetTimeStamp(unsigned mediaID, unsigned timeStamp)
 {
-    if (videoTransmitterStream == NULL) {
-        return;
-    }
+  if (videoTransmitterStream == NULL) {
+    return;
+  }
     
-    RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
-    dataFrame.SetTimestamp(timeStamp);
+  RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
+  dataFrame.SetTimestamp(timeStamp);
 }
 
 void XMMediaStream::AppendData(unsigned mediaID, void *data, unsigned length)
 {
-    if (videoTransmitterStream == NULL) {
-        return;
-    }
+  if (videoTransmitterStream == NULL) { 
+    return;
+  }
     
-    RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
+  RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
 
-    BYTE *dataPtr = dataFrame.GetPayloadPtr();
-    PINDEX dataSize = dataFrame.GetPayloadSize();
+  BYTE *dataPtr = dataFrame.GetPayloadPtr();
+  PINDEX dataSize = dataFrame.GetPayloadSize();
     
-    dataPtr += dataSize;
-    dataSize += length;
+  dataPtr += dataSize;
+  dataSize += length;
     
-    memcpy(dataPtr, data, length);
+  memcpy(dataPtr, data, length);
     
-    dataFrame.SetPayloadSize(dataSize);
+  dataFrame.SetPayloadSize(dataSize);
 }
 
 void XMMediaStream::SendPacket(unsigned mediaID, bool setMarker)
 {
-    if (videoTransmitterStream == NULL) {
-        return;
-    }
+  if (videoTransmitterStream == NULL) {
+    return;
+  }
     
-    RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
+  RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
     
-    dataFrame.SetMarker(setMarker);
+  dataFrame.SetMarker(setMarker);
     
-    videoTransmitterStream->PushPacket(dataFrame);
+  videoTransmitterStream->PushPacket(dataFrame);
     
-    dataFrame.SetPayloadSize(0);
+  dataFrame.SetPayloadSize(0);
 }
 
 void XMMediaStream::HandleDidStopTransmitting(unsigned mediaID)
 {
-    if (videoTransmitterStream == NULL) {
-        return;
-    }
-    
-    videoTransmitterStream->isTerminated = true;
-    videoTransmitterStream = NULL;
+  if (videoTransmitterStream == NULL) {
+    return;
+  }
+      
+  videoTransmitterStream->isTerminated = true;
+  videoTransmitterStream = NULL;
 }
 
-bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
+/*bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
                                    bool isEndOfChain)
 {
     if(isEndOfChain == true) {
@@ -205,5 +201,5 @@ bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
         }
         return true;
     }
-    return OpalMediaStream::ExecuteCommand(command/*, isEndOfChain*/);
-}
+    return OpalMediaStream::ExecuteCommand(command/*, isEndOfChain);
+}*/

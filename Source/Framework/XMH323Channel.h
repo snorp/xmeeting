@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Channel.h,v 1.8 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMH323Channel.h,v 1.9 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,14 +14,14 @@
 
 class XMH323Channel : public H323_RTPChannel
 {
-	PCLASSINFO(XMH323Channel, H323_RTPChannel);
+  PCLASSINFO(XMH323Channel, H323_RTPChannel);
 	
-	XMH323Channel(H323Connection & connection,
+  XMH323Channel(H323Connection & connection,
                 const H323Capability & capability,
                 Directions direction,
                 RTP_Session & rtp);
 	
-	virtual void OnFlowControl(long bitRateRestriction);
+  virtual void OnFlowControl(long bitRateRestriction);
 };
 
 #endif // __XM_H323_CHANNEL_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoInputModule.h,v 1.16 2007/05/08 15:17:13 hfriederich Exp $
+ * $Id: XMVideoInputModule.h,v 1.17 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -398,10 +398,10 @@ void XMClearPixelBuffer(CVPixelBufferRef pixelBuffer);
  **/
 void *XMCreateImageCopyContext(unsigned srcWidth, unsigned srcHeight,
                                unsigned xOffset, unsigned yOffset,
-							   unsigned bytesPerRow, OSType srcPixelFormat,
-							   CGDirectPaletteRef colorPalette,
-							   CVPixelBufferRef dstPixelBuffer,
-							   XMImageScaleOperation imageScaleOperation);
+                               unsigned bytesPerRow, OSType srcPixelFormat,
+                               CGDirectPaletteRef colorPalette,
+                               CVPixelBufferRef dstPixelBuffer,
+                               XMImageScaleOperation imageScaleOperation);
 
 /*!
 	@function XMDisposeImageCopyContext(void *imageCopyContext);
@@ -425,7 +425,7 @@ void XMDisposeImageCopyContext(void *imageCopyContext);
 	@result		Returns the success of this operation
  **/
 BOOL XMCopyImageIntoPixelBuffer(void *src, CVPixelBufferRef dstPixelBuffer,
-								void *imageCopyContext);
+                                void *imageCopyContext);
 
 void XMRGBA2ARGB(void *buffer, unsigned width, unsigned height, unsigned bytesPerRow);
 

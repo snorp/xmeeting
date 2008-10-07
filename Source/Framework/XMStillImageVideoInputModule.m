@@ -1,5 +1,5 @@
 /*
- * $Id: XMStillImageVideoInputModule.m,v 1.6 2007/05/08 10:49:54 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.m,v 1.7 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,371 +23,340 @@
 
 - (id)init
 {
-	[self doesNotRecognizeSelector:_cmd];
-	[self release];
-	return nil;
+  [self doesNotRecognizeSelector:_cmd];
+  [self release];
+  return nil;
 }
 
 - (id)_init
 {
-	self = [super init];
+  self = [super init];
 	
-	NSString *deviceName = NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_DEVICE_NAME", @"");
-	stillNames = [[NSArray alloc] initWithObjects:deviceName, nil];
-	inputManager = nil;
+  NSString *deviceName = NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_DEVICE_NAME", @"");
+  stillNames = [[NSArray alloc] initWithObjects:deviceName, nil];
+  inputManager = nil;
 	
-	preserveImagePath = NO;
-	imagePath = nil;
+  preserveImagePath = NO;
+  imagePath = nil;
 	
-	actualImagePath = nil;
-	actualScaleType = XMImageScaleOperation_NoScaling;
-	pixelBuffer = NULL;
+  actualImagePath = nil;
+  actualScaleType = XMImageScaleOperation_NoScaling;
+  pixelBuffer = NULL;
 	
-	deviceSettingsView = nil;
+  deviceSettingsView = nil;
 	
-	return self;
+  return self;
 }
 
 - (void)dealloc
 {		
-	[inputManager release];
-	[stillNames release];
+  [inputManager release];
+  [stillNames release];
+  
+  [imagePath release];
 	
-	[imagePath release];
+  [actualImagePath release];
+  
+  if (pixelBuffer != NULL) {
+    CVPixelBufferRelease(pixelBuffer);
+    pixelBuffer = NULL;
+  }
 	
-	[actualImagePath release];
-	if(pixelBuffer != NULL)
-	{
-		CVPixelBufferRelease(pixelBuffer);
-		pixelBuffer = NULL;
-	}
-	
-	[super dealloc];
+  [super dealloc];
 }
 
 - (NSString *)identifier
 {
-	return @"XMStillImageVideoInputModule";
+  return @"XMStillImageVideoInputModule";
 }
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_NAME", @"");
+  return NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_NAME", @"");
 }
 
 - (void)setupWithInputManager:(id<XMVideoInputManager>)theManager
 {
-	inputManager = [theManager retain];
+  inputManager = [theManager retain];
 }
 
 - (void)close
 {			
-	[inputManager release];
-	inputManager = nil;
+  [inputManager release];
+  inputManager = nil;
 }
 
 // Still Image
 - (NSArray *)inputDevices
 {		
-	return stillNames;
+  return stillNames;
 }
 
 - (BOOL)openInputDevice:(NSString *)device
 {	
-	// make sure that the correct image is displayed
-	[inputManager noteSettingsDidChangeForModule:self];
-	return YES;	// always allow them to select still images. Use dummy image if nothing present
+  // make sure that the correct image is displayed
+  [inputManager noteSettingsDidChangeForModule:self];
+  return YES;	// always allow them to select still images. Use dummy image if nothing present
 }
 
 - (BOOL)closeInputDevice
 {	
-	if(pixelBuffer != NULL)
-	{
-		CVPixelBufferRelease(pixelBuffer);
-		pixelBuffer = NULL;
-	}
+  if (pixelBuffer != NULL) {
+    CVPixelBufferRelease(pixelBuffer);
+    pixelBuffer = NULL;
+  }
 	
-	if(preserveImagePath == NO)
-	{
-		[imagePath release];
-		imagePath = nil;
-		scaleType = XMImageScaleOperation_NoScaling;
-	}
+  if (preserveImagePath == NO) {
+    [imagePath release];
+    imagePath = nil;
+    scaleType = XMImageScaleOperation_NoScaling;
+  }
 	
-	return YES;
+  return YES;
 }
 
 - (BOOL)setInputFrameSize:(XMVideoSize)theVideoSize
 {
-	if(videoSize == theVideoSize)
-	{
-		return YES;
-	}
+  if (videoSize == theVideoSize) {
+    return YES;
+  }
 	
-	videoSize = theVideoSize;
+  videoSize = theVideoSize;
 	
-	if(pixelBuffer != NULL)
-	{
-		CVPixelBufferRelease(pixelBuffer);
-		pixelBuffer = NULL;
-	}
+  if (pixelBuffer != NULL) {
+    CVPixelBufferRelease(pixelBuffer);
+    pixelBuffer = NULL;
+  }
 	
-	return YES;
+  return YES;
 }
 
 - (BOOL)setFrameGrabRate:(unsigned)theFrameGrabRate
 {
-	return YES;
+  return YES;
 }
 
 - (BOOL)grabFrame
 {
-	if(pixelBuffer == NULL)
-	{	
-		NSString *theImagePath = actualImagePath;
-		XMImageScaleOperation scaleOperation = actualScaleType;
-		if(theImagePath == nil)
-		{
-            CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:videoSize];
-            if (dummyPicture != NULL)
-            {
-                [inputManager handleGrabbedFrame:dummyPicture];
-                return YES;
-            }
-            else
-            {
-                [inputManager handleErrorWithCode:2 hintCode:1];
-                return NO;
-            }
-		}
-		NSData *data = [[NSData alloc] initWithContentsOfFile:theImagePath];
-		NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
-		[data release];
+  if (pixelBuffer == NULL) {	
+    NSString *theImagePath = actualImagePath;
+    XMImageScaleOperation scaleOperation = actualScaleType;
+    if (theImagePath == nil) {
+      CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:videoSize];
+      if (dummyPicture != NULL) {
+        [inputManager handleGrabbedFrame:dummyPicture];
+        return YES;
+      } else {
+        [inputManager handleErrorWithCode:2 hintCode:1];
+        return NO;
+      } 
+    }
+    NSData *data = [[NSData alloc] initWithContentsOfFile:theImagePath];
+    NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
+    [data release];
 		
-		if(bitmapImageRep == nil)
-		{
-            CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:videoSize];
-            if (dummyPicture != NULL)
-            {
-                [inputManager handleGrabbedFrame:dummyPicture];
-                return YES;
-            }
-            else
-            {
-                [inputManager handleErrorWithCode:2 hintCode:2];
-                return NO;
-            }
-		}
+    if (bitmapImageRep == nil) {
+      CVPixelBufferRef dummyPicture = [XMDummyVideoInputModule getDummyImageForVideoSize:videoSize];
+      if (dummyPicture != NULL) {
+        [inputManager handleGrabbedFrame:dummyPicture];
+        return YES;
+      } else {
+        [inputManager handleErrorWithCode:2 hintCode:2];
+        return NO;
+      }
+    }
 		
-		UInt8 *bitmapData = (UInt8 *)[bitmapImageRep bitmapData];
+    UInt8 *bitmapData = (UInt8 *)[bitmapImageRep bitmapData];
 		
-		unsigned width = [bitmapImageRep pixelsWide];
-		unsigned height = [bitmapImageRep pixelsHigh];
-		unsigned bytesPerRow = [bitmapImageRep bytesPerRow];
+    unsigned width = [bitmapImageRep pixelsWide];
+    unsigned height = [bitmapImageRep pixelsHigh];
+    unsigned bytesPerRow = [bitmapImageRep bytesPerRow];
 		
-		unsigned bitsPerPixel = [bitmapImageRep bitsPerPixel];
-		OSType pixelFormat;
+    unsigned bitsPerPixel = [bitmapImageRep bitsPerPixel];
+    OSType pixelFormat;
 		
-		switch(bitsPerPixel)
-		{
-			case 8:
-				pixelFormat = k8IndexedPixelFormat;
-				break;
-			case 16:
-				pixelFormat = k16BE555PixelFormat;
-				break;
-			case 24:
-				pixelFormat = k24RGBPixelFormat;
-				break;
-			default:
-				pixelFormat = k32ARGBPixelFormat;
-				unsigned bitmapFormat = [bitmapImageRep bitmapFormat];
-				if((bitmapFormat & NSAlphaFirstBitmapFormat) == 0)
-				{
-					// need to convert from RGBA to ARGB
-					XMRGBA2ARGB(bitmapData, width, height, bytesPerRow);
-				}
-				break;
-		}
+    switch (bitsPerPixel) {
+      case 8:
+        pixelFormat = k8IndexedPixelFormat;
+        break;
+      case 16:
+        pixelFormat = k16BE555PixelFormat;
+        break;
+      case 24:
+        pixelFormat = k24RGBPixelFormat;
+        break;
+      default:
+        pixelFormat = k32ARGBPixelFormat;
+        unsigned bitmapFormat = [bitmapImageRep bitmapFormat];
+        if ((bitmapFormat & NSAlphaFirstBitmapFormat) == 0) {
+          // need to convert from RGBA to ARGB
+          XMRGBA2ARGB(bitmapData, width, height, bytesPerRow);
+        }
+        break;
+    }
 		
-		pixelBuffer = XMCreatePixelBuffer(videoSize);
+    pixelBuffer = XMCreatePixelBuffer(videoSize);
 		
-		void *context = XMCreateImageCopyContext(width, height, 0, 0, bytesPerRow, pixelFormat, NULL, pixelBuffer, scaleOperation);
+    void *context = XMCreateImageCopyContext(width, height, 0, 0, bytesPerRow, pixelFormat, NULL, pixelBuffer, scaleOperation);
 		
-		BOOL result = XMCopyImageIntoPixelBuffer(bitmapData, pixelBuffer, context);
+    BOOL result = XMCopyImageIntoPixelBuffer(bitmapData, pixelBuffer, context);
 		
-		XMDisposeImageCopyContext(context);
+    XMDisposeImageCopyContext(context);
 		
-		if(result == NO)
-		{
-			[inputManager handleErrorWithCode:2 hintCode:0];
-			return NO;
-		}
+    if (result == NO) {
+      [inputManager handleErrorWithCode:2 hintCode:0];
+      return NO;
+    }
 		
-		[bitmapImageRep release];
-	}
+    [bitmapImageRep release];
+  }
 	
-	[inputManager handleGrabbedFrame:pixelBuffer];
+  [inputManager handleGrabbedFrame:pixelBuffer];
 	
-	return YES;
+  return YES;
 }
 
 - (NSString *)descriptionForErrorCode:(int)errorCode hintCode:(int)code device:(NSString *)device
 {
-	return NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_ERROR", @"");
+  return NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_ERROR", @"");
 }
 
 // Setup dialog options: to select image
 - (BOOL)hasSettingsForDevice:(NSString *)device
 {	// This method will be called on the main thread.
 	
-	return YES;
+  return YES;
 }
 
 - (BOOL)requiresSettingsDialogWhenDeviceOpens:(NSString *)device
 {	// This method will be called on the main thread.
 	
-	// return NO if path exists and is an image.
-	if(imagePath == nil)
-	{
-		return YES;
-	}
+  // return NO if path exists and is an image.
+  if (imagePath == nil) {
+    return YES;
+  }
 	
-	return NO;
+  return NO;
 }
 
 - (NSData *)internalSettings
 {	// This method is called on the main thread
 	
-	NSString *theImagePath = imagePath;
-	if(imagePath == nil)
-	{
-		theImagePath = @"";
-	}
+  NSString *theImagePath = imagePath;
+  if (imagePath == nil) {
+    theImagePath = @"";
+  }
 	
-	NSArray *values = [[NSArray alloc] initWithObjects:theImagePath, [NSNumber numberWithUnsignedInt:scaleType], nil];	
-	// for now only one image, other for recent images and other parameters.
-	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:values];
+  NSArray *values = [[NSArray alloc] initWithObjects:theImagePath, [NSNumber numberWithUnsignedInt:scaleType], nil];	
+  // for now only one image, other for recent images and other parameters.
+  NSData *data = [NSKeyedArchiver archivedDataWithRootObject:values];
 	
-	[values release];
+  [values release];
 	
-	return data;
+  return data;
 }
 
 - (void)applyInternalSettings:(NSData *)settings
 {	// This method is NOT called on the main thread
-	NSArray *array = (NSArray *)[NSKeyedUnarchiver unarchiveObjectWithData:settings];
+  NSArray *array = (NSArray *)[NSKeyedUnarchiver unarchiveObjectWithData:settings];
 	
-	// for now only one image, other for recent images.
-	NSString *aPath = (NSString *)[array objectAtIndex:0];	
-	NSNumber *scaling = (NSNumber *) [array objectAtIndex:1];	
-	actualScaleType = (XMImageScaleOperation)[scaling unsignedIntValue];
+  // for now only one image, other for recent images.
+  NSString *aPath = (NSString *)[array objectAtIndex:0];	
+  NSNumber *scaling = (NSNumber *) [array objectAtIndex:1];	
+  actualScaleType = (XMImageScaleOperation)[scaling unsignedIntValue];
 	
-	if([aPath isEqualToString:@""])
-	{
-		aPath = nil;
-	}
-	[actualImagePath release];
-	actualImagePath = [aPath copy];
+  if ([aPath isEqualToString:@""]) {
+    aPath = nil;
+  }
+  [actualImagePath release];
+  actualImagePath = [aPath copy];
 	
-	if(pixelBuffer != NULL)
-	{
-		CVPixelBufferRelease(pixelBuffer);
-		pixelBuffer = NULL;
-	}
+  if (pixelBuffer != NULL) {
+    CVPixelBufferRelease(pixelBuffer);
+    pixelBuffer = NULL;
+  }
 }
 
 - (NSDictionary *)permamentSettings
 {	//This method will be called on the main thread.	
 
-	NSString *path = imagePath;
-	XMImageScaleOperation scaleOperation = scaleType;
+  NSString *path = imagePath;
+  XMImageScaleOperation scaleOperation = scaleType;
 	
-	if(preserveImagePath == NO)
-	{
-		path = nil;
-		scaleOperation = XMImageScaleOperation_NoScaling;
-	}
+  if (preserveImagePath == NO) {
+    path = nil;
+    scaleOperation = XMImageScaleOperation_NoScaling;
+  }
 		
-	if(path == nil)
-	{
-		path = @"";
-	}
-	return [NSDictionary dictionaryWithObjectsAndKeys:path, @"stillImage", 
-													[NSNumber numberWithInt:scaleOperation], @"stillImageScaling",
-													[NSNumber numberWithBool:preserveImagePath], @"preserveImagePath", 
-													nil] ;
+  if (path == nil) {
+    path = @"";
+  }
+  return [NSDictionary dictionaryWithObjectsAndKeys:path, @"stillImage", 
+                            [NSNumber numberWithInt:scaleOperation], @"stillImageScaling",
+                            [NSNumber numberWithBool:preserveImagePath], @"preserveImagePath", 
+                            nil] ;
 }
 
 - (BOOL)setPermamentSettings:(NSDictionary *)settings
 {	//This method will be called on the main thread.
 	
-	NSString *aPath = [settings objectForKey: @"stillImage"];
-	NSNumber *scaling =  [settings objectForKey: @"stillImageScaling"];
-	NSNumber *number = [settings objectForKey: @"preserveImagePath"];
+  NSString *aPath = [settings objectForKey: @"stillImage"];
+  NSNumber *scaling =  [settings objectForKey: @"stillImageScaling"];
+  NSNumber *number = [settings objectForKey: @"preserveImagePath"];
 	
-	if(aPath == nil || scaling == nil || number == nil)
-	{
-		return NO;
-	}
+  if (aPath == nil || scaling == nil || number == nil) {
+    return NO;
+  }
 	
-	if([aPath isEqualToString:@""])
-	{
-		aPath = nil;
-	}
+  if ([aPath isEqualToString:@""]) {
+    aPath = nil;
+  }
 	
-	[self _setImagePath:aPath];
+  [self _setImagePath:aPath];
 	
-	scaleType = [scaling unsignedShortValue];
-	preserveImagePath = [number boolValue];
+  scaleType = [scaling unsignedShortValue];
+  preserveImagePath = [number boolValue];
 	
-	[inputManager noteSettingsDidChangeForModule:self];
+  [inputManager noteSettingsDidChangeForModule:self];
 
-	return YES;
+  return YES;
 }
 
 - (NSView *)settingsViewForDevice:(NSString *)device
 {	//This method will be called on the main thread.
 	
-	if(deviceSettingsView == nil)
-	{
-		[NSBundle loadNibNamed:@"StillImageSettings" owner:self];
-	}
+  if (deviceSettingsView == nil) {
+    [NSBundle loadNibNamed:@"StillImageSettings" owner:self];
+  }
 	
-	if(device == nil)
-	{
-		int state = (preserveImagePath == YES) ? NSOnState : NSOffState;
-		[preserveImagePathSwitch setState:state];
+  if (device == nil) {
+    int state = (preserveImagePath == YES) ? NSOnState : NSOffState;
+    [preserveImagePathSwitch setState:state];
 		
-		return moduleSettingsView;
-	}
-	else
-	{
-		[self _updateImage];
-		[self _updateScale];
-		return deviceSettingsView;
-	}
+    return moduleSettingsView;
+  } else {
+    [self _updateImage];
+    [self _updateScale];
+    return deviceSettingsView;
+  }
 }
 
 - (void)setDefaultSettingsForDevice:(NSString *)device
 {	//This method will be called on the main thread.
 	
-	if(device == nil)
-	{
-		preserveImagePath = NO;
-		[preserveImagePathSwitch setState:NSOffState];
-	}
-	else
-	{
-		[imagePath release];
-		imagePath = nil;
-		scaleType = XMImageScaleOperation_NoScaling;
+  if (device == nil) {
+    preserveImagePath = NO;
+    [preserveImagePathSwitch setState:NSOffState];
+  } else {
+    [imagePath release];
+    imagePath = nil;
+    scaleType = XMImageScaleOperation_NoScaling;
 		
-		[self _updateImage];
-		[self _updateScale];
+    [self _updateImage];
+    [self _updateScale];
 		
-		[inputManager noteSettingsDidChangeForModule:self];
-	}
+    [inputManager noteSettingsDidChangeForModule:self];
+  }
 }
 
 #pragma mark -
@@ -396,60 +365,49 @@
 // Update to new image...
 - (BOOL)_setImagePath:(NSString *)aPath
 {
-	if(aPath != nil)
-	{
-		NSData *data = [[NSData alloc] initWithContentsOfFile:aPath];
-		NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
+  if (aPath != nil) {
+    NSData *data = [[NSData alloc] initWithContentsOfFile:aPath];
+    NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithData:data];
 		
-		BOOL succ = YES;
+    BOOL success = (bitmapImageRep == nil) ? NO : YES;
 		
-		if(bitmapImageRep == nil)
-		{
-			succ = NO;
-		}
+    [data release];
+    [bitmapImageRep release];
 		
-		[data release];
-		[bitmapImageRep release];
+    if (success == NO) {
+      [inputManager handleErrorWithCode:3 hintCode:0];
+      return NO;
+    }
+  }
 		
-		if(succ == NO)
-		{
-			[inputManager handleErrorWithCode:3 hintCode:0];
-			return NO;
-		}
-	}
-		
-	NSString *old = imagePath;
-	imagePath = [aPath  copy];
-	[old release];
+  NSString *old = imagePath;
+  imagePath = [aPath  copy];
+  [old release];
 	
-	[inputManager noteSettingsDidChangeForModule:self];
+  [inputManager noteSettingsDidChangeForModule:self];
 	
-	return YES;
+  return YES;
 }
 
 - (void)_updateImage
 {
-	if(deviceSettingsView != nil)
-	{
-		if(imagePath != nil)
-		{	
-			NSImage *theImage = (NSImage *) [[NSImage alloc]  initWithContentsOfFile: imagePath];
-			[pathField setStringValue: imagePath];
-			[previewImage setImage: theImage];
-		}
-		else
-		{
-			[pathField setStringValue:NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_NO_IMAGE", @"")];
-			[previewImage setImage:nil];
-		}
+  if (deviceSettingsView != nil) {
+    if (imagePath != nil) {	
+      NSImage *theImage = (NSImage *) [[NSImage alloc]  initWithContentsOfFile: imagePath];
+      [pathField setStringValue: imagePath];
+      [previewImage setImage: theImage];
+    } else {
+      [pathField setStringValue:NSLocalizedString(@"XM_FRAMEWORK_STILL_MODULE_NO_IMAGE", @"")];
+      [previewImage setImage:nil];
+    }
 	} 
 }
 
 - (void)_updateScale
 {	
-	[imageScaling selectItemWithTag:scaleType];
-	[previewImage setImageAlignment:  (scaleType == XMImageScaleOperation_NoScaling) ?   NSImageAlignTopLeft : NSImageAlignCenter];
-	[previewImage setImageScaling: (scaleType == XMImageScaleOperation_NoScaling)?  NSScaleNone : ((scaleType == XMImageScaleOperation_ScaleProportionally) ? NSScaleProportionally: NSScaleToFit) ];
+  [imageScaling selectItemWithTag:scaleType];
+  [previewImage setImageAlignment:  (scaleType == XMImageScaleOperation_NoScaling) ?   NSImageAlignTopLeft : NSImageAlignCenter];
+  [previewImage setImageScaling: (scaleType == XMImageScaleOperation_NoScaling)?  NSScaleNone : ((scaleType == XMImageScaleOperation_ScaleProportionally) ? NSScaleProportionally: NSScaleToFit) ];
 }
 
 #pragma mark -
@@ -457,65 +415,63 @@
 
 - (void)awakeFromNib
 {
-	int state = (preserveImagePath == YES) ? NSOnState : NSOffState;
-	[preserveImagePathSwitch setState:state];
+  int state = (preserveImagePath == YES) ? NSOnState : NSOffState;
+  [preserveImagePathSwitch setState:state];
 	
-	[self _updateImage];
-	[self _updateScale];
+  [self _updateImage];
+  [self _updateScale];
 }
 
 - (IBAction)_changeImage:(id)sender
 {	// Select Image ...
        
-	NSOpenPanel *oPanel = [NSOpenPanel openPanel];
-	int result;
+  NSOpenPanel *oPanel = [NSOpenPanel openPanel];
+  int result;
       
-	[oPanel setAllowsMultipleSelection:NO];
-	[oPanel setCanChooseDirectories:NO];
-	[oPanel setCanChooseFiles:YES];
-	[oPanel setPrompt: NSLocalizedString(@"Set Image", @"Set Image")];
+  [oPanel setAllowsMultipleSelection:NO];
+  [oPanel setCanChooseDirectories:NO];
+  [oPanel setCanChooseFiles:YES];
+  [oPanel setPrompt: NSLocalizedString(@"Set Image", @"Set Image")];
 	
-	NSString *defaultPath = imagePath;
-	if(imagePath == nil)
-	{
-		defaultPath = NSHomeDirectory();
-	}
+  NSString *defaultPath = imagePath;
+  if (imagePath == nil) {
+    defaultPath = NSHomeDirectory();
+  }
 
-	result = [oPanel runModalForDirectory:defaultPath file:nil types:[NSImage imageUnfilteredFileTypes]];
+  result = [oPanel runModalForDirectory:defaultPath file:nil types:[NSImage imageUnfilteredFileTypes]];
 
-	if (result == NSOKButton)
-	{	
-		NSArray *filesToOpen = [oPanel filenames];
+  if (result == NSOKButton) {	
+    NSArray *filesToOpen = [oPanel filenames];
 
-		NSString *aPath = [filesToOpen objectAtIndex: 0];
-		//NSLog(@"path = %@", aPath);
-		[self _setImagePath: aPath];
+    NSString *aPath = [filesToOpen objectAtIndex: 0];
+    //NSLog(@"path = %@", aPath);
+    [self _setImagePath: aPath];
 			
-		[self _updateImage];
+    [self _updateImage];
 			
-		[inputManager noteSettingsDidChangeForModule:self];
-	}
+    [inputManager noteSettingsDidChangeForModule:self];
+  }
 }
 
 - (IBAction)_scaleTypeChanged:(id)sender
 {
-	//XMImageScaleOperation_NoScaling = 0,
-	//XMImageScaleOperation_ScaleProportionally,
-	//XMImageScaleOperation_ScaleToFit	
-	scaleType = (XMImageScaleOperation)[[imageScaling selectedItem] tag];
+  //XMImageScaleOperation_NoScaling = 0,
+  //XMImageScaleOperation_ScaleProportionally,
+  //XMImageScaleOperation_ScaleToFit	
+  scaleType = (XMImageScaleOperation)[[imageScaling selectedItem] tag];
 	
-	//	NSScaleProportionally = 0,   // Fit proportionally
-	//	NSScaleToFit,                // Forced fit (distort if necessary)
-	//	NSScaleNone                  // Don't scale (clip)
+  //	NSScaleProportionally = 0,   // Fit proportionally
+  //	NSScaleToFit,                // Forced fit (distort if necessary)
+  //	NSScaleNone                  // Don't scale (clip)
 	
-	[self _updateScale];
+  [self _updateScale];
 	
-	[inputManager noteSettingsDidChangeForModule:self];	
+  [inputManager noteSettingsDidChangeForModule:self];	
 }
 
 - (IBAction)_togglePreserveImagePath:(id)sender
 {
-	preserveImagePath = ([preserveImagePathSwitch state] == NSOnState) ? YES : NO;
+  preserveImagePath = ([preserveImagePathSwitch state] == NSOnState) ? YES : NO;
 }
 
 @end

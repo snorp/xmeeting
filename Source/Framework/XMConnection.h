@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.14 2008/09/24 06:52:41 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.15 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,9 +29,9 @@ public:
   virtual void Release(OpalConnection::CallEndReason callEndReason);
   
   virtual OpalMediaFormatList GetMediaFormats() const;
-  virtual void AdjustMediaFormatOptions(OpalMediaFormat & mediaFormat) const;
+  //virtual void AdjustMediaFormatOptions(OpalMediaFormat & mediaFormat) const;
     
-  virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
+  //virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
 	
   virtual bool IsMediaBypassPossible(const OpalMediaType & mediaType) const { return false; }
 	
@@ -54,10 +54,10 @@ private:
   OpalH224Handler *h224Handler;
   OpalH281Handler *h281Handler;
     
-  OpalVideoFormat h261VideoFormat;
-  OpalVideoFormat h263VideoFormat;
-  OpalVideoFormat h263PlusVideoFormat;
-  OpalVideoFormat h264VideoFormat;
+  //OpalVideoFormat h261VideoFormat;
+  //OpalVideoFormat h263VideoFormat;
+  //OpalVideoFormat h263PlusVideoFormat;
+  //OpalVideoFormat h264VideoFormat;
 };
 
 #endif // __XM_CONNECTION_H__

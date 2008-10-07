@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.9 2008/08/14 19:57:05 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.10 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,35 +15,41 @@
 
 class XMConnection;
 
+/**
+ * OpalMediaStream wrapper for QuickTime codecs (sending)
+ * The packetizers directly assemble the RTP data frame through the
+ * API presented here
+ **/
 class XMMediaStream : public OpalMediaStream
 {
-	PCLASSINFO(XMMediaStream, OpalMediaStream);
+  PCLASSINFO(XMMediaStream, OpalMediaStream);
 	
 public:
-	XMMediaStream(XMConnection & conn,
+  XMMediaStream(XMConnection & conn,
                 const OpalMediaFormat & mediaFormat,
                 unsigned sessionID,
                 bool isSource);
-	~XMMediaStream();
+  ~XMMediaStream();
 	
-    virtual void OnPatchStart();
-    virtual bool Close();
-	virtual bool ReadPacket(RTP_DataFrame & packet);
-	virtual bool WritePacket(RTP_DataFrame & packet);
-	virtual bool IsSynchronous() const { return false; }
-    virtual bool RequiresPatchThread() const { return false; }
+  virtual void OnPatchStart();
+  virtual bool Close();
+  virtual bool ReadPacket(RTP_DataFrame & packet);
+  virtual bool WritePacket(RTP_DataFrame & packet);
+  virtual bool IsSynchronous() const { return false; }
+  virtual bool RequiresPatchThread() const { return false; }
     
-    static void SetTimeStamp(unsigned mediaID, unsigned timeStamp);
-    static void AppendData(unsigned mediaID, void *data, unsigned lenght);
-    static void SendPacket(unsigned mediaID, bool setMarker);
-    static void HandleDidStopTransmitting(unsigned mediaID);
+  // packetizer methods
+  static void SetTimeStamp(unsigned mediaID, unsigned timeStamp);
+  static void AppendData(unsigned mediaID, void *data, unsigned lenght);
+  static void SendPacket(unsigned mediaID, bool setMarker);
+  static void HandleDidStopTransmitting(unsigned mediaID);
     
-    virtual bool ExecuteCommand(const OpalMediaCommand & command, bool isEndOfChain = false);
+  //virtual bool ExecuteCommand(const OpalMediaCommand & command, bool isEndOfChain = false);
     
 private:
-    RTP_DataFrame dataFrame;
-    bool hasStarted;
-    bool isTerminated;
+  RTP_DataFrame dataFrame;
+  bool hasStarted;
+  bool isTerminated;
 };
 
 #endif // __XM_MEDIA_STREAM_H__

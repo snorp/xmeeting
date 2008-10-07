@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.32 2008/09/22 22:56:47 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.33 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -80,14 +80,14 @@ const char * const H264LimitedModeOption = "H264LimitedMode";
 
 const OpalVideoFormat & XMGetMediaFormat_H261()
 {
-	static const OpalVideoFormat XMMediaFormat_H261(_XMMediaFormat_H261,
-													RTP_DataFrame::H261,
-													_XMMediaFormatEncoding_H261,
-													XM_MAX_FRAME_WIDTH,
-													XM_MAX_FRAME_HEIGHT,
-													XM_MAX_FRAME_RATE,
-													XM_MAX_H261_BITRATE);
-	return XMMediaFormat_H261;
+  static const OpalVideoFormat XMMediaFormat_H261(_XMMediaFormat_H261,
+                                                  RTP_DataFrame::H261,
+                                                  _XMMediaFormatEncoding_H261,
+                                                  XM_MAX_FRAME_WIDTH,
+                                                  XM_MAX_FRAME_HEIGHT,
+                                                  XM_MAX_FRAME_RATE,
+                                                  XM_MAX_H261_BITRATE);
+  return XMMediaFormat_H261;
 }
 
 const OpalVideoFormat & XMGetMediaFormat_H263()
@@ -131,82 +131,64 @@ const OpalVideoFormat & XMGetMediaFormat_H264()
 
 XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat)
 {
-	if(mediaFormat == XM_MEDIA_FORMAT_H261)
-	{
-		return XMCodecIdentifier_H261;
-	}
-	else if(mediaFormat == XM_MEDIA_FORMAT_H263 ||
-			mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
-	{
-		return XMCodecIdentifier_H263;
-	}
-	else if(mediaFormat == XM_MEDIA_FORMAT_H264)
-	{
-		return XMCodecIdentifier_H264;
-	}
+  if (mediaFormat == XM_MEDIA_FORMAT_H261) {
+    return XMCodecIdentifier_H261;
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 ||
+            mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
+    return XMCodecIdentifier_H263;
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
+    return XMCodecIdentifier_H264;
+  }
 	
-	return XMCodecIdentifier_UnknownCodec;
+  return XMCodecIdentifier_UnknownCodec;
 }
 
 XMVideoSize _XMGetMediaFormatSize(const OpalMediaFormat & mediaFormat)
 {
-	unsigned width = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption());
-	unsigned height = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameHeightOption());
+  unsigned width = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameWidthOption());
+  unsigned height = mediaFormat.GetOptionInteger(OpalVideoFormat::FrameHeightOption());
 	
-	if(width == XM_CIF_WIDTH && height == XM_CIF_HEIGHT)
-	{
-		return XMVideoSize_CIF;
-	}
-	else if(width == XM_QCIF_WIDTH && height == XM_QCIF_HEIGHT)
-	{
-		return XMVideoSize_QCIF;
-	}
-	else if(width == XM_SQCIF_WIDTH && height == XM_SQCIF_HEIGHT)
-	{
-		return XMVideoSize_SQCIF;
-	}
-	else if (width != 0 && height != 0) {
-        return XMVideoSize_Custom;
-    }
-    else
-	{
-		return XMVideoSize_NoVideo;
-	}
+  if (width == XM_CIF_WIDTH && height == XM_CIF_HEIGHT) {
+    return XMVideoSize_CIF;
+  } else if (width == XM_QCIF_WIDTH && height == XM_QCIF_HEIGHT) {
+    return XMVideoSize_QCIF;
+  } else if (width == XM_SQCIF_WIDTH && height == XM_SQCIF_HEIGHT) {
+    return XMVideoSize_SQCIF;
+  } else if (width != 0 && height != 0) {
+    return XMVideoSize_Custom;
+  } else {
+    return XMVideoSize_NoVideo;
+  }
 }
 
 const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat)
 {
-	if(mediaFormat == XM_MEDIA_FORMAT_H261)
-	{
-		return _XMMediaFormatName_H261;
-	}
-	else if(mediaFormat == XM_MEDIA_FORMAT_H263 ||
-			mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
-	{
-		return _XMMediaFormatName_H263;
-	}
-	else if(mediaFormat == XM_MEDIA_FORMAT_H264)
-	{
-		return _XMMediaFormatName_H264;
-	}
+  if (mediaFormat == XM_MEDIA_FORMAT_H261) {
+    return _XMMediaFormatName_H261;
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 ||
+             mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
+    return _XMMediaFormatName_H263;
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
+    return _XMMediaFormatName_H264;
+  }
 	
-	// if nothing found, simply return the media format string itself
-	return mediaFormat;
+  // if nothing found, simply return the media format string itself
+  return mediaFormat;
 }
 
 unsigned _XMGetMaxH261Bitrate()
 {
-    return XM_MAX_H261_BITRATE;
+  return XM_MAX_H261_BITRATE;
 }
 
 unsigned _XMGetMaxH263Bitrate()
 {
-    return XM_MAX_H263_BITRATE;
+  return XM_MAX_H263_BITRATE;
 }
 
 unsigned _XMGetMaxH264Bitrate()
 {
-    return XM_MAX_H264_BITRATE;
+  return XM_MAX_H264_BITRATE;
 }
 
 #pragma mark -
@@ -214,227 +196,198 @@ unsigned _XMGetMaxH264Bitrate()
 
 bool _XMHasCodecInstalled(XMCodecIdentifier codecIdentifier)
 {
-    const char *formatString = _XMMediaFormatForCodecIdentifier(codecIdentifier);
+  const char *formatString = _XMMediaFormatForCodecIdentifier(codecIdentifier);
     
-    if (formatString == NULL)
-    {
-        return false;
-    }
+  if (formatString == NULL) {
+    return false;
+  }
     
-    return OpalMediaFormat::GetAllRegisteredMediaFormats().HasFormat(formatString);
+  return OpalMediaFormat::GetAllRegisteredMediaFormats().HasFormat(formatString);
 }
 
 const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 {
-	switch(codecIdentifier)
-	{
-		case XMCodecIdentifier_G711_uLaw:
-			return _XMMediaFormatIdentifier_G711_uLaw;
-		case XMCodecIdentifier_G711_ALaw:
-			return _XMMediaFormatIdentifier_G711_ALaw;
-		case XMCodecIdentifier_Speex:
-			return _XMMediaFormatIdentifier_Speex;
-        case XMCodecIdentifier_GSM:
-            return _XMMediaFormatIdentifier_GSM;
-		case XMCodecIdentifier_H261:
-			return _XMMediaFormatIdentifier_H261;
-		case XMCodecIdentifier_H263:
-			return _XMMediaFormatIdentifier_H263;
-		case XMCodecIdentifier_H264:
-			return _XMMediaFormatIdentifier_H264;
-		default:
-			return NULL;
-	}
+  switch (codecIdentifier) {
+    case XMCodecIdentifier_G711_uLaw:
+      return _XMMediaFormatIdentifier_G711_uLaw;
+    case XMCodecIdentifier_G711_ALaw:
+      return _XMMediaFormatIdentifier_G711_ALaw;
+    case XMCodecIdentifier_Speex:
+      return _XMMediaFormatIdentifier_Speex;
+    case XMCodecIdentifier_GSM:
+      return _XMMediaFormatIdentifier_GSM;
+    case XMCodecIdentifier_H261:
+      return _XMMediaFormatIdentifier_H261;
+    case XMCodecIdentifier_H263:
+      return _XMMediaFormatIdentifier_H263;
+    case XMCodecIdentifier_H264:
+      return _XMMediaFormatIdentifier_H264;
+    default:
+      return NULL;
+  }
 }
 
 #pragma mark -
 #pragma mark XM_H323_H261_Capability methods
 
 XM_H323_H261_Capability::XM_H323_H261_Capability()
+: qcifMPI(1),
+  cifMPI(1),
+  maxBitRate(XM_MAX_H261_BITRATE/100)
 {
-	qcifMPI = 1;
-	cifMPI = 1;
-	maxBitRate = XM_MAX_H261_BITRATE/100;
-    
-    SetPayloadType(XM_MEDIA_FORMAT_H261.GetPayloadType());
+  SetPayloadType(XM_MEDIA_FORMAT_H261.GetPayloadType());
 }
 
 PObject * XM_H323_H261_Capability::Clone() const
 {
-	return new XM_H323_H261_Capability(*this);
+  return new XM_H323_H261_Capability(*this);
 }
 
 PObject::Comparison XM_H323_H261_Capability::Compare(const PObject & obj) const
 {
-	Comparison result = H323Capability::Compare(obj);
-	if(result != EqualTo)
-	{
-		return result;
-	}
+  Comparison result = H323Capability::Compare(obj);
+  if (result != EqualTo) {
+    return result;
+  }
 	
-	if(PIsDescendant(&obj, XM_H323_H261_Capability))
-	{	
-		const XM_H323_H261_Capability & other = (const XM_H323_H261_Capability &)obj;
+  if (PIsDescendant(&obj, XM_H323_H261_Capability)) {	
+    const XM_H323_H261_Capability & other = (const XM_H323_H261_Capability &)obj;
 	
-		if (((cifMPI > 0) && (other.cifMPI > 0)) ||
-			((qcifMPI > 0) && (other.qcifMPI > 0)))
-		{
-			return EqualTo;
-		}
-	}
+    if (((cifMPI > 0) && (other.cifMPI > 0)) ||
+        ((qcifMPI > 0) && (other.qcifMPI > 0))) {
+      return EqualTo;
+    }
+  }
 	
-	return LessThan;
+  return LessThan;
 }
 
 unsigned XM_H323_H261_Capability::GetSubType() const
 {
-	return H245_VideoCapability::e_h261VideoCapability;
+  return H245_VideoCapability::e_h261VideoCapability;
 }
 
 PString XM_H323_H261_Capability::GetFormatName() const
 {
-	return XM_MEDIA_FORMAT_H261;
+  return XM_MEDIA_FORMAT_H261;
 }
 
 bool XM_H323_H261_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 {
-	cap.SetTag(H245_VideoCapability::e_h261VideoCapability);
+  cap.SetTag(H245_VideoCapability::e_h261VideoCapability);
 	
-	H245_H261VideoCapability & h261 = cap;
+  H245_H261VideoCapability & h261 = cap;
 	
-	if(qcifMPI > 0)
-	{
-		h261.IncludeOptionalField(H245_H261VideoCapability::e_qcifMPI);
-		h261.m_qcifMPI = qcifMPI;
-	}
-	if(cifMPI > 0)
-	{
-		h261.IncludeOptionalField(H245_H261VideoCapability::e_cifMPI);
-		h261.m_cifMPI = cifMPI;
-	}
+  if (qcifMPI > 0) {
+    h261.IncludeOptionalField(H245_H261VideoCapability::e_qcifMPI);
+    h261.m_qcifMPI = qcifMPI;
+  }
+  if (cifMPI > 0) {
+    h261.IncludeOptionalField(H245_H261VideoCapability::e_cifMPI);
+    h261.m_cifMPI = cifMPI;
+  }
 	
-	h261.m_temporalSpatialTradeOffCapability = false;
-	h261.m_maxBitRate = maxBitRate;
-	h261.m_stillImageTransmission = false;
+  h261.m_temporalSpatialTradeOffCapability = false;
+  h261.m_maxBitRate = maxBitRate;
+  h261.m_stillImageTransmission = false;
 	
-	return true;
+  return true;
 }
 
 bool XM_H323_H261_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 {
-	pdu.SetTag(H245_VideoMode::e_h261VideoMode);
-	H245_H261VideoMode & mode = pdu;
-	mode.m_resolution.SetTag(cifMPI > 0 ? H245_H261VideoMode_resolution::e_cif : 
-										  H245_H261VideoMode_resolution::e_qcif);
-	mode.m_bitRate = maxBitRate;
-	mode.m_stillImageTransmission = false;
+  pdu.SetTag(H245_VideoMode::e_h261VideoMode);
+  H245_H261VideoMode & mode = pdu;
+  mode.m_resolution.SetTag(cifMPI > 0 ? H245_H261VideoMode_resolution::e_cif : H245_H261VideoMode_resolution::e_qcif);
+  mode.m_bitRate = maxBitRate;
+  mode.m_stillImageTransmission = false;
 	
-	return true;
+  return true;
 }
 
 bool XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 {
-	if (cap.GetTag() != H245_VideoCapability::e_h261VideoCapability)
-	{
-		return false;
-	}
+  if (cap.GetTag() != H245_VideoCapability::e_h261VideoCapability) {
+    return false;
+  }
 	
-	OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
+  OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
 	
-	const H245_H261VideoCapability & h261 = cap;
-	if (h261.HasOptionalField(H245_H261VideoCapability::e_qcifMPI))
-	{
-		qcifMPI = h261.m_qcifMPI;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
-	}
-	else
-	{
-		qcifMPI = 0;
-	}
+  const H245_H261VideoCapability & h261 = cap;
+  if (h261.HasOptionalField(H245_H261VideoCapability::e_qcifMPI)) {
+    qcifMPI = h261.m_qcifMPI;
+    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
+    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
+  } else {
+    qcifMPI = 0;
+  }
 	
-	if (h261.HasOptionalField(H245_H261VideoCapability::e_cifMPI)) {
-		cifMPI = h261.m_cifMPI;
-		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
-		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
-	}
-	else
-	{
-		cifMPI = 0;
-	}
+  if (h261.HasOptionalField(H245_H261VideoCapability::e_cifMPI)) {
+    cifMPI = h261.m_cifMPI;
+    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
+    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
+  } else {
+    cifMPI = 0;
+  }
 	
-    maxBitRate = std::min(maxBitRate, (unsigned)h261.m_maxBitRate);
-	mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
+  maxBitRate = std::min(maxBitRate, (unsigned)h261.m_maxBitRate);
+  mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
 
-	return true;
+  return true;
 }
 
 bool XM_H323_H261_Capability::IsValidCapabilityForSending() const
 {
-	return true;
+  return true;
 }
 
 PObject::Comparison XM_H323_H261_Capability::CompareTo(const XMH323VideoCapability & obj) const
 {
-	if(PIsDescendant(&obj, XM_H323_H261_Capability))
-	{	
-		const XM_H323_H261_Capability & other = (const XM_H323_H261_Capability &)obj;
+  if (PIsDescendant(&obj, XM_H323_H261_Capability)) {	
+    const XM_H323_H261_Capability & other = (const XM_H323_H261_Capability &)obj;
 		
-		if((cifMPI > 0) && (other.cifMPI > 0))
-		{
-			return EqualTo;
-		}
-		else if(cifMPI > 0)
-		{
-			return GreaterThan;
-		}
-		else if(other.cifMPI > 0)
-		{
-			return LessThan;
-		}
-		else if((qcifMPI > 0) && (other.qcifMPI > 0))
-		{
-			return EqualTo;
-		}
-		else if(qcifMPI > 0)
-		{
-			return GreaterThan;
-		}
-		else if(other.qcifMPI > 0)
-		{
-			return LessThan;
-		}
-		else
-		{
-			return EqualTo;
-		}
-	}
+    if ((cifMPI > 0) && (other.cifMPI > 0)) {
+      return EqualTo;
+    } else if (cifMPI > 0) {
+      return GreaterThan;
+    } else if (other.cifMPI > 0) {
+      return LessThan;
+    } else if ((qcifMPI > 0) && (other.qcifMPI > 0)) {
+      return EqualTo;
+    } else if (qcifMPI > 0) {
+      return GreaterThan;
+    } else if (other.qcifMPI > 0) {
+      return LessThan;
+    } else {
+      return EqualTo;
+    }
+  }
 	
-	return LessThan;
+  return LessThan;
 }
 
-void XM_H323_H261_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
+/*void XM_H323_H261_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
 {
-    qcifMPI = 0;
-    cifMPI = 0;
+  qcifMPI = 0;
+  cifMPI = 0;
     
-    XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-    unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
-    unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
+  XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+  unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
+  unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
+  
+  if (videoSize >= XMVideoSize_QCIF) {
+    qcifMPI = mpi;
+  }
+  if (videoSize >= XMVideoSize_CIF) {
+    cifMPI = mpi;
+  }
     
-    if(videoSize >= XMVideoSize_QCIF) {
-        qcifMPI = mpi;
-    }
-    if(videoSize >= XMVideoSize_CIF) {
-        cifMPI = mpi;
-    }
+  maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
     
-    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
-    
-    SetPayloadType(mediaFormat.GetPayloadType());
-}
+  SetPayloadType(mediaFormat.GetPayloadType());
+}*/
 
 #pragma mark -
 #pragma mark XM_H323_H263_Capability methods
@@ -483,7 +436,7 @@ XM_H323_H263_Capability::XM_H323_H263_Capability(bool theIsH263PlusCapability)
     isRFC2429 = theIsH263PlusCapability;
     
     SetPayloadType(XM_MEDIA_FORMAT_H263.GetPayloadType());
-    if(theIsH263PlusCapability == true) {
+    if (theIsH263PlusCapability == true) {
         SetPayloadType(XM_MEDIA_FORMAT_H263PLUS.GetPayloadType());
     }
 }
@@ -497,20 +450,20 @@ PObject * XM_H323_H263_Capability::Clone() const
 
 PObject::Comparison XM_H323_H263_Capability::Compare(const PObject & obj) const
 {
-	if(!PIsDescendant(&obj, XM_H323_H263_Capability))
+	if (!PIsDescendant(&obj, XM_H323_H263_Capability))
 	{
 		return LessThan;
 	}
 	
 	Comparison result = H323Capability::Compare(obj);
-	if(result != EqualTo)
+	if (result != EqualTo)
 	{
 		return result;
 	}
 	
 	const XM_H323_H263_Capability & other = (const XM_H323_H263_Capability &)obj;
 	
-	if(((sqcifMPI > 0) && (other.sqcifMPI > 0)) ||
+	if (((sqcifMPI > 0) && (other.sqcifMPI > 0)) ||
 	   ((qcifMPI > 0) && (other.qcifMPI > 0)) ||
 	   ((cifMPI > 0) && (other.cifMPI > 0)) ||
 	   ((cif4MPI > 0) && (other.cif4MPI > 0)) ||
@@ -521,7 +474,7 @@ PObject::Comparison XM_H323_H263_Capability::Compare(const PObject & obj) const
 	   ((slowCif4MPI > 0) && (other.slowCif4MPI > 0)) ||
 	   ((slowCif16MPI > 0) && (other.slowCif16MPI > 0)))
 	{
-		if(other.isH263PlusCapability == isH263PlusCapability)
+		if (other.isH263PlusCapability == isH263PlusCapability)
 		{
 			return EqualTo;
 		}
@@ -537,7 +490,7 @@ unsigned XM_H323_H263_Capability::GetSubType() const
 
 PString XM_H323_H263_Capability::GetFormatName() const
 {
-	if(isH263PlusCapability == true)
+	if (isH263PlusCapability == true)
 	{
 		return XM_MEDIA_FORMAT_H263PLUS;
 	}
@@ -553,27 +506,27 @@ bool XM_H323_H263_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 	
 	H245_H263VideoCapability & h263 = cap;
 	
-	if(sqcifMPI > 0)
+	if (sqcifMPI > 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_sqcifMPI);
 		h263.m_sqcifMPI = sqcifMPI;
 	}
-	if(qcifMPI > 0)
+	if (qcifMPI > 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_qcifMPI);
 		h263.m_qcifMPI = qcifMPI;
 	}
-	if(cifMPI > 0)
+	if (cifMPI > 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_cifMPI);
 		h263.m_cifMPI = cifMPI;
 	}
-	if(cif4MPI > 0)
+	if (cif4MPI > 0)
 	{
 		//h263.IncludeOptionalField(H245_H263VideoCapability::e_cif4MPI);
 		//h263.m_cif4MPI = cif4MPI;
 	}
-	if(cif16MPI > 0)
+	if (cif16MPI > 0)
 	{
 		//h263.IncludeOptionalField(H245_H263VideoCapability::e_cif16MPI);
 		//h263.m_cif16MPI = cif16MPI;
@@ -592,33 +545,33 @@ bool XM_H323_H263_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 	h263.IncludeOptionalField(H245_H263VideoCapability::e_bppMaxKb);
 	h263.m_bppMaxKb = 0;
 	
-	if(slowSqcifMPI > 0 && sqcifMPI == 0)
+	if (slowSqcifMPI > 0 && sqcifMPI == 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_slowSqcifMPI);
 		h263.m_slowSqcifMPI = slowSqcifMPI;
 	}
-	if(slowQcifMPI > 0 && qcifMPI == 0)
+	if (slowQcifMPI > 0 && qcifMPI == 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_slowQcifMPI);
 		h263.m_slowQcifMPI = slowQcifMPI;
 	}
-	if(slowCifMPI > 0 && cifMPI == 0)
+	if (slowCifMPI > 0 && cifMPI == 0)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCifMPI);
 		h263.m_slowCifMPI = slowCifMPI;
 	}
-	if(slowCif4MPI > 0 && cif4MPI == 0)
+	if (slowCif4MPI > 0 && cif4MPI == 0)
 	{
 		//h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCif4MPI);
 		//h263.m_slowCif4MPI = slowCif4MPI;
 	}
-	if(slowCif16MPI > 0 && cif16MPI == 0)
+	if (slowCif16MPI > 0 && cif16MPI == 0)
 	{
 		//h263.IncludeOptionalField(H245_H263VideoCapability::e_slowCif16MPI);
 		//h263.m_slowCif16MPI = slowCif16MPI;
 	}
 	
-	if(isH263PlusCapability == true)
+	if (isH263PlusCapability == true)
 	{
 		h263.IncludeOptionalField(H245_H263VideoCapability::e_h263Options);
 	}
@@ -647,14 +600,14 @@ bool XM_H323_H263_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 
 bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 {
-	if(cap.GetTag() != H245_VideoCapability::e_h263VideoCapability)
+	if (cap.GetTag() != H245_VideoCapability::e_h263VideoCapability)
 	{
 		return false;
 	}
 	
 	const H245_H263VideoCapability & h263 = cap;
 	
-	if(h263.HasOptionalField(H245_H263VideoCapability::e_h263Options))
+	if (h263.HasOptionalField(H245_H263VideoCapability::e_h263Options))
 	{
 		isH263PlusCapability = true;
         SetPayloadType(XM_MEDIA_FORMAT_H263PLUS.GetPayloadType());
@@ -669,14 +622,14 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
     
     
     // "Reset" the media format
-    if(isH263PlusCapability == true) {
+    if (isH263PlusCapability == true) {
         mediaFormat = XM_MEDIA_FORMAT_H263PLUS;
     } else {
         mediaFormat = XM_MEDIA_FORMAT_H263;
     }
     SetCanRFC2429(canRFC2429);
 	
-	if(h263.HasOptionalField(H245_H263VideoCapability::e_sqcifMPI))
+	if (h263.HasOptionalField(H245_H263VideoCapability::e_sqcifMPI))
 	{
 		sqcifMPI = h263.m_sqcifMPI;
 		slowSqcifMPI = 0;
@@ -684,7 +637,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), 128);
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::SQCIFHeight);
 	}
-	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowSqcifMPI))
+	else if (h263.HasOptionalField(H245_H263VideoCapability::e_slowSqcifMPI))
 	{
 		sqcifMPI = 0;
 		slowSqcifMPI = h263.m_slowSqcifMPI;
@@ -696,7 +649,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		sqcifMPI = 0;
 		slowSqcifMPI = 0;
 	}
-	if(h263.HasOptionalField(H245_H263VideoCapability::e_qcifMPI))
+	if (h263.HasOptionalField(H245_H263VideoCapability::e_qcifMPI))
 	{
 		qcifMPI = h263.m_qcifMPI;
 		slowQcifMPI = 0;
@@ -704,7 +657,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), PVideoDevice::QCIFWidth);
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::QCIFHeight);
 	}
-	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowQcifMPI))
+	else if (h263.HasOptionalField(H245_H263VideoCapability::e_slowQcifMPI))
 	{
 		qcifMPI = 0;
 		slowQcifMPI = h263.m_slowQcifMPI;
@@ -716,14 +669,14 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		qcifMPI = 0;
 		slowQcifMPI = 0;
 	}
-	if(h263.HasOptionalField(H245_H263VideoCapability::e_cifMPI))
+	if (h263.HasOptionalField(H245_H263VideoCapability::e_cifMPI))
 	{
 		cifMPI = h263.m_cifMPI;
 		mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), PVideoDevice::CIFWidth);
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), PVideoDevice::CIFHeight);
 	}
-	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowCifMPI))
+	else if (h263.HasOptionalField(H245_H263VideoCapability::e_slowCifMPI))
 	{
 		cifMPI = 0;
 		slowCifMPI = h263.m_slowCifMPI;
@@ -735,7 +688,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		cifMPI = 0;
 		slowCifMPI = 0;
 	}
-	if(h263.HasOptionalField(H245_H263VideoCapability::e_cif4MPI))
+	if (h263.HasOptionalField(H245_H263VideoCapability::e_cif4MPI))
 	{
 		cif4MPI = h263.m_cif4MPI;
 		slowCif4MPI = 0;
@@ -743,7 +696,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		//mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIF4Width);
 		//mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIF4Height);
 	}
-	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowCif4MPI))
+	else if (h263.HasOptionalField(H245_H263VideoCapability::e_slowCif4MPI))
 	{
 		cif4MPI = 0;
 		slowCif4MPI = h263.m_slowCif4MPI;
@@ -755,7 +708,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		cif4MPI = 0;
 		slowCif4MPI = 0;
 	}
-	if(h263.HasOptionalField(H245_H263VideoCapability::e_cif16MPI))
+	if (h263.HasOptionalField(H245_H263VideoCapability::e_cif16MPI))
 	{
 		cif16MPI = h263.m_cif16MPI;
 		slowCif16MPI = 0;
@@ -763,7 +716,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		//mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption, PVideoDevice::CIF16Width);
 		//mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption, PVideoDevice::CIF16Height);
 	}
-	else if(h263.HasOptionalField(H245_H263VideoCapability::e_slowCif16MPI))
+	else if (h263.HasOptionalField(H245_H263VideoCapability::e_slowCif16MPI))
 	{
 		cif16MPI = 0;
 		slowCif16MPI = h263.m_slowCif16MPI;
@@ -785,11 +738,11 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 
 /*void XM_H323_H263_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
 {
-	if(isH263PlusCapability)
+	if (isH263PlusCapability)
 	{
 		// Enter RFC2429 media packetization information
 		bool alreadyPresent = false;
-		if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
+		if (mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
 		{
 			alreadyPresent = true;
 		}
@@ -801,7 +754,7 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
 		
 		PINDEX index = 0;
-		if(alreadyPresent == true)
+		if (alreadyPresent == true)
 		{
 			index = arrayOfRTPPayloadType.GetSize();
 			arrayOfRTPPayloadType.SetSize(index + 1);
@@ -825,13 +778,13 @@ void XM_H323_H263_Capability::OnReceivedPDU(const H245_MediaPacketizationCapabil
     {
         const H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
         
-        for(PINDEX i = 0; i < arrayOfRTPPayloadType.GetSize(); i++) {
+        for (PINDEX i = 0; i < arrayOfRTPPayloadType.GetSize(); i++) {
             const H245_RTPPayloadType & payloadType = arrayOfRTPPayloadType[i];
             const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = payloadType.m_payloadDescriptor;
             if (payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_rfc_number);
             {
                 const PASN_Integer & integer = payloadDescriptor;
-                if(integer.GetValue() == 2429) {
+                if (integer.GetValue() == 2429) {
                     SetCanRFC2429(true);
                     return;
                 }
@@ -842,7 +795,7 @@ void XM_H323_H263_Capability::OnReceivedPDU(const H245_MediaPacketizationCapabil
 
 void XM_H323_H263_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const
 {	
-	if(isH263PlusCapability)
+	if (isH263PlusCapability)
 	{
 		mediaPacketization.SetTag(H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType);
 		
@@ -861,7 +814,7 @@ void XM_H323_H263_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters_me
 
 void XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization)
 {		
-	if(mediaPacketization.GetTag() != H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType)
+	if (mediaPacketization.GetTag() != H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType)
 	{
 		return;
 	}
@@ -869,19 +822,19 @@ void XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParame
 	const H245_RTPPayloadType & rtpPayloadType = mediaPacketization;
 	const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = rtpPayloadType.m_payloadDescriptor;
 	
-	if(payloadDescriptor.GetTag() != H245_RTPPayloadType_payloadDescriptor::e_rfc_number)
+	if (payloadDescriptor.GetTag() != H245_RTPPayloadType_payloadDescriptor::e_rfc_number)
 	{
 		return;
 	}
 	
 	const PASN_Integer & rfcValue = payloadDescriptor;
 	
-	if(rfcValue.GetValue() == 2429)
+	if (rfcValue.GetValue() == 2429)
 	{
         SetIsRFC2429(true);
 	}
     
-    if(rtpPayloadType.HasOptionalField(H245_RTPPayloadType::e_payloadType)) {
+    if (rtpPayloadType.HasOptionalField(H245_RTPPayloadType::e_payloadType)) {
         unsigned payloadType = rtpPayloadType.m_payloadType;
         SetPayloadType((RTP_DataFrame::PayloadTypes)payloadType);
     }
@@ -895,80 +848,80 @@ bool XM_H323_H263_Capability::IsValidCapabilityForSending() const
 PObject::Comparison XM_H323_H263_Capability::CompareTo(const XMH323VideoCapability & obj) const
 {
 	
-	if(PIsDescendant(&obj, XM_H323_H263_Capability))
+	if (PIsDescendant(&obj, XM_H323_H263_Capability))
 	{	
 		PObject::Comparison result;
 		const XM_H323_H263_Capability & other = (const XM_H323_H263_Capability &)obj;
 		
-		if((cifMPI > 0) && (other.cifMPI > 0))
+		if ((cifMPI > 0) && (other.cifMPI > 0))
 		{
 			result = EqualTo;
 		}
-		else if(cifMPI > 0)
+		else if (cifMPI > 0)
 		{
 			result = GreaterThan;
 		}
-		else if(other.cifMPI > 0)
+		else if (other.cifMPI > 0)
 		{
 			result = LessThan;
 		}
-		else if((qcifMPI > 0) && (other.qcifMPI > 0))
+		else if ((qcifMPI > 0) && (other.qcifMPI > 0))
 		{
 			result = EqualTo;
 		}
-		else if(qcifMPI > 0)
+		else if (qcifMPI > 0)
 		{
 			result = GreaterThan;
 		}
-		else if(other.qcifMPI > 0)
+		else if (other.qcifMPI > 0)
 		{
 			result = LessThan;
 		}
-		else if((sqcifMPI > 0) && (other.sqcifMPI > 0))
+		else if ((sqcifMPI > 0) && (other.sqcifMPI > 0))
 		{
 			result = EqualTo;
 		}
-		else if(sqcifMPI > 0)
+		else if (sqcifMPI > 0)
 		{
 			result = GreaterThan;
 		}
-		else if(other.sqcifMPI > 0)
+		else if (other.sqcifMPI > 0)
 		{
 			result = LessThan;
 		}
-		else if((slowCifMPI > 0) && (other.slowCifMPI > 0))
+		else if ((slowCifMPI > 0) && (other.slowCifMPI > 0))
 		{
 			result = EqualTo;
 		}
-		else if(slowCifMPI > 0)
+		else if (slowCifMPI > 0)
 		{
 			result = GreaterThan;
 		}
-		else if(other.slowCifMPI > 0)
+		else if (other.slowCifMPI > 0)
 		{
 			result = LessThan;
 		}
-		else if((slowQcifMPI > 0) && (other.slowQcifMPI > 0))
+		else if ((slowQcifMPI > 0) && (other.slowQcifMPI > 0))
 		{
 			result = EqualTo;
 		}
-		else if(slowQcifMPI > 0)
+		else if (slowQcifMPI > 0)
 		{
 			result = GreaterThan;
 		}
-		else if(other.slowQcifMPI > 0)
+		else if (other.slowQcifMPI > 0)
 		{
 			result = LessThan;
 		}
-		else if((slowSqcifMPI > 0) && (other.slowSqcifMPI > 0))
+		else if ((slowSqcifMPI > 0) && (other.slowSqcifMPI > 0))
 		{
 			result = EqualTo;
 		}
-		else if(slowSqcifMPI > 0)
+		else if (slowSqcifMPI > 0)
 		{
 			result = GreaterThan;
 		}
-		else if(other.slowSqcifMPI > 0)
+		else if (other.slowSqcifMPI > 0)
 		{
 			result = LessThan;
 		}
@@ -977,13 +930,13 @@ PObject::Comparison XM_H323_H263_Capability::CompareTo(const XMH323VideoCapabili
 			result = EqualTo;
 		}
 		
-		if(result == EqualTo)
+		if (result == EqualTo)
 		{
-			if(isH263PlusCapability && !other.isH263PlusCapability)
+			if (isH263PlusCapability && !other.isH263PlusCapability)
 			{
 				result = GreaterThan;
 			}
-			else if(!isH263PlusCapability && other.isH263PlusCapability)
+			else if (!isH263PlusCapability && other.isH263PlusCapability)
 			{
 				result = LessThan;
 			}
@@ -1013,19 +966,19 @@ void XM_H323_H263_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
     unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
     
-    if(videoSize >= XMVideoSize_SQCIF) {
+    if (videoSize >= XMVideoSize_SQCIF) {
         sqcifMPI = mpi;
     }
-    if(videoSize >= XMVideoSize_QCIF) {
+    if (videoSize >= XMVideoSize_QCIF) {
         qcifMPI = mpi;
     }
-    if(videoSize >= XMVideoSize_CIF) {
+    if (videoSize >= XMVideoSize_CIF) {
         cifMPI = mpi;
     }
-    if(videoSize >= XMVideoSize_4CIF) {
+    if (videoSize >= XMVideoSize_4CIF) {
         cif4MPI = mpi;
     }
-    if(videoSize >= XMVideoSize_16CIF) {
+    if (videoSize >= XMVideoSize_16CIF) {
         cif16MPI = mpi;
     }
     
@@ -1078,7 +1031,7 @@ PObject * XM_H323_H264_Capability::Clone() const
 
 PObject::Comparison XM_H323_H264_Capability::Compare(const PObject & obj) const
 {
-	if(!PIsDescendant(&obj, XM_H323_H264_Capability))
+	if (!PIsDescendant(&obj, XM_H323_H264_Capability))
 	{
 		return LessThan;
 	}
@@ -1145,7 +1098,7 @@ bool XM_H323_H264_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 
 bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 {
-	if(cap.GetTag() != H245_VideoCapability::e_genericVideoCapability)
+	if (cap.GetTag() != H245_VideoCapability::e_genericVideoCapability)
 	{
 		return false;
 	}
@@ -1153,26 +1106,26 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	const H245_GenericCapability & h264 = cap;
 	
 	const H245_CapabilityIdentifier & h264CapabilityIdentifier = h264.m_capabilityIdentifier;
-	if(h264CapabilityIdentifier.GetTag() != H245_CapabilityIdentifier::e_standard)
+	if (h264CapabilityIdentifier.GetTag() != H245_CapabilityIdentifier::e_standard)
 	{
 		return false;
 	}
 	
 	const PASN_ObjectId & h264ObjectId = h264CapabilityIdentifier;
-	if(h264ObjectId != "0.0.8.241.0.0.1")
+	if (h264ObjectId != "0.0.8.241.0.0.1")
 	{
 		return false;
 	}
 	
 	OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
 	
-	if(!h264.HasOptionalField(H245_GenericCapability::e_maxBitRate))
+	if (!h264.HasOptionalField(H245_GenericCapability::e_maxBitRate))
 	{
 		return false;
 	}
 	maxBitRate = std::min(maxBitRate, (unsigned)h264.m_maxBitRate);
 	
-	if(!h264.HasOptionalField(H245_GenericCapability::e_collapsing))
+	if (!h264.HasOptionalField(H245_GenericCapability::e_collapsing))
 	{
 		return false;
 	}
@@ -1180,12 +1133,12 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	const H245_ArrayOf_GenericParameter & h264Collapsing = h264.m_collapsing;
 	unsigned size = h264Collapsing.GetSize();
 	unsigned i;
-	for(i = 0; i < size; i++)
+	for (i = 0; i < size; i++)
 	{
 		const H245_GenericParameter & parameter = h264Collapsing[i];
 		
 		const H245_ParameterIdentifier & parameterIdentifier = parameter.m_parameterIdentifier;
-		if(parameterIdentifier.GetTag() != H245_ParameterIdentifier::e_standard)
+		if (parameterIdentifier.GetTag() != H245_ParameterIdentifier::e_standard)
 		{
 			break;
 		}
@@ -1194,17 +1147,17 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 		
 		const H245_ParameterValue & parameterValue = parameter.m_parameterValue;
 		
-		switch(parameterInteger)
+		switch (parameterInteger)
 		{
 			case 41:
-				if(parameterValue.GetTag() == H245_ParameterValue::e_booleanArray)
+				if (parameterValue.GetTag() == H245_ParameterValue::e_booleanArray)
 				{
 					const PASN_Integer & profileValueInteger = parameterValue;
 					SetProfile(profileValueInteger);
 				}
 				break;
 			case 42:
-				if(parameterValue.GetTag() == H245_ParameterValue::e_unsignedMin)
+				if (parameterValue.GetTag() == H245_ParameterValue::e_unsignedMin)
 				{
 					const PASN_Integer & levelValueInteger = parameterValue;
 					SetLevel(levelValueInteger);
@@ -1218,38 +1171,38 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	unsigned width = 0;
 	unsigned height = 0;
 	
-	if(level < XM_H264_LEVEL_CODE_1_1)
+	if (level < XM_H264_LEVEL_CODE_1_1)
 	{
 		width = PVideoDevice::QCIFWidth;
 		height = PVideoDevice::QCIFHeight;
-		if(maxBitRate > 640)
+		if (maxBitRate > 640)
 		{
 			maxBitRate = 640;
 		}
 	}
-	else if(level < XM_H264_LEVEL_CODE_1_2)
+	else if (level < XM_H264_LEVEL_CODE_1_2)
 	{
 		width = PVideoDevice::QCIFWidth;
 		height = PVideoDevice::QCIFHeight;
-		if(maxBitRate > 1280)
+		if (maxBitRate > 1280)
 		{
 			maxBitRate = 1280;
 		}
 	}
-	else if(level < XM_H264_LEVEL_CODE_1_3)
+	else if (level < XM_H264_LEVEL_CODE_1_3)
 	{
 		width = PVideoDevice::CIFWidth;
 		height = PVideoDevice::CIFHeight;
-		if(maxBitRate > 3840)
+		if (maxBitRate > 3840)
 		{
 			maxBitRate = 3840;
 		}
 	}
-	else if(level < XM_H264_LEVEL_CODE_2)
+	else if (level < XM_H264_LEVEL_CODE_2)
 	{
 		width = PVideoDevice::CIFWidth;
 		height = PVideoDevice::CIFHeight;
-		if(maxBitRate > 7680)
+		if (maxBitRate > 7680)
 		{
 			maxBitRate = 7680;
 		}
@@ -1258,7 +1211,7 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	{
 		width = PVideoDevice::CIFWidth;
 		height = PVideoDevice::CIFHeight;
-		if(maxBitRate > 20000)
+		if (maxBitRate > 20000)
 		{
 			maxBitRate = 20000;
 		}
@@ -1275,7 +1228,7 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 {
 	// Signal H.264 packetization modes understood by this endpoint
 	bool alreadyPresent = false;
-	if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
+	if (mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
 	{
 		alreadyPresent = true;
 	}
@@ -1287,7 +1240,7 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
 
 	PINDEX index = 0;
-	if(alreadyPresent == true)
+	if (alreadyPresent == true)
 	{
 		index = arrayOfRTPPayloadType.GetSize();
     }
@@ -1311,20 +1264,20 @@ void XM_H323_H264_Capability::OnReceivedPDU(const H245_MediaPacketizationCapabil
 {
 	SetPacketizationMode(XM_H264_PACKETIZATION_MODE_SINGLE_NAL);
 	
-	if(mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
+	if (mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
 	{
 		const H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
 		PINDEX size = arrayOfRTPPayloadType.GetSize();
 		PINDEX i;
 		
-		for(i = 0; i < size; i++)
+		for (i = 0; i < size; i++)
 		{
 			const H245_RTPPayloadType & payloadType = arrayOfRTPPayloadType[i];
 			const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = payloadType.m_payloadDescriptor;
-			if(payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_oid)
+			if (payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_oid)
 			{
 				const PASN_ObjectId & objectId = payloadDescriptor;
-				if(objectId == "0.0.8.241.0.0.0.1")
+				if (objectId == "0.0.8.241.0.0.0.1")
 				{
 					SetPacketizationMode(XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED);
                     break;
@@ -1336,10 +1289,10 @@ void XM_H323_H264_Capability::OnReceivedPDU(const H245_MediaPacketizationCapabil
 
 bool XM_H323_H264_Capability::IsValidCapabilityForSending() const
 {
-	if(((profile & XM_H264_PROFILE_CODE_BASELINE) != 0) &&
+	if (((profile & XM_H264_PROFILE_CODE_BASELINE) != 0) &&
 	   (level <= XM_H264_LEVEL_CODE_2))
 	{
-		if(h264LimitedMode == false && 
+		if (h264LimitedMode == false && 
 		   packetizationMode != XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED)
 		{
 			return false;
@@ -1351,27 +1304,27 @@ bool XM_H323_H264_Capability::IsValidCapabilityForSending() const
 
 PObject::Comparison XM_H323_H264_Capability::CompareTo(const XMH323VideoCapability & obj) const
 {
-	if(PIsDescendant(&obj, XM_H323_H264_Capability))
+	if (PIsDescendant(&obj, XM_H323_H264_Capability))
 	{	
 		const XM_H323_H264_Capability & other = (const XM_H323_H264_Capability &)obj;
 		
-		if(((profile & XM_H264_PROFILE_CODE_BASELINE) != 0) && 
+		if (((profile & XM_H264_PROFILE_CODE_BASELINE) != 0) && 
 		   ((other.profile & XM_H264_PROFILE_CODE_BASELINE) == 0))
 		{
 			return GreaterThan;
 		}
-		else if(((profile & XM_H264_PROFILE_CODE_BASELINE) == 0) &&
+		else if (((profile & XM_H264_PROFILE_CODE_BASELINE) == 0) &&
 				((other.profile & XM_H264_PROFILE_CODE_BASELINE) != 0))
 		{
 			return LessThan;
 		}
 		else
 		{
-			if(level == other.level)
+			if (level == other.level)
 			{
 				return EqualTo;
 			}
-			else if(level > other.level)
+			else if (level > other.level)
 			{
 				return GreaterThan;
 			}
@@ -1401,23 +1354,23 @@ unsigned XM_H323_H264_Capability::GetProfile() const
 
 unsigned XM_H323_H264_Capability::GetLevel() const
 {
-	if(level < XM_H264_LEVEL_CODE_1_B)
+	if (level < XM_H264_LEVEL_CODE_1_B)
 	{
 		return XM_H264_LEVEL_1;
 	} 
-	else if(level < XM_H264_LEVEL_CODE_1_1)
+	else if (level < XM_H264_LEVEL_CODE_1_1)
 	{
 		return XM_H264_LEVEL_1_B;
 	}
-	else if(level < XM_H264_LEVEL_CODE_1_2)
+	else if (level < XM_H264_LEVEL_CODE_1_2)
 	{
 		return XM_H264_LEVEL_1_1;
 	}
-	else if(level < XM_H264_LEVEL_CODE_1_3)
+	else if (level < XM_H264_LEVEL_CODE_1_3)
 	{
 		return XM_H264_LEVEL_1_2;
 	}
-	else if(level < XM_H264_LEVEL_CODE_2)
+	else if (level < XM_H264_LEVEL_CODE_2)
 	{
 		return XM_H264_LEVEL_1_3;
 	}
@@ -1456,11 +1409,11 @@ void XM_H323_H264_Capability::SetPacketizationMode(unsigned _packetizationMode)
     unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
 	
-	if(videoSize >= XMVideoSize_CIF)
+	if (videoSize >= XMVideoSize_CIF)
 	{
 		sdpMediaFormat.SetFMTP(psprintf("CIF=%d;QCIF=%d;MaxBR=%d", mpi, mpi, maxBitRate));
 	}
-	else if(videoSize >= XMVideoSize_QCIF)
+	else if (videoSize >= XMVideoSize_QCIF)
 	{
 		sdpMediaFormat.SetFMTP(psprintf("QCIF=%d;MaxBR=%d", mpi, maxBitRate));
 	}
@@ -1485,34 +1438,34 @@ bool XM_SDP_H261_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
     
 	unsigned i;
 	unsigned count = tokens.GetSize();
-	for(i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		const PString & str = tokens[i];
 		
-		if(str.Left(4) == "CIF=")
+		if (str.Left(4) == "CIF=")
 		{
 			PString mpiStr = str(4, 1000);
 			cifMPI = mpiStr.AsUnsigned();
 		}
-		else if(str.Left(5) == "QCIF=")
+		else if (str.Left(5) == "QCIF=")
 		{
             PString mpiStr = str(5, 1000);
             qcifMPI = mpiStr.AsUnsigned();
 		}
-		else if(str.Left(6) == "MaxBR=")
+		else if (str.Left(6) == "MaxBR=")
 		{
 			PString brStr = str(6, 1000);
 			bitrate = brStr.AsUnsigned() * 100;
 		}
 	}
 	
-    if(cifMPI != 0) 
+    if (cifMPI != 0) 
     {
         mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
         mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
-    else if(qcifMPI != 0)
+    else if (qcifMPI != 0)
     {
         mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
         mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
@@ -1526,7 +1479,7 @@ bool XM_SDP_H261_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
     
-    if(bitrate == 0)
+    if (bitrate == 0)
     {
         bitrate = sessionDescription.GetBandwidthValue() * 1000;
         if (bitrate == 0) {
@@ -1553,15 +1506,15 @@ bool XM_SDP_H263_Capability::OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const
     unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
     unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
 	
-	if(videoSize >= XMVideoSize_CIF)
+	if (videoSize >= XMVideoSize_CIF)
 	{
 		sdpMediaFormat.SetFMTP(psprintf("CIF=%d;QCIF=%d;SQCIF=%d;MaxBR=%d", mpi, mpi, mpi, maxBitRate));
 	}
-	else if(videoSize >= XMVideoSize_QCIF)
+	else if (videoSize >= XMVideoSize_QCIF)
 	{
 		sdpMediaFormat.SetFMTP(psprintf("QCIF=%d;SQCIF=%d;MaxBR=%d", mpi, mpi, maxBitRate));
 	}
-    else if(videoSize >= XMVideoSize_SQCIF)
+    else if (videoSize >= XMVideoSize_SQCIF)
     {
         sdpMediaFormat.SetFMTP(psprintf("SQCIF=%d;MaxBR=%d", mpi, maxBitRate));
     }
@@ -1587,39 +1540,39 @@ bool XM_SDP_H263_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
     
 	unsigned i;
 	unsigned count = tokens.GetSize();
-	for(i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		const PString & str = tokens[i];
 		
-		if(str.Left(4) == "CIF=")
+		if (str.Left(4) == "CIF=")
 		{
 			PString mpiStr = str(4, 1000);
 			cifMPI = mpiStr.AsUnsigned();
 		}
-		else if(str.Left(5) == "QCIF=")
+		else if (str.Left(5) == "QCIF=")
 		{
             PString mpiStr = str(5, 1000);
             qcifMPI = mpiStr.AsUnsigned();
 		}
-        else if(str.Left(6) == "SQCIF=")
+        else if (str.Left(6) == "SQCIF=")
         {
             PString mpiStr = str(6, 1000);
             sqcifMPI = mpiStr.AsUnsigned();
         }
-		else if(str.Left(6) == "MaxBR=")
+		else if (str.Left(6) == "MaxBR=")
 		{
 			PString brStr = str(6, 1000);
 			bitrate = brStr.AsUnsigned() * 100;
 		}
 	}
 	
-    if(cifMPI != 0) 
+    if (cifMPI != 0) 
     {
         mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
         mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
-    else if(qcifMPI != 0)
+    else if (qcifMPI != 0)
     {
         mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
         mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
@@ -1639,7 +1592,7 @@ bool XM_SDP_H263_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
 		mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
     }
     
-    if(bitrate == 0)
+    if (bitrate == 0)
     {
         bitrate = sessionDescription.GetBandwidthValue() * 1000;
         if (bitrate == 0) {
@@ -1658,7 +1611,7 @@ bool XM_SDP_H263_Capability::OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat
 bool _XMGetCanRFC2429(const OpalMediaFormat & mediaFormat)
 {
     bool canRFC2429 = false;
-    if(mediaFormat.HasOption(CanRFC2429Option)) {
+    if (mediaFormat.HasOption(CanRFC2429Option)) {
         canRFC2429 = mediaFormat.GetOptionBoolean(CanRFC2429Option);
     }
     return canRFC2429;
@@ -1666,7 +1619,7 @@ bool _XMGetCanRFC2429(const OpalMediaFormat & mediaFormat)
 
 void _XMSetCanRFC2429(OpalMediaFormat & mediaFormat, bool canRFC2429)
 {
-    if(mediaFormat.HasOption(CanRFC2429Option)) {
+    if (mediaFormat.HasOption(CanRFC2429Option)) {
         mediaFormat.SetOptionBoolean(CanRFC2429Option, canRFC2429);
     } else {
         mediaFormat.AddOption(new OpalMediaOptionBoolean(CanRFC2429Option, false, OpalMediaOption::AlwaysMerge, canRFC2429));
@@ -1676,7 +1629,7 @@ void _XMSetCanRFC2429(OpalMediaFormat & mediaFormat, bool canRFC2429)
 bool _XMGetIsRFC2429(const OpalMediaFormat & mediaFormat)
 {
     bool isRFC2429 = false;
-    if(mediaFormat.HasOption(IsRFC2429Option)) {
+    if (mediaFormat.HasOption(IsRFC2429Option)) {
         isRFC2429 = mediaFormat.GetOptionBoolean(IsRFC2429Option);
     }
     return isRFC2429;
@@ -1684,7 +1637,7 @@ bool _XMGetIsRFC2429(const OpalMediaFormat & mediaFormat)
 
 void _XMSetIsRFC2429(OpalMediaFormat & mediaFormat, bool isRFC2429)
 {
-    if(mediaFormat.HasOption(IsRFC2429Option)) {
+    if (mediaFormat.HasOption(IsRFC2429Option)) {
         mediaFormat.SetOptionBoolean(IsRFC2429Option, isRFC2429);
     } else {
         mediaFormat.AddOption(new OpalMediaOptionBoolean(IsRFC2429Option, false, OpalMediaOption::AlwaysMerge, isRFC2429));
@@ -1694,7 +1647,7 @@ void _XMSetIsRFC2429(OpalMediaFormat & mediaFormat, bool isRFC2429)
 unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat)
 {
     unsigned profile = XM_H264_PROFILE_BASELINE;
-    if(mediaFormat.HasOption(ProfileOption)) {
+    if (mediaFormat.HasOption(ProfileOption)) {
         profile = mediaFormat.GetOptionInteger(ProfileOption);
     }
     return profile;
@@ -1702,7 +1655,7 @@ unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat)
 
 void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile)
 {
-    if(mediaFormat.HasOption(ProfileOption)) {
+    if (mediaFormat.HasOption(ProfileOption)) {
         mediaFormat.SetOptionInteger(ProfileOption, profile);
     } else {
         mediaFormat.AddOption(new OpalMediaOptionInteger(ProfileOption, false, OpalMediaOption::AlwaysMerge, profile));
@@ -1712,7 +1665,7 @@ void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile)
 unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat)
 {
     unsigned level = XM_H264_LEVEL_1;
-    if(mediaFormat.HasOption(LevelOption)) {
+    if (mediaFormat.HasOption(LevelOption)) {
         level = mediaFormat.GetOptionInteger(LevelOption);
     }
     return level;
@@ -1720,7 +1673,7 @@ unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat)
 
 void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level)
 {
-    if(mediaFormat.HasOption(LevelOption)) {
+    if (mediaFormat.HasOption(LevelOption)) {
         mediaFormat.SetOptionInteger(LevelOption, level);
     } else {
         mediaFormat.AddOption(new OpalMediaOptionInteger(LevelOption, false, OpalMediaOption::AlwaysMerge, level));
@@ -1730,7 +1683,7 @@ void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level)
 unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat)
 {
     unsigned packetizationMode = XM_H264_PACKETIZATION_MODE_SINGLE_NAL;
-    if(mediaFormat.HasOption(PacketizationOption)) {
+    if (mediaFormat.HasOption(PacketizationOption)) {
         packetizationMode = mediaFormat.GetOptionInteger(PacketizationOption);
     }
     return packetizationMode;
@@ -1738,7 +1691,7 @@ unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat)
 
 void _XMSetH264PacketizationMode(OpalMediaFormat & mediaFormat, unsigned packetizationMode)
 {
-    if(mediaFormat.HasOption(PacketizationOption)) {
+    if (mediaFormat.HasOption(PacketizationOption)) {
         mediaFormat.SetOptionInteger(PacketizationOption, packetizationMode);
     } else {
          mediaFormat.AddOption(new OpalMediaOptionInteger(PacketizationOption, false, OpalMediaOption::AlwaysMerge, packetizationMode));
@@ -1748,7 +1701,7 @@ void _XMSetH264PacketizationMode(OpalMediaFormat & mediaFormat, unsigned packeti
 bool _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat)
 {
     bool enableLimitedMode = false;
-    if(mediaFormat.HasOption(H264LimitedModeOption)) {
+    if (mediaFormat.HasOption(H264LimitedModeOption)) {
         enableLimitedMode = mediaFormat.GetOptionBoolean(H264LimitedModeOption);
     }
     return enableLimitedMode;
@@ -1756,7 +1709,7 @@ bool _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat)
 
 void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264LimitedMode)
 {
-    if(mediaFormat.HasOption(H264LimitedModeOption)) {
+    if (mediaFormat.HasOption(H264LimitedModeOption)) {
         mediaFormat.SetOptionBoolean(H264LimitedModeOption, enableH264LimitedMode);
     } else {
         mediaFormat.AddOption(new OpalMediaOptionBoolean(H264LimitedModeOption, false, OpalMediaOption::AlwaysMerge, enableH264LimitedMode));

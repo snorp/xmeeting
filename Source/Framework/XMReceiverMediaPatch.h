@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.h,v 1.10 2007/02/13 11:56:09 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.h,v 1.11 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,24 +17,24 @@
 
 class XMReceiverMediaPatch : public OpalMediaPatch
 {
-	PCLASSINFO(XMReceiverMediaPatch, OpalMediaPatch);
+  PCLASSINFO(XMReceiverMediaPatch, OpalMediaPatch);
 	
 public:
-	XMReceiverMediaPatch(OpalMediaStream & source);
-	~XMReceiverMediaPatch();
+  XMReceiverMediaPatch(OpalMediaStream & source);
+  ~XMReceiverMediaPatch();
 	
-	virtual void Start();
+  virtual void Start();
 	
 protected:
 		
-		// Overrides from OpalMediaPatch
-		virtual void Main();
+  // Overrides from OpalMediaPatch
+  virtual void Main();
 	
 private:
 		
-	void IssueVideoUpdatePictureCommand();
+  void IssueVideoUpdatePictureCommand();
 	
-	XMRTPPacketReassembler * packetReassembler;
+  XMRTPPacketReassembler * packetReassembler;
 };
 
 #endif // __XM_RECEIVER_MEDIA_PATCH__

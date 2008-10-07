@@ -1,5 +1,5 @@
 /*
- * $Id: XMVideoView.h,v 1.3 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMVideoView.h,v 1.4 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,8 +30,8 @@
  * the VideoManager.
  **/
 - (void)renderLocalVideo:(CVOpenGLTextureRef)localVideo didChange:(BOOL)localVideoDidChange
-			 remoteVideo:(CVOpenGLTextureRef)remoteVideo didChange:(BOOL)remoteVideoDidChange
-				isForced:(BOOL)isForced;
+             remoteVideo:(CVOpenGLTextureRef)remoteVideo didChange:(BOOL)remoteVideoDidChange
+                isForced:(BOOL)isForced;
 
 @end
 

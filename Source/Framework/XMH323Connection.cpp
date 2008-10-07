@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.36 2008/10/02 07:50:22 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.37 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,13 +25,11 @@ XMH323Connection::XMH323Connection(OpalCall & call,
                                    const H323TransportAddress & address,
                                    unsigned options,
                                    OpalConnection::StringOptions * stringOptions)
-: H323Connection(call, endPoint, token, alias, address, options, stringOptions)
+: H323Connection(call, endPoint, token, alias, address, options, stringOptions),
+  initialBandwidth(XMOpalManager::GetManager()->GetBandwidthLimit()/100),
+  inBandDTMFHandler(NULL)
 {	
-  // setting correct initial bandwidth
-  initialBandwidth = XMOpalManager::GetManager()->GetBandwidthLimit() / 100;
   bandwidthAvailable = initialBandwidth;
-	
-  inBandDTMFHandler = NULL;
 }
 
 XMH323Connection::~XMH323Connection()
@@ -116,15 +114,14 @@ void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaTy
 }
 
 bool XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
-										  unsigned sessionID,
-										  H323Channel::Directions dir)
+                                          unsigned sessionID,
+                                          H323Channel::Directions dir)
 {
-    // Override default behaviour to add additional checks if the format is valid for
-    // sending. Both the capability and the manager have to agree that it is possible
-    // to send the media format described in the capability.
-	bool isValidCapability = true;
-	if(PIsDescendant(&capability, XMH323VideoCapability))
-	{
+  /*// Override default behaviour to add additional checks if the format is valid for
+  // sending. Both the capability and the manager have to agree that it is possible
+  // to send the media format described in the capability.
+  bool isValidCapability = true;
+  if(PIsDescendant(&capability, XMH323VideoCapability)) {
 		XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
 		isValidCapability = videoCapability.IsValidCapabilityForSending();
 		if(isValidCapability)
@@ -136,24 +133,21 @@ bool XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
 	if(isValidCapability == false)
 	{
 		return false;
-	}
+	}*/
 	
 	return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
 }
 
 H323_RTPChannel * XMH323Connection::CreateRTPChannel(const H323Capability & capability,
                                                      H323Channel::Directions dir,
-                                                     RTP_Session & rtp,
-                                                     unsigned sessionID)
+                                                     RTP_Session & rtp)
 {
-    //if(capability.GetMediaFormat().GetMediaType() != OpalDefaultVideoMediaType)
-    //{
-        //return H323Connection::CreateRTPChannel(capability, dir, rtp, sessionID);
-    //}
-    
-    //XMH323Channel *channel = new XMH323Channel(*this, capability, dir, rtp, sessionID);
-    //return channel;
-  return NULL;
+  if (capability.GetMediaFormat().GetMediaType() != OpalMediaType::Video()) {
+    return H323Connection::CreateRTPChannel(capability, dir, rtp);
+  }
+  
+  // Use a special channel for the video streams, to allow sending flow control information
+  return new XMH323Channel(*this, capability, dir, rtp);
 }
 
 bool XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
@@ -169,21 +163,20 @@ bool XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
 
 bool XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
-	if(!H323Connection::OnOpenMediaStream(mediaStream))
-	{
-		return false;
-	}
+  if(!H323Connection::OnOpenMediaStream(mediaStream)) {
+    return false;
+  }
     
-    XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
-	
+  // inform the subsystem
+  XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	return true;
 }
 
 bool XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
-	bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
-    GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
-	return true;
+  bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
+  GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
+  return true;
 }
 
 bool XMH323Connection::SendUserInputTone(char tone, unsigned duration)

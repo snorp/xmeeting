@@ -1,5 +1,5 @@
 /*
- * $Id: XMStillImageVideoInputModule.h,v 1.3 2007/08/17 11:36:42 hfriederich Exp $
+ * $Id: XMStillImageVideoInputModule.h,v 1.4 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,9 +32,9 @@
   BOOL preserveImagePath;
   NSString *imagePath;	
   XMImageScaleOperation scaleType;		
-		//XMImageScaleOperation_NoScaling = 0,
-		//XMImageScaleOperation_ScaleProportionally,
-		//XMImageScaleOperation_ScaleToFit
+    //XMImageScaleOperation_NoScaling = 0,
+    //XMImageScaleOperation_ScaleProportionally,
+    //XMImageScaleOperation_ScaleToFit
   
   XMVideoSize videoSize;			// required size of output image.
   

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.h,v 1.12 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMMediaReceiver.h,v 1.13 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,7 +36,7 @@ typedef struct XMAtom {
 
 - (void)_startMediaReceivingForSession:(unsigned)sessionID withCodec:(XMCodecIdentifier)codecIdentifier;
 - (void)_stopMediaReceivingForSession:(unsigned)sessionID;
-- (BOOL)_decodeFrameForSession:(unsigned)sessionID data:(UInt8 *)data length:(unsigned)length;
+- (BOOL)_decodeFrameForSession:(unsigned)sessionID data:(UInt8 *)data length:(unsigned)length callToken:(const char *)callToken;
 
 - (void)_handleH264SPSAtomData:(UInt8 *)data length:(unsigned)length;
 - (void)_handleH264PPSAtomData:(UInt8 *)data length:(unsigned)length;

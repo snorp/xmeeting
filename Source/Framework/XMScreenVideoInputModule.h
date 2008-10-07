@@ -1,5 +1,5 @@
 /*
- * $Id: XMScreenVideoInputModule.h,v 1.7 2007/08/17 11:36:42 hfriederich Exp $
+ * $Id: XMScreenVideoInputModule.h,v 1.8 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -70,7 +70,7 @@
 
 @interface XMScreenSelectionView : XMAreaSelectionView
 {
-    XMScreenVideoInputModule *inputModule;
+  XMScreenVideoInputModule *inputModule;
 }
 
 - (void)setInputModule:(XMScreenVideoInputModule *)inputModule;

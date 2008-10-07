@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.37 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.38 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -216,105 +216,104 @@ void _XMHandleVideoStreamClosed(const char *_callToken, bool isIncomingStream)
 
 void _XMHandleFECCChannelOpened()
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMOpalDispatcher _feccChannelOpened];
+  [XMOpalDispatcher _feccChannelOpened];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 #pragma mark -
 #pragma mark MediaReceiver callbacks
 
-void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
-						   unsigned maxBitrate, unsigned keyframeInterval, unsigned flags)
+void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, 
+                           XMVideoSize videoSize, unsigned maxFramesPerSecond,
+                           unsigned maxBitrate, unsigned keyframeInterval, unsigned flags)
 {
-	// this is called from a thread without run loop and without autorelease pool
+  // this is called from a thread without run loop and without autorelease pool
 	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMMediaTransmitter _startTransmittingForSession:sessionID withCodec:codec videoSize:videoSize maxFramesPerSecond:maxFramesPerSecond
-										  maxBitrate:maxBitrate keyframeInterval:keyframeInterval flags:flags];
-	[autoreleasePool release];
+  [XMMediaTransmitter _startTransmittingForSession:sessionID withCodec:codec videoSize:videoSize 
+                                maxFramesPerSecond:maxFramesPerSecond maxBitrate:maxBitrate 
+                                  keyframeInterval:keyframeInterval flags:flags];
+  [autoreleasePool release];
 }
 
 void _XMStopMediaTransmit(unsigned sessionID)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMMediaTransmitter _stopTransmittingForSession:sessionID];
+  [XMMediaTransmitter _stopTransmittingForSession:sessionID];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMStartMediaReceiving(unsigned sessionID, XMCodecIdentifier codecIdentifier)
 {
-	[_XMMediaReceiverSharedInstance _startMediaReceivingForSession:sessionID
-														 withCodec:codecIdentifier];
+  [_XMMediaReceiverSharedInstance _startMediaReceivingForSession:sessionID withCodec:codecIdentifier];
 }
 
 void _XMStopMediaReceiving(unsigned sessionID)
 {
-	[_XMMediaReceiverSharedInstance _stopMediaReceivingForSession:sessionID];
+  [_XMMediaReceiverSharedInstance _stopMediaReceivingForSession:sessionID];
 }
 
-bool _XMProcessFrame(unsigned sessionID, void *data, unsigned length)
+bool _XMProcessFrame(const char *callToken, unsigned sessionID, void *data, unsigned length)
 {
-	return [_XMMediaReceiverSharedInstance _decodeFrameForSession:sessionID
-															 data:data
-														   length:length];
+  return [_XMMediaReceiverSharedInstance _decodeFrameForSession:sessionID data:data length:length callToken:callToken];
 }
 
 void _XMHandleH264SPSAtomData(void *data, unsigned length)
 {
-	[_XMMediaReceiverSharedInstance _handleH264SPSAtomData:data length:length];
+  [_XMMediaReceiverSharedInstance _handleH264SPSAtomData:data length:length];
 }
 
 void _XMHandleH264PPSAtomData(void *data, unsigned length)
 {
-	[_XMMediaReceiverSharedInstance _handleH264PPSAtomData:data length:length];
+  [_XMMediaReceiverSharedInstance _handleH264PPSAtomData:data length:length];
 }
 
 void _XMUpdatePicture()
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMMediaTransmitter _updatePicture];
+  [XMMediaTransmitter _updatePicture];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMSetMaxVideoBitrate(unsigned maxVideoBitrate)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[XMMediaTransmitter _setMaxBitrate:maxVideoBitrate];
+  [XMMediaTransmitter _setMaxBitrate:maxVideoBitrate];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMHandleAudioInputLevel(double level)
 {
-	NSNumber *number = [[NSNumber alloc] initWithDouble:level];
+  NSNumber *number = [[NSNumber alloc] initWithDouble:level];
 	
-	[_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioInputLevel:)
-													withObject:number waitUntilDone:NO];
-	[number release];
+  [_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioInputLevel:)
+                                                  withObject:number waitUntilDone:NO];
+  [number release];
 }
 
 void _XMHandleAudioOutputLevel(double level)
 {
-	NSNumber *number = [[NSNumber alloc] initWithDouble:level];
+  NSNumber *number = [[NSNumber alloc] initWithDouble:level];
 	
-	[_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioOutputLevel:)
-													withObject:number waitUntilDone:NO];
+  [_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioOutputLevel:)
+                                                  withObject:number waitUntilDone:NO];
 	
-	[number release];
+  [number release];
 }
 
 void _XMHandleAudioTestEnd()
 {
-	[_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioTestEnd)
-													withObject:nil waitUntilDone:NO];
+  [_XMAudioManagerSharedInstance performSelectorOnMainThread:@selector(_handleAudioTestEnd)
+                                                  withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark -
@@ -322,16 +321,16 @@ void _XMHandleAudioTestEnd()
 
 void _XMHandleGatekeeperRegistration(const char *gatekeeperName, const char *gatekeeperAliases)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *name = [[NSString alloc] initWithCString:gatekeeperName encoding:NSASCIIStringEncoding];
+  NSString *name = [[NSString alloc] initWithCString:gatekeeperName encoding:NSASCIIStringEncoding];
   NSString *aliases = [[NSString alloc] initWithCString:gatekeeperAliases encoding:NSASCIIStringEncoding];
   NSArray *aliasArr = [aliases componentsSeparatedByString:@"\n"];
-	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistration:name aliases:aliasArr];
-	[name release];
+  [_XMOpalDispatcherSharedInstance _handleGatekeeperRegistration:name aliases:aliasArr];
+  [name release];
   [aliases release];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus reason)
@@ -345,20 +344,20 @@ void _XMHandleGatekeeperRegistrationFailure(XMGatekeeperRegistrationStatus reaso
 
 void _XMHandleGatekeeperUnregistration()
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[_XMOpalDispatcherSharedInstance _handleGatekeeperUnregistration];
+  [_XMOpalDispatcherSharedInstance _handleGatekeeperUnregistration];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMHandleGatekeeperRegistrationComplete()
 {
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[_XMOpalDispatcherSharedInstance _handleGatekeeperRegistrationComplete];
+  [_XMOpalDispatcherSharedInstance _handleGatekeeperRegistrationComplete];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 #pragma mark -
@@ -366,42 +365,42 @@ void _XMHandleGatekeeperRegistrationComplete()
 
 void _XMHandleSIPRegistration(const char *_aor)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
     
-	NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistration:aor];
-	[aor release];
+  NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
+  [_XMOpalDispatcherSharedInstance _handleSIPRegistration:aor];
+  [aor release];
     
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMHandleSIPUnregistration(const char *_aor)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPUnregistration:aor];
-	[aor release];
+  NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
+  [_XMOpalDispatcherSharedInstance _handleSIPUnregistration:aor];
+  [aor release];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMHandleSIPRegistrationFailure(const char *_aor, XMSIPStatusCode failReason)
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:aor failReason:failReason];
-	[aor release];
+  NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
+  [_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:aor failReason:failReason];
+  [aor release];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }
 
 void _XMHandleSIPRegistrationComplete()
 {
-	NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
-	[_XMOpalDispatcherSharedInstance _handleSIPRegistrationComplete];
+  [_XMOpalDispatcherSharedInstance _handleSIPRegistrationComplete];
 	
-	[autoreleasePool release];
+  [autoreleasePool release];
 }

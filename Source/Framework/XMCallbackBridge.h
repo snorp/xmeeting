@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.h,v 1.39 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMCallbackBridge.h,v 1.40 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -118,8 +118,9 @@ void _XMHandleFECCChannelOpened();
 /**
  * Instructs the MediaTransmitter to start sending video data
  **/
-void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, XMVideoSize videoSize, unsigned maxFramesPerSecond,
-						   unsigned maxBitrate, unsigned keyframeInterval, unsigned flags);
+void _XMStartMediaTransmit(unsigned sessionID, XMCodecIdentifier codec, 
+                           XMVideoSize videoSize, unsigned maxFramesPerSecond,
+                           unsigned maxBitrate, unsigned keyframeInterval, unsigned flags);
 
 /**
  * Instructs the MediaTransmitter to stop sending video data
@@ -141,7 +142,7 @@ void _XMStopMediaReceiving(unsigned sessionID);
 /**
  * Forwads the received packet to the MediaReceiver
  **/
-bool _XMProcessFrame(unsigned sessionID, void *packet, unsigned length);
+bool _XMProcessFrame(const char *callToken, unsigned sessionID, void *packet, unsigned length);
 
 /**
  * Forwards a received SPS atom of a H.264 stream to the MediaReceiver

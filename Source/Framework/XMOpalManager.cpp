@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.74 2008/10/02 07:50:22 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.75 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -101,6 +101,9 @@ XMOpalManager::XMOpalManager(bool _logCallStatistics)
   stun = new XMSTUNClient();
   interfaceMonitor = new XMInterfaceMonitor(*this);
   interfaceUpdateThread = NULL;
+  
+  // ensure all video media formats are loaded
+  XMGetMediaFormat_H261();
 }
 
 XMOpalManager::~XMOpalManager()
@@ -441,56 +444,49 @@ OpalMediaPatch * XMOpalManager::CreateMediaPatch(OpalMediaStream & source, bool 
 {
   // Incoming video streams are treated using a special patch instance.
   // The other streams have the default OpalMediaPatch / OpalPassiveMediaPatch instance
-  /*if (requiresPatchThread == true && source.GetMediaFormat().GetMediaType() == OpalDefaultVideoMediaType) {
-	return new XMReceiverMediaPatch(source);
-  }*/
+  if (!PIsDescendant(&source, XMMediaStream) && source.GetMediaFormat().GetMediaType() == OpalMediaType::Video()) {
+    return new XMReceiverMediaPatch(source);
+  }
   
   return OpalManager::CreateMediaPatch(source, requiresPatchThread);
 }
 
 void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream)
 {
-  // Called when an RTP stream is opened.
+  // Called from the RTP connection when an RTP stream is opened.
   // The main purpose of this callback is to forward this information to the Obj-C world
   
-  unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+  const PString & callToken = connection.GetCall().GetToken();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-  /*if (mediaType == OpalDefaultVideoMediaType)
-  {
-	// The incoming video stream (source for OPAL) is treated as being open as soon the
-	// first data is decoded and the exact parameters of the stream are
-	// known.
-	if (stream.IsSink())
-	{
-	  XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-	  const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
+  if (mediaType == OpalMediaType::Video()) {
+    // The incoming video stream (source for OPAL) is treated as being open as soon the
+    // first data is decoded and the exact parameters of the stream are
+    // known.
+    if (stream.IsSink()) {
+      XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
+      const char *mediaFormatName = _XMGetMediaFormatName(mediaFormat);
 	  
-	  _XMHandleVideoStreamOpened(callID, mediaFormatName, videoSize, false, 0, 0);
-	}
+      _XMHandleVideoStreamOpened(callToken, mediaFormatName, videoSize, false, 0, 0);
+    }
+  } else if (mediaType == OpalMediaType::Audio()) {
+    _XMHandleAudioStreamOpened(callToken, mediaFormat, stream.IsSource());
   }
-  else if (mediaType == OpalDefaultAudioMediaType)
-  {
-	_XMHandleAudioStreamOpened(callID, mediaFormat, stream.IsSource());
-  }*/
 }
 
 void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream)
 {
-  // Called when an RTP stream is closed.
+  // Called from the local connection when an RTP stream is closed.
   // The main purpose of this callback is to forward this information to the Obj-C world
   
-  unsigned callID = connection.GetCall().GetToken().AsUnsigned();
+  const PString & callToken = connection.GetCall().GetToken().AsUnsigned();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
-  /*if (mediaType == OpalDefaultVideoMediaType) 
-  {
-	_XMHandleVideoStreamClosed(callID, stream.IsSource());
+  if (mediaType == OpalMediaType::Video()) {
+    _XMHandleVideoStreamClosed(callToken, stream.IsSource());
+  } else if (mediaType == OpalMediaType::Audio()) {
+    _XMHandleAudioStreamClosed(callToken, stream.IsSource());
   }
-  else if (mediaType == OpalDefaultAudioMediaType)
-  {
-	_XMHandleAudioStreamClosed(callID, stream.IsSource());
-  }*/
 }
 
 #pragma mark -

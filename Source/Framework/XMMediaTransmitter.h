@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.h,v 1.25 2007/08/17 11:36:41 hfriederich Exp $
+ * $Id: XMMediaTransmitter.h,v 1.26 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,12 +84,12 @@
 + (void)_stopVideoDisplay;
 
 + (void)_startTransmittingForSession:(unsigned)sessionID
-						   withCodec:(XMCodecIdentifier)codecIdentifier
-						   videoSize:(XMVideoSize)videoSize 
-				  maxFramesPerSecond:(unsigned)maxFramesPerSecond
-						  maxBitrate:(unsigned)maxBitrate
-					keyframeInterval:(unsigned)keyframeInterval
-							   flags:(unsigned)flags;
+                           withCodec:(XMCodecIdentifier)codecIdentifier
+                           videoSize:(XMVideoSize)videoSize 
+                  maxFramesPerSecond:(unsigned)maxFramesPerSecond
+                          maxBitrate:(unsigned)maxBitrate
+                    keyframeInterval:(unsigned)keyframeInterval
+                               flags:(unsigned)flags;
 + (void)_stopTransmittingForSession:(unsigned)sessionID;
 
 + (void)_updatePicture;
@@ -98,9 +98,9 @@
 + (void)_setVideoBytesSent:(unsigned)videoBytesSent;
 
 + (void)_startRecordingWithCodec:(XMCodecIdentifier)codecIdentifier
-					   videoSize:(XMVideoSize)videoSize
-					codecQuality:(XMCodecQuality)codecQuality
-					  maxBitrate:(unsigned)maxBitrate;
+                       videoSize:(XMVideoSize)videoSize
+                    codecQuality:(XMCodecQuality)codecQuality
+                      maxBitrate:(unsigned)maxBitrate;
 + (void)_stopRecording;
 
 + (void)_sendSettings:(NSData *)settings toModule:(id<XMVideoInputModule>)module;

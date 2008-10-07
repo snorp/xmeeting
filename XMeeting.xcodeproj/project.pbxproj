@@ -338,7 +338,6 @@
 		D1D4359B0DC8BDA30065FD1C /* XMMediaStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */; };
 		D1D4359C0DC8BDA50065FD1C /* XMNetworkConfiguration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */; };
 		D1D4359D0DC8BDA70065FD1C /* XMOpalManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D163350A07A1C576003FD9C0 /* XMOpalManager.cpp */; };
-		D1D4359E0DC8BDA80065FD1C /* XMOpalPatches.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */; };
 		D1D4359F0DC8BDAA0065FD1C /* XMPacketReassemblers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */; };
 		D1D435A00DC8BDAC0065FD1C /* XMProcess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D163364F07A456C4003FD9C0 /* XMProcess.cpp */; };
 		D1D435A10DC8BDAC0065FD1C /* XMReceiverMediaPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */; };
@@ -782,7 +781,6 @@
 		D13AED4A0BBA3854008B3CBA /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
 		D13AED4D0BBA38D4008B3CBA /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		D13AED500BBA3931008B3CBA /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
-		D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMOpalPatches.cpp; path = Source/Framework/XMOpalPatches.cpp; sourceTree = "<group>"; };
 		D14587ED09013DD4004A1EDF /* XMCallStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMCallStatistics.h; path = Source/Framework/XMCallStatistics.h; sourceTree = "<group>"; };
 		D14587EE09013DD4004A1EDF /* XMCallStatistics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMCallStatistics.m; path = Source/Framework/XMCallStatistics.m; sourceTree = "<group>"; };
 		D147D6050970342B005DE11C /* XMRTPPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMRTPPacket.h; path = Source/Framework/XMRTPPacket.h; sourceTree = "<group>"; };
@@ -1746,51 +1744,30 @@
 				D1B353220E4DB16000C47DB5 /* Utils */,
 				D1AD25710E67D38800143295 /* Preferences */,
 				D14BBF9F0E3F84C8007B1A57 /* Call Management */,
+				D16DE2280E992B0000E5124C /* Codec Management */,
+				D16DE3390E99E12600E5124C /* Video Management */,
 				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
 				D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */,
 				D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */,
 				D10E40160AAD8454009EA376 /* XMCallRecorder.h */,
 				D16395600841B4E100F7FD83 /* XMCalltoURL.h */,
-				D1BA776A086CB1E3007E6CEC /* XMCodec.h */,
-				D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */,
-				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
 				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
 				D13962150BF0BA2F00C76EFD /* XMH323URL.h */,
-				D19722EA08FB127600295E05 /* XMMediaReceiver.h */,
-				D1FE4EC408ED55F900AAFF98 /* XMMediaTransmitter.h */,
-				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
-				D1972B0208FC529C00295E05 /* XMPacketBuilderDispatch.h */,
 				D10157EC09409867000A9BA7 /* XMRTPH263Packetizer.h */,
 				D10157F209409882000A9BA7 /* XMRTPH263PacketizerDispatch.h */,
 				D12077B60A011A0900179B6C /* XMRTPH263PlusPacketizer.h */,
 				D12077B70A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h */,
 				D198B481097636F300180551 /* XMRTPH264Packetizer.h */,
 				D198B4870976371D00180551 /* XMRTPH264PacketizerDispatch.h */,
-				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
-				D1FE53F708F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.h */,
 				D13962B50BF0C9F100C76EFD /* XMSIPURL.h */,
-				D1C8FCC60A44070D00EF1A8C /* XMStillImageVideoInputModule.h */,
-				D132789908C7A40800298F25 /* XMVideoInputModule.h */,
-				D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */,
-				D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */,
-				D166CD6407B2312300BC27A6 /* XMVideoView.h */,
 				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
 				D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */,
 				D1D63D3607AA9A8800F1FB74 /* XMAudioManager.m */,
 				D10E40170AAD8454009EA376 /* XMCallRecorder.m */,
 				D16395610841B4E100F7FD83 /* XMCalltoURL.m */,
-				D1BA776B086CB1E3007E6CEC /* XMCodec.m */,
-				D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */,
-				D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */,
 				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */,
 				D13962160BF0BA2F00C76EFD /* XMH323URL.m */,
-				D19722EB08FB127600295E05 /* XMMediaReceiver.m */,
-				D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */,
-				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
-				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
 				D13962B60BF0C9F100C76EFD /* XMSIPURL.m */,
-				D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */,
-				D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */,
 			);
 			name = "Obj-C";
 			sourceTree = "<group>";
@@ -1815,26 +1792,16 @@
 				D1AD249C0E67342100143295 /* SIP */,
 				D103B7250E81ACCD0026B236 /* Local */,
 				D1BE22540E86D8F800552D60 /* Media */,
-				D1972B0008FC529C00295E05 /* XMPacketBuilder.c */,
 				D10157ED09409867000A9BA7 /* XMRTPH263Packetizer.c */,
 				D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */,
 				D198B482097636F300180551 /* XMRTPH264Packetizer.c */,
 				D10BDA490AC45832004320A8 /* XMAudioTester.cpp */,
-				D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */,
 				D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */,
-				D13C78DF09B8205A006C6C3B /* XMOpalPatches.cpp */,
-				D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */,
 				D163364F07A456C4003FD9C0 /* XMProcess.cpp */,
-				D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */,
-				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
 				D1010AB30C71F6D20010523E /* XMURLParser.cpp */,
 				D10BDA540AC4668C004320A8 /* XMAudioTester.h */,
-				D1971F0A08FAB3F400295E05 /* XMMediaStream.h */,
 				D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */,
-				D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */,
 				D163364E07A456C4003FD9C0 /* XMProcess.h */,
-				D197216908FADEE300295E05 /* XMReceiverMediaPatch.h */,
-				D147D6050970342B005DE11C /* XMRTPPacket.h */,
 				D1010AB40C71F6D20010523E /* XMURLParser.h */,
 			);
 			name = OPAL;
@@ -1981,8 +1948,8 @@
 				D1DE52EE07C6474100343A8D /* XMH323EndPoint.cpp */,
 				D14F9A390914C673002486B2 /* XMH323Connection.h */,
 				D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */,
-				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
 				D1EEDEB50992514A000BF113 /* XMH323Channel.h */,
+				D1EEDEB60992514A000BF113 /* XMH323Channel.cpp */,
 			);
 			name = H323;
 			sourceTree = "<group>";
@@ -1996,6 +1963,44 @@
 				D1013A0707CA9B670041BCDB /* OPAL */,
 			);
 			name = Framework;
+			sourceTree = "<group>";
+		};
+		D16DE2280E992B0000E5124C /* Codec Management */ = {
+			isa = PBXGroup;
+			children = (
+				D1D63D4307AA9B2B00F1FB74 /* XMCodecManager.h */,
+				D1D63D4407AA9B2B00F1FB74 /* XMCodecManager.m */,
+				D1BA776A086CB1E3007E6CEC /* XMCodec.h */,
+				D1BA776B086CB1E3007E6CEC /* XMCodec.m */,
+			);
+			name = "Codec Management";
+			sourceTree = "<group>";
+		};
+		D16DE3390E99E12600E5124C /* Video Management */ = {
+			isa = PBXGroup;
+			children = (
+				D1D63D3D07AA9A9F00F1FB74 /* XMVideoManager.h */,
+				D1D63D3E07AA9A9F00F1FB74 /* XMVideoManager.m */,
+				D166CD6407B2312300BC27A6 /* XMVideoView.h */,
+				D1FE4EC408ED55F900AAFF98 /* XMMediaTransmitter.h */,
+				D1FE4EC508ED55F900AAFF98 /* XMMediaTransmitter.m */,
+				D12E605A0998AFE9004EF9F8 /* XMVideoModule.h */,
+				D132789908C7A40800298F25 /* XMVideoInputModule.h */,
+				D1FE53F708F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.h */,
+				D1FE53F808F00A7100AAFF98 /* XMSequenceGrabberVideoInputModule.m */,
+				D1C8FCC60A44070D00EF1A8C /* XMStillImageVideoInputModule.h */,
+				D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */,
+				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
+				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
+				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
+				D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */,
+				D1972B0208FC529C00295E05 /* XMPacketBuilderDispatch.h */,
+				D1972B0108FC529C00295E05 /* XMPacketBuilder.h */,
+				D1972B0008FC529C00295E05 /* XMPacketBuilder.c */,
+				D19722EA08FB127600295E05 /* XMMediaReceiver.h */,
+				D19722EB08FB127600295E05 /* XMMediaReceiver.m */,
+			);
+			name = "Video Management";
 			sourceTree = "<group>";
 		};
 		D1887E0B0A27B96900C938BB /* Patches */ = {
@@ -2490,6 +2495,14 @@
 				D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */,
 				D14B04C30B0606DA001AB527 /* XMInBandDTMFHandler.h */,
 				D14B04C20B0606DA001AB527 /* XMInBandDTMFHandler.cpp */,
+				D1971F0A08FAB3F400295E05 /* XMMediaStream.h */,
+				D1971F0B08FAB3F400295E05 /* XMMediaStream.cpp */,
+				D147D6050970342B005DE11C /* XMRTPPacket.h */,
+				D147D6060970342B005DE11C /* XMRTPPacket.cpp */,
+				D197216908FADEE300295E05 /* XMReceiverMediaPatch.h */,
+				D197216A08FADEE300295E05 /* XMReceiverMediaPatch.cpp */,
+				D147D9D90973A83E005DE11C /* XMPacketReassemblers.h */,
+				D147DA1D0973ABEE005DE11C /* XMPacketReassemblers.cpp */,
 			);
 			name = Media;
 			sourceTree = "<group>";
@@ -3588,7 +3601,6 @@
 				D1D4359B0DC8BDA30065FD1C /* XMMediaStream.cpp in Sources */,
 				D1D4359C0DC8BDA50065FD1C /* XMNetworkConfiguration.cpp in Sources */,
 				D1D4359D0DC8BDA70065FD1C /* XMOpalManager.cpp in Sources */,
-				D1D4359E0DC8BDA80065FD1C /* XMOpalPatches.cpp in Sources */,
 				D1D4359F0DC8BDAA0065FD1C /* XMPacketReassemblers.cpp in Sources */,
 				D1D435A00DC8BDAC0065FD1C /* XMProcess.cpp in Sources */,
 				D1D435A10DC8BDAC0065FD1C /* XMReceiverMediaPatch.cpp in Sources */,

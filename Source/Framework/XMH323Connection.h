@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.22 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.23 2008/10/07 23:19:17 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -41,8 +41,7 @@ public:
     
 	virtual H323_RTPChannel * CreateRTPChannel(const H323Capability & capability,
                                                H323Channel::Directions dir,
-                                               RTP_Session & rtp,
-                                               unsigned sessionID);
+                                               RTP_Session & rtp);
 	
 	virtual bool OnClosingLogicalChannel(H323Channel & channel);
 	
