@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.75 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.76 2008/10/08 23:55:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -383,10 +383,8 @@ void XMOpalManager::OnEstablishedCall(OpalCall & call)
 
 void XMOpalManager::OnReleased(OpalConnection & connection)
 {
-  // inform the framework, that a call has ended, if the released
-  // connection is an XMConnection instance.
-  // also provide the framework with informations about the local address
-  // (useful for call statistics)
+  // inform the framework, that a call has ended if the released connection is an XMConnection instance.
+  // also provide the framework with informations about the local address (useful for call statistics)
   
   const PString & callToken = connection.GetCall().GetToken();
   
@@ -476,10 +474,10 @@ void XMOpalManager::OnOpenRTPMediaStream(const OpalConnection & connection, cons
 
 void XMOpalManager::OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream)
 {
-  // Called from the local connection when an RTP stream is closed.
+  // Called from the RTP connection when an RTP stream is closed.
   // The main purpose of this callback is to forward this information to the Obj-C world
   
-  const PString & callToken = connection.GetCall().GetToken().AsUnsigned();
+  const PString & callToken = connection.GetCall().GetToken();
   OpalMediaFormat mediaFormat = stream.GetMediaFormat();
   const OpalMediaType & mediaType = mediaFormat.GetMediaType();
   if (mediaType == OpalMediaType::Video()) {

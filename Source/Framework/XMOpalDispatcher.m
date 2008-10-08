@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.60 2008/09/24 06:52:42 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.61 2008/10/08 23:55:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -466,7 +466,7 @@ typedef enum _XMOpalDispatcherMessage
   NSPort *thePort = [_XMOpalDispatcherSharedInstance _receivePort];
   NSPortMessage *portMessage = [[NSPortMessage alloc] initWithSendPort:thePort receivePort:nil components:components];
   [portMessage setMsgid:(unsigned)message];
-  if ([portMessage sendBeforeDate:[NSDate date]] == NO) {
+  if ([portMessage sendBeforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]] == NO) {
     NSLog(@"Sending the message failed (Dispatcher) %x", message);
   }
   [portMessage release];
@@ -1079,8 +1079,10 @@ typedef enum _XMOpalDispatcherMessage
   NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
   NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
-  if (![callToken isEqualToString:_callToken]) {
-    NSLog(@"call token mismatch on MediaStreamClosed: %@ to actual %@", _callToken, callToken);
+  // The media stream closed message usually arrives after the call has been cleared. -> callToken nil
+  // If the stream is closed during a call, things look differently...
+  if (callToken != nil && ![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on AudioStreamClosed: %@ to actual %@", _callToken, callToken);
     return;
   }
   
@@ -1106,8 +1108,10 @@ typedef enum _XMOpalDispatcherMessage
   NSData *tokenData = (NSData *)[messageComponents objectAtIndex:0];
   NSString *_callToken = (NSString *)[NSKeyedUnarchiver unarchiveObjectWithData:tokenData];
   
-  if (![callToken isEqualToString:_callToken]) {
-    NSLog(@"call token mismatch on MediaStreamClosed: %@ to actual %@", _callToken, callToken);
+  // The media stream closed message usually arrives after the call has been cleared. -> callToken nil
+  // If the stream is closed during a call, things look differently...
+  if (callToken != nil && ![callToken isEqualToString:_callToken]) {
+    NSLog(@"call token mismatch on VideoStreamClosed: %@ to actual %@", _callToken, callToken);
     return;
   }
   

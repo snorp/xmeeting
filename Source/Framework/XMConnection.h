@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.15 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.16 2008/10/08 23:55:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,7 +39,6 @@ public:
                                               unsigned sessionID,
                                               bool isSource);
   virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
-  virtual void OnClosedMediaStream(const OpalMediaStream & stream);
   PSoundChannel * CreateSoundChannel(bool isSource);
 	
   OpalH281Handler * GetH281Handler();

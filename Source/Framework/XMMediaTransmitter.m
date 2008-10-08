@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.59 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.60 2008/10/08 23:55:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -335,7 +335,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
   NSPort *thePort = [_XMMediaTransmitterSharedInstance _receivePort];
   NSPortMessage *portMessage = [[NSPortMessage alloc] initWithSendPort:thePort receivePort:nil components:components];
   [portMessage setMsgid:(unsigned)message];
-  if ([portMessage sendBeforeDate:[NSDate date]] == NO) {
+  if ([portMessage sendBeforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]] == NO) {
     NSLog(@"Sending the message failed: %x", message);
   }
   [portMessage release];

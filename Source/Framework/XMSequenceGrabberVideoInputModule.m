@@ -1,5 +1,5 @@
 /*
- * $Id: XMSequenceGrabberVideoInputModule.m,v 1.25 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMSequenceGrabberVideoInputModule.m,v 1.26 2008/10/08 23:55:32 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,8 +11,12 @@
 #import "XMUtils.h"
 #import "XMDummyVideoInputModule.h"
 
-#define XM_GRAB_WIDTH 352
-#define XM_GRAB_HEIGHT 288
+// The Built-in iSight returns perfectly resized pixel buffers when
+// grabbing 352x288 sized images. However, the clean rect as reported
+// by CVImageBufferGetCleanRect is incorrect, causing horrible drawing
+// results on screen (transmitted images are just fine)
+#define XM_GRAB_WIDTH 640
+#define XM_GRAB_HEIGHT 480
 
 #define XM_CALLBACK_NEVER_CALLED 0
 #define XM_CALLBACK_NOT_CALLED 1
@@ -853,11 +857,11 @@ bail:
   pixelBufferAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
 	
   // Setting the Width / Height for the buffer
-  number = [[NSNumber alloc] initWithInt:frameSize.width];
+  number = [[NSNumber alloc] initWithInt:(int)frameSize.width];
   [pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferWidthKey];
   [number release];
 	
-  number = [[NSNumber alloc] initWithInt:frameSize.height];
+  number = [[NSNumber alloc] initWithInt:(int)frameSize.height];
   [pixelBufferAttributes setObject:number forKey:(NSString *)kCVPixelBufferHeightKey];
   [number release];
 	
