@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.15 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.16 2008/10/08 21:20:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -161,10 +161,12 @@ void XMMediaStream::AppendData(unsigned mediaID, void *data, unsigned length)
     
   dataPtr += dataSize;
   dataSize += length;
+  
+  // SetPayloadSize must be called BEFORE copying the data, or some data will get lost.
+  // (Don't know why!!!!!)
+  dataFrame.SetPayloadSize(dataSize);
     
   memcpy(dataPtr, data, length);
-    
-  dataFrame.SetPayloadSize(dataSize);
 }
 
 void XMMediaStream::SendPacket(unsigned mediaID, bool setMarker)

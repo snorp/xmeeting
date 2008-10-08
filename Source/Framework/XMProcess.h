@@ -1,5 +1,5 @@
 /*
- * $Id: XMProcess.h,v 1.4 2006/06/22 21:12:18 hfriederich Exp $
+ * $Id: XMProcess.h,v 1.5 2008/10/08 21:20:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,7 @@ class XMProcess : public PProcess
 public:
 	// Constructor
 	XMProcess();
+  virtual ~XMProcess();
 	
 	// never used!
 	virtual void Main();

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.10 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.11 2008/10/08 21:20:50 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -196,7 +196,7 @@ ComponentResult XMPacketBuilder_AddPacketSampleData(XMPacketBuilderGlobals globa
   UInt8 *data = (UInt8 *)inSampleDataParams->data;
 	
   data += inSampleOffset;
-	
+  
   _XMAppendData(2, (void *)data, inSampleDataLength);
 	
 bail:
