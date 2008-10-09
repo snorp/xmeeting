@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.76 2008/10/08 23:55:32 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.77 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,8 @@
 #include "XMSIPEndPoint.h"
 #include "XMNetworkConfiguration.h"
 
-#define XM_MAX_BANDWIDTH 1100000
+// use a very large value as the initial value, the codecs have built-in bandwidth limits
+#define XM_MAX_BANDWIDTH 1000000000
 
 using namespace std;
 
@@ -70,15 +71,13 @@ void XMOpalManager::CloseOpal()
 }
 
 XMOpalManager::XMOpalManager(bool _logCallStatistics)
-: logCallStatistics(_logCallStatistics)
+: bandwidthLimit(XM_MAX_BANDWIDTH),
+  logCallStatistics(_logCallStatistics),
+  defaultAudioPacketTime(0),
+  currentAudioPacketTime(0),
+  enableH264LimitedMode(false),
+  callEndReason(XMCallEndReasonCount)
 {	
-  bandwidthLimit = XM_MAX_BANDWIDTH;
-  
-  defaultAudioPacketTime = 0;
-  currentAudioPacketTime = 0;
-  
-  callEndReason = XMCallEndReasonCount;
-  
   // do NOT run the interface monitor update thread, as we're doing this through callbacks from the system. 
   // Also use a custom interface filter to ensure that only ever one interface is used.
   PInterfaceMonitor::GetInstance().SetRunMonitorThread(false);
@@ -498,6 +497,15 @@ void XMOpalManager::SetUserName(const PString & username)
   GetSIPEndPoint()->SetDefaultDisplayName(username);
 }
 
+void XMOpalManager::SetBandwidthLimit(unsigned limit)
+{
+  if (limit == 0) {
+    bandwidthLimit = XM_MAX_BANDWIDTH;
+  } else {
+    bandwidthLimit = limit;
+  }
+}
+
 #pragma mark -
 #pragma mark Network Setup Methods
 
@@ -657,28 +665,6 @@ unsigned XMOpalManager::GetCurrentAudioPacketTime()
 
 #pragma mark -
 #pragma mark Information about current Calls
-
-unsigned XMOpalManager::GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier) const
-{
-  // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. If at all, only I-frames should be
-  // sent.
-  /*if (codecIdentifier == XMCodecIdentifier_H263 && remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
-  {
-	// zero key frame interval means sending only I-frames
-	return 0;
-  }*/
-  
-  /*switch (callProtocol) // call protocol no longer stored
-  {
-	case XMCallProtocol_H323:
-	  return 200;
-	case XMCallProtocol_SIP:
-	  return 60; // SIP currently lacks the possibility to send videoFastUpdate requests
-	default:
-	  return 0;
-  }*/
-  return 0;
-}
 
 bool XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const
 {

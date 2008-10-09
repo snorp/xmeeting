@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.23 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.24 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,16 +71,6 @@ extern const OpalVideoFormat & XMGetMediaFormat_H264();
 #define XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED 2
 
 #pragma mark -
-#pragma mark Media Format Options
-
-extern const char * const CanRFC2429Option;
-extern const char * const IsRFC2429Option;
-extern const char * const ProfileOption;
-extern const char * const LevelOption;
-extern const char * const PacketizationOption;
-extern const char * const H264LimitedModeOption;
-
-#pragma mark -
 #pragma mark Managing Media Formats
 
 XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat);
@@ -134,13 +124,6 @@ public:
 	
   virtual bool IsValidCapabilityForSending() const;
   virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
-    
-  //virtual void UpdateFormat(const OpalMediaFormat & mediaFormat);
-	
-private:
-  unsigned cifMPI;
-  unsigned qcifMPI;
-  unsigned maxBitRate;
 };
 
 class XM_H323_H263_Capability : public XMH323VideoCapability

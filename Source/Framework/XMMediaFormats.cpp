@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.33 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.34 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -68,6 +68,8 @@ const char *_XMMediaFormatEncoding_H263Plus = "H263-1998";
 //const char *_XMMediaFormatEncoding_H264 = "H264";
 const char *_XMMediaFormatEncoding_H264 = NULL;
 
+PString CIFMPIOption = "CIFMPI";
+PString QCIFMPIOption = "QCIFMPI";
 const char * const CanRFC2429Option = "CanRFC2429";
 const char * const IsRFC2429Option = "IsRFC2429";
 const char * const ProfileOption = "Profile";
@@ -133,8 +135,7 @@ XMCodecIdentifier _XMGetMediaFormatCodec(const OpalMediaFormat & mediaFormat)
 {
   if (mediaFormat == XM_MEDIA_FORMAT_H261) {
     return XMCodecIdentifier_H261;
-  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 ||
-            mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
     return XMCodecIdentifier_H263;
   } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
     return XMCodecIdentifier_H264;
@@ -165,8 +166,7 @@ const char *_XMGetMediaFormatName(const OpalMediaFormat & mediaFormat)
 {
   if (mediaFormat == XM_MEDIA_FORMAT_H261) {
     return _XMMediaFormatName_H261;
-  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 ||
-             mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
     return _XMMediaFormatName_H263;
   } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
     return _XMMediaFormatName_H264;
@@ -231,9 +231,6 @@ const char *_XMMediaFormatForCodecIdentifier(XMCodecIdentifier codecIdentifier)
 #pragma mark XM_H323_H261_Capability methods
 
 XM_H323_H261_Capability::XM_H323_H261_Capability()
-: qcifMPI(1),
-  cifMPI(1),
-  maxBitRate(XM_MAX_H261_BITRATE/100)
 {
   SetPayloadType(XM_MEDIA_FORMAT_H261.GetPayloadType());
 }
@@ -250,11 +247,32 @@ PObject::Comparison XM_H323_H261_Capability::Compare(const PObject & obj) const
     return result;
   }
 	
+  // Only match if a format can be sent
   if (PIsDescendant(&obj, XM_H323_H261_Capability)) {	
     const XM_H323_H261_Capability & other = (const XM_H323_H261_Capability &)obj;
-	
-    if (((cifMPI > 0) && (other.cifMPI > 0)) ||
-        ((qcifMPI > 0) && (other.qcifMPI > 0))) {
+    
+    const OpalMediaFormat & mediaFormat = GetMediaFormat();
+    const OpalMediaFormat & otherFormat = other.GetMediaFormat();
+    
+    bool cif = true;
+    bool qcif = true;
+    bool otherCIF = true;
+    bool otherQCIF = true;
+    
+    if (mediaFormat.HasOption(CIFMPIOption)) {
+      cif = (mediaFormat.GetOptionInteger(CIFMPIOption) > 0);
+    }
+    if (mediaFormat.HasOption(QCIFMPIOption)) {
+      qcif = (mediaFormat.GetOptionInteger(QCIFMPIOption) > 0);
+    }
+    if (otherFormat.HasOption(CIFMPIOption)) {
+      otherCIF = (otherFormat.GetOptionInteger(CIFMPIOption) > 0);
+    }
+    if (otherFormat.HasOption(QCIFMPIOption)) {
+      otherQCIF = (otherFormat.GetOptionInteger(QCIFMPIOption) > 0);
+    }
+    
+    if ((cif && otherCIF) || (qcif && otherQCIF)) {
       return EqualTo;
     }
   }
@@ -274,6 +292,23 @@ PString XM_H323_H261_Capability::GetFormatName() const
 
 bool XM_H323_H261_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 {
+  // default values
+  unsigned cifMPI = 1;
+  unsigned qcifMPI = 1;
+  unsigned maxBitRate = XM_MAX_H261_BITRATE/100;
+  
+  const OpalMediaFormat & mediaFormat = GetMediaFormat();
+  
+  if (mediaFormat.HasOption(CIFMPIOption)) {
+    cifMPI = mediaFormat.GetOptionInteger(CIFMPIOption);
+  }
+  if (mediaFormat.HasOption(QCIFMPIOption)) {
+    qcifMPI = mediaFormat.GetOptionInteger(QCIFMPIOption);
+  }
+  if (mediaFormat.HasOption(OpalMediaFormat::MaxBitRateOption())) {
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption())/100;
+  }
+  
   cap.SetTag(H245_VideoCapability::e_h261VideoCapability);
 	
   H245_H261VideoCapability & h261 = cap;
@@ -296,6 +331,21 @@ bool XM_H323_H261_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 
 bool XM_H323_H261_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 {
+  unsigned cifMPI = 1;
+  unsigned qcifMPI = 1;
+  unsigned maxBitRate = XM_MAX_H261_BITRATE/100;
+  
+  const OpalMediaFormat & mediaFormat = GetMediaFormat();
+  if (mediaFormat.HasOption(CIFMPIOption)) {
+    cifMPI = mediaFormat.GetOptionInteger(CIFMPIOption);
+  }
+  if (mediaFormat.HasOption(QCIFMPIOption)) {
+    qcifMPI = mediaFormat.GetOptionInteger(QCIFMPIOption);
+  }
+  if (mediaFormat.HasOption(OpalMediaFormat::MaxBitRateOption())) {
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption())/100;
+  }
+  
   pdu.SetTag(H245_VideoMode::e_h261VideoMode);
   H245_H261VideoMode & mode = pdu;
   mode.m_resolution.SetTag(cifMPI > 0 ? H245_H261VideoMode_resolution::e_cif : H245_H261VideoMode_resolution::e_qcif);
@@ -312,24 +362,32 @@ bool XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
   }
 	
   OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
-	
+	unsigned cifMPI = 0;
+  unsigned qcifMPI = 0;
+  unsigned maxBitRate = XM_MAX_H261_BITRATE/100;
+  if (mediaFormat.HasOption(OpalMediaFormat::MaxBitRateOption())) {
+    maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption())/100;
+  }
+  
   const H245_H261VideoCapability & h261 = cap;
   if (h261.HasOptionalField(H245_H261VideoCapability::e_qcifMPI)) {
     qcifMPI = h261.m_qcifMPI;
-    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
-  } else {
-    qcifMPI = 0;
   }
-	
   if (h261.HasOptionalField(H245_H261VideoCapability::e_cifMPI)) {
     cifMPI = h261.m_cifMPI;
+  }
+  
+  mediaFormat.SetOptionInteger(CIFMPIOption, cifMPI);
+  mediaFormat.SetOptionInteger(QCIFMPIOption, qcifMPI);
+  
+  if (cifMPI > 0) {
     mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
     mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
     mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
   } else {
-    cifMPI = 0;
+    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
+    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
+    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
   }
 	
   maxBitRate = std::min(maxBitRate, (unsigned)h261.m_maxBitRate);
@@ -345,7 +403,7 @@ bool XM_H323_H261_Capability::IsValidCapabilityForSending() const
 
 PObject::Comparison XM_H323_H261_Capability::CompareTo(const XMH323VideoCapability & obj) const
 {
-  if (PIsDescendant(&obj, XM_H323_H261_Capability)) {	
+  /*if (PIsDescendant(&obj, XM_H323_H261_Capability)) {	
     const XM_H323_H261_Capability & other = (const XM_H323_H261_Capability &)obj;
 		
     if ((cifMPI > 0) && (other.cifMPI > 0)) {
@@ -363,31 +421,10 @@ PObject::Comparison XM_H323_H261_Capability::CompareTo(const XMH323VideoCapabili
     } else {
       return EqualTo;
     }
-  }
+  }*/
 	
   return LessThan;
 }
-
-/*void XM_H323_H261_Capability::UpdateFormat(const OpalMediaFormat & mediaFormat)
-{
-  qcifMPI = 0;
-  cifMPI = 0;
-    
-  XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
-  unsigned frameTime = mediaFormat.GetOptionInteger(OpalMediaFormat::FrameTimeOption());
-  unsigned mpi = round((frameTime * 2997.0) / (OpalMediaFormat::VideoClockRate * 100.0));
-  
-  if (videoSize >= XMVideoSize_QCIF) {
-    qcifMPI = mpi;
-  }
-  if (videoSize >= XMVideoSize_CIF) {
-    cifMPI = mpi;
-  }
-    
-  maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()) / 100;
-    
-  SetPayloadType(mediaFormat.GetPayloadType());
-}*/
 
 #pragma mark -
 #pragma mark XM_H323_H263_Capability methods

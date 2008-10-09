@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.16 2008/10/08 21:20:50 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.17 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
 #include "XMConnection.h"
+#include "XMEndPoint.h"
 
 #include <codec/vidcodec.h>
 #include <opal/patch.h>
@@ -18,11 +19,12 @@
 
 static XMMediaStream *videoTransmitterStream = NULL;
 
-XMMediaStream::XMMediaStream(XMConnection & conn,
+XMMediaStream::XMMediaStream(XMConnection & _connection,
                              const OpalMediaFormat & mediaFormat,
                              unsigned sessionID,
                              bool isSource)
-: OpalMediaStream(conn, mediaFormat, sessionID, isSource),
+: OpalMediaStream(_connection, mediaFormat, sessionID, isSource),
+  connection(_connection),
   dataFrame((isSource ? 3000 : 0)),
   hasStarted(false),
   isTerminated(false)
@@ -47,9 +49,6 @@ void XMMediaStream::OnPatchStart()
     if(hasStarted == true || isTerminated == true) {
       return;
     }
-        
-    // Adjust the local media format
-    mediaFormat = mediaPatch->GetSource().GetMediaFormat();
       
     RTP_DataFrame::PayloadTypes payloadType = mediaFormat.GetPayloadType();
         
@@ -66,8 +65,7 @@ void XMMediaStream::OnPatchStart()
     XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
         
     if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
-       videoSize == XMVideoSize_NoVideo) 
-    {
+       videoSize == XMVideoSize_NoVideo || videoSize == XMVideoSize_Custom) {
       // Shouldn't actually happen
       return;
     }
@@ -101,8 +99,8 @@ void XMMediaStream::OnPatchStart()
     dataFrame.SetPayloadSize(0);
     dataFrame.SetPayloadType(payloadType);
         
-    unsigned keyframeInterval = XMOpalManager::GetManager()->GetKeyFrameIntervalForCurrentCall(codecIdentifier);
-    _XMStartMediaTransmit(2, codecIdentifier, videoSize, framesPerSecond, bitrate, keyframeInterval, flags);
+    unsigned keyFrameInterval = GetKeyFrameInterval(codecIdentifier);
+    _XMStartMediaTransmit(2, codecIdentifier, videoSize, framesPerSecond, bitrate, keyFrameInterval, flags);
   }
 }
 
@@ -194,6 +192,28 @@ void XMMediaStream::HandleDidStopTransmitting(unsigned mediaID)
   videoTransmitterStream = NULL;
 }
 
+unsigned XMMediaStream::GetKeyFrameInterval(XMCodecIdentifier codecIdentifier)
+{
+  XMCallProtocol callProtocol = XMEndPoint::GetCallProtocolForCall(connection);
+  PString remoteApplicationString = XMOpalManager::GetRemoteApplicationString(connection.GetRemoteProductInfo());
+  
+  // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. If at all, only I-frames should be sent.
+  if (codecIdentifier == XMCodecIdentifier_H263 && remoteApplicationString.Find("ACCORD MGC") != P_MAX_INDEX) {
+    // zero key frame interval means sending only I-frames
+    return 0;
+  }
+  
+  switch (callProtocol) {
+    case XMCallProtocol_H323:
+      return 200;
+    case XMCallProtocol_SIP:
+      return 60;
+    default:
+      return 0;
+  }
+}
+
+
 /*bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
                                    bool isEndOfChain)
 {
@@ -205,3 +225,4 @@ void XMMediaStream::HandleDidStopTransmitting(unsigned mediaID)
     }
     return OpalMediaStream::ExecuteCommand(command/*, isEndOfChain);
 }*/
+                                           

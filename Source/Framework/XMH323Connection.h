@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.24 2008/10/08 23:55:32 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.25 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,41 +22,41 @@ class XMH323Connection : public H323Connection
 	
 public:
 	
-	XMH323Connection(OpalCall & call,
+  XMH323Connection(OpalCall & call,
                    H323EndPoint & endpoint,
                    const PString & token,
                    const PString & alias,
                    const H323TransportAddress & address,
                    unsigned options = 0,
                    OpalConnection::StringOptions * stringOptions = NULL);
-	~XMH323Connection();
+  ~XMH323Connection();
 	
-	virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
+  virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
 
-	virtual void SelectDefaultLogicalChannel(const OpalMediaType & mediaType);
+  virtual void SelectDefaultLogicalChannel(const OpalMediaType & mediaType);
 	
-	virtual bool OpenLogicalChannel(const H323Capability & capability,
-									unsigned sessionID,
-									H323Channel::Directions dir);
+  virtual bool OpenLogicalChannel(const H323Capability & capability,
+                                  unsigned sessionID,
+                                  H323Channel::Directions dir);
     
-	virtual H323_RTPChannel * CreateRTPChannel(const H323Capability & capability,
-                                               H323Channel::Directions dir,
-                                               RTP_Session & rtp);
+  virtual H323_RTPChannel * CreateRTPChannel(const H323Capability & capability,
+                                             H323Channel::Directions dir,
+                                             RTP_Session & rtp);
 	
-	virtual bool OnClosingLogicalChannel(H323Channel & channel);
+  virtual bool OnClosingLogicalChannel(H323Channel & channel);
 	
-    // Propagate opening/closing of media streams to the Obj-C world
-	virtual bool OnOpenMediaStream(OpalMediaStream & stream);
+  // Propagate opening/closing of media streams to the Obj-C world
+  virtual bool OnOpenMediaStream(OpalMediaStream & stream);
   virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 	
-	// Overridden to circumvent the default Opal bandwidth management
-	virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
-	virtual unsigned GetBandwidthUsed() const { return 0; }
-	virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
+  // Overridden to circumvent the default Opal bandwidth management
+  virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
+  virtual unsigned GetBandwidthUsed() const { return 0; }
+  virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
 	
-    // Overridden to being able to send in-band DTMF
-	virtual bool SendUserInputTone(char tone, unsigned duration);
-    virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
+  // Overridden to being able to send in-band DTMF
+  virtual bool SendUserInputTone(char tone, unsigned duration);
+  virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     
   // Improved clean up when closing the framework
   void CleanUp();
@@ -65,7 +65,7 @@ public:
 private:
 	
   unsigned initialBandwidth;
-	XMInBandDTMFHandler * inBandDTMFHandler;
+  XMInBandDTMFHandler * inBandDTMFHandler;
 };
 
 #endif // __XM_H323_CONNECTION_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.38 2008/10/08 23:55:32 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.39 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -117,41 +117,32 @@ bool XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
                                           unsigned sessionID,
                                           H323Channel::Directions dir)
 {
-  /*// Override default behaviour to add additional checks if the format is valid for
+  // Override default behaviour to add additional checks if the format is valid for
   // sending. Both the capability and the manager have to agree that it is possible
   // to send the media format described in the capability.
-  bool isValidCapability = true;
   if(PIsDescendant(&capability, XMH323VideoCapability)) {
-		XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
-		isValidCapability = videoCapability.IsValidCapabilityForSending();
-		if(isValidCapability)
-		{
-			isValidCapability = XMOpalManager::GetManager()->IsValidFormatForSending(videoCapability.GetMediaFormat());
-		}
-	}
-	
-	if(isValidCapability == false)
-	{
-		return false;
-	}*/
-	
-	return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
+    XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
+    if (!videoCapability.IsValidCapabilityForSending() || !XMOpalManager::GetManager()->IsValidFormatForSending(videoCapability.GetMediaFormat())) {
+      return false;
+    }
+  }
+  return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
 }
 
 H323_RTPChannel * XMH323Connection::CreateRTPChannel(const H323Capability & capability,
                                                      H323Channel::Directions dir,
                                                      RTP_Session & rtp)
 {
-  if (capability.GetMediaFormat().GetMediaType() != OpalMediaType::Video()) {
-    return H323Connection::CreateRTPChannel(capability, dir, rtp);
-  }
-  
   // Use a special channel for the video streams, to allow sending flow control information
-  return new XMH323Channel(*this, capability, dir, rtp);
+  if (capability.GetMediaFormat().GetMediaType() == OpalMediaType::Video()) {
+    return new XMH323Channel(*this, capability, dir, rtp);
+  }
+  return H323Connection::CreateRTPChannel(capability, dir, rtp);
 }
 
 bool XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
 {
+  // TODO: CONSIDER AGAIN!
   // Called if the remote party requests to close the channel.
   // In contrast to the default Opal implementation, we actually
   // DO close the channel. Don't know if this is a bug in Opal or not.
@@ -166,7 +157,7 @@ bool XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
   if(!H323Connection::OnOpenMediaStream(mediaStream)) {
     return false;
   }
-    
+  
   // inform the subsystem
   XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	return true;
@@ -181,7 +172,6 @@ void XMH323Connection::OnClosedMediaStream(const OpalMediaStream & stream)
 bool XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
   bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
-  GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
   return true;
 }
 

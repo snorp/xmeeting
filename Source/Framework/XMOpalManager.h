@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.45 2008/09/24 06:52:42 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.46 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,76 +22,75 @@ class XMSIPEndPoint;
 
 class XMOpalManager : public OpalManager
 {
-	PCLASSINFO(XMOpalManager, OpalManager);
+  PCLASSINFO(XMOpalManager, OpalManager);
 	
 public:
-	static void InitOpal(const PString & pTracePath, bool logCallStatistics);
-	static void CloseOpal();
+  static void InitOpal(const PString & pTracePath, bool logCallStatistics);
+  static void CloseOpal();
 	
-	XMOpalManager(bool logCallStatistics);
-	~XMOpalManager();
+  XMOpalManager(bool logCallStatistics);
+  ~XMOpalManager();
 	
-	/* Getting access to the OPAL manager */
-	static XMOpalManager * GetManager();
+  /* Getting access to the OPAL manager */
+  static XMOpalManager * GetManager();
 	
-	/* Getting access to the endpoints */
-	static XMH323EndPoint * GetH323EndPoint();
-	static XMSIPEndPoint * GetSIPEndPoint();
-	static XMEndPoint * GetCallEndPoint();
+  /* Getting access to the endpoints */
+  static XMH323EndPoint * GetH323EndPoint();
+  static XMSIPEndPoint * GetSIPEndPoint();
+  static XMEndPoint * GetCallEndPoint();
   
   /* Handle network configuration changes */
   void HandleNetworkConfigurationChange();
   
   /* NAT methods */
-	void SetNATInformation(const PStringArray & stunServers, const PString & publicAddress);
+  void SetNATInformation(const PStringArray & stunServers, const PString & publicAddress);
   void HandlePublicAddressUpdate(const PString & publicAddress);
     
   /* Initiating a call */
   void InitiateCall(XMCallProtocol protocol, const char * remoteParty, const char *origAddressString);
   void HandleCallInitiationFailed(XMCallEndReason endReason);
 	
-	/* getting remote applcation info */
+  /* getting remote applcation info */
   static PString GetRemoteApplicationString(const OpalProductInfo & info);
 	
-	/* getting call statistics */
-	void GetCallStatistics(const PString & callToken, XMCallStatisticsRecord *callStatistics);
+  /* getting call statistics */
+  void GetCallStatistics(const PString & callToken, XMCallStatisticsRecord *callStatistics);
 	
-	/* overriding some callbacks */
-	virtual void OnEstablishedCall(OpalCall & call);
-	virtual void OnReleased(OpalConnection & connection);
-	virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, bool requiresPatchThread = true);
+  /* overriding some callbacks */
+  virtual void OnEstablishedCall(OpalCall & call);
+  virtual void OnReleased(OpalConnection & connection);
+  virtual OpalMediaPatch * CreateMediaPatch(OpalMediaStream & source, bool requiresPatchThread = true);
     
   void OnOpenRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
   void OnClosedRTPMediaStream(const OpalConnection & connection, const OpalMediaStream & stream);
 	
-	/* General setup methods */
-	void SetUserName(const PString & name);
+  /* General setup methods */
+  void SetUserName(const PString & name);
 
-	/* Bandwidth usage */
+  /* Bandwidth usage */
   unsigned GetBandwidthLimit() const { return bandwidthLimit; }
-	void SetBandwidthLimit(unsigned limit) { bandwidthLimit = limit; }
-	unsigned GetVideoBandwidthLimit() const { return bandwidthLimit - 64000; }
+  void SetBandwidthLimit(unsigned limit);
+  unsigned GetVideoBandwidthLimit() const { return bandwidthLimit - 64000; }
 	
-	/* Audio setup methods */
-	void SetAudioPacketTime(unsigned audioPacketTime);
-	void SetCurrentAudioPacketTime(unsigned audioPacketTime);
-	unsigned GetCurrentAudioPacketTime();
+  /* Audio setup methods */
+  void SetAudioPacketTime(unsigned audioPacketTime);
+  void SetCurrentAudioPacketTime(unsigned audioPacketTime);
+  unsigned GetCurrentAudioPacketTime();
     
   /* H.264 methods */
   bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
   void SetEnableH264LimitedMode(bool _enable) { enableH264LimitedMode = _enable; }
 	
-	/* getting /setting information about current call */
-	unsigned GetKeyFrameIntervalForCurrentCall(XMCodecIdentifier codecIdentifier) const;
-	bool IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const;
+  /* getting /setting information about current call */
+  bool IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const;
 	
-	/* User input mode information */
-	bool SetUserInputMode(XMUserInputMode userInputMode);
+  /* User input mode information */
+  bool SetUserInputMode(XMUserInputMode userInputMode);
 	
-	/* Debug log information */
-	static void LogMessage(const PString & message);
+  /* Debug log information */
+  static void LogMessage(const PString & message);
     
-  /* Convenience function to define current codec bandwidth limits */
+  /* Define current codec bandwidth limits */
   static unsigned GetH261BandwidthLimit();
   static unsigned GetH263BandwidthLimit();
   static unsigned GetH264BandwidthLimit();
@@ -147,8 +146,8 @@ private:
   
   unsigned bandwidthLimit;
 	
-	unsigned defaultAudioPacketTime;
-	unsigned currentAudioPacketTime;
+  unsigned defaultAudioPacketTime;
+  unsigned currentAudioPacketTime;
   
   bool enableH264LimitedMode;
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.10 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.11 2008/10/09 20:18:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -13,6 +13,8 @@
 #include <opal/mediastrm.h>
 #include <rtp/rtp.h>
 
+#include "XMTypes.h"
+
 class XMConnection;
 
 /**
@@ -25,7 +27,7 @@ class XMMediaStream : public OpalMediaStream
   PCLASSINFO(XMMediaStream, OpalMediaStream);
 	
 public:
-  XMMediaStream(XMConnection & conn,
+  XMMediaStream(XMConnection & connection,
                 const OpalMediaFormat & mediaFormat,
                 unsigned sessionID,
                 bool isSource);
@@ -47,6 +49,10 @@ public:
   //virtual bool ExecuteCommand(const OpalMediaCommand & command, bool isEndOfChain = false);
     
 private:
+    
+  unsigned GetKeyFrameInterval(XMCodecIdentifier identifier);
+  
+  XMConnection & connection;
   RTP_DataFrame dataFrame;
   bool hasStarted;
   bool isTerminated;
