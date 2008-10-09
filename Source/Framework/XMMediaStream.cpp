@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.17 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.18 2008/10/09 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -136,6 +136,15 @@ bool XMMediaStream::WritePacket(RTP_DataFrame & packet)
   return false;
 }
 
+bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command)
+{
+  if(PIsDescendant(&command, OpalVideoUpdatePicture)) {
+    _XMUpdatePicture();
+   // return true;
+  }
+  return OpalMediaStream::ExecuteCommand(command);
+}
+
 void XMMediaStream::SetTimeStamp(unsigned mediaID, unsigned timeStamp)
 {
   if (videoTransmitterStream == NULL) {
@@ -212,17 +221,4 @@ unsigned XMMediaStream::GetKeyFrameInterval(XMCodecIdentifier codecIdentifier)
       return 0;
   }
 }
-
-
-/*bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command,
-                                   bool isEndOfChain)
-{
-    if(isEndOfChain == true) {
-        if(PIsDescendant(&command, OpalVideoUpdatePicture)) {
-            _XMUpdatePicture();
-        }
-        return true;
-    }
-    return OpalMediaStream::ExecuteCommand(command/*, isEndOfChain);
-}*/
                                            

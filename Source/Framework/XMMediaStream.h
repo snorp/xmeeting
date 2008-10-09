@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.h,v 1.11 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMMediaStream.h,v 1.12 2008/10/09 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,14 +39,14 @@ public:
   virtual bool WritePacket(RTP_DataFrame & packet);
   virtual bool IsSynchronous() const { return false; }
   virtual bool RequiresPatchThread() const { return false; }
+  
+  virtual bool ExecuteCommand(const OpalMediaCommand & command);
     
   // packetizer methods
   static void SetTimeStamp(unsigned mediaID, unsigned timeStamp);
   static void AppendData(unsigned mediaID, void *data, unsigned lenght);
   static void SendPacket(unsigned mediaID, bool setMarker);
   static void HandleDidStopTransmitting(unsigned mediaID);
-    
-  //virtual bool ExecuteCommand(const OpalMediaCommand & command, bool isEndOfChain = false);
     
 private:
     

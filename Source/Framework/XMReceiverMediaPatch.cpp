@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.34 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.35 2008/10/09 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,6 +40,12 @@ void XMReceiverMediaPatch::Start()
   XMAudioTester::Stop();
 	
   OpalMediaPatch::Start();
+}
+
+void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & notifier, bool fromSink)
+{
+  commandNotifier = notifier;
+  OpalMediaPatch::SetCommandNotifier(notifier, fromSink);
 }
 
 void XMReceiverMediaPatch::Main()
@@ -379,11 +385,9 @@ void XMReceiverMediaPatch::Main()
 
 void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
 {
-  if (sinks.GetSize() == 0) {
-    return;
-  }
-    
   OpalVideoUpdatePicture command = OpalVideoUpdatePicture(-1, -1, -1);
     
-  sinks[0].stream->ExecuteCommand(command);
+  if (!commandNotifier.IsNULL()) {
+    commandNotifier(command, 0);
+  }
 }

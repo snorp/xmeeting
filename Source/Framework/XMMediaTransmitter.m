@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.60 2008/10/08 23:55:32 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.61 2008/10/09 21:22:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1594,7 +1594,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 {
   if (compressionSession != NULL) {
     OSErr err = noErr;
-		
+    
     err = ICMCompressionFrameOptionsSetForceKeyFrame(compressionFrameOptions, needsPictureUpdate);
     if (err != noErr) {
       NSLog(@"ICMCompressionFrameOptionsSetForceKeyFrame failed %d", (int)err);
