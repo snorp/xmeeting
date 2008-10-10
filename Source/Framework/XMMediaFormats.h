@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.26 2008/10/10 08:14:47 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.27 2008/10/10 11:25:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -140,57 +140,7 @@ public:
   virtual bool OnSendingPDU(H245_VideoCapability & pdu) const;
   virtual bool OnSendingPDU(H245_VideoMode & pdu) const;
   virtual bool OnReceivedPDU(const H245_VideoCapability & pdu);
-	
-  //virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
-  //virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
-	
-  unsigned GetProfile() const;
-  unsigned GetLevel() const;
-	
-private:
-        
-  void SetProfile(WORD profile);
-  void SetLevel(unsigned level);
-  void SetPacketizationMode(unsigned packetizationMode);
-	
-  unsigned maxBitRate;
-  WORD profile;
-  unsigned level;
-  unsigned packetizationMode;
-  bool h264LimitedMode;
 };
-
-#pragma mark -
-#pragma mark SDP Capabilities
-
-/*class XM_SDP_H261_Capability : public SDPCapability
-{
-    PCLASSINFO(XM_SDP_H261_Capability, SDPCapability);
-    
-public:
-    
-    virtual bool OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
-    virtual bool OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
-                               const SDPMediaDescription & mediaDescription,
-                               const SDPSessionDescription & sessionDescription);
-};
-
-class XM_SDP_H263_Capability : public SDPCapability
-{
-    PCLASSINFO(XM_SDP_H263_Capability, SDPCapability);
-    
-public:
-    
-    virtual bool OnSendingSDP(SDPMediaFormat & sdpMediaFormat) const;
-    virtual bool OnReceivedSDP(const SDPMediaFormat & sdpMediaFormat,
-                               const SDPMediaDescription & mediaDescription,
-                               const SDPSessionDescription & sessionDescription);
-};
-
-class XM_SDP_H263PLUS_Capability : public XM_SDP_H263_Capability
-{
-    PCLASSINFO(XM_SDP_H263PLUS_Capability, XM_SDP_H263_Capability);
-};*/
 
 #pragma mark -
 #pragma mark Packetization and Codec Option Functions
@@ -201,10 +151,10 @@ unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile);
 unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level);
-unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat);
+/*unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat);
 void _XMSetH264PacketizationMode(OpalMediaFormat & mediaFormat, unsigned packetizationMode);
 bool _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat);
-void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264LimitedMode);
+void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264LimitedMode);*/
 
 #pragma mark -
 #pragma mark Macros
@@ -213,5 +163,7 @@ void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264L
   H323_REGISTER_CAPABILITY(XM_H323_H261_Capability, XMGetMediaFormat_H261().GetName()); \
   H323_REGISTER_CAPABILITY(XM_H323_H263_Capability, XMGetMediaFormat_H263().GetName()); \
   H323_REGISTER_CAPABILITY(XM_H323_H263PLUS_Capability, XMGetMediaFormat_H263Plus().GetName()); \
+  H323_REGISTER_CAPABILITY(XM_H323_H264_Capability, XMGetMediaFormat_H264().GetName()); \
+
 
 #endif // __XM_MEDIA_FORMATS_H__

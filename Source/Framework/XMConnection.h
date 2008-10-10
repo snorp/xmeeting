@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.18 2008/10/10 07:32:15 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.19 2008/10/10 11:25:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,7 +51,7 @@ private:
   OpalVideoFormat h261VideoFormat;
   OpalVideoFormat h263VideoFormat;
   OpalVideoFormat h263PlusVideoFormat;
-  //OpalVideoFormat h264VideoFormat;
+  OpalVideoFormat h264VideoFormat;
 };
 
 #endif // __XM_CONNECTION_H__

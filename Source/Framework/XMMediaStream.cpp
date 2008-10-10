@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.18 2008/10/09 21:22:04 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.19 2008/10/10 11:25:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -82,15 +82,15 @@ void XMMediaStream::OnPatchStart()
         cout << "Sending RFC2429" << endl;
       }
     } else if(codecIdentifier == XMCodecIdentifier_H264) {
-      if(_XMGetH264PacketizationMode(mediaFormat) == XM_H264_PACKETIZATION_MODE_SINGLE_NAL) {
+      //if(_XMGetH264PacketizationMode(mediaFormat) == XM_H264_PACKETIZATION_MODE_SINGLE_NAL) {
         // We send only at a limited bitrate to avoid too many
         // NAL units which are TOO big to fit
         if(bitrate > 320000) {
           bitrate = 320000;
         }
-      }
-        
-      flags = (_XMGetH264PacketizationMode(mediaFormat) << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
+      //}
+      // TODO: FIXME
+      flags = (XM_H264_PACKETIZATION_MODE_SINGLE_NAL << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
     }
         
     videoTransmitterStream = this;
