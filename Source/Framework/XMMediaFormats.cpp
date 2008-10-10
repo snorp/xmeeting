@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.35 2008/10/10 07:32:15 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.36 2008/10/10 08:14:47 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -126,10 +126,12 @@ XMMediaFormat_H263::XMMediaFormat_H263(bool isH263Plus)
   AddOption(new OpalMediaOptionUnsigned(CIF16Option(),     false, OpalMediaOption::MaxMerge, 0, 0, 30));
   AddOption(new OpalMediaOptionBoolean(CanRFC2429Option(), false, OpalMediaOption::MinMerge, false));
   AddOption(new OpalMediaOptionBoolean(IsRFC2429Option(),  false, OpalMediaOption::MinMerge, false));
+  AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "RFC2190"));
   
   if (isH263Plus) {
     SetOptionBoolean(CanRFC2429Option(), true);
     SetOptionBoolean(IsRFC2429Option(), true);
+    SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "RFC2429");
   }
 }
 
@@ -612,110 +614,6 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
 	return true;
 }
-
-/*void XM_H323_H263_Capability::OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const
-{
-	if (isH263PlusCapability)
-	{
-		// Enter RFC2429 media packetization information
-		bool alreadyPresent = false;
-		if (mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
-		{
-			alreadyPresent = true;
-		}
-		else
-		{
-			mediaPacketizationCapability.IncludeOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType);
-		}
-		
-		H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
-		
-		PINDEX index = 0;
-		if (alreadyPresent == true)
-		{
-			index = arrayOfRTPPayloadType.GetSize();
-			arrayOfRTPPayloadType.SetSize(index + 1);
-		}
-		else
-		{
-			arrayOfRTPPayloadType.SetSize(1);
-		}
-		
-		H245_RTPPayloadType & h263PayloadType = arrayOfRTPPayloadType[index];
-		H245_RTPPayloadType_payloadDescriptor & h263Descriptor = h263PayloadType.m_payloadDescriptor;
-		h263Descriptor.SetTag(H245_RTPPayloadType_payloadDescriptor::e_rfc_number);
-		PASN_Integer & h263Integer = (PASN_Integer &)h263Descriptor;
-		h263Integer.SetValue(2429);
-	}
-}
-
-void XM_H323_H263_Capability::OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability)
-{
-    if (mediaPacketizationCapability.HasOptionalField(H245_MediaPacketizationCapability::e_rtpPayloadType))
-    {
-        const H245_ArrayOf_RTPPayloadType & arrayOfRTPPayloadType = mediaPacketizationCapability.m_rtpPayloadType;
-        
-        for (PINDEX i = 0; i < arrayOfRTPPayloadType.GetSize(); i++) {
-            const H245_RTPPayloadType & payloadType = arrayOfRTPPayloadType[i];
-            const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = payloadType.m_payloadDescriptor;
-            if (payloadDescriptor.GetTag() == H245_RTPPayloadType_payloadDescriptor::e_rfc_number);
-            {
-                const PASN_Integer & integer = payloadDescriptor;
-                if (integer.GetValue() == 2429) {
-                    SetCanRFC2429(true);
-                    return;
-                }
-            }
-        }
-    }
-}
-
-void XM_H323_H263_Capability::OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const
-{	
-	if (isH263PlusCapability)
-	{
-		mediaPacketization.SetTag(H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType);
-		
-		H245_RTPPayloadType & rtpPayloadType = mediaPacketization;
-		
-		H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = rtpPayloadType.m_payloadDescriptor;
-		
-		payloadDescriptor.SetTag(H245_RTPPayloadType_payloadDescriptor::e_rfc_number);
-		PASN_Integer & rfcValue = payloadDescriptor;
-		rfcValue.SetValue(2429);
-		
-		rtpPayloadType.IncludeOptionalField(H245_RTPPayloadType::e_payloadType);
-		rtpPayloadType.m_payloadType = GetPayloadType();
-	}
-}
-
-void XM_H323_H263_Capability::OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization)
-{		
-	if (mediaPacketization.GetTag() != H245_H2250LogicalChannelParameters_mediaPacketization::e_rtpPayloadType)
-	{
-		return;
-	}
-	
-	const H245_RTPPayloadType & rtpPayloadType = mediaPacketization;
-	const H245_RTPPayloadType_payloadDescriptor & payloadDescriptor = rtpPayloadType.m_payloadDescriptor;
-	
-	if (payloadDescriptor.GetTag() != H245_RTPPayloadType_payloadDescriptor::e_rfc_number)
-	{
-		return;
-	}
-	
-	const PASN_Integer & rfcValue = payloadDescriptor;
-	
-	if (rfcValue.GetValue() == 2429)
-	{
-        SetIsRFC2429(true);
-	}
-    
-    if (rtpPayloadType.HasOptionalField(H245_RTPPayloadType::e_payloadType)) {
-        unsigned payloadType = rtpPayloadType.m_payloadType;
-        SetPayloadType((RTP_DataFrame::PayloadTypes)payloadType);
-    }
-}*/
 
 #pragma mark -
 #pragma mark XM_H323_H263PLUS_Capability Methods
