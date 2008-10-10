@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.78 2008/10/10 07:32:15 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.79 2008/10/10 09:00:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,8 +73,7 @@ void XMOpalManager::CloseOpal()
 XMOpalManager::XMOpalManager(bool _logCallStatistics)
 : bandwidthLimit(XM_MAX_BANDWIDTH),
   logCallStatistics(_logCallStatistics),
-  defaultAudioPacketTime(0),
-  currentAudioPacketTime(0),
+  audioPacketTime(0),
   enableH264LimitedMode(false),
   callEndReason(XMCallEndReasonCount)
 {	
@@ -399,9 +398,6 @@ void XMOpalManager::OnReleased(OpalConnection & connection)
 	
     // Notify the framework that the call has ended
     _XMHandleCallCleared(callToken, endReason);
-    
-    // reset some per-call variables
-    currentAudioPacketTime = 0;
 	
   } else {
 	
@@ -635,32 +631,6 @@ bool XMOpalManager::HasNetworkInterfaces() const
 }
 
 #pragma mark -
-#pragma mark Audio Setup Methods
-
-void XMOpalManager::SetAudioPacketTime(unsigned audioPacketTime)
-{
-  defaultAudioPacketTime = audioPacketTime;
-}
-
-void XMOpalManager::SetCurrentAudioPacketTime(unsigned audioPacketTime)
-{
-  currentAudioPacketTime = audioPacketTime;
-}
-
-unsigned XMOpalManager::GetCurrentAudioPacketTime()
-{
-  if (currentAudioPacketTime != 0) // remote party signaled special value
-  {
-	return currentAudioPacketTime;
-  }
-  if (defaultAudioPacketTime != 0) // user defined special value
-  {
-	return defaultAudioPacketTime;
-  }
-  return 0; // use default value
-}
-
-#pragma mark -
 #pragma mark UserInput methods
 
 bool XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
@@ -691,6 +661,22 @@ bool XMOpalManager::SetUserInputMode(XMUserInputMode userInputMode)
   GetCallEndPoint()->SetSendUserInputMode(mode);
   
   return true;
+}
+
+void XMOpalManager::AdjustMediaFormats(const OpalConnection & conn,
+                                       OpalMediaFormatList & mediaFormats) const
+{
+  OpalManager::AdjustMediaFormats(conn, mediaFormats);
+  
+  // adjust the TX Frames Per Packet option if the user specified a custom value
+  if (audioPacketTime != 0) {
+    for (PINDEX i = 0; i < mediaFormats.GetSize(); i++) {
+      OpalMediaFormat & mediaFormat = mediaFormats[i];
+      if (mediaFormat.HasOption(OpalAudioFormat::TxFramesPerPacketOption())) {
+        mediaFormat.SetOptionInteger(OpalAudioFormat::TxFramesPerPacketOption(), audioPacketTime);
+      }
+    }
+  }
 }
 
 #pragma mark -

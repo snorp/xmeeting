@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.47 2008/10/10 07:32:15 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.48 2008/10/10 09:00:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -73,9 +73,7 @@ public:
   unsigned GetVideoBandwidthLimit() const { return bandwidthLimit - 64000; }
 	
   /* Audio setup methods */
-  void SetAudioPacketTime(unsigned audioPacketTime);
-  void SetCurrentAudioPacketTime(unsigned audioPacketTime);
-  unsigned GetCurrentAudioPacketTime();
+  void SetAudioPacketTime(unsigned _audioPacketTime) { audioPacketTime = _audioPacketTime; }
     
   /* H.264 methods */
   bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
@@ -91,12 +89,13 @@ public:
   static unsigned GetH261BandwidthLimit();
   static unsigned GetH263BandwidthLimit();
   static unsigned GetH264BandwidthLimit();
+  
+  virtual void AdjustMediaFormats(const OpalConnection & connection, OpalMediaFormatList & mediaFormats) const;
 	
 private:
   void UpdateNetworkInterfaces();
   void SetupNATTraversal();
-  void HandleSTUNInformation(PSTUNClient::NatTypes natType,
-                               const PString & publicAddress);
+  void HandleSTUNInformation(PSTUNClient::NatTypes natType, const PString & publicAddress);
   bool HasNetworkInterfaces() const;
   void ExtractLocalAddress(const PString & callToken, OpalConnection * connection);
   
@@ -142,9 +141,7 @@ private:
   PMutex natMutex;
   
   unsigned bandwidthLimit;
-	
-  unsigned defaultAudioPacketTime;
-  unsigned currentAudioPacketTime;
+  unsigned audioPacketTime;
   
   bool enableH264LimitedMode;
 	
