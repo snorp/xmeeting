@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.25 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.26 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,12 +32,6 @@ public:
   ~XMH323Connection();
 	
   virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
-
-  virtual void SelectDefaultLogicalChannel(const OpalMediaType & mediaType);
-	
-  virtual bool OpenLogicalChannel(const H323Capability & capability,
-                                  unsigned sessionID,
-                                  H323Channel::Directions dir);
     
   virtual H323_RTPChannel * CreateRTPChannel(const H323Capability & capability,
                                              H323Channel::Directions dir,

@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.77 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.78 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -100,9 +100,6 @@ XMOpalManager::XMOpalManager(bool _logCallStatistics)
   stun = new XMSTUNClient();
   interfaceMonitor = new XMInterfaceMonitor(*this);
   interfaceUpdateThread = NULL;
-  
-  // ensure all video media formats are loaded
-  XMGetMediaFormat_H261();
 }
 
 XMOpalManager::~XMOpalManager()
@@ -661,24 +658,6 @@ unsigned XMOpalManager::GetCurrentAudioPacketTime()
 	return defaultAudioPacketTime;
   }
   return 0; // use default value
-}
-
-#pragma mark -
-#pragma mark Information about current Calls
-
-bool XMOpalManager::IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const
-{
-  /*if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS)
-  {
-	// Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. Disable sending
-	// H.263 to this MGC for now.
-	/*if (remoteApplication.Find("ACCORD MGC") != P_MAX_INDEX)
-	{
-	  return false;
-	}
-  }
-  return true;*/
-    return true;
 }
 
 #pragma mark -

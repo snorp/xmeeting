@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.24 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.25 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -84,33 +84,9 @@ unsigned _XMGetMaxH264Bitrate();
 #pragma mark -
 #pragma mark H.323 Capabilities
 
-/**
- * This class adds some common functionality to the video capabilities
- * used within XMeeting.
- *
- * The IsValidCapabilityForSending() returns if the XMeeting system can
- * actually send the format that is advertised by the capability.
- * This is to handle some shortcomings in the QuickTime library.
- *
- * CompareTo() implements a different compare algorithm than the one
- * found in Compare(). The default Compare() must return EqualTo if
- * both capabilities define the same format and are compatible, or the
- * capability merge system of Opal will fail. However, CompareTo() is
- * used to rank similar capabilities in order to choose the best one.
- **/
-class XMH323VideoCapability : public H323VideoCapability
+class XM_H323_H261_Capability : public H323VideoCapability
 {
-  PCLASSINFO(XMH323VideoCapability, H323VideoCapability);
-	
-public:
-	
-  virtual bool IsValidCapabilityForSending() const = 0;
-  virtual Comparison CompareTo(const XMH323VideoCapability & obj) const = 0;
-};
-
-class XM_H323_H261_Capability : public XMH323VideoCapability
-{
-  PCLASSINFO(XM_H323_H261_Capability, XMH323VideoCapability);
+  PCLASSINFO(XM_H323_H261_Capability, H323VideoCapability);
 	
 public:
   XM_H323_H261_Capability();
@@ -121,18 +97,15 @@ public:
   virtual bool OnSendingPDU(H245_VideoCapability & pdu) const;
   virtual bool OnSendingPDU(H245_VideoMode & pdu) const;
   virtual bool OnReceivedPDU(const H245_VideoCapability & pdu);
-	
-  virtual bool IsValidCapabilityForSending() const;
-  virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
 };
 
-class XM_H323_H263_Capability : public XMH323VideoCapability
+class XM_H323_H263_Capability : public H323VideoCapability
 {
-  PCLASSINFO(XM_H323_H263_Capability, XMH323VideoCapability);
+  PCLASSINFO(XM_H323_H263_Capability, H323VideoCapability);
 	
 public:
   XM_H323_H263_Capability();
-  XM_H323_H263_Capability(bool isH263PlusCapability);
+  XM_H323_H263_Capability(bool isH263Plus);
   virtual PObject * Clone() const;
   virtual Comparison Compare(const PObject & obj) const;
   virtual unsigned GetSubType() const;
@@ -145,38 +118,9 @@ public:
     //virtual bool HasMediaPacketizationParameters() const { return IsH263PlusCapability(); }
 	//virtual void OnSendingPDU(H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization) const;
 	//virtual void OnReceivedPDU(const H245_H2250LogicalChannelParameters_mediaPacketization & mediaPacketization);
-	
-  virtual bool IsValidCapabilityForSending() const;
-  virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
-    
-  virtual void UpdateFormat(const OpalMediaFormat & mediaFormat);
-	
-  bool IsH263PlusCapability() const { return isH263PlusCapability; }
-  bool CanRFC2429() const { return canRFC2429; }
-  bool IsRFC2429() const { return isRFC2429; }
-	
-private :
-        
-  void SetCanRFC2429(bool canRFC2429);
-  void SetIsRFC2429(bool isRFC2429);
-    
-  unsigned sqcifMPI;
-  unsigned qcifMPI;
-  unsigned cifMPI;
-  unsigned cif4MPI;
-  unsigned cif16MPI;
-	
-  unsigned maxBitRate;
-	
-  unsigned slowSqcifMPI;
-  unsigned slowQcifMPI;
-  unsigned slowCifMPI;
-  unsigned slowCif4MPI;
-  unsigned slowCif16MPI;
-	
+  
+private:
   bool isH263PlusCapability;
-  bool canRFC2429;
-  bool isRFC2429;
 };
 
 class XM_H323_H263PLUS_Capability : public XM_H323_H263_Capability
@@ -188,9 +132,9 @@ public:
   XM_H323_H263PLUS_Capability();
 };
 
-class XM_H323_H264_Capability : public XMH323VideoCapability
+class XM_H323_H264_Capability : public H323VideoCapability
 {
-  PCLASSINFO(XM_H323_H264_Capability, XMH323VideoCapability);
+  PCLASSINFO(XM_H323_H264_Capability, H323VideoCapability);
 	
 public:
   XM_H323_H264_Capability();
@@ -204,11 +148,6 @@ public:
 	
   //virtual void OnSendingPDU(H245_MediaPacketizationCapability & mediaPacketizationCapability) const;
   //virtual void OnReceivedPDU(const H245_MediaPacketizationCapability & mediaPacketizationCapability);
-	
-  virtual bool IsValidCapabilityForSending() const;
-  virtual Comparison CompareTo(const XMH323VideoCapability & obj) const;
-    
-  virtual void UpdateFormat(const OpalMediaFormat & mediaFormat);
 	
   unsigned GetProfile() const;
   unsigned GetLevel() const;
@@ -261,10 +200,7 @@ class XM_SDP_H263PLUS_Capability : public XM_SDP_H263_Capability
 #pragma mark -
 #pragma mark Packetization and Codec Option Functions
 
-bool _XMGetCanRFC2429(const OpalMediaFormat & mediaFormat);
-void _XMSetCanRFC2429(OpalMediaFormat & mediaFormat, bool canRFC2429);
 bool _XMGetIsRFC2429(const OpalMediaFormat & mediaFormat);
-void _XMSetIsRFC2429(OpalMediaFormat & mediaFormat, bool isRFC2429);
 
 unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile);
@@ -280,11 +216,7 @@ void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264L
 
 #define XM_REGISTER_FORMATS() \
   H323_REGISTER_CAPABILITY(XM_H323_H261_Capability, XMGetMediaFormat_H261().GetName()); \
-  //static H323CapabilityFactory::Worker<XM_H323_H263_Capability> h263Factory(XM_MEDIA_FORMAT_H263, true); \
-  //static H323CapabilityFactory::Worker<XM_H323_H263PLUS_Capability> h263PlusFactory(XM_MEDIA_FORMAT_H263PLUS, true); \
-  //static H323CapabilityFactory::Worker<XM_H323_H264_Capability> h264Factory(XM_MEDIA_FORMAT_H264, true); \
-  //SDP_REGISTER_CAPABILITY(XM_SDP_H261_Capability, XM_MEDIA_FORMAT_H261); \
-  //SDP_REGISTER_CAPABILITY(XM_SDP_H263_Capability, XM_MEDIA_FORMAT_H263); \
-  //SDP_REGISTER_CAPABILITY(XM_SDP_H263PLUS_Capability, XM_MEDIA_FORMAT_H263PLUS); \
+  H323_REGISTER_CAPABILITY(XM_H323_H263_Capability, XMGetMediaFormat_H263().GetName()); \
+  H323_REGISTER_CAPABILITY(XM_H323_H263PLUS_Capability, XMGetMediaFormat_H263Plus().GetName()); \
 
 #endif // __XM_MEDIA_FORMATS_H__

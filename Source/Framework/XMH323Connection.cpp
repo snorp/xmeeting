@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.39 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.40 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,80 +53,6 @@ void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
       audioCap.SetTxFramesInPacket(30);
     }
   }*/
-}
-
-void XMH323Connection::SelectDefaultLogicalChannel(const OpalMediaType & mediaType)
-{
-	// overridden to achieve better capability select behaviour for the video capabilities
-	
-	/*if(mediaType != OpalDefaultVideoMediaType)
-	{
-        // Use default capability selection
-		H323Connection::SelectDefaultLogicalChannel(mediaType);
-		return;
-	}*/
-	
-	/*if(FindChannel(mediaType, false))
-	{
-        // There exists already a channel for this media type
-		return;
-	}*/
-    
-    // Go through the list of local capabilities and search for matching remote capabilities.
-    // Among these, pick the one that is ranked highest according to the CompareTo() implementation
-	/*for(unsigned i = 0; i < localCapabilities.GetSize(); i++)
-	{
-		H323Capability & localCapability = localCapabilities[i];
-        if(PIsDescendant(&localCapability, XMH323VideoCapability)) // Should always be true
-        {
-            XMH323VideoCapability & localVideoCapability = (XMH323VideoCapability &)localCapability;
-            XMH323VideoCapability *chosenCapability = NULL;
-            for(unsigned j = 0; j < remoteCapabilities.GetSize(); j++)
-            {
-                H323Capability & remoteCapability = remoteCapabilities[j];
-                // The two capabilities must be equal (Compare() must return EqualTo)
-                // However, The two H.263 capabilities don't return EqualTo when comparing to a H.263 capability
-                // of the other flavour. Else, merging of capabilities might not work correctly.
-                // To correctly handle all kinds of remote capability sets, they are still treated as compatible
-                // capabilities
-                if(localVideoCapability == remoteCapability || 
-                    (PIsDescendant(&localVideoCapability, XM_H323_H263_Capability) && PIsDescendant(&remoteCapability, XM_H323_H263_Capability)))
-                {
-                    // Pick the "highest" available capability
-                    XMH323VideoCapability & remoteVideoCapability = (XMH323VideoCapability &)remoteCapability;
-                    if(chosenCapability == NULL ||
-                       remoteVideoCapability.CompareTo(*chosenCapability) == PObject::GreaterThan)
-                    {
-                        chosenCapability = &remoteVideoCapability;
-                    }
-                }
-            }
-        
-            // Try to open a channel for the capability. If successful, we're done
-            //unsigned sessionID = GetRTPSessionIDForMediaType(mediaType);
-            unsigned sessionID = 0;
-            if(chosenCapability != NULL && OpenLogicalChannel(*chosenCapability, sessionID, H323Channel::IsTransmitter))
-            {
-                break;
-            }
-        }
-	}*/
-}
-
-bool XMH323Connection::OpenLogicalChannel(const H323Capability & capability,
-                                          unsigned sessionID,
-                                          H323Channel::Directions dir)
-{
-  // Override default behaviour to add additional checks if the format is valid for
-  // sending. Both the capability and the manager have to agree that it is possible
-  // to send the media format described in the capability.
-  if(PIsDescendant(&capability, XMH323VideoCapability)) {
-    XMH323VideoCapability & videoCapability = (XMH323VideoCapability &)capability;
-    if (!videoCapability.IsValidCapabilityForSending() || !XMOpalManager::GetManager()->IsValidFormatForSending(videoCapability.GetMediaFormat())) {
-      return false;
-    }
-  }
-  return H323Connection::OpenLogicalChannel(capability, sessionID, dir);
 }
 
 H323_RTPChannel * XMH323Connection::CreateRTPChannel(const H323Capability & capability,

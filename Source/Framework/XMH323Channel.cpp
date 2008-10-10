@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Channel.cpp,v 1.9 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMH323Channel.cpp,v 1.10 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,7 +32,7 @@ XMH323Channel::XMH323Channel(H323Connection & connection,
 
 void XMH323Channel::OnFlowControl(long bitRateRestriction)
 {
-  if(PIsDescendant(capability, XMH323VideoCapability)) {
+  if(PIsDescendant(capability, H323VideoCapability)) {
     unsigned requestedLimit = bitRateRestriction*100;
     long videoBandwidthLimit = XMOpalManager::GetManager()->GetVideoBandwidthLimit();
     if(requestedLimit > videoBandwidthLimit) {

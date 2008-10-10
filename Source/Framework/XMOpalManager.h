@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.46 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.47 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -80,9 +80,6 @@ public:
   /* H.264 methods */
   bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
   void SetEnableH264LimitedMode(bool _enable) { enableH264LimitedMode = _enable; }
-	
-  /* getting /setting information about current call */
-  bool IsValidFormatForSending(const OpalMediaFormat & mediaFormat) const;
 	
   /* User input mode information */
   bool SetUserInputMode(XMUserInputMode userInputMode);

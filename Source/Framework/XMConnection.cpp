@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.32 2008/10/09 20:18:21 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.33 2008/10/10 07:32:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -33,9 +33,9 @@ private:
 XMConnection::XMConnection(OpalCall & call, XMEndPoint & _endpoint)
 : OpalLocalConnection(call, _endpoint, NULL),
   endpoint(_endpoint),
-  h261VideoFormat(XM_MEDIA_FORMAT_H261)
-  //h263VideoFormat(XM_MEDIA_FORMAT_H263),
-  //h263PlusVideoFormat(XM_MEDIA_FORMAT_H263PLUS),
+  h261VideoFormat(XM_MEDIA_FORMAT_H261),
+  h263VideoFormat(XM_MEDIA_FORMAT_H263),
+  h263PlusVideoFormat(XM_MEDIA_FORMAT_H263PLUS)
   //h264VideoFormat(XM_MEDIA_FORMAT_H264)
 {
   if (endpoint.GetEnableSilenceSuppression()) {
@@ -51,12 +51,11 @@ XMConnection::XMConnection(OpalCall & call, XMEndPoint & _endpoint)
     
   h224Handler = NULL;
   h281Handler = NULL;
-    
-  // Update the video media format options.
-  // At the moment, only bandwidth is actively propagated
+  
+  // update the bandwidth information
   h261VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH261BandwidthLimit());
-  //h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH263BandwidthLimit());
-  //h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH263BandwidthLimit());
+  h263VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH263BandwidthLimit());
+  h263PlusVideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH263BandwidthLimit());
   //h264VideoFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), XMOpalManager::GetH264BandwidthLimit());
   //_XMSetEnableH264LimitedMode(h264VideoFormat, XMOpalManager::GetManager()->GetEnableH264LimitedMode());
 }
@@ -93,14 +92,27 @@ void XMConnection::Release(OpalConnection::CallEndReason callEndReason) {
 
 OpalMediaFormatList XMConnection::GetMediaFormats() const
 {
+  // Polycom MGC (Accord MGC) has problems decoding QuickTime H.263. Disable sending H.263 to this MGC for now.
+  bool excludeH263 = false;
+  PSafePtr<OpalConnection> otherConnection = GetOtherPartyConnection();
+  if (otherConnection != NULL) {
+    const OpalProductInfo & info = otherConnection->GetRemoteProductInfo();
+    if (info.name.Find("ACCORD MGC") != P_MAX_INDEX) {
+      excludeH263 = true;
+    }
+  }
+  
 	OpalMediaFormatList mediaFormats;
 	
 	mediaFormats += OpalPCM16;
 	
   if (enableVideo == true) {
     mediaFormats += h261VideoFormat;
-    //mediaFormats += XM_MEDIA_FORMAT_H263;
-    //mediaFormats += XM_MEDIA_FORMAT_H263PLUS;
+    
+    if (!excludeH263) {
+      mediaFormats += h263VideoFormat;
+      mediaFormats += h263PlusVideoFormat;
+    }
     //mediaFormats += XM_MEDIA_FORMAT_H264;
   }
 	
