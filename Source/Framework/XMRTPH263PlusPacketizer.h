@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH263PlusPacketizer.h,v 1.1 2006/05/02 06:55:59 hfriederich Exp $
+ * $Id: XMRTPH263PlusPacketizer.h,v 1.2 2008/10/11 19:03:25 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -18,7 +18,7 @@
 #define kXMRTPH263PlusPacketizerType '+263'
 
 /**
- * Registering the XMRTPH263Packetizer QuickTime Component
+ * Registering the XMRTPH263PlusPacketizer QuickTime Component
  * so that it can be used when needed.
  **/
 Boolean XMRegisterRTPH263PlusPacketizer();
