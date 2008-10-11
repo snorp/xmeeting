@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.61 2008/10/09 21:22:04 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.62 2008/10/11 17:57:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1483,10 +1483,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
   if (codecType == FOUR_CHAR_CODE('avc1') && isTransmitting == YES) {
     // Profile is currently fixed to Baseline
-    // The level is adjusted by the use of the
-    // bitrate, but the SPS returned reveals
-    // level 1.1 in case of QCIF and level 1.3
-    // in case of CIF
+    // The level is adjusted by the use of the bitrate, but the SPS returned reveals
+    // level 1.1 in case of QCIF and level 1.3 in case of CIF
 		
     Handle h264Settings = NewHandleClear(0);
 		
@@ -1501,6 +1499,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
     unsigned settingsSize = GetHandleSize(h264Settings) / 4;
     UInt32 *data = (UInt32 *)*h264Settings;
     for (unsigned i = 0; i < settingsSize; i++) {
+      
 			// Forcing Baseline profile
 #if defined(__BIG_ENDIAN__)
       if (data[i] == FOUR_CHAR_CODE('sprf')) {

@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.35 2008/10/09 21:22:04 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.36 2008/10/11 17:57:02 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -159,6 +159,8 @@ void XMReceiverMediaPatch::Main()
     }
 		
     _XMStartMediaReceiving(sessionID, codecIdentifier);
+    
+    unsigned decodingFailures = 0; // tracks the # of successive failed frames
 		
 		// loop to receive packets and process them
 		do {
@@ -327,8 +329,14 @@ void XMReceiverMediaPatch::Main()
       }
 
       if (processingSuccessful == false) {
-        IssueVideoUpdatePictureCommand();
+        // avoid flooding the remote party with update commands
+        decodingFailures++;
+        if (decodingFailures < 3 || (decodingFailures % 10) == 0) {
+          IssueVideoUpdatePictureCommand();
+        }
         processingSuccessful = true;
+      } else {
+        decodingFailures = 0; // reset the failure counter
       }
 			
       // Of not all packets can be released, the remaining packets are
