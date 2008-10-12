@@ -1,19 +1,21 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.19 2008/10/10 11:25:21 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.20 2008/10/12 13:02:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
  */
 
+#include <ptclib/random.h>
+
+#include <codec/vidcodec.h>
+#include <opal/patch.h>
+
 #include "XMMediaStream.h"
 #include "XMOpalManager.h"
 #include "XMCallbackBridge.h"
 #include "XMConnection.h"
 #include "XMEndPoint.h"
-
-#include <codec/vidcodec.h>
-#include <opal/patch.h>
 
 #define XM_MAX_FPS 30
 
@@ -27,7 +29,8 @@ XMMediaStream::XMMediaStream(XMConnection & _connection,
   connection(_connection),
   dataFrame((isSource ? 3000 : 0)),
   hasStarted(false),
-  isTerminated(false)
+  isTerminated(false),
+  timeStampBase(PRandom::Number())
 {
 }
 
@@ -152,7 +155,7 @@ void XMMediaStream::SetTimeStamp(unsigned mediaID, unsigned timeStamp)
   }
     
   RTP_DataFrame & dataFrame = videoTransmitterStream->dataFrame;
-  dataFrame.SetTimestamp(timeStamp);
+  dataFrame.SetTimestamp(videoTransmitterStream->timeStampBase + timeStamp);
 }
 
 void XMMediaStream::AppendData(unsigned mediaID, void *data, unsigned length)

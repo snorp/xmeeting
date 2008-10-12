@@ -1,5 +1,5 @@
 /*
- * $Id: XMPacketBuilder.c,v 1.11 2008/10/08 21:20:50 hfriederich Exp $
+ * $Id: XMPacketBuilder.c,v 1.12 2008/10/12 13:02:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,7 @@
  */
 
 #include <QuickTime/QuickTime.h>
+
 #include "XMPacketBuilder.h"
 #include "XMBridge.h"
 
