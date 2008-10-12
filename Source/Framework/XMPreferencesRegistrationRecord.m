@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesRegistrationRecord.m,v 1.3 2008/08/29 11:32:29 hfriederich Exp $
+ * $Id: XMPreferencesRegistrationRecord.m,v 1.4 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -209,14 +209,6 @@
 	NSString *old = password;
 	password = [thePassword copy];
 	[old release];
-}
-
-- (NSString *)addressOfRecord
-{
-  if (aor == nil) {
-    aor = XMCreateAddressOfRecord(domain, username);
-  }
-  return aor;
 }
 
 @end

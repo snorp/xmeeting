@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.h,v 1.28 2008/08/29 11:32:29 hfriederich Exp $
+ * $Id: XMUtils.h,v 1.29 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -133,8 +133,7 @@ void XMLogMessage(NSString *message);
 
 /**
  * Constructs an address-of-record string based on host and username.
- * The caller must explicitly release the returned string.
  **/
-NSString *XMCreateAddressOfRecord(NSString *host, NSString *username);
+NSString *XMGetAddressOfRecord(NSString *domain, NSString *username);
 
 #endif // __XM_UTILS_H__

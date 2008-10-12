@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.79 2008/10/10 09:00:10 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.80 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -545,7 +545,11 @@ void XMOpalManager::SetNATInformation(const PStringArray & _stunServers,
 void XMOpalManager::UpdateNetworkInterfaces()
 {
   PWaitAndSignal m(natMutex);
+  GetH323EndPoint()->OnStartInterfaceListRefresh();
+  GetSIPEndPoint()->OnStartInterfaceListRefresh();
   PInterfaceMonitor::GetInstance().RefreshInterfaceList();
+  GetSIPEndPoint()->OnEndInterfaceListRefresh();
+  GetH323EndPoint()->OnEndInterfaceListRefresh();
 }
 
 void XMOpalManager::SetupNATTraversal()

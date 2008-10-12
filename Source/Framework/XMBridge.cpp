@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.cpp,v 1.62 2008/09/24 06:52:40 hfriederich Exp $
+ * $Id: XMBridge.cpp,v 1.63 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved
@@ -224,23 +224,28 @@ bool _XMSetSIPProxy(const char *host,
   return XMOpalManager::GetSIPEndPoint()->UseProxy(host, username, password);
 }
 
-void _XMPrepareRegistrationSetup(bool proxyChanged)
+void _XMPrepareSIPRegistrations(bool proxyChanged)
 {
-  XMOpalManager::GetSIPEndPoint()->PrepareRegistrationSetup(proxyChanged);
+  XMOpalManager::GetSIPEndPoint()->PrepareRegistrations(proxyChanged);
 }
 
-void _XMUseRegistration(const char *domain,
-                        const char *username,
-                        const char *authorizationUsername,
-                        const char *password,
-                        bool proxyChanged)
+void _XMUseSIPRegistration(const char *domain,
+                           const char *username,
+                           const char *authorizationUsername,
+                           const char *password,
+                           bool proxyChanged)
 {
   XMOpalManager::GetSIPEndPoint()->UseRegistration(domain, username, authorizationUsername, password, proxyChanged);
 }
 
-void _XMFinishRegistrationSetup(bool proxyChanged)
+void _XMFinishSIPRegistrations(bool proxyChanged)
 {
-  XMOpalManager::GetSIPEndPoint()->FinishRegistrationSetup(proxyChanged);
+  XMOpalManager::GetSIPEndPoint()->FinishRegistrations(proxyChanged);
+}
+
+void _XMRetryFailedSIPRegistrations()
+{
+  XMOpalManager::GetSIPEndPoint()->RetryFailedRegistrations();
 }
 
 bool _XMIsSIPRegistered()

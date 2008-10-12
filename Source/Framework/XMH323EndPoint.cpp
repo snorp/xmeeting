@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.42 2008/09/22 22:56:47 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.43 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -95,23 +95,23 @@ XMH323EndPoint::~XMH323EndPoint()
 
 bool XMH323EndPoint::EnableListeners(bool flag)
 {
-	bool result = true;
+  bool result = true;
 	
-	if (flag == true) {
-		if (isListening == false) {
-			result = StartListeners(GetDefaultListeners());
-			if (result == true) {
-				isListening = true;
-			}
-		}
-	} else {
-		if (isListening == true) {
-			RemoveListener(NULL);
-			isListening = false;
-		}
-	}
+  if (flag == true) {
+    if (isListening == false) {
+      result = StartListeners(GetDefaultListeners());
+      if (result == true) {
+        isListening = true;
+      }
+    }
+  } else {
+    if (isListening == true) {
+      RemoveListener(NULL);
+      isListening = false;
+    }
+  }
 	
-	return result;
+  return result;
 }
 
 void XMH323EndPoint::SetGatekeeper(const PString & address,

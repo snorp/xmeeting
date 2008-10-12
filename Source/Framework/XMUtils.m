@@ -1,5 +1,5 @@
 /*
- * $Id: XMUtils.m,v 1.29 2008/08/29 11:32:29 hfriederich Exp $
+ * $Id: XMUtils.m,v 1.30 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -571,28 +571,28 @@ void _XMDynamicStoreCallback(SCDynamicStoreRef dynamicStore, CFArrayRef changedK
   [_XMUtilsSharedInstance updateNetworkInformation];
 }
 
-NSString *XMCreateAddressOfRecord(NSString *host, NSString *username)
+NSString *XMGetAddressOfRecord(NSString *domain, NSString *username)
 {
   if (username == nil) { // sanity check
     return nil;
   }
   unsigned atLocation = [username rangeOfString:@"@"].location;
   
-  if (atLocation == NSNotFound && host == nil) {
+  if (atLocation == NSNotFound && domain == nil) {
     return nil;
   }
   
   // Use same procedure as the AOR calculation in SIPEndPoint::GetAddressOfRecord()
   NSMutableString *str = [[NSMutableString alloc] init];
   [str appendString:username];
-  if (atLocation != NSNotFound && host != nil) {
+  if (atLocation != NSNotFound && domain != nil) {
     [str appendString:@";proxy="];
-    [str appendString:host];
+    [str appendString:domain];
   } else {
     [str appendString:@"@"];
-    [str appendString:host];
+    [str appendString:domain];
   }
   NSString *aor = [str copy];
   [str release];
-  return aor;
+  return [aor autorelease];
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.22 2008/10/02 07:50:22 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.23 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,7 +23,8 @@ class XMSIPRegistrationRecord : public PObject
   
 public:
   
-  XMSIPRegistrationRecord(const PString & addressOfRecord,
+  XMSIPRegistrationRecord(const PString & domain, 
+                          const PString & username,
                           const PString & authorizationUsername,
                           const PString & password);
   ~XMSIPRegistrationRecord();
@@ -36,19 +37,24 @@ public:
     ToRemove
   };
   
-  const PString & GetAddressOfRecord() const { return addressOfRecord; }
+  const PString & GetDomain() const { return domain; }
+  const PString & GetUsername() const { return username; }
   const PString & GetAuthorizationUsername() const { return authorizationUsername; }
   void SetAuthorizationUsername(const PString & _authorizationUsername) { authorizationUsername = _authorizationUsername; }
   const PString & GetPassword() const { return password; }
   void SetPassword(const PString & _password) { password = _password; }
+  const PString & GetAddressOfRecord() const { return addressOfRecord; }
+  void SetAddressOfRecord(const PString & _addressOfRecord) { addressOfRecord = _addressOfRecord; }
   Status GetStatus() const { return status; }
   void SetStatus(Status _status) { status = _status; }
   
 private:
     
-  PString addressOfRecord;
+  PString domain;
+  PString username;
   PString authorizationUsername;
   PString password;
+  PString addressOfRecord;
   Status status;
 };
 
@@ -63,25 +69,25 @@ public:
   // Protocol
   bool EnableListeners(bool enable);
   bool IsListening() const { return isListening; }
+  virtual PStringArray GetDefaultListeners() const;
   bool UseProxy(const PString & hostname,
                 const PString & username,
                 const PString & password);
   
   // Registrations
-  void PrepareRegistrationSetup(bool proxyChanged);
-  void UseRegistration(const PString & host,
+  void PrepareRegistrations(bool proxyChanged);
+  void UseRegistration(const PString & domain,
                        const PString & username,
                        const PString & authorizationUsername,
                        const PString & password,
                        bool proxyChanged);
-  void FinishRegistrationSetup(bool proxyChanged);
+  void FinishRegistrations(bool proxyChanged);
+  void RetryFailedRegistrations();
   virtual void OnRegistrationFailed(const PString & aor,
                                     SIP_PDU::StatusCodes reason,
                                     bool wasRegistering);
   virtual void OnRegistered(const PString & aor,
                             bool wasRegistering);
-  
-  void HandleNetworkStatusChange();
   
   virtual SIPConnection * CreateConnection(OpalCall & call,
                                            const PString & token,
@@ -94,25 +100,30 @@ public:
   
   virtual SIPURL GetDefaultRegisteredPartyName(const OpalTransport & transport);
   
+  // interface handling
+  void OnStartInterfaceListRefresh();
+  void OnEndInterfaceListRefresh();
+  
   // Called when framework is closing
   void CleanUp();
   void AddReleasingConnection(XMSIPConnection * connection);
   void RemoveReleasingConnection(XMSIPConnection * connection);
   
 private:
-  static PString GetAddressOfRecord(const PString & host, const PString & username);
+  static PString GetAddressOfRecord(const PString & domain, const PString & username);
+  void DoRegister(XMSIPRegistrationRecord & registrationRecord);
+  void RemoveRegisterHandler(XMSIPRegistrationRecord & record);
+                       
   void CheckRegistrationProcess();
   
 	bool isListening;
-  
-  PString connectionToken;
   
   PLIST(XMSIPRegistrationList, XMSIPRegistrationRecord);
   
   PMutex registrationListMutex;
   XMSIPRegistrationList activeRegistrations;
-  
-  PMutex transportMutex;
+  bool notifyRegistrationsFinished;
+  bool isRefreshingInterfaces;
   
   PList<XMSIPConnection> releasingConnections;
   PMutex releasingConnectionsMutex;

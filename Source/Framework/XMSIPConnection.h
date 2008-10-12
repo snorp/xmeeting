@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.16 2008/09/21 19:37:32 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.17 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,40 +17,41 @@
 
 class XMSIPConnection : public SIPConnection
 {
-	PCLASSINFO(XMSIPConnection, SIPConnection);
+  PCLASSINFO(XMSIPConnection, SIPConnection);
 	
 public:
 	
-	XMSIPConnection(OpalCall & call,
-					SIPEndPoint & endpoint,
-					const PString & token,
-					const SIPURL & address,
-					OpalTransport * transport,
-					unsigned int options = 0,
-                    OpalConnection::StringOptions * stringOptions = NULL);
+  XMSIPConnection(OpalCall & call,
+                  SIPEndPoint & endpoint,
+                  const PString & token,
+                  const SIPURL & address,
+                  OpalTransport * transport,
+                  unsigned int options = 0,
+                  OpalConnection::StringOptions * stringOptions = NULL);
 	
-	~XMSIPConnection();
+  ~XMSIPConnection();
 	
-	virtual void OnCreatingINVITE(SIP_PDU & invite);
+	//virtual void OnCreatingINVITE(SIP_PDU & invite);
     
-    virtual bool OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
+  /*virtual bool OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
                                            const OpalMediaType & mediaType,
-                                           SDPSessionDescription & sdpOut);
+                                           SDPSessionDescription & sdpOut);*/
 	
-	virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
-                                              bool isSource);
+	/*virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
+                                              bool isSource);*/
 	
-    // Propagate opening of media streams to the Obj-C world
-	virtual bool OnOpenMediaStream(OpalMediaStream & stream);
+  // Propagate opening/closing of media streams to the Obj-C world
+  virtual bool OnOpenMediaStream(OpalMediaStream & stream);
+  virtual void OnClosedMediaStream(const OpalMediaStream & stream);
 		
-    // Overridden to circumvent the default Opal bandwidth management
-	virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
-	virtual unsigned GetBandwidthUsed() const { return 0; }
-	virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
+  // Overridden to circumvent the default Opal bandwidth management
+  virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
+  virtual unsigned GetBandwidthUsed() const { return 0; }
+  virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
 	
-    // Overridden to being able to send in-band DTMF
-	virtual bool SendUserInputTone(char tone, unsigned duration);
-    virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
+  // Overridden to being able to send in-band DTMF
+  virtual bool SendUserInputTone(char tone, unsigned duration);
+  virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
     
   void CleanUp();
   virtual void OnReleased();
@@ -58,7 +59,7 @@ public:
 private:
 	
   unsigned initialBandwidth;
-	XMInBandDTMFHandler *inBandDTMFHandler;
+  XMInBandDTMFHandler *inBandDTMFHandler;
 };
 
 #endif // __XM_SIP_CONNECTION_H__

@@ -1,5 +1,5 @@
 /*
- * $Id: XMBridge.h,v 1.55 2008/09/24 06:52:40 hfriederich Exp $
+ * $Id: XMBridge.h,v 1.56 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,13 +180,14 @@ extern "C" {
                       const char *username,
                       const char *password);
   
-  void _XMPrepareRegistrationSetup(bool proxyChanged);
-  void _XMUseRegistration(const char *domain,
-                          const char *username,
-                          const char *authorizationUsername,
-                          const char *password,
-                          bool proxyChanged);
-  void _XMFinishRegistrationSetup(bool proxyChanged);
+  void _XMPrepareSIPRegistrations(bool proxyChanged);
+  void _XMUseSIPRegistration(const char *domain,
+                             const char *username,
+                             const char *authorizationUsername,
+                             const char *password,
+                             bool proxyChanged);
+  void _XMFinishSIPRegistrations(bool proxyChanged);
+  void _XMRetryFailedSIPRegistrations();
   
   bool _XMIsSIPRegistered();
   

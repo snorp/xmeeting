@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallbackBridge.m,v 1.38 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMCallbackBridge.m,v 1.39 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -363,12 +363,16 @@ void _XMHandleGatekeeperRegistrationComplete()
 #pragma mark -
 #pragma mark SIP specific Callbacks
 
-void _XMHandleSIPRegistration(const char *_aor)
+void _XMHandleSIPRegistration(const char *_domain, const char *_username, const char *_aor)
 {
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
     
+  NSString *domain = [[NSString alloc] initWithCString:_domain encoding:NSASCIIStringEncoding];
+  NSString *username = [[NSString alloc] initWithCString:_username encoding:NSASCIIStringEncoding];
   NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
-  [_XMOpalDispatcherSharedInstance _handleSIPRegistration:aor];
+  [_XMOpalDispatcherSharedInstance _handleSIPRegistrationForDomain:domain username:username aor:aor];
+  [domain release];
+  [username release];
   [aor release];
     
   [autoreleasePool release];
@@ -385,12 +389,18 @@ void _XMHandleSIPUnregistration(const char *_aor)
   [autoreleasePool release];
 }
 
-void _XMHandleSIPRegistrationFailure(const char *_aor, XMSIPStatusCode failReason)
+void _XMHandleSIPRegistrationFailure(const char *_domain, const char *_username,
+                                     const char *_aor, XMSIPStatusCode failReason)
 {
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
 	
+  NSString *domain = [[NSString alloc] initWithCString:_domain encoding:NSASCIIStringEncoding];
+  NSString *username = [[NSString alloc] initWithCString:_username encoding:NSASCIIStringEncoding];
   NSString *aor = [[NSString alloc] initWithCString:_aor encoding:NSASCIIStringEncoding];
-  [_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailure:aor failReason:failReason];
+  [_XMOpalDispatcherSharedInstance _handleSIPRegistrationFailureForDomain:domain username:username 
+                                                                      aor:aor failReason:failReason];
+  [domain release];
+  [username release];
   [aor release];
 	
   [autoreleasePool release];

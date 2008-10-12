@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.58 2008/09/24 06:52:40 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.59 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -855,8 +855,12 @@ enum {
   }
 }
 
-- (void)_handleSIPRegistration:(NSString *)addressOfRecord
+- (void)_handleSIPRegistration:(NSArray *)info
 {	
+  NSString *domain   = (NSString *)[info objectAtIndex:0];
+  NSString *username = (NSString *)[info objectAtIndex:1];
+  NSString *aor      = (NSString *)[info objectAtIndex:2];
+  
   NSArray *registrationRecords = [activePreferences sipRegistrationRecords];
   unsigned searchIndex = NSNotFound;
   unsigned count = [registrationRecords count];
@@ -866,9 +870,7 @@ enum {
       continue;
     }
     
-    NSString *aor = [record addressOfRecord];
-    
-    if ([aor isEqualToString:addressOfRecord]) {
+    if ([[record domain] isEqualToString:domain] && [[record username] isEqualToString:username]) {
       searchIndex = i;
       break;
     }
@@ -880,7 +882,7 @@ enum {
   }
   
   count = [sipRegistrations count];
-  [sipRegistrations addObject:addressOfRecord];
+  [sipRegistrations addObject:aor];
   
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:XMSIPStatusCode_Successful_OK];
   [sipRegistrationStates replaceObjectAtIndex:searchIndex withObject:number];
@@ -911,8 +913,10 @@ enum {
 - (void)_handleSIPRegistrationFailure:(NSArray *)info
 {
   // extracting information from the array
-  NSString *addressOfRecord = (NSString *)[info objectAtIndex:0];
-  NSNumber *failReason = (NSNumber *)[info objectAtIndex:1];
+  NSString *domain     = (NSString *)[info objectAtIndex:0];
+  NSString *username   = (NSString *)[info objectAtIndex:1];
+  //NSString *aor        = (NSString *)[info objectAtIndex:2];
+  NSNumber *failReason = (NSNumber *)[info objectAtIndex:3];
   
   NSArray *records = [activePreferences sipRegistrationRecords];
   unsigned searchIndex = NSNotFound;
@@ -923,9 +927,7 @@ enum {
       continue;
     }
     
-    NSString *aor = [record addressOfRecord];
-    
-    if ([aor isEqualToString:addressOfRecord]) {
+    if ([[record domain] isEqualToString:domain] && [[record username] isEqualToString:username]) {
       searchIndex = i;
       break;
     }

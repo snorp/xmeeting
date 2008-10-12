@@ -1,5 +1,5 @@
 /*
- * $Id: XMPrivate.h,v 1.51 2008/09/24 06:52:42 hfriederich Exp $
+ * $Id: XMPrivate.h,v 1.52 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -128,7 +128,7 @@ void _XMCheckCloseStatus();
 - (void)_handleSIPProtocolStatus:(NSNumber *)protocolStatus;
 
 // Called every time the Framework register at a SIP registrar
-- (void)_handleSIPRegistration:(NSString *)aor;
+- (void)_handleSIPRegistration:(NSArray *)info;
 
 // Called every time the Framework unregisters from a SIP registrar
 - (void)_handleSIPUnregistration:(NSString *)aor;

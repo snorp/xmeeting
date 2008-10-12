@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.19 2008/08/28 11:07:21 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.20 2008/10/12 12:24:11 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -158,8 +158,7 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
 {
   NSString *statusCodeString;
   
-  switch (statusCode)
-  {
+  switch (statusCode) {
     case XMSIPStatusCode_IllegalCode:
       statusCodeString = @"<Illegal Status Code>";
       break;
@@ -233,7 +232,7 @@ NSString *XMSIPStatusCodeString(XMSIPStatusCode statusCode)
       statusCodeString = @"407 Proxy Authentication Required";
       break;
     case XMSIPStatusCode_Failure_RequestTimeout:
-      statusCodeString = @"408 Request Timeout";
+      statusCodeString = @"No response from server - 408 Request Timeout";
       break;
     case XMSIPStatusCode_Failure_Conflict:
       statusCodeString = @"409 Conflict";

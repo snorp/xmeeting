@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.28 2008/10/02 07:50:22 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.29 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -38,18 +38,18 @@ XMSIPConnection::~XMSIPConnection()
   delete inBandDTMFHandler;
 }
 
-void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
+/*void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
 {
-    /* Add bandwidth information to SDP */
+    /* Add bandwidth information to SDP 
 	/*if(invite.HasSDP()) {
 		SDPSessionDescription & sdp = invite.GetSDP();
 		unsigned bandwidth = bandwidthAvailable / 10;
         sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier());
         sdp.SetBandwidthValue(bandwidth);
-	}*/
-}
+	}
+}*/
 
-bool XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
+/*bool XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
 												const OpalMediaType & mediaType,
 												SDPSessionDescription & sdpOut)
 {
@@ -71,11 +71,11 @@ bool XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sd
 	}
 	sdpOut.SetBandwidthValue(bandwidthAvailable/10);
 	
-    return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);*/
+    return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);
   return false;
-}
+}*/
 
-OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
+/*OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
 													 bool isSource)
 {
 	// Adjust some audio parameters if needed
@@ -94,27 +94,31 @@ OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & med
 		}
 	}
 	
-	return SIPConnection::CreateMediaStream(mediaFormat, isSource);*/
+	return SIPConnection::CreateMediaStream(mediaFormat, isSource);
   return false;
-}
+}*/
 
 bool XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
-	if(!SIPConnection::OnOpenMediaStream(mediaStream))
-	{
-		return false;
-	}
-    
-    XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
-	
+  if(!SIPConnection::OnOpenMediaStream(mediaStream)) {
+    return false;
+  }
+  
+  // inform the subsystem
+  XMOpalManager::GetManager()->OnOpenRTPMediaStream(*this, mediaStream);
 	return true;
+}
+
+void XMSIPConnection::OnClosedMediaStream(const OpalMediaStream & stream)
+{
+  SIPConnection::OnClosedMediaStream(stream);
+  XMOpalManager::GetManager()->OnClosedRTPMediaStream(*this, stream);
 }
 
 bool XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
-	bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
-    GetCall().GetOtherPartyConnection(*this)->SetBandwidthAvailable(bandwidthAvailable, force);
-	return true;
+  bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
+  return true;
 }
 
 bool XMSIPConnection::SendUserInputTone(char tone, unsigned duration)
@@ -144,12 +148,7 @@ void XMSIPConnection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
 
 void XMSIPConnection::CleanUp()
 {
-    // Abort all pending transactions
-    /*PWaitAndSignal m(jobProcessingMutex);
-    for (PINDEX i = transactions.GetSize(); i > 0; i--) {
-        const PString & key = transactions.GetKeyAt(i-1);
-        transactions[key].Abort();
-    }*/
+  // TODO: Abort all pending transactions
 }
 
 void XMSIPConnection::OnReleased()

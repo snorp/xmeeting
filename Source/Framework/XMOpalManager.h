@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.48 2008/10/10 09:00:10 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.49 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,8 +39,9 @@ public:
   static XMSIPEndPoint * GetSIPEndPoint();
   static XMEndPoint * GetCallEndPoint();
   
-  /* Handle network configuration changes */
+  /* Network configuration */
   void HandleNetworkConfigurationChange();
+  bool HasNetworkInterfaces() const;
   
   /* NAT methods */
   void SetNATInformation(const PStringArray & stunServers, const PString & publicAddress);
@@ -96,7 +97,6 @@ private:
   void UpdateNetworkInterfaces();
   void SetupNATTraversal();
   void HandleSTUNInformation(PSTUNClient::NatTypes natType, const PString & publicAddress);
-  bool HasNetworkInterfaces() const;
   void ExtractLocalAddress(const PString & callToken, OpalConnection * connection);
   
   class XMInterfaceMonitor : public OpalManager::InterfaceMonitor

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.h,v 1.22 2008/09/21 19:37:31 hfriederich Exp $
+ * $Id: XMH323EndPoint.h,v 1.23 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -54,6 +54,10 @@ public:
 	// H.460 support
 	virtual bool OnSendFeatureSet(unsigned, H225_FeatureSet &);
   virtual void OnReceiveFeatureSet(unsigned, const H225_FeatureSet &);
+  
+  // interface handling
+  void OnStartInterfaceListRefresh() const { }
+  void OnEndInterfaceListRefresh() const { }
   
   // Called when the framework is closing
   void CleanUp();

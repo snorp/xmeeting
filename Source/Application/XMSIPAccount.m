@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPAccount.m,v 1.6 2008/08/29 11:32:29 hfriederich Exp $
+ * $Id: XMSIPAccount.m,v 1.7 2008/10/12 12:24:11 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -245,7 +245,7 @@ NSString *XMKey_SIPAccountPassword = @"XMeeting_SIPAccountPassword";
 - (NSString *)addressOfRecord
 {
   if (aor == nil) {
-    aor = XMCreateAddressOfRecord(domain, username);
+    aor = [XMGetAddressOfRecord(domain, username) retain];
   }
   return aor;
 }

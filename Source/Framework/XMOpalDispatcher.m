@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.61 2008/10/08 23:55:32 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.62 2008/10/12 12:24:12 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -490,12 +490,17 @@ typedef enum _XMOpalDispatcherMessage
   currentPreferences = nil;
   
   callToken = nil;
+  callEndReason = XMCallEndReasonCount;
   
   controlTimer = nil;
   callStatisticsUpdateIntervalTimer = nil;
   
+  resyncSubsystemCounter = 0;
   gatekeeperRegistrationWaitLock = [[NSLock alloc] init];
   sipRegistrationWaitLock = [[NSLock alloc] init];
+  doesWaitForSIPRegistrationCompletion = NO;
+  
+  logCallStatistics = NO;
   
   return self;
 }
@@ -1444,8 +1449,8 @@ typedef enum _XMOpalDispatcherMessage
     
     // unregistering if needed
     [sipRegistrationWaitLock lock]; // will be unlocked from within _XMFinishRegistrationSetup()
-    _XMPrepareRegistrationSetup(NO);
-    _XMFinishRegistrationSetup(NO);
+    _XMPrepareSIPRegistrations(NO);
+    _XMFinishSIPRegistrations(NO);
     
     // disabling the SIP Listeners
     _XMEnableSIP(NO);
@@ -1465,7 +1470,7 @@ typedef enum _XMOpalDispatcherMessage
   
   [sipRegistrationWaitLock lock]; // will be unlocked from within -_handleSIPRegistrationSetupComplete
   
-  _XMPrepareRegistrationSetup(proxyInfoChanged);
+  _XMPrepareSIPRegistrations(proxyInfoChanged);
   
   for (unsigned i = 0; i < count; i++) {
     XMPreferencesRegistrationRecord *record = (XMPreferencesRegistrationRecord *)[records objectAtIndex:i];
@@ -1489,11 +1494,11 @@ typedef enum _XMOpalDispatcherMessage
       registrationAuthorizationUsername = [authorizationUsername cStringUsingEncoding:NSASCIIStringEncoding];
       registrationPassword = [password cStringUsingEncoding:NSASCIIStringEncoding];
       
-      _XMUseRegistration(registrationDomain, registrationUsername, registrationAuthorizationUsername, registrationPassword, proxyInfoChanged);
+      _XMUseSIPRegistration(registrationDomain, registrationUsername, registrationAuthorizationUsername, registrationPassword, proxyInfoChanged);
     }
   }
   
-  _XMFinishRegistrationSetup(proxyInfoChanged);
+  _XMFinishSIPRegistrations(proxyInfoChanged);
 }
 
 - (void)_waitForSubsystemSetupCompletion
@@ -1543,9 +1548,11 @@ typedef enum _XMOpalDispatcherMessage
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleGatekeeperUnregistration) withObject:nil waitUntilDone:NO];
 }
 
-- (void)_handleSIPRegistration:(NSString *)aor
+- (void)_handleSIPRegistrationForDomain:(NSString *)domain username:(NSString *)username aor:(NSString *)aor
 {
-  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistration:) withObject:aor waitUntilDone:NO];
+  NSArray *arr = [[NSArray alloc] initWithObjects:domain, username, aor, nil];
+  [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistration:) withObject:arr waitUntilDone:NO];
+  [arr release];
 }
 
 - (void)_handleSIPUnregistration:(NSString *)aor
@@ -1553,10 +1560,11 @@ typedef enum _XMOpalDispatcherMessage
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPUnregistration:) withObject:aor waitUntilDone:NO];
 }
 
-- (void)_handleSIPRegistrationFailure:(NSString *)aor failReason:(XMSIPStatusCode)failReason
+- (void)_handleSIPRegistrationFailureForDomain:(NSString *)domain username:(NSString *)username 
+                                           aor:(NSString *)aor failReason:(XMSIPStatusCode)failReason
 {
   NSNumber *errorNumber = [[NSNumber alloc] initWithUnsignedInt:failReason];
-  NSArray *array = [[NSArray alloc] initWithObjects:aor, errorNumber, nil];
+  NSArray *array = [[NSArray alloc] initWithObjects:domain, username, aor, errorNumber, nil];
   
   [_XMCallManagerSharedInstance performSelectorOnMainThread:@selector(_handleSIPRegistrationFailure:)
                                                  withObject:array
@@ -1589,6 +1597,8 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_resyncSubsystem:(NSTimer *)timer
 {
+  resyncSubsystemCounter++;
+  
   if (currentPreferences == nil) {
     return;
   }
@@ -1606,6 +1616,8 @@ typedef enum _XMOpalDispatcherMessage
   // retry to enable SIP if it previously failed
   if (enableSIP && _XMIsSIPEnabled() == NO) {
     [self _doSIPSetup:currentPreferences verbose:YES]; 
+  } else if (enableSIP && (resyncSubsystemCounter % 3) == 0) { // only retry every 60 seconds
+    _XMRetryFailedSIPRegistrations();
   }
 }
 
