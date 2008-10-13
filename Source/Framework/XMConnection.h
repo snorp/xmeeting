@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.19 2008/10/10 11:25:21 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.20 2008/10/13 20:27:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -48,10 +48,10 @@ private:
   OpalH224Handler *h224Handler;
   OpalH281Handler *h281Handler;
     
-  OpalVideoFormat h261VideoFormat;
-  OpalVideoFormat h263VideoFormat;
-  OpalVideoFormat h263PlusVideoFormat;
-  OpalVideoFormat h264VideoFormat;
+  OpalMediaFormat h261VideoFormat;
+  OpalMediaFormat h263VideoFormat;
+  OpalMediaFormat h263PlusVideoFormat;
+  OpalMediaFormat h264VideoFormat;
 };
 
 #endif // __XM_CONNECTION_H__

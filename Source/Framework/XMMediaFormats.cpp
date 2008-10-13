@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.37 2008/10/10 11:25:21 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.38 2008/10/13 20:27:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,7 @@
 #define XM_CIF_HEIGHT PVideoDevice::CIFHeight
 #define XM_QCIF_WIDTH PVideoDevice::QCIFWidth
 #define XM_QCIF_HEIGHT PVideoDevice::QCIFHeight
-#define XM_SQCIF_WIDTH 128
+#define XM_SQCIF_WIDTH PVideoDevice::SQCIFWidth
 #define XM_SQCIF_HEIGHT PVideoDevice::SQCIFHeight
 
 #define XM_MAX_FRAME_WIDTH XM_CIF_WIDTH
@@ -70,31 +70,112 @@ const char *_XMMediaFormatEncoding_H264 = "H264";
 #pragma mark -
 #pragma mark MediaFormat Definitions
 
-class XMMediaFormat_H261 : public OpalVideoFormat
+class XMMediaFormat_H261 : public OpalVideoFormatInternal
 {
+  PCLASSINFO(XMMediaFormat_H261, OpalVideoFormatInternal);
+  
 public:
   XMMediaFormat_H261();
-  static const PString & CIFOption()  { static PString s = "CIF MPI";  return s; }
+  virtual PObject* Clone() const;
+  virtual bool ToNormalisedOptions();
+  virtual bool ToCustomisedOptions();
+  
   static const PString & QCIFOption() { static PString s = "QCIF MPI"; return s; }
+  static const PString & CIFOption()  { static PString s = "CIF MPI";  return s; }
 };
 
 XMMediaFormat_H261::XMMediaFormat_H261()
-: OpalVideoFormat(_XMMediaFormat_H261,
-                  RTP_DataFrame::H261,
-                  _XMMediaFormatEncoding_H261,
-                  XM_CIF_WIDTH,
-                  XM_CIF_HEIGHT,
-                  XM_MAX_FRAME_RATE,
-                  XM_MAX_H261_BITRATE)
+: OpalVideoFormatInternal(_XMMediaFormat_H261,
+                          RTP_DataFrame::H261,
+                          _XMMediaFormatEncoding_H261,
+                          XM_CIF_WIDTH,
+                          XM_CIF_HEIGHT,
+                          XM_MAX_FRAME_RATE,
+                          XM_MAX_H261_BITRATE,
+                          0)
 {
-  AddOption(new OpalMediaOptionUnsigned(CIFOption(),  false, OpalMediaOption::MaxMerge, 1, 0, 30));
-  AddOption(new OpalMediaOptionUnsigned(QCIFOption(), false, OpalMediaOption::MaxMerge, 1, 0, 30));
+  OpalMediaOption *cifOption =  new OpalMediaOptionUnsigned(CIFOption(),  false, OpalMediaOption::MaxMerge, 1, 0, 30);
+  cifOption->SetFMTPName("CIF");
+  cifOption->SetFMTPDefault("0");
+  AddOption(cifOption);
+  
+  OpalMediaOption *qcifOption = new OpalMediaOptionUnsigned(QCIFOption(), false, OpalMediaOption::MaxMerge, 1, 0, 30);
+  qcifOption->SetFMTPName("QCIF");
+  qcifOption->SetFMTPDefault("0");
+  AddOption(qcifOption);
+  
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::MinRxFrameWidthOption(), XM_QCIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::MinRxFrameHeightOption(), XM_QCIF_HEIGHT);
+  SetOptionInteger(OpalVideoFormat::MaxRxFrameWidthOption(), XM_CIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::MaxRxFrameHeightOption(), XM_CIF_HEIGHT);
 }
 
-class XMMediaFormat_H263 : public OpalVideoFormat
+PObject* XMMediaFormat_H261::Clone() const
 {
+  return new XMMediaFormat_H261(*this);
+}
+
+bool XMMediaFormat_H261::ToNormalisedOptions()
+{
+  unsigned cifMPI = GetOptionInteger(CIFOption(), 1);
+  unsigned qcifMPI = GetOptionInteger(QCIFOption(), 1);
+  
+  unsigned width = 0;
+  unsigned height = 0;
+  unsigned mpi = 0;
+  
+  if (cifMPI > 0) {
+    mpi = cifMPI;
+    width = XM_CIF_WIDTH;
+    height = XM_CIF_HEIGHT;
+  } else if (qcifMPI > 0) {
+    mpi = qcifMPI;
+    width = XM_QCIF_WIDTH;
+    height = XM_QCIF_HEIGHT;
+  }
+  
+  SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*mpi/2997);
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), width);
+  SetOptionInteger(OpalVideoFormat::FrameHeightOption(), height);
+  
+  return OpalVideoFormatInternal::ToNormalisedOptions();
+}
+
+bool XMMediaFormat_H261::ToCustomisedOptions()
+{
+  unsigned frameTime = GetOptionInteger(OpalMediaFormat::FrameTimeOption(), 0);
+  unsigned mpi = (unsigned)round((double)frameTime*2997/((double)100*OpalMediaFormat::VideoClockRate));
+  unsigned width = GetOptionInteger(OpalVideoFormat::FrameWidthOption(), 0);
+  unsigned height = GetOptionInteger(OpalVideoFormat::FrameHeightOption(), 0);
+  
+  unsigned cifMPI = 0;
+  unsigned qcifMPI = 0;
+  
+  if (width >= XM_QCIF_WIDTH && height >= XM_QCIF_HEIGHT) {
+    qcifMPI = mpi;
+  }
+  if (width >= XM_CIF_WIDTH && height >= XM_CIF_HEIGHT) {
+    cifMPI = mpi;
+  }
+  
+  SetOptionInteger(QCIFOption(), qcifMPI);
+  SetOptionInteger(CIFOption(), cifMPI);
+  
+  return OpalVideoFormatInternal::ToCustomisedOptions();
+}
+
+class XMMediaFormat_H263 : public OpalVideoFormatInternal
+{
+  PCLASSINFO(XMMediaFormat_H263, OpalVideoFormatInternal);
+  
 public:
   XMMediaFormat_H263(bool isH263Plus);
+  virtual PObject* Clone() const;
+  virtual bool ToNormalisedOptions();
+  virtual bool ToCustomisedOptions();
+  
   static const PString & SQCIFOption()      { static PString s = "SQCIF MPI";    return s; }
   static const PString & QCIFOption()       { static PString s = "QCIF MPI";     return s; }
   static const PString & CIFOption()        { static PString s = "CIF MPI";      return s; }
@@ -105,28 +186,115 @@ public:
 };
 
 XMMediaFormat_H263::XMMediaFormat_H263(bool isH263Plus)
-: OpalVideoFormat((isH263Plus ? _XMMediaFormat_H263Plus : _XMMediaFormat_H263),
-                  (isH263Plus ? (RTP_DataFrame::PayloadTypes)98 : RTP_DataFrame::H263),
-                  (isH263Plus ? _XMMediaFormatEncoding_H263Plus : _XMMediaFormatEncoding_H263),
-                  XM_CIF_WIDTH,
-                  XM_CIF_HEIGHT,
-                  XM_MAX_FRAME_RATE,
-                  XM_MAX_H263_BITRATE)
+: OpalVideoFormatInternal((isH263Plus ? _XMMediaFormat_H263Plus : _XMMediaFormat_H263),
+                          (isH263Plus ? (RTP_DataFrame::PayloadTypes)98 : RTP_DataFrame::H263),
+                          (isH263Plus ? _XMMediaFormatEncoding_H263Plus : _XMMediaFormatEncoding_H263),
+                          XM_CIF_WIDTH,
+                          XM_CIF_HEIGHT,
+                          XM_MAX_FRAME_RATE,
+                          XM_MAX_H263_BITRATE,
+                          0)
 {
-  AddOption(new OpalMediaOptionUnsigned(SQCIFOption(),     false, OpalMediaOption::MaxMerge, 1, 0, 30));
-  AddOption(new OpalMediaOptionUnsigned(QCIFOption(),      false, OpalMediaOption::MaxMerge, 1, 0, 30));
-  AddOption(new OpalMediaOptionUnsigned(CIFOption(),       false, OpalMediaOption::MaxMerge, 1, 0, 30));
-  AddOption(new OpalMediaOptionUnsigned(CIF4Option(),      false, OpalMediaOption::MaxMerge, 0, 0, 30));
-  AddOption(new OpalMediaOptionUnsigned(CIF16Option(),     false, OpalMediaOption::MaxMerge, 0, 0, 30));
-  AddOption(new OpalMediaOptionBoolean(CanRFC2429Option(), false, OpalMediaOption::MinMerge, false));
+  OpalMediaOption *sqcifOption = new OpalMediaOptionUnsigned(SQCIFOption(), false, OpalMediaOption::MaxMerge, 1, 0, 30);
+  sqcifOption->SetFMTPName("SQCIF");
+  sqcifOption->SetFMTPDefault("0");
+  AddOption(sqcifOption);
+  
+  OpalMediaOption *qcifOption = new OpalMediaOptionUnsigned(QCIFOption(), false, OpalMediaOption::MaxMerge, 1, 0, 30);
+  qcifOption->SetFMTPName("QCIF");
+  qcifOption->SetFMTPDefault("0");
+  AddOption(qcifOption);
+  
+  OpalMediaOption *cifOption = new OpalMediaOptionUnsigned(CIFOption(), false, OpalMediaOption::MaxMerge, 1, 0, 30);
+  cifOption->SetFMTPName("CIF");
+  cifOption->SetFMTPDefault("0");
+  AddOption(cifOption);
+  
+  OpalMediaOption *cif4Option = new OpalMediaOptionUnsigned(CIF4Option(), false, OpalMediaOption::MaxMerge, 0, 0, 30);
+  cif4Option->SetFMTPName("CIF4");
+  cif4Option->SetFMTPDefault("0");
+  AddOption(cif4Option);
+  
+  OpalMediaOption *cif16Option = new OpalMediaOptionUnsigned(CIF16Option(), false, OpalMediaOption::MaxMerge, 0, 0, 30);
+  cif16Option->SetFMTPName("CIF16");
+  cif16Option->SetFMTPDefault("0");
+  AddOption(cif16Option);
+
   AddOption(new OpalMediaOptionBoolean(IsRFC2429Option(),  false, OpalMediaOption::MinMerge, false));
   AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "RFC2190"));
   
   if (isH263Plus) {
-    SetOptionBoolean(CanRFC2429Option(), true);
     SetOptionBoolean(IsRFC2429Option(), true);
     SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "RFC2429");
   }
+}
+
+PObject *XMMediaFormat_H263::Clone() const
+{
+  return new XMMediaFormat_H263(*this);
+}
+
+bool XMMediaFormat_H263::ToNormalisedOptions()
+{
+  unsigned sqcifMPI = GetOptionInteger(SQCIFOption(), 1);
+  unsigned qcifMPI = GetOptionInteger(QCIFOption(), 1);
+  unsigned cifMPI = GetOptionInteger(CIFOption(), 1);
+  
+  unsigned width = 0;
+  unsigned height = 0;
+  unsigned mpi = 0;
+  
+  if (cifMPI > 0) {
+    mpi = cifMPI;
+    width = XM_CIF_WIDTH;
+    height = XM_CIF_HEIGHT;
+  } else if (qcifMPI > 0) {
+    mpi = qcifMPI;
+    width = XM_QCIF_WIDTH;
+    height = XM_QCIF_HEIGHT;
+  } else if (sqcifMPI > 0) {
+    mpi = sqcifMPI;
+    width = XM_SQCIF_WIDTH;
+    height = XM_SQCIF_HEIGHT;
+  }
+  
+  SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*mpi/2997);
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), width);
+  SetOptionInteger(OpalVideoFormat::FrameHeightOption(), height);
+  
+  return OpalVideoFormatInternal::ToNormalisedOptions();
+}
+
+bool XMMediaFormat_H263::ToCustomisedOptions()
+{
+  unsigned frameTime = GetOptionInteger(OpalMediaFormat::FrameTimeOption(), 0);
+  unsigned mpi = (unsigned)round((double)frameTime*2997/((double)100*OpalMediaFormat::VideoClockRate));
+  unsigned width = GetOptionInteger(OpalVideoFormat::FrameWidthOption(), 0);
+  unsigned height = GetOptionInteger(OpalVideoFormat::FrameHeightOption(), 0);
+  
+  unsigned sqcifMPI = 0;
+  unsigned qcifMPI = 0;
+  unsigned cifMPI = 0;
+  unsigned cif4MPI = 0;
+  unsigned cif16MPI = 0;
+  
+  if (width >= XM_SQCIF_WIDTH && height >= XM_SQCIF_HEIGHT) {
+    sqcifMPI = mpi;
+  }
+  if (width >= XM_QCIF_WIDTH && height >= XM_QCIF_HEIGHT) {
+    qcifMPI = mpi;
+  }
+  if (width >= XM_CIF_WIDTH && height >= XM_CIF_HEIGHT) {
+    cifMPI = mpi;
+  }
+  
+  SetOptionInteger(SQCIFOption(), sqcifMPI);
+  SetOptionInteger(QCIFOption(), qcifMPI);
+  SetOptionInteger(CIFOption(), cifMPI);
+  SetOptionInteger(CIF4Option(), cif4MPI);
+  SetOptionInteger(CIF16Option(), cif16MPI);
+  
+  return OpalVideoFormatInternal::ToCustomisedOptions();
 }
 
 class XMMediaFormat_H264 : public OpalVideoFormat
@@ -151,25 +319,25 @@ XMMediaFormat_H264::XMMediaFormat_H264()
   AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "0.0.8.241.0.0.0.0"));
 }
 
-const OpalVideoFormat & XMGetMediaFormat_H261()
+const OpalMediaFormat & XMGetMediaFormat_H261()
 {
-  static const XMMediaFormat_H261 format;
+  static const OpalMediaFormat format(new XMMediaFormat_H261());
   return format;
 }
 
-const OpalVideoFormat & XMGetMediaFormat_H263()
+const OpalMediaFormat & XMGetMediaFormat_H263()
 {
-	static const XMMediaFormat_H263 format(false);
+	static const OpalMediaFormat format(new XMMediaFormat_H263(false));
 	return format;
 }
 
-const OpalVideoFormat & XMGetMediaFormat_H263Plus()
+const OpalMediaFormat & XMGetMediaFormat_H263Plus()
 {
-	static const XMMediaFormat_H263 format(true);
+	static const OpalMediaFormat format(new XMMediaFormat_H263(true));
 	return format;
 }
 
-const OpalVideoFormat & XMGetMediaFormat_H264()
+const OpalMediaFormat & XMGetMediaFormat_H264()
 {
   static const XMMediaFormat_H264 format;
   return format;
@@ -385,16 +553,6 @@ bool XM_H323_H261_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
   
   mediaFormat.SetOptionInteger(XMMediaFormat_H261::CIFOption(), cifMPI);
   mediaFormat.SetOptionInteger(XMMediaFormat_H261::QCIFOption(), qcifMPI);
-  
-  if (cifMPI > 0) {
-    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
-  } else {
-    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
-  }
 	
   unsigned maxBitRate = std::min((unsigned)mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()), (h261.m_maxBitRate)*100);
   mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate);
@@ -597,21 +755,6 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
   mediaFormat.SetOptionInteger(XMMediaFormat_H263::CIFOption(),   cifMPI);
   mediaFormat.SetOptionInteger(XMMediaFormat_H263::QCIFOption(),  qcifMPI);
   mediaFormat.SetOptionInteger(XMMediaFormat_H263::SQCIFOption(), sqcifMPI);
-  
-  if (cifMPI) {
-    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*cifMPI/2997);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_CIF_HEIGHT);
-  } else if (qcifMPI) {
-    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*qcifMPI/2997);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_QCIF_WIDTH);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_QCIF_HEIGHT);
-  } else {
-    mediaFormat.SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*sqcifMPI/2997);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_SQCIF_WIDTH);
-    mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), XM_SQCIF_HEIGHT);
-  }
-	
   
 	unsigned maxBitRate = std::min((unsigned)mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption()), (h263.m_maxBitRate)*100);
   mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate);

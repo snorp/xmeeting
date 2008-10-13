@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.27 2008/10/10 11:25:21 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.28 2008/10/13 20:27:07 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -45,10 +45,10 @@ extern const char *_XMMediaFormatEncoding_H264;
 
 #pragma mark XMeeting Video Formats
 
-extern const OpalVideoFormat & XMGetMediaFormat_H261();
-extern const OpalVideoFormat & XMGetMediaFormat_H263();
-extern const OpalVideoFormat & XMGetMediaFormat_H263Plus();
-extern const OpalVideoFormat & XMGetMediaFormat_H264();
+extern const OpalMediaFormat & XMGetMediaFormat_H261();
+extern const OpalMediaFormat & XMGetMediaFormat_H263();
+extern const OpalMediaFormat & XMGetMediaFormat_H263Plus();
+extern const OpalMediaFormat & XMGetMediaFormat_H264();
 
 #define XM_MEDIA_FORMAT_H261 XMGetMediaFormat_H261()
 #define XM_MEDIA_FORMAT_H263 XMGetMediaFormat_H263()
