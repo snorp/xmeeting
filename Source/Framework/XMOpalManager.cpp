@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.80 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.81 2008/10/14 20:54:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -92,9 +92,9 @@ XMOpalManager::XMOpalManager(bool _logCallStatistics)
   SetAutoStartReceiveVideo(true);
   
   AddRouteEntry("xm:.*   = h323:<da>");
-  AddRouteEntry("h323:.* = xm:<da>");
+  AddRouteEntry("h323:.* = xm:<db>");
   AddRouteEntry("xm:.*   = sip:<da>");
-  AddRouteEntry("sip:.*  = xm:<da>");
+  AddRouteEntry("sip:.*  = xm:<db>");
   
   stun = new XMSTUNClient();
   interfaceMonitor = new XMInterfaceMonitor(*this);
