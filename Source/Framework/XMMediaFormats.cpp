@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.39 2008/10/14 22:41:52 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.40 2008/10/14 22:43:18 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -331,7 +331,6 @@ PObject* XMMediaFormat_H264::Clone() const
 
 bool XMMediaFormat_H264::IsValidForProtocol(const PString & protocol) const
 {
-  cout << "Is valid for protocol " << protocol << endl;
   if (protocol == "h323") {
     return true;
   }
