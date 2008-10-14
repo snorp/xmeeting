@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.36 2008/10/14 07:13:41 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.37 2008/10/14 07:15:15 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,7 +10,6 @@
 
 #include <h323/h323ep.h>
 #include <sip/sipep.h>
-#include <h224/h224mediafmt.h>
 #include <h224/h281.h>
 #include <h224/h224handler.h>
 #include <h224/h281handler.h>
