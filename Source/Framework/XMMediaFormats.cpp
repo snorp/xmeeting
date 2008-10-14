@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.38 2008/10/13 20:27:07 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.39 2008/10/14 22:41:52 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,8 +26,7 @@
 
 #define XM_MAX_H261_BITRATE 960000
 #define XM_MAX_H263_BITRATE 960000
-#define XM_MAX_H264_BITRATE 768000
-#define XM_DEFAULT_SIP_VIDEO_BITRATE 320000
+#define XM_MAX_H264_BITRATE 2000000
 
 #define XM_H264_PROFILE_CODE_BASELINE 64
 #define XM_H264_PROFILE_CODE_MAIN     32
@@ -297,26 +296,132 @@ bool XMMediaFormat_H263::ToCustomisedOptions()
   return OpalVideoFormatInternal::ToCustomisedOptions();
 }
 
-class XMMediaFormat_H264 : public OpalVideoFormat
+class XMMediaFormat_H264 : public OpalVideoFormatInternal
 {
 public:
   XMMediaFormat_H264();
+  virtual PObject* Clone() const;
+  virtual bool IsValidForProtocol(const PString & protocol) const;
+  virtual bool ToNormalisedOptions();
+  virtual bool ToCustomisedOptions();
+  
   static const PString & ProfileOption()           { static PString s = "Profile";            return s; }
   static const PString & LevelOption()             { static PString s = "Level";              return s; }
 };
 
 XMMediaFormat_H264::XMMediaFormat_H264()
-: OpalVideoFormat(_XMMediaFormat_H264, 
-                  (RTP_DataFrame::PayloadTypes)97,
-                  _XMMediaFormatEncoding_H264,
-                  XM_MAX_FRAME_WIDTH,
-                  XM_MAX_FRAME_HEIGHT,
-                  XM_MAX_FRAME_RATE,
-                  XM_MAX_H264_BITRATE)
+: OpalVideoFormatInternal(_XMMediaFormat_H264, 
+                          (RTP_DataFrame::PayloadTypes)97,
+                          _XMMediaFormatEncoding_H264,
+                          XM_MAX_FRAME_WIDTH,
+                          XM_MAX_FRAME_HEIGHT,
+                          XM_MAX_FRAME_RATE,
+                          XM_MAX_H264_BITRATE,
+                          0)
 {
   AddOption(new OpalMediaOptionUnsigned(ProfileOption(), false, OpalMediaOption::NoMerge, XM_H264_PROFILE_BASELINE, XM_H264_PROFILE_BASELINE, XM_H264_PROFILE_MAIN));
   AddOption(new OpalMediaOptionUnsigned(LevelOption(),   false, OpalMediaOption::NoMerge, XM_H264_LEVEL_2, XM_H264_LEVEL_1, XM_H264_LEVEL_2));
   AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "0.0.8.241.0.0.0.0"));
+}
+
+PObject* XMMediaFormat_H264::Clone() const
+{
+  return new XMMediaFormat_H264(*this);
+}
+
+bool XMMediaFormat_H264::IsValidForProtocol(const PString & protocol) const
+{
+  cout << "Is valid for protocol " << protocol << endl;
+  if (protocol == "h323") {
+    return true;
+  }
+  return false;
+}
+
+bool XMMediaFormat_H264::ToNormalisedOptions()
+{
+  unsigned level = GetOptionInteger(LevelOption(), 0);
+  unsigned maxBitRate = GetOptionInteger(OpalVideoFormat::MaxBitRateOption(), 0);
+  unsigned width = 0;
+  unsigned height = 0;
+  unsigned mpi = 0;
+  
+  // See Table A-1 Level limits in the H.264 spec
+  if (level < XM_H264_LEVEL_1_B) { // use level 1
+    width = XM_QCIF_WIDTH;
+    height = XM_QCIF_HEIGHT;
+    if (maxBitRate > 64000) {
+      maxBitRate = 64000;
+    }
+    mpi = 2; // 15 FPS
+  } else if (level < XM_H264_LEVEL_1_1) { // use level 1.b
+    width = XM_QCIF_WIDTH;
+    height = XM_QCIF_HEIGHT;
+    if (maxBitRate < 128000) {
+      maxBitRate = 128000;
+    }
+    mpi = 2; // 15 FPS
+  } else if (level < XM_H264_LEVEL_1_2) { // use level 1.1
+    // Use QCIF instead of CIF, but transmit 30 FPS
+    width = XM_QCIF_WIDTH;
+    height = XM_QCIF_HEIGHT;
+    if (maxBitRate > 192000) {
+      maxBitRate = 192000;
+    }
+    mpi = 1;
+  } else if (level < XM_H264_LEVEL_1_3) { // use level 1.2
+    width = XM_CIF_WIDTH;
+    height = XM_CIF_HEIGHT;
+    if (maxBitRate > 384000) {
+      maxBitRate = 384000;
+    }
+    mpi = 2;
+  } else if (level < XM_H264_LEVEL_2) { // use level 1.3
+    width = XM_CIF_WIDTH;
+    height = XM_CIF_HEIGHT;
+    if (maxBitRate > 768000) {
+      maxBitRate = 768000;
+    }
+    mpi = 1;
+  } else { // use level 2
+    width = XM_CIF_WIDTH;
+    height = XM_CIF_HEIGHT;
+    if (maxBitRate > 2000000) {
+      maxBitRate = 2000000;
+    }
+    mpi = 1;
+  }
+  
+  SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*mpi/2997);
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), width);
+  SetOptionInteger(OpalVideoFormat::FrameHeightOption(), height);
+  SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate);
+  
+  return OpalVideoFormatInternal::ToNormalisedOptions();
+}
+
+bool XMMediaFormat_H264::ToCustomisedOptions()
+{
+  unsigned bitrate = GetOptionInteger(OpalMediaFormat::MaxBitRateOption(), 0);
+  unsigned level;
+  
+  // Determine the level. See Table A-1 in the H264 spec
+  if (bitrate < 128000) {
+    level = XM_H264_LEVEL_1;
+  } else if (bitrate < 192000) {
+    level = XM_H264_LEVEL_1_B;
+  } else if (bitrate < 384000) {
+    level = XM_H264_LEVEL_1_1;
+  } else if (bitrate < 768000) {
+    level = XM_H264_LEVEL_1_2;
+  } else if (bitrate < 2000000) {
+    level = XM_H264_LEVEL_1_3;
+  } else {
+    level = XM_H264_LEVEL_2;
+  }
+
+  SetOptionInteger(LevelOption(), level);
+  return OpalVideoFormatInternal::ToCustomisedOptions();
 }
 
 const OpalMediaFormat & XMGetMediaFormat_H261()
@@ -339,7 +444,7 @@ const OpalMediaFormat & XMGetMediaFormat_H263Plus()
 
 const OpalMediaFormat & XMGetMediaFormat_H264()
 {
-  static const XMMediaFormat_H264 format;
+  static const OpalMediaFormat format(new XMMediaFormat_H264());
   return format;
 }
 
@@ -986,45 +1091,8 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
     return false;
   }
 	
-  unsigned width = 0;
-  unsigned height = 0;
-	
-  if (level < XM_H264_LEVEL_1_1) {
-    width = XM_QCIF_WIDTH;
-    height = XM_QCIF_HEIGHT;
-    if (maxBitRate > 640) {
-      maxBitRate = 640;
-    }
-  } else if (level < XM_H264_LEVEL_1_2) {
-    width = XM_QCIF_WIDTH;
-    height = XM_QCIF_HEIGHT;
-    if (maxBitRate > 1280) {
-      maxBitRate = 1280;
-    }
-  } else if (level < XM_H264_LEVEL_1_3) {
-    width = XM_CIF_WIDTH;
-    height = XM_CIF_HEIGHT;
-    if (maxBitRate > 3840) {
-      maxBitRate = 3840;
-    }
-  } else if (level < XM_H264_LEVEL_2) {
-    width = XM_CIF_WIDTH;
-    height = XM_CIF_HEIGHT;
-    if (maxBitRate > 7680) {
-      maxBitRate = 7680;
-    }
-  } else {
-    width = XM_CIF_WIDTH;
-    height = XM_CIF_HEIGHT;
-    if (maxBitRate > 20000) {
-      maxBitRate = 20000;
-    }
-  }
-	
   mediaFormat.SetOptionInteger(XMMediaFormat_H264::ProfileOption(), profile);
   mediaFormat.SetOptionInteger(XMMediaFormat_H264::LevelOption(), level);
-  mediaFormat.SetOptionInteger(OpalVideoFormat::FrameWidthOption(), width);
-  mediaFormat.SetOptionInteger(OpalVideoFormat::FrameHeightOption(), height);
   mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
 
   return true;
