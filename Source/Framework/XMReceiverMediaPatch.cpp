@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.36 2008/10/11 17:57:02 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.37 2008/10/14 21:35:10 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -166,7 +166,8 @@ void XMReceiverMediaPatch::Main()
 		do {
       inUse.StartRead();
 			
-      bool processingSuccessful = true;
+      bool completePacketGroup = true;
+      bool decodingSuccessful = true;
       unsigned numberOfPacketsToRelease = 0;
 			
       XMRTPPacket *packet = packets[packetIndex];
@@ -204,7 +205,7 @@ void XMReceiverMediaPatch::Main()
             firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
             firstPacketOfPacketGroup = NULL;
             lastPacketOfPacketGroup = NULL;
-            processingSuccessful = false;
+            completePacketGroup = false;
             PTRACE(1, "XMeetingReceiverMediaPatch\tIncomplete old packet group");
 						
             // There are (packetIndex + 1) packets in the buffer, but only the last one
@@ -314,11 +315,14 @@ void XMReceiverMediaPatch::Main()
           result = _XMProcessFrame(GetSource().GetConnection().GetCall().GetToken(), sessionID, frameBuffer, frameBufferSize);
           if (result == false) {
             PTRACE(1, "XMeetingReceiverMediaPatch\tDecompression of the frame failed");
-            processingSuccessful = false;
+            decodingSuccessful = false;
+            decodingFailures++;
+          } else {
+            decodingFailures = 0;
           }
         } else {
           PTRACE(1, "XMeetingReceiverMediaPatch\tCould not copy packets into frame buffer");
-          processingSuccessful = false;
+          decodingSuccessful = false;
         }
         firstSeqNrOfPacketGroup = lastPacketOfPacketGroup->GetSequenceNumber() + 1;
         firstPacketOfPacketGroup = NULL;
@@ -328,18 +332,16 @@ void XMReceiverMediaPatch::Main()
         numberOfPacketsToRelease = packetIndex + 1;
       }
 
-      if (processingSuccessful == false) {
+      if (completePacketGroup == false) {
+        IssueVideoUpdatePictureCommand();
+      } else if (decodingSuccessful == false) {
         // avoid flooding the remote party with update commands
-        decodingFailures++;
-        if (decodingFailures < 3 || (decodingFailures % 10) == 0) {
+        if (decodingFailures < 3 || (decodingFailures % 30) == 0) {
           IssueVideoUpdatePictureCommand();
         }
-        processingSuccessful = true;
-      } else {
-        decodingFailures = 0; // reset the failure counter
       }
 			
-      // Of not all packets can be released, the remaining packets are
+      // If not all packets can be released, the remaining packets are
       // put at the beginning of the packet pool.
       if (numberOfPacketsToRelease != 0) {
         for (unsigned i = 0; i < (packetIndex + 1 - numberOfPacketsToRelease); i++) {
