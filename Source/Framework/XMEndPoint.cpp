@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.cpp,v 1.35 2008/09/24 06:52:41 hfriederich Exp $
+ * $Id: XMEndPoint.cpp,v 1.36 2008/10/14 07:13:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -166,75 +166,68 @@ bool XMEndPoint::SendUserInputString(PString & callToken, const PString & string
 
 bool XMEndPoint::StartCameraEvent(PString & callID, XMCameraEvent cameraEvent)
 {	
-	OpalH281Handler *h281Handler = GetH281Handler(callID);
+  OpalH281Handler *h281Handler = GetH281Handler(callID);
+	if (h281Handler == NULL) {
+    return false;
+  }
 	
-	if (h281Handler == NULL)
-	{
-		return false;
-	}
+  H281_Frame::PanDirection panDirection = H281_Frame::NoPan;
+  H281_Frame::TiltDirection tiltDirection = H281_Frame::NoTilt;
+  H281_Frame::ZoomDirection zoomDirection = H281_Frame::NoZoom;
+  H281_Frame::FocusDirection focusDirection = H281_Frame::NoFocus;
 	
-	H281_Frame::PanDirection panDirection = H281_Frame::NoPan;
-	H281_Frame::TiltDirection tiltDirection = H281_Frame::NoTilt;
-	H281_Frame::ZoomDirection zoomDirection = H281_Frame::NoZoom;
-	H281_Frame::FocusDirection focusDirection = H281_Frame::NoFocus;
+  switch (cameraEvent) {
+    case XMCameraEvent_NoEvent:
+      return false;
+    case XMCameraEvent_PanLeft:
+      panDirection = H281_Frame::PanLeft;
+      break;
+    case XMCameraEvent_PanRight:
+      panDirection = H281_Frame::PanRight;
+      break;
+    case XMCameraEvent_TiltUp:
+      tiltDirection = H281_Frame::TiltUp;
+      break;
+    case XMCameraEvent_TiltDown:
+      tiltDirection = H281_Frame::TiltDown;
+      break;
+    case XMCameraEvent_ZoomIn:
+      zoomDirection = H281_Frame::ZoomIn;
+      break;
+    case XMCameraEvent_ZoomOut:
+      zoomDirection = H281_Frame::ZoomOut;
+      break;
+    case XMCameraEvent_FocusIn:
+      focusDirection = H281_Frame::FocusIn;
+      break;
+    case XMCameraEvent_FocusOut:
+      focusDirection = H281_Frame::FocusOut;
+      break;
+  }
 	
-	switch(cameraEvent)
-	{
-		case XMCameraEvent_NoEvent:
-			return false;
-		case XMCameraEvent_PanLeft:
-			panDirection = H281_Frame::PanLeft;
-			break;
-		case XMCameraEvent_PanRight:
-			panDirection = H281_Frame::PanRight;
-			break;
-		case XMCameraEvent_TiltUp:
-			tiltDirection = H281_Frame::TiltUp;
-			break;
-		case XMCameraEvent_TiltDown:
-			tiltDirection = H281_Frame::TiltDown;
-			break;
-		case XMCameraEvent_ZoomIn:
-			zoomDirection = H281_Frame::ZoomIn;
-			break;
-		case XMCameraEvent_ZoomOut:
-			zoomDirection = H281_Frame::ZoomOut;
-			break;
-		case XMCameraEvent_FocusIn:
-			focusDirection = H281_Frame::FocusIn;
-			break;
-		case XMCameraEvent_FocusOut:
-			focusDirection = H281_Frame::FocusOut;
-			break;
-	}
-	
-	h281Handler->StartAction(panDirection, tiltDirection, zoomDirection, focusDirection);
+  h281Handler->StartAction(panDirection, tiltDirection, zoomDirection, focusDirection);
 	
 	return true;
 }
 
 void XMEndPoint::StopCameraEvent(PString & callID)
 {	
-	OpalH281Handler *h281Handler = GetH281Handler(callID);
+  OpalH281Handler *h281Handler = GetH281Handler(callID);
+  if (h281Handler == NULL) {
+    return;
+  }
 	
-	if (h281Handler == NULL)
-	{
-		return;
-	}
-	
-	h281Handler->StopAction();
+  h281Handler->StopAction();
 }
 
-OpalH281Handler * XMEndPoint::GetH281Handler(PString & callID)
+OpalH281Handler * XMEndPoint::GetH281Handler(PString & callToken)
 {
-	/*PSafePtr<XMConnection> connection = GetXMConnectionWithLock("XMeeting");
-	if (connection == NULL)
-	{
-		return NULL;
-	}
+  PSafePtr<XMConnection> connection = GetConnectionWithLockAs<XMConnection>(callToken, PSafeReadOnly);
+  if (connection == NULL) {
+    return NULL;
+  }
 	
-	return connection->GetH281Handler();*/
-  return NULL;
+  return connection->GetH281Handler();
 }
 
 #pragma mark -

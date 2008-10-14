@@ -1,5 +1,5 @@
 /*
- * $Id: XMEndPoint.h,v 1.20 2008/09/24 06:52:41 hfriederich Exp $
+ * $Id: XMEndPoint.h,v 1.21 2008/10/14 07:13:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,7 +64,7 @@ public:
 
 private:
         
-	OpalH281Handler * GetH281Handler(PString & callID);
+  OpalH281Handler * GetH281Handler(PString & callID);
 	
 	bool enableSilenceSuppression;
 	bool enableEchoCancellation;

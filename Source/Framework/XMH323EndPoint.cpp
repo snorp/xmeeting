@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323EndPoint.cpp,v 1.43 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMH323EndPoint.cpp,v 1.44 2008/10/14 07:13:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -63,8 +63,6 @@ private:
   PString terminalAlias2;
   PString password;
 };
-
-//OPAL_REGISTER_H224_CAPABILITY();
 
 XMH323EndPoint::XMH323EndPoint(OpalManager & manager)
 : H323EndPoint(manager),

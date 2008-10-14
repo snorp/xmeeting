@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.34 2008/10/10 11:25:21 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.35 2008/10/14 07:13:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -115,7 +115,7 @@ OpalMediaFormatList XMConnection::GetMediaFormats() const
     mediaFormats += h264VideoFormat;
   }
 	
-  /*mediaFormats += OpalH224;*/
+  mediaFormats += GetOpalH224();
 	
 	return mediaFormats;
 }
@@ -128,11 +128,10 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
     return new XMMediaStream(*this, mediaFormat, sessionID, isSource);
   }
 	
-	/*if (mediaFormat == OpalH224)
-	{
-		OpalH224Handler *h224Handler = GetH224Handler();
-		return new OpalH224MediaStream(*this, *h224Handler, mediaFormat, isSource);
-	}*/
+  if (mediaFormat.GetMediaType() == OpalH224MediaType::MediaType()) {
+    OpalH224Handler *h224Handler = GetH224Handler();
+    return new OpalH224MediaStream(*this, *h224Handler, mediaFormat, sessionID, isSource);
+	}
 	
   // if not audio, use the default handling
   if (mediaFormat.GetMediaType() != OpalMediaType::Audio()) {
@@ -171,19 +170,19 @@ PSoundChannel * XMConnection::CreateSoundChannel(bool isSource)
 
 OpalH224Handler * XMConnection::GetH224Handler()
 {
-	if (h224Handler == NULL) {
-		//h281Handler = new OpalH281Handler();
-		//h224Handler = new OpalH224Handler();
-		//h224Handler->AddClient(*h281Handler);
-		//_XMHandleFECCChannelOpened();
-	}
+  if (h224Handler == NULL) {
+    h281Handler = new OpalH281Handler();
+    h224Handler = new OpalH224Handler();
+    h224Handler->AddClient(*h281Handler);
+    _XMHandleFECCChannelOpened();
+  }
 	
 	return h224Handler;
 }
 
 OpalH281Handler * XMConnection::GetH281Handler()
 {
-	return h281Handler;
+  return h281Handler;
 }
 
 #pragma mark -

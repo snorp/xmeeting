@@ -312,7 +312,6 @@
 		D1D435440DC8BA0A0065FD1C /* srtp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1D6F9ED0BA2A85C005CAA26 /* srtp.cxx */; };
 		D1D435450DC8BA0B0065FD1C /* zrtpudp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1D434AD0DC8B7D50065FD1C /* zrtpudp.cxx */; };
 		D1D435460DC8BA110065FD1C /* h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78009DC4834005D0464 /* h224.cxx */; };
-		D1D435470DC8BA120065FD1C /* h224mediafmt.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1FB205D0B565AC700E374C0 /* h224mediafmt.cxx */; };
 		D1D435480DC8BA120065FD1C /* h281.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78109DC4834005D0464 /* h281.cxx */; };
 		D1D435490DC8BA130065FD1C /* h323h224.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B7C509DC50E5005D0464 /* h323h224.cxx */; };
 		D1D4354A0DC8BA130065FD1C /* q922.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B78209DC4835005D0464 /* q922.cxx */; };
@@ -1519,8 +1518,6 @@
 		D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMGeneralPurposeAddressResource.m; path = Source/Framework/XMGeneralPurposeAddressResource.m; sourceTree = "<group>"; };
 		D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSimpleAddressResource.h; path = Source/Application/XMSimpleAddressResource.h; sourceTree = "<group>"; };
 		D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSimpleAddressResource.m; path = Source/Application/XMSimpleAddressResource.m; sourceTree = "<group>"; };
-		D1FB20310B56540300E374C0 /* h224mediafmt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h224mediafmt.h; sourceTree = "<group>"; };
-		D1FB205D0B565AC700E374C0 /* h224mediafmt.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = h224mediafmt.cxx; sourceTree = "<group>"; };
 		D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookRecord.h; path = Source/Application/XMAddressBookRecord.h; sourceTree = "<group>"; };
 		D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookRecord.m; path = Source/Application/XMAddressBookRecord.m; sourceTree = "<group>"; };
 		D1FD475509B650D500EB517B /* XMSIPEndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSIPEndPoint.h; path = Source/Framework/XMSIPEndPoint.h; sourceTree = "<group>"; };
@@ -3102,7 +3099,6 @@
 			isa = PBXGroup;
 			children = (
 				D1F0B78009DC4834005D0464 /* h224.cxx */,
-				D1FB205D0B565AC700E374C0 /* h224mediafmt.cxx */,
 				D1F0B78109DC4834005D0464 /* h281.cxx */,
 				D1F0B7C509DC50E5005D0464 /* h323h224.cxx */,
 				D1F0B78209DC4835005D0464 /* q922.cxx */,
@@ -3116,7 +3112,6 @@
 			children = (
 				D1F0B78709DC4867005D0464 /* h224.h */,
 				D1BFF0EE09E2BB8E00D3665A /* h224handler.h */,
-				D1FB20310B56540300E374C0 /* h224mediafmt.h */,
 				D1F0B78809DC4867005D0464 /* h281.h */,
 				D1BFF0EF09E2BB8E00D3665A /* h281handler.h */,
 				D1F0B7C709DC50F6005D0464 /* h323h224.h */,
@@ -3575,7 +3570,6 @@
 				D1D435440DC8BA0A0065FD1C /* srtp.cxx in Sources */,
 				D1D435450DC8BA0B0065FD1C /* zrtpudp.cxx in Sources */,
 				D1D435460DC8BA110065FD1C /* h224.cxx in Sources */,
-				D1D435470DC8BA120065FD1C /* h224mediafmt.cxx in Sources */,
 				D1D435480DC8BA120065FD1C /* h281.cxx in Sources */,
 				D1D435490DC8BA130065FD1C /* h323h224.cxx in Sources */,
 				D1D4354A0DC8BA130065FD1C /* q922.cxx in Sources */,

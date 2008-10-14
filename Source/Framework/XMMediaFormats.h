@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.28 2008/10/13 20:27:07 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.29 2008/10/14 07:13:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,6 +14,7 @@
 #include <codec/vidcodec.h>
 #include <h323/h323caps.h>
 #include <sip/sdpcaps.h>
+#include <h224/h323h224.h>
 
 #include "XMTypes.h"
 
@@ -151,10 +152,6 @@ unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile);
 unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level);
-/*unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat);
-void _XMSetH264PacketizationMode(OpalMediaFormat & mediaFormat, unsigned packetizationMode);
-bool _XMGetEnableH264LimitedMode(const OpalMediaFormat & mediaFormat);
-void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264LimitedMode);*/
 
 #pragma mark -
 #pragma mark Macros
@@ -164,6 +161,7 @@ void _XMSetEnableH264LimitedMode(OpalMediaFormat & mediaFormat, bool enableH264L
   H323_REGISTER_CAPABILITY(XM_H323_H263_Capability, XMGetMediaFormat_H263().GetName()); \
   H323_REGISTER_CAPABILITY(XM_H323_H263PLUS_Capability, XMGetMediaFormat_H263Plus().GetName()); \
   H323_REGISTER_CAPABILITY(XM_H323_H264_Capability, XMGetMediaFormat_H264().GetName()); \
+  H323_REGISTER_CAPABILITY(H323_H224Capability, GetOpalH224().GetName()); \
 
 
 #endif // __XM_MEDIA_FORMATS_H__
