@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.62 2008/10/11 17:57:02 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.63 2008/10/14 08:37:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -139,8 +139,8 @@ void XMPacketizerDataReleaseProc(UInt8 *inData, void *inRefCon);
 void XMMediaTransmitterPixelBufferReleaseCallback(void *releaseRefCon, const void *baseAddress);
 UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette);
 
-void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame);
-void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame, unsigned frameNumber);
+void _XMAdjustH261Data(UInt8 *data, BOOL isINTRAFrame, UInt32 timestamp);
+void _XMAdjustH263Data(UInt8 *data, BOOL isINTRAFrame, UInt32 timestamp);
 BOOL _XMIsH263IFrame(UInt8* data);
 
 #pragma mark -
@@ -1971,12 +1971,13 @@ BOOL _XMIsH263IFrame(UInt8* data);
 	
   // Making H.261 stream standard compliant
   if (codecType == kH261CodecType) {
-    _XMAdjustH261Data(data, needsPictureUpdate);
+    _XMAdjustH261Data(data, needsPictureUpdate, timeStamp);
   } else if (codecType == kH263CodecType) {
     if (keyframeInterval == 0 && _XMIsH263IFrame(data) == NO) {
+      // can't send non I-frame pictures at zero keyframe interval
       return noErr;
     }
-    _XMAdjustH263Data(data, needsPictureUpdate, (timeStamp/3003));
+    _XMAdjustH263Data(data, needsPictureUpdate, timeStamp);
   }
 	
   sampleData.data = (const UInt8 *)data;
@@ -2605,9 +2606,8 @@ UInt32 *_XMCreateColorLookupTable(CGDirectPaletteRef palette)
   scanBit(theDataIndex, theMask); \
 }
 
-void _XMAdjustH261Data(UInt8 *h261Data, BOOL isINTRAFrame)
-{
-	
+void _XMAdjustH261Data(UInt8 *h261Data, BOOL isINTRAFrame, UInt32 timestamp)
+{	
   // In the H.261 standard, there are two bits in PTYPE which
   // were originally unused. The first bit of them is now the
   // flag defining the still image mode. If this mode isn't used,
@@ -2618,43 +2618,75 @@ void _XMAdjustH261Data(UInt8 *h261Data, BOOL isINTRAFrame)
   // In addition, the Freeze picture release bit should be set
   // whenever an INTRA frame is sent to make some polycom devices
   // happy.
+  // Also set a correct value in the TR field of the H.261 picture header
+  UInt8 tr = (UInt8)(timestamp/3003) - 1;
   UInt32 dataIndex = 1;
   UInt8 mask = 0x01;
 	
   UInt8 bit;
-  readBit(bit, h261Data, dataIndex, mask);
-	
-  while (bit == 0) {
+  
+  // scan past PSC
+  do  {
     readBit(bit, h261Data, dataIndex, mask);
+  } while (bit == 0);
+  scanBit(dataIndex, mask);
+  scanBit(dataIndex, mask);
+  scanBit(dataIndex, mask);
+  scanBit(dataIndex, mask);
+  
+  // Write the TR value
+  if ((tr >> 4) & 0x01) {
+    h261Data[dataIndex] |= mask;
   }
+  scanBit(dataIndex, mask);
+  if ((tr >> 3) & 0x01) {
+    h261Data[dataIndex] |= mask;
+  }
+  scanBit(dataIndex, mask);
+  if ((tr >> 2) & 0x01) {
+    h261Data[dataIndex] |= mask;
+  }
+  scanBit(dataIndex, mask);
+  if ((tr >> 1) & 0x01) {
+    h261Data[dataIndex] |= mask;
+  }
+  scanBit(dataIndex, mask);
+  if (tr & 0x01) {
+    h261Data[dataIndex] |= mask;
+  }
+  scanBit(dataIndex, mask);
+  
+  // scan past Split screen indicator, Document camera indicator
+  scanBit(dataIndex, mask);
+  scanBit(dataIndex, mask);
 	
-  dataIndex += 1;
-  scanBit(dataIndex, mask);
-  scanBit(dataIndex, mask);
-  scanBit(dataIndex, mask);
+  // Set the Freeze picture release bit if needed
   if (isINTRAFrame) {
     h261Data[dataIndex] |= mask;
   }
   scanBit(dataIndex, mask);
+  
+  // scan past Source format
   scanBit(dataIndex, mask);
 	
+  // set Optional still image mode HI_RES and Spare bits to one (disabled)
   h261Data[dataIndex] |= mask;
   scanBit(dataIndex, mask);
   h261Data[dataIndex] |= mask;
 }
 
-void _XMAdjustH263Data(UInt8 *h263Data, BOOL isINTRAFrame, unsigned frameNumber)
+void _XMAdjustH263Data(UInt8 *h263Data, BOOL isINTRAFrame, UInt32 timestamp)
 {
-  if ((h263Data[4] & 0x02) == 0) { //isINTRAFrame)
+  if ((h263Data[4] & 0x02) == 0) { //isINTRAFrame
     h263Data[4] |= 0x20;
   }
 	
-  // Ensure that the frame number corresponds with the
-  // RTP timestamp
-  UInt8 theFrameNumber = (UInt8)frameNumber;
+  // Set the correct TR value
+  UInt8 tr = (UInt8)(timestamp/3003) - 1;
   h263Data[2] &= 0xfc;
-  h263Data[2] |= ((theFrameNumber >> 6) & 0x03);
-  h263Data[3] = (theFrameNumber << 2) | 0x02;
+  h263Data[3] &= 0x03;
+  h263Data[2] |= ((tr >> 6) & 0x03);
+  h263Data[3] |= ((tr << 2) & 0xfc);
 }
 
 BOOL _XMIsH263IFrame(UInt8* data)
