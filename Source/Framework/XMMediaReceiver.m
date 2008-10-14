@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaReceiver.m,v 1.27 2008/10/07 23:19:17 hfriederich Exp $
+ * $Id: XMMediaReceiver.m,v 1.28 2008/10/14 22:55:53 hfriederich Exp $
  *
  * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,6 +12,7 @@
 #import "XMUtils.h"
 #import "XMVideoManager.h"
 #import "XMCallbackBridge.h"
+#import "XMBridge.h"
 
 #define XM_PACKET_POOL_GRANULARITY 16
 #define XM_CHUNK_BUFFER_SIZE 352*288*4
@@ -192,7 +193,7 @@ static void XMProcessDecompressedFrameProc(void *decompressionTrackingRefCon,
     }
 		
     if (videoMediaSize == XMVideoSize_NoVideo) {
-      NSLog(@"No valid data video size");
+      _XMLogMessage("No valid video data size");
       return NO;
     }
 		
