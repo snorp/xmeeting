@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.35 2008/10/14 07:13:41 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.36 2008/10/15 22:23:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -115,9 +115,10 @@ OpalMediaFormatList XMConnection::GetMediaFormats() const
     mediaFormats += h264VideoFormat;
   }
 	
-  mediaFormats += GetOpalH224();
-	
-	return mediaFormats;
+  mediaFormats += GetOpalH224_H323AnnexQ();
+  mediaFormats += GetOpalH224_HDLCTunneling();
+  
+  return mediaFormats;
 }
 
 OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,

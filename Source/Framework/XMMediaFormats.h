@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.29 2008/10/14 07:13:41 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.30 2008/10/15 22:23:04 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -161,7 +161,8 @@ void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level);
   H323_REGISTER_CAPABILITY(XM_H323_H263_Capability, XMGetMediaFormat_H263().GetName()); \
   H323_REGISTER_CAPABILITY(XM_H323_H263PLUS_Capability, XMGetMediaFormat_H263Plus().GetName()); \
   H323_REGISTER_CAPABILITY(XM_H323_H264_Capability, XMGetMediaFormat_H264().GetName()); \
-  H323_REGISTER_CAPABILITY(H323_H224Capability, GetOpalH224().GetName()); \
+  H323_REGISTER_CAPABILITY(H323_H224_AnnexQCapability, GetOpalH224_H323AnnexQ().GetName()); \
+  H323_REGISTER_CAPABILITY(H323_H224_HDLCTunnelingCapability, GetOpalH224_HDLCTunneling().GetName()); \
 
 
 #endif // __XM_MEDIA_FORMATS_H__
