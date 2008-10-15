@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.29 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.30 2008/10/15 23:25:16 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,7 +28,7 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 : SIPConnection(call, endpoint, token, address, transport, options, stringOptions)
 {
 	initialBandwidth = (XMOpalManager::GetManager()->GetBandwidthLimit() / 100);
-    bandwidthAvailable = initialBandwidth;
+  bandwidthAvailable = initialBandwidth;
 	
   inBandDTMFHandler = NULL;
 }
@@ -37,66 +37,6 @@ XMSIPConnection::~XMSIPConnection()
 {
   delete inBandDTMFHandler;
 }
-
-/*void XMSIPConnection::OnCreatingINVITE(SIP_PDU & invite)
-{
-    /* Add bandwidth information to SDP 
-	/*if(invite.HasSDP()) {
-		SDPSessionDescription & sdp = invite.GetSDP();
-		unsigned bandwidth = bandwidthAvailable / 10;
-        sdp.SetBandwidthModifier(SDPSessionDescription::ApplicationSpecificBandwidthModifier());
-        sdp.SetBandwidthValue(bandwidth);
-	}
-}*/
-
-/*bool XMSIPConnection::OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
-												const OpalMediaType & mediaType,
-												SDPSessionDescription & sdpOut)
-{
-	// adjusting bandwidth information,
-	// taking the lower value of remote (if set)
-	// and own bandwidth limit
-	/*PString bandwidthModifier = sdpIn.GetBandwidthModifier();
-	if(bandwidthModifier.IsEmpty())
-	{
-		bandwidthModifier = SDPSessionDescription::ConferenceTotalBandwidthModifier();
-	}
-	sdpOut.SetBandwidthModifier(bandwidthModifier);
-	
-	unsigned remoteBandwidth = sdpIn.GetBandwidthValue();
-	unsigned localBandwidth = bandwidthAvailable/10;
-	if(remoteBandwidth != 0 && remoteBandwidth < localBandwidth)
-	{
-		SetBandwidthAvailable(10*remoteBandwidth);
-	}
-	sdpOut.SetBandwidthValue(bandwidthAvailable/10);
-	
-    return SIPConnection::OnSendSDPMediaDescription(sdpIn, mediaType, sdpOut);
-  return false;
-}*/
-
-/*OpalMediaStream * XMSIPConnection::CreateMediaStream(const OpalMediaFormat & mediaFormat,
-													 bool isSource)
-{
-	// Adjust some audio parameters if needed
-	/*const SDPMediaDescriptionList & mediaDescriptionList = remoteSDP.GetMediaDescriptions();
-	for(PINDEX i = 0; i < mediaDescriptionList.GetSize(); i++)
-	{
-		SDPMediaDescription & description = mediaDescriptionList[i];
-		if(description.GetMediaType() == OpalDefaultAudioMediaType)
-		{
-			PINDEX packetTime = description.GetPacketTime();
-			if(packetTime != 0)
-			{
-				XMOpalManager::GetManager()->SetCurrentAudioPacketTime(packetTime);
-			}
-			break;
-		}
-	}
-	
-	return SIPConnection::CreateMediaStream(mediaFormat, isSource);
-  return false;
-}*/
 
 bool XMSIPConnection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {

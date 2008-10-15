@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.cpp,v 1.44 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMSIPEndPoint.cpp,v 1.45 2008/10/15 23:25:16 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -55,11 +55,6 @@ bool XMSIPEndPoint::EnableListeners(bool enable)
   }
   
   return result;
-}
-
-PStringArray XMSIPEndPoint::GetDefaultListeners() const {
-  // Disable TCP for now, as this confuses some registrars if multiple contacts in one REGISTER
-  return PStringArray("udp$*:5060");
 }
 
 bool XMSIPEndPoint::UseProxy(const PString & hostname,
@@ -395,32 +390,6 @@ SIPConnection * XMSIPEndPoint::CreateConnection(OpalCall & call,
                                                 OpalConnection::StringOptions * stringOptions)
 {
   return new XMSIPConnection(call, *this, token, destination, transport, options, stringOptions);
-}
-
-SIPURL XMSIPEndPoint::GetDefaultRegisteredPartyName(const OpalTransport & transport)
-{
-  // If using a proxy, use the proxy user name and domain name
-  SIPURL proxyURL = GetProxy();
-  if (!proxyURL.IsEmpty()) {
-    return proxyURL;
-  }
-  
-  // Get the default value
-  SIPURL url = SIPEndPoint::GetDefaultRegisteredPartyName(transport);
-  
-  // If the superclass returns IP "0.0.0.0", make the
-  // OpalTransportAddress empty. This in turn indicates
-  // to the callers that they should use the current
-  // transport's local address
-  OpalTransportAddress address = url.GetHostAddress();
-  PIPSocket::Address ip;
-  if (!address.GetIpAddress(ip)) {
-    return url;
-  }
-  if (ip.IsAny()) {
-    url = SIPURL(GetDefaultLocalPartyName(), OpalTransportAddress());
-  }
-  return url;
 }
 
 #pragma mark -

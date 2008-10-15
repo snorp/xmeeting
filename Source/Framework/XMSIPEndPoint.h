@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPEndPoint.h,v 1.23 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMSIPEndPoint.h,v 1.24 2008/10/15 23:25:16 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,7 +69,6 @@ public:
   // Protocol
   bool EnableListeners(bool enable);
   bool IsListening() const { return isListening; }
-  virtual PStringArray GetDefaultListeners() const;
   bool UseProxy(const PString & hostname,
                 const PString & username,
                 const PString & password);
@@ -97,8 +96,6 @@ public:
                                            SIP_PDU * invite,
                                            unsigned int options = 0,
                                            OpalConnection::StringOptions * stringOptions = NULL);
-  
-  virtual SIPURL GetDefaultRegisteredPartyName(const OpalTransport & transport);
   
   // interface handling
   void OnStartInterfaceListRefresh();

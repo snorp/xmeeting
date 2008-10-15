@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.h,v 1.17 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMSIPConnection.h,v 1.18 2008/10/15 23:25:16 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,15 +30,6 @@ public:
                   OpalConnection::StringOptions * stringOptions = NULL);
 	
   ~XMSIPConnection();
-	
-	//virtual void OnCreatingINVITE(SIP_PDU & invite);
-    
-  /*virtual bool OnSendSDPMediaDescription(const SDPSessionDescription & sdpIn,
-                                           const OpalMediaType & mediaType,
-                                           SDPSessionDescription & sdpOut);*/
-	
-	/*virtual OpalMediaStream * CreateMediaStream(const OpalMediaFormat & mediaFormat,
-                                              bool isSource);*/
 	
   // Propagate opening/closing of media streams to the Obj-C world
   virtual bool OnOpenMediaStream(OpalMediaStream & stream);
