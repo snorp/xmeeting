@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.62 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.63 2008/10/16 21:43:24 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1713,17 +1713,18 @@ typedef enum _XMOpalDispatcherMessage
 - (NSString *)_adjustedAddress:(NSString *)address protocol:(XMCallProtocol)callProtocol
 {
   if (callProtocol == XMCallProtocol_H323 && _XMIsRegisteredAtGatekeeper() == YES) {
-    // Try to do DNS lookups. This is needed to workaround problems with
-    // DNS addresses and Gatekeepers in recent versions of OPAL
-    NSHost *host = [NSHost hostWithName:address];
-    NSArray *addresses = [host addresses];
-    unsigned count = [addresses count];
-    unsigned i;
-    for (i = 0; i < count; i++) {
-      NSString *resolvedAddress = [addresses objectAtIndex:i];
-      // at the moment only IPv4 addresses are accepted
-      if (XMIsIPAddress(resolvedAddress)) {
-        return resolvedAddress;
+    if (!XMIsPhoneNumber(address) && !XMIsIPAddress(address)) {
+      // Try to do DNS lookups. This is needed to workaround problems with
+      // DNS addresses and Gatekeepers in recent versions of OPAL
+      NSHost *host = [NSHost hostWithName:address];
+      NSArray *addresses = [host addresses];
+      unsigned count = [addresses count];
+      for (unsigned i = 0; i < count; i++) {
+        NSString *resolvedAddress = [addresses objectAtIndex:i];
+        // at the moment only IPv4 addresses are accepted
+        if (XMIsIPAddress(resolvedAddress)) {
+          return resolvedAddress;
+        }
       }
     }
   }
