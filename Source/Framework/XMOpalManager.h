@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.h,v 1.49 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMOpalManager.h,v 1.50 2008/10/16 22:04:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -71,10 +71,12 @@ public:
   /* Bandwidth usage */
   unsigned GetBandwidthLimit() const { return bandwidthLimit; }
   void SetBandwidthLimit(unsigned limit);
-  unsigned GetVideoBandwidthLimit() const { return bandwidthLimit - 64000; }
 	
   /* Audio setup methods */
   void SetAudioPacketTime(unsigned _audioPacketTime) { audioPacketTime = _audioPacketTime; }
+  
+  /* Video bandwidth management */
+  unsigned GetVideoBandwidthLimit(const OpalMediaFormat & mediaFormat, unsigned totalBandwidthLimit = 0) const;
     
   /* H.264 methods */
   bool GetEnableH264LimitedMode() const { return enableH264LimitedMode; }
@@ -85,12 +87,8 @@ public:
 	
   /* Debug log information */
   static void LogMessage(const PString & message);
-    
-  /* Define current codec bandwidth limits */
-  static unsigned GetH261BandwidthLimit();
-  static unsigned GetH263BandwidthLimit();
-  static unsigned GetH264BandwidthLimit();
   
+  /* Media Format adjustments go here */
   virtual void AdjustMediaFormats(const OpalConnection & connection, OpalMediaFormatList & mediaFormats) const;
 	
 private:

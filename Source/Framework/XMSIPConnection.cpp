@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPConnection.cpp,v 1.30 2008/10/15 23:25:16 hfriederich Exp $
+ * $Id: XMSIPConnection.cpp,v 1.31 2008/10/16 22:04:44 hfriederich Exp $
  *
  * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,12 +25,13 @@ XMSIPConnection::XMSIPConnection(OpalCall & call,
 								 unsigned int options,
                                  OpalConnection::StringOptions * stringOptions)
 
-: SIPConnection(call, endpoint, token, address, transport, options, stringOptions)
+: SIPConnection(call, endpoint, token, address, transport, options, stringOptions),
+  inBandDTMFHandler(NULL)
 {
-	initialBandwidth = (XMOpalManager::GetManager()->GetBandwidthLimit() / 100);
-  bandwidthAvailable = initialBandwidth;
-	
-  inBandDTMFHandler = NULL;
+  // bandwidth limit is given in units of 100bit/s for OPAL, both direction
+  // XMeeting uses unit bit/s, one direction only
+	initialBandwidth = XMOpalManager::GetManager()->GetBandwidthLimit()/50;
+  SetBandwidthAvailable(initialBandwidth);
 }
 
 XMSIPConnection::~XMSIPConnection()
@@ -58,6 +59,11 @@ void XMSIPConnection::OnClosedMediaStream(const OpalMediaStream & stream)
 bool XMSIPConnection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
   bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
+  
+  PSafePtr<OpalConnection> conn = GetOtherPartyConnection();
+  if (conn != NULL) {
+    conn->SetBandwidthAvailable(bandwidthAvailable);
+  }
   return true;
 }
 

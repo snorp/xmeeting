@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.21 2008/10/13 20:27:07 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.22 2008/10/16 22:04:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,7 +61,7 @@ void XMMediaStream::OnPatchStart()
     framesPerSecond = std::max(framesPerSecond, (unsigned)1);
         
     unsigned bitrate = mediaFormat.GetBandwidth();
-    bitrate = std::min(bitrate, XMOpalManager::GetManager()->GetVideoBandwidthLimit());
+    bitrate = std::min(bitrate, XMOpalManager::GetManager()->GetVideoBandwidthLimit(mediaFormat));
         
     unsigned flags = 0;
         

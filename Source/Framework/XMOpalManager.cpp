@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.81 2008/10/14 20:54:26 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.82 2008/10/16 22:04:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -694,21 +694,26 @@ void XMOpalManager::LogMessage(const PString & message)
 }
 
 #pragma mark -
-#pragma mark Convenience Functions
+#pragma mark Video Bandwidth Management
 
-unsigned XMOpalManager::GetH261BandwidthLimit()
+unsigned XMOpalManager::GetVideoBandwidthLimit(const OpalMediaFormat & mediaFormat, unsigned totalBandwidthLimit) const
 {
-  return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH261Bitrate());
-}
-
-unsigned XMOpalManager::GetH263BandwidthLimit()
-{
-  return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH263Bitrate());
-}
-
-unsigned XMOpalManager::GetH264BandwidthLimit()
-{
-  return std::min(GetManager()->GetVideoBandwidthLimit(), _XMGetMaxH264Bitrate());
+  if (totalBandwidthLimit == 0) { // take the current global value
+    totalBandwidthLimit = bandwidthLimit;
+  } else {
+    totalBandwidthLimit = std::min(totalBandwidthLimit, bandwidthLimit);
+  }
+  unsigned videoBandwidthLimit = totalBandwidthLimit - 64000;
+  
+  // go through the video media formats
+  if (mediaFormat == XM_MEDIA_FORMAT_H261) {
+    videoBandwidthLimit = std::min(videoBandwidthLimit, _XMGetMaxH261Bitrate());
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H263 || mediaFormat == XM_MEDIA_FORMAT_H263PLUS) {
+    videoBandwidthLimit = std::min(videoBandwidthLimit, _XMGetMaxH263Bitrate());
+  } else if (mediaFormat == XM_MEDIA_FORMAT_H264) {
+    videoBandwidthLimit = std::min(videoBandwidthLimit, _XMGetMaxH264Bitrate());
+  }
+  return videoBandwidthLimit;
 }
 
 #pragma mark -

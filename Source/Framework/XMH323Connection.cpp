@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.40 2008/10/10 07:32:15 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.41 2008/10/16 22:04:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,10 +26,14 @@ XMH323Connection::XMH323Connection(OpalCall & call,
                                    unsigned options,
                                    OpalConnection::StringOptions * stringOptions)
 : H323Connection(call, endPoint, token, alias, address, options, stringOptions),
-  initialBandwidth(XMOpalManager::GetManager()->GetBandwidthLimit()/100),
   inBandDTMFHandler(NULL)
 {	
-  bandwidthAvailable = initialBandwidth;
+  // restrict the available bandwidth to 2x2 MBit/s to avoid troubles with some gatekeeperss
+  // (this value is sent in the ARQ)
+  // bandwidth limit is given in units of 100bit/s
+  unsigned totalBandwidthLimit = XMOpalManager::GetManager()->GetBandwidthLimit();
+  initialBandwidth = std::min(totalBandwidthLimit/50, (unsigned)40000);
+  SetBandwidthAvailable(initialBandwidth);
 }
 
 XMH323Connection::~XMH323Connection()
@@ -98,6 +102,11 @@ void XMH323Connection::OnClosedMediaStream(const OpalMediaStream & stream)
 bool XMH323Connection::SetBandwidthAvailable(unsigned newBandwidth, bool force)
 {
   bandwidthAvailable = std::min(initialBandwidth, newBandwidth);
+  
+  PSafePtr<OpalConnection> conn = GetOtherPartyConnection();
+  if (conn != NULL) {
+    conn->SetBandwidthAvailable(bandwidthAvailable);
+  }
   return true;
 }
 

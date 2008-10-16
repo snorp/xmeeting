@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.h,v 1.20 2008/10/13 20:27:07 hfriederich Exp $
+ * $Id: XMConnection.h,v 1.21 2008/10/16 22:04:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -34,12 +34,17 @@ public:
                                               unsigned sessionID,
                                               bool isSource);
   virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
-  PSoundChannel * CreateSoundChannel(bool isSource);
-	
+  
+  // bandwidth management
+  virtual bool SetBandwidthAvailable(unsigned newBandwidth, bool force = false);
+  virtual unsigned GetBandwidthUsed() const { return 0; }
+  virtual bool SetBandwidthUsed(unsigned releasedBandwidth, unsigned requiredBandwidth) { return true; }
+  
   OpalH281Handler * GetH281Handler();
 	
 private:
 		
+  PSoundChannel * CreateSoundChannel(bool isSource);
   OpalH224Handler * GetH224Handler();
   
   bool enableVideo;
