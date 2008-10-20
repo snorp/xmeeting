@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.40 2008/10/14 22:43:18 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.41 2008/10/20 21:24:00 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -180,7 +180,6 @@ public:
   static const PString & CIFOption()        { static PString s = "CIF MPI";      return s; }
   static const PString & CIF4Option()       { static PString s = "CIF4 MPI";     return s; }
   static const PString & CIF16Option()      { static PString s = "CIF16 MPI";    return s; }
-  static const PString & CanRFC2429Option() { static PString s = "Can RFC 2429"; return s; }
   static const PString & IsRFC2429Option()  { static PString s = "Is RFC 2429";  return s; }
 };
 
@@ -220,11 +219,10 @@ XMMediaFormat_H263::XMMediaFormat_H263(bool isH263Plus)
   AddOption(cif16Option);
 
   AddOption(new OpalMediaOptionBoolean(IsRFC2429Option(),  false, OpalMediaOption::MinMerge, false));
-  AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "RFC2190"));
   
   if (isH263Plus) {
     SetOptionBoolean(IsRFC2429Option(), true);
-    SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "RFC2429");
+    AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "RFC2429"));
   }
 }
 
@@ -307,6 +305,8 @@ public:
   
   static const PString & ProfileOption()           { static PString s = "Profile";            return s; }
   static const PString & LevelOption()             { static PString s = "Level";              return s; }
+  static const PString & SingleNALUnitOption()     { static PString s = "SingleNALUnit";      return s; }
+  static const PString & NonInterleavedOption()    { static PString s = "NonInterleaved";     return s; }
 };
 
 XMMediaFormat_H264::XMMediaFormat_H264()
@@ -321,7 +321,9 @@ XMMediaFormat_H264::XMMediaFormat_H264()
 {
   AddOption(new OpalMediaOptionUnsigned(ProfileOption(), false, OpalMediaOption::NoMerge, XM_H264_PROFILE_BASELINE, XM_H264_PROFILE_BASELINE, XM_H264_PROFILE_MAIN));
   AddOption(new OpalMediaOptionUnsigned(LevelOption(),   false, OpalMediaOption::NoMerge, XM_H264_LEVEL_2, XM_H264_LEVEL_1, XM_H264_LEVEL_2));
-  AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "0.0.8.241.0.0.0.0"));
+  AddOption(new OpalMediaOptionBoolean(SingleNALUnitOption(), false, OpalMediaOption::MinMerge, true));
+  AddOption(new OpalMediaOptionBoolean(NonInterleavedOption(), false, OpalMediaOption::MinMerge, true));
+  AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "0.0.8.241.0.0.0.1,0.0.8.241.0.0.0.0"));
 }
 
 PObject* XMMediaFormat_H264::Clone() const
@@ -391,6 +393,20 @@ bool XMMediaFormat_H264::ToNormalisedOptions()
     mpi = 1;
   }
   
+  bool singleNALUnitMode = false;
+  bool nonInterleavedMode = false;
+  PString mediaPacketizationString = GetOptionString(OpalMediaFormat::MediaPacketizationOption(), "");
+  PStringArray mediaPacketizations = mediaPacketizationString.Tokenise(",");
+  for (PINDEX i = 0; i < mediaPacketizations.GetSize(); i++) {
+    if (mediaPacketizations[i] == "0.0.8.241.0.0.0.0") {
+      singleNALUnitMode = true;
+    } else if (mediaPacketizations[i] == "0.0.8.241.0.0.0.1") {
+      nonInterleavedMode = true;
+    }
+  }
+  SetOptionBoolean(SingleNALUnitOption(), singleNALUnitMode);
+  SetOptionBoolean(NonInterleavedOption(), nonInterleavedMode);
+  
   SetOptionInteger(OpalMediaFormat::FrameTimeOption(), OpalMediaFormat::VideoClockRate*100*mpi/2997);
   SetOptionInteger(OpalVideoFormat::FrameWidthOption(), width);
   SetOptionInteger(OpalVideoFormat::FrameHeightOption(), height);
@@ -418,8 +434,20 @@ bool XMMediaFormat_H264::ToCustomisedOptions()
   } else {
     level = XM_H264_LEVEL_2;
   }
-
   SetOptionInteger(LevelOption(), level);
+  
+  bool singleNALUnitMode = GetOptionBoolean(SingleNALUnitOption(), false);
+  bool nonInterleavedMode = GetOptionBoolean(NonInterleavedOption(), false);
+  PString packetizations = "";
+  if (singleNALUnitMode && nonInterleavedMode) {
+    packetizations = "0.0.8.241.0.0.0.1,0.0.8.241.0.0.0.0";
+  } else if (singleNALUnitMode) {
+    packetizations = "0.0.8.241.0.0.0.0";
+  } else if (nonInterleavedMode) {
+    packetizations = "0.0.8.241.0.0.0.1";
+  }
+  SetOptionString(OpalMediaFormat::MediaPacketizationOption(), packetizations);
+
   return OpalVideoFormatInternal::ToCustomisedOptions();
 }
 
@@ -821,8 +849,6 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
   }
 	
   OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
-  
-  bool canRFC2429 = mediaFormat.GetOptionBoolean(XMMediaFormat_H263::CanRFC2429Option());
     
   // "Reset" the media format
   if (isH263PlusCapability == true) {
@@ -830,7 +856,6 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
   } else {
     mediaFormat = XM_MEDIA_FORMAT_H263;
   }
-  mediaFormat.SetOptionBoolean(XMMediaFormat_H263::CanRFC2429Option(), canRFC2429);
   
   unsigned sqcifMPI = 0;
   unsigned qcifMPI  = 0;
