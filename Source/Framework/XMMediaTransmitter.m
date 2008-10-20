@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.63 2008/10/14 08:37:34 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.64 2008/10/20 22:06:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1364,10 +1364,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
 }
 
 - (unsigned)_adjustVideoBitrateLimit:(unsigned)bitrate forCodec:(CodecType)codec
-{
-  // taking into account packetization overhead
-  bitrate = (bitrate * 0.95);
-	
+{	
   // protection against codec hangups
   if (bitrate < 80000 && codec == kH261CodecType) {
     bitrate = 80000;  
@@ -1937,7 +1934,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
     }
 		
     // Preventing the packetizer from creating packets
-    // greater than the ethernet packet size
+    // greater than the ethernet packet size.
     err = RTPMPSetMaxPacketSize(mediaPacketizer, 1400);
     if (err != noErr) {
       NSLog(@"SetMaxPacketSize failed: %d", (int)err);

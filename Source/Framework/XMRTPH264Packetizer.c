@@ -1,5 +1,5 @@
 /*
- * $Id: XMRTPH264Packetizer.c,v 1.7 2008/10/11 18:56:55 hfriederich Exp $
+ * $Id: XMRTPH264Packetizer.c,v 1.8 2008/10/20 22:06:42 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,7 +17,8 @@ typedef struct
   ComponentInstance packetBuilder;
   TimeBase timeBase;
   TimeScale timeScale;
-  UInt32 maxPacketSize;
+  UInt32 maxPacketSize_Soft;
+  UInt32 maxPacketSize_Hard;
   Boolean useNonInterleavedMode;
   UInt8 *spsAtomData;
   UInt8 *ppsAtomData;
@@ -56,7 +57,8 @@ ComponentResult XMRTPH264Packetizer_Open(XMRTPH264PacketizerGlobals globals, Com
   globals->target = self;
   globals->timeBase = 0;
   globals->timeScale = 0;
-  globals->maxPacketSize = 1438;
+  globals->maxPacketSize_Soft = 1438;
+  globals->maxPacketSize_Hard = 2500;
   globals->useNonInterleavedMode = false;
   globals->spsAtomData = NULL;
   globals->spsAtomLength = 0;
@@ -159,7 +161,10 @@ ComponentResult XMRTPH264Packetizer_SetSampleData(XMRTPH264PacketizerGlobals glo
                                                   const RTPMPSampleDataParams *sampleData,
                                                   SInt32 *outFlags)
 {	
-  UInt32 maxPacketLength = globals->maxPacketSize;
+  UInt32 maxPacketLength = globals->maxPacketSize_Hard;
+  if (globals->useNonInterleavedMode == true) {
+    maxPacketLength = globals->maxPacketSize_Soft;
+  }
   const UInt8 *data = sampleData->data;
   UInt32 dataLength = sampleData->dataLength;
   UInt32 index = 0;
@@ -441,14 +446,14 @@ ComponentResult XMRTPH264Packetizer_GetMediaType(XMRTPH264PacketizerGlobals glob
 
 ComponentResult XMRTPH264Packetizer_SetMaxPacketSize(XMRTPH264PacketizerGlobals globals, UInt32 inMaxPacketSize)
 {
-  globals->maxPacketSize = inMaxPacketSize;
+  globals->maxPacketSize_Soft = inMaxPacketSize;
   return noErr;
 }
 
 ComponentResult XMRTPH264Packetizer_GetMaxPacketSize(XMRTPH264PacketizerGlobals globals,
 													 UInt32 *outMaxPacketSize)
 {
-  *outMaxPacketSize = globals->maxPacketSize;
+  *outMaxPacketSize = globals->maxPacketSize_Soft;
   return noErr;
 }
 

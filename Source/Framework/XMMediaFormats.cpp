@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.41 2008/10/20 21:24:00 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.42 2008/10/20 22:06:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1161,5 +1161,15 @@ void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level)
   if (mediaFormat.HasOption(XMMediaFormat_H264::LevelOption())) {
     mediaFormat.SetOptionInteger(XMMediaFormat_H264::LevelOption(), level);
   }
+}
+
+unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat)
+{
+  if (mediaFormat.HasOption(XMMediaFormat_H264::NonInterleavedOption())) {
+    if (mediaFormat.GetOptionBoolean(XMMediaFormat_H264::NonInterleavedOption())) {
+      return XM_H264_PACKETIZATION_MODE_NON_INTERLEAVED;
+    }
+  }
+  return XM_H264_PACKETIZATION_MODE_SINGLE_NAL;
 }
 

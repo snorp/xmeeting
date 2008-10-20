@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.22 2008/10/16 22:04:44 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.23 2008/10/20 22:06:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -49,7 +49,7 @@ void XMMediaStream::OnPatchStart()
       
     // Ensure the code below runs just once.
     // Also avoid possible race conditions
-    if(hasStarted == true || isTerminated == true) {
+    if (hasStarted == true || isTerminated == true) {
       return;
     }
       
@@ -68,33 +68,33 @@ void XMMediaStream::OnPatchStart()
     XMCodecIdentifier codecIdentifier = _XMGetMediaFormatCodec(mediaFormat);
     XMVideoSize videoSize = _XMGetMediaFormatSize(mediaFormat);
         
-    if(codecIdentifier == XMCodecIdentifier_UnknownCodec ||
+    if (codecIdentifier == XMCodecIdentifier_UnknownCodec ||
        videoSize == XMVideoSize_NoVideo || videoSize == XMVideoSize_Custom) {
       // Shouldn't actually happen
       return;
     }
         
-    if(codecIdentifier == XMCodecIdentifier_H263) {
+    if (codecIdentifier == XMCodecIdentifier_H263) {
       // If we're  sending H.263, we need to know which
       // format to send. The payload code is submitted in the
       // flags parameter
       flags = payloadType;
             
-      if(payloadType == RTP_DataFrame::H263) {
+      if (payloadType == RTP_DataFrame::H263) {
         cout << "Sending RFC2190" << endl;
       } else {
         cout << "Sending RFC2429" << endl;
       }
-    } else if(codecIdentifier == XMCodecIdentifier_H264) {
-      //if(_XMGetH264PacketizationMode(mediaFormat) == XM_H264_PACKETIZATION_MODE_SINGLE_NAL) {
+    } else if (codecIdentifier == XMCodecIdentifier_H264) {
+      unsigned packetizationMode = _XMGetH264PacketizationMode(mediaFormat);
+      if (packetizationMode == XM_H264_PACKETIZATION_MODE_SINGLE_NAL) {
         // We send only at a limited bitrate to avoid too many
         // NAL units which are TOO big to fit
-        if(bitrate > 320000) {
-          bitrate = 320000;
+        if (bitrate > 380000) {
+          bitrate = 380000;
         }
-      //}
-      // TODO: FIXME
-      flags = (XM_H264_PACKETIZATION_MODE_SINGLE_NAL << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
+      }
+      flags = (packetizationMode << 8) + (_XMGetH264Profile(mediaFormat) << 4) + _XMGetH264Level(mediaFormat);
     }
         
     videoTransmitterStream = this;
@@ -142,7 +142,7 @@ bool XMMediaStream::WritePacket(RTP_DataFrame & packet)
 
 bool XMMediaStream::ExecuteCommand(const OpalMediaCommand & command)
 {
-  if(PIsDescendant(&command, OpalVideoUpdatePicture)) {
+  if (PIsDescendant(&command, OpalVideoUpdatePicture)) {
     _XMUpdatePicture();
    // return true;
   }

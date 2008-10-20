@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.30 2008/10/15 22:23:04 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.31 2008/10/20 22:06:42 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -152,6 +152,7 @@ unsigned _XMGetH264Profile(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Profile(OpalMediaFormat & mediaFormat, unsigned profile);
 unsigned _XMGetH264Level(const OpalMediaFormat & mediaFormat);
 void _XMSetH264Level(OpalMediaFormat & mediaFormat, unsigned level);
+unsigned _XMGetH264PacketizationMode(const OpalMediaFormat & mediaFormat);
 
 #pragma mark -
 #pragma mark Macros
