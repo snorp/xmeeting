@@ -1,5 +1,5 @@
 /*
- * $Id: XMApplicationFunctions.m,v 1.20 2008/10/12 12:24:11 hfriederich Exp $
+ * $Id: XMApplicationFunctions.m,v 1.21 2008/10/21 07:32:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -53,16 +53,14 @@ NSString *XMCallEndReasonString(XMCallEndReason callEndReason)
   
   switch (callEndReason) {
     case XMCallEndReason_EndedByLocalUser:
-      reasonString = NSLocalizedString(@"XM_CALL_END_USER_CLEARED", @"");
-      break;
     case XMCallEndReason_EndedByNoAccept:
-    case XMCallEndReason_EndedByRefusal:
-      reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_REFUSED", @"");
+    case XMCallEndReason_EndedByAnswerDenied:
+      reasonString = NSLocalizedString(@"XM_CALL_END_USER_CLEARED", @"");
       break;
     case XMCallEndReason_EndedByRemoteUser:
       reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_CLEARED", @"");
       break;
-    case XMCallEndReason_EndedByAnswerDenied:
+    case XMCallEndReason_EndedByRefusal:
     case XMCallEndReason_EndedByNoAnswer:
     case XMCallEndReason_EndedByTemporaryFailure:
       reasonString = NSLocalizedString(@"XM_CALL_END_REMOTE_NO_ANSWER", @"");;

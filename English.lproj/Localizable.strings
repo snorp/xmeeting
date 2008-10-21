@@ -54,7 +54,6 @@
 
 /* Call end reason */
 "XM_CALL_END_USER_CLEARED" = "User cleared call";
-"XM_CALL_END_REMOTE_REFUSED" = "Remote party refused call";
 "XM_CALL_END_REMOTE_CLEARED" = "Remote party cleared call";
 "XM_CALL_END_REMOTE_NO_ANSWER" = "Remote pary did not answer call";
 "XM_CALL_END_REMOTE_ABORT" = "Remote party stopped calling";

@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.41 2008/10/16 22:04:44 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.42 2008/10/21 07:32:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,6 +26,7 @@ XMH323Connection::XMH323Connection(OpalCall & call,
                                    unsigned options,
                                    OpalConnection::StringOptions * stringOptions)
 : H323Connection(call, endPoint, token, alias, address, options, stringOptions),
+  releaseCause(Q931::ErrorInCauseIE),
   inBandDTMFHandler(NULL)
 {	
   // restrict the available bandwidth to 2x2 MBit/s to avoid troubles with some gatekeeperss
@@ -133,6 +134,21 @@ void XMH323Connection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
     }
     patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
   }
+}
+
+void XMH323Connection::OnReceivedReleaseComplete(const H323SignalPDU & pdu)
+{
+  releaseCause = pdu.GetQ931().GetCause();
+  H323Connection::OnReceivedReleaseComplete(pdu);
+  releaseCause = Q931::ErrorInCauseIE;
+}
+
+void XMH323Connection::Release(OpalConnection::CallEndReason callEndReason)
+{
+  if (callEndReason == OpalConnection::EndedByQ931Cause && releaseCause == Q931::CallRejected) {
+    callEndReason = OpalConnection::EndedByRefusal;
+  }
+  H323Connection::Release(callEndReason);
 }
 
 void XMH323Connection::CleanUp()

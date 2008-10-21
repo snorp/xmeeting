@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.26 2008/10/10 07:32:15 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.27 2008/10/21 07:32:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -51,12 +51,18 @@ public:
   // Overridden to being able to send in-band DTMF
   virtual bool SendUserInputTone(char tone, unsigned duration);
   virtual void OnPatchMediaStream(bool isSource, OpalMediaPatch & patch);
+  
+  // Better call end reason handling if the remote party rejects the call
+  virtual void OnReceivedReleaseComplete(const H323SignalPDU & pdu);
+  virtual void Release(OpalConnection::CallEndReason callEndReason);
     
   // Improved clean up when closing the framework
   void CleanUp();
   virtual void CleanUpOnCallEnd();
 	
 private:
+    
+  Q931::CauseValues releaseCause;
 	
   unsigned initialBandwidth;
   XMInBandDTMFHandler * inBandDTMFHandler;

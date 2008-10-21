@@ -147,6 +147,8 @@
 		D15436510C020535002A027E /* XMeetingABPlugin-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */; };
 		D15436520C020561002A027E /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE4B75083CE0FC00B66B5D /* AddressBook.framework */; };
 		D15436650C02056D002A027E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
+		D15B1CE00EADBC6C0070B7B5 /* ratectl.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D15B1CDF0EADBC6C0070B7B5 /* ratectl.h */; };
+		D15B1CE20EADBC840070B7B5 /* ratectl.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15B1CE10EADBC840070B7B5 /* ratectl.cxx */; };
 		D15F71C40E54B7300006CB43 /* g711a1_plc.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D15F71C30E54B7300006CB43 /* g711a1_plc.cxx */; };
 		D162158409F0F91600647E48 /* CallHistory_H323.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158209F0F91600647E48 /* CallHistory_H323.tiff */; };
 		D162158509F0F91600647E48 /* CallHistory_SIP.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D162158309F0F91600647E48 /* CallHistory_SIP.tiff */; };
@@ -510,6 +512,7 @@
 				D10B8E0C0A512F5D00003A33 /* logo.tiff in CopyFiles */,
 				D10B8E0D0A512F5D00003A33 /* mainwindow.png in CopyFiles */,
 				D10B8E0E0A512F5D00003A33 /* osd.png in CopyFiles */,
+				D15B1CE00EADBC6C0070B7B5 /* ratectl.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -819,6 +822,8 @@
 		D15439C90C0C5769002A027E /* handlers.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = handlers.cxx; sourceTree = "<group>"; };
 		D15B0679084763F000FA58A1 /* XMDatabaseField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDatabaseField.h; sourceTree = "<group>"; };
 		D15B067A084763F000FA58A1 /* XMDatabaseField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDatabaseField.m; sourceTree = "<group>"; };
+		D15B1CDF0EADBC6C0070B7B5 /* ratectl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ratectl.h; sourceTree = "<group>"; };
+		D15B1CE10EADBC840070B7B5 /* ratectl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ratectl.cxx; sourceTree = "<group>"; };
 		D15C639B0B069E5E00C24799 /* XMH323Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMH323Connection.cpp; path = Source/Framework/XMH323Connection.cpp; sourceTree = "<group>"; };
 		D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMApplicationFunctions.h; path = Source/Application/XMApplicationFunctions.h; sourceTree = "<group>"; };
 		D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMApplicationFunctions.m; path = Source/Application/XMApplicationFunctions.m; sourceTree = "<group>"; };
@@ -2551,6 +2556,7 @@
 				D10973CF0BADCB1E007E8087 /* opalplugin.h */,
 				D10973CA0BADCABB007E8087 /* opalpluginmgr.h */,
 				D1CEE13208F9022B007E4ABE /* opalwavfile.h */,
+				D15B1CDF0EADBC6C0070B7B5 /* ratectl.h */,
 				D1CEE13308F9022B007E4ABE /* rfc2833.h */,
 				D1D4348D0DC8B6900065FD1C /* rfc4175.h */,
 				D1CEE13408F9022B007E4ABE /* silencedetect.h */,
@@ -2727,6 +2733,7 @@
 				D1D4349F0DC8B7690065FD1C /* iLBCmf.cxx */,
 				D1B581820A76C299005DF33D /* opalpluginmgr.cxx */,
 				D1CEE2BF08F90262007E4ABE /* opalwavfile.cxx */,
+				D15B1CE10EADBC840070B7B5 /* ratectl.cxx */,
 				D1CEE2C008F90262007E4ABE /* rfc2833.cxx */,
 				D1D434970DC8B73C0065FD1C /* rfc4175.cxx */,
 				D1CEE2C108F90262007E4ABE /* silencedetect.cxx */,
@@ -3699,6 +3706,7 @@
 				D14BBF650E3F7E28007B1A57 /* localep.cxx in Sources */,
 				D15F71C40E54B7300006CB43 /* g711a1_plc.cxx in Sources */,
 				D1AD1A6A0E63212100143295 /* pvidfile.cxx in Sources */,
+				D15B1CE20EADBC840070B7B5 /* ratectl.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
