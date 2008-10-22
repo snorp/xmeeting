@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.38 2008/10/16 22:04:44 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.39 2008/10/22 05:46:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -61,9 +61,9 @@ XMConnection::XMConnection(OpalCall & call, XMEndPoint & _endpoint)
 XMConnection::~XMConnection()
 {
 	if (h224Handler != NULL) {
-		//h224Handler->RemoveClient(*h281Handler);
-		//delete h281Handler;
-		//delete h224Handler;
+		h224Handler->RemoveClient(*h281Handler);
+		delete h281Handler;
+		delete h224Handler;
 		
 		h224Handler = NULL;
 		h281Handler = NULL;
@@ -106,7 +106,6 @@ OpalMediaFormatList XMConnection::GetMediaFormats() const
 	
   if (enableVideo == true) {
     mediaFormats += h261VideoFormat;
-    
     if (!excludeH263) {
       mediaFormats += h263VideoFormat;
       mediaFormats += h263PlusVideoFormat;

@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.42 2008/10/20 22:06:42 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.43 2008/10/22 05:46:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -828,6 +828,10 @@ bool XM_H323_H263_Capability::OnSendingPDU(H245_VideoMode & pdu) const
   mode.m_advancedPrediction = false;
   mode.m_pbFrames = false;
   mode.m_errorCompensation = false;
+  
+  if (isH263PlusCapability) {
+    mode.IncludeOptionalField(H245_H263VideoMode::e_h263Options);
+  }
 	
   return true;
 }

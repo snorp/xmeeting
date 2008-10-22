@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.h,v 1.27 2008/10/21 07:32:26 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.28 2008/10/22 05:46:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -30,8 +30,6 @@ public:
                    unsigned options = 0,
                    OpalConnection::StringOptions * stringOptions = NULL);
   ~XMH323Connection();
-	
-  virtual void OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu);
     
   virtual H323_RTPChannel * CreateRTPChannel(const H323Capability & capability,
                                              H323Channel::Directions dir,
@@ -61,11 +59,15 @@ public:
   virtual void CleanUpOnCallEnd();
 	
 private:
-    
+  // Handling if video decoding fails permamently
+  PDECLARE_NOTIFIER(OpalMediaFormat, XMH323Connection, OnDecodingVideoFailed);
+  
   Q931::CauseValues releaseCause;
 	
   unsigned initialBandwidth;
   XMInBandDTMFHandler * inBandDTMFHandler;
+  
+  OpalMediaFormatList excludedFormats;
 };
 
 #endif // __XM_H323_CONNECTION_H__

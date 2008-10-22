@@ -1,5 +1,5 @@
 /*
- * $Id: XMReceiverMediaPatch.cpp,v 1.37 2008/10/14 21:35:10 hfriederich Exp $
+ * $Id: XMReceiverMediaPatch.cpp,v 1.38 2008/10/22 05:46:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -46,6 +46,11 @@ void XMReceiverMediaPatch::SetCommandNotifier(const PNotifier & notifier, bool f
 {
   commandNotifier = notifier;
   OpalMediaPatch::SetCommandNotifier(notifier, fromSink);
+}
+
+void XMReceiverMediaPatch::SetDecodingFailureNotifier(const PNotifier & notifier)
+{
+  decodingFailureNotifier = notifier;
 }
 
 void XMReceiverMediaPatch::Main()
@@ -340,6 +345,12 @@ void XMReceiverMediaPatch::Main()
           IssueVideoUpdatePictureCommand();
         }
       }
+      
+      // Notify if decoding fails permamently
+      if (decodingFailures == 200) {
+        HandleDecodingFailed();
+        decodingFailures = 0;
+      }
 			
       // If not all packets can be released, the remaining packets are
       // put at the beginning of the packet pool.
@@ -399,5 +410,13 @@ void XMReceiverMediaPatch::IssueVideoUpdatePictureCommand()
     
   if (!commandNotifier.IsNULL()) {
     commandNotifier(command, 0);
+  }
+}
+
+void XMReceiverMediaPatch::HandleDecodingFailed()
+{
+  if (!decodingFailureNotifier.IsNULL()) {
+    OpalMediaFormat mediaFormat = source.GetMediaFormat();
+    decodingFailureNotifier(mediaFormat, 0);
   }
 }

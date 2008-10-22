@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Connection.cpp,v 1.42 2008/10/21 07:32:26 hfriederich Exp $
+ * $Id: XMH323Connection.cpp,v 1.43 2008/10/22 05:46:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,8 @@
 #include "XMH323EndPoint.h"
 #include "XMH323Channel.h"
 #include "XMBridge.h"
+#include "XMReceiverMediaPatch.h"
+#include "XMConnection.h"
 
 XMH323Connection::XMH323Connection(OpalCall & call,
                                    H323EndPoint & endPoint,
@@ -40,24 +42,6 @@ XMH323Connection::XMH323Connection(OpalCall & call,
 XMH323Connection::~XMH323Connection()
 {
   delete inBandDTMFHandler;
-}
-
-void XMH323Connection::OnSendCapabilitySet(H245_TerminalCapabilitySet & pdu)
-{
-  // TODO: Recheck if this still is necessary
-  /*H323Connection::OnSendCapabilitySet(pdu);
-	
-  const H323Capabilities & localCaps = GetLocalCapabilities();
-
-  for (unsigned i = 0; i < localCaps.GetSize(); i++) {
-    H323Capability & h323Capability = localCaps[i];
-		
-    // Override default Opal behaviour to obtain better NetMeeting compatibility
-    if(PIsDescendant(&h323Capability, H323AudioCapability)) {
-      H323AudioCapability & audioCap = (H323AudioCapability &)h323Capability;
-      audioCap.SetTxFramesInPacket(30);
-    }
-  }*/
 }
 
 H323_RTPChannel * XMH323Connection::CreateRTPChannel(const H323Capability & capability,
@@ -85,7 +69,7 @@ bool XMH323Connection::OnClosingLogicalChannel(H323Channel & channel)
 
 bool XMH323Connection::OnOpenMediaStream(OpalMediaStream & mediaStream)
 {
-  if(!H323Connection::OnOpenMediaStream(mediaStream)) {
+  if (!H323Connection::OnOpenMediaStream(mediaStream)) {
     return false;
   }
   
@@ -115,7 +99,7 @@ bool XMH323Connection::SendUserInputTone(char tone, unsigned duration)
 {
   // Separate RFC2833 is not implemented. Therefore it is used within
   // XMeeting to signal in-band DTMF
-  if(sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 && inBandDTMFHandler != NULL) {
+  if (sendUserInputMode == OpalConnection::SendUserInputAsSeparateRFC2833 && inBandDTMFHandler != NULL) {
     inBandDTMFHandler->SendTone(tone, duration);
     return true;
   }
@@ -128,11 +112,18 @@ void XMH323Connection::OnPatchMediaStream(bool isSource, OpalMediaPatch & patch)
   H323Connection::OnPatchMediaStream(isSource, patch);
 	
   // Add the in-band DTMF handler if this is an audio sending stream
-  if(!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalMediaType::Audio()) {
-    if(inBandDTMFHandler == NULL) {
+  if (!isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalMediaType::Audio()) {
+    if (inBandDTMFHandler == NULL) {
       inBandDTMFHandler = new XMInBandDTMFHandler();
     }
     patch.AddFilter(inBandDTMFHandler->GetTransmitHandler(), OpalPCM16);
+  }
+  
+  // add the video frame decoding failed notifier
+  if (isSource && patch.GetSource().GetMediaFormat().GetMediaType() == OpalMediaType::Video()) {
+    if (PIsDescendant(&patch, XMReceiverMediaPatch)) {
+      ((XMReceiverMediaPatch &)patch).SetDecodingFailureNotifier(PCREATE_NOTIFIER(OnDecodingVideoFailed));
+    }
   }
 }
 
@@ -149,6 +140,33 @@ void XMH323Connection::Release(OpalConnection::CallEndReason callEndReason)
     callEndReason = OpalConnection::EndedByRefusal;
   }
   H323Connection::Release(callEndReason);
+}
+
+void XMH323Connection::OnDecodingVideoFailed(OpalMediaFormat & mediaFormat, INT ignore)
+{
+  excludedFormats += mediaFormat;
+  
+  // Request a mode change, use the existing audio / H.224 channels and all available video formats
+  PString modePrefix = "";
+  OpalMediaStreamPtr audioStream = GetMediaStream(OpalMediaType::Audio(), true);
+  OpalMediaStreamPtr h224Stream = GetMediaStream(OpalH224MediaType::MediaType(), true);
+  if (audioStream != NULL) {
+    modePrefix += audioStream->GetMediaFormat().GetName() + "\t";
+  }
+  if (h224Stream != NULL) {
+    modePrefix += h224Stream->GetMediaFormat().GetName() + "\t";
+  }
+  PString modes = "";
+  OpalMediaFormatList mediaFormats = GetMediaFormats();
+  mediaFormats -= excludedFormats;
+  for (PINDEX i = 0; i < mediaFormats.GetSize(); i++) {
+    const OpalMediaFormat & mediaFormat = mediaFormats[i];
+    if (mediaFormat.GetMediaType() == OpalMediaType::Video()) {
+      modes += modePrefix + mediaFormat.GetName() + "\n";
+    }
+  }
+  PTRACE(1, "XMH323Con\tRequest mode change since can't decode incoming video stream");
+  RequestModeChange(modes);
 }
 
 void XMH323Connection::CleanUp()
