@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.43 2008/10/22 05:46:51 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.44 2008/10/23 21:50:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1003,52 +1003,21 @@ PString XM_H323_H264_Capability::GetFormatName() const
 
 bool XM_H323_H264_Capability::OnSendingPDU(H245_VideoCapability & cap) const
 {
-  const OpalMediaFormat & mediaFormat = GetMediaFormat();
-  unsigned profile    = mediaFormat.GetOptionInteger(XMMediaFormat_H264::ProfileOption());
-  unsigned level      = mediaFormat.GetOptionInteger(XMMediaFormat_H264::LevelOption());
-  unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption())/100;
-  
   cap.SetTag(H245_VideoCapability::e_genericVideoCapability);
-	
   H245_GenericCapability & h264 = cap;
-	
-  H245_CapabilityIdentifier & h264CapabilityIdentifier = h264.m_capabilityIdentifier;
-  h264CapabilityIdentifier.SetTag(H245_CapabilityIdentifier::e_standard);
-  PASN_ObjectId & h264ObjectId = h264CapabilityIdentifier;
-  h264ObjectId.SetValue("0.0.8.241.0.0.1");
-	
-  h264.IncludeOptionalField(H245_GenericCapability::e_maxBitRate);
-  h264.m_maxBitRate = maxBitRate;
-	
-  h264.IncludeOptionalField(H245_GenericCapability::e_collapsing);
-  H245_ArrayOf_GenericParameter & h264Collapsing = h264.m_collapsing;
-  h264Collapsing.SetSize(2);
-	
-  H245_GenericParameter & h264Profile = h264Collapsing[0];
-  H245_ParameterIdentifier & profileIdentifier = h264Profile.m_parameterIdentifier;
-  profileIdentifier.SetTag(H245_ParameterIdentifier::e_standard);
-  PASN_Integer & profileIdentifierInteger = profileIdentifier;
-  profileIdentifierInteger.SetValue(41);
-  H245_ParameterValue & profileValue = h264Profile.m_parameterValue;
-  profileValue.SetTag(H245_ParameterValue::e_booleanArray);
-  PASN_Integer & profileValueInteger = profileValue;
-  profileValueInteger.SetValue(GetProfileCode(profile));
-	
-  H245_GenericParameter & h264Level = h264Collapsing[1];
-  H245_ParameterIdentifier & levelIdentifier = h264Level.m_parameterIdentifier;
-  levelIdentifier.SetTag(H245_ParameterIdentifier::e_standard);
-  PASN_Integer & levelIdentifierInteger = levelIdentifier;
-  levelIdentifierInteger.SetValue(42);
-  H245_ParameterValue & levelValue = h264Level.m_parameterValue;
-  levelValue.SetTag(H245_ParameterValue::e_unsignedMin);
-  PASN_Integer & levelValueInteger = levelValue;
-  levelValueInteger.SetValue(GetLevelCode(level));
+  
+  OnSendingPDU(h264);
 	
   return true;
 }
 
 bool XM_H323_H264_Capability::OnSendingPDU(H245_VideoMode & pdu) const
 {
+  pdu.SetTag(H245_VideoMode::e_genericVideoMode);
+	
+  H245_GenericCapability & h264 = pdu;
+  OnSendingPDU(h264);
+  
   return true;
 }
 
@@ -1124,6 +1093,46 @@ bool XM_H323_H264_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
   mediaFormat.SetOptionInteger(OpalMediaFormat::MaxBitRateOption(), maxBitRate*100);
 
   return true;
+}
+
+void XM_H323_H264_Capability::OnSendingPDU(H245_GenericCapability & h264) const
+{
+  const OpalMediaFormat & mediaFormat = GetMediaFormat();
+  unsigned profile    = mediaFormat.GetOptionInteger(XMMediaFormat_H264::ProfileOption());
+  unsigned level      = mediaFormat.GetOptionInteger(XMMediaFormat_H264::LevelOption());
+  unsigned maxBitRate = mediaFormat.GetOptionInteger(OpalMediaFormat::MaxBitRateOption())/100;
+	
+  H245_CapabilityIdentifier & h264CapabilityIdentifier = h264.m_capabilityIdentifier;
+  h264CapabilityIdentifier.SetTag(H245_CapabilityIdentifier::e_standard);
+  PASN_ObjectId & h264ObjectId = h264CapabilityIdentifier;
+  h264ObjectId.SetValue("0.0.8.241.0.0.1");
+	
+  h264.IncludeOptionalField(H245_GenericCapability::e_maxBitRate);
+  h264.m_maxBitRate = maxBitRate;
+	
+  h264.IncludeOptionalField(H245_GenericCapability::e_collapsing);
+  H245_ArrayOf_GenericParameter & h264Collapsing = h264.m_collapsing;
+  h264Collapsing.SetSize(2);
+	
+  H245_GenericParameter & h264Profile = h264Collapsing[0];
+  H245_ParameterIdentifier & profileIdentifier = h264Profile.m_parameterIdentifier;
+  profileIdentifier.SetTag(H245_ParameterIdentifier::e_standard);
+  PASN_Integer & profileIdentifierInteger = profileIdentifier;
+  profileIdentifierInteger.SetValue(41);
+  H245_ParameterValue & profileValue = h264Profile.m_parameterValue;
+  profileValue.SetTag(H245_ParameterValue::e_booleanArray);
+  PASN_Integer & profileValueInteger = profileValue;
+  profileValueInteger.SetValue(GetProfileCode(profile));
+	
+  H245_GenericParameter & h264Level = h264Collapsing[1];
+  H245_ParameterIdentifier & levelIdentifier = h264Level.m_parameterIdentifier;
+  levelIdentifier.SetTag(H245_ParameterIdentifier::e_standard);
+  PASN_Integer & levelIdentifierInteger = levelIdentifier;
+  levelIdentifierInteger.SetValue(42);
+  H245_ParameterValue & levelValue = h264Level.m_parameterValue;
+  levelValue.SetTag(H245_ParameterValue::e_unsignedMin);
+  PASN_Integer & levelValueInteger = levelValue;
+  levelValueInteger.SetValue(GetLevelCode(level));
 }
 
 #pragma mark -

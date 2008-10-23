@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.h,v 1.31 2008/10/20 22:06:42 hfriederich Exp $
+ * $Id: XMMediaFormats.h,v 1.32 2008/10/23 21:50:08 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -141,6 +141,8 @@ public:
   virtual bool OnSendingPDU(H245_VideoCapability & pdu) const;
   virtual bool OnSendingPDU(H245_VideoMode & pdu) const;
   virtual bool OnReceivedPDU(const H245_VideoCapability & pdu);
+private:
+  void OnSendingPDU(H245_GenericCapability & capability) const;
 };
 
 #pragma mark -
