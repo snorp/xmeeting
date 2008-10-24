@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.44 2008/10/23 21:50:08 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.45 2008/10/24 06:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -219,11 +219,19 @@ XMMediaFormat_H263::XMMediaFormat_H263(bool isH263Plus)
   AddOption(cif16Option);
 
   AddOption(new OpalMediaOptionBoolean(IsRFC2429Option(),  false, OpalMediaOption::MinMerge, false));
+  AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, ""));
   
   if (isH263Plus) {
     SetOptionBoolean(IsRFC2429Option(), true);
-    AddOption(new OpalMediaOptionString(OpalVideoFormat::MediaPacketizationOption(), false, "RFC2429"));
+    SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "RFC2429");
   }
+  
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::FrameWidthOption(), XM_CIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::MinRxFrameWidthOption(), XM_SQCIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::MinRxFrameHeightOption(), XM_SQCIF_HEIGHT);
+  SetOptionInteger(OpalVideoFormat::MaxRxFrameWidthOption(), XM_CIF_WIDTH);
+  SetOptionInteger(OpalVideoFormat::MaxRxFrameHeightOption(), XM_CIF_HEIGHT);
 }
 
 PObject *XMMediaFormat_H263::Clone() const
@@ -856,9 +864,11 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
     
   // "Reset" the media format
   if (isH263PlusCapability == true) {
-    mediaFormat = XM_MEDIA_FORMAT_H263PLUS;
+    mediaFormat.SetOptionBoolean(XMMediaFormat_H263::IsRFC2429Option(), true);
+    mediaFormat.SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "RFC2429");
   } else {
-    mediaFormat = XM_MEDIA_FORMAT_H263;
+    mediaFormat.SetOptionBoolean(XMMediaFormat_H263::IsRFC2429Option(), false);
+    mediaFormat.SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "");
   }
   
   unsigned sqcifMPI = 0;

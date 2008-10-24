@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaTransmitter.m,v 1.64 2008/10/20 22:06:42 hfriederich Exp $
+ * $Id: XMMediaTransmitter.m,v 1.65 2008/10/24 06:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1045,8 +1045,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
     dataRateParams.dataOverrun = overrun;
     dataRateParams.frameDuration = avgFrameDuration;
     dataRateParams.keyFrameRate = 0;
-    dataRateParams.minSpatialQuality = codecNormalQuality;
-    dataRateParams.minTemporalQuality = codecNormalQuality;
+    dataRateParams.minSpatialQuality = codecMaxQuality;
+    dataRateParams.minTemporalQuality = codecMaxQuality;
 		
     OSStatus err = noErr;
     err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
@@ -1726,8 +1726,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
                                   32,
                                   codecType,
                                   (CompressorComponent)compressor,
-                                  codecHighQuality,
-                                  codecHighQuality,
+                                  codecMaxQuality,
+                                  codecMaxQuality,
                                   0,
                                   NULL,
                                   0,
@@ -1740,7 +1740,7 @@ BOOL _XMIsH263IFrame(UInt8* data);
       err = GetMaxCompressionSize(pixMapHandle,
                                   &dstRect,
                                   0,
-                                  codecNormalQuality,
+                                  codecMaxQuality,
                                   codecType,
                                   (CompressorComponent)compressor,
                                   &maxCompressionSize);
@@ -1758,8 +1758,8 @@ BOOL _XMIsH263IFrame(UInt8* data);
       dataRateParams.dataOverrun = 0;
       dataRateParams.frameDuration = 30;
       dataRateParams.keyFrameRate = 0;
-      dataRateParams.minSpatialQuality = codecNormalQuality;
-      dataRateParams.minTemporalQuality = codecNormalQuality;
+      dataRateParams.minSpatialQuality = codecMaxQuality;
+      dataRateParams.minTemporalQuality = codecMaxQuality;
       err = SetCSequenceDataRateParams(compressSequence, &dataRateParams);
       if (err != noErr) {
         NSLog(@"Setting data rate contraints failed %d", err);

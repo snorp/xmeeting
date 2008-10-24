@@ -1,5 +1,5 @@
 /*
- * $Id: XMConnection.cpp,v 1.39 2008/10/22 05:46:51 hfriederich Exp $
+ * $Id: XMConnection.cpp,v 1.40 2008/10/24 06:38:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -136,7 +136,7 @@ OpalMediaStream * XMConnection::CreateMediaStream(const OpalMediaFormat & mediaF
 	}
 	
   // if not audio, use the default handling
-  if (mediaFormat.GetMediaType() != OpalMediaType::Audio()) {
+  if (mediaFormat.GetMediaType() != OpalMediaType::Audio()) {    
     return OpalConnection::CreateMediaStream(mediaFormat, sessionID, isSource);
   }
   
