@@ -1,9 +1,9 @@
 /*
- * $Id: XMeeting.m,v 1.19 2008/09/24 06:52:43 hfriederich Exp $
+ * $Id: XMeeting.m,v 1.20 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import <Cocoa/Cocoa.h>

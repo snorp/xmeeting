@@ -1,9 +1,9 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.23 2008/10/20 22:06:42 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.24 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #include <ptclib/random.h>

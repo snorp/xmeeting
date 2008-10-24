@@ -1,9 +1,9 @@
 /*
- * $Id: XMLocation.m,v 1.17 2007/09/27 21:13:10 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.18 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMLocation.h"

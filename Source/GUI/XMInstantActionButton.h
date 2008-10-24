@@ -1,9 +1,9 @@
 /*
- * $Id: XMInstantActionButton.h,v 1.4 2007/08/17 11:36:44 hfriederich Exp $
+ * $Id: XMInstantActionButton.h,v 1.5 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2008 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_INSTANT_ACTION_BUTTON_H__

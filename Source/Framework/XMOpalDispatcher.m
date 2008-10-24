@@ -1,9 +1,9 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.63 2008/10/16 21:43:24 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.64 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMOpalDispatcher.h"

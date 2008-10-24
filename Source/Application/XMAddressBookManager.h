@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookManager.h,v 1.7 2007/08/17 11:36:40 hfriederich Exp $
+ * $Id: XMAddressBookManager.h,v 1.8 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_ADDRESS_BOOK_MANAGER_H__
@@ -105,7 +105,7 @@ extern NSString *XMAddressBookProperty_HumanReadableCallAddress_0_1;
  * to the person as soon as a call adress was set. This only works when isPhoneNumber is NO.
  **/
 - (XMAddressBookRecord *)recordForPerson:(ABPerson *)person identifier:(NSString *)identifier
-						   isPhoneNumber:(BOOL)isPhoneNumber;
+                           isPhoneNumber:(BOOL)isPhoneNumber;
 
 /**
  * Sets the primary identifier for the person specified

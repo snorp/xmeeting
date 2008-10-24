@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryRecord.m,v 1.16 2007/08/17 10:28:35 hfriederich Exp $
+ * $Id: XMCallHistoryRecord.m,v 1.17 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallHistoryRecord.h"
@@ -39,8 +39,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (id)initWithAddress:(NSString *)theAddress protocol:(XMCallProtocol)theCallProtocol displayString:(NSString *)theDisplayString
 {
-  if(theAddress == nil || theCallProtocol == XMCallProtocol_UnknownProtocol || theDisplayString == nil)
-  {
+  if (theAddress == nil || theCallProtocol == XMCallProtocol_UnknownProtocol || theDisplayString == nil) {
     // this condition isn't allowed!
     [self release];
     return nil;
@@ -68,8 +67,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   
   XMCallProtocol theCallProtocol = XMCallProtocol_H323;
   
-  if(theCallProtocolNumber != nil)
-  {
+  if (theCallProtocolNumber != nil) {
     theCallProtocol = (XMCallProtocol)[theCallProtocolNumber unsignedIntValue];
   }
   
@@ -95,8 +93,8 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:[self callProtocol]];
   
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:[self address], XMKey_CallHistoryRecordAddress,
-    number, XMKey_CallHistoryRecordProtocol,
-    [super displayString], XMKey_CallHistoryRecordDisplayString, nil];
+                                                                  number, XMKey_CallHistoryRecordProtocol,
+                                                                  [super displayString], XMKey_CallHistoryRecordDisplayString, nil];
   
   [number release];
   
@@ -108,10 +106,8 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (XMAddressResource *)addressResource
 {
-  if(type == XMCallHistoryRecordType_AddressBookRecord)
-  {
-    if(addressBookRecord != nil)
-    {
+  if (type == XMCallHistoryRecordType_AddressBookRecord) {
+    if (addressBookRecord != nil) {
       return (XMAddressResource *)[addressBookRecord callAddress];
     }
     return nil;
@@ -124,17 +120,13 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
   NSString *theDisplayString = nil;
   NSString *theAddress = [self address];
   
-  if(type == XMCallHistoryRecordType_AddressBookRecord)
-  {
+  if (type == XMCallHistoryRecordType_AddressBookRecord) {
     theDisplayString = [addressBookRecord displayName];
-  }
-  else
-  {
+  } else {
     theDisplayString = [super displayString];
   }
   
-  if(theDisplayString == nil)
-  {
+  if (theDisplayString == nil) {
     return theAddress;
   }
   
@@ -160,18 +152,12 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (NSImage *)displayImage
 {
-  if(type == XMCallHistoryRecordType_AddressBookRecord)
-  {
+  if (type == XMCallHistoryRecordType_AddressBookRecord) {
     return [NSImage imageNamed:@"AddressBook"];
-  }
-  else
-  {
-    if([self callProtocol] == XMCallProtocol_H323)
-    {
+  } else {
+    if ([self callProtocol] == XMCallProtocol_H323) {
       return [NSImage imageNamed:@"CallHistory_H323"];
-    }
-    else
-    {
+    } else {
       return [NSImage imageNamed:@"CallHistory_SIP"];
     }
   }
@@ -192,33 +178,26 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (BOOL)_checkType
 {
-  if(addressBookRecord != nil)
-  {
+  if (addressBookRecord != nil) {
     [addressBookRecord release];
     addressBookRecord = nil;
   }
   
   BOOL didChange = NO;
   
-  if([[XMPreferencesManager sharedInstance] searchAddressBookDatabase])
-  {
+  if ([[XMPreferencesManager sharedInstance] searchAddressBookDatabase]) {
     // check for matches in the AddressBook database
     addressBookRecord = [[XMAddressBookManager sharedInstance] recordWithCallAddress:[self address]];
   }
   
-  if(addressBookRecord != nil)
-  {
+  if (addressBookRecord != nil) {
     [addressBookRecord retain];
-    if(type != XMCallHistoryRecordType_AddressBookRecord)
-    {
+    if (type != XMCallHistoryRecordType_AddressBookRecord) {
       type = XMCallHistoryRecordType_AddressBookRecord;
       didChange = YES;
     }
-  }
-  else
-  {
-    if(type != XMCallHistoryRecordType_GeneralRecord)
-    {
+  } else {
+    if (type != XMCallHistoryRecordType_GeneralRecord) {
       type = XMCallHistoryRecordType_GeneralRecord;
       didChange = YES;
     }
@@ -229,8 +208,7 @@ NSString *XMKey_CallHistoryRecordDisplayString = @"XMeeting_DisplayString";
 
 - (void)_addressBookDatabaseDidChange:(NSNotification *)notif
 {
-  if([self _checkType] == YES)
-  {
+  if ([self _checkType] == YES) {
     NSNotification *notif = [NSNotification notificationWithName:XMNotification_CallHistoryCallAddressProviderDataDidChange 
                                                           object:[XMCallHistoryCallAddressProvider sharedInstance]];
     NSNotificationQueue *notificationQueue = [NSNotificationQueue defaultQueue];

@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallStatistics.m,v 1.2 2006/03/14 23:05:57 hfriederich Exp $
+ * $Id: XMCallStatistics.m,v 1.3 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallStatistics.h"

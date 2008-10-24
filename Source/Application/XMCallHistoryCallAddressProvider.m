@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallHistoryCallAddressProvider.m,v 1.12 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMCallHistoryCallAddressProvider.m,v 1.13 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallHistoryCallAddressProvider.h"
@@ -29,8 +29,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 {
   static XMCallHistoryCallAddressProvider *sharedInstance = nil;
   
-  if(sharedInstance == nil)
-  {
+  if (sharedInstance == nil) {
     sharedInstance = [[XMCallHistoryCallAddressProvider alloc] _init];
   }
   
@@ -52,23 +51,18 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   isActiveCallAddressProvider = NO;
   
   NSArray *storedHistory = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_CallHistoryRecords];
-  unsigned i;
   unsigned count = 0;
   
-  if(storedHistory != nil)
-  {
+  if (storedHistory != nil) {
     count = [storedHistory count];
   }
   
   callHistoryRecords = [[NSMutableArray alloc] initWithCapacity:count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     NSDictionary *dictionaryRepresentation = [storedHistory objectAtIndex:i];
     XMCallHistoryRecord *callHistoryRecord = [[XMCallHistoryRecord alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
     
-    if(callHistoryRecord)
-    {
+    if (callHistoryRecord) {
       [callHistoryRecords addObject:callHistoryRecord];
     }
     
@@ -88,8 +82,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   [callHistoryRecords release];
   [searchMatches release];
   
-  if(isActiveCallAddressProvider)
-  {
+  if (isActiveCallAddressProvider) {
     [[XMCallAddressManager sharedInstance] removeCallAddressProvider:self];
   }
   
@@ -106,18 +99,14 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 
 - (void)setActiveCallAddressProvider:(BOOL)flag
 {
-  if(flag == isActiveCallAddressProvider)
-  {
+  if (flag == isActiveCallAddressProvider) {
     return;
   }
   
-  if(flag == YES)
-  {
+  if (flag == YES) {
     [[XMCallAddressManager sharedInstance] addCallAddressProvider:self];
     isActiveCallAddressProvider = YES;
-  }
-  else
-  {
+  } else {
     [[XMCallAddressManager sharedInstance] removeCallAddressProvider:self];
     isActiveCallAddressProvider = NO;
   }
@@ -133,13 +122,9 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 
 - (void)synchronizeUserDefaults
 {
-  unsigned i;
   unsigned count = [callHistoryRecords count];
-  
   NSMutableArray *dictionaryRepresentations = [[NSMutableArray alloc] initWithCapacity:count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
     NSDictionary *dictionaryRepresentation = [record dictionaryRepresentation];
     [dictionaryRepresentations addObject:dictionaryRepresentation];
@@ -160,25 +145,19 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   
   [searchMatches removeAllObjects];
   
-  unsigned i;
   unsigned count = [callHistoryRecords count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
     
-    if([record type] == XMCallHistoryRecordType_GeneralRecord)
-    {
+    if ([record type] == XMCallHistoryRecordType_GeneralRecord) {
       NSString *address = [record address];
       
-      if(searchRange.length <= [address length])
-      {
+      if (searchRange.length <= [address length]) {
         NSRange prefixRange = [address rangeOfString:searchString
                                              options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
                                                range:searchRange];
       
-        if(prefixRange.location != NSNotFound)
-        {
+        if (prefixRange.location != NSNotFound) {
           [searchMatches addObject:record];
         }
       }
@@ -195,8 +174,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   NSRange searchRange = NSMakeRange(0, [uncompletedString length]);
   NSString *address = [record address];
   
-  if(searchRange.length > [address length])
-  {
+  if (searchRange.length > [address length]) {
     return nil;
   }
   
@@ -204,8 +182,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
                                        options:(NSCaseInsensitiveSearch | NSLiteralSearch | NSAnchoredSearch)
                                          range:searchRange];
   
-  if(prefixRange.location == NSNotFound)
-  {
+  if (prefixRange.location == NSNotFound) {
     return nil;
   }
   
@@ -222,17 +199,13 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   NSString *address = [addressResource address];
   XMCallProtocol callProtocol = [addressResource callProtocol];
   
-  unsigned i;
   unsigned count = [callHistoryRecords count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
     
     if ([record type] == XMCallHistoryRecordType_GeneralRecord &&
         [record callProtocol] == callProtocol && 
-        [[record address] caseInsensitiveCompare:address] == NSOrderedSame)
-    {
+        [[record address] caseInsensitiveCompare:address] == NSOrderedSame) {
       [record setDisplayString:[addressResource humanReadableAddress]]; // keep the display string up-to-date
       return record;
     }
@@ -245,12 +218,9 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 {
   XMCallHistoryRecord *record = (XMCallHistoryRecord *)callAddress;
   
-  if([record callProtocol] == XMCallProtocol_H323)
-  {
+  if ([record callProtocol] == XMCallProtocol_H323) {
     *selectedIndex = 0;
-  }
-  else
-  {
+  } else {
     *selectedIndex = 1;
   }
   
@@ -261,12 +231,9 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 {
   XMCallHistoryRecord *record = (XMCallHistoryRecord *)callAddress;
   
-  if(index == 0)
-  {
+  if (index == 0) {
     [record setCallProtocol:XMCallProtocol_H323];
-  }
-  else
-  {
+  } else {
     [record setCallProtocol:XMCallProtocol_SIP];
   }
   
@@ -275,17 +242,12 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
 
 - (NSArray *)allAddresses
 {
-  unsigned i;
   unsigned count = [callHistoryRecords count];
-  
   NSMutableArray *addresses = [NSMutableArray arrayWithCapacity:count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
     
-    if([record type] == XMCallHistoryRecordType_GeneralRecord)
-    {
+    if ([record type] == XMCallHistoryRecordType_GeneralRecord) {
       [addresses addObject:record];
     }
   }
@@ -307,22 +269,15 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   NSString *address = [[callAddress addressResource] address];
   XMCallProtocol callProtocol = [[callAddress addressResource] callProtocol];
   
-  unsigned i;
   unsigned count = [callHistoryRecords count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMCallHistoryRecord *record = (XMCallHistoryRecord *)[callHistoryRecords objectAtIndex:i];
-    if([[record address] isEqualToString:address])
-    {
-      if(i == 0)
-      {
+    if ([[record address] isEqualToString:address]) {
+      if (i == 0) {
         // Update the user defaults in case the user chose a different cal protocol
         [self synchronizeUserDefaults];
         return;
-      }
-      else
-      {
+      } else {
         [record retain];
         [callHistoryRecords removeObjectAtIndex:i];
         [callHistoryRecords insertObject:record atIndex:0];
@@ -338,8 +293,7 @@ NSString *XMKey_CallHistoryRecords = @"XMeeting_CallHistoryRecords";
   // the address is not in the call history, thus creating a new instance.
   XMCallHistoryRecord *record = [[XMCallHistoryRecord alloc] initWithAddress:address protocol:callProtocol displayString:[callAddress displayString]];
   
-  if(count == 10)
-  {
+  if (count == 10) {
     [callHistoryRecords removeObjectAtIndex:9];
   }
   [callHistoryRecords insertObject:record atIndex:0];

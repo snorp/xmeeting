@@ -1,9 +1,9 @@
 /*
- * $Id: XMWindow.m,v 1.6 2006/05/16 21:33:08 hfriederich Exp $
+ * $Id: XMWindow.m,v 1.7 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMWindow.h"
@@ -14,15 +14,14 @@ NSString *XMNotification_WindowWillMiniaturize = @"XMeetingWindowWillMiniaturize
 
 - (void)miniaturize:(id)sender
 {
-	// The OpenGL views want to draw their current content into the window frame buffer
-	// before the window minimizes, so that the video does freeze but not entirely disappear
-	// (white rect) when the window minimizes and is displayed in the dock.
-	// Unfortunately, anything drawn after -miniaturize: has been called does not appear on screen.
-	// Since this notification is posted before the window is "frozen", the changes appear on the
-	// screen
-	[[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_WindowWillMiniaturize
-														object:self];
-	[super miniaturize:sender];
+  // The OpenGL views want to draw their current content into the window frame buffer
+  // before the window minimizes, so that the video does freeze but not entirely disappear
+  // (white rect) when the window minimizes and is displayed in the dock.
+  // Unfortunately, anything drawn after -miniaturize: has been called does not appear on screen.
+  // Since this notification is posted before the window is "frozen", the changes appear on the
+  // screen
+  [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_WindowWillMiniaturize object:self];
+  [super miniaturize:sender];
 }
 
 @end
@@ -38,7 +37,7 @@ NSString *XMNotification_WindowWillMiniaturize = @"XMeetingWindowWillMiniaturize
  **/
 - (BOOL)_hasActiveControls
 {
-	return YES;
+  return YES;
 }
 
 @end
@@ -47,28 +46,28 @@ NSString *XMNotification_WindowWillMiniaturize = @"XMeetingWindowWillMiniaturize
 
 - (id)init
 {
-	NSScreen *mainScreen = [NSScreen mainScreen];
-	NSRect mainScreenRect = [mainScreen frame];
-	
-	self = [super initWithContentRect:mainScreenRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:mainScreen];
-	
-	[self setLevel:NSScreenSaverWindowLevel];
-	
-	return self;
+  NSScreen *mainScreen = [NSScreen mainScreen];
+  NSRect mainScreenRect = [mainScreen frame];
+  
+  self = [super initWithContentRect:mainScreenRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:mainScreen];
+  
+  [self setLevel:NSScreenSaverWindowLevel];
+  
+  return self;
 }
 
 - (BOOL)canBecomeKeyWindow
 {
-	return YES;
+  return YES;
 }
 
 /*- (void)applicationSwitched:(NSNotification *)notif
 {
-	//if the camera is activated when in fullscreen, it may happen that ichat
-	//will become the active application. To avoid this, we re-activate ourselves.
-	[NSApp activateIgnoringOtherApps:YES];
-	[self makeKeyAndOrderFront:nil];
-	[self setLevel:NSScreenSaverWindowLevel];
+  //if the camera is activated when in fullscreen, it may happen that ichat
+  //will become the active application. To avoid this, we re-activate ourselves.
+  [NSApp activateIgnoringOtherApps:YES];
+  [self makeKeyAndOrderFront:nil];
+  [self setLevel:NSScreenSaverWindowLevel];
 }*/
 
 // blocking this behaviour
@@ -82,9 +81,9 @@ NSString *XMNotification_WindowWillMiniaturize = @"XMeetingWindowWillMiniaturize
 
 /*- (void)dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	[super dealloc];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  
+  [super dealloc];
 }*/
 
 @end

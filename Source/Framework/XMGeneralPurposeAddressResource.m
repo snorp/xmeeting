@@ -1,9 +1,9 @@
 /*
- * $Id: XMGeneralPurposeAddressResource.m,v 1.5 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.m,v 1.6 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMGeneralPurposeAddressResource.h"

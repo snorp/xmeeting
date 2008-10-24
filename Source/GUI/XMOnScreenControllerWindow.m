@@ -1,9 +1,9 @@
 /*
- * $Id: XMOnScreenControllerWindow.m,v 1.8 2006/10/07 07:47:10 hfriederich Exp $
+ * $Id: XMOnScreenControllerWindow.m,v 1.9 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Ivan Guajana. All rights reserved.
+ * Copyright (c) 2005-2008 Ivan Guajana, Hannes Friederich. All rights reserved.
  */
 
 #import "XMOnScreenControllerWindow.h"

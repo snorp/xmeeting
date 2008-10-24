@@ -1,9 +1,9 @@
 /*
- * $Id: XMH323Connection.h,v 1.28 2008/10/22 05:46:51 hfriederich Exp $
+ * $Id: XMH323Connection.h,v 1.29 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_H323_CONNECTION_H__

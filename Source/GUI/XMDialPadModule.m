@@ -1,9 +1,9 @@
 /*
- * $Id: XMDialPadModule.m,v 1.15 2006/11/02 22:30:00 hfriederich Exp $
+ * $Id: XMDialPadModule.m,v 1.16 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMDialPadModule.h"

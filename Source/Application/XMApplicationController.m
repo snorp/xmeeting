@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationController.m,v 1.70 2008/09/24 06:52:33 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.71 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMApplicationController.h"
@@ -83,8 +83,8 @@
 - (void)_showSetupAssistant;
 - (void)_setupApplication;
 - (void)_setupApplicationWithLocations:(NSArray *)locations 
-						  h323Accounts:(NSArray *)h323Accounts
-						   sipAccounts:(NSArray *)sipAccounts;
+                          h323Accounts:(NSArray *)h323Accounts
+                           sipAccounts:(NSArray *)sipAccounts;
 
 @end
 

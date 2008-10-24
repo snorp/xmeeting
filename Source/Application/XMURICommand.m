@@ -1,9 +1,9 @@
 /*
- * $Id: XMURICommand.m,v 1.5 2007/08/17 19:38:56 hfriederich Exp $
+ * $Id: XMURICommand.m,v 1.6 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMeeting.h"
@@ -26,8 +26,7 @@
 {
   XMCallAddressManager * callManager = [XMCallAddressManager sharedInstance];
   
-  if (![[XMCallManager sharedInstance] isInCall]) // not in a call
-  {  
+  if (![[XMCallManager sharedInstance] isInCall]) { // not in a call  
     XMAddressResource *addressResource = nil;
     // Try if it is an XMeeting-URL
     if ([XMeetingURL isXMeetingURL:addressString]) {
@@ -36,23 +35,17 @@
       addressResource = [XMAddressResource addressResourceWithStringRepresentation:addressString];
     }
     if (addressResource != nil) {
-      NSLog(@"A");
       id<XMCallAddress> callAddress = [callManager addressMatchingResource:addressResource];
       if (callAddress == nil) {
         callAddress = [[[XMSimpleAddressResourceWrapper alloc] initWithAddressResource:addressResource] autorelease];
       }
       [callManager makeCallToAddress:callAddress];
       return nil;
-    }
-    else
-    {
-      NSLog(@"b");
+    } else {
       NSString *formatString = NSLocalizedString(@"XM_ILLEGAL_URI", @"");
       return [NSString stringWithFormat:formatString, addressString];
     }
-  }
-  else
-  {
+  } else {
     return NSLocalizedString(@"XM_ALREADY_IN_CALL", @"");
   }
 }
@@ -67,17 +60,13 @@
   NSString *errorString = nil;
   
   if ([command isEqualToString:@"GetURL"] ||
-      [command isEqualToString:@"OpenURL"])
-  {
+      [command isEqualToString:@"OpenURL"]) {
     errorString = [XMURICommand tryToCallAddress:urlString];
-  }
-  else
-  {
+  } else {
     errorString = @"<Unknown command>";
   }
   
-  if (errorString != nil)
-  {
+  if (errorString != nil) {
     [[NSSound soundNamed:@"Funk"] play];
     [self setScriptErrorString:errorString];
   }
@@ -109,7 +98,7 @@
   
   BOOL valid = YES;
   
-  if(![XMeetingURL isXMeetingURL:_url]) {
+  if (![XMeetingURL isXMeetingURL:_url]) {
     valid = NO;
     goto bail;
   }

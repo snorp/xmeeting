@@ -1,9 +1,9 @@
 /*
- * $Id: XMStringConstants.h,v 1.38 2008/08/29 08:50:22 hfriederich Exp $
+ * $Id: XMStringConstants.h,v 1.39 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_STRING_CONSTANTS_H__

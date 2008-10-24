@@ -1650,24 +1650,24 @@
 			isa = PBXGroup;
 			children = (
 				1A348F970984E4210033FA95 /* IGPopupView.h */,
-				D189805108241F11007CD286 /* XMBooleanCell.h */,
-				D13274EF08C6F2BB00298F25 /* XMCallInfoView.h */,
-				D15B0679084763F000FA58A1 /* XMDatabaseField.h */,
-				D1A24F2A0C6FD96000408CF7 /* XMIDDPrefixFormatter.h */,
-				D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */,
-				D102AFFB09EA770F0050239C /* XMInstantActionButton.h */,
-				D1A561020C6CA45A0086E6F6 /* XMIPAddressFormatter.h */,
-				D132750608C6F38000298F25 /* XMRecentCallsView.h */,
-				D10D49E2093CA220000DD61E /* XMWindow.h */,
 				1A348F980984E4210033FA95 /* IGPopupView.m */,
+				D189805108241F11007CD286 /* XMBooleanCell.h */,
 				D189805208241F11007CD286 /* XMBooleanCell.m */,
+				D13274EF08C6F2BB00298F25 /* XMCallInfoView.h */,
 				D13274F008C6F2BB00298F25 /* XMCallInfoView.m */,
+				D15B0679084763F000FA58A1 /* XMDatabaseField.h */,
 				D15B067A084763F000FA58A1 /* XMDatabaseField.m */,
+				D1A24F2A0C6FD96000408CF7 /* XMIDDPrefixFormatter.h */,
 				D1A24F2B0C6FD96000408CF7 /* XMIDDPrefixFormatter.m */,
+				D11C5E500A49EC730030633D /* XMIncomingCallAlert.h */,
 				D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */,
+				D102AFFB09EA770F0050239C /* XMInstantActionButton.h */,
 				D102AFFC09EA770F0050239C /* XMInstantActionButton.m */,
+				D1A561020C6CA45A0086E6F6 /* XMIPAddressFormatter.h */,
 				D1A561030C6CA45A0086E6F6 /* XMIPAddressFormatter.m */,
+				D132750608C6F38000298F25 /* XMRecentCallsView.h */,
 				D132750708C6F38000298F25 /* XMRecentCallsView.m */,
+				D10D49E2093CA220000DD61E /* XMWindow.h */,
 				D10D49E3093CA220000DD61E /* XMWindow.m */,
 			);
 			name = "GUI-Objects";
@@ -1934,6 +1934,29 @@
 			name = "AddressBook Plugin";
 			sourceTree = "<group>";
 		};
+		D15B26640EB1E10A0070B7B5 /* Call Addresses */ = {
+			isa = PBXGroup;
+			children = (
+				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
+				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
+				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */,
+				D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */,
+				D1EF068C091756FA008A8974 /* XMAddressBookManager.h */,
+				D1EF068D091756FA008A8974 /* XMAddressBookManager.m */,
+				D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */,
+				D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */,
+				D1AF744B084DA1BE00D50883 /* XMAddressBookCallAddressProvider.h */,
+				D1AF744C084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m */,
+				D1BA7630086B4848007E6CEC /* XMCallHistoryCallAddressProvider.h */,
+				D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */,
+				D1BA7664086BEC5E007E6CEC /* XMCallHistoryRecord.h */,
+				D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */,
+				D1BD63A20A950B6B007C8E46 /* XMURICommand.h */,
+				D1BD63A30A950B6C007C8E46 /* XMURICommand.m */,
+			);
+			name = "Call Addresses";
+			sourceTree = "<group>";
+		};
 		D15F721E0E54BADA0006CB43 /* H323 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2103,25 +2126,10 @@
 			children = (
 				D163336307A01BD5003FD9C0 /* XMApplicationController.h */,
 				D1E8B5CB0CABE92400083FFF /* XMApplicationController.m */,
-				D1AD29170E680E0C00143295 /* Preferences */,
-				D1AF744B084DA1BE00D50883 /* XMAddressBookCallAddressProvider.h */,
-				D1EF068C091756FA008A8974 /* XMAddressBookManager.h */,
-				D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */,
 				D15D5A2708C0BD0A00C7D89C /* XMApplicationFunctions.h */,
-				D1AF73D9084D02C200D50883 /* XMCallAddressManager.h */,
-				D1BA7630086B4848007E6CEC /* XMCallHistoryCallAddressProvider.h */,
-				D1BA7664086BEC5E007E6CEC /* XMCallHistoryRecord.h */,
-				D1F61A9F08706A6900FDD4F0 /* XMSimpleAddressResource.h */,
-				D1BD63A20A950B6B007C8E46 /* XMURICommand.h */,
-				D1AF744C084DA1BE00D50883 /* XMAddressBookCallAddressProvider.m */,
-				D1EF068D091756FA008A8974 /* XMAddressBookManager.m */,
-				D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */,
 				D15D5A2808C0BD0A00C7D89C /* XMApplicationFunctions.m */,
-				D1AF73DA084D02C200D50883 /* XMCallAddressManager.m */,
-				D1BA7631086B4848007E6CEC /* XMCallHistoryCallAddressProvider.m */,
-				D1BA7665086BEC5E007E6CEC /* XMCallHistoryRecord.m */,
-				D1F61AA008706A6900FDD4F0 /* XMSimpleAddressResource.m */,
-				D1BD63A30A950B6C007C8E46 /* XMURICommand.m */,
+				D1AD29170E680E0C00143295 /* Preferences */,
+				D15B26640EB1E10A0070B7B5 /* Call Addresses */,
 			);
 			name = "Application Management";
 			sourceTree = "<group>";

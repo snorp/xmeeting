@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallAddressManager.m,v 1.11 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMCallAddressManager.m,v 1.12 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMCallAddressManager.h"
@@ -24,8 +24,7 @@
 {
   static XMCallAddressManager *sharedInstance = nil;
   
-  if(sharedInstance == nil)
-  {
+  if (sharedInstance == nil) {
     sharedInstance = [[XMCallAddressManager alloc] _init];
   }
   return sharedInstance;
@@ -50,7 +49,7 @@
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_callEnded:)
                                                name:XMNotification_CallManagerDidClearCall
-                                             object:nil];	
+                                             object:nil];  
   return self;
 }
 
@@ -58,8 +57,7 @@
 {
   [callAddressProviders release];
   
-  if(activeCallAddress != nil)
-  {
+  if (activeCallAddress != nil) {
     [activeCallAddress release];
     activeCallAddress = nil;
   }
@@ -83,13 +81,11 @@
 
 - (NSArray *)addressesMatchingString:(NSString *)searchString
 {
-  unsigned i;
   unsigned count = [callAddressProviders count];
   
   NSMutableArray *matches = [NSMutableArray arrayWithCapacity:10];
   
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     id<XMCallAddressProvider> provider = (id<XMCallAddressProvider>)[callAddressProviders objectAtIndex:i];
     NSArray *providerMatches = [provider addressesMatchingString:searchString];
     
@@ -103,8 +99,7 @@
 {
   id<XMCallAddressProvider> provider = [address provider];
   
-  if(provider == nil)
-  {
+  if (provider == nil) {
     return nil;
   }
   return [provider completionStringForAddress:address uncompletedString:uncompletedString];
@@ -112,10 +107,9 @@
 
 - (id<XMCallAddress>)addressMatchingResource:(XMAddressResource *)addressResource
 {
-  unsigned i;
   unsigned count = [callAddressProviders count];
   
-  for (i = 0; i < count; i++) 
+  for (unsigned i = 0; i < count; i++) 
   {
     id<XMCallAddressProvider> provider = (id<XMCallAddressProvider>)[callAddressProviders objectAtIndex:i];
     id<XMCallAddress> address = [provider addressMatchingResource:addressResource];
@@ -130,8 +124,7 @@
 {
   id<XMCallAddressProvider> provider = [address provider];
   
-  if(provider == nil)
-  {
+  if (provider == nil) {
     return [NSArray array];
   }
   return [provider alternativesForAddress:address selectedIndex:selectedIndex];
@@ -141,8 +134,7 @@
 {
   id<XMCallAddressProvider> provider = [address provider];
   
-  if(provider == nil)
-  {
+  if (provider == nil) {
     return nil;
   }
   
@@ -151,21 +143,16 @@
 
 - (NSArray *)allAddresses
 {
-  unsigned i;
-  unsigned count = [callAddressProviders count];
-  
   NSMutableArray *addresses = [NSMutableArray arrayWithCapacity:20];
-  
-  for(i = 0; i < count; i++)
-  {
+  unsigned count = [callAddressProviders count]; 
+  for (unsigned i = 0; i < count; i++) {
     id<XMCallAddressProvider> provider = (id<XMCallAddressProvider>)[callAddressProviders objectAtIndex:i];
     if ([provider priorityForAllAddresses] == XMProviderPriority_Normal) {
       NSArray *addr = [provider allAddresses];
       [addresses addObjectsFromArray:addr];
     }
   }
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     id<XMCallAddressProvider> provider = (id<XMCallAddressProvider>)[callAddressProviders objectAtIndex:i];
     if ([provider priorityForAllAddresses] == XMProviderPriority_Low) {
       NSArray *addr = [provider allAddresses];
@@ -183,15 +170,13 @@
 
 - (void)makeCallToAddress:(id<XMCallAddress>)callAddress
 {
-  if(activeCallAddress != nil)
-  {
+  if (activeCallAddress != nil) {
     NSLog(@"Illegal, active callAddress not nil");
     return;
   }
   
-  if(callAddress == nil ||
-     [[[callAddress addressResource] address] isEqualToString:@""])
-  {
+  if (callAddress == nil ||
+     [[[callAddress addressResource] address] isEqualToString:@""]) {
     NSLog(@"nil or EMPTY ADDRESS!");
     return;
   }
@@ -205,8 +190,7 @@
 
 - (void)_callEnded:(NSNotification *)notif
 {
-  if(activeCallAddress != nil)
-  {
+  if (activeCallAddress != nil) {
     [activeCallAddress release];
     activeCallAddress = nil;
   }

@@ -1,9 +1,9 @@
 /*
- * $Id: XMDatabaseField.m,v 1.13 2007/08/25 07:45:32 hfriederich Exp $
+ * $Id: XMDatabaseField.m,v 1.14 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMDatabaseField.h"
@@ -84,7 +84,7 @@
 }
 
 - (void)_init
-{	
+{  
   // setting up the window attibutes
   pulldownWindow = [[XMDatabaseFieldWindow alloc] initWithContentRect:NSMakeRect(0,0,0,0) 
                                                             styleMask:NSBorderlessWindowMask
@@ -152,8 +152,7 @@
   [pulldownTableView release];
   [tableData release];
   
-  if(representedObject != nil)
-  {
+  if (representedObject != nil) {
     [representedObject release];
   }
   
@@ -195,8 +194,7 @@
 
 - (void)setRepresentedObject:(id)theObject
 {
-  if(representedObject != nil)
-  {
+  if (representedObject != nil) {
     [representedObject release];
     representedObject = nil;
   }
@@ -207,13 +205,11 @@
 
 - (void)endEditing
 {
-  if(representedObject != nil)
-  {
+  if (representedObject != nil) {
     return;
   }
   
-  if(dataSource != nil)
-  {
+  if (dataSource != nil) {
     NSString *currentString = [self stringValue];
     
     representedObject = [[dataSource databaseField:self representedObjectForCompletedString:currentString] retain];
@@ -229,16 +225,14 @@
 
 - (void)controlTextDidChange:(NSControl *)control
 {
-  if(representedObject != nil)
-  {
+  if (representedObject != nil) {
     [representedObject release];
     representedObject = nil;
     [[self cell] _setImage:defaultImage];
     [self _setNeedsDisplay];
   }
   
-  if(dataSource != nil && shouldFetchCompletions == YES)
-  {
+  if (dataSource != nil && shouldFetchCompletions == YES) {
     // getting the string to complete
     NSText *currentEditor = [self currentEditor];
     [uncompletedString release];
@@ -255,8 +249,7 @@
                        indexOfSelectedItem:&indexOfSelectedItem] retain];
     
     unsigned count = [tableData count];
-    if(count != 0)
-    {
+    if (count != 0) {
       // we have completions, therefore we display the completions window
       pulldownMode = COMPLETIONS_WINDOW;
       [self _displayObjectAtIndex:indexOfSelectedItem];
@@ -270,61 +263,40 @@
 }
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command
-{	
+{  
   BOOL returnValue = NO;
   
-  if(command == @selector(moveDown:))
-  {
-    if(windowIsShown)
-    {
+  if (command == @selector(moveDown:)) {
+    if (windowIsShown) {
       [self moveDown:self];
       returnValue = YES;
-    }
-    else
-    {
+    } else {
       returnValue = NO;
     }
-  }
-  else if(command == @selector(moveUp:))
-  {
-    if(windowIsShown)
-    {
+  } else if (command == @selector(moveUp:)) {
+    if (windowIsShown) {
       [self moveUp:self];
       returnValue = YES;
-    }
-    else
-    {
+    } else {
       returnValue = NO;
     }
-  }
-  else if(command == @selector(deleteBackward:))
-  {
+  } else if (command == @selector(deleteBackward:)) {
     [self deleteBackward:self];
     returnValue = NO;
-  }
-  else if(command == @selector(insertTab:))
-  {
-    if(windowIsShown)
-    {
+  } else if (command == @selector(insertTab:)) {
+    if (windowIsShown) {
       [self insertTab:self];
       returnValue = YES;
-    }
-    else
-    {
+    } else {
       [self insertTab:self];
       returnValue = NO;
     }
-  }
-  else if(command == @selector(insertNewline:))
-  {
-    if(windowIsShown)
-    {
+  } else if (command == @selector(insertNewline:)) {
+    if (windowIsShown) {
       [self insertNewline:self];
       returnValue = YES;
     }
-  }
-  else if(command == @selector(cancelOperation:))
-  {
+  } else if (command == @selector(cancelOperation:)) {
     // we have to return YES since otherwise, a completions window
     // containing dictionary completions could be shown
     returnValue = YES;
@@ -341,12 +313,9 @@
 
 - (void)drawRect:(NSRect)rect
 {
-  if(rect.size.width == 1)
-  {
+  if (rect.size.width == 1) {
     [[self cell] _setNeedsDrawing:NO];
-  }
-  else
-  {
+  } else {
     [[self cell] _setNeedsDrawing:YES];
   }
   
@@ -356,8 +325,7 @@
 - (void)moveDown:(id)sender
 {
   int newSelectedCompletionIndex = [pulldownTableView selectedRow] + 1;
-  if(newSelectedCompletionIndex == [tableData count])
-  {
+  if (newSelectedCompletionIndex == [tableData count]) {
     return;
   }
   [self _displayObjectAtIndex:newSelectedCompletionIndex];
@@ -366,9 +334,8 @@
 - (void)moveUp:(id)sender
 {
   int newSelectedCompletionIndex = [pulldownTableView selectedRow] - 1;
-  if(newSelectedCompletionIndex < 0)
-  {
-    return ;
+  if (newSelectedCompletionIndex < 0) {
+    return;
   }
   [self _displayObjectAtIndex:newSelectedCompletionIndex];
 }
@@ -376,8 +343,7 @@
 - (void)deleteBackward:(id)sender
 {
   NSText *currentEditor = [self currentEditor];
-  if([[currentEditor string] length] != 0)
-  {
+  if ([[currentEditor string] length] != 0) {
     shouldFetchCompletions = NO;
   }
 }
@@ -386,37 +352,27 @@
 {
   NSString *string;
   
-  if(windowIsShown == YES)
-  {
+  if (windowIsShown == YES) {
     unsigned selectedIndex = [pulldownTableView selectedRow];
     string = [tableData objectAtIndex:selectedIndex];
-  }
-  else
-  {
+  } else {
     string = [self stringValue];
-    if(dataSource != nil)
-    {
+    if (dataSource != nil) {
       unsigned index;
       [dataSource databaseField:self completionsForString:string indexOfSelectedItem:&index];
     }
   }
   
-  if(dataSource != nil)
-  {
-    if(pulldownMode == COMPLETIONS_WINDOW)
-    {
-      if(representedObject != nil)
-      {
+  if (dataSource != nil) {
+    if (pulldownMode == COMPLETIONS_WINDOW) {
+      if (representedObject != nil) {
         [representedObject release];
         representedObject = nil;
       }
       representedObject = [[dataSource databaseField:self representedObjectForCompletedString:string] retain];
       [self _displayRepresentedObject];
-    }
-    else if(pulldownMode == PULLDOWN_OBJECTS_WINDOW)
-    {
-      if(representedObject != nil)
-      {
+    } else if (pulldownMode == PULLDOWN_OBJECTS_WINDOW) {
+      if (representedObject != nil) {
         [representedObject release];
         representedObject = nil;
       }
@@ -424,13 +380,10 @@
       representedObject = (id)[string retain];
       [self _displayRepresentedObject];
       
-      if(isOverDisclosure == NO)
-      {
+      if (isOverDisclosure == NO) {
         [[self cell] _setDisclosureHighlighted:NO];
       }
-    }
-    else
-    {
+    } else {
       unsigned selectedIndex = [pulldownTableView selectedRow];
       [dataSource databaseField:self userSelectedImageOption:string index:selectedIndex];
     }
@@ -451,61 +404,45 @@
   NSPoint mouseLocation = [self convertPoint:eventLocation fromView:nil];
   NSRect bounds = [self bounds];
   
-  if(mouseLocation.x >= bounds.size.width - DISCLOSURE_WIDTH)
-  {
-    if(windowIsShown == YES)
-    {
-      if(pulldownMode == PULLDOWN_OBJECTS_WINDOW)
-      {
+  if (mouseLocation.x >= bounds.size.width - DISCLOSURE_WIDTH) {
+    if (windowIsShown == YES) {
+      if (pulldownMode == PULLDOWN_OBJECTS_WINDOW) {
         [self _hideWindow];
         return;
       }
     }
-    if(dataSource != nil)
-    {
+    if (dataSource != nil) {
       [self endEditing];
       
       NSArray *pulldownObjects = [dataSource pulldownObjectsForDatabaseField:self];
       unsigned count = [pulldownObjects count];
       
-      if(count != 0)
-      {
+      if (count != 0) {
         [tableData release];
         tableData = [pulldownObjects retain];
         
         [self _displayWindow:PULLDOWN_OBJECTS_WINDOW];
       }
     }
-  }
-  else if([[self cell] _image] != nil &&
-          mouseLocation.x <= bounds.size.height + 2)
-  {
-    if(windowIsShown == YES)
-    {
-      if(pulldownMode == IMAGE_OPTIONS_WINDOW)
-      {
+  } else if ([[self cell] _image] != nil && mouseLocation.x <= bounds.size.height + 2) {
+    if (windowIsShown == YES) {
+      if (pulldownMode == IMAGE_OPTIONS_WINDOW) {
         [self _hideWindow];
       }
-    }
-    else if(dataSource != nil)
-    {
+    } else if (dataSource != nil) {
       unsigned selectedIndex = 0;
       NSArray *imageOptions = [dataSource imageOptionsForDatabaseField:self selectedIndex:&selectedIndex];
       
-      if([imageOptions count] != 0)
-      {
+      if ([imageOptions count] != 0) {
         [tableData release];
         tableData = [imageOptions retain];
-        
         
         pulldownMode = IMAGE_OPTIONS_WINDOW;
         [self _displayObjectAtIndex:selectedIndex];
         [self _displayWindow:IMAGE_OPTIONS_WINDOW];
       }
     }
-  }
-  else
-  {
+  } else {
     [super mouseDown:event];
   }
 }
@@ -530,9 +467,7 @@
 {
   isOverDisclosure = NO;
   
-  if(windowIsShown == YES &&
-     pulldownMode == PULLDOWN_OBJECTS_WINDOW)
-  {
+  if (windowIsShown == YES && pulldownMode == PULLDOWN_OBJECTS_WINDOW) {
     return;
   }
   
@@ -554,8 +489,7 @@
   
   [notificationCenter removeObserver:self name:NSViewFrameDidChangeNotification object:nil];
   
-  if([self window] != nil)
-  {
+  if ([self window] != nil) {
     [notificationCenter addObserver:self selector:@selector(_frameDidChange:) 
                                name:NSViewFrameDidChangeNotification object:[[self window] contentView]];
   }
@@ -569,8 +503,7 @@
 
 - (void)viewWillStartLiveResize
 {
-  if(windowIsShown)
-  {
+  if (windowIsShown) {
     [self endEditing];
     [self _hideWindow];
   }
@@ -583,11 +516,9 @@
   return [tableData count];
 }
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn 
-			row:(int)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-  if(pulldownMode == PULLDOWN_OBJECTS_WINDOW)
-  {
+  if (pulldownMode == PULLDOWN_OBJECTS_WINDOW) {
     id object = [tableData objectAtIndex:rowIndex];
     return [dataSource databaseField:self displayStringForRepresentedObject:object];
   }
@@ -599,8 +530,7 @@
 {
   int selectedRow = [pulldownTableView selectedRow];
   
-  if(selectedRow != -1)
-  {
+  if (selectedRow != -1) {
     [self insertTab:self];
   }
 }
@@ -620,29 +550,23 @@
   NSImage *displayImage;
   NSString *displayString;
   
-  if(representedObject != nil && dataSource != nil)
-  {
+  if (representedObject != nil && dataSource != nil) {
     displayImage = [dataSource databaseField:self imageForRepresentedObject:representedObject];
-    if(displayImage == nil)
-    {
+    if (displayImage == nil) {
       displayImage = defaultImage;
     }
     displayString = [dataSource databaseField:self displayStringForRepresentedObject:representedObject];
-  }
-  else
-  {
+  
+  } else {
     displayImage = defaultImage;
     displayString = @"";
   }
   
   [cell _setImage:displayImage];
   
-  if(currentEditor != nil)
-  {
+  if (currentEditor != nil) {
     [currentEditor setString:displayString];
-  }
-  else
-  {
+  } else {
     [cell setStringValue:displayString];
   }
   [self setNeedsDisplay:YES];
@@ -657,8 +581,7 @@
   [pulldownTableView scrollRowToVisible:indexOfObject];
   [indexSet release];
   
-  if(pulldownMode == COMPLETIONS_WINDOW)
-  {
+  if (pulldownMode == COMPLETIONS_WINDOW) {
     // replacing the old string with the new one
     NSText *currentEditor = [self currentEditor];
     NSString *completedString = [tableData objectAtIndex:indexOfObject];
@@ -678,8 +601,7 @@
 {
   NSWindow *parentWindow = [self window];
   
-  if(mode != WINDOW_UPDATE_MODE)
-  {
+  if (mode != WINDOW_UPDATE_MODE) {
     pulldownMode = mode;
   }
   
@@ -690,30 +612,22 @@
   NSPoint screenPoint = [parentWindow convertBaseToScreen:windowPoint];
   
   // calculating the size, adjusting the scrollers accordingly
-  if(mode != WINDOW_UPDATE_MODE)
-  {
+  if (mode != WINDOW_UPDATE_MODE) {
     unsigned numberOfItems = [tableData count];
-    if(numberOfItems > 5)
-    {
+    if (numberOfItems > 5) {
       numberOfItems = 5;
       [pulldownScrollView setHasVerticalScroller:YES];
-    }
-    else
-    {
+    } else {
       [pulldownScrollView setHasVerticalScroller:NO];
     }
-	
+  
     // calculating the window's size
     float height = (float)([pulldownTableView rowHeight] * numberOfItems);
     float width;
-	
-    if(pulldownMode == COMPLETIONS_WINDOW ||
-       pulldownMode == IMAGE_OPTIONS_WINDOW)
-    {
+  
+    if (pulldownMode == COMPLETIONS_WINDOW || pulldownMode == IMAGE_OPTIONS_WINDOW) {
       width = frame.size.width - DISCLOSURE_WIDTH;
-    }
-    else
-    {
+    } else {
       width = frame.size.width;
     }
     NSRect menuWindowFrame = NSMakeRect(screenPoint.x, screenPoint.y - height, width, height);
@@ -721,16 +635,13 @@
     [pulldownTableView sizeToFit];
     [pulldownTableView reloadData];
     [pulldownWindow makeFirstResponder:pulldownScrollView];
-	
+  
     // display on screen if necessary
-    if(!windowIsShown)
-    {
+    if (!windowIsShown) {
       [parentWindow addChildWindow:pulldownWindow ordered:NSWindowAbove];
       windowIsShown = YES;
     }
-  }
-  else
-  {
+  } else {
     NSRect frame = [pulldownWindow frame];
     frame.origin.x = screenPoint.x;
     frame.origin.y = screenPoint.y;
@@ -741,8 +652,7 @@
 
 - (void)_hideWindow
 {
-  if(windowIsShown)
-  {
+  if (windowIsShown) {
     NSWindow *window = [self window];
     [window removeChildWindow:pulldownWindow];
     [pulldownWindow orderOut:self];
@@ -752,8 +662,7 @@
 
 - (void)_updateDisclosureTrackingRect
 {
-  if(disclosureTrackingRect != 0)
-  {
+  if (disclosureTrackingRect != 0) {
     [self removeTrackingRect:disclosureTrackingRect];
   }
   
@@ -761,8 +670,7 @@
   bounds.origin.x = bounds.size.width - DISCLOSURE_WIDTH;
   bounds.size.width = DISCLOSURE_WIDTH;
   NSTrackingRectTag theTrackingRect = [self addTrackingRect:bounds owner:self userData:@"test" assumeInside:NO];
-  if(theTrackingRect != 0)
-  {
+  if (theTrackingRect != 0) {
     disclosureTrackingRect = theTrackingRect;
   }
 }
@@ -862,12 +770,11 @@
  * system does draw the text content
  **/
 - (NSRect)drawingRectForBounds:(NSRect)bounds
-{	
+{  
   bounds = [super drawingRectForBounds:bounds];
   
   // we only adjust the bounds if we have an image to draw
-  if(image != nil)
-  {
+  if (image != nil) {
     // width is bounds height
     float width = bounds.size.height;
     
@@ -888,9 +795,8 @@
 }
 
 - (void)drawWithFrame:(NSRect)frame inView:(NSView *)view
-{	
-  if(needsDrawing == YES)
-  {
+{  
+  if (needsDrawing == YES) {
     
     // drawing the disclosure border
     NSBezierPath *borderPath = [[NSBezierPath alloc] init];
@@ -905,45 +811,36 @@
     [borderPath lineToPoint:borderEndPoint];
     [borderPath closePath];
     
-    if(isDisclosureHighlighted == YES)
-    {
+    if (isDisclosureHighlighted == YES) {
       [[NSColor colorWithCalibratedRed:0.4 green:0.4 blue:0.4 alpha:1.0] set];
-    }
-    else
-    {
+    } else {
       [[NSColor colorWithCalibratedRed:0.55 green:0.55 blue:0.55 alpha:1.0] set];
     }
     [borderPath setLineWidth:2.0];
     [borderPath stroke];
     
-    if(isDisclosureHighlighted)
-    {
+    if (isDisclosureHighlighted) {
       [[NSColor colorWithCalibratedRed:0.45 green:0.45 blue:0.45 alpha:1.0] set];
-    }
-    else
-    {
+    } else {
       [[NSColor colorWithCalibratedRed:0.65 green:0.65 blue:0.65 alpha:1.0] set];
     }
     [borderPath fill];
     [borderPath release];
-	
+  
     // drawing the disclosure rectangle
     NSBezierPath *disclosurePath = [[NSBezierPath alloc] init];
     NSPoint pointA = NSMakePoint(frame.size.width - 3.0, frame.size.height/2.0 - 3);
     NSPoint pointB = NSMakePoint(frame.size.width - 3.0 - 8.0, frame.size.height/2.0 - 3);
     NSPoint pointC = NSMakePoint(frame.size.width - 3.0 - 4.0, frame.size.height/2.0 + 2.5);
-	
+  
     [disclosurePath moveToPoint:pointA];
     [disclosurePath lineToPoint:pointB];
     [disclosurePath lineToPoint:pointC];
     [disclosurePath lineToPoint:pointA];
-	
-    if(isDisclosureHighlighted == YES)
-    {
+  
+    if (isDisclosureHighlighted == YES) {
       [[NSColor colorWithCalibratedRed:0.9 green:0.9 blue:0.9 alpha:1.0] set];
-    }
-    else
-    {
+    } else {
       [[NSColor grayColor] set];
     }
     [disclosurePath fill];
@@ -956,16 +853,14 @@
   // using the superclass to draw text and borders
   [super drawWithFrame:frame inView:view];
   
-  if(needsDrawing == YES && image != nil)
-  {
+  if (needsDrawing == YES && image != nil) {
     // drawing the image
     float dimension = frame.size.height - 6;
     [imageCell drawWithFrame:NSMakeRect(frame.origin.x + 3, frame.origin.y + 3, dimension, dimension) inView:view];
   }
   
   // drawing the focus ring if needed
-  if(needsDrawing == YES && [self showsFirstResponder])
-  {
+  if (needsDrawing == YES && [self showsFirstResponder]) {
     [NSGraphicsContext saveGraphicsState];
     NSSetFocusRingStyle(NSFocusRingOnly);
     

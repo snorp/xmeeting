@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesRegistrationRecord.h,v 1.4 2008/10/12 12:24:12 hfriederich Exp $
+ * $Id: XMPreferencesRegistrationRecord.h,v 1.5 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_REGISTRATION_RECORD_H__

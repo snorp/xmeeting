@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.23 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.24 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAddressBookModule.h"

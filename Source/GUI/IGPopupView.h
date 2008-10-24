@@ -1,9 +1,9 @@
 /*
- * $Id: IGPopupView.h,v 1.3 2007/08/17 11:36:43 hfriederich Exp $
+ * $Id: IGPopupView.h,v 1.4 2008/10/24 12:22:02 hfriederich Exp $
  *
  * Copyright (c) 2005 IGDocks
  * All rights reserved.
- * Copyright (c) 2005-2006 Ivan Guajana. All rights reserved.
+ * Copyright (c) 2005-2008 Ivan Guajana, Hannes Friederich. All rights reserved.
  */
 
 /* IGPopupView */

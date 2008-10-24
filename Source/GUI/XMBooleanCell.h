@@ -1,9 +1,9 @@
 /*
- * $Id: XMBooleanCell.h,v 1.3 2006/01/21 23:27:00 hfriederich Exp $
+ * $Id: XMBooleanCell.h,v 1.4 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2006 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_BOOLEAN_CELL_H__

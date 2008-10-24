@@ -1,9 +1,9 @@
 /*
- * $Id: XMInfoModule.h,v 1.9 2007/09/27 21:13:12 hfriederich Exp $
+ * $Id: XMInfoModule.h,v 1.10 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2006-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006-2007 Ivan Guajana, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2008 Ivan Guajana, Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_INFO_MODULE_H__

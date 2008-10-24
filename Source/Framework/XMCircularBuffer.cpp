@@ -1,9 +1,9 @@
 /*
- * $Id: XMCircularBuffer.cpp,v 1.8 2008/09/22 22:56:46 hfriederich Exp $
+ * $Id: XMCircularBuffer.cpp,v 1.9 2008/10/24 12:22:02 hfriederich Exp $
  *
- * Copyright (c) 2005-2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2007 Andreas Fenkart, Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2008 Andreas Fenkart, Hannes Friederich. All rights reserved.
  */
 
 // Note: when resetting the buffer within Restart(),
