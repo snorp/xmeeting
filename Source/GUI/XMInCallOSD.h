@@ -1,9 +1,9 @@
 /*
- * $Id: XMInCallOSD.h,v 1.5 2007/08/17 11:36:43 hfriederich Exp $
+ * $Id: XMInCallOSD.h,v 1.6 2008/11/03 21:34:03 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Ivan Guajana. All rights reserved.
+ * Copyright (c) 2006-2008 Ivan Guajana, Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_IN_CALL_OSD_H__

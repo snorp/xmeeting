@@ -2064,20 +2064,20 @@
 		D1A5E1F909C882EA0063B926 /* Video Display */ = {
 			isa = PBXGroup;
 			children = (
-				1A490EAD09974BAE0096261F /* XMAudioOnlyOSD.h */,
-				1AD42B5C09938EF500F92546 /* XMInCallOSD.h */,
-				D1A5E1FA09C8835E0063B926 /* XMLocalVideoView.h */,
-				1A348F9D0984E4210033FA95 /* XMOnScreenControllerView.h */,
-				1A348F9F0984E4210033FA95 /* XMOnScreenControllerWindow.h */,
-				1A348FA10984E4210033FA95 /* XMOpenGLUtilities.h */,
 				1A348FA30984E4210033FA95 /* XMOSDVideoView.h */,
-				1A490EAE09974BAE0096261F /* XMAudioOnlyOSD.m */,
-				1AD42B5D09938EF500F92546 /* XMInCallOSD.m */,
-				D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */,
-				1A348F9E0984E4210033FA95 /* XMOnScreenControllerView.m */,
-				1A348FA00984E4210033FA95 /* XMOnScreenControllerWindow.m */,
-				1A348FA20984E4210033FA95 /* XMOpenGLUtilities.m */,
 				1A348FA40984E4210033FA95 /* XMOSDVideoView.m */,
+				D1A5E1FA09C8835E0063B926 /* XMLocalVideoView.h */,
+				D1A5E1FB09C8835E0063B926 /* XMLocalVideoView.m */,
+				1AD42B5C09938EF500F92546 /* XMInCallOSD.h */,
+				1AD42B5D09938EF500F92546 /* XMInCallOSD.m */,
+				1A490EAD09974BAE0096261F /* XMAudioOnlyOSD.h */,
+				1A490EAE09974BAE0096261F /* XMAudioOnlyOSD.m */,
+				1A348F9D0984E4210033FA95 /* XMOnScreenControllerView.h */,
+				1A348F9E0984E4210033FA95 /* XMOnScreenControllerView.m */,
+				1A348F9F0984E4210033FA95 /* XMOnScreenControllerWindow.h */,
+				1A348FA00984E4210033FA95 /* XMOnScreenControllerWindow.m */,
+				1A348FA10984E4210033FA95 /* XMOpenGLUtilities.h */,
+				1A348FA20984E4210033FA95 /* XMOpenGLUtilities.m */,
 			);
 			name = "Video Display";
 			sourceTree = "<group>";
