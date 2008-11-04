@@ -1,5 +1,5 @@
 /*
- * $Id: XMTextChatModule.h,v 1.5 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMTextChatModule.h,v 1.6 2008/11/04 23:12:35 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,8 +14,8 @@
 
 @interface XMTextChatModule : NSObject <XMMainWindowAdditionModule> {
 
-	IBOutlet NSView *contentView;
-	NSSize contentViewSize;
+  IBOutlet NSView *contentView;
+  NSSize contentViewSize;
 }
 
 @end

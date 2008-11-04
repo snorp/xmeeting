@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.28 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.29 2008/11/04 23:12:35 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -65,7 +65,7 @@
 }
 
 - (void)dealloc
-{	
+{  
   [terminalAliasViews release];
   [registrationViews release];
   
@@ -218,12 +218,10 @@
 
 - (void)becomeActiveModule
 {
-  
 }
 
 - (void)becomeInactiveModule
 {
-  
 }
 
 #pragma mark -
@@ -338,7 +336,7 @@
   addressExtraHeight = (interfaceCount-1)*XM_IP_ADDRESSES_TEXT_FIELD_HEIGHT;
   
   NSString *publicAddress = [utils publicAddress];
-		
+    
   // display public address only if local addresses don't contain the public address
   // (i.e. behind a NAT)
   if (publicAddress != nil && ![utils isLocalAddress:publicAddress]) {

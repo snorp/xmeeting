@@ -1,5 +1,5 @@
 /*
- * $Id: XMTextChatModule.m,v 1.8 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMTextChatModule.m,v 1.9 2008/11/04 23:12:35 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,50 +14,49 @@
 
 - (id)init
 {
-	//[[XMMainWindowController sharedInstance] addAdditionModule:self];
-	
-	return self;
+  //[[XMMainWindowController sharedInstance] addAdditionModule:self];
+  
+  return self;
 }
 
 - (void)dealloc
 {
-	[nibLoader release];
-	
-	[super dealloc];
+  [nibLoader release];
+  
+  [super dealloc];
 }
 
 - (void)awakeFromNib
 {
-	contentViewSize = [contentView frame].size;
+  contentViewSize = [contentView frame].size;
 }
 
 - (NSString *)name
 {
-	return @"Text Chat";
+  return @"Text Chat";
 }
 
 - (NSImage *)image
 {
-	return [NSImage imageNamed:@"TextChat"];
+  return [NSImage imageNamed:@"TextChat"];
 }
 
 - (NSView *)contentView
 {
-	if(nibLoader == nil)
-	{
-		nibLoader = [[NSNib alloc] initWithNibNamed:@"TextChatModule" bundle:nil];
-		[nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
-	}
-	
-	return contentView;
+  if(nibLoader == nil) {
+    nibLoader = [[NSNib alloc] initWithNibNamed:@"TextChatModule" bundle:nil];
+    [nibLoader instantiateNibWithOwner:self topLevelObjects:nil];
+  }
+  
+  return contentView;
 }
 
 - (NSSize)contentViewSize
 {
-	// if not already done, causing the nib file to load
-	[self contentView];
-	
-	return contentViewSize;
+  // if not already done, causing the nib file to load
+  [self contentView];
+  
+  return contentViewSize;
 }
 
 - (void)becomeActiveModule
@@ -70,7 +69,7 @@
 
 - (BOOL)isResizableWhenInSeparateWindow
 {
-	return YES;
+  return YES;
 }
 
 @end

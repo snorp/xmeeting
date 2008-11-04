@@ -1,5 +1,5 @@
 /*
- * $Id: XMInspectorModule.m,v 1.2 2006/10/07 10:45:51 hfriederich Exp $
+ * $Id: XMInspectorModule.m,v 1.3 2008/11/04 23:12:35 hfriederich Exp $
  *
  * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,9 +16,9 @@
 
 - (id)init
 {
-	isEnabled = YES;
-	
-	return self;
+  isEnabled = YES;
+  
+  return self;
 }
 
 #pragma mark -
@@ -26,26 +26,25 @@
 
 - (void)setTag:(XMInspectorControllerTag)theTag
 {
-	tag = theTag;
+  tag = theTag;
 }
 
 - (BOOL)isEnabled
 {
-	return isEnabled;
+  return isEnabled;
 }
 
 - (void)setEnabled:(BOOL)flag
 {
-	if(isEnabled != flag)
-	{
-		isEnabled = flag;
-		[[XMInspectorController inspectorWithTag:tag] moduleStatusChanged:self];
-	}
+  if (isEnabled != flag) {
+    isEnabled = flag;
+    [[XMInspectorController inspectorWithTag:tag] moduleStatusChanged:self];
+  }
 }
 
 - (void)resizeContentView
 {
-	[[XMInspectorController inspectorWithTag:tag] moduleSizeChanged:self];
+  [[XMInspectorController inspectorWithTag:tag] moduleSizeChanged:self];
 }
 
 #pragma mark -
@@ -53,37 +52,37 @@
 
 - (NSString *)identifier
 {
-	return nil;
+  return nil;
 }
 
 - (NSString *)name
 {
-	return nil;
+  return nil;
 }
 
 - (NSImage *)image
 {
-	return nil;
+  return nil;
 }
 
 - (NSView *)contentView
 {
-	return nil;
+  return nil;
 }
 
 - (NSSize)contentViewSize
 {
-	return NSMakeSize(0, 0);
+  return NSMakeSize(0, 0);
 }
 
 - (NSSize)contentViewMinSize
 {
-	return [self contentViewSize];
+  return [self contentViewSize];
 }
 
 - (NSSize)contentViewMaxSize
 {
-	return [self contentViewSize];
+  return [self contentViewSize];
 }
 
 - (void)becomeActiveModule

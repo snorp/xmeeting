@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.31 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.32 2008/11/04 23:12:35 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -208,9 +208,9 @@
   
   if (![locationName isEqualToString:activeLocationName]) {
     NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_LOCATION_SWITCH", @""), activeLocationName];
-	
+  
     [self _logText:logText date:nil];
-	
+  
     [logText release];
     
     [locationName release];
@@ -378,7 +378,7 @@
 }
 
 - (void)_didUnregisterFromGatekeeper:(NSNotification *)notif
-{	
+{  
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_GK_UNREGISTRATION", @""), gatekeeperName];
   
   [self _logText:logText date:nil];
@@ -446,7 +446,7 @@
   
   XMSIPStatusCode failReason = [[XMCallManager sharedInstance] sipRegistrationStatusAtIndex:index];
   NSString *failReasonString = XMSIPStatusCodeString(failReason);
-		
+    
   NSString *logText = [[NSString alloc] initWithFormat:NSLocalizedString(@"XM_CALL_HISTORY_MODULE_SIP_REG_FAILURE", @""),
     aor, failReasonString];
   
