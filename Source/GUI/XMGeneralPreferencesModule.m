@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.11 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.12 2008/11/06 08:41:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,12 +12,6 @@
 
 NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferencesModule";
 
-@interface XMGeneralPreferencesModule (PrivateMethods)
-
--(void)_chooseDebugFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-
-@end
-
 @implementation XMGeneralPreferencesModule
 
 #pragma mark Init & Deallocation Methods
@@ -25,7 +19,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 - (id)init
 {
   prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
-  
   return self;
 }
 
@@ -38,7 +31,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 - (void)dealloc
 {
   [prefWindowController release];
-  
   [super dealloc];
 }
 
@@ -88,19 +80,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
   
   int state = ([prefManager defaultAutomaticallyAcceptIncomingCalls] == YES) ? NSOnState : NSOffState;
   [automaticallyAcceptIncomingCallsSwitch setState:state];
-  
-  state = ([XMPreferencesManager enablePTrace] == YES) ? NSOnState : NSOffState;
-  [generateDebugLogSwitch setState:state];
-  
-  NSString *debugLogFilePath = [XMPreferencesManager pTraceFilePath];
-  if(debugLogFilePath == nil)
-  {
-    debugLogFilePath = @"";
-  }
-  [debugLogFilePathField setStringValue:debugLogFilePath];
-  
-  // validating the user interface
-  [self toggleGenerateDebugLogFile:self];
 }
 
 - (void)savePreferences
@@ -111,12 +90,6 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
   
   BOOL flag = ([automaticallyAcceptIncomingCallsSwitch state] == NSOnState) ? YES : NO;
   [prefManager setDefaultAutomaticallyAcceptIncomingCalls:flag];
-  
-  flag = ([generateDebugLogSwitch state] == NSOnState) ? YES : NO;
-  [XMPreferencesManager setEnablePTrace:flag];
-  
-  NSString *path = [debugLogFilePathField stringValue];
-  [XMPreferencesManager setPTraceFilePath:path];
 }
 
 - (void)becomeActiveModule
@@ -131,51 +104,9 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
   [prefWindowController notePreferencesDidChange];
 }
 
-- (IBAction)toggleGenerateDebugLogFile:(id)sender
-{
-  int state = [generateDebugLogSwitch state];
-  BOOL enableButton = (state == NSOnState) ? YES : NO;
-  
-  [chooseDebugLogFilePathButton setEnabled:enableButton];
-  
-  [self defaultAction:self];
-}
-
-- (IBAction)chooseDebugFilePath:(id)sender
-{
-  NSSavePanel *savePanel = [NSSavePanel savePanel];
-  NSString *path = [debugLogFilePathField stringValue];
-  
-  NSString *directory = nil;
-  NSString *file = nil;
-  
-  [savePanel setPrompt:NSLocalizedString(@"XM_GENERAL_PREFERENCES_CHOOSE", @"")];
-  
-  if(![path isEqualToString:@""])
-  {
-    directory = [path stringByDeletingLastPathComponent];
-    file = [path lastPathComponent];
-  }
-  
-  [savePanel beginSheetForDirectory:directory file:file modalForWindow:[contentView window] modalDelegate:self
-                     didEndSelector:@selector(_chooseDebugFilePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
-}
-
 - (void)controlTextDidChange:(NSNotification *)notif
 {
   [self defaultAction:self];
-}
-
-#pragma mark -
-#pragma mark Private Methods
-
--(void)_chooseDebugFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-  if(returnCode == NSOKButton)
-  {
-    [debugLogFilePathField setStringValue:[sheet filename]];
-    [self defaultAction:self];
-  }
 }
 
 @end

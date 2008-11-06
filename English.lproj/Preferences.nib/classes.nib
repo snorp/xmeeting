@@ -92,21 +92,25 @@
             ACTIONS = {
                 chooseDebugFilePath = id; 
                 defaultAction = id; 
-                toggleAutomaticallyHideInCallControls = id; 
                 toggleGenerateDebugLogFile = id; 
             }; 
-            CLASS = XMGeneralPreferencesModule; 
+            CLASS = XMDebugPreferencesModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                automaticallyAcceptIncomingCallsSwitch = NSButton; 
-                automaticallyEnterFullScreenSwitch = NSButton; 
-                automaticallyHideInCallControlsSwitch = NSButton; 
                 chooseDebugLogFilePathButton = NSButton; 
                 contentView = NSView; 
                 debugLogFilePathField = NSTextField; 
                 generateDebugLogSwitch = NSButton; 
-                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
-                showSelfViewMirroredSwitch = NSButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {defaultAction = id; }; 
+            CLASS = XMGeneralPreferencesModule; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                automaticallyAcceptIncomingCallsSwitch = NSButton; 
+                contentView = NSView; 
                 userNameField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 

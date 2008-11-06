@@ -228,6 +228,8 @@
 "XM_VIDEO_PREFERENCES_SHOW_SETTINGS" = "Show Settings...";
 "XM_ADDRESS_BOOK_PREFERENCES_NAME"= "Address Book";
 "XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Edit the Address Book integration of XMeeting";
+"XM_DEBUG_PREFERENCES_NAME" = "Debug";
+"XM_DEBUG_PREFERENCES_TOOLTIP" = "Debug Preferences";
 
 /* Setup Assistant */
 "XM_SETUP_ASSISTANT_CONTINUE" = "Continue";

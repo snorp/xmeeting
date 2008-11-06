@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.13 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.14 2008/11/06 08:41:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,9 +22,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 - (id)_init;
 
   // toolbar delegate methods
-- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar 
-	 itemForItemIdentifier:(NSString *)itemIdentifier 
- willBeInsertedIntoToolbar:(BOOL)flag;
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag;
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar;
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar;
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar;
@@ -47,8 +45,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 {
   static XMPreferencesWindowController *sharedInstance = nil;
   
-  if(sharedInstance == nil)
-  {
+  if (sharedInstance == nil) {
     sharedInstance = [[XMPreferencesWindowController alloc] _init];
   }
   
@@ -134,19 +131,14 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   NSWindow *window = [self window];
   
   /* we always center the preferences window when displaying the preferences anew */
-  if(![window isVisible])
-  {
+  if (![window isVisible]) {
     // we cause each module to reload its data so that the values are consistent
     unsigned count = [modules count];
-    unsigned i;
-    
-    for(i = 0; i < count; i++)
-    {
+    for (unsigned i = 0; i < count; i++) {
       id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
       [module loadPreferences];
       
-      if(i == 0)
-      {
+      if (i == 0) {
         [[[self window] toolbar] setSelectedItemIdentifier:[module identifier]];
       }
     }
@@ -158,16 +150,13 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
     preferencesHaveChanged = NO;
     
     NSString *windowTopLeftCornerString = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_PreferencesWindowTopLeftCorner];
-    if(windowTopLeftCornerString != nil)
-    {
+    if (windowTopLeftCornerString != nil) {
       NSPoint windowTopLeftCorner = NSPointFromString(windowTopLeftCornerString);
       NSRect windowFrame = [window frame];
       windowFrame.origin = windowTopLeftCorner;
       windowFrame.origin.y -= windowFrame.size.height;
       [window setFrame:windowFrame display:NO];
-    }
-    else
-    {
+    } else {
       [window center];
     }
   }
@@ -176,13 +165,11 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (void)closePreferencesWindow
 {
-  if([self isWindowLoaded] == NO)
-  {
+  if ([self isWindowLoaded] == NO) {
     return;
   }
   
-  if([[self window] isVisible] && preferencesHaveChanged)
-  {
+  if ([[self window] isVisible] && preferencesHaveChanged) {
     /* We first ask the user whether he wants to save the changes made */
     NSAlert *alert = [[NSAlert alloc] init];
     
@@ -192,9 +179,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
     [alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"")];
     
     int result = [alert runModal];
-    
-    if(result == NSAlertFirstButtonReturn)
-    {
+    if (result == NSAlertFirstButtonReturn) {
       [self applyPreferences:self];
     }
   }
@@ -207,8 +192,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (void)notePreferencesDidChange
 {
-  if(!preferencesHaveChanged)
-  {
+  if (!preferencesHaveChanged) {
     [applyButton setEnabled:YES];
     [[self window] setDocumentEdited:YES];
     preferencesHaveChanged = YES;
@@ -216,7 +200,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 }
 
 - (void)addPreferencesModule:(id<XMPreferencesModule>)module
-{	
+{  
   NSString *identifier = [module identifier];
   NSToolbarItem *toolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:identifier];
   
@@ -227,15 +211,12 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   [toolbarItem setAction:@selector(toolbarItemAction:)];
   
   // iterating over all existing modules, inserting the new module at the correct place
-  unsigned count = [modules count];
   unsigned i;
+  unsigned count = [modules count];
   unsigned position = [module position];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (i = 0; i < count; i++) {
     id<XMPreferencesModule> theModule = (id<XMPreferencesModule>)[modules objectAtIndex:i];
-    if([theModule position] >= position)
-    {
+    if ([theModule position] >= position) {
       break;
     }
   }
@@ -250,19 +231,14 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 #pragma mark -
 #pragma mark Toolbar Delegate Methods
 
-- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar 
-	 itemForItemIdentifier:(NSString *)itemIdentifier 
- willBeInsertedIntoToolbar:(BOOL)flag
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
-  if([itemIdentifier isEqualToString:XMKey_ButtonToolbarItemIdentifier])
-  {
+  if ([itemIdentifier isEqualToString:XMKey_ButtonToolbarItemIdentifier]) {
     return buttonToolbarItem;
   }
   
   unsigned index = [identifiers indexOfObject:itemIdentifier];
-  
-  if(index != NSNotFound)
-  {
+  if (index != NSNotFound) {
     return (NSToolbarItem *)[toolbarItems objectAtIndex:index];
   }
   
@@ -289,17 +265,14 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (IBAction)toolbarItemAction:(NSToolbarItem *)item
 {
-  if(item == currentSelectedItem)
-  {
+  if (item == currentSelectedItem) {
     return;
   }
   
   NSString *identifier = [item itemIdentifier];
   
   unsigned index = [identifiers indexOfObject:identifier];
-  
-  if(index != NSNotFound)
-  {
+  if (index != NSNotFound) {
     NSWindow *window = [self window];
     id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:index];
     NSView *contentView = [module contentView];
@@ -325,22 +298,16 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (IBAction)applyPreferences:(id)sender
 {
-  unsigned count = [modules count];
-  unsigned i;
-  
   // Ensure that the locations module is the last one to store it's preferences
   // to ensure location data integrity
   id<XMPreferencesModule> locationsModule = nil;
   
-  for(i = 0; i < count; i++)
-  {
+  unsigned count = [modules count]; 
+  for (unsigned i = 0; i < count; i++) {
     id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
-    if([[module identifier] isEqualToString:XMKey_LocationPreferencesModuleIdentifier])
-    {
+    if ([[module identifier] isEqualToString:XMKey_LocationPreferencesModuleIdentifier]) {
       locationsModule = module; // The locations have to be saved last
-    }
-    else
-    {
+    } else {
       [module savePreferences];
     }
   }
@@ -359,8 +326,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (BOOL)windowShouldClose:(id)sender
 {
-  if(preferencesHaveChanged)
-  {
+  if (preferencesHaveChanged) {
     /* We first ask the user whether he wants to save the changes made */
     NSAlert *alert = [[NSAlert alloc] init];
     
@@ -387,8 +353,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   NSPoint topLeftWindowCorner = windowFrame.origin;
   topLeftWindowCorner.y += windowFrame.size.height;
   NSString *topLeftWindowCornerString = NSStringFromPoint(topLeftWindowCorner);
-  [[NSUserDefaults standardUserDefaults] setObject:topLeftWindowCornerString
-                                            forKey:XMKey_PreferencesWindowTopLeftCorner];
+  [[NSUserDefaults standardUserDefaults] setObject:topLeftWindowCornerString forKey:XMKey_PreferencesWindowTopLeftCorner];
 }
 
 #pragma mark -
@@ -396,13 +361,11 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (void)savePreferencesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-  if(returnCode == NSAlertSecondButtonReturn) //Abort
-  {
+  if (returnCode == NSAlertSecondButtonReturn) { //Abort
     return;
   }
   
-  if(returnCode == NSAlertFirstButtonReturn) // save the preferences
-  {
+  if (returnCode == NSAlertFirstButtonReturn) { // save the preferences
     // causing the system to save all preferences
     [self applyPreferences:self];
   }

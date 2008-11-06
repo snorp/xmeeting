@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.h,v 1.8 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.h,v 1.9 2008/11/06 08:41:46 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,15 +26,9 @@ extern NSString *XMKey_GeneralPreferencesModuleIdentifier;
   
   IBOutlet NSTextField *userNameField;
   IBOutlet NSButton *automaticallyAcceptIncomingCallsSwitch;
-  IBOutlet NSButton *generateDebugLogSwitch;
-  IBOutlet NSTextField *debugLogFilePathField;
-  IBOutlet NSButton *chooseDebugLogFilePathButton;
 }
 
 - (IBAction)defaultAction:(id)sender;
-
-- (IBAction)toggleGenerateDebugLogFile:(id)sender;
-- (IBAction)chooseDebugFilePath:(id)sender;
 
 @end
 
