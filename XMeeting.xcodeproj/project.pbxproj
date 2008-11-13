@@ -880,8 +880,8 @@
 		D1887CC40A2713E200C938BB /* h460.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = h460.h; sourceTree = "<group>"; };
 		D1887D620A27A85500C938BB /* pssl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = pssl.cxx; sourceTree = "<group>"; };
 		D1887DEB0A27B67B00C938BB /* psasl.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = psasl.cxx; sourceTree = "<group>"; };
-		D1887E110A27BA2F00C938BB /* prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = prop.h; path = Source/Framework/prop.h; sourceTree = "<group>"; };
-		D1887E120A27BA2F00C938BB /* sasl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sasl.h; path = Source/Framework/sasl.h; sourceTree = "<group>"; };
+		D1887E110A27BA2F00C938BB /* prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = prop.h; path = ../../XMeeting/Source/Framework/prop.h; sourceTree = "<group>"; };
+		D1887E120A27BA2F00C938BB /* sasl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sasl.h; path = ../../XMeeting/Source/Framework/sasl.h; sourceTree = "<group>"; };
 		D1887E760A283DEA00C938BB /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D1897F7C0823EEF2007CD286 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = English; path = English.lproj/XMCodecDescriptions.plist; sourceTree = "<group>"; };
 		D189805108241F11007CD286 /* XMBooleanCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMBooleanCell.h; sourceTree = "<group>"; };
