@@ -128,6 +128,8 @@
 		D1205B1109F989AA00179B6C /* up_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205B0F09F989AA00179B6C /* up_arrow.tif */; };
 		D120614409FBDE5100179B6C /* AddressBook_16.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D120614309FBDE5100179B6C /* AddressBook_16.tiff */; };
 		D120649A09FE56C600179B6C /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D120649909FE56C600179B6C /* Accelerate.framework */; };
+		D1216BAB0ECB954800DC292F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D1216BA80ECB953300DC292F /* main.m */; };
+		D1216BFA0ECB9C1400DC292F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
 		D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */; };
@@ -760,6 +762,8 @@
 		D12077B50A011A0900179B6C /* XMRTPH263PlusPacketizer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XMRTPH263PlusPacketizer.c; path = Source/Framework/XMRTPH263PlusPacketizer.c; sourceTree = "<group>"; };
 		D12077B60A011A0900179B6C /* XMRTPH263PlusPacketizer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PlusPacketizer.h; path = Source/Framework/XMRTPH263PlusPacketizer.h; sourceTree = "<group>"; };
 		D12077B70A011A0900179B6C /* XMRTPH263PlusPacketizerDispatch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMRTPH263PlusPacketizerDispatch.h; path = Source/Framework/XMRTPH263PlusPacketizerDispatch.h; sourceTree = "<group>"; };
+		D1216B9A0ECB94F700DC292F /* BuildConfigurationTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BuildConfigurationTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1216BA80ECB953300DC292F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BuildConfiguration/main.m; sourceTree = "<group>"; };
 		D121C701087D53D80097DEF7 /* XMCircularBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMCircularBuffer.cpp; path = Source/Framework/XMCircularBuffer.cpp; sourceTree = "<group>"; };
 		D121C784087D5FC80097DEF7 /* XMCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMCircularBuffer.h; path = Source/Framework/XMCircularBuffer.h; sourceTree = "<group>"; };
 		D1296DF409288A7A0077C77F /* psync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = psync.h; sourceTree = "<group>"; };
@@ -1574,6 +1578,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1216B980ECB94F700DC292F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1216BFA0ECB9C1400DC292F /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D15435ED0C01FB62002A027E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1647,6 +1659,7 @@
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
 				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
 				D15435EF0C01FB62002A027E /* Address Book plugin.bundle */,
+				D1216B9A0ECB94F700DC292F /* BuildConfigurationTool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1693,6 +1706,7 @@
 				080E96DDFE201D6D7F000001 /* Code Source */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
+				D1216B960ECB94B900DC292F /* BuildConfiguration */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				D1B6057D08F8F7A90034B47F /* ptlib */,
 				D1CEE10608F901DB007E4ABE /* opal */,
@@ -1881,6 +1895,14 @@
 				D10FD6560A7D49C700935B10 /* speex_preprocess.c */,
 			);
 			name = speex;
+			sourceTree = "<group>";
+		};
+		D1216B960ECB94B900DC292F /* BuildConfiguration */ = {
+			isa = PBXGroup;
+			children = (
+				D1216BA80ECB953300DC292F /* main.m */,
+			);
+			name = BuildConfiguration;
 			sourceTree = "<group>";
 		};
 		D14BBF2D0E3F7B43007B1A57 /* h460 */ = {
@@ -3218,6 +3240,22 @@
 			productReference = D10975240BAE73F4007E8087 /* gsm_pwplugin.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		D1216B990ECB94F700DC292F /* BuildConfigurationTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1216BA20ECB952900DC292F /* Build configuration list for PBXNativeTarget "BuildConfigurationTool" */;
+			buildPhases = (
+				D1216B970ECB94F700DC292F /* Sources */,
+				D1216B980ECB94F700DC292F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BuildConfigurationTool;
+			productName = BuildConfigurationTool;
+			productReference = D1216B9A0ECB94F700DC292F /* BuildConfigurationTool */;
+			productType = "com.apple.product-type.tool";
+		};
 		D15435EE0C01FB62002A027E /* XMeetingABPlugin */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D154360F0C01FB66002A027E /* Build configuration list for PBXNativeTarget "XMeetingABPlugin" */;
@@ -3273,6 +3311,7 @@
 				D1E314C10B52AA6900385072 /* speex */,
 				D10974F30BAE73F4007E8087 /* gsm */,
 				D15435EE0C01FB62002A027E /* XMeetingABPlugin */,
+				D1216B990ECB94F700DC292F /* BuildConfigurationTool */,
 			);
 		};
 /* End PBXProject section */
@@ -3441,7 +3480,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"****************************************\";\necho \"* XMeeting PTLib/Opal configure script *\";\necho \"****************************************\";\n\nif [ -f $PROJECT_DIR/../ptlib/include/ptbuildopts.h ];\nthen\n  echo \"PTLib: running configure not needed\";\nelse\n  echo \"PTLib: running configure\";\n  cd $PROJECT_DIR/../ptlib/\n  ./configure --enable-minsize --enable-sasl --enable-openssl --enable-plugins --enable-resolver\n  cd $PROJECT_DIR\nfi\n\nif [ -f $PROJECT_DIR/../opal/include/opal/buildopts.h ]\nthen\n  echo \"OPAL: running configure not needed\";\nelse\n  echo \"OPAL: running configure\";\n  cd $PROJECT_DIR/../opal\n  \n  if [ -f /usr/local/bin/pkg-config ]\n  then\n    echo \"Found pkg-config in /usr/local/bin\";\n    PKG_CONFIG_LOCATION=/usr/local/bin/pkg-config;\n    export PKG_CONFIG_LOCATION;\n  else\n    if [ -f /sw/bin/pkg-config ]\n    then\n      echo \"Found pkg-config in /sw/bin\";\n      PKG_CONFIG_LOCATION=/sw/bin/pkg-config;\n      export PKG_CONFIG_LOCATION;\n    else\n      echo \"No 'pkg-config' found on the system. Cannot configure OPAL\";\n    fi\n  fi\n\n  ./configure PTLIBDIR=$PROJECT_DIR/../ptlib/ PKG_CONFIG=$PKG_CONFIG_LOCATION --disable-lid --disable-ivr --disable-t38 --disable-t120 --disable-iax --enable-video --disable-rfc4175\n  cd $PROJECT_DIR\nfi\n\nif [ -f $PROJECT_DIR/../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\n  echo \"PTLib: Running bison not needed\";\nelse\n  echo \"PTLib: Running bison\";\n  /usr/bin/bison $PROJECT_DIR/../ptlib/src/ptlib/common/getdate.y -o $PROJECT_DIR/../ptlib/src/ptlib/common/getdate.tab.c \nfi\n\necho \"*******************************\";";
+			shellScript = "echo \"****************************************\";\necho \"* XMeeting PTLib/Opal configure script *\";\necho \"****************************************\";\n\nif [ -f $PROJECT_DIR/../ptlib/include/ptbuildopts.h ];\nthen\n  echo \"PTLib: running configure not needed\";\nelse\n  echo \"PTLib: running configure\";\n  cd $PROJECT_DIR/../ptlib/\n  ./configure --enable-minsize --enable-sasl --enable-openssl --enable-plugins --enable-resolver\n  cd $PROJECT_DIR\nfi\n\nif [ -f $PROJECT_DIR/../opal/include/opal/buildopts.h ]\nthen\n  echo \"OPAL: opal/include/buildopts.h already present\";\nelse\n  echo \"OPAL: create opal/include/buildopts.h\";\n\n  cd $PROJECT_DIR  \n  BuildConfiguration/BuildConfigurationTool\nfi\n\nif [ -f $PROJECT_DIR/../ptlib/src/ptlib/common/getdate.tab.c ]; \nthen\n  echo \"PTLib: Running bison not needed\";\nelse\n  echo \"PTLib: Running bison\";\n  /usr/bin/bison $PROJECT_DIR/../ptlib/src/ptlib/common/getdate.y -o $PROJECT_DIR/../ptlib/src/ptlib/common/getdate.tab.c \nfi\n\necho \"*******************************\";";
 		};
 		D1AD19370E630C2D00143295 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3745,6 +3784,14 @@
 				D10975460BAE7565007E8087 /* rpe.c in Sources */,
 				D10975470BAE7565007E8087 /* short_term.c in Sources */,
 				D10975480BAE7565007E8087 /* table.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1216B970ECB94F700DC292F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1216BAB0ECB954800DC292F /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4447,6 +4494,60 @@
 			};
 			name = Deployment;
 		};
+		D1216BA30ECB952900DC292F /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = BuildConfigurationTool;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		D1216BA40ECB952900DC292F /* Development_i386 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = BuildConfigurationTool;
+				ZERO_LINK = YES;
+			};
+			name = Development_i386;
+		};
+		D1216BA50ECB952900DC292F /* Development_PPC */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = BuildConfigurationTool;
+				ZERO_LINK = YES;
+			};
+			name = Development_PPC;
+		};
+		D1216BA60ECB952900DC292F /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = BuildConfigurationTool;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
 		D15436100C01FB66002A027E /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4616,6 +4717,17 @@
 				D11B6B5D0C8C416500CA9DE3 /* Development_i386 */,
 				D10FD9510A852E1500935B10 /* Development_PPC */,
 				D11E93F708589A9200154C02 /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+		D1216BA20ECB952900DC292F /* Build configuration list for PBXNativeTarget "BuildConfigurationTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1216BA30ECB952900DC292F /* Development */,
+				D1216BA40ECB952900DC292F /* Development_i386 */,
+				D1216BA50ECB952900DC292F /* Development_PPC */,
+				D1216BA60ECB952900DC292F /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
