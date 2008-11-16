@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallRecorder.h,v 1.6 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMCallRecorder.h,v 1.7 2008/11/16 12:55:38 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -69,10 +69,10 @@
  * However, the framerate of the recorded video may be significantly lower if the flag is not set.
  **/
 - (BOOL)startRecordingInRecompressionModeToFile:(NSString *)file videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier 
-							  videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
-							   recordLocalVideo:(BOOL)recordLocalVideo recordRemoteVideo:(BOOL)recordRemoteVideo
-						   audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier
-						   lowPriorityRecording:(BOOL)lowPriorityRecording;
+                              videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
+                               recordLocalVideo:(BOOL)recordLocalVideo recordRemoteVideo:(BOOL)recordRemoteVideo
+                           audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier
+                           lowPriorityRecording:(BOOL)lowPriorityRecording;
 
 /**
  * Starts a recording session, recording only the local video source.
@@ -81,8 +81,8 @@
  * used for recording is the same one used for transmission.
  **/
 - (BOOL)startRecordingInLocalVideoModeToFile:(NSString *)file videoCodecIdentifier:(XMCodecIdentifier)videoCodecIdentifier
-						   videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
-						audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier;
+                           videoCodecQuality:(XMCodecQuality)videoCodecQuality videoDataRate:(unsigned)videoDataRate
+                        audioCodecIdentifier:(XMCodecIdentifier)audioCodecIdentifier;
 
 /**
  * Starts a recording session, recording only the remote video source.
