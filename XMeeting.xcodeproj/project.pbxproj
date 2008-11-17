@@ -131,6 +131,7 @@
 		D1216BAB0ECB954800DC292F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D1216BA80ECB953300DC292F /* main.m */; };
 		D1216BFA0ECB9C1400DC292F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
+		D1330E940ED2253800623750 /* debugPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1330E930ED2253800623750 /* debugPreferences.tif */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
 		D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */; };
 		D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED450BBA382D008B3CBA /* libsasl2.dylib */; };
@@ -778,6 +779,7 @@
 		D132750608C6F38000298F25 /* XMRecentCallsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMRecentCallsView.h; sourceTree = "<group>"; };
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
+		D1330E930ED2253800623750 /* debugPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = debugPreferences.tif; path = Resources/Images/debugPreferences.tif; sourceTree = "<group>"; };
 		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		D1395D0C0BEF380300C76EFD /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/ScreenSettings.nib; sourceTree = "<group>"; };
 		D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAreaSelectionView.h; path = Source/Framework/XMAreaSelectionView.h; sourceTree = "<group>"; };
@@ -816,7 +818,7 @@
 		D14BBF5F0E3F7DF6007B1A57 /* localep.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = localep.h; sourceTree = "<group>"; };
 		D14BBF640E3F7E28007B1A57 /* localep.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = localep.cxx; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
-		D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XMeetingABPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D15435EF0C01FB62002A027E /* Address Book plugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Address Book plugin.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPlugin.h; path = Source/AddressBookPlugin/XMAddressBookPlugin.h; sourceTree = "<group>"; };
 		D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPlugin.m; path = Source/AddressBookPlugin/XMAddressBookPlugin.m; sourceTree = "<group>"; };
 		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
@@ -1658,7 +1660,7 @@
 				8D1107320486CEB800E47090 /* XMeeting.app */,
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
 				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
-				D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */,
+				D15435EF0C01FB62002A027E /* Address Book plugin.bundle */,
 				D1216B9A0ECB94F700DC292F /* BuildConfigurationTool */,
 			);
 			name = Products;
@@ -3004,11 +3006,9 @@
 		D1EB1897084379C5002CEF53 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				D1A562A90C6DAB420086E6F6 /* Action.png */,
-				D1A562A60C6DAA280086E6F6 /* Remove.png */,
-				D1A562A00C6DA9460086E6F6 /* Add.png */,
-				D10BD5460AC1D503004320A8 /* recording.gif */,
 				D1BB917309BCDF99000897D9 /* accountPreferences.tif */,
+				D1A562A90C6DAB420086E6F6 /* Action.png */,
+				D1A562A00C6DA9460086E6F6 /* Add.png */,
 				D1EB18AC08437A26002CEF53 /* AddressBook.tiff */,
 				D120614309FBDE5100179B6C /* AddressBook_16.tiff */,
 				D1AF645F0A3947FC00CAF35F /* appearancePreferences.tif */,
@@ -3023,6 +3023,7 @@
 				1ADAFBE80990F74700F6C5FF /* camera_24_down.tif */,
 				1ADAFBD60990EBA700F6C5FF /* contacts_24.tif */,
 				1ADAFBD50990EBA700F6C5FF /* contacts_24_down.tif */,
+				D1330E930ED2253800623750 /* debugPreferences.tif */,
 				D104D9BF0A0E9947000898F2 /* DefaultURL_H323.tif */,
 				D104D9C00A0E9947000898F2 /* DefaultURL_SIP.tif */,
 				D104D94F0A0E5973000898F2 /* dial_pad_0.tif */,
@@ -3088,6 +3089,8 @@
 				1A348FC80984E4680033FA95 /* pinpmode_ichat_large_down.tif */,
 				1A348FCB0984E4680033FA95 /* pinpmode_sidebyside_large.tif */,
 				1A348FCA0984E4680033FA95 /* pinpmode_sidebyside_large_down.tif */,
+				D10BD5460AC1D503004320A8 /* recording.gif */,
+				D1A562A60C6DAA280086E6F6 /* Remove.png */,
 				D1205B0909F9899600179B6C /* right_arrow.tif */,
 				D1205B0809F9899600179B6C /* right_arrow_down.tif */,
 				1A348FCC0984E4680033FA95 /* semaphore_green.tif */,
@@ -3270,7 +3273,7 @@
 			);
 			name = XMeetingABPlugin;
 			productName = "Address Book plugin";
-			productReference = D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */;
+			productReference = D15435EF0C01FB62002A027E /* Address Book plugin.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D1E314C10B52AA6900385072 /* speex */ = {
@@ -3456,6 +3459,7 @@
 				D1A562A10C6DA9460086E6F6 /* Add.png in Resources */,
 				D1A562A70C6DAA280086E6F6 /* Remove.png in Resources */,
 				D1A562AA0C6DAB420086E6F6 /* Action.png in Resources */,
+				D1330E940ED2253800623750 /* debugPreferences.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
