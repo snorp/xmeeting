@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.36 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.37 2008/11/18 07:56:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -116,8 +116,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)_didUpdateNetworkInformation:(NSNotification *)notif;
 
 - (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)locations
-										h323Accounts:(NSArray *)h323Accounts
-										 sipAccounts:(NSArray *)sipAccounts;
+                                        h323Accounts:(NSArray *)h323Accounts
+                                         sipAccounts:(NSArray *)sipAccounts;
 
   // Misc.
 - (void)_alertLocationName;
@@ -239,7 +239,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 }
 
 - (void)loadPreferences
-{	
+{
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   
   // replacing the locations with a fresh set
@@ -260,6 +260,10 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   
   // displaying the first tab item at the start
   [sectionsTab selectFirstTabViewItem:self];
+  
+  // update the GUI
+  [locationsTableView reloadData];
+  [self _loadCurrentLocation];
 }
 
 - (void)savePreferences
@@ -269,14 +273,13 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // in case that the locations table view is editing a location's name,
   // we have to store that value as well
   unsigned index = [locationsTableView editedRow];
-  if(index != -1)
-  {
+  if (index != -1) {
     NSCell *cell = [locationsTableView selectedCell];
     NSText *text = [locationsTableView currentEditor];
     [cell endEditing:text];
   }
   
-  // first, save the current location
+  // save the current location
   [self _saveCurrentLocation];
   
   // pass the changed locations to the preferences manager
@@ -303,11 +306,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (IBAction)importLocations:(id)sender
 {
-  [[XMSetupAssistantManager sharedInstance] 
-			runImportLocationsAssistantModalForWindow:[contentView window]
-										modalDelegate:self
-									   didEndSelector:@selector(_importLocationsAssistantDidEndWithLocations:
-																h323Accounts:sipAccounts:)];
+  [[XMSetupAssistantManager sharedInstance] runImportLocationsAssistantModalForWindow:[contentView window]
+                                                                        modalDelegate:self
+                                                                       didEndSelector:@selector(_importLocationsAssistantDidEndWithLocations:h323Accounts:sipAccounts:)];
 }
 
 - (IBAction)duplicateLocation:(id)sender
@@ -333,10 +334,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   }
   
   // removing the location from the list and taking the first location as the current one.
+  // validate the GUI
   [locations removeObjectAtIndex:index];
   currentLocation = nil;
-  
-  // validate the GUI
   NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
   [locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
   [locationsTableView reloadData];
@@ -348,8 +348,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self defaultAction:self];
   
   // in case of index == 0, we have to manually set the new active location
-  if(index == 0)
-  {
+  if (index == 0) {
     currentLocation = (XMLocation *)[locations objectAtIndex:0];
   }
 }
@@ -371,6 +370,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (IBAction)actionButton:(id)sender
 {
+  // simulate that the button gets clicked
   [[actionPopup cell] performClickWithFrame:[sender frame] inView:[sender superview]];    
   [actionPopup selectItem: nil];
 }
@@ -379,6 +379,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   [prefWindowController notePreferencesDidChange];
 }
+
+#pragma mark -
+#pragma mark Network Methods
 
 - (IBAction)toggleAutoGetExternalAddress:(id)sender
 {
@@ -408,7 +411,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     }
     [stunServersTable reloadData];
     [self _validateSTUNUserInterface];
-  [self defaultAction:self];
+    [self defaultAction:self];
   }
 }
 
@@ -445,6 +448,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self defaultAction:self];
 }
 
+#pragma mark -
+#pragma mark H323 Methods
+
 - (IBAction)toggleEnableH323:(id)sender
 {
   [self _validateH323UserInterface];
@@ -454,9 +460,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (IBAction)gatekeeperAccountSelected:(id)sender
 {
   [self _updateGatekeeperAccountInfo];
-  
   [self defaultAction:self];
 }
+
+#pragma mark -
+#pragma mark SIP Methods
 
 - (IBAction)toggleEnableSIP:(id)sender
 {
@@ -480,9 +488,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [sipAccounts release];
   
   unsigned count = [accountModule sipAccountCount];
-  unsigned i;
   sipAccounts = [[NSMutableArray alloc] initWithCapacity:count];
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *account = [accountModule sipAccountAtIndex:i];
     [sipAccounts addObject:[[[XMSIPAccountInfo alloc] _initWithTag:[account tag] enabled:NO] autorelease]];
   }
@@ -497,16 +504,16 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self defaultAction:self];
 }
 
+#pragma mark -
+#pragma mark Audio Methods
+
 - (IBAction)moveAudioCodec:(id)sender
 {
   int rowIndex = [audioCodecPreferenceOrderTableView selectedRow];
   int newIndex;
-  if(sender == moveAudioCodecUpButton)
-  {
+  if (sender == moveAudioCodecUpButton) {
     newIndex = rowIndex - 1;
-  }
-  else
-  {
+  } else {
     newIndex = rowIndex + 1;
   }
   [audioCodecs exchangeObjectAtIndex:rowIndex withObjectAtIndex:newIndex];
@@ -533,6 +540,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self defaultAction:self];
 }
 
+#pragma mark -
+#pragma mark Video Methods
+
 - (IBAction)toggleEnableVideo:(id)sender
 {
   [self _validateVideoUserInterface];
@@ -543,12 +553,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   int rowIndex = [videoCodecPreferenceOrderTableView selectedRow];
   int newIndex;
-  if(sender == moveVideoCodecUpButton)
-  {
+  if (sender == moveVideoCodecUpButton) {
     newIndex = rowIndex - 1;
-  }
-  else
-  {
+  } else {
     newIndex = rowIndex + 1;
   }
   [videoCodecs exchangeObjectAtIndex:rowIndex withObjectAtIndex:newIndex];
@@ -575,20 +582,20 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self defaultAction:self];
 }
 
+#pragma mark -
+#pragma mark Misc.
+
 - (IBAction)endNewLocationSheet:(id)sender
 {
   int returnCode;
   
-  if(sender == newLocationOKButton)
-  {
+  if (sender == newLocationOKButton) {
     // check whether the name already exists
     NSString *locationName = [newLocationNameField stringValue];
     unsigned count = [locations count];
-    unsigned i;
-    for(i = 0; i < count; i++)
-    {
+    for (unsigned i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
-      if([[location name] isEqualToString:locationName])
+      if ([[location name] isEqualToString:locationName])
       {
         [self _alertLocationName];
         
@@ -596,9 +603,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
       }
     }
     returnCode = NSOKButton;
-  }
-  else
-  {
+    
+  } else {
     returnCode = NSCancelButton; 
   }
   
@@ -614,8 +620,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   unsigned h323AccountToSelect = 0;
   unsigned h323AccountTag = 0;
   
-  if(currentLocation != nil)
-  {
+  if (currentLocation != nil) {
     h323AccountTag = [[h323AccountsPopUp selectedItem] tag];
   }
   
@@ -626,8 +631,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   }
   
   [h323AccountsPopUp removeAllItems];
-  NSMenu *menu = [h323AccountsPopUp menu];
   
+  NSMenu *menu = [h323AccountsPopUp menu];
   if (hasMultiItem) {
     NSMenuItem *multiItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")
                                                        action:NULL
@@ -645,20 +650,17 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [noneItem release];
   
   unsigned count = [accountModule h323AccountCount];
-  unsigned i;
-  
-  if(count != 0) {
+  if (count != 0) {
     [menu addItem:[NSMenuItem separatorItem]];
   }
   
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMH323Account *h323Account = [accountModule h323AccountAtIndex:i];
     NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[h323Account name]
                                                       action:NULL keyEquivalent:@""];
     unsigned tag = [h323Account tag];
     [menuItem setTag:tag];
-    if(tag == h323AccountTag) {
+    if (tag == h323AccountTag) {
       h323AccountToSelect = (i+2);
     }
     [menu addItem:menuItem];
@@ -666,17 +668,15 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   }
   
   // Updating the SIP account tag infos (if present)
-  
   if (currentLocation != nil && sipAccounts != nil) {
     NSArray *oldAccounts = sipAccounts;
     count = [accountModule sipAccountCount];
     sipAccounts = [[NSMutableArray alloc] initWithCapacity:count];
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:i];
       unsigned numInfos = [oldAccounts count];
-      unsigned j;
       BOOL enabled = NO;
-      for (j = 0; j < numInfos; j++) {
+      for (unsigned j = 0; j < numInfos; j++) {
         XMSIPAccountInfo *info = (XMSIPAccountInfo *)[oldAccounts objectAtIndex:j];
         if ([info tag] == [sipAccount tag]) {
           enabled = [info enabled];
@@ -693,8 +693,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   unsigned sipAccountToSelect = 0;
   unsigned sipAccountTag = 0;
   
-  if(currentLocation != nil)
-  {
+  if (currentLocation != nil) {
     sipAccountTag = [[sipProxyPopUp selectedItem] tag];
   }
   if (sipAccountTag == XMCustomSIPProxyTag) {
@@ -734,13 +733,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   
   count = [accountModule sipAccountCount];
   
-  if(count != 0)
-  {
+  if (count != 0) {
     [menu addItem:[NSMenuItem separatorItem]];
   }
   
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *sipAccount = [accountModule sipAccountAtIndex:i];
     
     NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[sipAccount name]
@@ -748,8 +745,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     unsigned tag = [sipAccount tag];
     [menuItem setTag:tag];
     
-    if(sipAccountTag == tag)
-    {
+    if (sipAccountTag == tag) {
       sipAccountToSelect = (i+3);
     }
     
@@ -758,6 +754,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     [menuItem release];
   }
   
+  // update the GUI
   [h323AccountsPopUp selectItemAtIndex:h323AccountToSelect];
   [sipProxyPopUp selectItemAtIndex:sipAccountToSelect];
   
@@ -773,7 +770,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   if ([notif object] == sipProxyPasswordField) {
     sipProxyPasswordDidChange = YES;
   }
-  // we simply want the same effect as the default action.
+  // same effect as the default action.
   [self defaultAction:self];
 }
 
@@ -781,14 +778,14 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 #pragma mark Adding a New Location
 
 - (void)_addLocation:(XMLocation *)location
-{	
+{  
   // the current count is the later index for the new location
   unsigned index = [locations count];
   
   // adding the location
   [locations addObject:location];
   
-  // validate the GUI
+  // update the GUI
   NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
   [locationsTableView reloadData];
   [locationsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
@@ -803,17 +800,17 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (void)_loadCurrentLocation
 {
-  if(currentLocation)
-  {
+  if (currentLocation != nil) {
     [self _saveCurrentLocation];
+    currentLocation = nil;
   }
   
   NSIndexSet * selectedRows = [locationsTableView selectedRowIndexes];
   unsigned count = [selectedRows count];
   
-  if (count == 1) {
+  if (count == 1) { // only one location selected
     currentLocation = [locations objectAtIndex:[selectedRows firstIndex]];
-  } else {
+  } else { // multiple locations selected
     [multipleLocationsWrapper release];
     
     NSMutableArray * selectedLocations = [[NSMutableArray alloc] initWithCapacity:count];
@@ -839,13 +836,10 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self _setTag:bandwidth forPopUp:bandwidthLimitPopUp];
   
   obj = [currentLocation publicAddress];
-  if(obj == nil)	// this means that the external address is automatically picked
-  {
+  if (obj == nil) { // this means that the external address is automatically picked
     state = NSOnState;
     obj = @"";
-  }
-  else
-  {
+  } else {
     if ([obj isEqual:@""]) {
       state = NSMixedState;
       [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_LOCATION_PREFERENCES_MULTIPLE_VALUES", @"")];
@@ -904,12 +898,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     unsigned numSIPAccounts = [sipAccountRecords count];
     sipAccounts = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
     unsigned numTags = [sipAccountTags count];
-    unsigned i, j;
-    for (i = 0; i < numSIPAccounts; i++) {
+    for (unsigned i = 0; i < numSIPAccounts; i++) {
       XMSIPAccount *account = (XMSIPAccount *)[sipAccountRecords objectAtIndex:i];
       unsigned _tag = [account tag];
       BOOL found = NO;
-      for (j = 0; j < numTags; j++) {
+      for (unsigned j = 0; j < numTags; j++) {
         if (_tag == [(NSNumber *)[sipAccountTags objectAtIndex:j] unsignedIntValue]) {
           found = YES;
           break;
@@ -995,8 +988,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   int state;
   
   // warn if no protocol is enabled
-  if([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState)
-  {
+  if ([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState) {
     [self _alertNoProtocolEnabled:currentLocation];
   }
   
@@ -1007,9 +999,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   state = [autoGetExternalAddressSwitch state];
   if (state == NSMixedState) {
     obj = [NSNull null];
-  }
-  else if([obj isEqual:@""] || [autoGetExternalAddressSwitch state] == NSOnState)
-  {
+  } else if ([obj isEqual:@""] || [autoGetExternalAddressSwitch state] == NSOnState) {
     obj = nil;
   }
   [currentLocation setExternalAddress:(NSString *)obj];
@@ -1037,11 +1027,10 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   
   if (sipAccounts != nil && defaultSIPAccountIndex != UINT_MAX) {
     unsigned numSIPAccounts = [sipAccounts count];
-    unsigned i;
     NSMutableArray *accountTags = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
     NSArray *accountRecords = [accountModule sipAccounts];
     unsigned defaultSIPAccountTag = 0;
-    for (i = 0; i < numSIPAccounts; i++) {
+    for (unsigned i = 0; i < numSIPAccounts; i++) {
       if ([(XMSIPAccountInfo *)[sipAccounts objectAtIndex:i] enabled] == YES) {
         XMSIPAccount *account = (XMSIPAccount *)[accountRecords objectAtIndex:i];
         [accountTags addObject:[NSNumber numberWithUnsignedInt:[account tag]]];
@@ -1063,12 +1052,10 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   if ((NSObject *)host != [NSNull null] && [host isEqualToString:@""]) {
     host = nil;
   }
-  if((NSObject *)username != [NSNull null] && [username isEqualToString:@""])
-  {
+  if ((NSObject *)username != [NSNull null] && [username isEqualToString:@""]) {
     username = nil;
   }
-  if((NSObject *)password != [NSNull null] && [password isEqualToString:@""])
-  {
+  if ((NSObject *)password != [NSNull null] && [password isEqualToString:@""]) {
     password = nil;
   }
     
@@ -1176,8 +1163,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
   // int -1 is same as unsigned int UINT_MAX (two's complement)
   BOOL result = [popUpButton selectItemWithTag:tag];
-  if(result == NO)
-  {
+  if (result == NO) {
     [popUpButton selectItemAtIndex:0];
   }
 }
@@ -1213,12 +1199,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     unsigned numSIPAccounts = [sipAccountRecords count];
     sipAccounts = [[NSMutableArray alloc] initWithCapacity:numSIPAccounts];
     unsigned numTags = [sipAccountTags count];
-    unsigned i, j;
-    for (i = 0; i < numSIPAccounts; i++) {
+    for (unsigned i = 0; i < numSIPAccounts; i++) {
       XMSIPAccount *account = (XMSIPAccount *)[sipAccountRecords objectAtIndex:i];
       unsigned _tag = [account tag];
       BOOL found = NO;
-      for (j = 0; j < numTags; j++) {
+      for (unsigned j = 0; j < numTags; j++) {
         if (_tag == [(NSNumber *)[sipAccountTags objectAtIndex:j] unsignedIntValue]) {
           found = YES;
           break;
@@ -1242,14 +1227,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     indexOffset++;
   }
   
-  if(index < indexOffset)
-  {
+  if (index < indexOffset) {
     [gatekeeperHostField setStringValue:@""];
     [gatekeeperUserAliasField setStringValue:@""];
     [gatekeeperPhoneNumberField setStringValue:@""];
-  }
-  else
-  {
+  } else {
     index -= indexOffset;
     
     XMH323Account *h323Account = [accountModule h323AccountAtIndex:index];
@@ -1258,16 +1240,13 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     NSString *gkUsername = [h323Account terminalAlias1];
     NSString *gkPhoneNumber = [h323Account terminalAlias2];
     
-    if(gkHost == nil)
-    {
+    if (gkHost == nil) {
       gkHost = @"";
     }
-    if(gkUsername == nil)
-    {
+    if (gkUsername == nil) {
       gkUsername = @"";
     }
-    if(gkPhoneNumber == nil)
-    {
+    if (gkPhoneNumber == nil) {
       gkPhoneNumber = @"";
     }
     [gatekeeperHostField setStringValue:gkHost];
@@ -1293,26 +1272,21 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   unsigned state = [autoGetExternalAddressSwitch state];
   [publicAddressField setEnabled:(state == NSOffState ? YES : NO)];
-		
-  if(state == NSOnState)
-  {
+    
+  if (state == NSOnState) {
     XMUtils *utils = [XMUtils sharedInstance];
     NSString *publicAddress = [utils publicAddress];
     NSString *displayString;
     
-    if(publicAddress == nil)
-    {
+    if (publicAddress == nil) {
       [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:NSLocalizedString(@"XM_EXTERNAL_ADDRESS_NOT_AVAILABLE", @"")];
       displayString = @"";
-    }
-    else
-    {
+    } else {
       displayString = publicAddress;
     }
     [publicAddressField setStringValue:displayString];
-  }
-  else if (state == NSOffState)
-  {
+  
+  } else if (state == NSOffState) {
     if (![currentLocation isKindOfClass:[XMMultipleLocationsWrapper class]]) {
       [(NSTextFieldCell *)[publicAddressField cell] setPlaceholderString:@""];
     }
@@ -1399,12 +1373,12 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     [audioCodecsTab selectFirstTabViewItem:self];
     unsigned count = [audioCodecs count];
     int selectedRow = [audioCodecPreferenceOrderTableView selectedRow];
-    if(selectedRow == 0) {
+    if (selectedRow == 0) {
       [moveAudioCodecUpButton setEnabled:NO];
     } else {
       [moveAudioCodecUpButton setEnabled:YES];
     }
-    if(selectedRow == (count -1)) {
+    if (selectedRow == (count -1)) {
       [moveAudioCodecDownButton setEnabled:NO];
     } else {
       [moveAudioCodecDownButton setEnabled:YES];
@@ -1431,12 +1405,12 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     unsigned count = [videoCodecs count];
     int selectedRow = [videoCodecPreferenceOrderTableView selectedRow];
       BOOL enableFlag = ([enableVideoSwitch state] == NSOffState) ? NO : YES;
-    if(selectedRow == 0 || enableFlag == NO) {
+    if (selectedRow == 0 || enableFlag == NO) {
       [moveVideoCodecUpButton setEnabled:NO];
     } else {
       [moveVideoCodecUpButton setEnabled:YES];
     }
-    if(selectedRow == (count -1) || enableFlag == NO) {
+    if (selectedRow == (count -1) || enableFlag == NO) {
       [moveVideoCodecDownButton setEnabled:NO];
     } else {
       [moveVideoCodecDownButton setEnabled:YES];
@@ -1464,23 +1438,15 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
-  if(tableView == locationsTableView)
-  {
+  if (tableView == locationsTableView) {
     return [locations count];
-  }
-  else if (tableView == stunServersTable)
-  {
+  } else if (tableView == stunServersTable) {
     return [stunServers count];
-  }
-  else if (tableView == sipAccountsTable) {
+  } else if (tableView == sipAccountsTable) {
     return [[accountModule sipAccounts] count];
-  }
-  else if(tableView == audioCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == audioCodecPreferenceOrderTableView) {
     return [audioCodecs count];
-  }
-  else if(tableView == videoCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == videoCodecPreferenceOrderTableView) {
     return [videoCodecs count];
   }
   
@@ -1489,14 +1455,11 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)column row:(int)rowIndex
 {
-  if(tableView == locationsTableView)
-  {
+  if (tableView == locationsTableView) {
     return [(XMLocation *)[locations objectAtIndex:rowIndex] name];
-  }
-  else if (tableView == stunServersTable) {
+  } else if (tableView == stunServersTable) {
     return [stunServers objectAtIndex:rowIndex];
-  }
-  else if (tableView == sipAccountsTable) {
+  } else if (tableView == sipAccountsTable) {
     XMSIPAccount *sipAccount = (XMSIPAccount *)[[accountModule sipAccounts] objectAtIndex:rowIndex];
     NSString *identifier = [column identifier];
     
@@ -1507,26 +1470,20 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     } else {
       return [NSNumber numberWithBool:[(XMSIPAccountInfo *)[sipAccounts objectAtIndex:rowIndex] enabled]];
     }
-  }
-  else if(tableView != audioCodecPreferenceOrderTableView &&
-     tableView != videoCodecPreferenceOrderTableView)
-  {
+  } else if (tableView != audioCodecPreferenceOrderTableView &&
+             tableView != videoCodecPreferenceOrderTableView) {
     return nil;
   }
   NSString *columnIdentifier = [column identifier];
   XMPreferencesCodecListRecord *record;
   
-  if(tableView == audioCodecPreferenceOrderTableView)
-  {
+  if (tableView == audioCodecPreferenceOrderTableView) {
     record = (XMPreferencesCodecListRecord *)[audioCodecs objectAtIndex:rowIndex];
-  }
-  else if(tableView == videoCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == videoCodecPreferenceOrderTableView) {
     record = (XMPreferencesCodecListRecord *)[videoCodecs objectAtIndex:rowIndex];
   }
 
-  if([columnIdentifier isEqualToString:XMKey_EnabledIdentifier])
-  {
+  if ([columnIdentifier isEqualToString:XMKey_EnabledIdentifier]) {
     return [NSNumber numberWithBool:[record isEnabled]];
   }
   XMCodecIdentifier identifier = identifier = [record identifier];
@@ -1537,26 +1494,20 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-  if(tableView == locationsTableView)
-  {
-    if([anObject isKindOfClass:[NSString class]])
-    {
+  if (tableView == locationsTableView) {
+    if ([anObject isKindOfClass:[NSString class]]) {
       NSString *newName = (NSString *)anObject;
       unsigned count = [locations count];
       
       // check whether this name already exists
-      unsigned i;
-      for(i = 0; i < count; i++)
-      {
-        if(i == rowIndex)
-        {
+      for (unsigned i = 0; i < count; i++) {
+        if (i == rowIndex) {
           continue;
         }
         
         XMLocation *location = [locations objectAtIndex:i];
         
-        if([[location name] isEqualToString:newName])
-        {
+        if ([[location name] isEqualToString:newName]) {
           [self _alertLocationName];
           return;
         }
@@ -1564,22 +1515,17 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
       
       [(XMLocation *)[locations objectAtIndex:rowIndex] setName:newName];
     }
-  }
-  else if (tableView == stunServersTable)
-  {
+  } else if (tableView == stunServersTable) {
     NSString *serverName = (NSString *)anObject;
     [stunServers replaceObjectAtIndex:rowIndex withObject:serverName];
-  }
-  else if (tableView == sipAccountsTable)
-  {
+  } else if (tableView == sipAccountsTable) {
     XMSIPAccountInfo *info = (XMSIPAccountInfo *)[sipAccounts objectAtIndex:rowIndex];
     [info setEnabled:[anObject boolValue]];
     
     unsigned count = [sipAccounts count];
     unsigned numEnabled = 0;
     unsigned enabledIndex = UINT_MAX;
-    unsigned i;
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMSIPAccountInfo *info = (XMSIPAccountInfo *)[sipAccounts objectAtIndex:i];
       if ([info enabled] == YES) {
         numEnabled++;
@@ -1595,14 +1541,10 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
       defaultSIPAccountIndex = enabledIndex;
       [sipAccountsTable reloadData];
     }
-  }
-  else if(tableView == audioCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == audioCodecPreferenceOrderTableView) {
     [[currentLocation audioCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
     [audioCodecPreferenceOrderTableView reloadData];
-  }
-  else if(tableView == videoCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == videoCodecPreferenceOrderTableView) {
     [[currentLocation videoCodecListRecordAtIndex:rowIndex] setEnabled:[anObject boolValue]];
     [videoCodecPreferenceOrderTableView reloadData];
   }
@@ -1614,31 +1556,23 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   NSTableView *tableView = (NSTableView *)[notif object];
   
-  if(tableView == locationsTableView)
-  {
+  if (tableView == locationsTableView) {
     [self _loadCurrentLocation];
     [self _validateLocationButtonUserInterface];
-  }
-  else if (tableView == stunServersTable) {
+  } else if (tableView == stunServersTable) {
     [self _validateSTUNUserInterface];
-  }
-  else if (tableView == sipAccountsTable) {
+  } else if (tableView == sipAccountsTable) {
     [self _validateSIPAccountsUserInterface];
-  }
-  else if(tableView == audioCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == audioCodecPreferenceOrderTableView) {
     [self _validateAudioOrderUserInterface];
-  }
-  else if(tableView == videoCodecPreferenceOrderTableView)
-  {
+  } else if (tableView == videoCodecPreferenceOrderTableView) {
     [self _validateVideoOrderUserInterface];
   }
 }
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-  if (tableView == stunServersTable)
-  {
+  if (tableView == stunServersTable) {
     NSColor *color;
     if (stunServers == nil) {
       color = [NSColor disabledControlTextColor];
@@ -1650,9 +1584,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
       }
     }
     [(NSTextFieldCell *)aCell setTextColor:color];
-  }
-  else if (tableView == sipAccountsTable)
-  {
+    
+  } else if (tableView == sipAccountsTable) {
     if ([[aTableColumn identifier] isEqualToString:XMKey_SIPAccountEnabledIdentifier]) {
       return;
     }
@@ -1661,9 +1594,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     } else {
       [aCell setFont:[NSFont systemFontOfSize:TABLE_FONT_SIZE]];
     }
-  }
-  else if(tableView == audioCodecPreferenceOrderTableView)
-  {
+  
+  } else if (tableView == audioCodecPreferenceOrderTableView) {
     XMPreferencesCodecListRecord *codecRecord = (XMPreferencesCodecListRecord *)[audioCodecs objectAtIndex:rowIndex];
     XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[codecRecord identifier]];
     if ([[aTableColumn identifier] isEqualToString:XMKey_EnabledIdentifier]) {
@@ -1675,9 +1607,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
         [(NSTextFieldCell *)aCell setTextColor:[NSColor disabledControlTextColor]];
       }
     }
-  }
-  else if(tableView == videoCodecPreferenceOrderTableView)
-  {
+  
+  } else if (tableView == videoCodecPreferenceOrderTableView) {
     XMPreferencesCodecListRecord *codecRecord = (XMPreferencesCodecListRecord *)[videoCodecs objectAtIndex:rowIndex];
     XMCodec *codec = [[XMCodecManager sharedInstance] codecForIdentifier:[codecRecord identifier]];
     if ([[aTableColumn identifier] isEqualToString:XMKey_EnabledIdentifier]) {
@@ -1697,8 +1628,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (void)_newLocationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode context:(void *)context
 {
-  if(returnCode == NSOKButton)
-  {
+  if (returnCode == NSOKButton) {
     NSString *name = [newLocationNameField stringValue];
     
     XMLocation *location = [[XMLocation alloc] initWithName:name];
@@ -1716,33 +1646,28 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 }
 
 - (void)_importLocationsAssistantDidEndWithLocations:(NSArray *)theLocations
-										h323Accounts:(NSArray *)h323Accounts
-										 sipAccounts:(NSArray *)_sipAccounts
+                                        h323Accounts:(NSArray *)h323Accounts
+                                         sipAccounts:(NSArray *)_sipAccounts
 {
   [accountModule addH323Accounts:h323Accounts];
   [accountModule addSIPAccounts:_sipAccounts];
   [self noteAccountsDidChange];
   
   unsigned count = [theLocations count];
-  unsigned i;
   
   unsigned index = [locations count];
   
   // check for name collisions
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = [theLocations objectAtIndex:i];
     NSString *name = [location name];
     
     unsigned existingCount = [locations count];
-    unsigned j;
     
-    for(j = 0; j < existingCount; j++)
-    {
+    for (unsigned j = 0; j < existingCount; j++) {
       XMLocation *testLocation = [locations objectAtIndex:j];
       
-      if([[testLocation name] isEqualToString:name])
-      {
+      if ([[testLocation name] isEqualToString:name]) {
         name = [name stringByAppendingString:@" 1"];
         [location setName:name];
         j = 0;
@@ -1752,8 +1677,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     [locations addObject:location];
   }
   
-  if(count != 0)
-  {
+  if (count != 0) {
     // validate the GUI
     NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
     [locationsTableView reloadData];
@@ -2006,9 +1930,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (unsigned)h323AccountTag
 {
   unsigned count = [locations count];
-  unsigned i;
   unsigned _tag;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
       _tag = [location h323AccountTag];
@@ -2025,8 +1948,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   if (_tag != UINT_MAX) {
     unsigned count = [locations count];
-    unsigned i;
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
       [location setH323AccountTag:_tag];
     }
@@ -2048,10 +1970,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (NSArray *)sipAccountTags
 {
   unsigned count = [locations count];
-  unsigned i;
   NSArray *array;
   
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
       array = [location sipAccountTags];
@@ -2070,8 +1991,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   if ((NSObject *)tags != [NSNull null]) {
     unsigned count = [locations count];
-    unsigned i;
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
       [location setSIPAccountTags:tags];
     }
@@ -2081,9 +2001,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (unsigned)defaultSIPAccountTag
 {
   unsigned count = [locations count];
-  unsigned i;
   unsigned _tag;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
       _tag = [location sipProxyTag];
@@ -2100,8 +2019,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   if (_tag != UINT_MAX) {
     unsigned count = [locations count];
-    unsigned i;
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
       [location setDefaultSIPAccountTag:_tag];
     }
@@ -2111,9 +2029,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (unsigned)sipProxyTag
 {
   unsigned count = [locations count];
-  unsigned i;
   unsigned _tag;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
       _tag = [location sipProxyTag];
@@ -2130,8 +2047,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   if (_tag != UINT_MAX) {
     unsigned count = [locations count];
-    unsigned i;
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
       [location setSIPProxyTag:_tag];
     }
@@ -2165,9 +2081,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (NSString *)_sipProxyPassword
 {
   unsigned count = [locations count];
-  unsigned i;
   NSString *pwd;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
       pwd = [location _sipProxyPassword];
@@ -2185,8 +2100,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   if ((NSObject *)password != [NSNull null]) {
     unsigned count = [locations count];
-    unsigned i;
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
       [location _setSIPProxyPassword:password];
     }
@@ -2201,9 +2115,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)audioCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
   unsigned count = [locations count];
-  unsigned i;
-  
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     [location audioCodecListExchangeRecordAtIndex:index1 withRecordAtIndex:index2];
   }
@@ -2211,10 +2123,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (void)resetAudioCodecs
 {
-  unsigned count = [locations count];
-  unsigned i;
-  
-  for (i = 0; i < count; i++) {
+  unsigned count = [locations count];  
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     [location resetAudioCodecs];
   }
@@ -2296,9 +2206,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)videoCodecListExchangeRecordAtIndex:(unsigned)index1 withRecordAtIndex:(unsigned)index2
 {
   unsigned count = [locations count];
-  unsigned i;
-  
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     [location videoCodecListExchangeRecordAtIndex:index1 withRecordAtIndex:index2];
   }
@@ -2307,9 +2215,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)resetVideoCodecs
 {
   unsigned count = [locations count];
-  unsigned i;
-  
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     [location resetVideoCodecs];
   }
@@ -2350,11 +2256,10 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (NSObject *)_valueForKey:(NSString *)key checkNil:(BOOL)checkNil nilObject:(NSObject *)nilObject
 {
   unsigned count = [locations count];
-  unsigned i;
   NSObject *object;
   BOOL hasNil = NO;
   
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     if (i == 0) {
       object = [location valueForKey:key];
@@ -2383,9 +2288,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)_setValue:(NSObject *)value forKey:(NSString *)key
 {
   unsigned count = [locations count];
-  unsigned i;
-  
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     [location setValue:value forKey:key];
   }

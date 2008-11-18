@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookPreferencesModule.m,v 1.4 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMAddressBookPreferencesModule.m,v 1.5 2008/11/18 07:56:06 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -20,22 +20,22 @@
 
 - (id)init
 {
-	prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
-	
-	return self;
+  prefWindowController = [[XMPreferencesWindowController sharedInstance] retain];
+  
+  return self;
 }
 
 - (void)awakeFromNib
 {
-	contentViewHeight = [contentView frame].size.height;
-	[prefWindowController addPreferencesModule:self];
+  contentViewHeight = [contentView frame].size.height;
+  [prefWindowController addPreferencesModule:self];
 }
 
 - (void)dealloc
 {
-	[prefWindowController release];
-	
-	[super dealloc];
+  [prefWindowController release];
+  
+  [super dealloc];
 }
 
 #pragma mark -
@@ -43,67 +43,67 @@
 
 - (unsigned)position
 {
-	return 6;
+  return 6;
 }
 
 - (NSString *)identifier
 {
-	return @"XMeeting_AddressBookPreferencesModule";
+  return @"XMeeting_AddressBookPreferencesModule";
 }
 
 - (NSString *)toolbarLabel
 {
-	return NSLocalizedString(@"XM_ADDRESS_BOOK_PREFERENCES_NAME", @"");
+  return NSLocalizedString(@"XM_ADDRESS_BOOK_PREFERENCES_NAME", @"");
 }
 
 - (NSImage *)toolbarImage
 {
-	return [NSImage imageNamed:@"AddressBook"];
+  return [NSImage imageNamed:@"AddressBook"];
 }
 
 - (NSString *)toolTipText
 {
-	return NSLocalizedString(@"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP", @"");
+  return NSLocalizedString(@"XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP", @"");
 }
 
 - (NSView *)contentView
 {
-	return contentView;
+  return contentView;
 }
 
 - (float)contentViewHeight
 {
-	return contentViewHeight;
+  return contentViewHeight;
 }
 
 - (void)loadPreferences
 {
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	
-	int state = ([preferencesManager searchAddressBookDatabase] == YES) ? NSOnState : NSOffState;
-	[enableABDatabaseSearchSwitch setState:state];
-	
-	state = ([preferencesManager enableAddressBookPhoneNumbers] == YES) ? NSOnState : NSOffState;
-	[enableABPhoneNumbersSwitch setState:state];
-	
-	XMCallProtocol callProtocol = [preferencesManager addressBookPhoneNumberProtocol];
-	[phoneNumberProtocolMatrix selectCellWithTag:(int)callProtocol];
-	
-	[self _validateProtocolMatrix];
+  XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+  
+  int state = ([preferencesManager searchAddressBookDatabase] == YES) ? NSOnState : NSOffState;
+  [enableABDatabaseSearchSwitch setState:state];
+  
+  state = ([preferencesManager enableAddressBookPhoneNumbers] == YES) ? NSOnState : NSOffState;
+  [enableABPhoneNumbersSwitch setState:state];
+  
+  XMCallProtocol callProtocol = [preferencesManager addressBookPhoneNumberProtocol];
+  [phoneNumberProtocolMatrix selectCellWithTag:(int)callProtocol];
+  
+  [self _validateProtocolMatrix];
 }
 
 - (void)savePreferences
 {
-	XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-	
-	BOOL flag = ([enableABDatabaseSearchSwitch state] == NSOnState) ? YES : NO;
-	[preferencesManager setSearchAddressBookDatabase:flag];
-	
-	flag = ([enableABPhoneNumbersSwitch state] == NSOnState) ? YES : NO;
-	[preferencesManager setEnableAddressBookPhoneNumbers:flag];
-	
-	XMCallProtocol callProtocol = (XMCallProtocol)[[phoneNumberProtocolMatrix selectedCell] tag];
-	[preferencesManager setAddressBookPhoneNumberProtocol:callProtocol];
+  XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
+  
+  BOOL flag = ([enableABDatabaseSearchSwitch state] == NSOnState) ? YES : NO;
+  [preferencesManager setSearchAddressBookDatabase:flag];
+  
+  flag = ([enableABPhoneNumbersSwitch state] == NSOnState) ? YES : NO;
+  [preferencesManager setEnableAddressBookPhoneNumbers:flag];
+  
+  XMCallProtocol callProtocol = (XMCallProtocol)[[phoneNumberProtocolMatrix selectedCell] tag];
+  [preferencesManager setAddressBookPhoneNumberProtocol:callProtocol];
 }
 
 - (void)becomeActiveModule
@@ -115,13 +115,13 @@
 
 - (IBAction)defaultAction:(id)sender
 {
-	[prefWindowController notePreferencesDidChange];
+  [prefWindowController notePreferencesDidChange];
 }
 
 - (IBAction)toggleEnableABPhoneNumbers:(id)sender
 {
-	[self _validateProtocolMatrix];
-	[self defaultAction:self];
+  [self _validateProtocolMatrix];
+  [self defaultAction:self];
 }
 
 #pragma mark -
@@ -129,14 +129,11 @@
 
 - (void)_validateProtocolMatrix
 {
-	if([enableABPhoneNumbersSwitch state] == NSOnState)
-	{
-		[phoneNumberProtocolMatrix setEnabled:YES];
-	}
-	else
-	{
-		[phoneNumberProtocolMatrix setEnabled:NO];
-	}
+  if ([enableABPhoneNumbersSwitch state] == NSOnState) {
+    [phoneNumberProtocolMatrix setEnabled:YES];
+  } else {
+    [phoneNumberProtocolMatrix setEnabled:NO];
+  }
 }
 
 @end

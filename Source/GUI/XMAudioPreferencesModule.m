@@ -1,5 +1,5 @@
 /*
- * $Id: XMAudioPreferencesModule.m,v 1.4 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMAudioPreferencesModule.m,v 1.5 2008/11/18 07:56:06 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,7 +94,7 @@ NSString *XMString_UseDefaultDevice = @"";
 }
 
 - (void)loadPreferences
-{	
+{  
   [preferredOutputDevicePopUp removeAllItems];
   [preferredInputDevicePopUp removeAllItems];
   
@@ -107,14 +107,12 @@ NSString *XMString_UseDefaultDevice = @"";
   XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
   
   NSString *preferredOutputDevice = [preferredOutputDevicePopUp titleOfSelectedItem];
-  if([preferredOutputDevice isEqualToString:XMString_UseDefaultDevice])
-  {
+  if ([preferredOutputDevice isEqualToString:XMString_UseDefaultDevice]) {
     preferredOutputDevice = nil;
   }
   
   NSString *preferredInputDevice = [preferredInputDevicePopUp titleOfSelectedItem];
-  if([preferredInputDevice isEqualToString:XMString_UseDefaultDevice])
-  {
+  if ([preferredInputDevice isEqualToString:XMString_UseDefaultDevice]) {
     preferredInputDevice = nil;
   }
   
@@ -155,15 +153,11 @@ NSString *XMString_UseDefaultDevice = @"";
   
   NSString *preferredDevice;
   
-  if([preferredOutputDevicePopUp numberOfItems] == 0)
-  {
+  if ([preferredOutputDevicePopUp numberOfItems] == 0) {
     preferredDevice = [prefManager preferredAudioOutputDevice];
-  }
-  else
-  {
+  } else {
     preferredDevice = [preferredOutputDevicePopUp titleOfSelectedItem];
-    if([preferredDevice isEqualToString:XMString_UseDefaultDevice])
-    {
+    if ([preferredDevice isEqualToString:XMString_UseDefaultDevice]) {
       preferredDevice = nil;
     }
   }
@@ -174,8 +168,7 @@ NSString *XMString_UseDefaultDevice = @"";
   
   [preferredOutputDevicePopUp addItemWithTitle:XMString_UseDefaultDevice];
   
-  if(preferredDevice != nil && ![devices containsObject:preferredDevice])
-  {
+  if (preferredDevice != nil && ![devices containsObject:preferredDevice]) {
     [preferredOutputDevicePopUp addItemWithTitle:preferredDevice];
   }
   
@@ -183,12 +176,9 @@ NSString *XMString_UseDefaultDevice = @"";
   
   [preferredOutputDevicePopUp addItemsWithTitles:devices];
   
-  if(preferredDevice == nil)
-  {
+  if (preferredDevice == nil) {
     [preferredOutputDevicePopUp selectItemAtIndex:0];
-  }
-  else
-  {
+  } else {
     [preferredOutputDevicePopUp selectItemWithTitle:preferredDevice];
   }
 }
@@ -200,15 +190,11 @@ NSString *XMString_UseDefaultDevice = @"";
   
   NSString *preferredDevice;
   
-  if([preferredInputDevicePopUp numberOfItems] == 0)
-  {
+  if ([preferredInputDevicePopUp numberOfItems] == 0) {
     preferredDevice = [prefManager preferredAudioInputDevice];
-  }
-  else
-  {
+  } else {
     preferredDevice = [preferredInputDevicePopUp titleOfSelectedItem];
-    if([preferredDevice isEqualToString:XMString_UseDefaultDevice])
-    {
+    if ([preferredDevice isEqualToString:XMString_UseDefaultDevice]) {
       preferredDevice = nil;
     }
   }
@@ -219,8 +205,7 @@ NSString *XMString_UseDefaultDevice = @"";
   
   [preferredInputDevicePopUp addItemWithTitle:XMString_UseDefaultDevice];
   
-  if(preferredDevice != nil && ![devices containsObject:preferredDevice])
-  {
+  if (preferredDevice != nil && ![devices containsObject:preferredDevice]) {
     [preferredInputDevicePopUp addItemWithTitle:preferredDevice];
   }
   
@@ -228,12 +213,9 @@ NSString *XMString_UseDefaultDevice = @"";
   
   [preferredInputDevicePopUp addItemsWithTitles:devices];
   
-  if(preferredDevice == nil)
-  {
+  if (preferredDevice == nil) {
     [preferredInputDevicePopUp selectItemAtIndex:0];
-  }
-  else
-  {
+  } else {
     [preferredInputDevicePopUp selectItemWithTitle:preferredDevice];
   }
 }

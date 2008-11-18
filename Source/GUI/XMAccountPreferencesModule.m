@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.13 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.14 2008/11/18 07:56:06 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -172,36 +172,31 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
   h323AccountToEdit = (XMH323Account *)[h323Accounts objectAtIndex:index];
   
   NSString *string = [h323AccountToEdit name];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [h323AccountNameField setStringValue:string];
   
   string = [h323AccountToEdit gatekeeperHost];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [h323GatekeeperHostField setStringValue:string];
   
   string = [h323AccountToEdit terminalAlias1];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [h323TerminalAlias1Field setStringValue:string];
   
   string = [h323AccountToEdit terminalAlias2];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [h323TerminalAlias2Field setStringValue:string];
   
   string = [h323AccountToEdit password];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [h323PasswordField setStringValue:string];
@@ -250,36 +245,31 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
   sipAccountToEdit = (XMSIPAccount *)[sipAccounts objectAtIndex:index];
   
   NSString *string = [sipAccountToEdit name];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [sipAccountNameField setStringValue:string];
   
   string = [sipAccountToEdit domain];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [sipRegistrationDomainField setStringValue:string];
   
   string = [sipAccountToEdit username];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [sipUsernameField setStringValue:string];
   
   string = [sipAccountToEdit authorizationUsername];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [sipAuthorizationUsernameField setStringValue:string];
   
   string = [sipAccountToEdit password];
-  if(string == nil)
-  {
+  if (string == nil) {
     string = @"";
   }
   [sipPasswordField setStringValue:string];
@@ -294,20 +284,16 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   NSString *name = [h323AccountNameField stringValue];
   
+  // check that name isn't used already
   unsigned count = [h323Accounts count];
-  unsigned i;
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMH323Account *account = [h323Accounts objectAtIndex:i];
     
-    if(account == h323AccountToEdit)
-    {
+    if (account == h323AccountToEdit) {
       continue;
     }
     
-    if([[account name] isEqualToString:name])
-    {
+    if ([[account name] isEqualToString:name]) {
       [self _alertAccountName];
       return;
     }
@@ -327,20 +313,16 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   NSString *name = [sipAccountNameField stringValue];
   
+  // check that name isn't used already
   unsigned count = [sipAccounts count];
-  unsigned i;
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *account = [sipAccounts objectAtIndex:i];
     
-    if(account == sipAccountToEdit)
-    {
+    if (account == sipAccountToEdit) {
       continue;
     }
     
-    if([[account name] isEqualToString:name])
-    {
+    if ([[account name] isEqualToString:name]) {
       [self _alertAccountName];
       return;
     }
@@ -386,23 +368,17 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)addH323Accounts:(NSArray *)theAccounts
 {
+  // inseart each account, but avoid name collisions
   unsigned count = [theAccounts count];
-  unsigned i;
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMH323Account *account = (XMH323Account *)[theAccounts objectAtIndex:i];
     NSString *name = [account name];
     
     unsigned existingCount = [h323Accounts count];
-    unsigned j;
-    
-    for(j = 0; j < existingCount; j++)
-    {
+    for (unsigned j = 0; j < existingCount; j++) {
       XMH323Account *accountToTest = (XMH323Account *)[h323Accounts objectAtIndex:j];
       
-      if([[accountToTest name] isEqualToString:name])
-      {
+      if ([[accountToTest name] isEqualToString:name]) {
         name = [name stringByAppendingString:@" 1"];
         [account setName:name];
         j = 0;
@@ -418,23 +394,17 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)addSIPAccounts:(NSArray *)theAccounts
 {
+  // insert each account, but avoid name collisions
   unsigned count = [theAccounts count];
-  unsigned i;
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *account = (XMSIPAccount *)[theAccounts objectAtIndex:i];
     NSString *name = [account name];
     
     unsigned existingCount = [sipAccounts count];
-    unsigned j;
-    
-    for(j = 0; j < existingCount; j++)
-    {
+    for (unsigned j = 0; j < existingCount; j++) {
       XMSIPAccount *accountToTest = (XMSIPAccount *)[sipAccounts objectAtIndex:j];
       
-      if([[accountToTest name] isEqualToString:name])
-      {
+      if ([[accountToTest name] isEqualToString:name]) {
         name = [name stringByAppendingString:@" 1"];
         [account setName:name];
         j = 0;
@@ -452,13 +422,10 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 #pragma mark TableView data source & delegate methods
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
-{	
-  if(tableView == h323AccountsTableView)
-  {
+{  
+  if (tableView == h323AccountsTableView) {
     return [h323Accounts count];
-  }
-  else if(tableView == sipAccountsTableView)
-  {
+  } else if (tableView == sipAccountsTableView) {
     return [sipAccounts count];
   }
   
@@ -469,41 +436,27 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   NSString *identifier = [tableColumn identifier];
   
-  if(tableView == h323AccountsTableView)
-  {
+  if (tableView == h323AccountsTableView) {
     XMH323Account *h323Account = (XMH323Account *)[h323Accounts objectAtIndex:rowIndex];
     
-    if([identifier isEqualToString:XMKey_AccountPreferencesNameIdentifier])
-    {
+    if ([identifier isEqualToString:XMKey_AccountPreferencesNameIdentifier]) {
       return [h323Account name];
-    }
-    else if([identifier isEqualToString:XMKey_AccountPreferencesHostIdentifier])
-    {
+    } else if ([identifier isEqualToString:XMKey_AccountPreferencesHostIdentifier]) {
       return [h323Account gatekeeperHost];
-    }
-    else if([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier])
-    {
+    } else if ([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier]) {
       return [h323Account terminalAlias1];
     }
-  }
-  else if(tableView == sipAccountsTableView)
-  {
+    
+  } else if (tableView == sipAccountsTableView) {
     XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:rowIndex];
     
-    if([identifier isEqualToString:XMKey_AccountPreferencesNameIdentifier])
-    {
+    if ([identifier isEqualToString:XMKey_AccountPreferencesNameIdentifier]) {
       return [sipAccount name];
-    }
-    else if([identifier isEqualToString:XMKey_AccountPreferencesHostIdentifier])
-    {
+    } else if ([identifier isEqualToString:XMKey_AccountPreferencesHostIdentifier]) {
       return [sipAccount domain];
-    }
-    else if([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier])
-    {
+    } else if ([identifier isEqualToString:XMKey_AccountPreferencesUsernameIdentifier]) {
       return [sipAccount username];
-    }
-    else if([identifier isEqualToString:XMKey_AccountPreferencesAuthorizationUsernameIdentifier])
-    {
+    } else if ([identifier isEqualToString:XMKey_AccountPreferencesAuthorizationUsernameIdentifier]) {
       return [sipAccount authorizationUsername];
     }
   }
@@ -523,24 +476,18 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   BOOL enableButtons;
   
-  if([h323AccountsTableView selectedRow] == -1)
-  {
+  if ([h323AccountsTableView selectedRow] == -1) {
     enableButtons = NO;
-  }
-  else
-  {
+  } else {
     enableButtons = YES;
   }
   
   [deleteH323AccountButton setEnabled:enableButtons];
   [editH323AccountButton setEnabled:enableButtons];
   
-  if([sipAccountsTableView selectedRow] == -1)
-  {
+  if ([sipAccountsTableView selectedRow] == -1) {
     enableButtons = NO;
-  }
-  else
-  {
+  } else {
     enableButtons = YES;
   }
   
@@ -550,53 +497,46 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)_h323EditAccountPanelDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-  if(returnCode == NSRunStoppedResponse)
-  {
+  if (returnCode == NSRunStoppedResponse) {
     BOOL isNewAccount = NO;
     
-    if(h323AccountToEdit == nil)
-    {
+    if (h323AccountToEdit == nil) {
       h323AccountToEdit = [[XMH323Account alloc] init];
       isNewAccount = YES;
     }
     
+    // replace empty strings with nil
     NSString *string = [h323AccountNameField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [h323AccountToEdit setName:string];
     
     string = [h323GatekeeperHostField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [h323AccountToEdit setGatekeeperHost:string];
     
     string = [h323TerminalAlias1Field stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [h323AccountToEdit setTerminalAlias1:string];
     
     string = [h323TerminalAlias2Field stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [h323AccountToEdit setTerminalAlias2:string];
     
     string = [h323PasswordField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [h323AccountToEdit setPassword:string];
     
-    if(isNewAccount == YES)
-    {
+    if (isNewAccount == YES) {
       [h323Accounts addObject:h323AccountToEdit];
       [h323AccountToEdit release];
     }
@@ -611,53 +551,46 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 
 - (void)_sipEditAccountPanelDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-  if(returnCode == NSRunStoppedResponse)
-  {
+  if (returnCode == NSRunStoppedResponse) {
     BOOL isNewAccount = NO;
     
-    if(sipAccountToEdit == nil)
-    {
+    if (sipAccountToEdit == nil) {
       sipAccountToEdit = [[XMSIPAccount alloc] init];
       isNewAccount = YES;
     }
     
+    // replace empty strings with nil
     NSString *string = [sipAccountNameField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [sipAccountToEdit setName:string];
     
     string = [sipRegistrationDomainField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [sipAccountToEdit setDomain:string];
     
     string = [sipUsernameField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [sipAccountToEdit setUsername:string];
     
     string = [sipAuthorizationUsernameField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [sipAccountToEdit setAuthorizationUsername:string];
     
     string = [sipPasswordField stringValue];
-    if([string isEqualToString:@""])
-    {
+    if ([string isEqualToString:@""]) {
       string = nil;
     }
     [sipAccountToEdit setPassword:string];
     
-    if(isNewAccount == YES)
-    {
+    if (isNewAccount == YES) {
       [sipAccounts addObject:sipAccountToEdit];
       [sipAccountToEdit release];
     }
