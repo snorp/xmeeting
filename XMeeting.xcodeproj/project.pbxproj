@@ -132,6 +132,7 @@
 		D1216BFA0ECB9C1400DC292F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2DA0F08F470D700BE224E /* Cocoa.framework */; };
 		D13231D009052FC500F4D5A7 /* Cam.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D13231CF09052FC500F4D5A7 /* Cam.tiff */; };
 		D1330E940ED2253800623750 /* debugPreferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1330E930ED2253800623750 /* debugPreferences.tif */; };
+		D1330F770ED540A800623750 /* svcproc.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D1330F760ED540A800623750 /* svcproc.cxx */; };
 		D134B910093B79020090271F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D134B90F093B79020090271F /* OpenGL.framework */; };
 		D1395D0D0BEF380300C76EFD /* ScreenSettings.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1395D0B0BEF380300C76EFD /* ScreenSettings.nib */; };
 		D13AED460BBA382D008B3CBA /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D13AED450BBA382D008B3CBA /* libsasl2.dylib */; };
@@ -780,6 +781,7 @@
 		D132750708C6F38000298F25 /* XMRecentCallsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMRecentCallsView.m; sourceTree = "<group>"; };
 		D132789908C7A40800298F25 /* XMVideoInputModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMVideoInputModule.h; path = Source/Framework/XMVideoInputModule.h; sourceTree = "<group>"; };
 		D1330E930ED2253800623750 /* debugPreferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = debugPreferences.tif; path = Resources/Images/debugPreferences.tif; sourceTree = "<group>"; };
+		D1330F760ED540A800623750 /* svcproc.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = svcproc.cxx; sourceTree = "<group>"; };
 		D134B90F093B79020090271F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		D1395D0C0BEF380300C76EFD /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/ScreenSettings.nib; sourceTree = "<group>"; };
 		D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMAreaSelectionView.h; path = Source/Framework/XMAreaSelectionView.h; sourceTree = "<group>"; };
@@ -2495,6 +2497,7 @@
 				D1E9137D0A4833F7005CDF27 /* config.cxx */,
 				D1B607E808F8F86C0034B47F /* osutil.cxx */,
 				D1B607EE08F8F86C0034B47F /* socket.cxx */,
+				D1330F760ED540A800623750 /* svcproc.cxx */,
 				D1B607F108F8F86C0034B47F /* switch.cxx */,
 				D1B607F208F8F86C0034B47F /* tlib.cxx */,
 				D1B607F708F8F86C0034B47F /* udll.cxx */,
@@ -3767,6 +3770,7 @@
 				D1AD1A6A0E63212100143295 /* pvidfile.cxx in Sources */,
 				D15B1CE20EADBC840070B7B5 /* ratectl.cxx in Sources */,
 				D1F921A20EC2E00B008B4F86 /* XMDebugPreferencesModule.m in Sources */,
+				D1330F770ED540A800623750 /* svcproc.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
