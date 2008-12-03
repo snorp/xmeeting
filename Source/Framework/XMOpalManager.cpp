@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalManager.cpp,v 1.83 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMOpalManager.cpp,v 1.84 2008/12/03 22:48:51 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,7 +40,6 @@ static XMSIPEndPoint *sipEndPointInstance = NULL;
 void XMOpalManager::InitOpal(const PString & pTracePath, bool logCallStatistics)
 {	
   if (theProcess == NULL) {
-    PProcess::PreInitialise(0, 0, 0);
     theProcess = new XMProcess;
     
     if (pTracePath != NULL) {
