@@ -1,5 +1,5 @@
 /*
- * $Id: main.m,v 1.2 2008/11/16 23:26:15 hfriederich Exp $
+ * $Id: main.m,v 1.3 2008/12/03 22:10:00 hfriederich Exp $
  *
  * Copyright (c) 2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,12 +37,13 @@ typedef struct FileDefinition {
 
 NSString *PTLIBTemplateFile = @"../ptlib/include/ptbuildopts.h.in";
 NSString *PTLIBOutputFile = @"../ptlib/include/ptbuildopts.h";
+NSString *PTLIBVersionFile = @"../ptlib/version.h";
 // TODO: Add code to automatically detect the PTLIB version
 ReplaceRecord PTLIBRecords[] = {
-  { @"#undef    PTLIB_MAJOR",             @"#define PTLIB_MAJOR 2" },
-  { @"#undef    PTLIB_MINOR",             @"#define PTLIB_MINOR 5" },
-  { @"#undef    PTLIB_BUILD",             @"#define PTLIB_BUILD 1" },
-  { @"#undef    PTLIB_VERSION",           @"#define PTLIB_VERSION \"2.5.1\"" },
+  { @"#undef    PTLIB_MAJOR",             @"#define PTLIB_MAJOR __XM_PTLIB_MAJOR__" },
+  { @"#undef    PTLIB_MINOR",             @"#define PTLIB_MINOR __XM_PTLIB_MINOR__" },
+  { @"#undef    PTLIB_BUILD",             @"#define PTLIB_BUILD __XM_PTLIB_BUILD__" },
+  { @"#undef    PTLIB_VERSION",           @"#define PTLIB_VERSION \"__XM_PTLIB_MAJOR__.__XM_PTLIB_MINOR__.__XM_PTLIB_BUILD__\"" },
   { @"#undef    P_LINUX",                 @"/* #undef P_LINUX */" },
   { @"#undef    P_FREEBSD",               @"/* #undef P_FREEBSD */" },
   { @"#undef    P_OPENBSD",               @"/* #undef P_OPENBSD */" },
@@ -127,12 +128,13 @@ unsigned PTLIBNumRecords = 83;
 
 NSString *OPALTemplateFile = @"../opal/include/opal/buildopts.h.in";
 NSString *OPALOutputFile = @"../opal/include/opal/buildopts.h";
+NSString *OPALVersionFile = @"../opal/version.h";
 // TODO: Add code to automatically detect the OPAL version
 ReplaceRecord OPALRecords[] = {
-  { @"#undef OPAL_MAJOR",               @"#define OPAL_MAJOR 3" },
-  { @"#undef OPAL_MINOR",               @"#define OPAL_MINOR 5" },
-  { @"#undef OPAL_BUILD",               @"#define OPAL_BUILD 1" },
-  { @"#undef OPAL_VERSION",             @"#define OPAL_VERSION \"3.5.1\"" },
+  { @"#undef OPAL_MAJOR",               @"#define OPAL_MAJOR __XM_OPAL_MAJOR__" },
+  { @"#undef OPAL_MINOR",               @"#define OPAL_MINOR __XM_OPAL_MINOR__" },
+  { @"#undef OPAL_BUILD",               @"#define OPAL_BUILD __XM_OPAL_BUILD__" },
+  { @"#undef OPAL_VERSION",             @"#define OPAL_VERSION \"__XM_OPAL_MAJOR__.__XM_OPAL_MINOR__.__XM_OPAL_BUILD__\"" },
   { @"#undef  OPAL_PTLIB_SSL\n",        @"/* #undef OPAL_PTLIB_SSL */\n" },
   { @"#undef  OPAL_PTLIB_SSL_AES",      @"/* #undef OPAL_PTLIB_SSL_AES */" },
   { @"#undef  OPAL_PTLIB_ASN",          @"/* #undef OPAL_PTLIB_ASN */" },
@@ -171,7 +173,17 @@ unsigned OPALNumRecords = 36;
 NSString *OSVersionMajor;
 NSString *OSVersionMinor;
 
+NSString *PTLibVersionMajor;
+NSString *PTLibVersionMinor;
+NSString *PTLibVersionBuild;
+
+NSString *OPALVersionMajor;
+NSString *OPALVersionMinor;
+NSString *OPALVersionBuild;
+
 void getDarwinVersion(unsigned *major, unsigned *minor);
+void getPTLIBVersion(unsigned *major, unsigned *minor, unsigned *build);
+void getOPALVersion(unsigned *major, unsigned *minor, unsigned *build);
 int processFile(NSString *templateFile, NSString *outputFile, ReplaceRecord *replaceRecords, unsigned numReplaceRecords);
 
 int main(int argc, char *argv[])
@@ -180,11 +192,21 @@ int main(int argc, char *argv[])
   
   NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
   
-  unsigned darwinVersionMajor, darwinVersionMinor;
-  getDarwinVersion(&darwinVersionMajor, &darwinVersionMinor);
+  unsigned versionMajor, versionMinor, versionBuild;
+  getDarwinVersion(&versionMajor, &versionMinor);
   
-  OSVersionMajor = [[NSString alloc] initWithFormat:@"%d", darwinVersionMajor];
-  OSVersionMinor = [[NSString alloc] initWithFormat:@"%02d", darwinVersionMinor];
+  OSVersionMajor = [[NSString alloc] initWithFormat:@"%d", versionMajor];
+  OSVersionMinor = [[NSString alloc] initWithFormat:@"%02d", versionMinor];
+  
+  getPTLIBVersion(&versionMajor, &versionMinor, &versionBuild);
+  PTLibVersionMajor = [[NSString alloc] initWithFormat:@"%d", versionMajor];
+  PTLibVersionMinor = [[NSString alloc] initWithFormat:@"%d", versionMinor];
+  PTLibVersionBuild = [[NSString alloc] initWithFormat:@"%d", versionBuild];
+  
+  getOPALVersion(&versionMajor, &versionMinor, &versionBuild);
+  OPALVersionMajor = [[NSString alloc] initWithFormat:@"%d", versionMajor];
+  OPALVersionMinor = [[NSString alloc] initWithFormat:@"%d", versionMinor];
+  OPALVersionBuild = [[NSString alloc] initWithFormat:@"%d", versionBuild];
   
   int result;
   
@@ -226,6 +248,12 @@ int processFile(NSString *templateFile, NSString *outputFile, ReplaceRecord *rep
   
   [outputString replaceOccurrencesOfString:@"__XM_OS_MAJOR__" withString:OSVersionMajor options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
   [outputString replaceOccurrencesOfString:@"__XM_OS_MINOR__" withString:OSVersionMinor options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
+  [outputString replaceOccurrencesOfString:@"__XM_PTLIB_MAJOR__" withString:PTLibVersionMajor options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
+  [outputString replaceOccurrencesOfString:@"__XM_PTLIB_MINOR__" withString:PTLibVersionMinor options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
+  [outputString replaceOccurrencesOfString:@"__XM_PTLIB_BUILD__" withString:PTLibVersionBuild options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
+  [outputString replaceOccurrencesOfString:@"__XM_OPAL_MAJOR__" withString:OPALVersionMajor options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
+  [outputString replaceOccurrencesOfString:@"__XM_OPAL_MINOR__" withString:OPALVersionMinor options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
+  [outputString replaceOccurrencesOfString:@"__XM_OPAL_BUILD__" withString:OPALVersionBuild options:NSLiteralSearch range:NSMakeRange(0, [outputString length])];
   
   if (![outputString writeToFile:outputFile atomically:YES encoding:NSASCIIStringEncoding error:NULL]) {
     return 2;
@@ -254,4 +282,52 @@ void getDarwinVersion(unsigned *systemVersionMajor, unsigned *systemVersionMinor
   [scanner scanInt:(int *)systemVersionMinor];
   
   free(kernelVersion);
+}
+
+void getPTLIBVersion(unsigned *major, unsigned *minor, unsigned *build)
+{
+  NSString *text = [NSString stringWithContentsOfFile:PTLIBVersionFile encoding:NSASCIIStringEncoding error:NULL];
+  if (text == nil) {
+    return;
+  }
+  NSScanner *scanner = [NSScanner scannerWithString:text];
+  [scanner scanUpToString:@"MAJOR_VERSION " intoString:NULL];
+  [scanner scanString:@"MAJOR_VERSION " intoString:NULL];
+  if (![scanner scanInt:(int*)major]) {
+    return;
+  }
+  [scanner scanUpToString:@"MINOR_VERSION " intoString:NULL];
+  [scanner scanString:@"MINOR_VERSION " intoString:NULL];
+  if (![scanner scanInt:(int*)minor]) {
+    return;
+  }
+  [scanner scanUpToString:@"BUILD_NUMBER " intoString:NULL];
+  [scanner scanString:@"BUILD_NUMBER " intoString:NULL];
+  if (![scanner scanInt:(int*)build]) {
+    return;
+  }
+}
+
+void getOPALVersion(unsigned *major, unsigned *minor, unsigned *build)
+{
+  NSString *text = [NSString stringWithContentsOfFile:OPALVersionFile encoding:NSASCIIStringEncoding error:NULL];
+  if (text == nil) {
+    return;
+  }
+  NSScanner *scanner = [NSScanner scannerWithString:text];
+  [scanner scanUpToString:@"MAJOR_VERSION " intoString:NULL];
+  [scanner scanString:@"MAJOR_VERSION " intoString:NULL];
+  if (![scanner scanInt:(int*)major]) {
+    return;
+  }
+  [scanner scanUpToString:@"MINOR_VERSION " intoString:NULL];
+  [scanner scanString:@"MINOR_VERSION " intoString:NULL];
+  if (![scanner scanInt:(int*)minor]) {
+    return;
+  }
+  [scanner scanUpToString:@"BUILD_NUMBER " intoString:NULL];
+  [scanner scanString:@"BUILD_NUMBER " intoString:NULL];
+  if (![scanner scanInt:(int*)build]) {
+    return;
+  }
 }
