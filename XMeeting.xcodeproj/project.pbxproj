@@ -118,6 +118,12 @@
 		D10BD5470AC1D503004320A8 /* recording.gif in Resources */ = {isa = PBXBuildFile; fileRef = D10BD5460AC1D503004320A8 /* recording.gif */; };
 		D10E453F0AADEC11009EA376 /* CallRecorderModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D10E453D0AADEC11009EA376 /* CallRecorderModule.nib */; };
 		D11C5E650A49ED950030633D /* IncomingCallAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = D11C5E630A49ED950030633D /* IncomingCallAlert.nib */; };
+		D11C86EC0EEF2F95000F60B8 /* im.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C86E90EEF2F95000F60B8 /* im.h */; };
+		D11C86ED0EEF2F95000F60B8 /* msrp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C86EA0EEF2F95000F60B8 /* msrp.h */; };
+		D11C86EE0EEF2F95000F60B8 /* sipim.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C86EB0EEF2F95000F60B8 /* sipim.h */; };
+		D11C86F30EEF2FB3000F60B8 /* im_mf.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D11C86F00EEF2FB3000F60B8 /* im_mf.cxx */; };
+		D11C86F40EEF2FB3000F60B8 /* msrp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D11C86F10EEF2FB3000F60B8 /* msrp.cxx */; };
+		D11C86F50EEF2FB3000F60B8 /* sipim.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D11C86F20EEF2FB3000F60B8 /* sipim.cxx */; };
 		D1205AF909F986A000179B6C /* down_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF709F986A000179B6C /* down_arrow_down.tif */; };
 		D1205AFA09F986A000179B6C /* down_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205AF809F986A000179B6C /* down_arrow.tif */; };
 		D1205B0A09F9899600179B6C /* left_arrow_down.tif in Resources */ = {isa = PBXBuildFile; fileRef = D1205B0609F9899600179B6C /* left_arrow_down.tif */; };
@@ -520,6 +526,9 @@
 				D10B8E0E0A512F5D00003A33 /* osd.png in CopyFiles */,
 				D15B1CE00EADBC6C0070B7B5 /* ratectl.h in CopyFiles */,
 				D1F921A10EC2E00B008B4F86 /* XMDebugPreferencesModule.h in CopyFiles */,
+				D11C86EC0EEF2F95000F60B8 /* im.h in CopyFiles */,
+				D11C86ED0EEF2F95000F60B8 /* msrp.h in CopyFiles */,
+				D11C86EE0EEF2F95000F60B8 /* sipim.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -749,6 +758,12 @@
 		D11C5E510A49EC730030633D /* XMIncomingCallAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMIncomingCallAlert.m; sourceTree = "<group>"; };
 		D11C5E640A49ED950030633D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
 		D11C5F230A49F9F90030633D /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/IncomingCallAlert.nib; sourceTree = "<group>"; };
+		D11C86E90EEF2F95000F60B8 /* im.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = im.h; sourceTree = "<group>"; };
+		D11C86EA0EEF2F95000F60B8 /* msrp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = msrp.h; sourceTree = "<group>"; };
+		D11C86EB0EEF2F95000F60B8 /* sipim.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sipim.h; sourceTree = "<group>"; };
+		D11C86F00EEF2FB3000F60B8 /* im_mf.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = im_mf.cxx; sourceTree = "<group>"; };
+		D11C86F10EEF2FB3000F60B8 /* msrp.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = msrp.cxx; sourceTree = "<group>"; };
+		D11C86F20EEF2FB3000F60B8 /* sipim.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sipim.cxx; sourceTree = "<group>"; };
 		D11DDF8D0B20A989006086D5 /* XMNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMNetworkConfiguration.h; path = Source/Framework/XMNetworkConfiguration.h; sourceTree = "<group>"; };
 		D11DDF8E0B20A989006086D5 /* XMNetworkConfiguration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMNetworkConfiguration.cpp; path = Source/Framework/XMNetworkConfiguration.cpp; sourceTree = "<group>"; };
 		D1205AF709F986A000179B6C /* down_arrow_down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down_arrow_down.tif; path = Resources/Images/down_arrow_down.tif; sourceTree = "<group>"; };
@@ -1901,6 +1916,26 @@
 			name = speex;
 			sourceTree = "<group>";
 		};
+		D11C86E80EEF2F95000F60B8 /* im */ = {
+			isa = PBXGroup;
+			children = (
+				D11C86E90EEF2F95000F60B8 /* im.h */,
+				D11C86EA0EEF2F95000F60B8 /* msrp.h */,
+				D11C86EB0EEF2F95000F60B8 /* sipim.h */,
+			);
+			path = im;
+			sourceTree = "<group>";
+		};
+		D11C86EF0EEF2FB3000F60B8 /* im */ = {
+			isa = PBXGroup;
+			children = (
+				D11C86F00EEF2FB3000F60B8 /* im_mf.cxx */,
+				D11C86F10EEF2FB3000F60B8 /* msrp.cxx */,
+				D11C86F20EEF2FB3000F60B8 /* sipim.cxx */,
+			);
+			path = im;
+			sourceTree = "<group>";
+		};
 		D1216B960ECB94B900DC292F /* BuildConfiguration */ = {
 			isa = PBXGroup;
 			children = (
@@ -2705,6 +2740,7 @@
 				D1CEE11208F9022B007E4ABE /* asn */,
 				D1F0B78609DC4867005D0464 /* h224 */,
 				D14BBF3C0E3F7B6F007B1A57 /* h460 */,
+				D11C86E80EEF2F95000F60B8 /* im */,
 			);
 			name = include;
 			path = ../opal/include;
@@ -2721,6 +2757,7 @@
 				D1CEE20108F90261007E4ABE /* asn */,
 				D1F0B77F09DC4834005D0464 /* h224 */,
 				D14BBF2D0E3F7B43007B1A57 /* h460 */,
+				D11C86EF0EEF2FB3000F60B8 /* im */,
 			);
 			name = src;
 			path = ../opal/src;
@@ -3771,6 +3808,9 @@
 				D15B1CE20EADBC840070B7B5 /* ratectl.cxx in Sources */,
 				D1F921A20EC2E00B008B4F86 /* XMDebugPreferencesModule.m in Sources */,
 				D1330F770ED540A800623750 /* svcproc.cxx in Sources */,
+				D11C86F30EEF2FB3000F60B8 /* im_mf.cxx in Sources */,
+				D11C86F40EEF2FB3000F60B8 /* msrp.cxx in Sources */,
+				D11C86F50EEF2FB3000F60B8 /* sipim.cxx in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
