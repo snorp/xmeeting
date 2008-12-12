@@ -1,11 +1,12 @@
 /*
- * $Id: XMMediaStream.cpp,v 1.24 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMMediaStream.cpp,v 1.25 2008/12/12 09:34:45 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
+#include <ptlib.h>
 #include <ptclib/random.h>
 
 #include <codec/vidcodec.h>
