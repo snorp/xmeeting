@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.46 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.47 2008/12/18 07:53:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -9,6 +9,7 @@
 #include <ptlib.h>
 #include <ptlib/videoio.h>
 #include <asn/h245.h>
+#include <math.h>
 
 #include "XMMediaFormats.h"
 #include "XMBridge.h"
@@ -852,15 +853,17 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
   const H245_H263VideoCapability & h263 = cap;
   
+  OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
+  
   if (h263.HasOptionalField(H245_H263VideoCapability::e_h263Options)) {
     isH263PlusCapability = true;
     SetPayloadType(XM_MEDIA_FORMAT_H263PLUS.GetPayloadType());
+    mediaFormat = XM_MEDIA_FORMAT_H263PLUS;
   } else {
     isH263PlusCapability = false;
     SetPayloadType(XM_MEDIA_FORMAT_H263.GetPayloadType());
+    mediaFormat = XM_MEDIA_FORMAT_H263;
   }
-	
-  OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
     
   // "Reset" the media format
   if (isH263PlusCapability == true) {
