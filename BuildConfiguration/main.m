@@ -1,5 +1,5 @@
 /*
- * $Id: main.m,v 1.3 2008/12/03 22:10:00 hfriederich Exp $
+ * $Id: main.m,v 1.4 2008/12/18 08:28:43 hfriederich Exp $
  *
  * Copyright (c) 2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -111,17 +111,17 @@ ReplaceRecord PTLIBRecords[] = {
   { @"#undef P_EXCEPTIONS",               @"/* #undef P_EXCEPTIONS */" },
   { @"#undef USE_SYSTEM_SWAB",            @"#define USE_SYSTEM_SWAB" },
   { @"#undef    P_64BIT",                 @"/* #undef P_64BIT */" },
-  { @"#undef    P_LPIA",                  @"/* #undef P_LPIA */" },
+  { @"#undef P_LPIA",                     @"/* #undef P_LPIA */" },
   { @"#undef    PNO_LONG_DOUBLE",         @"/* #undef PNO_LONG_DOUBLE */" },
-  { @"#undef    P_HAS_POSIX_READDIR_R",   @"#define P_HAS_POSIX_READDIR_R 3" },
-  { @"#undef  P_HAS_STL_STREAMS",         @"#define P_HAS_STL_STREAMS 1" },
-  { @"#undef  P_HAS_ATOMIC_INT",          @"#define P_HAS_ATOMIC_INT 1" },
-  { @"#undef  P_HAS_RECURSIVE_MUTEX",     @"#define P_HAS_RECURSIVE_MUTEX 2" },
-  { @"#undef  P_NEEDS_GNU_CXX_NAMESPACE", @"#define P_NEEDS_GNU_CXX_NAMESPACE 1" },
-  { @"#undef  PMEMORY_CHECK",             @"/* #undef PMEMORY_CHECK */" },
-  { @"#undef  P_HAS_RECVMSG",             @"/* #undef P_HAS_RECVMSG */" },
-  { @"#undef  P_HAS_UPAD128_T",           @"/* #undef P_HAS_UPAD128_T */" },
-  { @"#undef  P_HAS_INET_NTOP",           @"#define P_HAS_INET_NTOP 1" },
+  { @"#undef P_HAS_POSIX_READDIR_R",      @"#define P_HAS_POSIX_READDIR_R 3" },
+  { @"#undef P_HAS_STL_STREAMS",          @"#define P_HAS_STL_STREAMS 1" },
+  { @"#undef P_HAS_ATOMIC_INT",           @"#define P_HAS_ATOMIC_INT 1" },
+  { @"#undef P_HAS_RECURSIVE_MUTEX",      @"#define P_HAS_RECURSIVE_MUTEX 2" },
+  { @"#undef P_NEEDS_GNU_CXX_NAMESPACE",  @"#define P_NEEDS_GNU_CXX_NAMESPACE 1" },
+  { @"#undef PMEMORY_CHECK",              @"/* #undef PMEMORY_CHECK */" },
+  { @"#undef P_HAS_RECVMSG",              @"/* #undef P_HAS_RECVMSG */" },
+  { @"#undef P_HAS_UPAD128_T",            @"/* #undef P_HAS_UPAD128_T */" },
+  { @"#undef P_HAS_INET_NTOP",            @"#define P_HAS_INET_NTOP 1" },
   { @"#undef  P_USE_STANDARD_CXX_BOOL",   @"#define P_USE_STANDARD_CXX_BOOL 1" },
 };
 unsigned PTLIBNumRecords = 83;
