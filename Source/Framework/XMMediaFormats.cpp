@@ -1,5 +1,5 @@
 /*
- * $Id: XMMediaFormats.cpp,v 1.47 2008/12/18 07:53:48 hfriederich Exp $
+ * $Id: XMMediaFormats.cpp,v 1.48 2008/12/18 07:58:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -853,23 +853,22 @@ bool XM_H323_H263_Capability::OnReceivedPDU(const H245_VideoCapability & cap)
 	
   const H245_H263VideoCapability & h263 = cap;
   
-  OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
-  
   if (h263.HasOptionalField(H245_H263VideoCapability::e_h263Options)) {
     isH263PlusCapability = true;
     SetPayloadType(XM_MEDIA_FORMAT_H263PLUS.GetPayloadType());
-    mediaFormat = XM_MEDIA_FORMAT_H263PLUS;
   } else {
     isH263PlusCapability = false;
     SetPayloadType(XM_MEDIA_FORMAT_H263.GetPayloadType());
-    mediaFormat = XM_MEDIA_FORMAT_H263;
   }
-    
+      
   // "Reset" the media format
+  OpalMediaFormat & mediaFormat = GetWritableMediaFormat();
   if (isH263PlusCapability == true) {
+    mediaFormat = XM_MEDIA_FORMAT_H263PLUS;
     mediaFormat.SetOptionBoolean(XMMediaFormat_H263::IsRFC2429Option(), true);
     mediaFormat.SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "RFC2429");
   } else {
+    mediaFormat = XM_MEDIA_FORMAT_H263;
     mediaFormat.SetOptionBoolean(XMMediaFormat_H263::IsRFC2429Option(), false);
     mediaFormat.SetOptionString(OpalVideoFormat::MediaPacketizationOption(), "");
   }
