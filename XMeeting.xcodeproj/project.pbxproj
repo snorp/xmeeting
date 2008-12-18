@@ -121,7 +121,6 @@
 		D11C86EC0EEF2F95000F60B8 /* im.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C86E90EEF2F95000F60B8 /* im.h */; };
 		D11C86ED0EEF2F95000F60B8 /* msrp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C86EA0EEF2F95000F60B8 /* msrp.h */; };
 		D11C86EE0EEF2F95000F60B8 /* sipim.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C86EB0EEF2F95000F60B8 /* sipim.h */; };
-		D11C86F30EEF2FB3000F60B8 /* im_mf.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D11C86F00EEF2FB3000F60B8 /* im_mf.cxx */; };
 		D11C86F40EEF2FB3000F60B8 /* msrp.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D11C86F10EEF2FB3000F60B8 /* msrp.cxx */; };
 		D11C86F50EEF2FB3000F60B8 /* sipim.cxx in Sources */ = {isa = PBXBuildFile; fileRef = D11C86F20EEF2FB3000F60B8 /* sipim.cxx */; };
 		D11C87B70EF2661C000F60B8 /* rfc4103.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D11C87B50EF2661C000F60B8 /* rfc4103.h */; };
@@ -3822,7 +3821,6 @@
 				D15B1CE20EADBC840070B7B5 /* ratectl.cxx in Sources */,
 				D1F921A20EC2E00B008B4F86 /* XMDebugPreferencesModule.m in Sources */,
 				D1330F770ED540A800623750 /* svcproc.cxx in Sources */,
-				D11C86F30EEF2FB3000F60B8 /* im_mf.cxx in Sources */,
 				D11C86F40EEF2FB3000F60B8 /* msrp.cxx in Sources */,
 				D11C86F50EEF2FB3000F60B8 /* sipim.cxx in Sources */,
 				D11C87BB0EF26627000F60B8 /* rfc4103.cxx in Sources */,
