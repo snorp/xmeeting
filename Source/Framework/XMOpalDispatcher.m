@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.64 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.65 2008/12/25 22:29:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -496,8 +496,12 @@ typedef enum _XMOpalDispatcherMessage
   callStatisticsUpdateIntervalTimer = nil;
   
   resyncSubsystemCounter = 0;
-  gatekeeperRegistrationWaitLock = [[NSLock alloc] init];
-  sipRegistrationWaitLock = [[NSLock alloc] init];
+  pthread_mutex_init(&gatekeeperRegistrationMutex, NULL);
+  pthread_cond_init(&gatekeeperRegistrationCond, NULL);
+  gatekeeperRegistrationInProgress = NO;
+  pthread_mutex_init(&sipRegistrationMutex, NULL);
+  pthread_cond_init(&sipRegistrationCond, NULL);
+  sipRegistrationInProgress = NO;
   doesWaitForSIPRegistrationCompletion = NO;
   
   logCallStatistics = NO;
@@ -518,8 +522,10 @@ typedef enum _XMOpalDispatcherMessage
   [controlTimer release];
   [callStatisticsUpdateIntervalTimer release];
   
-  [gatekeeperRegistrationWaitLock release];
-  [sipRegistrationWaitLock release];
+  pthread_mutex_destroy(&gatekeeperRegistrationMutex);
+  pthread_cond_destroy(&gatekeeperRegistrationCond);
+  pthread_mutex_destroy(&sipRegistrationMutex);
+  pthread_cond_destroy(&sipRegistrationCond);
   
   [super dealloc];
 }
@@ -1372,7 +1378,12 @@ typedef enum _XMOpalDispatcherMessage
     protocolStatus = XMProtocolStatus_Disabled;
     
     // unregistering from the gk if registered
-    [gatekeeperRegistrationWaitLock lock]; // will be unlocked from another thread
+    pthread_mutex_lock(&gatekeeperRegistrationMutex);
+    while (gatekeeperRegistrationInProgress) {
+      pthread_cond_wait(&gatekeeperRegistrationCond, &gatekeeperRegistrationMutex);
+    }
+    gatekeeperRegistrationInProgress = YES;
+    pthread_mutex_unlock(&gatekeeperRegistrationMutex);
     _XMSetGatekeeper(NULL, NULL, NULL, NULL);
     
     // disabling the H.323 Listeners 
@@ -1412,7 +1423,12 @@ typedef enum _XMOpalDispatcherMessage
   }
   
   // the result of this operation will be handled through callbacks
-  [gatekeeperRegistrationWaitLock lock]; // will be unlocked from another thread
+  pthread_mutex_lock(&gatekeeperRegistrationMutex);
+  while (gatekeeperRegistrationInProgress) {
+    pthread_cond_wait(&gatekeeperRegistrationCond, &gatekeeperRegistrationMutex);
+  }
+  gatekeeperRegistrationInProgress = YES;
+  pthread_mutex_unlock(&gatekeeperRegistrationMutex);
   _XMSetGatekeeper(gatekeeperAddress, 
                    gatekeeperTerminalAlias1, 
                    gatekeeperTerminalAlias2,
@@ -1448,7 +1464,12 @@ typedef enum _XMOpalDispatcherMessage
     _XMSetSIPProxy(NULL, NULL, NULL);
     
     // unregistering if needed
-    [sipRegistrationWaitLock lock]; // will be unlocked from within _XMFinishRegistrationSetup()
+    pthread_mutex_lock(&sipRegistrationMutex);
+    while (sipRegistrationInProgress) {
+      pthread_cond_wait(&sipRegistrationCond, &sipRegistrationMutex);
+    }
+    sipRegistrationInProgress = YES;
+    pthread_mutex_unlock(&sipRegistrationMutex);
     _XMPrepareSIPRegistrations(NO);
     _XMFinishSIPRegistrations(NO);
     
@@ -1468,7 +1489,12 @@ typedef enum _XMOpalDispatcherMessage
   NSArray *records = [preferences sipRegistrationRecords];
   unsigned count = [records count];
   
-  [sipRegistrationWaitLock lock]; // will be unlocked from within -_handleSIPRegistrationSetupComplete
+  pthread_mutex_lock(&sipRegistrationMutex);
+  while (sipRegistrationInProgress) {
+    pthread_cond_wait(&sipRegistrationCond, &sipRegistrationMutex);
+  }
+  sipRegistrationInProgress = YES;
+  pthread_mutex_unlock(&sipRegistrationMutex);
   
   _XMPrepareSIPRegistrations(proxyInfoChanged);
   
@@ -1505,10 +1531,18 @@ typedef enum _XMOpalDispatcherMessage
 {
   // Since the registrations perform asynchronously,
   // we wait here until this task has completed
-  [gatekeeperRegistrationWaitLock lock];
-  [gatekeeperRegistrationWaitLock unlock];
-  [sipRegistrationWaitLock lock];
-  [sipRegistrationWaitLock unlock];
+  pthread_mutex_lock(&gatekeeperRegistrationMutex);
+  while (gatekeeperRegistrationInProgress) {
+    pthread_cond_wait(&gatekeeperRegistrationCond, &gatekeeperRegistrationMutex);
+  }
+  pthread_mutex_unlock(&gatekeeperRegistrationMutex);
+  
+  pthread_mutex_lock(&sipRegistrationMutex);
+  while (sipRegistrationInProgress) {
+    pthread_cond_wait(&sipRegistrationCond, &sipRegistrationMutex);
+  }
+  sipRegistrationInProgress = YES;
+  pthread_mutex_unlock(&sipRegistrationMutex);
 }
 
 #pragma mark -
@@ -1577,12 +1611,18 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleGatekeeperRegistrationComplete
 {
-  [gatekeeperRegistrationWaitLock unlock];
+  pthread_mutex_lock(&gatekeeperRegistrationMutex);
+  gatekeeperRegistrationInProgress = NO;
+  pthread_cond_signal(&gatekeeperRegistrationCond);
+  pthread_mutex_unlock(&gatekeeperRegistrationMutex);
 }
 
 - (void)_handleSIPRegistrationComplete
 {
-  [sipRegistrationWaitLock unlock];
+  pthread_mutex_lock(&sipRegistrationMutex);
+  sipRegistrationInProgress = NO;
+  pthread_cond_signal(&sipRegistrationCond);
+  pthread_mutex_unlock(&sipRegistrationMutex);
 }
 
 - (void)_handleCallStartToken:(NSString *)_callToken callEndReason:(XMCallEndReason)_callEndReason

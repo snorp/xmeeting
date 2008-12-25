@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.h,v 1.31 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMOpalDispatcher.h,v 1.32 2008/12/25 22:29:34 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,6 +10,7 @@
 #define __XM_OPAL_DISPATCHER_H__
 
 #import <Foundation/Foundation.h>
+#import <pthread.h>
 
 #import "XMTypes.h"
 #import "XMPreferences.h"
@@ -30,8 +31,12 @@
   NSTimer *callStatisticsUpdateIntervalTimer;
   
   unsigned resyncSubsystemCounter;
-  NSLock *gatekeeperRegistrationWaitLock;
-  NSLock *sipRegistrationWaitLock;
+  pthread_mutex_t gatekeeperRegistrationMutex;
+  pthread_cond_t gatekeeperRegistrationCond;
+  BOOL gatekeeperRegistrationInProgress;
+  pthread_mutex_t sipRegistrationMutex;
+  pthread_cond_t sipRegistrationCond;
+  BOOL sipRegistrationInProgress;
   BOOL doesWaitForSIPRegistrationCompletion;
   
   BOOL logCallStatistics;
