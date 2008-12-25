@@ -1,5 +1,5 @@
 /*
- * $Id: main.m,v 1.4 2008/12/18 08:28:43 hfriederich Exp $
+ * $Id: main.m,v 1.5 2008/12/25 12:52:27 hfriederich Exp $
  *
  * Copyright (c) 2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -153,7 +153,8 @@ ReplaceRecord OPALRecords[] = {
   { @"#undef\tOPAL_H323",               @"#define OPAL_H323 1" },
   { @"#undef  OPAL_LID",                @"/* #undef OPAL_LID */" },
   { @"#undef  OPAL_T120DATA",           @"/* #undef OPAL_T120DATA */" },
-  { @"#undef  OPAL_H224FECC",           @"#define OPAL_H224FECC 1" },
+  { @"#undef  OPAL_HAS_H224",           @"#define OPAL_HAS_H224 1" },
+  { @"#undef  OPAL_HAS_H281",           @"#define OPAL_HAS_H281 1" },
   { @"#undef  OPAL_H501",               @"#define OPAL_H501 1" },
   { @"#undef  OPAL_H450",               @"#define OPAL_H450 1" },
   { @"#undef  OPAL_H460",               @"#define OPAL_H460 1" },
@@ -168,7 +169,7 @@ ReplaceRecord OPALRecords[] = {
   { @"#undef  OPAL_SPEEX_FLOAT_NOISE",  @"/* #undef OPAL_SPEEX_FLOAT_NOISE */" },
   { @"#undef OPAL_JAVA",                @"/* #undef OPAL_JAVA */" },
 };
-unsigned OPALNumRecords = 36;
+unsigned OPALNumRecords = 37;
 
 NSString *OSVersionMajor;
 NSString *OSVersionMinor;
