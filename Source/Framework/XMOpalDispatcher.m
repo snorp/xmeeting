@@ -1,5 +1,5 @@
 /*
- * $Id: XMOpalDispatcher.m,v 1.66 2008/12/26 09:03:07 hfriederich Exp $
+ * $Id: XMOpalDispatcher.m,v 1.67 2008/12/26 09:05:06 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -1464,7 +1464,6 @@ typedef enum _XMOpalDispatcherMessage
     _XMSetSIPProxy(NULL, NULL, NULL);
     
     // unregistering if needed
-    NSLog(@"Start unregistering");
     pthread_mutex_lock(&sipRegistrationMutex);
     while (sipRegistrationInProgress) {
       pthread_cond_wait(&sipRegistrationCond, &sipRegistrationMutex);
@@ -1489,8 +1488,7 @@ typedef enum _XMOpalDispatcherMessage
 {
   NSArray *records = [preferences sipRegistrationRecords];
   unsigned count = [records count];
-  
-  NSLog(@"Do reg setup");
+
   pthread_mutex_lock(&sipRegistrationMutex);
   while (sipRegistrationInProgress) {
     pthread_cond_wait(&sipRegistrationCond, &sipRegistrationMutex);
@@ -1620,7 +1618,6 @@ typedef enum _XMOpalDispatcherMessage
 
 - (void)_handleSIPRegistrationComplete
 {
-  NSLog(@"SIP REG COMPLETE");
   pthread_mutex_lock(&sipRegistrationMutex);
   sipRegistrationInProgress = NO;
   pthread_cond_signal(&sipRegistrationCond);
