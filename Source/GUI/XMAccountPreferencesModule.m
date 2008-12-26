@@ -1,5 +1,5 @@
 /*
- * $Id: XMAccountPreferencesModule.m,v 1.14 2008/11/18 07:56:06 hfriederich Exp $
+ * $Id: XMAccountPreferencesModule.m,v 1.15 2008/12/26 08:43:15 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,7 +26,10 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 - (void)_h323EditAccountPanelDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)_sipEditAccountPanelDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 
-- (void)_alertAccountName;
+- (void)_alertNoAccountName;
+- (void)_alertDuplicateAccountName;
+- (void)_alertNoTerminalAlias;
+- (void)_alertNoSIPInfo;
 
 @end
 
@@ -284,6 +287,12 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   NSString *name = [h323AccountNameField stringValue];
   
+  // check that a name was entered
+  if ([name length] == 0) {
+    [self _alertNoAccountName];
+    return;
+  }
+  
   // check that name isn't used already
   unsigned count = [h323Accounts count];
   for (unsigned i = 0; i < count; i++) {
@@ -294,9 +303,16 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
     }
     
     if ([[account name] isEqualToString:name]) {
-      [self _alertAccountName];
+      [self _alertDuplicateAccountName];
       return;
     }
+  }
+  
+  // ensure at least a terminal alias was entered
+  NSString *terminalAlias1 = [h323TerminalAlias1Field stringValue];
+  if ([terminalAlias1 length] == 0) {
+    [self _alertNoTerminalAlias];
+    return;
   }
   
   [NSApp endSheet:editH323AccountPanel returnCode:NSRunStoppedResponse];
@@ -313,6 +329,12 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
 {
   NSString *name = [sipAccountNameField stringValue];
   
+  // check that a name was entered
+  if ([name length] == 0) {
+    [self _alertNoAccountName];
+    return;
+  }
+  
   // check that name isn't used already
   unsigned count = [sipAccounts count];
   for (unsigned i = 0; i < count; i++) {
@@ -323,9 +345,17 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
     }
     
     if ([[account name] isEqualToString:name]) {
-      [self _alertAccountName];
+      [self _alertDuplicateAccountName];
       return;
     }
+  }
+  
+  // ensure at least a reg. domain / user name was entered
+  NSString *regDomain = [sipRegistrationDomainField stringValue];
+  NSString *username = [sipUsernameField stringValue];
+  if ([regDomain length] == 0 || [username length] == 0) {
+    [self _alertNoSIPInfo];
+    return;
   }
   
   [NSApp endSheet:editSIPAccountPanel returnCode:NSRunStoppedResponse];
@@ -603,12 +633,51 @@ NSString *XMKey_AccountPreferencesAuthorizationUsernameIdentifier = @"authorizat
   }
 }
 
-- (void)_alertAccountName
+- (void)_alertNoAccountName
+{
+  NSAlert *alert = [[NSAlert alloc] init];
+    
+  [alert setMessageText:NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_NO_ACCOUNT_NAME", @"")];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+    
+  [alert runModal];
+  
+  [alert release];
+}
+
+- (void)_alertDuplicateAccountName
 {
   NSAlert *alert = [[NSAlert alloc] init];
   
   [alert setMessageText:NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_NAME_EXISTS", @"")];
   [alert setInformativeText:NSLocalizedString(@"XM_PREFERENCES_NAME_SUGGESTION", @"")];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  
+  [alert runModal];
+  
+  [alert release];
+}
+
+- (void)_alertNoTerminalAlias
+{
+  NSAlert *alert = [[NSAlert alloc] init];
+  
+  [alert setMessageText:NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_NO_TERMINAL_ALIAS", @"")];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  
+  [alert runModal];
+  
+  [alert release];
+}
+
+- (void)_alertNoSIPInfo
+{
+  NSAlert *alert = [[NSAlert alloc] init];
+  
+  [alert setMessageText:NSLocalizedString(@"XM_ACCOUNT_PREFERENCES_NO_SIP_INFO", @"")];
   [alert setAlertStyle:NSWarningAlertStyle];
   [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   

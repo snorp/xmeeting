@@ -209,6 +209,9 @@
 "XM_ACCOUNT_PREFERENCES_NAME" = "Accounts";
 "XM_ACCOUNT_PREFERENCES_TOOLTIP" = "Account Preferences";
 "XM_ACCOUNT_PREFERENCES_NAME_EXISTS" = "Account name already exists";
+"XM_ACCOUNT_PREFERENCES_NO_ACCOUNT_NAME" = "Please enter a Display Name";
+"XM_ACCOUNT_PREFERENCES_NO_TERMINAL_ALIAS" = "Please enter an User Alias/ID";
+"XM_ACCOUNT_PREFERENCES_NO_SIP_INFO" = "Please enter a Registration Domain and User Name";
 "XM_LOCATION_PREFERENCES_NAME" = "Locations";
 "XM_LOCATION_PREFERENCES_TOOLTIP" = "Edit the Locations";
 "XM_LOCATION_PREFERENCES_NEW_LOCATION" = "New Location";
