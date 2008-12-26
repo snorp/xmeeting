@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.m,v 1.56 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMNoCallModule.m,v 1.57 2008/12/26 11:00:55 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,8 +22,10 @@
 #import "XMMainWindowController.h"
 #import "XMLocalVideoView.h"
 
-#define XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY @"XMeeting_NoCallModuleSelfViewStatus"
-#define XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY @"XMeeting_NoCallModuleCallProtocol"
+NSString *XMKey_NoCallModuleSelfViewStatus = @"XMeeting_NoCallModuleSelfViewStatus";
+NSString *XMKey_NoCallModuleCallProtocol = @"XMeeting_NoCallModuleCallProtocol";
+NSString *XMKey_NoCallModuleSize_SelfViewShown = @"XMeeting_NoCallModuleSize_SelfViewShown";
+NSString *XMKey_NoCallModuleSize_SelfViewHidden = @"XMeeting_NoCallModuleSize_SelfViewHidden";
 
 #define VIDEO_INSET 5
 
@@ -51,6 +53,9 @@
 - (void)_updateStatusInformation:(NSString *)statusFieldString;
 - (void)_setCallProtocol:(XMCallProtocol)callProtocol;
 - (void)_setupVideoDisplay;
+
+- (void)_windowWillMiniaturize:(NSNotification *)notif;
+- (void)_windowDidDeminiaturize:(NSNotification *)notif;
 
 @end
 
@@ -99,15 +104,30 @@
   [notificationCenter addObserver:self selector:@selector(_didChangeGatekeeperStatus:) name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:nil];
   [notificationCenter addObserver:self selector:@selector(_didChangeSIPRegistrationStatus:) name:XMNotification_CallManagerDidChangeSIPRegistrationStatus object:nil];
   [notificationCenter addObserver:self selector:@selector(_addressBookDatabaseDidChange:) name:XMNotification_AddressBookManagerDidChangeDatabase object:nil];
+  [notificationCenter addObserver:self selector:@selector(_windowWillMiniaturize:) name:NSWindowWillMiniaturizeNotification object:nil]; // don't know the window
+  [notificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:) name:NSWindowDidDeminiaturizeNotification object:nil]; // don't known the window
 		
-  contentViewSizeWithSelfViewHidden = [contentView frame].size;
-  contentViewMinSizeWithSelfViewShown = contentViewSizeWithSelfViewHidden;
-  contentViewSizeWithSelfViewShown = contentViewMinSizeWithSelfViewShown;
+  contentViewMinSizeWithSelfViewHidden = [contentView frame].size;
+  contentViewMinSizeWithSelfViewShown = contentViewMinSizeWithSelfViewHidden;
   
   // substracting the space used by the self view
-  contentViewSizeWithSelfViewHidden.height -= (5 + [selfView frame].size.height);
+  contentViewMinSizeWithSelfViewHidden.height -= (VIDEO_INSET + [selfView frame].size.height);
   
-  XMCallProtocol initialCallProtocol = (XMCallProtocol)[[NSUserDefaults standardUserDefaults] integerForKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
+  // the initial size equals the min size, if not specified in preferences
+  NSString *selfViewHiddenSize = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_NoCallModuleSize_SelfViewHidden];
+  NSString *selfViewShownSize = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_NoCallModuleSize_SelfViewShown];
+  if (selfViewHiddenSize != nil) {
+    contentViewSizeWithSelfViewHidden = NSSizeFromString(selfViewHiddenSize);
+  } else {
+    contentViewSizeWithSelfViewHidden = contentViewMinSizeWithSelfViewHidden;
+  }
+  if (selfViewShownSize != nil) {
+    contentViewSizeWithSelfViewShown = NSSizeFromString(selfViewShownSize);
+  } else {
+    contentViewSizeWithSelfViewShown = contentViewMinSizeWithSelfViewShown;
+  }
+  
+  XMCallProtocol initialCallProtocol = (XMCallProtocol)[[NSUserDefaults standardUserDefaults] integerForKey:XMKey_NoCallModuleCallProtocol];
   if (initialCallProtocol == XMCallProtocol_UnknownProtocol) {
     initialCallProtocol = XMCallProtocol_H323;
   }
@@ -121,7 +141,7 @@
     [self _didStartSubsystemSetup:nil];
   }
   
-  BOOL showSelfView = [[NSUserDefaults standardUserDefaults] boolForKey:XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY];
+  BOOL showSelfView = [[NSUserDefaults standardUserDefaults] boolForKey:XMKey_NoCallModuleSelfViewStatus];
   
   if (showSelfView) {
     [self performSelector:@selector(toggleShowSelfView:) withObject:nil afterDelay:0.0];
@@ -149,10 +169,11 @@
   // if not already done, this triggers the loading of the nib file
   [self contentView];
   
-  if (doesShowSelfView == YES) {
+  if (doesShowSelfView) {
     return contentViewSizeWithSelfViewShown;
+  } else {
+    return contentViewSizeWithSelfViewHidden;
   }
-  return contentViewSizeWithSelfViewHidden;
 }
 
 - (NSSize)contentViewMinSize
@@ -160,10 +181,11 @@
   // if not already done, this triggers the loading of the nib file
   [self contentView];
   
-  if (doesShowSelfView == YES) {
+  if (doesShowSelfView) {
     return contentViewMinSizeWithSelfViewShown;
+  } else {
+    return contentViewMinSizeWithSelfViewHidden;
   }
-  return contentViewSizeWithSelfViewHidden;
 }
 
 - (NSSize)contentViewMaxSize
@@ -171,15 +193,18 @@
   // if not already done, this triggers the loading of the nib file
   [self contentView];
   
-  if (doesShowSelfView == YES) {
+  if (doesShowSelfView) {
     return NSMakeSize(5000, 5000);
+  } else {
+    return NSMakeSize(5000, contentViewMinSizeWithSelfViewHidden.height);
   }
-  return contentViewSizeWithSelfViewHidden;
 }
 
 - (NSSize)adjustResizeDifference:(NSSize)resizeDifference minimumHeight:(unsigned)minimumHeight
 {
   if (doesShowSelfView == NO) {
+    // also update the preferences
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize([contentView bounds].size) forKey:XMKey_NoCallModuleSize_SelfViewHidden];
     return resizeDifference;
   }
   
@@ -211,6 +236,9 @@
     }
   }
   
+  // also update the preferences
+  [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize([contentView bounds].size) forKey:XMKey_NoCallModuleSize_SelfViewShown];
+  
   return resizeDifference;
 }
 
@@ -221,8 +249,12 @@
 
 - (void)becomeInactiveModule
 {
-  if (doesShowSelfView == YES) {
+  if (doesShowSelfView) {
     contentViewSizeWithSelfViewShown = [contentView bounds].size;
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize(contentViewSizeWithSelfViewShown) forKey:XMKey_NoCallModuleSize_SelfViewShown];
+  } else {
+    contentViewSizeWithSelfViewHidden = [contentView bounds].size;
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize(contentViewSizeWithSelfViewHidden) forKey:XMKey_NoCallModuleSize_SelfViewHidden];
   }
 }
 
@@ -240,6 +272,9 @@
 - (IBAction)toggleShowSelfView:(id)sender
 {
   if (doesShowSelfView == NO) {
+    contentViewSizeWithSelfViewHidden = [contentView bounds].size;
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize(contentViewSizeWithSelfViewHidden) forKey:XMKey_NoCallModuleSize_SelfViewHidden];
+    
     doesShowSelfView = YES;
     [[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
     
@@ -247,18 +282,21 @@
     [selfView display];
     
     [self _setupVideoDisplay];
+    
+    [contentView display]; // avoids 'wrong' GUI at launch time, 10.5.x
   } else {
     [selfView stopDisplayingLocalVideo];
     [selfView stopDisplayingNoVideo];
     [selfView setDrawsBorder:NO];
     
     contentViewSizeWithSelfViewShown = [contentView bounds].size;
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize(contentViewSizeWithSelfViewShown) forKey:XMKey_NoCallModuleSize_SelfViewShown];
     
     doesShowSelfView = NO;
     [[XMMainWindowController sharedInstance] noteSizeValuesDidChangeOfModule:self];
   }
   
-  [[NSUserDefaults standardUserDefaults] setBool:doesShowSelfView forKey:XM_NO_CALL_MODULE_SELF_VIEW_STATUS_KEY];
+  [[NSUserDefaults standardUserDefaults] setBool:doesShowSelfView forKey:XMKey_NoCallModuleSelfViewStatus];
 }
 
 - (IBAction)showInfoInspector:(id)sender
@@ -284,7 +322,7 @@
     [[XMCallManager sharedInstance] clearActiveCall];
     [callButton setEnabled:NO];
     [statusField setStringValue:NSLocalizedString(@"Hangup...", @"")];
-    [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_yellow"]];
+    [statusButton setImage:[NSImage imageNamed:@"status_yellow"]];
     
     return;
   }
@@ -480,7 +518,7 @@
 
 - (void)_didStartSubsystemSetup:(NSNotification *)notif
 {
-  [semaphoreButton setHidden:YES];
+  [statusButton setHidden:YES];
   
   [busyIndicator startAnimation:self];
   [busyIndicator setHidden:NO];
@@ -493,7 +531,7 @@
 
 - (void)_didEndSubsystemSetup:(NSNotification *)notif
 {
-  [semaphoreButton setHidden:NO];
+  [statusButton setHidden:NO];
   
   [busyIndicator stopAnimation:self];
   [busyIndicator setHidden:YES];
@@ -657,17 +695,18 @@
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   XMLocation *activeLocation = [preferencesManager activeLocation];
   
+  // if no network interfaces are present, no calls can be made...
   NSArray *networkInterfaces = [utils networkInterfaces];
   unsigned interfaceCount = [networkInterfaces count];
-  
   if (interfaceCount == 0) {
     NSString *statusString = NSLocalizedString(@"XM_NO_CALL_NO_ADDRESS", @"");
-    [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
-    [semaphoreButton setToolTip:statusString];
+    [statusButton setImage:[NSImage imageNamed:@"status_red"]];
+    [statusButton setToolTip:statusString];
     [statusField setStringValue:statusString];
     return;
   }
   
+  // If no protocol is enabled, no calls can be made...
   BOOL isH323Enabled = [callManager isH323Enabled];
   BOOL isSIPEnabled = [callManager isSIPEnabled];
   BOOL enableH323 = [activeLocation enableH323];
@@ -686,28 +725,29 @@
       statusString = NSLocalizedString(@"XM_NO_CALL_SIP_FAILURE", @"");
     }
     
-    [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_red"]];
-    [semaphoreButton setToolTip:statusString];
+    [statusButton setImage:[NSImage imageNamed:@"status_red"]];
+    [statusButton setToolTip:statusString];
     [statusField setStringValue:statusString];
     return;
   }
-		
+
+  // use default status if nothing was entered
   if (statusFieldString == nil) {
     statusFieldString = NSLocalizedString(@"XM_NO_CALL_IDLE", @"");
   }
   [statusField setStringValue:statusFieldString];
   
+  // Determine status (yellow / green)
   NSMutableString *toolTipText = [[NSMutableString alloc] initWithCapacity:100];
-  
-  BOOL isYellowSemaphore = NO;
+  BOOL isYellowStatus = NO;
   if (enableH323 == YES) {
     if (isH323Enabled == NO) {
-      isYellowSemaphore = YES;
+      isYellowStatus = YES;
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_H323_FAILURE", @"")];
     } else if ([activeLocation h323AccountTag] != 0) {
       NSString *gatekeeperName = [callManager gatekeeperName];
       if (gatekeeperName == nil) { // using a gatekeeper but failed to register
-        isYellowSemaphore = YES;
+        isYellowStatus = YES;
         [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_GK_FAILURE", @"")];
       } else {
         [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_GK_OK", @"")];
@@ -719,7 +759,7 @@
   
   if (enableSIP == YES) {
     if (isSIPEnabled == NO) {
-      isYellowSemaphore = YES;
+      isYellowStatus = YES;
       [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_FAILURE", @"")];
     } else {
       unsigned count = [[activeLocation sipAccountTags] count];
@@ -727,7 +767,7 @@
       if (count != 0) {
         unsigned registrationCount = [callManager sipRegistrationCount];
         if (registrationCount != count) {
-          isYellowSemaphore = YES;
+          isYellowStatus = YES;
           if (count == 1) {
             [toolTipText appendString:NSLocalizedString(@"XM_NO_CALL_TOOLTIP_SIP_REG_FAILURE", @"")];
           } else if (registrationCount == 0) {
@@ -748,10 +788,10 @@
     }
   }
   
-  if (isYellowSemaphore == YES) {
-    [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_yellow"]];
+  if (isYellowStatus == YES) {
+    [statusButton setImage:[NSImage imageNamed:@"status_yellow"]];
   } else {
-    [semaphoreButton setImage:[NSImage imageNamed:@"semaphore_green"]];
+    [statusButton setImage:[NSImage imageNamed:@"status_green"]];
   }
   
   // appending the network addresses to the tool tip
@@ -791,8 +831,7 @@
     }
   }
   
-  // updating the remaining UI
-  [semaphoreButton setToolTip:toolTipText];
+  [statusButton setToolTip:toolTipText];
   [toolTipText release];
 }
 
@@ -833,7 +872,29 @@
     [resource release];
   }
   
-  [[NSUserDefaults standardUserDefaults] setInteger:(int)currentCallProtocol forKey:XM_NO_CALL_MODULE_CALL_PROTOCOL_KEY];
+  [[NSUserDefaults standardUserDefaults] setInteger:(int)currentCallProtocol forKey:XMKey_NoCallModuleCallProtocol];
+}
+
+- (void)_windowWillMiniaturize:(NSNotification *)notif
+{
+  // ensure the notification is of importance
+  if ([notif object] == [contentView window]) {
+    // ensure the busy indicator is stopped, otherwise there might be ugly artefacts in the GUI (10.5.x)
+    [busyIndicator stopAnimation:self];
+    [busyIndicator setHidden:YES];
+  }
+}
+
+- (void)_windowDidDeminiaturize:(NSNotification *)notif
+{
+  // ensure the notification is of importance
+  if ([notif object] == [contentView window]) {
+    // restart the busy indicator if needed
+    if ([[XMCallManager sharedInstance] doesAllowModifications] == NO) {
+      [busyIndicator startAnimation:self];
+      [busyIndicator setHidden:NO];
+    }
+  }
 }
 
 @end

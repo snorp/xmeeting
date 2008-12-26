@@ -1,5 +1,5 @@
 /*
- * $Id: XMNoCallModule.h,v 1.15 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMNoCallModule.h,v 1.16 2008/12/26 11:00:55 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -26,13 +26,14 @@
   // XMMainWindowModule Outlets and variables
   IBOutlet NSView *contentView;
   
-  NSSize contentViewSizeWithSelfViewHidden;
+  NSSize contentViewMinSizeWithSelfViewHidden;
   NSSize contentViewMinSizeWithSelfViewShown;
+  NSSize contentViewSizeWithSelfViewHidden;
   NSSize contentViewSizeWithSelfViewShown;
   
   // GUI Outlets
   IBOutlet XMLocalVideoView *selfView;
-  IBOutlet NSButton *semaphoreButton;
+  IBOutlet NSButton *statusButton;
   IBOutlet NSProgressIndicator *busyIndicator;
   IBOutlet NSTextField *statusField;
   IBOutlet NSPopUpButton *locationsPopUpButton;

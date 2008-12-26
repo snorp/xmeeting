@@ -1,58 +1,102 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = IGPopupView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {theMenu = NSMenu; }; 
-            SUPERCLASS = NSPopUpButton; 
-        }, 
-        {
-            CLASS = XMDatabaseField; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {dataSource = id; representedObject = id; }; 
-            SUPERCLASS = NSTextField; 
-        }, 
-        {CLASS = XMLocalVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {
-            ACTIONS = {
-                showAdditionModuleInSeparateWindow = id; 
-                showSelfView = id; 
-                toggleShowAdditionContent = id; 
-            }; 
-            CLASS = XMMainWindowController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {mainContentBox = NSBox; selfViewDrawer = NSDrawer; }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {
-                call = id; 
-                changeActiveLocation = id; 
-                showContacts = id; 
-                showInfoInspector = id; 
-                showTools = id; 
-                toggleShowSelfView = id; 
-            }; 
-            CLASS = XMNoCallModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                busyIndicator = NSProgressIndicator; 
-                callAddressField = XMDatabaseField; 
-                callButton = NSButton; 
-                contentView = NSView; 
-                locationsPopUpButton = NSPopUpButton; 
-                selfView = XMLocalVideoView; 
-                semaphoreButton = NSButton; 
-                statusField = NSTextField; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>IGPopupView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>theMenu</key>
+				<string>NSMenu</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSPopUpButton</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMDatabaseField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>representedObject</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>call</key>
+				<string>id</string>
+				<key>changeActiveLocation</key>
+				<string>id</string>
+				<key>showContacts</key>
+				<string>id</string>
+				<key>showInfoInspector</key>
+				<string>id</string>
+				<key>showTools</key>
+				<string>id</string>
+				<key>toggleShowSelfView</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMNoCallModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>busyIndicator</key>
+				<string>NSProgressIndicator</string>
+				<key>callAddressField</key>
+				<string>XMDatabaseField</string>
+				<key>callButton</key>
+				<string>NSButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>locationsPopUpButton</key>
+				<string>NSPopUpButton</string>
+				<key>selfView</key>
+				<string>XMLocalVideoView</string>
+				<key>statusButton</key>
+				<string>NSButton</string>
+				<key>statusField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMLocalVideoView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
