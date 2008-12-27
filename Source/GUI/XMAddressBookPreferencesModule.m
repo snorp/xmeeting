@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookPreferencesModule.m,v 1.5 2008/11/18 07:56:06 hfriederich Exp $
+ * $Id: XMAddressBookPreferencesModule.m,v 1.6 2008/12/27 08:07:51 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -108,6 +108,11 @@
 
 - (void)becomeActiveModule
 {
+}
+
+- (BOOL)validateData
+{
+  return YES;
 }
 
 #pragma mark -
