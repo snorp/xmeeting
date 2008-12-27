@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.24 2008/12/27 08:03:55 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.25 2008/12/27 16:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -108,6 +108,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
   IBOutlet NSButton *newLocationCancelButton;
   
   BOOL locationLoaded;
+  BOOL doAlertNoPublicAddress;
 }
 
 // action methos for dealing with locations

@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.38 2008/12/27 08:03:55 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.39 2008/12/27 16:54:40 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -36,6 +36,8 @@ NSString *XMKey_EnabledIdentifier = @"Enabled";
 NSString *XMKey_SIPAccountNameIdentifier = @"name";
 NSString *XMKey_SIPAccountDomainIdentifier = @"domain";
 NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
+
+NSString *XMKey_NetworkTabViewItemIdentifier = @"network";
 
 @interface XMSIPAccountInfo : NSObject {
   unsigned tag;
@@ -108,6 +110,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (void)tableViewSelectionDidChange:(NSNotification *)notif;
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)tableColumn row:(int)rowIndex;
+
+  // tab view delegate
+- (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
   // modal delegate methods
 - (void)_newLocationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode context:(void *)context;
@@ -303,7 +308,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     NSString *publicAddress = [publicAddressField stringValue];
     
     if (!XMIsIPAddress(publicAddress)) {
-      [self _alertNoPublicAddress];
+      doAlertNoPublicAddress = YES; 
+      [self performSelector:@selector(_alertNoPublicAddress) withObject:nil afterDelay:0.0];
       return NO;
     }
   }
@@ -1591,6 +1597,16 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   }
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)rowIndex
+{
+  if (tableView == locationsTableView) {
+    if ([tableView selectedRow] != -1 && [self validateData] == NO) {
+      return NO;
+    }
+  }
+  return YES;
+}
+
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
   if (tableView == stunServersTable) {
@@ -1642,6 +1658,19 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
       }
     }
   }
+}
+
+#pragma mark -
+#pragma mark Tab View Delegate Methods
+
+- (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+  if ([[[tabView selectedTabViewItem] identifier] isEqualToString:XMKey_NetworkTabViewItemIdentifier]) {
+    if (![self validateData]) {
+      return NO;
+    }
+  }
+  return YES;
 }
 
 #pragma mark -
@@ -1747,6 +1776,13 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 
 - (void)_alertNoPublicAddress
 {
+  // Changing an element in the table view might cause the -shouldSelectRow callback to be triggered
+  // multiple times. To avoid multiple alerts appearing, use this flag to ensure the alert
+  // appears once if requirested multiple times
+  if (doAlertNoPublicAddress == NO) {
+    return;
+  }
+  
   NSAlert *alert = [[NSAlert alloc] init];
   
   [alert setMessageText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NO_PUBLIC_ADDRESS", @"")];
@@ -1756,6 +1792,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [alert runModal];
   
   [alert release];
+  
+  doAlertNoPublicAddress = NO;
 }
 
 @end
