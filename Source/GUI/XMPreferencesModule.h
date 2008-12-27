@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesModule.h,v 1.7 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMPreferencesModule.h,v 1.8 2008/12/27 07:59:27 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -76,6 +76,13 @@
  * Callback to inform that the contentView became visible
  **/
 - (void)becomeActiveModule;
+
+/**
+ * Callback to allow the content view to check its data integrity.
+ * Return no if data validity fails. Problem-specific reports
+ * (e.g. alert dialogs) have to be made within this method.
+ **/
+- (BOOL)validateData;
 
 @end
 

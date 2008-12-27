@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.8 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.9 2008/12/27 07:59:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -28,6 +28,7 @@
   NSMutableArray *toolbarItems;
   NSView *emptyContentView;
   
+  NSToolbar *toolbar;
   NSToolbarItem *buttonToolbarItem;
   IBOutlet NSView *buttonToolbarView;
   IBOutlet NSButton *applyButton;
@@ -50,6 +51,12 @@
  * Closes the preferences window, asking the user whether to save the data or not
  **/
 - (void)closePreferencesWindow;
+
+/**
+ * Action Methods
+ **/
+- (IBAction)toolbarItemAction:(NSToolbarItem *)sender;
+- (IBAction)applyPreferences:(id)sender;
 
 @end
 

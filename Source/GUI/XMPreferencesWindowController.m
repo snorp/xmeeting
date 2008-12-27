@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.14 2008/11/06 08:41:46 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.15 2008/12/27 07:59:28 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -27,9 +27,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar;
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar;
 
-  // action method for the toolbar items
-- (IBAction)toolbarItemAction:(NSToolbarItem *)sender;
-- (IBAction)applyPreferences:(id)sender;
+- (BOOL)_validateCurrentModule;
 
   // modal sheets modal delegate methods
 - (void)savePreferencesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
@@ -101,7 +99,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   
   
   /* Now, setting up the toolbar */
-  NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:XMKey_PreferencesToolbar];
+  toolbar = [[NSToolbar alloc] initWithIdentifier:XMKey_PreferencesToolbar];
   [toolbar setAllowsUserCustomization:NO];
   [toolbar setAutosavesConfiguration:NO];
   [toolbar setDelegate:self];
@@ -130,7 +128,6 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 {
   NSWindow *window = [self window];
   
-  /* we always center the preferences window when displaying the preferences anew */
   if (![window isVisible]) {
     // we cause each module to reload its data so that the values are consistent
     unsigned count = [modules count];
@@ -180,6 +177,9 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
     
     int result = [alert runModal];
     if (result == NSAlertFirstButtonReturn) {
+      if (![self _validateCurrentModule]) {
+        return;
+      }
       [self applyPreferences:self];
     }
   }
@@ -269,6 +269,10 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
     return;
   }
   
+  if (![self _validateCurrentModule]) {
+    return;
+  }
+  
   NSString *identifier = [item itemIdentifier];
   
   unsigned index = [identifiers indexOfObject:identifier];
@@ -298,8 +302,12 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (IBAction)applyPreferences:(id)sender
 {
+  if (![self _validateCurrentModule]) {
+    return;
+  }
+  
   // Ensure that the locations module is the last one to store it's preferences
-  // to ensure location data integrity
+  // to preserve location data integrity
   id<XMPreferencesModule> locationsModule = nil;
   
   unsigned count = [modules count]; 
@@ -356,6 +364,22 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   [[NSUserDefaults standardUserDefaults] setObject:topLeftWindowCornerString forKey:XMKey_PreferencesWindowTopLeftCorner];
 }
 
+- (BOOL)_validateCurrentModule
+{
+  // ensure the old item's integrity
+  if (currentSelectedItem != nil) {
+    unsigned index = [identifiers indexOfObject:[currentSelectedItem itemIdentifier]];
+    if (index != NSNotFound) { // should not happen
+      id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:index];
+      if (![module validateData]) { // module rejected changes, don't change anything.
+        [toolbar setSelectedItemIdentifier:[currentSelectedItem itemIdentifier]];
+        return NO;
+      }
+    }
+  }
+  return YES;
+}
+
 #pragma mark -
 #pragma mark ModalDelegate Methods
 
@@ -366,6 +390,9 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   }
   
   if (returnCode == NSAlertFirstButtonReturn) { // save the preferences
+    if (![self _validateCurrentModule]) { // abort
+      return;
+    }
     // causing the system to save all preferences
     [self applyPreferences:self];
   }
