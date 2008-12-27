@@ -222,6 +222,7 @@
 "XM_LOCATION_PREFERENCES_CUSTOM_PROXY" = "Custom";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED" = "No Protocol enabled";
 "XM_LOCATION_PREFERENCES_NO_PROTOCOL_ENABLED_INFO" = "Neither the H.323 or SIP protocol is enabled in the location \"%@\". You will not be able to do any calls when this location is active.";
+"XM_LOCATION_PREFERENCES_NO_PUBLIC_ADDRESS" = "Please enter a valid public IP address!";
 "XM_AUDIO_PREFERENCES_NAME" = "Audio";
 "XM_AUDIO_PREFERENCES_TOOLTIP" = "Audio Preferences";
 "XM_AUDIO_PREFERENCES_DEFAULT_DEVICE" = "<Use default>";
@@ -233,6 +234,7 @@
 "XM_ADDRESS_BOOK_PREFERENCES_TOOLTIP" = "Edit the Address Book integration of XMeeting";
 "XM_DEBUG_PREFERENCES_NAME" = "Debug";
 "XM_DEBUG_PREFERENCES_TOOLTIP" = "Debug Preferences";
+"XM_DEBUG_PREFERENCES_NO_FILE_PATH" = "Please specify a debug file name!";
 
 /* Setup Assistant */
 "XM_SETUP_ASSISTANT_CONTINUE" = "Continue";
