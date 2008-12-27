@@ -1,9 +1,9 @@
 /*
- * $Id: XMInspectorModule.m,v 1.3 2008/11/04 23:12:35 hfriederich Exp $
+ * $Id: XMInspectorModule.m,v 1.4 2008/12/27 08:05:59 hfriederich Exp $
  *
- * Copyright (c) 2006 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006 Hannes Friederich, Ivan Guajana. All rights reserved.
+ * Copyright (c) 2006-2008 Hannes Friederich, Ivan Guajana. All rights reserved.
  */
 
 #import "XMInspectorModule.h"
