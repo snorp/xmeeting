@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocation.m,v 1.18 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMLocation.m,v 1.19 2008/12/27 19:10:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -57,7 +57,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 }
 
 - (id)initWithDictionary:(NSDictionary *)dict h323Accounts:(NSArray *)h323Accounts sipAccounts:(NSArray *)sipAccounts
-{	
+{  
   self = [super initWithDictionary:dict];
   
   NSString *theName = (NSString *)[dict objectForKey:XMKey_LocationName];
@@ -66,23 +66,19 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   [self setName:theName];
   
   NSNumber *number = (NSNumber *)[dict objectForKey:XMKey_LocationH323AccountID];
-  if(number != nil)
-  {
+  if (number != nil) {
     unsigned index = [number unsignedIntValue];
     XMH323Account *h323Account = [h323Accounts objectAtIndex:index];
     h323AccountTag = [h323Account tag];
   }
   
   NSArray *array = [dict objectForKey:XMKey_LocationSIPAccountIDs];
-  if(array != nil)
-  {
+  if (array != nil) {
     [sipAccountTags release];
     
     unsigned count = [array count];
-    unsigned i;
     NSMutableArray *tags = [[NSMutableArray alloc] initWithCapacity:count];
-    
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
       number = (NSNumber *)[array objectAtIndex:i];
       unsigned index = [number unsignedIntValue];
       XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:index];
@@ -100,8 +96,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   }
   
   number = (NSNumber *)[dict objectForKey:XMKey_LocationSIPProxyID];
-  if (number != nil)
-  {
+  if (number != nil) {
     unsigned index = [number unsignedIntValue];
     if (index == UINT_MAX) {
       sipProxyTag = XMCustomSIPProxyTag;
@@ -155,8 +150,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
       [self h323AccountTag] == [(XMLocation *)object h323AccountTag] &&
       [self sipAccountTags] == [(XMLocation *)object sipAccountTags] &&
       [self defaultSIPAccountTag] == [(XMLocation *)object defaultSIPAccountTag] &&
-      [self sipProxyTag] == [(XMLocation *)object sipProxyTag])
-  {
+      [self sipProxyTag] == [(XMLocation *)object sipProxyTag]) {
     return YES;
   }
   
@@ -167,8 +161,8 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 #pragma mark Getting different representations
 
 - (NSMutableDictionary *)dictionaryRepresentationWithH323Accounts:(NSArray *)h323Accounts
-													  sipAccounts:(NSArray *)sipAccounts
-{	
+                            sipAccounts:(NSArray *)sipAccounts
+{  
   NSMutableDictionary *dict = [super dictionaryRepresentation];
   
   // removing unneded keys
@@ -188,21 +182,15 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   
   NSString *theName = [self name];
   
-  if(theName)
-  {
+  if (theName) {
     [dict setObject:theName forKey:XMKey_LocationName];
   }
   
-  if(h323AccountTag != 0)
-  {
+  if (h323AccountTag != 0) {
     unsigned h323AccountCount = [h323Accounts count];
-    unsigned i;
-    
-    for(i = 0; i < h323AccountCount; i++)
-    {
+    for (unsigned i = 0; i < h323AccountCount; i++) {
       XMH323Account *h323Account = [h323Accounts objectAtIndex:i];
-      if([h323Account tag] == h323AccountTag)
-      {
+      if ([h323Account tag] == h323AccountTag) {
         NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
         [dict setObject:number forKey:XMKey_LocationH323AccountID];
         [number release];
@@ -212,18 +200,14 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   }
   
   unsigned count = [sipAccountTags count];
-  unsigned i;
   NSMutableArray *sipAccountIndexes = [[NSMutableArray alloc] initWithCapacity:count];
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     unsigned _tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
     unsigned sipAccountCount = [sipAccounts count];
-    unsigned j;
     
-    for(j = 0; j < sipAccountCount; j++)
-    {
+    for (unsigned j = 0; j < sipAccountCount; j++) {
       XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:j];
-      if([sipAccount tag] == _tag)
-      {
+      if ([sipAccount tag] == _tag) {
         NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:j];
         [sipAccountIndexes addObject:number];
         [number release];
@@ -236,13 +220,9 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   
   if (defaultSIPAccountTag != 0) {
     unsigned sipAccountCount = [sipAccounts count];
-    unsigned i;
-    
-    for(i = 0; i < sipAccountCount; i++)
-    {
+    for (unsigned i = 0; i < sipAccountCount; i++) {
       XMSIPAccount *sipAccount = [sipAccounts objectAtIndex:i];
-      if([sipAccount tag] == defaultSIPAccountTag)
-      {
+      if ([sipAccount tag] == defaultSIPAccountTag) {
         NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
         [dict setObject:number forKey:XMKey_LocationDefaultSIPAccountID];
         [number release];
@@ -251,17 +231,12 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
     }
   }
   
-  if(sipProxyTag != 0)
-  {
+  if (sipProxyTag != 0) {
     if (sipProxyTag != XMCustomSIPProxyTag) {
       unsigned sipAccountCount = [sipAccounts count];
-      unsigned i;
-    
-      for(i = 0; i < sipAccountCount; i++)
-      {
+      for (unsigned i = 0; i < sipAccountCount; i++) {
         XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
-        if([sipAccount tag] == sipProxyTag)
-        {
+        if ([sipAccount tag] == sipProxyTag) {
           NSNumber *number = [[NSNumber alloc] initWithUnsignedInt:i];
           [dict setObject:number forKey:XMKey_LocationSIPProxyID];
           [number release];
@@ -395,11 +370,9 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   [self setUserName:[preferencesManager userName]];
   
   BOOL didFillAccount = NO;
-  if(h323AccountTag != 0)
-  {
+  if (h323AccountTag != 0) {
     XMH323Account *h323Account = [preferencesManager h323AccountWithTag:h323AccountTag];
-    if(h323Account != nil)
-    {
+    if (h323Account != nil) {
       [self setGatekeeperAddress:[h323Account gatekeeperHost]];
       [self setGatekeeperTerminalAlias1:[h323Account terminalAlias1]];
       [self setGatekeeperTerminalAlias2:[h323Account terminalAlias2]];
@@ -409,8 +382,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
     }
   }
   
-  if(didFillAccount == NO)
-  {
+  if (didFillAccount == NO) {
     [self setGatekeeperAddress:nil];
     [self setGatekeeperTerminalAlias1:nil];
     [self setGatekeeperTerminalAlias2:nil];
@@ -419,7 +391,6 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
   
   didFillAccount = NO;
   unsigned count = [sipAccountTags count];
-  unsigned i;
   NSMutableArray *sipInfo = [[NSMutableArray alloc] initWithCapacity:count];
   XMSIPAccount *sipAccount = [preferencesManager sipAccountWithTag:defaultSIPAccountTag];
   if (sipAccount != nil) {
@@ -432,7 +403,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
     [sipInfo addObject:record];
     [record release];
   }
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     unsigned _tag = [(NSNumber *)[sipAccountTags objectAtIndex:i] unsignedIntValue];
     if (_tag == defaultSIPAccountTag) {
       continue;
@@ -570,8 +541,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 
 - (BOOL)usesGatekeeper
 {
-  if(h323AccountTag != 0)
-  {
+  if (h323AccountTag != 0) {
     return YES;
   }
   return NO;
@@ -579,8 +549,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 
 - (BOOL)usesRegistrations
 {
-  if([sipAccountTags count] != 0)
-  {
+  if ([sipAccountTags count] != 0) {
     return YES;
   }
   return NO;
@@ -593,8 +562,7 @@ NSString *XMKey_LocationSIPProxyID = @"XMeeting_SIPProxyID";
 {
   static unsigned nextTag = 0;
   
-  if(theTag == 0)
-  {
+  if (theTag == 0) {
     theTag = ++nextTag;
   }
   

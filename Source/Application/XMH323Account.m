@@ -1,5 +1,5 @@
 /*
- * $Id: XMH323Account.m,v 1.5 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMH323Account.m,v 1.6 2008/12/27 19:10:23 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -40,23 +40,19 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   Class stringClass = [NSString class];
   
   obj = [dictionary objectForKey:XMKey_H323AccountName];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setName:(NSString *)obj];
   }
   obj = [dictionary objectForKey:XMKey_H323AccountGatekeeperHost];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setGatekeeperHost:(NSString *)obj];
   }
   obj = [dictionary objectForKey:XMKey_H323AccountTerminalAlias1];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setTerminalAlias1:(NSString *)obj];
   }
   obj = [dictionary objectForKey:XMKey_H323AccountTerminalAlias2];
-  if(obj != nil && [obj isKindOfClass:stringClass])
-  {
+  if (obj != nil && [obj isKindOfClass:stringClass]) {
     [self setTerminalAlias2:(NSString *)obj];
   }
   
@@ -85,10 +81,9 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
   
   static int nextTag = 0;
   
-  if(theTag == 0)
-  {
+  if (theTag == 0) {
     theTag = ++nextTag;
-  }	
+  }  
   
   tag = theTag;
   name = nil;
@@ -123,20 +118,16 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 {
   NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:4];
   
-  if(name != nil)
-  {
+  if (name != nil) {
     [dictionary setObject:name forKey:XMKey_H323AccountName];
   }
-  if(gatekeeperHost != nil)
-  {
+  if (gatekeeperHost != nil) {
     [dictionary setObject:gatekeeperHost forKey:XMKey_H323AccountGatekeeperHost];
   }
-  if(terminalAlias1 != nil)
-  {
+  if (terminalAlias1 != nil) {
     [dictionary setObject:terminalAlias1 forKey:XMKey_H323AccountTerminalAlias1];
   }
-  if(terminalAlias2 != nil)
-  {
+  if (terminalAlias2 != nil) {
     [dictionary setObject:terminalAlias2 forKey:XMKey_H323AccountTerminalAlias2];
   }
   
@@ -158,8 +149,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 - (void)setName:(NSString *)theName
 {
-  if(name != theName)
-  {
+  if (name != theName) {
     NSString *old = name;
     name = [theName copy];
     [old release];
@@ -173,8 +163,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 - (void)setGatekeeperHost:(NSString *)theGatekeeperHost
 {
-  if(gatekeeperHost != theGatekeeperHost)
-  {
+  if (gatekeeperHost != theGatekeeperHost) {
     NSString *old = gatekeeperHost;
     gatekeeperHost = [theGatekeeperHost copy];
     [old release];
@@ -188,8 +177,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 - (void)setTerminalAlias1:(NSString *)theTerminalAlias1
 {
-  if(terminalAlias1 != theTerminalAlias1)
-  {
+  if (terminalAlias1 != theTerminalAlias1) {
     NSString *old = terminalAlias1;
     terminalAlias1 = [theTerminalAlias1 copy];
     [old release];
@@ -203,8 +191,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 - (void)setTerminalAlias2:(NSString *)theTerminalAlias2
 {
-  if(terminalAlias2 != theTerminalAlias2)
-  {
+  if (terminalAlias2 != theTerminalAlias2) {
     NSString *old = terminalAlias2;
     terminalAlias2 = [theTerminalAlias2 copy];
     [old release];
@@ -221,8 +208,7 @@ NSString *XMKey_H323AccountPassword = @"XMeeting_H323AccountPassword";
 
 - (void)setPassword:(NSString *)thePassword
 {
-  if(password != thePassword)
-  {
+  if (password != thePassword) {
     NSString *old = password;
     password = [thePassword copy];
     [old release];
