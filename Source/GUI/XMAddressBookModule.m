@@ -1,5 +1,5 @@
 /*
- * $Id: XMAddressBookModule.m,v 1.25 2008/11/04 23:12:35 hfriederich Exp $
+ * $Id: XMAddressBookModule.m,v 1.26 2008/12/27 08:10:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -25,6 +25,7 @@
 #define XM_CUSTOM_TAG 24
 
 NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeoplePickerView";
+NSString *XMKey_AddressBookModuleSize = @"XMeeting_AddressBookModuleSize";
 
 @interface XMAddressBookModule (PrivateMethods)
 
@@ -41,6 +42,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 - (void)_validateEditOKButton;
 
 - (void)_preferencesDidChange:(NSNotification *)notif;
+- (void)_windowDidResize:(NSNotification *)notif;
 
 @end
 
@@ -65,7 +67,13 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 - (void)awakeFromNib
 {
   contentViewMinSize = [contentView frame].size;
-  contentViewSize = contentViewMinSize;
+  
+  NSString *sizeString = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_AddressBookModuleSize];
+  if (sizeString != nil) {
+    contentViewSize = NSSizeFromString(sizeString);
+  } else {
+    contentViewSize = contentViewMinSize;
+  }
   
   [addressBookView setAutosaveName:XMAddressBookPeoplePickerViewAutosaveName];
   [addressBookView setTarget:self];
@@ -103,6 +111,8 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
   //set up cog-wheel menu
   [actionButton sendActionOn:NSLeftMouseDownMask];
   [actionPopup selectItem: nil];
+  
+  [notificationCenter addObserver:self selector:@selector(_windowDidResize:) name:NSWindowDidResizeNotification object:nil];
   
 }
 
@@ -160,6 +170,7 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
 - (void)becomeInactiveModule
 {
   contentViewSize = [contentView frame].size;
+  [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize(contentViewSize) forKey:XMKey_AddressBookModuleSize];
 }
 
 #pragma mark -
@@ -699,6 +710,13 @@ NSString *XMAddressBookPeoplePickerViewAutosaveName = @"XMeetingAddressBookPeopl
     [addressBookView addProperty:kABPhoneProperty];
   } else {
     [addressBookView removeProperty:kABPhoneProperty];
+  }
+}
+
+- (void)_windowDidResize:(NSNotification *)notif
+{
+  if ([notif object] == [contentView window]) {
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize([contentView bounds].size) forKey:XMKey_AddressBookModuleSize];
   }
 }
 
