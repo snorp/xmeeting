@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallManager.m,v 1.60 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMCallManager.m,v 1.61 2008/12/27 08:11:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -486,6 +486,13 @@ enum {
   } else if (state == SubsystemSetup) { // protect against multiple invocations
     state = Ready;
     [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_CallManagerDidEndSubsystemSetup object:self];
+  }
+  
+  // reset the gatekeeper status if gatekeeper is no longer used
+  if ([activePreferences gatekeeperTerminalAlias1] == nil) {
+    gatekeeperRegistrationStatus = XMGatekeeperRegistrationStatus_NotRegistered;
+    [terminalAliases release];
+    terminalAliases = nil;
   }
   
   // if the gatekeeper registration status did not change, but remains in an error state, still post a notification.
