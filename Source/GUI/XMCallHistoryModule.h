@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.h,v 1.15 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMCallHistoryModule.h,v 1.16 2008/12/27 08:08:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -23,6 +23,7 @@
   NSSize contentViewMinSize;
   NSSize contentViewSize;
   
+  IBOutlet NSTabView *tabView;
   IBOutlet NSScrollView *recentCallsScrollView;
   IBOutlet XMRecentCallsView *recentCallsView;
   IBOutlet NSTextView *logTextView;
@@ -36,7 +37,6 @@
   NSString *videoDevice;
   
   id<XMCallAddress> callAddress;
-	
 }
 
 @end

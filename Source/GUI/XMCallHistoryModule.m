@@ -1,5 +1,5 @@
 /*
- * $Id: XMCallHistoryModule.m,v 1.32 2008/11/04 23:12:35 hfriederich Exp $
+ * $Id: XMCallHistoryModule.m,v 1.33 2008/12/27 08:08:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -17,6 +17,9 @@
 #import "XMMainWindowController.h"
 #import "XMRecentCallsView.h"
 #import "XMApplicationFunctions.h"
+
+NSString *XMKey_CallHistoryModuleSelectedTab = @"XMeeting_CallHistoryModuleSelectedTab";
+NSString *XMKey_CallHistoryModuleSize = @"XMeeting_CallHistoryModuleSize";
 
 @interface XMCallHistoryModule (PrivateMethods)
 
@@ -45,10 +48,13 @@
 - (void)_didCloseIncomingAudioStream:(NSNotification *)notif;
 - (void)_didCloseOutgoingVideoStream:(NSNotification *)notif;
 - (void)_didCloseIncomingVideoStream:(NSNotification *)notif;
+- (void)_windowDidResize:(NSNotification *)notif;
 
 - (void)_didChangeVideoInputDevice:(NSNotification *)notif;
 
 - (void)_logText:(NSString *)text date:(NSDate *)date;
+
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)item;
 
 @end
 
@@ -124,7 +130,13 @@
 - (void)awakeFromNib
 {
   contentViewMinSize = [contentView frame].size;
-  contentViewSize = contentViewMinSize;
+  
+  NSString *sizeString = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_CallHistoryModuleSize];
+  if (sizeString != nil) {
+    contentViewSize = NSSizeFromString(sizeString);
+  } else {
+    contentViewSize = contentViewMinSize;
+  }
   
   [recentCallsScrollView setBorderType:NSBezelBorder];
   [recentCallsScrollView setHasHorizontalScroller:NO];
@@ -134,6 +146,13 @@
   NSSize contentSize = [recentCallsScrollView contentSize];
   [recentCallsView setFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
   [recentCallsScrollView setDocumentView:recentCallsView];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_windowDidResize:) name:NSWindowDidResizeNotification object:nil];
+  
+  id tabViewIdentifier = [[NSUserDefaults standardUserDefaults] objectForKey:XMKey_CallHistoryModuleSelectedTab];
+  if (tabViewIdentifier != nil) {
+    [tabView selectTabViewItemWithIdentifier:tabViewIdentifier];
+  }
 }
 
 #pragma mark -
@@ -190,11 +209,7 @@
 - (void)becomeInactiveModule
 {
   contentViewSize = [contentView frame].size;
-}
-
-- (BOOL)isResizableWhenInSeparateWindow
-{
-  return YES;
+  [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize(contentViewSize) forKey:XMKey_CallHistoryModuleSize];
 }
 
 #pragma mark -
@@ -551,6 +566,13 @@
   }
 }
 
+- (void)_windowDidResize:(NSNotification *)notif
+{
+  if ([notif object] == [contentView window]) {
+    [[NSUserDefaults standardUserDefaults] setObject:NSStringFromSize([contentView bounds].size) forKey:XMKey_CallHistoryModuleSize];
+  }
+}
+
 - (void)_logText:(NSString *)logText date:(NSDate *)date
 {
   BOOL createdDate = NO;
@@ -608,6 +630,11 @@
   
   NSRange endRange = NSMakeRange([[logTextView string] length], 0);
   [logTextView scrollRangeToVisible:endRange];
+}
+
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)item
+{
+  [[NSUserDefaults standardUserDefaults] setObject:[item identifier] forKey:XMKey_CallHistoryModuleSelectedTab];
 }
 
 @end
