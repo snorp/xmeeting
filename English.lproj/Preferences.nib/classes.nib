@@ -126,7 +126,6 @@
                 duplicateLocation = id; 
                 endNewLocationSheet = id; 
                 gatekeeperAccountSelected = id; 
-                getExternalAddress = id; 
                 importLocations = id; 
                 makeDefaultSIPAccount = id; 
                 moveAudioCodec = id; 
@@ -167,11 +166,9 @@
                 enableSIPSwitch = NSButton; 
                 enableSilenceSuppressionSwitch = NSButton; 
                 enableVideoSwitch = NSButton; 
-                externalAddressField = NSTextField; 
                 gatekeeperHostField = NSTextField; 
                 gatekeeperPhoneNumberField = NSTextField; 
                 gatekeeperUserAliasField = NSTextField; 
-                getExternalAddressButton = NSButton; 
                 h323AccountsPopUp = NSPopUpButton; 
                 internationalDialingPrefixField = NSTextField; 
                 locationsTableView = NSTableView; 
@@ -191,6 +188,7 @@
                 newLocationNameField = NSTextField; 
                 newLocationOKButton = NSButton; 
                 newLocationSheet = NSPanel; 
+                publicAddressField = NSTextField; 
                 removeSTUNServerButton = NSButton; 
                 sectionsTab = NSTabView; 
                 sipAccountsTab = NSTabView; 
@@ -208,10 +206,10 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {applyPreferences = id; revertPreferences = id; }; 
+            ACTIONS = {applyPreferences = id; toolbarItemAction = id; }; 
             CLASS = XMPreferencesWindowController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {applyButton = NSButton; buttonToolbarView = NSView; revertButton = NSButton; }; 
+            OUTLETS = {applyButton = NSButton; buttonToolbarView = NSView; }; 
             SUPERCLASS = NSWindowController; 
         }, 
         {

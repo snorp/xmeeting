@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.37 2008/11/18 07:56:06 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.38 2008/12/27 08:03:55 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -122,6 +122,7 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // Misc.
 - (void)_alertLocationName;
 - (void)_alertNoProtocolEnabled:(XMLocation *)location;
+- (void)_alertNoPublicAddress;
 
 @end
 
@@ -242,6 +243,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 {
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   
+  // Do not load the current location twice, as this might cause incorrect alerts on the screen.
+  locationLoaded = NO;
+  
   // replacing the locations with a fresh set
   [locations removeAllObjects];
   [locations addObjectsFromArray:[preferencesManager locations]];
@@ -263,7 +267,9 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   
   // update the GUI
   [locationsTableView reloadData];
-  [self _loadCurrentLocation];
+  if (locationLoaded == NO) {
+    [self _loadCurrentLocation];
+  }
 }
 
 - (void)savePreferences
@@ -289,6 +295,19 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
 - (void)becomeActiveModule
 {
   [[locationsTableView window] makeFirstResponder:locationsTableView];
+}
+
+- (BOOL)validateData
+{
+  if ([autoGetExternalAddressSwitch state] == NSOffState) {
+    NSString *publicAddress = [publicAddressField stringValue];
+    
+    if (!XMIsIPAddress(publicAddress)) {
+      [self _alertNoPublicAddress];
+      return NO;
+    }
+  }
+  return YES;
 }
 
 #pragma mark -
@@ -835,6 +854,15 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   unsigned bandwidth = [currentLocation bandwidthLimit];
   [self _setTag:bandwidth forPopUp:bandwidthLimitPopUp];
   
+  [stunServers release];
+  NSArray *servers = [currentLocation stunServers];
+  if ((NSObject *)servers == null) {
+    stunServers = nil;
+  } else {
+    stunServers = [servers mutableCopy];
+  }
+  [stunServersTable reloadData];
+  
   obj = [currentLocation publicAddress];
   if (obj == nil) { // this means that the external address is automatically picked
     state = NSOnState;
@@ -859,15 +887,6 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   }
   [autoGetExternalAddressSwitch setState:state];
   [autoGetExternalAddressSwitch setNeedsDisplay];
-  
-  [stunServers release];
-  NSArray *servers = [currentLocation stunServers];
-  if ((NSObject *)servers == null) {
-    stunServers = nil;
-  } else {
-    stunServers = [servers mutableCopy];
-  }
-  [stunServersTable reloadData];
   
   [self _setUnsignedInt:[currentLocation tcpPortBase] forTextField:minTCPPortField];
   [self _setUnsignedInt:[currentLocation tcpPortMax] forTextField:maxTCPPortField];
@@ -980,6 +999,8 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [self _validateVideoOrderUserInterface];
   
   sipProxyPasswordDidChange = NO;
+  
+  locationLoaded = YES;
 }
 
 - (void)_saveCurrentLocation
@@ -995,6 +1016,12 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   // saving the network section
   [currentLocation setBandwidthLimit:[self _extractTagFromPopUp:bandwidthLimitPopUp]];
   
+  NSArray *servers = stunServers;
+  if (servers == nil) {
+    servers = (NSArray *)[NSNull null];
+  }
+  [currentLocation setSTUNServers:servers];
+  
   obj = [publicAddressField stringValue];
   state = [autoGetExternalAddressSwitch state];
   if (state == NSMixedState) {
@@ -1003,12 +1030,6 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
     obj = nil;
   }
   [currentLocation setExternalAddress:(NSString *)obj];
-  
-  NSArray *servers = stunServers;
-  if (servers == nil) {
-    servers = (NSArray *)[NSNull null];
-  }
-  [currentLocation setSTUNServers:servers];
   
   [currentLocation setTCPPortBase:[self _extractUnsignedIntFromTextField:minTCPPortField]];
   [currentLocation setTCPPortMax:[self _extractUnsignedIntFromTextField:maxTCPPortField]];
@@ -1716,6 +1737,19 @@ NSString *XMKey_SIPAccountEnabledIdentifier = @"enabled";
   [alert setInformativeText:infoText];
   [infoText release];
   
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  
+  [alert runModal];
+  
+  [alert release];
+}
+
+- (void)_alertNoPublicAddress
+{
+  NSAlert *alert = [[NSAlert alloc] init];
+  
+  [alert setMessageText:NSLocalizedString(@"XM_LOCATION_PREFERENCES_NO_PUBLIC_ADDRESS", @"")];
   [alert setAlertStyle:NSWarningAlertStyle];
   [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
   
