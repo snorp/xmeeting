@@ -1,5 +1,5 @@
 /*
- * $Id: XMDebugPreferencesModule.m,v 1.1 2008/11/06 08:41:46 hfriederich Exp $
+ * $Id: XMDebugPreferencesModule.m,v 1.2 2008/12/27 08:04:38 hfriederich Exp $
  *
  * Copyright (c) 2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,7 +14,8 @@ NSString *XMKey_DebugPreferencesModuleIdentifier = @"XMeeting_DebugPreferencesMo
 
 @interface XMDebugPreferencesModule (PrivateMethods)
 
--(void)_chooseDebugFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)_chooseDebugFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)_alertNoDebugFilePath;
 
 @end
 
@@ -106,6 +107,18 @@ NSString *XMKey_DebugPreferencesModuleIdentifier = @"XMeeting_DebugPreferencesMo
 {
 }
 
+- (BOOL)validateData
+{
+  if ([generateDebugLogSwitch state] == NSOnState) {
+    NSString *path = [debugLogFilePathField stringValue];
+    if (path == nil || [path length] == 0) {
+      [self _alertNoDebugFilePath];
+      return NO;
+    }
+  }
+  return YES;
+}
+
 #pragma mark -
 #pragma mark Action & Delegate Methods
 
@@ -152,6 +165,20 @@ NSString *XMKey_DebugPreferencesModuleIdentifier = @"XMeeting_DebugPreferencesMo
     [debugLogFilePathField setStringValue:[sheet filename]];
     [self defaultAction:self];
   }
+}
+
+
+- (void)_alertNoDebugFilePath
+{
+  NSAlert *alert = [[NSAlert alloc] init];
+  
+  [alert setMessageText:NSLocalizedString(@"XM_DEBUG_PREFERENCES_NO_FILE_PATH", @"")];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  
+  [alert runModal];
+  
+  [alert release];
 }
 
 @end
