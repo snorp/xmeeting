@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.m,v 1.29 2008/11/04 23:12:35 hfriederich Exp $
+ * $Id: XMInfoModule.m,v 1.30 2008/12/27 08:06:47 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,7 +29,7 @@
 #define XM_SHOW_H323_DETAILS 1
 #define XM_SHOW_SIP_DETAILS 2
 
-#define XM_INFO_MODULE_DETAIL_STATUS_KEY @"XMeeting_InfoModuleDetailStatus"
+NSString *XMKey_InfoModuleDetailStatus = @"XMeeting_InfoModuleDetailStatus";
 
 @interface XMInfoModule (PrivateMethods)
 
@@ -90,7 +90,7 @@
   [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:) name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
   [notificationCenter addObserver:self selector:@selector(_updateProtocolStatus:) name:XMNotification_CallManagerDidChangeGatekeeperRegistrationStatus object:nil];
   
-  unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
+  unsigned detailStatus = [[NSUserDefaults standardUserDefaults] integerForKey:XMKey_InfoModuleDetailStatus];
   
   if (detailStatus & XM_SHOW_H323_DETAILS) {
     showH323Details = YES;
@@ -305,13 +305,13 @@
   
   if (interfaceCount == 0) {
     [ipAddressesField setStringValue:@""];
-    [ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+    [ipAddressStatusImage setImage:[NSImage imageNamed:@"status_red"]];
     
     addressExtraHeight = 0;
     [self resizeContentView];
     
     [natTypeField setStringValue:@""];
-    [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+    [natTypeStatusImage setImage:[NSImage imageNamed:@"status_red"]];
     
     return;
   }
@@ -349,7 +349,7 @@
   [ipAddressesField setStringValue:ipAddressString];
   [ipAddressesField setToolTip:ipAddressString];
   [ipAddressString release];
-  [ipAddressSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+  [ipAddressStatusImage setImage:[NSImage imageNamed:@"status_green"]];
   
   // Determining the NAT Type
   XMNATType natType = [utils natType];
@@ -357,11 +357,11 @@
   [natTypeField setStringValue:natTypeString];
   
   if (natType == XMNATType_Error || natType == XMNATType_BlockedNAT) {
-    [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+    [natTypeStatusImage setImage:[NSImage imageNamed:@"status_red"]];
   } else if (natType == XMNATType_SymmetricNAT || natType == XMNATType_SymmetricFirewall || natType == XMNATType_PartialBlockedNAT) {
-    [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_yellow"]];
+    [natTypeStatusImage setImage:[NSImage imageNamed:@"status_yellow"]];
   } else {
-    [natTypeSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+    [natTypeStatusImage setImage:[NSImage imageNamed:@"status_green"]];
   }
   
   [self resizeContentView];
@@ -383,23 +383,19 @@
   
   if ([activeLocation enableH323] == YES) {
     [h323StatusField setStringValue:NSLocalizedString(@"Online", @"")];
-    [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+    [h323StatusImage setImage:[NSImage imageNamed:@"status_green"]];
     
     if ([callManager isH323Enabled] == YES) {
       unsigned h323AccountTag = [activeLocation h323AccountTag];
-      NSString *terminalAlias = 0;
       if (h323AccountTag != 0) {
         XMH323Account *account = [preferencesManager h323AccountWithTag:h323AccountTag];
-        terminalAlias = [account terminalAlias1];
-      }
-      
-      if (terminalAlias != nil) {
+        NSString *terminalAlias = [account terminalAlias1];
         NSString *gatekeeper = [callManager gatekeeperName];
         
         if (gatekeeper != nil) {
           
           [gatekeeperField setStringValue:gatekeeper];
-          [gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+          [gatekeeperStatusImage setImage:[NSImage imageNamed:@"status_green"]];
           
           NSArray *aliases = [callManager terminalAliases];
           unsigned numAliases = [aliases count];
@@ -422,27 +418,27 @@
           }
         } else {
           [gatekeeperField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_REG_FAILURE", @"")];
-          [gatekeeperSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+          [gatekeeperStatusImage setImage:[NSImage imageNamed:@"status_red"]];
           [terminalAliasField setTextColor:[NSColor disabledControlTextColor]];
           [terminalAliasField setStringValue:terminalAlias];
         }
       } else {
         [gatekeeperField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
-        [gatekeeperSemaphoreView setImage:nil];
+        [gatekeeperStatusImage setImage:nil];
         [terminalAliasField setStringValue:@""];
       }
     } else {
       [h323StatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_PROTOCOL_FAILURE", @"")];
-      [h323StatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+      [h323StatusImage setImage:[NSImage imageNamed:@"status_red"]];
       [gatekeeperField setStringValue:@""];
-      [gatekeeperSemaphoreView setImage:nil];
+      [gatekeeperStatusImage setImage:nil];
       [terminalAliasField setStringValue:@""];
     }
   } else {
     [h323StatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_PROTOCOL", @"")];
-    [h323StatusSemaphoreView setImage:nil];
+    [h323StatusImage setImage:nil];
     [gatekeeperField setStringValue:@""];
-    [gatekeeperSemaphoreView setImage:nil];
+    [gatekeeperStatusImage setImage:nil];
     [terminalAliasField setStringValue:@""];
   }
   
@@ -465,7 +461,7 @@
   if ([activeLocation enableSIP] == YES) {
     if ([callManager isSIPEnabled] == YES) {
       [sipStatusField setStringValue:@"Online"];
-      [sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+      [sipStatusImage setImage:[NSImage imageNamed:@"status_green"]];
       
       NSArray *sipAccountTags = [activeLocation sipAccountTags];
       unsigned numSIPAccounts = [sipAccountTags count];
@@ -479,9 +475,9 @@
           if (i == 0) {
             [registrationField setStringValue:aor];
             if (okay) {
-              [registrationSemaphoreView setImage:[NSImage imageNamed:@"semaphore_green"]];
+              [registrationStatusImage setImage:[NSImage imageNamed:@"status_green"]];
             } else {
-              [registrationSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+              [registrationStatusImage setImage:[NSImage imageNamed:@"status_red"]];
             }
           } else {
             sipRegistrationsExtraHeight += XM_REGISTRATION_INFO_HEIGHT;
@@ -494,41 +490,35 @@
             [registrationViews addObject:textField];
             [textField release];
             
-            NSImageView *imageView = [self _copyImageView:registrationSemaphoreView];
+            NSImageView *imageView = [self _copyImageView:registrationStatusImage];
             frame = [imageView frame];
             frame.origin.y -= (i*XM_REGISTRATION_INFO_HEIGHT);
             [imageView setFrame:frame];
             [sipBox addSubview:imageView];
             if (okay) {
-              [imageView setImage:[NSImage imageNamed:@"semaphore_green"]];
+              [imageView setImage:[NSImage imageNamed:@"status_green"]];
             } else {
-              [imageView setImage:[NSImage imageNamed:@"semaphore_red"]];
+              [imageView setImage:[NSImage imageNamed:@"status_red"]];
             }
             [registrationViews addObject:imageView];
             [imageView release];
           }
         }
-      }
-      else
-      {
+      } else {
         [registrationField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_REG", @"")];
-        [registrationSemaphoreView setImage:nil];
+        [registrationStatusImage setImage:nil];
       }
-    }
-    else
-    {
+    } else {
       [sipStatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_PROTOCOL_FAILURE", @"")];
-      [sipStatusSemaphoreView setImage:[NSImage imageNamed:@"semaphore_red"]];
+      [sipStatusImage setImage:[NSImage imageNamed:@"status_red"]];
       [registrationField setStringValue:@""];
-      [registrationSemaphoreView setImage:nil];
+      [registrationStatusImage setImage:nil];
     }
-  }
-  else
-  {
+  } else {
     [sipStatusField setStringValue:NSLocalizedString(@"XM_INFO_MODULE_NO_PROTOCOL", @"")];
-    [sipStatusSemaphoreView setImage:nil];
+    [sipStatusImage setImage:nil];
     [registrationField setStringValue:@""];
-    [registrationSemaphoreView setImage:nil];
+    [registrationStatusImage setImage:nil];
   }
   
   // Now resize the SIP content view
@@ -562,7 +552,7 @@
     status += XM_SHOW_SIP_DETAILS;
   }
   
-  [[NSUserDefaults standardUserDefaults] setInteger:status forKey:XM_INFO_MODULE_DETAIL_STATUS_KEY];
+  [[NSUserDefaults standardUserDefaults] setInteger:status forKey:XMKey_InfoModuleDetailStatus];
 }
 
 - (NSTextField *)_copyTextField:(NSTextField *)_textField

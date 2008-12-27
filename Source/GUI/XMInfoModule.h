@@ -1,5 +1,5 @@
 /*
- * $Id: XMInfoModule.h,v 1.10 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMInfoModule.h,v 1.11 2008/12/27 08:06:47 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -21,17 +21,17 @@
   
   IBOutlet NSBox *networkBox;
   IBOutlet NSTextField *ipAddressesField;
-  IBOutlet NSImageView *ipAddressSemaphoreView;
+  IBOutlet NSImageView *ipAddressStatusImage;
   IBOutlet NSTextField *natTypeField;
-  IBOutlet NSImageView *natTypeSemaphoreView;
+  IBOutlet NSImageView *natTypeStatusImage;
   
   IBOutlet NSButton *h323Disclosure;
   IBOutlet NSBox *h323Box;
   IBOutlet NSTextField *h323Title;
   IBOutlet NSTextField *h323StatusField;
-  IBOutlet NSImageView *h323StatusSemaphoreView;
+  IBOutlet NSImageView *h323StatusImage;
   IBOutlet NSTextField *gatekeeperField;
-  IBOutlet NSImageView *gatekeeperSemaphoreView;
+  IBOutlet NSImageView *gatekeeperStatusImage;
   IBOutlet NSTextField *terminalAliasField;
   NSMutableArray *terminalAliasViews;
   
@@ -39,9 +39,9 @@
   IBOutlet NSBox *sipBox;
   IBOutlet NSTextField *sipTitle;
   IBOutlet NSTextField *sipStatusField;
-  IBOutlet NSImageView *sipStatusSemaphoreView;
+  IBOutlet NSImageView *sipStatusImage;
   IBOutlet NSTextField *registrationField;
-  IBOutlet NSImageView *registrationSemaphoreView;
+  IBOutlet NSImageView *registrationStatusImage;
   NSMutableArray *registrationViews;
   
   unsigned addressExtraHeight;
