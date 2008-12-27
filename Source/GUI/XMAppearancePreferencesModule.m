@@ -1,5 +1,5 @@
 /*
- * $Id: XMAppearancePreferencesModule.m,v 1.3 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMAppearancePreferencesModule.m,v 1.4 2008/12/27 08:01:37 hfriederich Exp $
  *
  * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -124,6 +124,11 @@
 
 - (void)becomeActiveModule
 {
+}
+
+- (BOOL)validateData
+{
+  return YES;
 }
 
 #pragma mark -

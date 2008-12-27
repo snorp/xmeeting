@@ -1,5 +1,5 @@
 /*
- * $Id: XMGeneralPreferencesModule.m,v 1.12 2008/11/06 08:41:46 hfriederich Exp $
+ * $Id: XMGeneralPreferencesModule.m,v 1.13 2008/12/27 08:01:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -94,6 +94,11 @@ NSString *XMKey_GeneralPreferencesModuleIdentifier = @"XMeeting_GeneralPreferenc
 
 - (void)becomeActiveModule
 {
+}
+
+- (BOOL)validateData
+{
+  return YES;
 }
 
 #pragma mark -

@@ -1,5 +1,5 @@
 /*
- * $Id: XMStatisticsModule.m,v 1.17 2008/11/04 23:12:35 hfriederich Exp $
+ * $Id: XMStatisticsModule.m,v 1.18 2008/12/27 08:01:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -113,11 +113,6 @@
 - (void)becomeInactiveModule
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (BOOL)isResizableWhenInSeparateWindow
-{
-  return NO;
 }
 
 #pragma mark User Interface Methods
