@@ -1,11 +1,12 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.32 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.33 2008/12/27 19:04:26 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
  * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
  */
 
+#import <Security/Security.h>
 #import "XMPreferencesManager.h"
 
 #import "XMH323Account.h"
@@ -68,8 +69,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 {
   static XMPreferencesManager *sharedInstance = nil;
   
-  if(!sharedInstance)
-  {
+  if (!sharedInstance) {
     sharedInstance = [[XMPreferencesManager alloc] _init];
     [sharedInstance _setup];
   }
@@ -80,10 +80,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 + (BOOL)doesHavePreferences
 {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  
   BOOL doesHavePreferences = [userDefaults boolForKey:XMKey_PreferencesManagerPreferencesAvailable];
   
-  // this is a one-time check, thus next time we return YES
+  // this is a one-time check, thus next time YES is returned
   [userDefaults setBool:YES forKey:XMKey_PreferencesManagerPreferencesAvailable];
   
   return doesHavePreferences;
@@ -143,8 +142,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   /* Register the default values of the preferences */
   NSMutableDictionary *defaultsDict = [[NSMutableDictionary alloc] init];
   
-  /* intermediate code to make sure that at least one location is present in UserDefaults */
-  /* later, this will be replaced by some sort of wizard popping up */
+  /* code to make sure that at least one location is present in UserDefaults */
   XMLocation *defaultLocation = [[XMLocation alloc] initWithName:NSLocalizedString(@"XM_DEFAULT_LOCATION_TEXT", @"")];
   NSDictionary *dict = [defaultLocation dictionaryRepresentationWithH323Accounts:nil sipAccounts:nil];
   NSArray *defaultLocationArray = [NSArray arrayWithObject:dict];
@@ -197,16 +195,12 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   [userDefaults registerDefaults:defaultsDict];
   [defaultsDict release];
   
-  /* getting the h323 accounts from UserDefaults */
+  // getting the h323 accounts from UserDefaults
   h323Accounts = [[NSMutableArray alloc] initWithCapacity:1];
   NSArray *dictArray = (NSArray *)[userDefaults objectForKey:XMKey_PreferencesManagerH323Accounts];
-  if(dictArray != nil)
-  {
+  if (dictArray != nil) {
     unsigned count = [dictArray count];
-    unsigned i;
-    
-    for(i = 0; i < count; i++)
-    {
+    for (unsigned i = 0; i < count; i++) {
       NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
       XMH323Account *h323Account = [[XMH323Account alloc] initWithDictionary:dict];
       [h323Accounts addObject:h323Account];
@@ -214,16 +208,12 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
     }
   }
   
-  /* getting the SIP accounts from UserDefaults */
+  // getting the SIP accounts from UserDefaults 
   sipAccounts = [[NSMutableArray alloc] initWithCapacity:1];
   dictArray = (NSArray *)[userDefaults objectForKey:XMKey_PreferencesManagerSIPAccounts];
-  if(dictArray != nil)
-  {
+  if (dictArray != nil) {
     unsigned count = [dictArray count];
-    unsigned i;
-    
-    for(i = 0; i < count; i++)
-    {
+    for (unsigned i = 0; i < count; i++) {
       NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
       XMSIPAccount *sipAccount = [[XMSIPAccount alloc] initWithDictionary:dict];
       [sipAccounts addObject:sipAccount];
@@ -231,16 +221,12 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
     }
   }
   
-  /* getting the locations list from UserDefaults */
+  // getting the locations list from UserDefaults
   locations = [[NSMutableArray alloc] initWithCapacity:1];
   dictArray = (NSArray *)[userDefaults objectForKey:XMKey_PreferencesManagerLocations];
-  if(dictArray != nil)
-  {
+  if (dictArray != nil) {
     unsigned count = [dictArray count];
-    unsigned i;
-    
-    for(i = 0; i < count; i++)
-    {
+    for (unsigned i = 0; i < count; i++) {
       NSDictionary *dict = (NSDictionary *)[dictArray objectAtIndex:i];
       XMLocation *location = [[XMLocation alloc] initWithDictionary:dict
                                                        h323Accounts:h323Accounts
@@ -250,55 +236,43 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
     }
   }
   
-  // since NSUserDefaults returns 0 if no value for the Key is found, we
-  // simply increase the stored value by one;
+  // since NSUserDefaults returns 0 if no value for the Key is found, 
+  // the value stored is increased by one
   int index = [userDefaults integerForKey:XMKey_PreferencesManagerActiveLocation];
-  if(index == 0)
-  {
+  if (index == 0) {
     activeLocation = 0;
-  }
-  else
-  {
+  } else {
     activeLocation = (unsigned)(index-1);
   }
   
   automaticallyAcceptIncomingCalls = [userDefaults boolForKey:XMKey_PreferencesManagerAutomaticallyAcceptIncomingCalls];
   
+  // enable the appropriate audio modules
   XMVideoManager *videoManager = [XMVideoManager sharedInstance];
   NSArray *disabledVideoModules = [self disabledVideoModules];
-  if(disabledVideoModules != nil)
-  {
-    unsigned i;
+  if (disabledVideoModules != nil) {
     unsigned count = [videoManager videoModuleCount];
-    
-    for(i = 0; i < count; i++)
-    {
+    for (unsigned i = 0; i < count; i++) {
       id<XMVideoModule> module = [videoManager videoModuleAtIndex:i];
       
       NSString *identifier = [module identifier];
-      if([disabledVideoModules containsObject:identifier])
-      {
+      if ([disabledVideoModules containsObject:identifier]) {
         [module setEnabled:NO];
       }
     }
   }
-  
   [self _setInitialAudioDevices];
   
-  if([videoManager inputDevices] != nil)
-  {
+  // init the video settings
+  if ([videoManager inputDevices] != nil) {
     [self _setInitialVideoInputDevice:nil];
-  }
-  else
-  {
+  } else {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_setInitialVideoInputDevice:)
                                                  name:XMNotification_VideoManagerDidUpdateInputDeviceList
                                                object:nil];
   }
-  
   NSDictionary *videoManagerSettings = [userDefaults objectForKey:XMKey_PreferencesManagerVideoManagerSettings];
-  if(videoManagerSettings != nil)
-  {
+  if (videoManagerSettings != nil) {
     [videoManager setSettings:videoManagerSettings];
   }
 }
@@ -324,46 +298,38 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   
   // post the notification
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-  [notificationCenter postNotificationName:XMNotification_PreferencesManagerDidChangePreferences
-                                    object:self
-                                  userInfo:nil];
-  [notificationCenter postNotificationName:XMNotification_PreferencesManagerDidChangeActiveLocation
-                                    object:self
-                                  userInfo:nil];
+  [notificationCenter postNotificationName:XMNotification_PreferencesManagerDidChangePreferences object:self userInfo:nil];
+  [notificationCenter postNotificationName:XMNotification_PreferencesManagerDidChangeActiveLocation object:self userInfo:nil];
 }
 
 - (void)synchronize
 {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   
-  /* storing the H.323 accounts */
+  // storing the H.323 accounts
   unsigned count = [h323Accounts count];
-  unsigned i;
-  NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count];
-  for(i = 0; i < count; i++)
-  {
+  NSMutableArray *dictArray = [[NSMutableArray alloc] initWithCapacity:count]; 
+  for (unsigned i = 0; i < count; i++) {
     XMH323Account *h323Account = (XMH323Account *)[h323Accounts objectAtIndex:i];
     [dictArray addObject:[h323Account dictionaryRepresentation]];
   }
   [userDefaults setObject:dictArray forKey:XMKey_PreferencesManagerH323Accounts];
   [dictArray release];
   
-  /* storing the SIP accounts */
+  // storing the SIP accounts
   count = [sipAccounts count];
   dictArray = [[NSMutableArray alloc] initWithCapacity:count];
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
     [dictArray addObject:[sipAccount dictionaryRepresentation]];
   }
   [userDefaults setObject:dictArray forKey:XMKey_PreferencesManagerSIPAccounts];
   [dictArray release];
   
-  /* storing the locations */
+  // storing the locations
   count = [locations count];
   dictArray = [[NSMutableArray alloc] initWithCapacity:count];
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
     [dictArray addObject:[location dictionaryRepresentationWithH323Accounts:h323Accounts sipAccounts:sipAccounts]];
   }
@@ -394,13 +360,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 - (XMH323Account *)h323AccountWithTag:(unsigned)tag
 {
   unsigned count = [h323Accounts count];
-  unsigned i;
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMH323Account *h323Account = (XMH323Account *)[h323Accounts objectAtIndex:i];
-    if([h323Account tag] == tag)
-    {
+    if ([h323Account tag] == tag) {
       return h323Account;
     }
   }
@@ -410,12 +372,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (NSArray *)h323Accounts
 {
-  unsigned count = [h323Accounts count];
-  unsigned i;
+  unsigned count = [h323Accounts count]; 
   NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     [arr addObject:[[h323Accounts objectAtIndex:i] copy]];
   }
   
@@ -424,24 +383,20 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (void)setH323Accounts:(NSArray *)accounts
 {
-  unsigned count = [accounts count];
-  unsigned i;
-  
-  if(accounts == nil)
-  {
+  // do nothing if accounts are nil
+  if (accounts == nil) {
     return;
   }
-		
+
   [h323Accounts removeAllObjects];
   
   Class h323AccountClass = [XMH323Account class];
   
-  for(i = 0; i < count; i++)
-  {
+  unsigned count = [accounts count];
+  for (unsigned i = 0; i < count; i++) {
     XMH323Account *h323Account = (XMH323Account *)[accounts objectAtIndex:i];
     
-    if([h323Account isKindOfClass:h323AccountClass])
-    {
+    if ([h323Account isKindOfClass:h323AccountClass]) {
       [h323Account savePassword];
       [h323Accounts addObject:[h323Account copy]];
     }
@@ -462,13 +417,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 - (XMSIPAccount *)sipAccountWithTag:(unsigned)tag
 {
   unsigned count = [sipAccounts count];
-  unsigned i;
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *sipAccount = (XMSIPAccount *)[sipAccounts objectAtIndex:i];
-    if([sipAccount tag] == tag)
-    {
+    if ([sipAccount tag] == tag) {
       return sipAccount;
     }
   }
@@ -479,11 +430,8 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 - (NSArray *)sipAccounts
 {
   unsigned count = [sipAccounts count];
-  unsigned i;
   NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     [arr addObject:[[sipAccounts objectAtIndex:i] copy]];
   }
   
@@ -492,11 +440,8 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (void)setSIPAccounts:(NSArray *)accounts
 {
-  unsigned count = [accounts count];
-  unsigned i;
-  
-  if(accounts == nil)
-  {
+  // do nothing if input is nil
+  if (accounts == nil) {
     return;
   }
   
@@ -504,12 +449,11 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   
   Class sipAccountClass = [XMSIPAccount class];
   
-  for(i = 0; i < count; i++)
-  {
+  unsigned count = [accounts count];
+  for (unsigned i = 0; i < count; i++) {
     XMSIPAccount *sipAccount = (XMSIPAccount *)[accounts objectAtIndex:i];
     
-    if([sipAccount isKindOfClass:sipAccountClass])
-    {
+    if ([sipAccount isKindOfClass:sipAccountClass]) {
       [sipAccount savePassword];
       [sipAccounts addObject:[sipAccount copy]];
     }
@@ -520,12 +464,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (NSArray *)locations
 {
-  unsigned count = [locations count];
-  unsigned i;
+  unsigned count = [locations count]; 
   NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     [arr addObject:[[locations objectAtIndex:i] copy]];
   }
   
@@ -535,26 +476,20 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 - (void)setLocations:(NSArray *)newLocations
 {
   unsigned count = [newLocations count];
-  unsigned i;
-  
   unsigned currentTag = [(XMLocation *)[locations objectAtIndex:activeLocation] tag];
   
-  if(count != 0)
-  {
+  if (count != 0) {
     [locations removeAllObjects];
     activeLocation = 0;
   }
   
   // we have also to determine the index of the actual location since this could have changed
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     XMLocation *location = (XMLocation *)[newLocations objectAtIndex:i];
     
-    if([location isKindOfClass:[XMLocation class]])
-    {
+    if ([location isKindOfClass:[XMLocation class]]) {
       [locations addObject:[location copy]];
-      if([location tag] == currentTag)
-      {
+      if ([location tag] == currentTag) {
         activeLocation = i;
       }
     }
@@ -565,31 +500,23 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   
   XMCallManager *callManager = [XMCallManager sharedInstance];
   
-  if([callManager doesAllowModifications])
-  {
+  if ([callManager doesAllowModifications]) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
     [location storeGlobalInformationsInSubsystem];
     [callManager setActivePreferences:location];
-  }
-  else
-  {
+  } else {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     
-    [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
-                               name:XMNotification_CallManagerDidClearCall object:nil];
-    [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
-                               name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+    [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:) name:XMNotification_CallManagerDidClearCall object:nil];
+    [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:) name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
   }
 }
 
 - (NSArray *)locationNames
 {
   unsigned count = [locations count];
-  unsigned i;
   NSMutableArray *arr = [[[NSMutableArray alloc] initWithCapacity:count] autorelease];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     [arr addObject:[(XMLocation *)[locations objectAtIndex:i] name]];
   }
   
@@ -603,8 +530,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (XMLocation *)activeLocation
 {
-  if(activeLocation == -1)
-  {
+  if (activeLocation == -1) {
     return nil;
   }
   return [locations objectAtIndex:activeLocation];
@@ -617,30 +543,22 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (void)activateLocationAtIndex:(unsigned)index
 {
-  if(activeLocation != index && index < [locations count])
-  {
+  if (activeLocation != index && index < [locations count]) {
     activeLocation = index;
 	
     // post the notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_PreferencesManagerDidChangeActiveLocation
-                                                        object:self
-                                                      userInfo:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:XMNotification_PreferencesManagerDidChangeActiveLocation object:self userInfo:nil];
 	
     XMCallManager *callManager = [XMCallManager sharedInstance];
-    if([callManager doesAllowModifications])
-    {
+    if ([callManager doesAllowModifications]) {
       XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
       [location storeGlobalInformationsInSubsystem];
       [callManager setActivePreferences:location];
-    }
-    else
-    {
+    } else {
       NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
       
-      [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
-                                 name:XMNotification_CallManagerDidClearCall object:nil];
-      [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:)
-                                 name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
+      [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:) name:XMNotification_CallManagerDidClearCall object:nil];
+      [notificationCenter addObserver:self selector:@selector(_updateCallManagerPreferences:) name:XMNotification_CallManagerDidEndSubsystemSetup object:nil];
     }
   }
 }
@@ -742,8 +660,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   UInt32 passwordLength;
   const char *passwordString;
   
-  if(serviceName == nil || accountName == nil)
-  {
+  if (serviceName == nil || accountName == nil) {
     return nil;
   }
   
@@ -762,7 +679,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
                                        (void **)&passwordString,
                                        NULL);
   
-  if(err != noErr)
+  if (err != noErr)
   {
     //NSLog(@"SecKeychainFindGenericPassword failed: %d", (int)err);
     return nil;
@@ -772,8 +689,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   
   err = SecKeychainItemFreeContent(NULL, (void *)passwordString);
   
-  if(err != noErr)
-  {
+  if (err != noErr) {
     NSLog(@"SecKeychainItemFreeContent failed: %d", (int)err);
   }
   
@@ -788,8 +704,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   const char *passwordString;
   SecKeychainItemRef keychainItem;
   
-  if(serviceName == nil || accountName == nil)
-  {
+  if (serviceName == nil || accountName == nil) {
     return;
   }
   
@@ -802,8 +717,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   UInt32 newPasswordLength = 0;
   const char *newPasswordString = NULL;
   
-  if(password != nil)
-  {
+  if (password != nil) {
     newPasswordLength = [password length];
     newPasswordString = [password cStringUsingEncoding:NSUTF8StringEncoding];
   }
@@ -817,31 +731,23 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
                                        &passwordLength,
                                        (void **)&passwordString,
                                        &keychainItem);
-  if(err == noErr)
-  {
-    if(newPasswordString == NULL)
-    {
+  if (err == noErr) {
+    if (newPasswordString == NULL) {
       // no password set, deleting the existing record
       err = SecKeychainItemDelete(keychainItem);
-      if(err != noErr)
-      {
+      if (err != noErr) {
         NSLog(@"SecKeychainItemDelete failed %d", (int)err);
       }
-    }
-    else if(strcmp(passwordString, newPasswordString) == 0)
-    {
+    } else if (strcmp(passwordString, newPasswordString) == 0) {
       // no need to modify pwd
       //NSLog(@"old pwd equal new pwd");
-    }
-    else
-    {
+    } else {
       // change the password
       err = SecKeychainItemModifyAttributesAndData(keychainItem,
                                                    NULL,
                                                    newPasswordLength,
                                                    newPasswordString);
-      if(err != noErr)
-      {
+      if (err != noErr) {
         NSLog(@"SecKeychainItemModifyAttributesAndData failed: %d", (int)err);
       }
     }
@@ -852,8 +758,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   // If we get here, the keychain has not yet stored a password for the service name and
   // account specified
   
-  if(newPasswordString == NULL)
-  {
+  if (newPasswordString == NULL) {
     return;
   }
   
@@ -866,8 +771,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
                                       newPasswordLength,
                                       (void *)newPasswordString,
                                       NULL);
-  if(err != noErr)
-  {
+  if (err != noErr) {
     NSLog(@"SecKeychainAddGenericPassword failed: %d", (int)err);
   }
 }
@@ -889,12 +793,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (void)setPreferredAudioOutputDevice:(NSString *)device
 {
-  if(device == nil)
-  {
+  if (device == nil) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferencesManagerPreferredAudioOutputDevice];
-  }
-  else
-  {
+  } else {
     [[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredAudioOutputDevice];
   }
 }
@@ -906,12 +807,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (void)setPreferredAudioInputDevice:(NSString *)device
 {
-  if(device == nil)
-  {
+  if (device == nil) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferencesManagerPreferredAudioInputDevice];
-  }
-  else
-  {
+  } else {
     [[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredAudioInputDevice];
   }
 }
@@ -920,8 +818,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 {
   NSArray *disabledVideoModules = [[NSUserDefaults standardUserDefaults] arrayForKey:XMKey_PreferencesManagerDisabledVideoModules];
   
-  if(disabledVideoModules == nil)
-  {
+  if (disabledVideoModules == nil) {
     return [NSArray array];
   }
   
@@ -932,26 +829,19 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 {
   XMVideoManager *videoManager = [XMVideoManager sharedInstance];
   
-  if(disabledVideoModules == nil)
-  {
+  if (disabledVideoModules == nil) {
     disabledVideoModules = [NSArray array];
   }
   
-  unsigned i;
   unsigned count = [videoManager videoModuleCount];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     id<XMVideoModule> module = [videoManager videoModuleAtIndex:i];
     
     NSString *identifier = [module identifier];
     
-    if([disabledVideoModules containsObject:identifier])
-    {
+    if ([disabledVideoModules containsObject:identifier]) {
       [module setEnabled:NO];
-    }
-    else
-    {
+    } else {
       [module setEnabled:YES];
     }
   }
@@ -966,12 +856,9 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 
 - (void)setPreferredVideoInputDevice:(NSString *)device
 {
-  if(device == nil)
-  {
+  if (device == nil) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
-  }
-  else
-  {
+  } else {
     [[NSUserDefaults standardUserDefaults] setObject:device forKey:XMKey_PreferencesManagerPreferredVideoInputDevice];
   }
 }
@@ -1023,19 +910,15 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   
   XMAudioManager *audioManager = [XMAudioManager sharedInstance];
   
-  if(preferredInputDevice != nil)
-  {
+  if (preferredInputDevice != nil) {
     NSArray *inputDevices = [audioManager inputDevices];
-    if([inputDevices containsObject:preferredInputDevice])
-    {
+    if ([inputDevices containsObject:preferredInputDevice]) {
       [audioManager setSelectedInputDevice:preferredInputDevice];
     }
   }
-  if(preferredOutputDevice != nil)
-  {
+  if (preferredOutputDevice != nil) {
     NSArray *outputDevices = [audioManager outputDevices];
-    if([outputDevices containsObject:preferredOutputDevice])
-    {
+    if ([outputDevices containsObject:preferredOutputDevice]) {
       [audioManager setSelectedOutputDevice:preferredOutputDevice];
     }
   }
@@ -1048,22 +931,17 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   
   NSString *device = [self preferredVideoInputDevice];
   
-  if(device == nil)
-  {
+  if (device == nil) {
     device = [devices objectAtIndex:0];
-  }
-  else
-  {
-    if(![devices containsObject:device])
-    {
+  } else {
+    if (![devices containsObject:device]) {
       device = [devices objectAtIndex:0];
     }
   }
   
   [videoManager setSelectedInputDevice:device];
   
-  if(notif != nil)
-  {
+  if (notif != nil) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:XMNotification_VideoManagerDidUpdateInputDeviceList object:nil];
   }
 }
@@ -1072,8 +950,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 {
   XMCallManager *callManager = [XMCallManager sharedInstance];
   
-  if([callManager doesAllowModifications])
-  {
+  if ([callManager doesAllowModifications]) {
     XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
     [location storeGlobalInformationsInSubsystem];
     [callManager setActivePreferences:location];
@@ -1088,8 +965,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
 - (void)_resetPasswords:(XMPasswordObjectType)type
 {
   unsigned count = [passwordObjects count];
-  unsigned i;
-  for (i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count; i++) {
     id<XMPasswordObject> obj = (id<XMPasswordObject>)[passwordObjects objectAtIndex:i];
     if ([obj type] == type) {
       [obj resetPassword];
