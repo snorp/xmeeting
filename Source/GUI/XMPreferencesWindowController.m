@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.15 2008/12/27 07:59:28 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.16 2009/01/03 20:07:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -12,10 +12,19 @@
 
 #import "XMLocationPreferencesModule.h"
 
+#import "XMSetupAssistantManager.h"
+
 NSString *XMKey_PreferencesNibName = @"Preferences";
 NSString *XMKey_PreferencesToolbar = @"XMeeting_PreferencesToolbar";
+NSString *XMKey_SimpleViewToolbarItemIdentifier = @"XMeeting_SimpleViewToolbarItemIdentifier";
 NSString *XMKey_ButtonToolbarItemIdentifier = @"XMeeting_ButtonToolbarItemIdentifier";
 NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTopLeftCorner";
+NSString *XMKey_PreferencesEditMode = @"XMeeting_PreferencesEditMode";
+
+enum {
+  XMPreferencesEditMode_Simple = 0,
+  XMPreferencesEditMode_Detailed = 1,
+};
 
 @interface XMPreferencesWindowController (PrivateMethods)
 
@@ -27,10 +36,12 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar;
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar;
 
+  // misc
 - (BOOL)_validateCurrentModule;
-
-  // modal sheets modal delegate methods
+- (void)_resizeWindowToSize:(NSSize)newSize contentView:(NSView *)newContentView;
+- (void)_alertUnsavedChanges;
 - (void)savePreferencesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)discardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 
 @end
 
@@ -74,6 +85,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 - (void)dealloc
 {
   [modules release];
+  [toolbar release];
   [identifiers release];
   [toolbarItems release];
   [emptyContentView release];
@@ -85,6 +97,14 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 {
   NSWindow *window = [self window];
   
+  // creating the simple view toolbar item
+  simpleViewToolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:XMKey_SimpleViewToolbarItemIdentifier];
+  [simpleViewToolbarItem setLabel:NSLocalizedString(@"XM_PREFERENCES_SIMPLE_VIEW", @"")];
+  [simpleViewToolbarItem setImage:[NSImage imageNamed:@"XMeeting"]];
+  [simpleViewToolbarItem setToolTip:NSLocalizedString(@"XM_PREFERENCES_SIMPLE_VIEW", @"")];
+  [simpleViewToolbarItem setTarget:self];
+  [simpleViewToolbarItem setAction:@selector(switchToSimpleView:)];
+  
   // creating the ButtonToolbarItem
   buttonToolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:XMKey_ButtonToolbarItemIdentifier];
   [buttonToolbarItem setView:buttonToolbarView];
@@ -93,32 +113,35 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   [buttonToolbarItem setMaxSize:size];
   
   // adding some additional items to the toolbar
+  [identifiers insertObject:XMKey_SimpleViewToolbarItemIdentifier atIndex:0];
+  [identifiers insertObject:NSToolbarSeparatorItemIdentifier atIndex:1];
   [identifiers addObject:NSToolbarFlexibleSpaceItemIdentifier];
   [identifiers addObject:NSToolbarSeparatorItemIdentifier];
   [identifiers addObject:XMKey_ButtonToolbarItemIdentifier];
   
-  
-  /* Now, setting up the toolbar */
+  // Setting up the toolbar
   toolbar = [[NSToolbar alloc] initWithIdentifier:XMKey_PreferencesToolbar];
   [toolbar setAllowsUserCustomization:NO];
   [toolbar setAutosavesConfiguration:NO];
   [toolbar setDelegate:self];
   
-  /* putting the first module on screen */
+  // putting the first module on screen 
   currentSelectedItem = [toolbarItems objectAtIndex:0];
   [toolbar setSelectedItemIdentifier:(NSString *)[identifiers objectAtIndex:0]];
   id<XMPreferencesModule> module = [modules objectAtIndex:0];
-  currentSelectedItemHeight = [module contentViewHeight];
   [window setContentView:[module contentView]];
   float windowWidth = [window frame].size.width;
-  [window setContentSize:NSMakeSize(windowWidth, currentSelectedItemHeight)];
+  [window setContentSize:NSMakeSize(windowWidth, [module contentViewHeight])];
   
-  /* linking the toolbar to the window */
+  // linking the toolbar to the window
   [window setToolbar:toolbar];
-  [toolbar release];
+  [window setShowsToolbarButton:NO];
   
-  /* making the apply button in the toolbar disabled */
+  // disable making the apply button in the toolbar
   [applyButton setEnabled:NO];
+  
+  // store the initial window width
+  initialWidth = [[window contentView] bounds].size.width;
 }
 
 #pragma mark -
@@ -128,23 +151,40 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 {
   NSWindow *window = [self window];
   
+  // prepare window content if window is not visible
   if (![window isVisible]) {
-    // we cause each module to reload its data so that the values are consistent
-    unsigned count = [modules count];
-    for (unsigned i = 0; i < count; i++) {
-      id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
-      [module loadPreferences];
+    
+    unsigned editMode = [[NSUserDefaults standardUserDefaults] integerForKey:XMKey_PreferencesEditMode];
+    
+    if (editMode == XMPreferencesEditMode_Simple) {
+      XMSetupAssistantManager *setupAssistantManager = [XMSetupAssistantManager sharedInstance];
       
-      if (i == 0) {
-        [[[self window] toolbar] setSelectedItemIdentifier:[module identifier]];
+      [toolbar setVisible:NO];
+      
+      [window setContentView:emptyContentView];
+      [window setContentSize:[setupAssistantManager contentViewSize]];
+      
+      [setupAssistantManager runEditAssistantInWindow:window];
+      
+    } else {
+      // each module has to reload its data so that the values are consistent
+      unsigned count = [modules count];
+      for (unsigned i = 0; i < count; i++) {
+        id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
+        [module loadPreferences];
+        
+        if (i == 0) {
+          [[window toolbar] setSelectedItemIdentifier:[module identifier]];
+        }
       }
+      
+      // show first module
+      [self toolbarItemAction:[toolbarItems objectAtIndex:0]];
+      
+      [applyButton setEnabled:NO];
+      [[self window] setDocumentEdited:NO];
+      preferencesHaveChanged = NO;
     }
-    
-    [self toolbarItemAction:[toolbarItems objectAtIndex:0]];
-    
-    [applyButton setEnabled:NO];
-    [[self window] setDocumentEdited:NO];
-    preferencesHaveChanged = NO;
     
     NSString *windowTopLeftCornerString = [[NSUserDefaults standardUserDefaults] stringForKey:XMKey_PreferencesWindowTopLeftCorner];
     if (windowTopLeftCornerString != nil) {
@@ -157,6 +197,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
       [window center];
     }
   }
+  
   [self showWindow:self];
 }
 
@@ -233,13 +274,16 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
+  if ([itemIdentifier isEqualToString:XMKey_SimpleViewToolbarItemIdentifier]) {
+    return simpleViewToolbarItem;
+  }
   if ([itemIdentifier isEqualToString:XMKey_ButtonToolbarItemIdentifier]) {
     return buttonToolbarItem;
   }
   
   unsigned index = [identifiers indexOfObject:itemIdentifier];
   if (index != NSNotFound) {
-    return (NSToolbarItem *)[toolbarItems objectAtIndex:index];
+    return (NSToolbarItem *)[toolbarItems objectAtIndex:index-2]; // index zero is simple view item, index one is separator
   }
   
   return nil;
@@ -269,6 +313,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
     return;
   }
   
+  // if module rejects validation, remain in module
   if (![self _validateCurrentModule]) {
     return;
   }
@@ -278,26 +323,73 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   unsigned index = [identifiers indexOfObject:identifier];
   if (index != NSNotFound) {
     NSWindow *window = [self window];
-    id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:index];
+    id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:index-2];
     NSView *contentView = [module contentView];
     
-    // adjusting the window's height
-    NSRect windowFrame = [window frame];
-    float newHeight = [module contentViewHeight];
-    float heightDifference = (newHeight - currentSelectedItemHeight);
-    windowFrame.origin.y = windowFrame.origin.y - heightDifference;
-    windowFrame.size.height = windowFrame.size.height + heightDifference;
-    
-    // removing the old view, then changing size, refresh the new view and finally adding the new content view
-    [window setContentView:emptyContentView];
-    [window setFrame:windowFrame display:YES animate:YES];
-    [window setContentView:contentView];
+    // resize the window
+    NSSize newSize = [[window contentView] bounds].size;
+    newSize.height = [module contentViewHeight];
+    [self _resizeWindowToSize:newSize contentView:contentView];
     
     [module becomeActiveModule];
     
     currentSelectedItem = item;
-    currentSelectedItemHeight = newHeight;
   }
+}
+
+- (IBAction)switchToSimpleView:(id)sender
+{
+  // ask the user before discarding unsaved changes
+  if (preferencesHaveChanged) {
+    [self _alertUnsavedChanges];
+    return;
+  }
+  
+  NSWindow *window = [self window];
+  XMSetupAssistantManager *setupAssistantManager = [XMSetupAssistantManager sharedInstance];
+  
+  // resize the window, hide the toolbar
+  [self _resizeWindowToSize:[setupAssistantManager contentViewSize] contentView:emptyContentView];
+  [toolbar setVisible:NO];
+  
+  // run the setup assistant in this window
+  [setupAssistantManager runEditAssistantInWindow:window];
+  
+  // store state in user defaults
+  [[NSUserDefaults standardUserDefaults] setInteger:XMPreferencesEditMode_Simple forKey:XMKey_PreferencesEditMode];
+}
+
+- (IBAction)switchToDetailedView:(id)sender
+{
+  NSWindow *window = [self window];
+  
+  // cause each module to reload its data so that the values are consistent
+  unsigned count = [modules count];
+  for (unsigned i = 0; i < count; i++) {
+    id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:i];
+    [module loadPreferences];
+  }
+  
+  [applyButton setEnabled:NO];
+  [[self window] setDocumentEdited:NO];
+  preferencesHaveChanged = NO;
+  
+  id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:0];
+  [toolbar setSelectedItemIdentifier:[module identifier]];
+  currentSelectedItem = [toolbarItems objectAtIndex:0];
+  
+  // show the toolbar again
+  [window setContentView:emptyContentView];
+  [toolbar setVisible:YES];
+  
+  // resize the window
+  NSSize newSize = NSMakeSize(initialWidth, [module contentViewHeight]);
+  [self _resizeWindowToSize:newSize contentView:[module contentView]];
+  
+  [module becomeActiveModule];
+  
+  // store state in user defaults
+  [[NSUserDefaults standardUserDefaults] setInteger:XMPreferencesEditMode_Detailed forKey:XMKey_PreferencesEditMode];
 }
 
 - (IBAction)applyPreferences:(id)sender
@@ -370,7 +462,7 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   if (currentSelectedItem != nil) {
     unsigned index = [identifiers indexOfObject:[currentSelectedItem itemIdentifier]];
     if (index != NSNotFound) { // should not happen
-      id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:index];
+      id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:index-2];
       if (![module validateData]) { // module rejected changes, don't change anything.
         [toolbar setSelectedItemIdentifier:[currentSelectedItem itemIdentifier]];
         return NO;
@@ -380,11 +472,46 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   return YES;
 }
 
+- (void)_resizeWindowToSize:(NSSize)newSize contentView:(NSView *)newContentView
+{
+  NSWindow *window = [self window];
+  NSRect windowFrame = [window frame];
+  NSSize oldSize = [[window contentView] bounds].size;
+  float widthDifference = (newSize.width - oldSize.width);
+  float heightDifference = (newSize.height - oldSize.height);
+  windowFrame.size.width = windowFrame.size.width + widthDifference;
+  windowFrame.origin.y = windowFrame.origin.y - heightDifference;
+  windowFrame.size.height = windowFrame.size.height + heightDifference;
+  
+  [window setContentView:emptyContentView];
+  [window setFrame:windowFrame display:YES animate:YES];
+  [window setContentView:newContentView];
+}
+
+- (void)_alertUnsavedChanges
+{
+  NSAlert *alert = [[NSAlert alloc] init];
+  
+  [alert setMessageText:NSLocalizedString(@"XM_PREFERENCES_UNSAVED_CHANGES", @"")];
+  [alert setInformativeText:@""];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
+  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"")];
+  
+  [alert beginSheetModalForWindow:[self window] 
+                    modalDelegate:self 
+                   didEndSelector:@selector(discardChangesAlertDidEnd:returnCode:contextInfo:)
+                      contextInfo:NULL];
+}
+
 #pragma mark -
 #pragma mark ModalDelegate Methods
 
 - (void)savePreferencesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
+  // memory cleanup
+  [alert release];
+  
   if (returnCode == NSAlertSecondButtonReturn) { //Abort
     return;
   }
@@ -399,6 +526,23 @@ NSString *XMKey_PreferencesWindowTopLeftCorner = @"XMeeting_PreferencesWindowTop
   
   // closing the window
   [[self window] orderOut:self];
+}
+
+- (void)discardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+  // memory cleanup
+  [alert release];
+  
+  if (returnCode == NSAlertSecondButtonReturn) { // Abort
+    [toolbar setSelectedItemIdentifier:[currentSelectedItem itemIdentifier]];
+    return;
+  }
+  
+  if (returnCode == NSAlertFirstButtonReturn) { // save the preferences
+    preferencesHaveChanged = NO;
+    
+    [self performSelector:@selector(switchToSimpleView:) withObject:self afterDelay:0.0];
+  }
 }
 
 @end

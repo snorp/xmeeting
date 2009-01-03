@@ -201,6 +201,8 @@
 /* Preferences Window */
 "XM_PREFERENCES_WINDOW_CLOSE" = "Do you want to save the changed preferences before closing?";
 "XM_PREFERENCES_NAME_SUGGESTION" = "Please choose another name.";
+"XM_PREFERENCES_SIMPLE_VIEW" = "Simple View";
+"XM_PREFERENCES_UNSAVED_CHANGES" = "There are unsaved changes which will be lost. Do you really want to continue?";
 "XM_GENERAL_PREFERENCES_NAME" = "General";
 "XM_GENERAL_PREFERENCES_TOOLTIP" = "General Purpose Preferences";
 "XM_GENERAL_PREFERENCES_CHOOSE" = "Choose";

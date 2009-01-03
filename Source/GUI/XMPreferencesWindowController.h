@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.h,v 1.9 2008/12/27 07:59:28 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.h,v 1.10 2009/01/03 20:07:38 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -29,12 +29,14 @@
   NSView *emptyContentView;
   
   NSToolbar *toolbar;
+  NSToolbarItem *simpleViewToolbarItem;
   NSToolbarItem *buttonToolbarItem;
   IBOutlet NSView *buttonToolbarView;
   IBOutlet NSButton *applyButton;
   
   NSToolbarItem *currentSelectedItem;
-  float currentSelectedItemHeight;
+  
+  float initialWidth;
 }
 
 /**
@@ -56,6 +58,8 @@
  * Action Methods
  **/
 - (IBAction)toolbarItemAction:(NSToolbarItem *)sender;
+- (IBAction)switchToSimpleView:(id)sender;
+- (IBAction)switchToDetailedView:(id)sender;
 - (IBAction)applyPreferences:(id)sender;
 
 @end
