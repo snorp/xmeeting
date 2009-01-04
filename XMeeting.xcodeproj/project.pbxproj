@@ -502,6 +502,7 @@
 		D1F6067C08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1F6067A08BBC5FC0005E9A0 /* LocalAudioVideoModule.nib */; };
 		D1F921A10EC2E00B008B4F86 /* XMDebugPreferencesModule.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1F9219F0EC2E00B008B4F86 /* XMDebugPreferencesModule.h */; };
 		D1F921A20EC2E00B008B4F86 /* XMDebugPreferencesModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D1F921A00EC2E00B008B4F86 /* XMDebugPreferencesModule.m */; };
+		D1FBC2720F10CA86006ACD69 /* XMSetupAssistantModules.m in Sources */ = {isa = PBXBuildFile; fileRef = D1FBC2710F10CA86006ACD69 /* XMSetupAssistantModules.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -1562,6 +1563,8 @@
 		D1F921A00EC2E00B008B4F86 /* XMDebugPreferencesModule.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = XMDebugPreferencesModule.m; path = Source/GUI/XMDebugPreferencesModule.m; sourceTree = "<group>"; };
 		D1FB991509D56F9C0078BBA9 /* XMAddressBookRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookRecord.h; path = Source/Application/XMAddressBookRecord.h; sourceTree = "<group>"; };
 		D1FB991609D56F9C0078BBA9 /* XMAddressBookRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookRecord.m; path = Source/Application/XMAddressBookRecord.m; sourceTree = "<group>"; };
+		D1FBC2700F10CA86006ACD69 /* XMSetupAssistantModules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSetupAssistantModules.h; path = Source/SetupAssistant/XMSetupAssistantModules.h; sourceTree = "<group>"; };
+		D1FBC2710F10CA86006ACD69 /* XMSetupAssistantModules.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMSetupAssistantModules.m; path = Source/SetupAssistant/XMSetupAssistantModules.m; sourceTree = "<group>"; };
 		D1FD475509B650D500EB517B /* XMSIPEndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMSIPEndPoint.h; path = Source/Framework/XMSIPEndPoint.h; sourceTree = "<group>"; };
 		D1FD475609B650D500EB517B /* XMSIPEndPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMSIPEndPoint.cpp; path = Source/Framework/XMSIPEndPoint.cpp; sourceTree = "<group>"; };
 		D1FD47CB09B6544B00EB517B /* sdp.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = sdp.cxx; sourceTree = "<group>"; };
@@ -3191,6 +3194,8 @@
 			children = (
 				D1EF074A0918B1B3008A8974 /* XMSetupAssistantManager.h */,
 				D1EF074B0918B1B3008A8974 /* XMSetupAssistantManager.m */,
+				D1FBC2700F10CA86006ACD69 /* XMSetupAssistantModules.h */,
+				D1FBC2710F10CA86006ACD69 /* XMSetupAssistantModules.m */,
 			);
 			name = "Setup Assistant";
 			sourceTree = "<group>";
@@ -3826,6 +3831,7 @@
 				D11C86F50EEF2FB3000F60B8 /* sipim.cxx in Sources */,
 				D11C87BB0EF26627000F60B8 /* rfc4103.cxx in Sources */,
 				D11C87BC0EF26627000F60B8 /* t140.cxx in Sources */,
+				D1FBC2720F10CA86006ACD69 /* XMSetupAssistantModules.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

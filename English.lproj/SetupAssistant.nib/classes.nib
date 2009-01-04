@@ -1,77 +1,82 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {
-                cancelAssistant = id; 
-                continueAssistant = id; 
-                continueNATSettings = id; 
-                getExternalAddress = id; 
-                goBackAssistant = id; 
-                protocolSwitchToggled = id; 
-                toggleAutoGetExternalAddress = id; 
-                toggleNATMethod = id; 
-                updateNATType = id; 
-            }; 
-            CLASS = XMSetupAssistantManager; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                automaticallyGetExternalAddressSwitch = NSButton; 
-                bandwidthLimitPopUp = NSPopUpButton; 
-                cancelButton = NSButton; 
-                contentBox = NSBox; 
-                continueButton = NSButton; 
-                continueNATSettingsButton = NSButton; 
-                cornerImage = NSImageView; 
-                enableH323Switch = NSButton; 
-                enableSIPSwitch = NSButton; 
-                enableVideoRadioButtons = NSMatrix; 
-                externalAddressField = NSTextField; 
-                flCompletedView = NSView; 
-                flGeneralSettingsView = NSView; 
-                flIntroductionView = NSView; 
-                flLocationView = NSView; 
-                flNATDetectionView = NSView; 
-                flNewLocationView = NSView; 
-                flProtocolsView = NSView; 
-                gatekeeperSettingsView = NSView; 
-                gkHostField = NSTextField; 
-                gkPasswordField = NSTextField; 
-                gkPhoneNumberField = NSTextField; 
-                gkUsernameField = NSTextField; 
-                goBackButton = NSButton; 
-                h323SettingsView = NSView; 
-                infoField = NSTextField; 
-                liCompletedView = NSView; 
-                liInfoView = NSView; 
-                locationNameField = NSTextField; 
-                locationRadioButtons = NSMatrix; 
-                natDetectionBox = NSBox; 
-                natDetectionProgressIndicator = NSProgressIndicator; 
-                natSettingsView = NSView; 
-                natTypeBox = NSBox; 
-                natTypeExplanationField = NSTextField; 
-                natTypeField = NSTextField; 
-                networkSettingsView = NSView; 
-                noneRadioButton = NSButton; 
-                registrarAuthUsernameField = NSTextField; 
-                registrarHostField = NSTextField; 
-                registrarPasswordField = NSTextField; 
-                registrarSettingsView = NSView; 
-                registrarUsernameField = NSTextField; 
-                sipSettingsView = NSView; 
-                stunServerField = NSComboBox; 
-                titleField = NSTextField; 
-                updateExternalAddressButton = NSButton; 
-                useGatekeeperRadioButtons = NSMatrix; 
-                useIPAddressTranslationRadioButton = NSButton; 
-                useRegistrarRadioButtons = NSMatrix; 
-                useSTUNRadioButton = NSButton; 
-                userNameField = NSTextField; 
-                videoSettingsView = NSView; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAEditIntroductionModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelAssistant</key>
+				<string>id</string>
+				<key>continueAssistant</key>
+				<string>id</string>
+				<key>continueNATSettings</key>
+				<string>id</string>
+				<key>getExternalAddress</key>
+				<string>id</string>
+				<key>goBackAssistant</key>
+				<string>id</string>
+				<key>protocolSwitchToggled</key>
+				<string>id</string>
+				<key>toggleAutoGetExternalAddress</key>
+				<string>id</string>
+				<key>toggleNATMethod</key>
+				<string>id</string>
+				<key>updateNATType</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMSetupAssistantManager</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>contentBox</key>
+				<string>NSBox</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>continueButton</key>
+				<string>NSButton</string>
+				<key>cornerImage</key>
+				<string>NSImageView</string>
+				<key>editIntroductionModule</key>
+				<string>id</string>
+				<key>generalSettingsModule</key>
+				<string>id</string>
+				<key>goBackButton</key>
+				<string>NSButton</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

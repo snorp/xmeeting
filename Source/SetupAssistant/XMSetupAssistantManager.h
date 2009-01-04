@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.9 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.10 2009/01/04 17:16:33 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -10,12 +10,43 @@
 #define __XM_SETUP_ASSISTANT_MANAGER_H__
 
 #import <Cocoa/Cocoa.h>
-
 #import "XMeeting.h"
 
 @class XMLocation;
 @class XMH323Account;
 @class XMSIPAccount;
+
+@protocol XMSetupAssistantData <NSObject>
+
+- (XMLocation *)location;
+- (NSArray *)h323Accounts;
+- (NSArray *)sipAccounts;
+
+@end
+
+@protocol XMSetupAssistantModule <NSObject>
+
+- (NSArray *)editKeys;
+- (BOOL)isActiveForData:(id<XMSetupAssistantData>)data;
+
+- (NSString *)title;
+- (BOOL)showTitle;
+- (NSView *)contentView;
+
+- (void)loadData:(id<XMSetupAssistantData>)data;
+- (void)saveData:(id<XMSetupAssistantData>)data;
+- (void)editData:(NSArray *)editKeys;
+
+@end
+
+@protocol XMSetupAssistantController <NSObject>
+
+- (id<XMSetupAssistantModule>)nextModule;
+- (id<XMSetupAssistantModule>)previousModule;
+- (BOOL)hasNextModule;
+- (BOOL)hasPreviousModule;
+
+@end
 
 /**
  * Keys that are understood when importing locations:
@@ -29,7 +60,7 @@
  * XMKey_SIPAccountPassword
  **/
 
-@interface XMSetupAssistantManager : NSWindowController {
+@interface XMSetupAssistantManager : NSWindowController <XMSetupAssistantData> {
 	
 @private
   int mode;
@@ -45,6 +76,8 @@
   NSObject *delegate;
   SEL didEndSelector;
   
+  IBOutlet NSView *contentView;
+  
   IBOutlet NSButton *continueButton;
   IBOutlet NSButton *goBackButton;
   IBOutlet NSButton *cancelButton;
@@ -53,7 +86,12 @@
   IBOutlet NSImageView *cornerImage;
   IBOutlet NSBox *contentBox;
   
-  IBOutlet NSView *flIntroductionView;
+  id<XMSetupAssistantController> controller;
+  
+  IBOutlet id<XMSetupAssistantModule> editIntroductionModule;
+  IBOutlet id<XMSetupAssistantModule> generalSettingsModule;
+  
+  /*IBOutlet NSView *flIntroductionView;
   IBOutlet NSView *flGeneralSettingsView;
   IBOutlet NSView *flLocationView;
   IBOutlet NSView *flNewLocationView;
@@ -70,10 +108,10 @@
   IBOutlet NSView *gatekeeperSettingsView;
   IBOutlet NSView *sipSettingsView;
   IBOutlet NSView *registrationSettingsView;
-  IBOutlet NSView *videoSettingsView;
+  IBOutlet NSView *videoSettingsView;*/
   
   // flGeneralSettings objects
-  IBOutlet NSTextField *userNameField;
+  /*IBOutlet NSTextField *userNameField;
   NSString *userName;
   
   // flLocation objects
@@ -130,11 +168,13 @@
   IBOutlet NSTextField *registrationPasswordField;
   
   // videoSettings objects
-  IBOutlet NSMatrix *enableVideoRadioButtons;
+  IBOutlet NSMatrix *enableVideoRadioButtons;*/
 
 }
 
 + (XMSetupAssistantManager *)sharedInstance;
+
+- (void)runEditAssistantInWindow:(NSWindow *)window;
 
 /**
  * Runs the assistant in the first application launch mode. When the
@@ -169,6 +209,8 @@
 									modalDelegate:(NSObject *)modalDelegate
 								   didEndSelector:(SEL)didEndSelector;
 
+- (NSSize)contentViewSize;
+
 // action methods
 - (IBAction)cancelAssistant:(id)sender;
 - (IBAction)continueAssistant:(id)sender;
@@ -185,6 +227,14 @@
 
 // Action methods for protocol activation
 - (IBAction)protocolSwitchToggled:(id)sender;
+
+@end
+
+@interface XMSAEditController : NSObject <XMSetupAssistantController> {
+  id<XMSetupAssistantModule> currentModule;
+}
+
++ (XMSAEditController *)sharedInstance;
 
 @end
 
