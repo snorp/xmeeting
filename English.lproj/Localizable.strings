@@ -241,6 +241,7 @@
 /* Setup Assistant */
 "XM_SETUP_ASSISTANT_CONTINUE" = "Continue";
 "XM_SETUP_ASSISTANT_FINISH" = "Finish";
+"XM_SETUP_ASSISTANT_NAME" = "XMeeting Setup Assistant";
 "XM_SETUP_ASSISTANT_DEFAULT_GK" = "<Default Gatekeeper>";
 "XM_SETUP_ASSISTANT_DEFAULT_REG" = "<Default Registrar>";
 "XM_SETUP_ASSISTANT_WELCOME" = "Welcome to XMeeting!";

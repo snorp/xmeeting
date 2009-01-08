@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.10 2009/01/04 17:16:33 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.11 2009/01/08 06:26:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -16,11 +16,28 @@
 @class XMH323Account;
 @class XMSIPAccount;
 
+/**
+ * List of attributes
+ **/
+extern NSString *XMAttribute_FirstLaunch;
+extern NSString *XMAttribute_PreferencesEdit;
+extern NSString *XMAttribute_LocationImport;
+extern NSString *XMAttribute_NewLocation;
+extern NSString *XMAttribute_EditLocation;
+
 @protocol XMSetupAssistantData <NSObject>
 
-- (XMLocation *)location;
+- (XMLocation *)currentLocation;
+- (NSArray *)locations;
 - (NSArray *)h323Accounts;
 - (NSArray *)sipAccounts;
+
+- (NSString *)username;
+- (void)setUsername:(NSString *)username;
+
+- (BOOL)hasAttribute:(NSString *)attribute;
+- (void)setAttribute:(NSString *)attribute;
+- (void)clearAttribute:(NSString *)attribute;
 
 @end
 
@@ -30,8 +47,10 @@
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data;
 
 - (NSString *)title;
-- (BOOL)showTitle;
+- (BOOL)showCornerImage;
 - (NSView *)contentView;
+
+- (BOOL)canSaveData;
 
 - (void)loadData:(id<XMSetupAssistantData>)data;
 - (void)saveData:(id<XMSetupAssistantData>)data;
@@ -45,6 +64,8 @@
 - (id<XMSetupAssistantModule>)previousModule;
 - (BOOL)hasNextModule;
 - (BOOL)hasPreviousModule;
+
+- (void)cancel;
 
 @end
 
@@ -63,33 +84,50 @@
 @interface XMSetupAssistantManager : NSWindowController <XMSetupAssistantData> {
 	
 @private
-  int mode;
-  int viewTag;
   
-  XMLocation *location;
+  NSArray *locations;
+  XMLocation *currentLocation;
   XMH323Account *h323Account;
   XMSIPAccount *sipAccount;
-  NSDictionary *locationImportData;
+  NSString *username;
+  /*NSDictionary *locationImportData;
   NSString *locationFilePath;
   unsigned currentKeysToAskIndex;
   NSWindow *modalWindow;
   NSObject *delegate;
-  SEL didEndSelector;
+  SEL didEndSelector;*/
+  
+  id<XMSetupAssistantController> controller;
+  id<XMSetupAssistantModule> currentModule;
+  
+  NSArray *editKeys;
+  NSMutableDictionary *attributes;
   
   IBOutlet NSView *contentView;
   
   IBOutlet NSButton *continueButton;
   IBOutlet NSButton *goBackButton;
   IBOutlet NSButton *cancelButton;
+  IBOutlet NSButton *detailedViewButton;
   
   IBOutlet NSTextField *titleField;
   IBOutlet NSImageView *cornerImage;
   IBOutlet NSBox *contentBox;
   
-  id<XMSetupAssistantController> controller;
+@public
+  IBOutlet id<XMSetupAssistantModule> generalSettingsModule;
+  IBOutlet id<XMSetupAssistantModule> locationModule;
+  IBOutlet id<XMSetupAssistantModule> newLocationModule;
+  IBOutlet id<XMSetupAssistantModule> networkModule;
+  IBOutlet id<XMSetupAssistantModule> protocolModule;
+  IBOutlet id<XMSetupAssistantModule> h323Module;
+  IBOutlet id<XMSetupAssistantModule> gatekeeperModule;
+  IBOutlet id<XMSetupAssistantModule> sipModule;
+  IBOutlet id<XMSetupAssistantModule> registrationModule;
+  IBOutlet id<XMSetupAssistantModule> videoModule;
   
   IBOutlet id<XMSetupAssistantModule> editIntroductionModule;
-  IBOutlet id<XMSetupAssistantModule> generalSettingsModule;
+  IBOutlet id<XMSetupAssistantModule> editDoneModule;
   
   /*IBOutlet NSView *flIntroductionView;
   IBOutlet NSView *flGeneralSettingsView;
@@ -211,30 +249,41 @@
 
 - (NSSize)contentViewSize;
 
+- (id<XMSetupAssistantController>)controller;
+- (id<XMSetupAssistantModule>)currentModule;
+
 // action methods
 - (IBAction)cancelAssistant:(id)sender;
 - (IBAction)continueAssistant:(id)sender;
 - (IBAction)goBackAssistant:(id)sender;
+- (IBAction)switchToDetailedView:(id)sender;
 
 // Action methods for NAT Detection
-- (IBAction)updateNATType:(id)sender;
-- (IBAction)continueNATSettings:(id)sender;
+//- (IBAction)updateNATType:(id)sender;
+//- (IBAction)continueNATSettings:(id)sender;
 
 // Action methods for NAT Traversal
-- (IBAction)toggleNATMethod:(id)sender;
-- (IBAction)getExternalAddress:(id)sender;
-- (IBAction)toggleAutoGetExternalAddress:(id)sender;
+//- (IBAction)toggleNATMethod:(id)sender;
+//- (IBAction)getExternalAddress:(id)sender;
+//- (IBAction)toggleAutoGetExternalAddress:(id)sender;
 
 // Action methods for protocol activation
-- (IBAction)protocolSwitchToggled:(id)sender;
+//- (IBAction)protocolSwitchToggled:(id)sender;
 
 @end
 
 @interface XMSAEditController : NSObject <XMSetupAssistantController> {
-  id<XMSetupAssistantModule> currentModule;
+  BOOL firstLocation;
+  unsigned state;
+  unsigned moduleIndex;
+  id<XMSetupAssistantModule> introductionModule;
+  id<XMSetupAssistantModule> generalModule;
+  NSArray *modules;
 }
 
-+ (XMSAEditController *)sharedInstance;
+- (id)initWithSetupAssistant:(XMSetupAssistantManager *)setupAssistant;
+
+- (void)continueAssistant;
 
 @end
 

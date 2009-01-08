@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.20 2009/01/04 17:16:33 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.21 2009/01/08 06:26:49 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,6 +15,12 @@
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
 #import "XMApplicationFunctions.h"
+
+NSString *XMAttribute_FirstLaunch = @"FirstLaunch";
+NSString *XMAttribute_PreferencesEdit = @"PreferencesEdit";
+NSString *XMAttribute_LocationImport = @"LocationImport";
+NSString *XMAttribute_NewLocation = @"NewLocation";
+NSString *XMAttribute_EditLocation = @"EditLocation";
 
 #define XM_QUIT_APPLICATION UINT_MAX
 
@@ -62,12 +68,10 @@
 - (id)_init;
 - (void)_cleanup;
 
+- (void)_loadModule:(id<XMSetupAssistantModule>)module;
 - (void)_setupButtons;
 
-- (void)_setTitle:(NSString *)title;
-- (void)_setShowCornerImage:(BOOL)flag;
-
-- (void)_showNextViewForFirstApplicationLaunchMode;
+/*- (void)_showNextViewForFirstApplicationLaunchMode;
 - (void)_showPreviousViewForFirstApplicationLaunchMode;
 - (void)_returnFromFirstApplicationLaunchAssistant:(int)returnCode;
 
@@ -143,7 +147,7 @@
 
 - (void)_validateSTUNUserInterface;
 - (void)_validateAddressTranslationUserInterface;
-- (void)_validateExternalAddressUserInterface;
+- (void)_validateExternalAddressUserInterface;*/
 
 @end
 
@@ -175,34 +179,35 @@ static XMSetupAssistantManager *sharedInstance = nil;
 {
   self = [super initWithWindowNibName:XMKey_SetupAssistantNibName owner:self];
   
-  /*mode = XM_NO_MODE;
-  viewTag = XM_NO_VIEW_TAG;
-  
-  location = nil;
+  locations = [[[XMPreferencesManager sharedInstance] locations] copy];
+  currentLocation = nil;
   h323Account = nil;
   sipAccount = nil;
-  locationImportData = nil;
-  currentKeysToAskIndex = 0;
+  username = nil;
   
-  userName = nil;*/
+  editKeys = [[NSArray alloc] init];
+  attributes = [[NSMutableDictionary alloc] initWithCapacity:8];
   
   return self;
 }
 
 - (void)_cleanup
 {
-  if (location != nil) {
-    [location release];
-    location = nil;
-  }
-  if (locationImportData != nil) {
-    [locationImportData release];
-    locationImportData = nil;
-  }
-  if (locationFilePath != nil) {
-    [locationFilePath release];
-    locationFilePath = nil;
-  }
+  [locations release];
+  locations = nil;
+  
+  [currentLocation release];
+  currentLocation = nil;
+  
+  [controller release];
+  controller = nil;
+  
+  currentModule = nil; // never retained
+  
+  [editKeys release];
+  editKeys = nil;
+  [attributes release];
+  attributes = nil;
 }
 
 - (void)dealloc
@@ -218,24 +223,22 @@ static XMSetupAssistantManager *sharedInstance = nil;
   // trigger loading of the nib file if needed
   [self window];
   
-  id<XMSetupAssistantModule> module = editIntroductionModule;
-  if ([module showTitle]) {
-    [titleField setStringValue:[module title]];
-    [cornerImage setHidden:NO];
-  } else {
-    [titleField setStringValue:@""];
-    [cornerImage setHidden:YES];
-  }
-  [contentBox setContentView:[module contentView]];
+  [controller release];
+  controller = [[XMSAEditController alloc] initWithSetupAssistant:self];
+  [attributes removeAllObjects];
+  [self setAttribute:XMAttribute_PreferencesEdit];
+  
+  [self continueAssistant:self];
   
   [displayWindow setContentView:contentView];
+  [detailedViewButton setHidden:NO];
 }
 
 - (void)runFirstApplicationLaunchAssistantWithDelegate:(NSObject *)theDelegate
                     didEndSelector:(SEL)theDidEndSelector
 {
-  delegate = theDelegate;
-  didEndSelector = theDidEndSelector;
+  //delegate = theDelegate;
+  //didEndSelector = theDidEndSelector;
   
   XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
   
@@ -253,22 +256,22 @@ static XMSetupAssistantManager *sharedInstance = nil;
   //[self _setupButtons];
   
   // creating an empty location
-  location = (XMLocation *)[[[preferencesManager locations] objectAtIndex:0] retain];
+  currentLocation = (XMLocation *)[[[preferencesManager locations] objectAtIndex:0] retain];
   h323Account = [[XMH323Account alloc] init];
   [h323Account setName:NSLocalizedString(@"XM_SETUP_ASSISTANT_DEFAULT_GK", @"")];
   sipAccount = [[XMSIPAccount alloc] init];
   [sipAccount setName:NSLocalizedString(@"XM_SETUP_ASSISTANT_DEFAULT_REG", @"")];
   
-  currentKeysToAskIndex = 0;
+  //currentKeysToAskIndex = 0;
   
   // preparing the general (non-location) settings
   //userName = [[preferencesManager userName] retain];
   
   // changing some default settings of the location
-  [location setEnableVideo:YES];
-  [location setBandwidthLimit:512000];
-  [location setEnableH323:YES];
-  [location setEnableSIP:YES];
+  [currentLocation setEnableVideo:YES];
+  [currentLocation setBandwidthLimit:512000];
+  [currentLocation setEnableH323:YES];
+  [currentLocation setEnableSIP:YES];
   //[location setSIPAccountTag:[sipAccount tag]];
   //[location setSIPProxyMode:XMSIPProxyMode_UseSIPAccount];
   
@@ -319,47 +322,82 @@ static XMSetupAssistantManager *sharedInstance = nil;
   return [contentView bounds].size;
 }
 
+- (id<XMSetupAssistantController>)controller
+{
+  return controller;
+}
+
+- (id<XMSetupAssistantModule>)currentModule
+{
+  return currentModule;
+}
+
 #pragma mark Action Methods
 
 - (IBAction)cancelAssistant:(id)sender
 {
-  /*if (mode == XM_FIRST_APPLICATION_LAUNCH_MODE ||
-     mode == XM_FIRST_APPLICATION_LAUNCH_IMPORT_LOCATIONS_MODE)
-  {
-    [self _returnFromFirstApplicationLaunchAssistant:NSRunAbortedResponse];
+  if (controller != nil) {
+    [controller cancel];
   }
-  else
-  {
-    [self close];
-    [NSApp endSheet:[self window]];
-    
-    [self _returnFromLocationImportAssistant:NSRunAbortedResponse];
-  }*/
-  [[XMPreferencesWindowController sharedInstance] switchToDetailedView:sender];
 }
 
 - (IBAction)continueAssistant:(id)sender
 {
-  /*if (mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
-  {
-    [self _showNextViewForFirstApplicationLaunchMode];
+  if (currentModule != nil && ![currentModule canSaveData]) {
+    NSBeep();
+    return;
   }
-  else
-  {
-    [self _showNextViewForImportLocationModes];
-  }*/
+  [currentModule saveData:self];
+  
+  if (controller != nil) {
+    // loop until a 'valid' module is found
+    int counter = 0;
+    while (counter < 1000) { // avoid infinite loops
+      id<XMSetupAssistantModule> module = [controller nextModule];
+      if (module == nil) { // logic error
+        NSBeep();
+        return;
+      }
+      if ([module isActiveForData:self]) {
+        [self _loadModule:module];
+        [self _setupButtons];
+        break;
+      }
+      counter++;
+    }
+  }
 }
 
 - (IBAction)goBackAssistant:(id)sender
 {
-  /*if (mode == XM_FIRST_APPLICATION_LAUNCH_MODE)
-  {
-    [self _showPreviousViewForFirstApplicationLaunchMode];
+  if (currentModule != nil && ![currentModule canSaveData]) {
+    NSBeep();
+    return;
   }
-  else
-  {
-    [self _showPreviousViewForImportLocationModes];
-  }*/
+  [currentModule saveData:self];
+  
+  if (controller != nil) {
+    // loop until a 'valid' module is found
+    int counter = 0;
+    while(counter < 1000) {
+      id<XMSetupAssistantModule> module = [controller previousModule];
+      if (module == nil) { // logic error
+        NSBeep();
+        return;
+      }
+      if ([module isActiveForData:self]) {
+        [self _loadModule:module];
+        [self _setupButtons];
+        break;
+      }
+      counter++;
+    }
+  }
+}
+
+- (IBAction)switchToDetailedView:(id)sender
+{
+  [[XMPreferencesWindowController sharedInstance] switchToDetailedView:sender];
 }
 
 - (IBAction)updateNATType:(id)sender
@@ -510,60 +548,30 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 #pragma mark Private Methods
 
+- (void)_loadModule:(id<XMSetupAssistantModule>)module
+{
+  [module loadData:self];
+  
+  [titleField setStringValue:[module title]];
+  [cornerImage setHidden:![module showCornerImage]];
+  [contentBox setContentView:[module contentView]];
+  
+  // save reference to module
+  currentModule = module;
+  
+  [module editData:editKeys];
+}
+
 - (void)_setupButtons
 {
-  /*BOOL isContinueButton = YES;
-  BOOL enableGoBackButton = YES;
-  
-  switch(viewTag)
-  {
-    case XM_FL_INTRODUCTION_VIEW_TAG:
-      enableGoBackButton = NO;
-      break;
-    case XM_LI_INFO_VIEW_TAG:
-      if (mode == XM_IMPORT_LOCATIONS_MODE)
-      {
-        if (currentKeysToAskIndex == 0)
-        {
-          enableGoBackButton = NO;
-        }
-      }
-      break;
-    case XM_FL_COMPLETED_VIEW_TAG:
-    case XM_LI_COMPLETED_VIEW_TAG:
-      isContinueButton = NO;
-      break;
-    default:
-      break;
-  }
-  
-  if ([contentBox contentView] == flNATDetectionView)
-  {
-    enableGoBackButton = NO;
-  }
-  
-  if (isContinueButton == YES)
-  {
+  if ([controller hasNextModule]) {
     [continueButton setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_CONTINUE", @"")];
     [continueButton setKeyEquivalent:@""];
-  }
-  else
-  {
+  } else {
     [continueButton setTitle:NSLocalizedString(@"XM_SETUP_ASSISTANT_FINISH", @"")];
     [continueButton setKeyEquivalent:@"\r"];
   }
-  
-  [goBackButton setEnabled:enableGoBackButton];*/
-}
-
-- (void)_setTitle:(NSString *)title
-{
-  //[titleField setStringValue:title];
-}
-
-- (void)_setShowCornerImage:(BOOL)flag
-{
-  //[cornerImage setHidden:!flag];
+  [goBackButton setEnabled:[controller hasPreviousModule]];
 }
 
 - (void)_showNextViewForFirstApplicationLaunchMode
@@ -2578,6 +2586,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
   [publicAddressField setTextColor:textColor];*/
 }
 
+- (XMLocation *)currentLocation
+{
+  return nil;
+}
+
+- (NSArray *)locations
+{
+  return locations;
+}
+
 - (NSArray *)sipAccounts
 {
   return [NSArray array];
@@ -2588,23 +2606,39 @@ static XMSetupAssistantManager *sharedInstance = nil;
   return [NSArray array];
 }
 
-- (XMLocation *)location
+- (NSString *)username
 {
-  return nil;
+  if (username == nil) {
+    username = [[[XMPreferencesManager sharedInstance] userName] retain];
+  }
+  return username;
+}
+
+- (void)setUsername:(NSString *)newUsername
+{
+  NSString *old = username;
+  username = [newUsername retain];
+  [old release];
+}
+
+- (BOOL)hasAttribute:(NSString *)attribute
+{
+  return ([attributes objectForKey:attribute] != nil) ? YES : NO;
+}
+
+- (void)setAttribute:(NSString *)attribute
+{
+  [attributes setObject:attribute forKey:attribute];
+}
+
+- (void)clearAttribute:(NSString *)attribute
+{
+  [attributes removeObjectForKey:attribute];
 }
 
 @end
 
 @implementation XMSAEditController
-
-+ (XMSAEditController *)sharedInstance
-{
-  static XMSAEditController *sharedInstance = nil;
-  if (sharedInstance == nil) {
-    sharedInstance = [[XMSAEditController alloc] _init];
-  }
-  return sharedInstance;
-}
 
 - (id)init
 {
@@ -2613,12 +2647,106 @@ static XMSetupAssistantManager *sharedInstance = nil;
   return nil;
 }
 
-- (id)_init
+- (id)initWithSetupAssistant:(XMSetupAssistantManager *)setupAssistant
 {
-  currentModule = nil;  
+  firstLocation = YES;
+  state = 0;
+  moduleIndex = UINT_MAX;
+  introductionModule = [setupAssistant->editIntroductionModule retain];
+  generalModule = [setupAssistant->generalSettingsModule retain];
+  modules = [[NSArray alloc] initWithObjects:setupAssistant->locationModule, setupAssistant->newLocationModule, 
+                                             setupAssistant->networkModule, setupAssistant->protocolModule,
+                                             setupAssistant->h323Module, setupAssistant->gatekeeperModule,
+                                             setupAssistant->sipModule, setupAssistant->registrationModule,
+                                             setupAssistant->videoModule, setupAssistant->editDoneModule, nil];
+  
   return self;
 }
 
+- (void)dealloc
+{
+  [introductionModule release];
+  [generalModule release];
+  [modules release];
+  
+  [super dealloc];
+}
 
+- (id<XMSetupAssistantModule>)nextModule
+{
+  if (state == 0) { // first run, show introduction module
+    state = 1;
+    return introductionModule;
+  } else if (state == 1) { // show general module next
+    state = 2;
+    moduleIndex = UINT_MAX;
+    return generalModule;
+  } else if (state >= 2) { // use modules from the array
+    state = 3;
+    moduleIndex++;
+    if (moduleIndex == [modules count]) {
+      NSLog(@"DONE!!!");
+      moduleIndex--;
+    }
+    return (id<XMSetupAssistantModule>)[modules objectAtIndex:moduleIndex];
+  }
+  return nil; // error
+}
+
+- (id<XMSetupAssistantModule>)previousModule
+{
+  if (state == 2) { // show introduction module again
+    state = 1;
+    return introductionModule;
+  } else if (state == 3) {
+    if (moduleIndex == 0 && firstLocation == YES) { // show general module again
+      state = 2;
+      moduleIndex = UINT_MAX;
+      return generalModule;
+    }
+    moduleIndex--;
+    return (id<XMSetupAssistantModule>)[modules objectAtIndex:moduleIndex];
+  }
+  return nil; // error
+}
+
+- (BOOL)hasNextModule
+{
+  if (state <= 2) {
+    return YES;
+  }
+  return moduleIndex < ([modules count]-1) ? YES : NO;
+}
+
+- (BOOL)hasPreviousModule
+{
+  if (state < 2) { // introduction module
+    return NO;
+  } else if (state == 2) { // general module
+    return YES;
+  } else if (firstLocation == YES) { // allowed to go back
+    return YES;
+  }
+  return moduleIndex > 0 ? YES : NO;
+}
+
+- (void)cancel
+{
+}
+
+- (void)continueAssistant
+{
+  if (state >= 2 && moduleIndex == [modules count]-1) {
+    XMSetupAssistantManager *manager = [XMSetupAssistantManager sharedInstance];
+    firstLocation = NO;
+    moduleIndex = UINT_MAX;
+    
+    // clear some attributes
+    [manager clearAttribute:XMAttribute_NewLocation];
+    [manager clearAttribute:XMAttribute_EditLocation];
+    
+    [manager continueAssistant:self];
+  }
+}
 
 @end

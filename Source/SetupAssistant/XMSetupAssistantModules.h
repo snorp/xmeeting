@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantModules.h,v 1.1 2009/01/04 17:16:33 hfriederich Exp $
+ * $Id: XMSetupAssistantModules.h,v 1.2 2009/01/08 06:26:49 hfriederich Exp $
  *
  * Copyright (c) 2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -14,20 +14,14 @@
 
 #import "XMSetupAssistantManager.h"
 
-@interface XMSAEditIntroductionModule : NSObject <XMSetupAssistantModule> {
-  
-  @private
-  
-  IBOutlet NSView *contentView;
-}
-
-@end
+#pragma mark -
+#pragma mark General
 
 @interface XMSAGeneralModule : NSObject <XMSetupAssistantModule> {
   
   @private
-  
   IBOutlet NSView *contentView;
+  IBOutlet NSTextField *nameField;
 }
 
 @end
@@ -35,9 +29,101 @@
 @interface XMSALocationModule : NSObject <XMSetupAssistantModule> {
 
   @private
+  IBOutlet NSView *contentView;
+  IBOutlet NSMatrix *locationRadioButtons;
+  IBOutlet NSTableView *locationsTable;
+}
+
+- (IBAction)radioButtonAction:(id)sender;
+
+@end
+
+@interface XMSANewLocationModule : NSObject <XMSetupAssistantModule> {
   
+  @private
+  IBOutlet NSView *contentView;
+  IBOutlet NSTextField *nameField;
+}
+
+@end
+
+@interface XMSANetworkModule : NSObject <XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+  IBOutlet NSPopUpButton *bandwidthLimitPopUp;
+}
+
+@end
+
+@interface XMSAProtocolModule : NSObject <XMSetupAssistantModule> {
+ 
+  @private
+  IBOutlet NSView *contentView;
+  IBOutlet NSButton *enableH323Switch;
+  IBOutlet NSButton *enableSIPSwitch;
+}
+
+@end
+
+@interface XMSAH323Module : NSObject <XMSetupAssistantModule> {
+  
+  @private
   IBOutlet NSView *contentView;
 }
+
+@end
+
+@interface XMSAGatekeeperModule : NSObject <XMSetupAssistantModule> {
+ 
+  @private
+  IBOutlet NSView *contentView;
+}
+
+@end
+
+@interface XMSASIPModule : NSObject <XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+}
+
+@end
+
+@interface XMSARegistrationModule : NSObject <XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+}
+
+@end
+
+@interface XMSAVideoModule : NSObject <XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+}
+
+@end
+
+#pragma mark -
+#pragma mark Edit Mode
+
+@interface XMSAEditIntroductionModule : NSObject <XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+}
+
+@end
+
+@interface XMSAEditDoneModule : NSObject<XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+}
+
+- (IBAction)continueAssistant:(id)sender;
 
 @end
 
