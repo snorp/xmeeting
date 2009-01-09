@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.11 2009/01/08 06:26:49 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.12 2009/01/09 08:08:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -24,20 +24,25 @@ extern NSString *XMAttribute_PreferencesEdit;
 extern NSString *XMAttribute_LocationImport;
 extern NSString *XMAttribute_NewLocation;
 extern NSString *XMAttribute_EditLocation;
+extern NSString *XMAttribute_UseGatekeeper;
+extern NSString *XMAttribute_UseSIPRegistrar;
 
 @protocol XMSetupAssistantData <NSObject>
 
-- (XMLocation *)currentLocation;
 - (NSArray *)locations;
 - (NSArray *)h323Accounts;
 - (NSArray *)sipAccounts;
 
-- (NSString *)username;
-- (void)setUsername:(NSString *)username;
-
 - (BOOL)hasAttribute:(NSString *)attribute;
 - (void)setAttribute:(NSString *)attribute;
 - (void)clearAttribute:(NSString *)attribute;
+
+- (XMLocation *)currentLocation;
+- (void)setCurrentLocation:(XMLocation *)location;
+- (XMLocation *)createLocation;
+
+- (NSString *)username;
+- (void)setUsername:(NSString *)username;
 
 @end
 
@@ -46,7 +51,7 @@ extern NSString *XMAttribute_EditLocation;
 - (NSArray *)editKeys;
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data;
 
-- (NSString *)title;
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data;
 - (BOOL)showCornerImage;
 - (NSView *)contentView;
 
@@ -86,6 +91,8 @@ extern NSString *XMAttribute_EditLocation;
 @private
   
   NSArray *locations;
+  NSArray *h323Accounts;
+  NSArray *sipAccounts;
   XMLocation *currentLocation;
   XMH323Account *h323Account;
   XMSIPAccount *sipAccount;
@@ -213,6 +220,7 @@ extern NSString *XMAttribute_EditLocation;
 + (XMSetupAssistantManager *)sharedInstance;
 
 - (void)runEditAssistantInWindow:(NSWindow *)window;
+- (void)abortEditAssistant;
 
 /**
  * Runs the assistant in the first application launch mode. When the
@@ -251,6 +259,11 @@ extern NSString *XMAttribute_EditLocation;
 
 - (id<XMSetupAssistantController>)controller;
 - (id<XMSetupAssistantModule>)currentModule;
+
+- (void)setEditKeys:(NSArray *)editKeys;
+- (void)addLocation:(XMLocation *)location;
+
+- (void)setButtonsEnabled:(BOOL)enable;
 
 // action methods
 - (IBAction)cancelAssistant:(id)sender;

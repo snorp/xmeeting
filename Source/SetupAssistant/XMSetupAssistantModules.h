@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantModules.h,v 1.2 2009/01/08 06:26:49 hfriederich Exp $
+ * $Id: XMSetupAssistantModules.h,v 1.3 2009/01/09 08:08:21 hfriederich Exp $
  *
  * Copyright (c) 2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -64,12 +64,15 @@
   IBOutlet NSButton *enableSIPSwitch;
 }
 
+- (IBAction)action:(id)sender;
+
 @end
 
 @interface XMSAH323Module : NSObject <XMSetupAssistantModule> {
   
   @private
   IBOutlet NSView *contentView;
+  IBOutlet NSMatrix *useGkRadioButtons;
 }
 
 @end
@@ -86,6 +89,7 @@
   
   @private
   IBOutlet NSView *contentView;
+  IBOutlet NSMatrix *useRegistrarRadioButtons;
 }
 
 @end
@@ -102,6 +106,7 @@
   
   @private
   IBOutlet NSView *contentView;
+  IBOutlet NSMatrix *videoRadioButtons;
 }
 
 @end

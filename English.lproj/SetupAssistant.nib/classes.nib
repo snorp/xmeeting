@@ -30,7 +30,7 @@
         {
             CLASS = XMSAH323Module; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {contentView = NSView; useGkRadioButtons = NSMatrix; }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -57,6 +57,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            ACTIONS = {action = id; }; 
             CLASS = XMSAProtocolModule; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -75,13 +76,13 @@
         {
             CLASS = XMSASIPModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {contentView = NSView; useRegistrarRadioButtons = NSMatrix; }; 
             SUPERCLASS = NSObject; 
         }, 
         {
             CLASS = XMSAVideoModule; 
             LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
+            OUTLETS = {contentView = NSView; videoRadioButtons = NSMatrix; }; 
             SUPERCLASS = NSObject; 
         }, 
         {

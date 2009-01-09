@@ -30,14 +30,14 @@
 		<string>610 523 460 326 0 0 1680 1028 </string>
 		<key>46</key>
 		<string>610 523 460 326 0 0 1680 1028 </string>
-		<key>47</key>
-		<string>610 523 460 326 0 0 1680 1028 </string>
 		<key>48</key>
 		<string>610 523 460 326 0 0 1680 1028 </string>
 		<key>490</key>
 		<string>532 602 460 326 0 0 1680 1028 </string>
 		<key>532</key>
 		<string>610 523 460 326 0 0 1680 1028 </string>
+		<key>551</key>
+		<string>787 497 460 326 0 0 1680 1028 </string>
 		<key>97</key>
 		<string>610 523 460 326 0 0 1680 1028 </string>
 	</dict>
@@ -49,7 +49,9 @@
 	<integer>4</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>45</integer>
+		<integer>194</integer>
+		<integer>48</integer>
+		<integer>551</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8S2167</string>

@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.16 2009/01/03 20:07:38 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.17 2009/01/09 08:07:44 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,9 +39,10 @@ enum {
   // misc
 - (BOOL)_validateCurrentModule;
 - (void)_resizeWindowToSize:(NSSize)newSize contentView:(NSView *)newContentView;
-- (void)_alertUnsavedChanges;
+- (void)_alertUnsavedChanges:(SEL)endSelector;
 - (void)savePreferencesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void)discardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)switchDiscardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)simpleViewDiscardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 
 @end
 
@@ -341,7 +342,7 @@ enum {
 {
   // ask the user before discarding unsaved changes
   if (preferencesHaveChanged) {
-    [self _alertUnsavedChanges];
+    [self _alertUnsavedChanges:@selector(switchDiscardChangesAlertDidEnd:returnCode:contextInfo:)];
     return;
   }
   
@@ -350,6 +351,7 @@ enum {
   
   // resize the window, hide the toolbar
   [self _resizeWindowToSize:[setupAssistantManager contentViewSize] contentView:emptyContentView];
+  [window setDocumentEdited:NO];
   [toolbar setVisible:NO];
   
   // run the setup assistant in this window
@@ -361,6 +363,12 @@ enum {
 
 - (IBAction)switchToDetailedView:(id)sender
 {
+  // ask the user before discarding unsaved changes
+  if (preferencesHaveChanged) {
+    [self _alertUnsavedChanges:@selector(switchDiscardChangesAlertDidEnd:returnCode:contextInfo:)];
+    return;
+  }
+  
   NSWindow *window = [self window];
   
   // cause each module to reload its data so that the values are consistent
@@ -371,7 +379,7 @@ enum {
   }
   
   [applyButton setEnabled:NO];
-  [[self window] setDocumentEdited:NO];
+  [window setDocumentEdited:NO];
   preferencesHaveChanged = NO;
   
   id<XMPreferencesModule> module = (id<XMPreferencesModule>)[modules objectAtIndex:0];
@@ -426,6 +434,14 @@ enum {
 
 - (BOOL)windowShouldClose:(id)sender
 {
+  // special handling if in simple edit mode
+  if ([[NSUserDefaults standardUserDefaults] integerForKey:XMKey_PreferencesEditMode] == XMPreferencesEditMode_Simple) {
+    if (preferencesHaveChanged) {
+      [self _alertUnsavedChanges:@selector(simpleViewDiscardChangesAlertDidEnd:returnCode:contextInfo:)];
+      return NO;
+    }
+    return YES;
+  }
   if (preferencesHaveChanged) {
     /* We first ask the user whether he wants to save the changes made */
     NSAlert *alert = [[NSAlert alloc] init];
@@ -488,7 +504,7 @@ enum {
   [window setContentView:newContentView];
 }
 
-- (void)_alertUnsavedChanges
+- (void)_alertUnsavedChanges:(SEL)endSelector
 {
   NSAlert *alert = [[NSAlert alloc] init];
   
@@ -496,11 +512,11 @@ enum {
   [alert setInformativeText:@""];
   [alert setAlertStyle:NSWarningAlertStyle];
   [alert addButtonWithTitle:NSLocalizedString(@"OK", @"")];
-  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"")];
+  [alert addButtonWithTitle:NSLocalizedString(@"Abort", @"")];
   
   [alert beginSheetModalForWindow:[self window] 
                     modalDelegate:self 
-                   didEndSelector:@selector(discardChangesAlertDidEnd:returnCode:contextInfo:)
+                   didEndSelector:endSelector
                       contextInfo:NULL];
 }
 
@@ -528,7 +544,7 @@ enum {
   [[self window] orderOut:self];
 }
 
-- (void)discardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void)switchDiscardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
   // memory cleanup
   [alert release];
@@ -537,11 +553,32 @@ enum {
     [toolbar setSelectedItemIdentifier:[currentSelectedItem itemIdentifier]];
     return;
   }
-  
-  if (returnCode == NSAlertFirstButtonReturn) { // save the preferences
+    
+  if (returnCode == NSAlertFirstButtonReturn) { // discard the preferences
     preferencesHaveChanged = NO;
     
-    [self performSelector:@selector(switchToSimpleView:) withObject:self afterDelay:0.0];
+    // if in simple mode, simply close the window. Else switch to simple view
+    if ([[NSUserDefaults standardUserDefaults] integerForKey:XMKey_PreferencesEditMode] == XMPreferencesEditMode_Simple) {
+      [self performSelector:@selector(switchToDetailedView:) withObject:self afterDelay:0.0];
+    } else {
+      [self performSelector:@selector(switchToSimpleView:) withObject:self afterDelay:0.0];
+    }
+  }
+}
+
+- (void)simpleViewDiscardChangesAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+  // memory cleanup
+  [alert release];
+  
+  if (returnCode == NSAlertSecondButtonReturn) { // Abort
+    return;
+  }
+  
+  if (returnCode == NSAlertFirstButtonReturn) { // discard the preferences
+    preferencesHaveChanged = NO;
+    
+    [[self window] performSelector:@selector(performClose:) withObject:self afterDelay:0.0];
   }
 }
 

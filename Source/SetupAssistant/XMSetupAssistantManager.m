@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.21 2009/01/08 06:26:49 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.22 2009/01/09 08:08:21 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -11,6 +11,8 @@
 
 #import "XMeeting.h"
 #import "XMPreferencesManager.h"
+#import "XMPreferencesWindowController.h"
+#import "XMPreferencesModule.h"
 #import "XMLocation.h"
 #import "XMH323Account.h"
 #import "XMSIPAccount.h"
@@ -21,6 +23,8 @@ NSString *XMAttribute_PreferencesEdit = @"PreferencesEdit";
 NSString *XMAttribute_LocationImport = @"LocationImport";
 NSString *XMAttribute_NewLocation = @"NewLocation";
 NSString *XMAttribute_EditLocation = @"EditLocation";
+NSString *XMAttribute_UseGatekeeper = @"UseGatekeeper";
+NSString *XMAttribute_UseSIPRegistrar = @"UseSIPRegistrar";
 
 #define XM_QUIT_APPLICATION UINT_MAX
 
@@ -179,14 +183,16 @@ static XMSetupAssistantManager *sharedInstance = nil;
 {
   self = [super initWithWindowNibName:XMKey_SetupAssistantNibName owner:self];
   
-  locations = [[[XMPreferencesManager sharedInstance] locations] copy];
+  locations = nil;
+  h323Accounts = nil;
+  sipAccounts = nil;
   currentLocation = nil;
-  h323Account = nil;
-  sipAccount = nil;
+  //h323Account = nil;
+  //sipAccount = nil;
   username = nil;
   
-  editKeys = [[NSArray alloc] init];
-  attributes = [[NSMutableDictionary alloc] initWithCapacity:8];
+  editKeys = nil;
+  attributes = nil;
   
   return self;
 }
@@ -196,8 +202,17 @@ static XMSetupAssistantManager *sharedInstance = nil;
   [locations release];
   locations = nil;
   
+  [h323Accounts release];
+  h323Accounts = nil;
+  
+  [sipAccounts release];
+  sipAccounts = nil;
+  
   [currentLocation release];
   currentLocation = nil;
+  
+  [username release];
+  username = nil;
   
   [controller release];
   controller = nil;
@@ -220,18 +235,31 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)runEditAssistantInWindow:(NSWindow *)displayWindow
 {
+  XMPreferencesManager *prefManager = [XMPreferencesManager sharedInstance];
+  
   // trigger loading of the nib file if needed
   [self window];
   
+  // refresh the locations and accounts
+  [self _cleanup];
+  locations = [[prefManager locations] copy];
+  h323Accounts = [[prefManager h323Accounts] copy];
+  sipAccounts = [[prefManager sipAccounts] copy];
+  
   [controller release];
   controller = [[XMSAEditController alloc] initWithSetupAssistant:self];
-  [attributes removeAllObjects];
+  attributes = [[NSMutableDictionary alloc] initWithCapacity:8];
   [self setAttribute:XMAttribute_PreferencesEdit];
   
   [self continueAssistant:self];
   
   [displayWindow setContentView:contentView];
   [detailedViewButton setHidden:NO];
+}
+
+- (void)abortEditAssistant
+{
+  [[contentView window] performClose:self];
 }
 
 - (void)runFirstApplicationLaunchAssistantWithDelegate:(NSObject *)theDelegate
@@ -330,6 +358,26 @@ static XMSetupAssistantManager *sharedInstance = nil;
 - (id<XMSetupAssistantModule>)currentModule
 {
   return currentModule;
+}
+
+- (void)setEditKeys:(NSArray *)keys
+{
+  NSArray *old = editKeys;
+  editKeys = [keys retain];
+  [old release];
+}
+
+- (void)addLocation:(XMLocation *)location
+{
+  NSArray *old = locations;
+  locations = [[locations arrayByAddingObject:location] retain];
+  [old release];
+}
+
+- (void)setButtonsEnabled:(BOOL)enable
+{
+  [continueButton setEnabled:enable];
+  [goBackButton setEnabled:enable];
 }
 
 #pragma mark Action Methods
@@ -552,13 +600,14 @@ static XMSetupAssistantManager *sharedInstance = nil;
 {
   [module loadData:self];
   
-  [titleField setStringValue:[module title]];
+  [titleField setStringValue:[module titleForData:self]];
   [cornerImage setHidden:![module showCornerImage]];
   [contentBox setContentView:[module contentView]];
   
   // save reference to module
   currentModule = module;
   
+  [self setButtonsEnabled:YES]; // by default, the buttons are enabled
   [module editData:editKeys];
 }
 
@@ -2586,39 +2635,19 @@ static XMSetupAssistantManager *sharedInstance = nil;
   [publicAddressField setTextColor:textColor];*/
 }
 
-- (XMLocation *)currentLocation
-{
-  return nil;
-}
-
 - (NSArray *)locations
 {
   return locations;
 }
 
-- (NSArray *)sipAccounts
-{
-  return [NSArray array];
-}
-
 - (NSArray *)h323Accounts
 {
-  return [NSArray array];
+  return h323Accounts;
 }
 
-- (NSString *)username
+- (NSArray *)sipAccounts
 {
-  if (username == nil) {
-    username = [[[XMPreferencesManager sharedInstance] userName] retain];
-  }
-  return username;
-}
-
-- (void)setUsername:(NSString *)newUsername
-{
-  NSString *old = username;
-  username = [newUsername retain];
-  [old release];
+  return sipAccounts;
 }
 
 - (BOOL)hasAttribute:(NSString *)attribute
@@ -2634,6 +2663,67 @@ static XMSetupAssistantManager *sharedInstance = nil;
 - (void)clearAttribute:(NSString *)attribute
 {
   [attributes removeObjectForKey:attribute];
+}
+
+- (XMLocation *)currentLocation
+{
+  return currentLocation;
+}
+
+- (void)setCurrentLocation:(XMLocation *)location
+{
+  XMLocation *old = currentLocation;
+  currentLocation = [location retain];
+  [old release];
+}
+
+- (XMLocation *)createLocation
+{
+  XMLocation *location = [[XMLocation alloc] init];
+  // set some default values
+  [location setEnableVideo:YES];
+  [location setBandwidthLimit:512000];
+  [location setEnableH323:YES];
+  [location setEnableSIP:YES];
+  
+  // choose appropriate name
+  NSString *nameTemplate = NSLocalizedString(@"XM_SETUP_ASSISTANT_NEW_LOCATION_NAME", @"");
+  unsigned index = 1;
+  while (index < 1000) {
+    NSString *name = [NSString stringWithFormat:nameTemplate, index];
+    
+    unsigned count = [locations count];
+    BOOL found = NO;
+    for (unsigned i = 0; i < count; i++) {
+      XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+      if ([[location name] isEqualToString:name]) {
+        found = YES;
+        break;
+      }
+    }
+    if (found == NO) {
+      [location setName:name];
+      index = 1000;
+    }
+    index++;
+  }
+  
+  return [location autorelease];
+}
+
+- (NSString *)username
+{
+  if (username == nil) {
+    username = [[[XMPreferencesManager sharedInstance] userName] retain];
+  }
+  return username;
+}
+
+- (void)setUsername:(NSString *)newUsername
+{
+  NSString *old = username;
+  username = [newUsername retain];
+  [old release];
 }
 
 @end
@@ -2660,6 +2750,9 @@ static XMSetupAssistantManager *sharedInstance = nil;
                                              setupAssistant->sipModule, setupAssistant->registrationModule,
                                              setupAssistant->videoModule, setupAssistant->editDoneModule, nil];
   
+  // TODO: Add code with edit keys
+  [setupAssistant setEditKeys:[NSArray array]];
+  
   return self;
 }
 
@@ -2682,6 +2775,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
     moduleIndex = UINT_MAX;
     return generalModule;
   } else if (state >= 2) { // use modules from the array
+    [[XMPreferencesWindowController sharedInstance] notePreferencesDidChange]; // mark window as dirty
     state = 3;
     moduleIndex++;
     if (moduleIndex == [modules count]) {
@@ -2732,6 +2826,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (void)cancel
 {
+  [[XMSetupAssistantManager sharedInstance] abortEditAssistant];
 }
 
 - (void)continueAssistant
@@ -2740,6 +2835,11 @@ static XMSetupAssistantManager *sharedInstance = nil;
     XMSetupAssistantManager *manager = [XMSetupAssistantManager sharedInstance];
     firstLocation = NO;
     moduleIndex = UINT_MAX;
+    
+    if ([manager hasAttribute:XMAttribute_NewLocation]) {
+      // store the location
+      [manager addLocation:[manager currentLocation]];
+    }
     
     // clear some attributes
     [manager clearAttribute:XMAttribute_NewLocation];

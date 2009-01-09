@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantModules.m,v 1.2 2009/01/08 06:26:49 hfriederich Exp $
+ * $Id: XMSetupAssistantModules.m,v 1.3 2009/01/09 08:08:21 hfriederich Exp $
  *
  * Copyright (c) 2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -7,6 +7,7 @@
  */
 
 #import "XMSetupAssistantModules.h"
+#import "XMLocation.h"
 
 #pragma mark -
 #pragma mark General
@@ -23,7 +24,7 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
   return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
 }
@@ -63,6 +64,15 @@
   [[nameField window] makeFirstResponder:nameField];
 }
 
+- (void)controlTextDidChange:(NSNotification *)notif
+{
+  if ([[nameField stringValue] length] == 0) {
+    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:NO];
+  } else {
+    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:YES];
+  }
+}
+
 @end
 
 @implementation XMSALocationModule 
@@ -77,9 +87,9 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  return NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATIONS", @"");
 }
 
 - (BOOL)showCornerImage
@@ -102,6 +112,7 @@
   BOOL enableImportLocation = NO;
   BOOL enableEditLocation = NO;
   
+  [locationsTable selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
   [locationsTable reloadData];
   
   if ([data hasAttribute:XMAttribute_PreferencesEdit]) {
@@ -120,9 +131,9 @@
   [locationRadioButtons selectCellAtRow:rowIndex column:0];
   
   if (enableEditLocation == NO || rowIndex != 2) {
-    [locationsTable setEnabled:NO];
+    [locationsTable setHidden:YES];
   } else {
-    [locationsTable setEnabled:YES];
+    [locationsTable setHidden:NO];
   }
 }
 
@@ -130,17 +141,20 @@
 {
   int rowIndex = [locationRadioButtons selectedRow];
   
-  if (rowIndex == 0) {
+  if (rowIndex == 0) { // create new location
     [data clearAttribute:XMAttribute_EditLocation];
     [data setAttribute:XMAttribute_NewLocation];
+    [data setCurrentLocation:[data createLocation]];
   } else if (rowIndex == 1) {
     // TODO
   } else {
     [data clearAttribute:XMAttribute_NewLocation];
     [data setAttribute:XMAttribute_EditLocation];
+    
+    int locationIndex = [locationsTable selectedRow];
+    XMLocation *location = (XMLocation *)[[data locations] objectAtIndex:locationIndex];
+    [data setCurrentLocation:location];
   }
-  
-  // TODO: Add code to select location
 }
 
 - (void)editData:(NSArray *)editKeys
@@ -153,9 +167,9 @@
   int rowIndex = [locationRadioButtons selectedRow];
   
   if (rowIndex == 2) {
-    [locationsTable setEnabled:YES];
+    [locationsTable setHidden:NO];
   } else {
-    [locationsTable setEnabled:NO];
+    [locationsTable setHidden:YES];
   }
 }
 
@@ -189,9 +203,9 @@
   return NO;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  return NSLocalizedString(@"XM_SETUP_ASSISTANT_NEW_LOCATION", @"");
 }
 
 - (BOOL)showCornerImage
@@ -206,19 +220,36 @@
 
 - (BOOL)canSaveData
 {
+  NSString *str = [nameField stringValue];
+  if ([str length] == 0) {
+    [self editData:nil]; // get focus again
+    return NO;
+  }
   return YES;
 }
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  [nameField setStringValue:[[data currentLocation] name]];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  [[data currentLocation] setName:[nameField stringValue]];
 }
 
 - (void)editData:(NSArray *)editKeys
 {
+  [[nameField window] makeFirstResponder:nameField];
+}
+
+- (void)controlTextDidChange:(NSNotification *)notif
+{
+  if ([[nameField stringValue] length] == 0) {
+    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:NO];
+  } else {
+    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:YES];
+  }
 }
 
 @end
@@ -235,9 +266,10 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -257,10 +289,12 @@
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  [bandwidthLimitPopUp selectItemWithTag:[[data currentLocation] bandwidthLimit]];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  [[data currentLocation] setBandwidthLimit:[[bandwidthLimitPopUp selectedItem] tag]];
 }
 
 - (void)editData:(NSArray *)editKeys
@@ -281,9 +315,10 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -298,19 +333,46 @@
 
 - (BOOL)canSaveData
 {
-  return YES;
+  if ([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState) {
+    return NO;
+  } else {
+    return YES;
+  }
 }
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  XMLocation *location = [data currentLocation];
+  
+  int state = [location enableH323] ? NSOnState : NSOffState;
+  [enableH323Switch setState:state];
+  
+  state = [location enableSIP] ? NSOnState : NSOffState;
+  [enableSIPSwitch setState:state];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  XMLocation *location = [data currentLocation];
+  
+  BOOL enable = [enableH323Switch state] == NSOnState ? YES : NO;
+  [location setEnableH323:enable];
+  
+  enable = [enableSIPSwitch state] == NSOnState ? YES : NO;
+  [location setEnableSIP:enable];
 }
 
 - (void)editData:(NSArray *)editKeys
 {
+}
+
+- (IBAction)action:(id)sender
+{
+  if ([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState) {
+    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:NO];
+  } else {
+    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:YES];
+  }
 }
 
 @end
@@ -324,12 +386,16 @@
 
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
 {
-  return YES;
+  if ([[data currentLocation] enableH323]) {
+    return YES;
+  }
+  return NO;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -349,10 +415,18 @@
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  int selectedIndex = [data hasAttribute:XMAttribute_UseGatekeeper] ? 0 : 1;
+  [useGkRadioButtons selectCellAtRow:selectedIndex column:0];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  int selectedIndex = [useGkRadioButtons selectedRow];
+  if (selectedIndex == 0) {
+    [data setAttribute:XMAttribute_UseGatekeeper];
+  } else {
+    [data clearAttribute:XMAttribute_UseGatekeeper];
+  }
 }
 
 - (void)editData:(NSArray *)editKeys
@@ -370,12 +444,16 @@
 
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
 {
-  return YES;
+  if ([[data currentLocation] enableH323] && [data hasAttribute:XMAttribute_UseGatekeeper]) {
+    return YES;
+  }
+  return NO;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -416,12 +494,16 @@
 
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
 {
-  return YES;
+  if ([[data currentLocation] enableSIP]) {
+    return YES;
+  }
+  return NO;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -441,10 +523,18 @@
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  int selectedIndex = [data hasAttribute:XMAttribute_UseSIPRegistrar] ? 0 : 1;
+  [useRegistrarRadioButtons selectCellAtRow:selectedIndex column:0];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  int selectedIndex = [useRegistrarRadioButtons selectedRow];
+  if (selectedIndex == 0) {
+    [data setAttribute:XMAttribute_UseSIPRegistrar];
+  } else {
+    [data clearAttribute:XMAttribute_UseSIPRegistrar];
+  }
 }
 
 - (void)editData:(NSArray *)editKeys
@@ -462,12 +552,16 @@
 
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
 {
-  return YES;
+  if ([[data currentLocation] enableSIP] && [data hasAttribute:XMAttribute_UseSIPRegistrar]) {
+    return YES;
+  }
+  return NO;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -511,9 +605,10 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  NSString *template = NSLocalizedString(@"XM_SETUP_ASSISTANT_LOCATION", @"");
+  return [NSString stringWithFormat:template, [[data currentLocation] name]];
 }
 
 - (BOOL)showCornerImage
@@ -533,10 +628,20 @@
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  int selectedIndex = [[data currentLocation] enableVideo] ? 0 : 1;
+  [videoRadioButtons selectCellAtRow:selectedIndex column:0];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  XMLocation *location = [data currentLocation];
+  
+  int selectedIndex = [videoRadioButtons selectedRow];
+  if (selectedIndex == 0) {
+    [location setEnableVideo:YES];
+  } else {
+    [location setEnableVideo:NO];
+  }
 }
 
 - (void)editData:(NSArray *)editKeys
@@ -563,7 +668,7 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
   return NSLocalizedString(@"XM_SETUP_ASSISTANT_NAME", @"");
 }
@@ -609,7 +714,7 @@
   return YES;
 }
 
-- (NSString *)title
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
   return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
 }
