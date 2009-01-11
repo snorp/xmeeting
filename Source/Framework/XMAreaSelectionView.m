@@ -1,9 +1,9 @@
 /*
- * $Id: XMAreaSelectionView.m,v 1.2 2007/05/08 13:40:41 hfriederich Exp $
+ * $Id: XMAreaSelectionView.m,v 1.3 2009/01/11 18:58:26 hfriederich Exp $
  *
- * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2007-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2007-2009 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAreaSelectionView.h"
@@ -52,18 +52,18 @@
 
 - (id)initWithFrame:(NSRect)frame 
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        x = 0;
-        y = 0;
-        width = frame.size.width;
-        height = frame.size.height;
+  self = [super initWithFrame:frame];
+  if (self) {
+    x = 0;
+    y = 0;
+    width = frame.size.width;
+    height = frame.size.height;
         
-        status = NONE;
-        startRect = NSMakeRect(x, y, width, height);
-        startMousePoint = NSMakePoint(0, 0);
-    }
-    return self;
+    status = NONE;
+    startRect = NSMakeRect(x, y, width, height);
+    startMousePoint = NSMakePoint(0, 0);
+  }
+  return self;
 }
 
 #pragma mark -
@@ -71,317 +71,288 @@
 
 - (void)drawRect:(NSRect)rect 
 {
-    [self drawBackground:rect doesChangeSelection:(status != NONE)];
+  [self drawBackground:rect doesChangeSelection:(status != NONE)];
     
-    [[NSColor redColor] set];
+  [[NSColor redColor] set];
     
-    NSFrameRectWithWidth(NSMakeRect(x, y, width, height), LINE_WIDTH);
+  NSFrameRectWithWidth(NSMakeRect(x, y, width, height), LINE_WIDTH);
 }
 
 - (void)resetCursorRects
 {
-    NSRect bounds = [self bounds];
-    NSCursor * crosshair = [NSCursor crosshairCursor];
-    NSCursor * leftRight = [NSCursor resizeLeftRightCursor];
-    NSCursor * upDown = [NSCursor resizeUpDownCursor];
-    NSRect rect;
+  NSRect bounds = [self bounds];
+  NSCursor * crosshair = [NSCursor crosshairCursor];
+  NSCursor * leftRight = [NSCursor resizeLeftRightCursor];
+  NSCursor * upDown = [NSCursor resizeUpDownCursor];
+  NSRect rect;
     
-    rect = OUTER_BOTTOM_RECT;
-    if (rect.size.width > 0 && rect.size.height > 0) {
-        [self addCursorRect:rect cursor:crosshair];
-    }
-    rect = OUTER_TOP_RECT;
-    if (rect.size.width > 0 && rect.size.height > 0) {
-        [self addCursorRect:rect cursor:crosshair];
-    }
-    rect = OUTER_LEFT_RECT;
-    if (rect.size.width > 0 && rect.size.height > 0) {
-        [self addCursorRect:rect cursor:crosshair];
-    }
-    rect = OUTER_RIGHT_RECT;
-    if (rect.size.width > 0 && rect.size.height > 0) {
-        [self addCursorRect:rect cursor:crosshair];
-    }
+  rect = OUTER_BOTTOM_RECT;
+  if (rect.size.width > 0 && rect.size.height > 0) {
+    [self addCursorRect:rect cursor:crosshair];
+  }
+  rect = OUTER_TOP_RECT;
+  if (rect.size.width > 0 && rect.size.height > 0) {
+    [self addCursorRect:rect cursor:crosshair];
+  }
+  rect = OUTER_LEFT_RECT;
+  if (rect.size.width > 0 && rect.size.height > 0) {
+    [self addCursorRect:rect cursor:crosshair];
+  }
+  rect = OUTER_RIGHT_RECT;
+  if (rect.size.width > 0 && rect.size.height > 0) {
+    [self addCursorRect:rect cursor:crosshair];
+  }
     
-    rect = LEFT_RECT(0);
-    if (rect.origin.x < 0) {
-        rect.size.width += rect.origin.x;
-        rect.origin.x -= rect.origin.x;
-    }
-    [self addCursorRect:rect cursor:leftRight];
-    rect = RIGHT_RECT(0);
-    if (rect.origin.x + rect.size.width > bounds.size.width) {
-        rect.size.width = bounds.size.width - rect.origin.x;
-    }
-    [self addCursorRect:rect cursor:leftRight];
+  rect = LEFT_RECT(0);
+  if (rect.origin.x < 0) {
+    rect.size.width += rect.origin.x;
+    rect.origin.x -= rect.origin.x;
+  }
+  [self addCursorRect:rect cursor:leftRight];
+  rect = RIGHT_RECT(0);
+  if (rect.origin.x + rect.size.width > bounds.size.width) {
+    rect.size.width = bounds.size.width - rect.origin.x;
+  }
+  [self addCursorRect:rect cursor:leftRight];
     
-    rect = BOTTOM_RECT(0);
-    if (rect.origin.y < 0) {
-        rect.size.height += rect.origin.y;
-        rect.origin.y -= rect.origin.y;
-    }
-    [self addCursorRect:rect cursor:upDown];
-    rect = TOP_RECT(0);
-    if (rect.origin.y + rect.size.height > bounds.size.height) {
-        rect.size.height = bounds.size.height - rect.origin.y;
-    }
-    [self addCursorRect:rect cursor:upDown];
+  rect = BOTTOM_RECT(0);
+  if (rect.origin.y < 0) {
+    rect.size.height += rect.origin.y;
+    rect.origin.y -= rect.origin.y;
+  }
+  [self addCursorRect:rect cursor:upDown];
+  rect = TOP_RECT(0);
+  if (rect.origin.y + rect.size.height > bounds.size.height) {
+      rect.size.height = bounds.size.height - rect.origin.y;
+  }
+  [self addCursorRect:rect cursor:upDown];
     
-    [self addCursorRect:MOVE_RECT(0) cursor:[NSCursor openHandCursor]];
+  [self addCursorRect:MOVE_RECT(0) cursor:[NSCursor openHandCursor]];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    NSPoint location = [self _getLocation:theEvent];
+  NSPoint location = [self _getLocation:theEvent];
     
-    startRect = NSMakeRect(x, y, width, height);
-    startMousePoint = location;
+  startRect = NSMakeRect(x, y, width, height);
+  startMousePoint = location;
     
-    if (NSPointInRect(location, MOVE_RECT(1))) {
-        status = MOVING;
-        [[NSCursor closedHandCursor] set];
-    }
-    else if (NSPointInRect(location, LEFT_RECT(1))) {
-        status = RESIZE_LEFT;
-    }
-    else if (NSPointInRect(location, RIGHT_RECT(1))) {
-        status = RESIZE_RIGHT;
-    }
-    else if (NSPointInRect(location, BOTTOM_RECT(1))) {
-        status = RESIZE_BOTTOM;
-    }
-    else if (NSPointInRect(location, TOP_RECT(1))) {
-        status = RESIZE_TOP;
-    }
-    else if (NSPointInRect(location, BOTTOM_LEFT_RECT(1))) {
-        status = RESIZE_BOTTOM_LEFT;
-    }
-    else if (NSPointInRect(location, BOTTOM_RIGHT_RECT(1))) {
-        status = RESIZE_BOTTOM_RIGHT;
-    }
-    else if (NSPointInRect(location, TOP_LEFT_RECT(1))) {
-        status = RESIZE_TOP_LEFT;
-    }
-    else if (NSPointInRect(location, TOP_RIGHT_RECT(1))) {
-        status = RESIZE_TOP_RIGHT;
-    }
-    else
-    {
-        status = SPAWN;
-    }
+  if (NSPointInRect(location, MOVE_RECT(1))) {
+    status = MOVING;
+    [[NSCursor closedHandCursor] set];
+  } else if (NSPointInRect(location, LEFT_RECT(1))) {
+    status = RESIZE_LEFT;
+  } else if (NSPointInRect(location, RIGHT_RECT(1))) {
+    status = RESIZE_RIGHT;
+  } else if (NSPointInRect(location, BOTTOM_RECT(1))) {
+    status = RESIZE_BOTTOM;
+  } else if (NSPointInRect(location, TOP_RECT(1))) {
+    status = RESIZE_TOP;
+  } else if (NSPointInRect(location, BOTTOM_LEFT_RECT(1))) {
+    status = RESIZE_BOTTOM_LEFT;
+  } else if (NSPointInRect(location, BOTTOM_RIGHT_RECT(1))) {
+    status = RESIZE_BOTTOM_RIGHT;
+  } else if (NSPointInRect(location, TOP_LEFT_RECT(1))) {
+    status = RESIZE_TOP_LEFT;
+  } else if (NSPointInRect(location, TOP_RIGHT_RECT(1))) {
+    status = RESIZE_TOP_RIGHT;
+  } else {
+    status = SPAWN;
+  }
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    status = NONE;
-    [[self window] invalidateCursorRectsForView:self];
-    [self selectedAreaUpdated];
+  status = NONE;
+  [[self window] invalidateCursorRectsForView:self];
+  [self selectedAreaUpdated];
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-    NSPoint location = [self _getLocation:theEvent];
-    NSRect bounds = [self bounds];
+  NSPoint location = [self _getLocation:theEvent];
+  NSRect bounds = [self bounds];
     
-    if (status == MOVING)
-    {
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxX = bounds.size.width - width;
-        int maxY = bounds.size.height - height;
-        x = (int)startRect.origin.x + deltaX;
-        y = (int)startRect.origin.y + deltaY;
-        if (x < 0) {
-            x = 0;
-        }
-        if (y < 0) {
-            y = 0;
-        }
-        if (x > maxX) {
-            x = maxX;
-        }
-        if (y > maxY) {
-            y = maxY;
-        }
+  if (status == MOVING) {
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxX = bounds.size.width - width;
+    int maxY = bounds.size.height - height;
+    x = (int)startRect.origin.x + deltaX;
+    y = (int)startRect.origin.y + deltaY;
+    if (x < 0) {
+      x = 0;
     }
-    else if (status == RESIZE_LEFT)
-    {
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int maxX = (int)startRect.origin.x + (int)startRect.size.width;
-        x = (int)startRect.origin.x + deltaX;
-        if (x < 0) {
-            x = 0;
-        }
-        if (x > maxX-4*LINE_WIDTH) {
-            x = maxX-4*LINE_WIDTH;
-        }
-        width = maxX - x;
+    if (y < 0) {
+      y = 0;
     }
-    else if (status == RESIZE_RIGHT)
-    {
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int maxWidth = (int)bounds.size.width - x;
-        width = (int)startRect.size.width + deltaX;
-        if (width < 4*LINE_WIDTH) {
-            width = 4*LINE_WIDTH;
-        }
-        if (width > maxWidth) {
-            width = maxWidth;
-        }
+    if (x > maxX) {
+      x = maxX;
     }
-    else if (status == RESIZE_BOTTOM)
-    {
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxY = (int)startRect.origin.y + (int)startRect.size.height;
-        y = (int)startRect.origin.y + deltaY;
-        if (y < 0) {
-            y = 0;
-        }
-        if (y > maxY-4*LINE_WIDTH) {
-            y = maxY-4*LINE_WIDTH;
-        }
-        height = maxY - y;
+    if (y > maxY) {
+      y = maxY;
     }
-    else if (status == RESIZE_TOP)
-    {
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxHeight = (int)bounds.size.height - y;
-        height = (int)startRect.size.height + deltaY;
-        if (height < 4*LINE_WIDTH) {
-            height = 4*LINE_WIDTH;
-        }
-        if (height > maxHeight) {
-            height = maxHeight;
-        }
+  } else if (status == RESIZE_LEFT) {
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int maxX = (int)startRect.origin.x + (int)startRect.size.width;
+    x = (int)startRect.origin.x + deltaX;
+    if (x < 0) {
+      x = 0;
     }
-    else if (status == RESIZE_BOTTOM_LEFT)
-    {
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxX = (int)startRect.origin.x + (int)startRect.size.width;
-        int maxY = (int)startRect.origin.y + (int)startRect.size.height;
-        x = (int)startRect.origin.x + deltaX;
-        y = (int)startRect.origin.y + deltaY;
-        if (x < 0) {
-            x = 0;
-        }
-        if (x > maxX-4*LINE_WIDTH) {
-            x = maxX-4*LINE_WIDTH;
-        }
-        if (y < 0) {
-            y = 0;
-        }
-        if (y > maxY-4*LINE_WIDTH) {
-            y = maxY-4*LINE_WIDTH;
-        }
-        height = maxY - y;
-        width = maxX - x;
+    if (x > maxX-4*LINE_WIDTH) {
+      x = maxX-4*LINE_WIDTH;
     }
-    else if (status == RESIZE_BOTTOM_RIGHT)
-    {
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxWidth = (int)bounds.size.width - x;
-        int maxY = (int)startRect.origin.y + (int)startRect.size.height;
-        width = (int)startRect.size.width + deltaX;
-        y = (int)startRect.origin.y + deltaY;
-        if (width < 4*LINE_WIDTH) {
-            width = 4*LINE_WIDTH;
-        }
-        if (width > maxWidth) {
-            width = maxWidth;
-        }
-        if (y < 0) {
-            y = 0;
-        }
-        if (y > maxY-4*LINE_WIDTH) {
-            y = maxY-4*LINE_WIDTH;
-        }
-        height = maxY - y;
+    width = maxX - x;
+  } else if (status == RESIZE_RIGHT) {
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int maxWidth = (int)bounds.size.width - x;
+    width = (int)startRect.size.width + deltaX;
+    if (width < 4*LINE_WIDTH) {
+      width = 4*LINE_WIDTH;
     }
-    else if (status == RESIZE_TOP_LEFT)
-    {      
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxX = (int)startRect.origin.x + (int)startRect.size.width;
-        int maxHeight = (int)bounds.size.height - y;
-        x = (int)startRect.origin.x + deltaX;
-        height = (int)startRect.size.height + deltaY;
-        if (x < 0) {
-            x = 0;
-        }
-        if (x > maxX-4*LINE_WIDTH) {
-            x = maxX-4*LINE_WIDTH;
-        }
-        if (height < 4*LINE_WIDTH) {
-            height = 4*LINE_WIDTH;
-        }
-        if (height > maxHeight) {
-            height = maxHeight;
-        }
-        width = maxX - x;
+    if (width > maxWidth) {
+      width = maxWidth;
     }
-    else if (status == RESIZE_TOP_RIGHT)
-    {
-        int deltaX = (int)location.x - (int)startMousePoint.x;
-        int deltaY = (int)location.y - (int)startMousePoint.y;
-        int maxWidth = (int)bounds.size.width - x;
-        int maxHeight = (int)bounds.size.height - y;
-        width = (int)startRect.size.width + deltaX;
-        height = (int)startRect.size.height + deltaY;
-        if (width < 4*LINE_WIDTH) {
-            width = 4*LINE_WIDTH;
-        }
-        if (width > maxWidth) {
-            width = maxWidth;
-        }
-        if (height < 4*LINE_WIDTH) {
-            height = 4*LINE_WIDTH;
-        }
-        if (height > maxHeight) {
-            height = maxHeight;
-        }
+  } else if (status == RESIZE_BOTTOM) {
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxY = (int)startRect.origin.y + (int)startRect.size.height;
+    y = (int)startRect.origin.y + deltaY;
+    if (y < 0) {
+      y = 0;
     }
-    else if (status == SPAWN)
-    {
-        x = MIN(location.x, startMousePoint.x);
-        y = MIN(location.y, startMousePoint.y);
-        width = ABS(location.x - startMousePoint.x);
-        height = ABS(location.y - startMousePoint.y);
+    if (y > maxY-4*LINE_WIDTH) {
+      y = maxY-4*LINE_WIDTH;
+    }
+    height = maxY - y;
+  } else if (status == RESIZE_TOP) {
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxHeight = (int)bounds.size.height - y;
+    height = (int)startRect.size.height + deltaY;
+    if (height < 4*LINE_WIDTH) {
+      height = 4*LINE_WIDTH;
+    }
+    if (height > maxHeight) {
+      height = maxHeight;
+    }
+  } else if (status == RESIZE_BOTTOM_LEFT) {
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxX = (int)startRect.origin.x + (int)startRect.size.width;
+    int maxY = (int)startRect.origin.y + (int)startRect.size.height;
+    x = (int)startRect.origin.x + deltaX;
+    y = (int)startRect.origin.y + deltaY;
+    if (x < 0) {
+      x = 0;
+    }
+    if (x > maxX-4*LINE_WIDTH) {
+      x = maxX-4*LINE_WIDTH;
+    }
+    if (y < 0) {
+      y = 0;
+    }
+    if (y > maxY-4*LINE_WIDTH) {
+      y = maxY-4*LINE_WIDTH;
+    }
+    height = maxY - y;
+    width = maxX - x;
+  } else if (status == RESIZE_BOTTOM_RIGHT) {
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxWidth = (int)bounds.size.width - x;
+    int maxY = (int)startRect.origin.y + (int)startRect.size.height;
+    width = (int)startRect.size.width + deltaX;
+    y = (int)startRect.origin.y + deltaY;
+    if (width < 4*LINE_WIDTH) {
+      width = 4*LINE_WIDTH;
+    }
+    if (width > maxWidth) {
+      width = maxWidth;
+    }
+    if (y < 0) {
+      y = 0;
+    }
+    if (y > maxY-4*LINE_WIDTH) {
+      y = maxY-4*LINE_WIDTH;
+    }
+    height = maxY - y;
+  } else if (status == RESIZE_TOP_LEFT) {      
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxX = (int)startRect.origin.x + (int)startRect.size.width;
+    int maxHeight = (int)bounds.size.height - y;
+    x = (int)startRect.origin.x + deltaX;
+    height = (int)startRect.size.height + deltaY;
+    if (x < 0) {
+      x = 0;
+    }
+    if (x > maxX-4*LINE_WIDTH) {
+      x = maxX-4*LINE_WIDTH;
+    }
+    if (height < 4*LINE_WIDTH) {
+      height = 4*LINE_WIDTH;
+    }
+    if (height > maxHeight) {
+      height = maxHeight;
+    }
+    width = maxX - x;
+  } else if (status == RESIZE_TOP_RIGHT) {
+    int deltaX = (int)location.x - (int)startMousePoint.x;
+    int deltaY = (int)location.y - (int)startMousePoint.y;
+    int maxWidth = (int)bounds.size.width - x;
+    int maxHeight = (int)bounds.size.height - y;
+    width = (int)startRect.size.width + deltaX;
+    height = (int)startRect.size.height + deltaY;
+    if (width < 4*LINE_WIDTH) {
+      width = 4*LINE_WIDTH;
+    }
+    if (width > maxWidth) {
+      width = maxWidth;
+    }
+    if (height < 4*LINE_WIDTH) {
+      height = 4*LINE_WIDTH;
+    }
+    if (height > maxHeight) {
+      height = maxHeight;
+    }
+  } else if (status == SPAWN) {
+    x = MIN(location.x, startMousePoint.x);
+    y = MIN(location.y, startMousePoint.y);
+    width = ABS(location.x - startMousePoint.x);
+    height = ABS(location.y - startMousePoint.y);
         
-        if (x < 0) {
-            width += x;
-            x = 0;
-        }
-        if (x > bounds.size.width-4*LINE_WIDTH) {
-            x = bounds.size.width-4*LINE_WIDTH;
-        }
-        if (y < 0) {
-            height += y;
-            y = 0;
-        }
-        if (y > bounds.size.height-4*LINE_WIDTH) {
-            y = bounds.size.height-4*LINE_WIDTH;
-        }
-        
-        int maxWidth = bounds.size.width - x;
-        int maxHeight = bounds.size.height - y;
-        
-        if (width < 4*LINE_WIDTH) {
-            width = 4*LINE_WIDTH;
-        }
-        if (width > maxWidth) {
-            width = maxWidth;
-        }
-        if (height < 4*LINE_WIDTH) {
-            height = 4*LINE_WIDTH;
-        }
-        if (height > maxHeight) {
-            height = maxHeight;
-        }
+    if (x < 0) {
+      width += x;
+      x = 0;
     }
+    if (x > bounds.size.width-4*LINE_WIDTH) {
+        x = bounds.size.width-4*LINE_WIDTH;
+    }
+    if (y < 0) {
+      height += y;
+      y = 0;
+    }
+    if (y > bounds.size.height-4*LINE_WIDTH) {
+      y = bounds.size.height-4*LINE_WIDTH;
+    }
+        
+    int maxWidth = bounds.size.width - x;
+    int maxHeight = bounds.size.height - y;
     
-    [self display];
+    if (width < 4*LINE_WIDTH) {
+      width = 4*LINE_WIDTH;
+    }
+    if (width > maxWidth) {
+      width = maxWidth;
+    }
+    if (height < 4*LINE_WIDTH) {
+      height = 4*LINE_WIDTH;
+    }
+    if (height > maxHeight) {
+      height = maxHeight;
+    }
+  }
+    
+  [self display];
 }
 
 #pragma mark -
@@ -389,27 +360,27 @@
 
 - (NSRect)selectedArea
 {
-    NSRect bounds = [self bounds];
+  NSRect bounds = [self bounds];
     
-    double normX = x / bounds.size.width;
-    double normY = y / bounds.size.height;
-    double normWidth = width / bounds.size.width;
-    double normHeight = height / bounds.size.height;
+  double normX = x / bounds.size.width;
+  double normY = y / bounds.size.height;
+  double normWidth = width / bounds.size.width;
+  double normHeight = height / bounds.size.height;
     
-    return NSMakeRect(normX, normY, normWidth, normHeight);
+  return NSMakeRect(normX, normY, normWidth, normHeight);
 }
 
 - (void)setSelectedArea:(NSRect)rect
 {
-    NSRect bounds = [self bounds];
+  NSRect bounds = [self bounds];
+  
+  x = rect.origin.x * bounds.size.width;
+  y = rect.origin.y * bounds.size.height;
+  width = rect.size.width * bounds.size.width;
+  height = rect.size.height * bounds.size.height;
     
-    x = rect.origin.x * bounds.size.width;
-    y = rect.origin.y * bounds.size.height;
-    width = rect.size.width * bounds.size.width;
-    height = rect.size.height * bounds.size.height;
-    
-    [[self window] invalidateCursorRectsForView:self];
-    [self setNeedsDisplay:YES];
+  [[self window] invalidateCursorRectsForView:self];
+  [self setNeedsDisplay:YES];
 }
 
 #pragma mark -
@@ -417,7 +388,7 @@
 
 - (void)drawBackground:(NSRect)rect doesChangeSelection:(BOOL)doesChangeSelection
 {
-    NSRectFill(rect);
+  NSRectFill(rect);
 }
 
 - (void)selectedAreaUpdated
@@ -429,9 +400,9 @@
 
 - (NSPoint)_getLocation:(NSEvent *)theEvent
 {
-    NSPoint location = [theEvent locationInWindow];
-    location = [self convertPoint:location fromView:nil];
-    return location;
+  NSPoint location = [theEvent locationInWindow];
+  location = [self convertPoint:location fromView:nil];
+  return location;
 }
 
 @end

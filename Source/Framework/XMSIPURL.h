@@ -1,9 +1,9 @@
 /*
- * $Id: XMSIPURL.h,v 1.2 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMSIPURL.h,v 1.3 2009/01/11 18:58:26 hfriederich Exp $
  *
- * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2007-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2007 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2007-2009 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_SIP_URL_H__

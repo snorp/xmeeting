@@ -842,7 +842,7 @@
 		D14BBF5F0E3F7DF6007B1A57 /* localep.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = localep.h; sourceTree = "<group>"; };
 		D14BBF640E3F7E28007B1A57 /* localep.cxx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = localep.cxx; sourceTree = "<group>"; };
 		D14F9A390914C673002486B2 /* XMH323Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMH323Connection.h; path = Source/Framework/XMH323Connection.h; sourceTree = "<group>"; };
-		D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XMeetingABPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D15435EF0C01FB62002A027E /* Address Book plugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Address Book plugin.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D154361B0C01FC22002A027E /* XMAddressBookPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMAddressBookPlugin.h; path = Source/AddressBookPlugin/XMAddressBookPlugin.h; sourceTree = "<group>"; };
 		D154361C0C01FC22002A027E /* XMAddressBookPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMAddressBookPlugin.m; path = Source/AddressBookPlugin/XMAddressBookPlugin.m; sourceTree = "<group>"; };
 		D15436500C020535002A027E /* XMeetingABPlugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "XMeetingABPlugin-Info.plist"; sourceTree = "<group>"; };
@@ -1689,7 +1689,7 @@
 				8D1107320486CEB800E47090 /* XMeeting.app */,
 				D1E314C20B52AA6900385072 /* speex_pwplugin.so */,
 				D10975240BAE73F4007E8087 /* gsm_pwplugin.so */,
-				D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */,
+				D15435EF0C01FB62002A027E /* Address Book plugin.bundle */,
 				D1216B9A0ECB94F700DC292F /* BuildConfigurationTool */,
 			);
 			name = Products;
@@ -1797,23 +1797,10 @@
 				D1AD25710E67D38800143295 /* Preferences */,
 				D14BBF9F0E3F84C8007B1A57 /* Call Management */,
 				D16DE2280E992B0000E5124C /* Codec Management */,
+				D1B0A9FF0F1A68CC001981EA /* Audio Management */,
 				D16DE3390E99E12600E5124C /* Video Management */,
 				D10E40160AAD8454009EA376 /* XMCallRecorder.h */,
 				D10E40170AAD8454009EA376 /* XMCallRecorder.m */,
-				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
-				D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */,
-				D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */,
-				D16395600841B4E100F7FD83 /* XMCalltoURL.h */,
-				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
-				D13962150BF0BA2F00C76EFD /* XMH323URL.h */,
-				D13962B50BF0C9F100C76EFD /* XMSIPURL.h */,
-				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
-				D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */,
-				D1D63D3607AA9A8800F1FB74 /* XMAudioManager.m */,
-				D16395610841B4E100F7FD83 /* XMCalltoURL.m */,
-				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */,
-				D13962160BF0BA2F00C76EFD /* XMH323URL.m */,
-				D13962B60BF0C9F100C76EFD /* XMSIPURL.m */,
 			);
 			name = "Obj-C";
 			sourceTree = "<group>";
@@ -2002,6 +1989,16 @@
 				D10AFE9507B3771F00BBC8EA /* XMCallManager.m */,
 				D197179308F94A6000295E05 /* XMOpalDispatcher.h */,
 				D197179408F94A6000295E05 /* XMOpalDispatcher.m */,
+				D16395260840C57A00F7FD83 /* XMAddressResource.h */,
+				D16395270840C57A00F7FD83 /* XMAddressResource.m */,
+				D1F614E5086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.h */,
+				D1F614E6086DA6E700FDD4F0 /* XMGeneralPurposeAddressResource.m */,
+				D16395600841B4E100F7FD83 /* XMCalltoURL.h */,
+				D16395610841B4E100F7FD83 /* XMCalltoURL.m */,
+				D13962150BF0BA2F00C76EFD /* XMH323URL.h */,
+				D13962160BF0BA2F00C76EFD /* XMH323URL.m */,
+				D13962B50BF0C9F100C76EFD /* XMSIPURL.h */,
+				D13962B60BF0C9F100C76EFD /* XMSIPURL.m */,
 			);
 			name = "Call Management";
 			sourceTree = "<group>";
@@ -2090,6 +2087,8 @@
 				D1C8FCC70A44070D00EF1A8C /* XMStillImageVideoInputModule.m */,
 				D12E626F0999168E004EF9F8 /* XMScreenVideoInputModule.h */,
 				D12E62700999168E004EF9F8 /* XMScreenVideoInputModule.m */,
+				D1395EF00BEF76A700C76EFD /* XMAreaSelectionView.h */,
+				D1395EF10BEF76A700C76EFD /* XMAreaSelectionView.m */,
 				D178D51408F58780006E9786 /* XMDummyVideoInputModule.h */,
 				D178D51508F58780006E9786 /* XMDummyVideoInputModule.m */,
 				D1972B0208FC529C00295E05 /* XMPacketBuilderDispatch.h */,
@@ -2216,6 +2215,15 @@
 				D15B26640EB1E10A0070B7B5 /* Call Addresses */,
 			);
 			name = "Application Management";
+			sourceTree = "<group>";
+		};
+		D1B0A9FF0F1A68CC001981EA /* Audio Management */ = {
+			isa = PBXGroup;
+			children = (
+				D1D63D3507AA9A8800F1FB74 /* XMAudioManager.h */,
+				D1D63D3607AA9A8800F1FB74 /* XMAudioManager.m */,
+			);
+			name = "Audio Management";
 			sourceTree = "<group>";
 		};
 		D1B353220E4DB16000C47DB5 /* Utils */ = {
@@ -3331,7 +3339,7 @@
 			);
 			name = XMeetingABPlugin;
 			productName = "Address Book plugin";
-			productReference = D15435EF0C01FB62002A027E /* XMeetingABPlugin.bundle */;
+			productReference = D15435EF0C01FB62002A027E /* Address Book plugin.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D1E314C10B52AA6900385072 /* speex */ = {

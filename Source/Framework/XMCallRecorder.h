@@ -1,9 +1,9 @@
 /*
- * $Id: XMCallRecorder.h,v 1.7 2008/11/16 12:55:38 hfriederich Exp $
+ * $Id: XMCallRecorder.h,v 1.8 2009/01/11 18:58:26 hfriederich Exp $
  *
- * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2009 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_CALL_RECORDER_H__

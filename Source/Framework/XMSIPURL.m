@@ -1,5 +1,5 @@
 /*
- * $Id: XMSIPURL.m,v 1.3 2007/08/16 15:41:08 hfriederich Exp $
+ * $Id: XMSIPURL.m,v 1.4 2009/01/11 18:58:26 hfriederich Exp $
  *
  * Copyright (c) 2007 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -32,8 +32,7 @@
 + (XMSIPURL *)addressResourceWithStringRepresentation:(NSString *)url
 {
   XMSIPURL *sipURL = [[XMSIPURL alloc] initWithStringRepresentation:url];
-  if (sipURL != nil)
-  {
+  if (sipURL != nil) {
     return [sipURL autorelease];
   }
   return nil;

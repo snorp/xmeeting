@@ -1,9 +1,9 @@
 /*
- * $Id: XMGeneralPurposeAddressResource.m,v 1.6 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMGeneralPurposeAddressResource.m,v 1.7 2009/01/11 18:58:26 hfriederich Exp $
  *
- * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2009 Hannes Friederich. All rights reserved.
  */
 
 #import "XMGeneralPurposeAddressResource.h"
@@ -25,8 +25,7 @@
 {
   NSNumber *number = (NSNumber *)[dictionaryRepresentation objectForKey:XMKey_GeneralPurposeAddressResource];
   
-  if(number != nil)
-  {
+  if (number != nil) {
     return YES;
   }
   return NO;
@@ -40,8 +39,7 @@
 + (XMGeneralPurposeAddressResource *)addressResourceWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
   XMGeneralPurposeAddressResource *generalPurposeAddressResource = [[XMGeneralPurposeAddressResource alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
-  if(generalPurposeAddressResource != nil)
-  {
+  if (generalPurposeAddressResource != nil) {
     [generalPurposeAddressResource autorelease];
   }
   return generalPurposeAddressResource;
@@ -63,8 +61,7 @@
 {
   NSNumber *number = [dictionaryRepresentation objectForKey:XMKey_GeneralPurposeAddressResource];
   
-  if(number == nil)
-  {
+  if (number == nil) {
     [self release];
     return nil;
   }
@@ -98,8 +95,7 @@
 - (XMCallProtocol)callProtocol
 {
   NSNumber *number = [dictionary objectForKey:XMKey_AddressResourceCallProtocol];
-  if(number == nil)
-  {
+  if (number == nil) {
     return XMCallProtocol_H323; // backwards compatibility
   }
   
@@ -123,7 +119,7 @@
 
 - (void)setAddress:(NSString *)address
 {
-  if(address != nil)
+  if (address != nil)
   {
     [dictionary setObject:address forKey:XMKey_AddressResourceAddress];
   }
@@ -140,17 +136,14 @@
 
 - (id)valueForKey:(NSString *)key
 {
-  if([key isEqualToString:XMKey_GeneralPurposeAddressResource])
-  {
+  if ([key isEqualToString:XMKey_GeneralPurposeAddressResource]) {
     return nil;
   }
-  if([key isEqualToString:XMKey_AddressResourceCallProtocol])
-  {
+  if ([key isEqualToString:XMKey_AddressResourceCallProtocol]) {
     XMCallProtocol callProtocol = [self callProtocol];
     return [NSNumber numberWithUnsignedInt:callProtocol];
   }
-  if([key isEqualToString:XMKey_AddressResourceHumanReadableAddress])
-  {
+  if ([key isEqualToString:XMKey_AddressResourceHumanReadableAddress]) {
     return [self humanReadableAddress];
   }
   return [dictionary objectForKey:key];
@@ -160,55 +153,35 @@
 {
   BOOL correctType = YES;
   
-  if([key isEqualToString:XMKey_AddressResourceCallProtocol])
-  {
+  if ([key isEqualToString:XMKey_AddressResourceCallProtocol]) {
     // do nothing right now
-  }
-  else if([key isEqualToString:XMKey_AddressResourceAddress])
-  {
-    if([value isKindOfClass:[NSString class]])
-    {
+  } else if ([key isEqualToString:XMKey_AddressResourceAddress]) {
+    if ([value isKindOfClass:[NSString class]]) {
       [self setAddress:(NSString *)value];
-    }
-    else
-    {
+    } else {
       correctType = NO;
     }
-  }
-  else
-  {
+  } else {
     XM_VALUE_TEST_RESULT result = [XMPreferences _checkValue:value forKey:key];
     
-    if(result == XM_INVALID_KEY)
-    {
+    if (result == XM_INVALID_KEY) {
       [NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeValidKey];
-    }
-    else if(result == XM_INVALID_VALUE_TYPE)
-    {
-      if(value == nil)
-      {
+    } else if (result == XM_INVALID_VALUE_TYPE) {
+      if (value == nil) {
         [dictionary removeObjectForKey:key];
-      }
-      else
-      {
+      } else {
         correctType = NO;
       }
-    }
-    else
-    {
-      if(value == nil)
-      {
+    } else {
+      if (value == nil) {
         [dictionary removeObjectForKey:key];
-      }
-      else
-      {
+      } else {
         [dictionary setObject:value forKey:key];
       }
     }
   }
   
-  if(correctType == NO)
-  {
+  if (correctType == NO) {
     [NSException raise:XMException_InvalidParameter format:XMExceptionReason_InvalidParameterMustBeOfCorrectType];
   }
 }
@@ -219,23 +192,18 @@
 {
   NSArray *keys = [dictionary allKeys];
   
-  unsigned i;
   unsigned count = [keys count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++)  {
     NSString *key = [keys objectAtIndex:i];
     
-    if([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
+    if ([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
        [key isEqualToString:XMKey_AddressResourceAddress] ||
-       [key isEqualToString:XMKey_AddressResourceCallProtocol])
-    {
+       [key isEqualToString:XMKey_AddressResourceCallProtocol]) {
       continue;
     }
     
     NSObject *value = [dictionary objectForKey:key];
-    if(![[preferences valueForKey:key] isEqual:value])
-    {
+    if (![[preferences valueForKey:key] isEqual:value]) {
       // at least one property changed, this is sufficiant
       // to return YES
       return YES;
@@ -249,17 +217,13 @@
 {
   NSArray *keys = [dictionary allKeys];
   
-  unsigned i;
   unsigned count = [keys count];
-  
-  for(i = 0; i < count; i++)
-  {
+  for (unsigned i = 0; i < count; i++) {
     NSString *key = [keys objectAtIndex:i];
     
-    if([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
+    if ([key isEqualToString:XMKey_GeneralPurposeAddressResource] ||
        [key isEqualToString:XMKey_AddressResourceAddress] ||
-       [key isEqualToString:XMKey_AddressResourceCallProtocol])
-    {
+       [key isEqualToString:XMKey_AddressResourceCallProtocol]) {
       continue;
     }
     

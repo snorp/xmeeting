@@ -1,9 +1,9 @@
 /*
- * $Id: XMAddressResource.m,v 1.6 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMAddressResource.m,v 1.7 2009/01/11 18:58:26 hfriederich Exp $
  *
- * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2009 Hannes Friederich. All rights reserved.
  */
 
 #import "XMAddressResource.h"
@@ -34,11 +34,10 @@ void _XMParseURLCallback(const char *displayName,
 
 + (BOOL)canHandleStringRepresentation:(NSString *)stringRepresentation
 {
-  if([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation] ||
+  if ([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation] ||
      [XMH323URL canHandleStringRepresentation:stringRepresentation] ||
      [XMSIPURL canHandleStringRepresentation:stringRepresentation] ||
-     [XMCalltoURL canHandleStringRepresentation:stringRepresentation])
-  {
+     [XMCalltoURL canHandleStringRepresentation:stringRepresentation]) {
     return YES;
   }
   return NO;
@@ -46,11 +45,10 @@ void _XMParseURLCallback(const char *displayName,
 
 + (BOOL)canHandleDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation
 {
-  if([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation] ||
+  if ([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation] ||
      [XMH323URL canHandleDictionaryRepresentation:dictionaryRepresentation] ||
      [XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation] ||
-     [XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+     [XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     return YES;
   }
   return NO;
@@ -60,20 +58,13 @@ void _XMParseURLCallback(const char *displayName,
 {
   XMAddressResource *instance = nil;
   
-  if([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation])
-  {
+  if ([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation]) {
     instance = [XMGeneralPurposeAddressResource addressResourceWithStringRepresentation:stringRepresentation];
-  }
-  else if ([XMH323URL canHandleStringRepresentation:stringRepresentation])
-  {
+  } else if ([XMH323URL canHandleStringRepresentation:stringRepresentation]) {
     instance = [XMH323URL addressResourceWithStringRepresentation:stringRepresentation];
-  }
-  else if ([XMSIPURL canHandleStringRepresentation:stringRepresentation])
-  {
+  } else if ([XMSIPURL canHandleStringRepresentation:stringRepresentation]) {
     instance = [XMSIPURL addressResourceWithStringRepresentation:stringRepresentation];
-  } 
-  else if ([XMCalltoURL canHandleStringRepresentation:stringRepresentation])
-  {
+  } else if ([XMCalltoURL canHandleStringRepresentation:stringRepresentation]) {
     instance = [XMCalltoURL addressResourceWithStringRepresentation:stringRepresentation];
   }
   
@@ -84,20 +75,13 @@ void _XMParseURLCallback(const char *displayName,
 {
   XMAddressResource *instance = nil;
   
-  if([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  if ([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     instance = [XMGeneralPurposeAddressResource addressResourceWithDictionaryRepresentation:dictionaryRepresentation];
-  }
-  else if ([XMH323URL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  } else if ([XMH323URL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     instance = [XMH323URL addressResourceWithDictionaryRepresentation:dictionaryRepresentation];
-  }
-  else if ([XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  } else if ([XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     instance = [XMSIPURL addressResourceWithDictionaryRepresentation:dictionaryRepresentation];
-  } 
-  else if ([XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  }  else if ([XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     instance = [XMCalltoURL addressResourceWithDictionaryRepresentation:dictionaryRepresentation];
   }
   
@@ -118,20 +102,13 @@ void _XMParseURLCallback(const char *displayName,
   // cleanup
   [self release];
   
-  if([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation])
-  {
+  if ([XMGeneralPurposeAddressResource canHandleStringRepresentation:stringRepresentation]) {
     return [[XMGeneralPurposeAddressResource alloc] initWithStringRepresentation:stringRepresentation];
-  }
-  else if ([XMH323URL canHandleStringRepresentation:stringRepresentation])
-  {
+  } else if ([XMH323URL canHandleStringRepresentation:stringRepresentation]) {
     return [[XMH323URL alloc] initWithStringRepresentation:stringRepresentation];
-  }
-  else if ([XMSIPURL canHandleStringRepresentation:stringRepresentation])
-  {
+  } else if ([XMSIPURL canHandleStringRepresentation:stringRepresentation]) {
     return [[XMSIPURL alloc] initWithStringRepresentation:stringRepresentation];
-  }
-  else if ([XMCalltoURL canHandleStringRepresentation:stringRepresentation])
-  {
+  } else if ([XMCalltoURL canHandleStringRepresentation:stringRepresentation]) {
     return [[XMCalltoURL alloc] initWithStringRepresentation:stringRepresentation];
   }
   
@@ -143,20 +120,13 @@ void _XMParseURLCallback(const char *displayName,
   // cleanup
   [self release];
   
-  if([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  if ([XMGeneralPurposeAddressResource canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     return [[XMGeneralPurposeAddressResource alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
-  }
-  else if ([XMH323URL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  } else if ([XMH323URL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     return [[XMH323URL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
-  }
-  else if ([XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  } else if ([XMSIPURL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     return [[XMSIPURL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
-  }
-  else if ([XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation])
-  {
+  } else if ([XMCalltoURL canHandleDictionaryRepresentation:dictionaryRepresentation]) {
     return [[XMCalltoURL alloc] initWithDictionaryRepresentation:dictionaryRepresentation];
   }
   
@@ -240,8 +210,7 @@ void _XMParseURLCallback(const char *displayName,
   }
   
 bail:
-    if (valid == NO)
-    {
+    if (valid == NO) {
       [self release];
       return nil;
     }

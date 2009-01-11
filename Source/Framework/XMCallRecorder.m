@@ -1,12 +1,13 @@
 /*
- * $Id: XMCallRecorder.m,v 1.9 2008/11/16 12:55:38 hfriederich Exp $
+ * $Id: XMCallRecorder.m,v 1.10 2009/01/11 18:58:26 hfriederich Exp $
  *
- * Copyright (c) 2006-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2006-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2006-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2006-2009 Hannes Friederich. All rights reserved.
  */
 
 #import <CoreAudio/CoreAudio.h>
+#import <QuickTime/QuickTime.h>
 #import <sys/time.h>
 
 #import "XMCallRecorder.h"
@@ -630,8 +631,7 @@ void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *srcBuffer
   
   FSSpec file;
   err = NativePathNameToFSSpec(path, &file, 0); // returns fnfErr if file does not exist, but FSSpec is valid anyway
-  if (err != noErr && err != fnfErr)
-  {
+  if (err != noErr && err != fnfErr) {
     errorCode = err;
     locationCode = 0x0100;
     return NO;
@@ -649,8 +649,7 @@ void _XMDataAddRemoteAudioALAW(void *dstBuffer, unsigned offset, void *srcBuffer
   ComponentResult err = noErr;
   audioCodecIdentifier = theAudioCodecIdentifier;
   
-  if (audioCodecIdentifier != XMCodecIdentifier_UnknownCodec)
-  {
+  if (audioCodecIdentifier != XMCodecIdentifier_UnknownCodec) {
     // The audio system uses two simple buffers, each constituting an 8KB sample to be added to the
     // movie. Once a sample is filled, it is written to the media and the two buffers are simply
     // interchanged. The most elegant solution would be to remap the VM pages to other physical
