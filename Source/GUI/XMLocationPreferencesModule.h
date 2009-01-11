@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.h,v 1.25 2008/12/27 16:54:40 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.h,v 1.26 2009/01/11 19:20:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -37,6 +37,7 @@ extern NSString *XMKey_LocationPreferencesModuleIdentifier;
   IBOutlet NSTableView *locationsTableView;
   IBOutlet NSButton *newLocationButton;
   IBOutlet NSButton *deleteLocationButton;
+  IBOutlet NSButton *selectAllButton;
   IBOutlet NSPopUpButton *actionPopup;
   IBOutlet NSButton *actionButton;
   IBOutlet NSTabView *sectionsTab;

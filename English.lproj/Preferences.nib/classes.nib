@@ -1,234 +1,465 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {
-                addH323Account = id; 
-                addSIPAccount = id; 
-                cancelH323AccountEdit = id; 
-                cancelSIPAccountEdit = id; 
-                deleteH323Account = id; 
-                deleteSIPAccount = id; 
-                editH323Account = id; 
-                editSIPAccount = id; 
-                endH323AccountEdit = id; 
-                endSIPAccountEdit = id; 
-            }; 
-            CLASS = XMAccountPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                addH323AccountButton = NSButton; 
-                addSIPAccountButton = NSButton; 
-                contentView = NSView; 
-                deleteH323AccountButton = NSButton; 
-                deleteSIPAccountButton = NSButton; 
-                editH323AccountButton = NSButton; 
-                editH323AccountPanel = NSPanel; 
-                editSIPAccountButton = NSButton; 
-                editSIPAccountPanel = NSPanel; 
-                h323AccountNameField = NSTextField; 
-                h323AccountsTableView = NSTableView; 
-                h323GatekeeperHostField = NSTextField; 
-                h323PasswordField = NSTextField; 
-                h323TerminalAlias1Field = NSTextField; 
-                h323TerminalAlias2Field = NSTextField; 
-                locationModule = XMLocationPreferencesModule; 
-                sipAccountNameField = NSTextField; 
-                sipAccountsTableView = NSTableView; 
-                sipAuthorizationUsernameField = NSTextField; 
-                sipPasswordField = NSTextField; 
-                sipRegistrationDomainField = NSTextField; 
-                sipUsernameField = NSTextField; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {defaultAction = id; toggleEnableABPhoneNumbers = id; }; 
-            CLASS = XMAddressBookPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentView = NSView; 
-                enableABDatabaseSearchSwitch = NSButton; 
-                enableABPhoneNumbersSwitch = NSButton; 
-                phoneNumberProtocolMatrix = NSMatrix; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                defaultAction = id; 
-                toggleAutomaticallyHideInCallControls = id; 
-                togglePlaySoundOnIncomingCall = id; 
-            }; 
-            CLASS = XMAppearancePreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                automaticallyEnterFullScreenSwitch = NSButton; 
-                automaticallyHideInCallControlsSwitch = NSButton; 
-                contentView = NSView; 
-                inCallControlsHideAndShowEffectPopUp = NSPopUpButton; 
-                playSoundOnIncomingCallSwitch = NSButton; 
-                showSelfViewMirroredSwitch = NSButton; 
-                soundTypePopUp = NSPopUpButton; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                defaultAction = id; 
-                preferredInputDeviceSelectionDidChange = id; 
-                preferredOutputDeviceSelectionDidChange = id; 
-            }; 
-            CLASS = XMAudioPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentView = NSView; 
-                preferredInputDevicePopUp = NSPopUpButton; 
-                preferredOutputDevicePopUp = NSPopUpButton; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                chooseDebugFilePath = id; 
-                defaultAction = id; 
-                toggleGenerateDebugLogFile = id; 
-            }; 
-            CLASS = XMDebugPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                chooseDebugLogFilePathButton = NSButton; 
-                contentView = NSView; 
-                debugLogFilePathField = NSTextField; 
-                generateDebugLogSwitch = NSButton; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {defaultAction = id; }; 
-            CLASS = XMGeneralPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                automaticallyAcceptIncomingCallsSwitch = NSButton; 
-                contentView = NSView; 
-                userNameField = NSTextField; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = XMIPAddressFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                actionButton = id; 
-                addSTUNServer = id; 
-                createNewLocation = id; 
-                defaultAction = id; 
-                deleteLocation = id; 
-                duplicateLocation = id; 
-                endNewLocationSheet = id; 
-                gatekeeperAccountSelected = id; 
-                importLocations = id; 
-                makeDefaultSIPAccount = id; 
-                moveAudioCodec = id; 
-                moveSTUNServerDown = id; 
-                moveSTUNServerUp = id; 
-                moveVideoCodec = id; 
-                overwriteAudioCodecs = id; 
-                overwriteSIPAccounts = id; 
-                overwriteSTUNServers = id; 
-                overwriteVideoCodecs = id; 
-                removeSTUNServer = id; 
-                renameLocation = id; 
-                selectAllLocations = id; 
-                sipProxySelected = id; 
-                toggleAutoGetExternalAddress = id; 
-                toggleEnableH323 = id; 
-                toggleEnableSIP = id; 
-                toggleEnableVideo = id; 
-            }; 
-            CLASS = XMLocationPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                accountModule = XMAccountPreferencesModule; 
-                actionButton = NSButton; 
-                actionPopup = NSPopUpButton; 
-                audioCodecPreferenceOrderTableView = NSTableView; 
-                audioCodecsTab = NSTabView; 
-                audioPacketTimePopUp = NSPopUpButton; 
-                autoGetExternalAddressSwitch = NSButton; 
-                bandwidthLimitPopUp = NSPopUpButton; 
-                contentView = NSView; 
-                deleteLocationButton = NSButton; 
-                enableEchoCancellationSwitch = NSButton; 
-                enableFastStartSwitch = NSButton; 
-                enableH245TunnelSwitch = NSButton; 
-                enableH264LimitedModeSwitch = NSButton; 
-                enableH323Switch = NSButton; 
-                enableSIPSwitch = NSButton; 
-                enableSilenceSuppressionSwitch = NSButton; 
-                enableVideoSwitch = NSButton; 
-                gatekeeperHostField = NSTextField; 
-                gatekeeperPhoneNumberField = NSTextField; 
-                gatekeeperUserAliasField = NSTextField; 
-                h323AccountsPopUp = NSPopUpButton; 
-                internationalDialingPrefixField = NSTextField; 
-                locationsTableView = NSTableView; 
-                makeDefaultSIPAccountButton = NSButton; 
-                maxTCPPortField = NSTextField; 
-                maxUDPPortField = NSTextField; 
-                minTCPPortField = NSTextField; 
-                minUDPPortField = NSTextField; 
-                moveAudioCodecDownButton = NSButton; 
-                moveAudioCodecUpButton = NSButton; 
-                moveSTUNServerDownButton = NSButton; 
-                moveSTUNServerUpButton = NSButton; 
-                moveVideoCodecDownButton = NSButton; 
-                moveVideoCodecUpButton = NSButton; 
-                newLocationButton = NSButton; 
-                newLocationCancelButton = NSButton; 
-                newLocationNameField = NSTextField; 
-                newLocationOKButton = NSButton; 
-                newLocationSheet = NSPanel; 
-                publicAddressField = NSTextField; 
-                removeSTUNServerButton = NSButton; 
-                sectionsTab = NSTabView; 
-                sipAccountsTab = NSTabView; 
-                sipAccountsTable = NSTableView; 
-                sipProxyHostField = NSTextField; 
-                sipProxyPasswordField = NSTextField; 
-                sipProxyPopUp = NSPopUpButton; 
-                sipProxyUsernameField = NSTextField; 
-                stunServersTab = NSTabView; 
-                stunServersTable = NSTableView; 
-                videoCodecPreferenceOrderTableView = NSTableView; 
-                videoCodecsTab = NSTabView; 
-                videoFrameRateField = NSTextField; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {applyPreferences = id; toolbarItemAction = id; }; 
-            CLASS = XMPreferencesWindowController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {applyButton = NSButton; buttonToolbarView = NSView; }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {
-                closeVideoModuleSettingsPanel = id; 
-                preferredVideoDeviceSelectionDidChange = id; 
-                restoreDefaultVideoModuleSettings = id; 
-            }; 
-            CLASS = XMVideoPreferencesModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentView = NSView; 
-                preferredVideoDevicePopUp = NSPopUpButton; 
-                videoModuleSettingsBox = NSBox; 
-                videoModuleSettingsPanel = NSPanel; 
-                videoModulesTableView = NSTableView; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>closeVideoModuleSettingsPanel</key>
+				<string>id</string>
+				<key>preferredVideoDeviceSelectionDidChange</key>
+				<string>id</string>
+				<key>restoreDefaultVideoModuleSettings</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMVideoPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>preferredVideoDevicePopUp</key>
+				<string>NSPopUpButton</string>
+				<key>videoModuleSettingsBox</key>
+				<string>NSBox</string>
+				<key>videoModuleSettingsPanel</key>
+				<string>NSPanel</string>
+				<key>videoModulesTableView</key>
+				<string>NSTableView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addH323Account</key>
+				<string>id</string>
+				<key>addSIPAccount</key>
+				<string>id</string>
+				<key>cancelH323AccountEdit</key>
+				<string>id</string>
+				<key>cancelSIPAccountEdit</key>
+				<string>id</string>
+				<key>deleteH323Account</key>
+				<string>id</string>
+				<key>deleteSIPAccount</key>
+				<string>id</string>
+				<key>editH323Account</key>
+				<string>id</string>
+				<key>editSIPAccount</key>
+				<string>id</string>
+				<key>endH323AccountEdit</key>
+				<string>id</string>
+				<key>endSIPAccountEdit</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMAccountPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>addH323AccountButton</key>
+				<string>NSButton</string>
+				<key>addSIPAccountButton</key>
+				<string>NSButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>deleteH323AccountButton</key>
+				<string>NSButton</string>
+				<key>deleteSIPAccountButton</key>
+				<string>NSButton</string>
+				<key>editH323AccountButton</key>
+				<string>NSButton</string>
+				<key>editH323AccountPanel</key>
+				<string>NSPanel</string>
+				<key>editSIPAccountButton</key>
+				<string>NSButton</string>
+				<key>editSIPAccountPanel</key>
+				<string>NSPanel</string>
+				<key>h323AccountNameField</key>
+				<string>NSTextField</string>
+				<key>h323AccountsTableView</key>
+				<string>NSTableView</string>
+				<key>h323GatekeeperHostField</key>
+				<string>NSTextField</string>
+				<key>h323PasswordField</key>
+				<string>NSTextField</string>
+				<key>h323TerminalAlias1Field</key>
+				<string>NSTextField</string>
+				<key>h323TerminalAlias2Field</key>
+				<string>NSTextField</string>
+				<key>locationModule</key>
+				<string>XMLocationPreferencesModule</string>
+				<key>sipAccountNameField</key>
+				<string>NSTextField</string>
+				<key>sipAccountsTableView</key>
+				<string>NSTableView</string>
+				<key>sipAuthorizationUsernameField</key>
+				<string>NSTextField</string>
+				<key>sipPasswordField</key>
+				<string>NSTextField</string>
+				<key>sipRegistrationDomainField</key>
+				<string>NSTextField</string>
+				<key>sipUsernameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>defaultAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMGeneralPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>automaticallyAcceptIncomingCallsSwitch</key>
+				<string>NSButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>userNameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>chooseDebugFilePath</key>
+				<string>id</string>
+				<key>defaultAction</key>
+				<string>id</string>
+				<key>toggleGenerateDebugLogFile</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMDebugPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chooseDebugLogFilePathButton</key>
+				<string>NSButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>debugLogFilePathField</key>
+				<string>NSTextField</string>
+				<key>generateDebugLogSwitch</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>defaultAction</key>
+				<string>id</string>
+				<key>toggleEnableABPhoneNumbers</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMAddressBookPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>enableABDatabaseSearchSwitch</key>
+				<string>NSButton</string>
+				<key>enableABPhoneNumbersSwitch</key>
+				<string>NSButton</string>
+				<key>phoneNumberProtocolMatrix</key>
+				<string>NSMatrix</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>defaultAction</key>
+				<string>id</string>
+				<key>toggleAutomaticallyHideInCallControls</key>
+				<string>id</string>
+				<key>togglePlaySoundOnIncomingCall</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMAppearancePreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>automaticallyEnterFullScreenSwitch</key>
+				<string>NSButton</string>
+				<key>automaticallyHideInCallControlsSwitch</key>
+				<string>NSButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>inCallControlsHideAndShowEffectPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>playSoundOnIncomingCallSwitch</key>
+				<string>NSButton</string>
+				<key>showSelfViewMirroredSwitch</key>
+				<string>NSButton</string>
+				<key>soundTypePopUp</key>
+				<string>NSPopUpButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>defaultAction</key>
+				<string>id</string>
+				<key>preferredInputDeviceSelectionDidChange</key>
+				<string>id</string>
+				<key>preferredOutputDeviceSelectionDidChange</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMAudioPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>preferredInputDevicePopUp</key>
+				<string>NSPopUpButton</string>
+				<key>preferredOutputDevicePopUp</key>
+				<string>NSPopUpButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>actionButton</key>
+				<string>id</string>
+				<key>addSTUNServer</key>
+				<string>id</string>
+				<key>createNewLocation</key>
+				<string>id</string>
+				<key>defaultAction</key>
+				<string>id</string>
+				<key>deleteLocation</key>
+				<string>id</string>
+				<key>duplicateLocation</key>
+				<string>id</string>
+				<key>endNewLocationSheet</key>
+				<string>id</string>
+				<key>gatekeeperAccountSelected</key>
+				<string>id</string>
+				<key>importLocations</key>
+				<string>id</string>
+				<key>makeDefaultSIPAccount</key>
+				<string>id</string>
+				<key>moveAudioCodec</key>
+				<string>id</string>
+				<key>moveSTUNServerDown</key>
+				<string>id</string>
+				<key>moveSTUNServerUp</key>
+				<string>id</string>
+				<key>moveVideoCodec</key>
+				<string>id</string>
+				<key>overwriteAudioCodecs</key>
+				<string>id</string>
+				<key>overwriteSIPAccounts</key>
+				<string>id</string>
+				<key>overwriteSTUNServers</key>
+				<string>id</string>
+				<key>overwriteVideoCodecs</key>
+				<string>id</string>
+				<key>removeSTUNServer</key>
+				<string>id</string>
+				<key>renameLocation</key>
+				<string>id</string>
+				<key>selectAllLocations</key>
+				<string>id</string>
+				<key>sipProxySelected</key>
+				<string>id</string>
+				<key>toggleAutoGetExternalAddress</key>
+				<string>id</string>
+				<key>toggleEnableH323</key>
+				<string>id</string>
+				<key>toggleEnableSIP</key>
+				<string>id</string>
+				<key>toggleEnableVideo</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMLocationPreferencesModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>accountModule</key>
+				<string>XMAccountPreferencesModule</string>
+				<key>actionButton</key>
+				<string>NSButton</string>
+				<key>actionPopup</key>
+				<string>NSPopUpButton</string>
+				<key>audioCodecPreferenceOrderTableView</key>
+				<string>NSTableView</string>
+				<key>audioCodecsTab</key>
+				<string>NSTabView</string>
+				<key>audioPacketTimePopUp</key>
+				<string>NSPopUpButton</string>
+				<key>autoGetExternalAddressSwitch</key>
+				<string>NSButton</string>
+				<key>bandwidthLimitPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>deleteLocationButton</key>
+				<string>NSButton</string>
+				<key>enableEchoCancellationSwitch</key>
+				<string>NSButton</string>
+				<key>enableFastStartSwitch</key>
+				<string>NSButton</string>
+				<key>enableH245TunnelSwitch</key>
+				<string>NSButton</string>
+				<key>enableH264LimitedModeSwitch</key>
+				<string>NSButton</string>
+				<key>enableH323Switch</key>
+				<string>NSButton</string>
+				<key>enableSIPSwitch</key>
+				<string>NSButton</string>
+				<key>enableSilenceSuppressionSwitch</key>
+				<string>NSButton</string>
+				<key>enableVideoSwitch</key>
+				<string>NSButton</string>
+				<key>gatekeeperHostField</key>
+				<string>NSTextField</string>
+				<key>gatekeeperPhoneNumberField</key>
+				<string>NSTextField</string>
+				<key>gatekeeperUserAliasField</key>
+				<string>NSTextField</string>
+				<key>h323AccountsPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>internationalDialingPrefixField</key>
+				<string>NSTextField</string>
+				<key>locationsTableView</key>
+				<string>NSTableView</string>
+				<key>makeDefaultSIPAccountButton</key>
+				<string>NSButton</string>
+				<key>maxTCPPortField</key>
+				<string>NSTextField</string>
+				<key>maxUDPPortField</key>
+				<string>NSTextField</string>
+				<key>minTCPPortField</key>
+				<string>NSTextField</string>
+				<key>minUDPPortField</key>
+				<string>NSTextField</string>
+				<key>moveAudioCodecDownButton</key>
+				<string>NSButton</string>
+				<key>moveAudioCodecUpButton</key>
+				<string>NSButton</string>
+				<key>moveSTUNServerDownButton</key>
+				<string>NSButton</string>
+				<key>moveSTUNServerUpButton</key>
+				<string>NSButton</string>
+				<key>moveVideoCodecDownButton</key>
+				<string>NSButton</string>
+				<key>moveVideoCodecUpButton</key>
+				<string>NSButton</string>
+				<key>newLocationButton</key>
+				<string>NSButton</string>
+				<key>newLocationCancelButton</key>
+				<string>NSButton</string>
+				<key>newLocationNameField</key>
+				<string>NSTextField</string>
+				<key>newLocationOKButton</key>
+				<string>NSButton</string>
+				<key>newLocationSheet</key>
+				<string>NSPanel</string>
+				<key>publicAddressField</key>
+				<string>NSTextField</string>
+				<key>removeSTUNServerButton</key>
+				<string>NSButton</string>
+				<key>sectionsTab</key>
+				<string>NSTabView</string>
+				<key>selectAllButton</key>
+				<string>NSButton</string>
+				<key>sipAccountsTab</key>
+				<string>NSTabView</string>
+				<key>sipAccountsTable</key>
+				<string>NSTableView</string>
+				<key>sipProxyHostField</key>
+				<string>NSTextField</string>
+				<key>sipProxyPasswordField</key>
+				<string>NSTextField</string>
+				<key>sipProxyPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>sipProxyUsernameField</key>
+				<string>NSTextField</string>
+				<key>stunServersTab</key>
+				<string>NSTabView</string>
+				<key>stunServersTable</key>
+				<string>NSTableView</string>
+				<key>videoCodecPreferenceOrderTableView</key>
+				<string>NSTableView</string>
+				<key>videoCodecsTab</key>
+				<string>NSTabView</string>
+				<key>videoFrameRateField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>applyPreferences</key>
+				<string>id</string>
+				<key>switchToDetailedView</key>
+				<string>id</string>
+				<key>switchToSimpleView</key>
+				<string>id</string>
+				<key>toolbarItemAction</key>
+				<string>NSToolbarItem</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMPreferencesWindowController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>applyButton</key>
+				<string>NSButton</string>
+				<key>buttonToolbarView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

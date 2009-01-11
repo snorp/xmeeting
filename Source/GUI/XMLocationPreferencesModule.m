@@ -1,5 +1,5 @@
 /*
- * $Id: XMLocationPreferencesModule.m,v 1.39 2008/12/27 16:54:40 hfriederich Exp $
+ * $Id: XMLocationPreferencesModule.m,v 1.40 2009/01/11 19:20:37 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -261,8 +261,9 @@ NSString *XMKey_NetworkTabViewItemIdentifier = @"network";
   // preparing the h323 and SIP account pop up buttons
   [self noteAccountsDidChange];
   
-  // causing the table view to reload its data and select the first item
-  [locationsTableView selectAll:self];
+  // select the first item of the locations table
+  [locationsTableView reloadData];
+  [locationsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
   
   // validating the location buttons
   [self _validateLocationButtonUserInterface];
@@ -380,7 +381,12 @@ NSString *XMKey_NetworkTabViewItemIdentifier = @"network";
 
 - (IBAction)selectAllLocations:(id)sender
 {
-  [locationsTableView selectAll:sender];
+  if ([[locationsTableView selectedRowIndexes] count] == [locations count]) {
+    // all selected, select only first one
+    [locationsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+  } else {
+    [locationsTableView selectAll:sender];
+  }
 }
 
 - (IBAction)renameLocation:(id)sender
@@ -1287,11 +1293,26 @@ NSString *XMKey_NetworkTabViewItemIdentifier = @"network";
 
 - (void)_validateLocationButtonUserInterface
 {
-  NSIndexSet * selectedRows = [locationsTableView selectedRowIndexes];
-  if ([selectedRows count] > 1 || [locations count] == 1) {
+  unsigned selectedRowsCount = [[locationsTableView selectedRowIndexes] count];
+  unsigned locationsCount = [locations count];
+  
+  if (selectedRowsCount > 1 || locationsCount == 1) {
+    // multiple locations selected, or only one location available
     [deleteLocationButton setEnabled:NO];
   } else {
     [deleteLocationButton setEnabled:YES];
+  }
+  if (locationsCount > 1) {
+    [selectAllButton setEnabled:YES];
+    if (selectedRowsCount == locationsCount) { // all selected
+      [selectAllButton setTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_DESELECT_ALL", @"")];
+    } else {
+      [selectAllButton setTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_SELECT_ALL", @"")];
+    }
+  } else {
+    // only one location
+    [selectAllButton setTitle:NSLocalizedString(@"XM_LOCATION_PREFERENCES_SELECT_ALL", @"")];
+    [selectAllButton setEnabled:NO];
   }
 }
 
