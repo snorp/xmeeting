@@ -1,125 +1,322 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = XMSAEditController; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {continueAssistant = id; }; 
-            CLASS = XMSAEditDoneModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSAEditIntroductionModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSAGatekeeperModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSAGeneralModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; nameField = NSTextField; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSAH323Module; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; useGkRadioButtons = NSMatrix; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {radioButtonAction = id; }; 
-            CLASS = XMSALocationModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentView = NSView; 
-                locationRadioButtons = NSMatrix; 
-                locationsTable = NSTableView; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSANetworkModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {bandwidthLimitPopUp = NSPopUpButton; contentView = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSANewLocationModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; nameField = NSTextField; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {action = id; }; 
-            CLASS = XMSAProtocolModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                contentView = NSView; 
-                enableH323Switch = NSButton; 
-                enableSIPSwitch = NSButton; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSARegistrationModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSASIPModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; useRegistrarRadioButtons = NSMatrix; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = XMSAVideoModule; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {contentView = NSView; videoRadioButtons = NSMatrix; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                cancelAssistant = id; 
-                continueAssistant = id; 
-                goBackAssistant = id; 
-                switchToDetailedView = id; 
-            }; 
-            CLASS = XMSetupAssistantManager; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                cancelButton = NSButton; 
-                contentBox = NSBox; 
-                contentView = NSView; 
-                continueButton = NSButton; 
-                controller = id; 
-                cornerImage = NSImageView; 
-                currentModule = id; 
-                detailedViewButton = NSButton; 
-                editDoneModule = id; 
-                editIntroductionModule = id; 
-                gatekeeperModule = id; 
-                generalSettingsModule = id; 
-                goBackButton = NSButton; 
-                h323Module = id; 
-                locationModule = id; 
-                networkModule = id; 
-                newLocationModule = id; 
-                protocolModule = id; 
-                registrationModule = id; 
-                sipModule = id; 
-                titleField = NSTextField; 
-                videoModule = id; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAH323Module</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>useGkRadioButtons</key>
+				<string>NSMatrix</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAFirstLaunchDoneModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>continueAssistant</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMSAEditDoneModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAVideoModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>videoRadioButtons</key>
+				<string>NSMatrix</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSASIPModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>useRegistrationRadioButtons</key>
+				<string>NSMatrix</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSARegistrationModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>sipRegAuthorizationUsernameField</key>
+				<string>NSTextField</string>
+				<key>sipRegDomainField</key>
+				<string>NSTextField</string>
+				<key>sipRegPasswordField</key>
+				<string>NSTextField</string>
+				<key>sipRegUsernameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSANewLocationModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>nameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAGeneralModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>nameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAEditIntroductionModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelAssistant</key>
+				<string>id</string>
+				<key>continueAssistant</key>
+				<string>id</string>
+				<key>goBackAssistant</key>
+				<string>id</string>
+				<key>switchToDetailedView</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMSetupAssistantManager</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>contentBox</key>
+				<string>NSBox</string>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>continueButton</key>
+				<string>NSButton</string>
+				<key>controller</key>
+				<string>id</string>
+				<key>cornerImage</key>
+				<string>NSImageView</string>
+				<key>currentModule</key>
+				<string>id</string>
+				<key>detailedViewButton</key>
+				<string>NSButton</string>
+				<key>editDoneModule</key>
+				<string>id</string>
+				<key>editIntroductionModule</key>
+				<string>id</string>
+				<key>firstLaunchDoneModule</key>
+				<string>id</string>
+				<key>firstLaunchIntroductionModule</key>
+				<string>id</string>
+				<key>gatekeeperModule</key>
+				<string>id</string>
+				<key>generalSettingsModule</key>
+				<string>id</string>
+				<key>goBackButton</key>
+				<string>NSButton</string>
+				<key>h323Module</key>
+				<string>id</string>
+				<key>locationModule</key>
+				<string>id</string>
+				<key>networkModule</key>
+				<string>id</string>
+				<key>newLocationModule</key>
+				<string>id</string>
+				<key>protocolModule</key>
+				<string>id</string>
+				<key>registrationModule</key>
+				<string>id</string>
+				<key>sipModule</key>
+				<string>id</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+				<key>videoModule</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAFirstLaunchIntroductionModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>radioButtonAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMSALocationModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>locationRadioButtons</key>
+				<string>NSMatrix</string>
+				<key>locationsTable</key>
+				<string>NSTableView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSANetworkModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>bandwidthLimitPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>contentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>action</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>XMSAProtocolModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>enableH323Switch</key>
+				<string>NSButton</string>
+				<key>enableSIPSwitch</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>XMSAGatekeeperModule</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>contentView</key>
+				<string>NSView</string>
+				<key>gkHostField</key>
+				<string>NSTextField</string>
+				<key>gkPasswordField</key>
+				<string>NSTextField</string>
+				<key>gkUserAlias1Field</key>
+				<string>NSTextField</string>
+				<key>gkUserAlias2Field</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

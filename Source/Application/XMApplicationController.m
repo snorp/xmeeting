@@ -1,9 +1,9 @@
 /*
- * $Id: XMApplicationController.m,v 1.71 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMApplicationController.m,v 1.72 2009/01/11 17:19:22 hfriederich Exp $
  *
- * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2009 Hannes Friederich. All rights reserved.
  */
 
 #import "XMApplicationController.h"
@@ -82,9 +82,6 @@
 
 - (void)_showSetupAssistant;
 - (void)_setupApplication;
-- (void)_setupApplicationWithLocations:(NSArray *)locations 
-                          h323Accounts:(NSArray *)h323Accounts
-                           sipAccounts:(NSArray *)sipAccounts;
 
 @end
 
@@ -752,32 +749,23 @@
 
 - (void)_showSetupAssistant
 {
-  [[XMSetupAssistantManager sharedInstance] runFirstApplicationLaunchAssistantWithDelegate:self
-                                                                            didEndSelector:@selector(_setupApplicationWithLocations:h323Accounts:sipAccounts:)];
+  [[XMSetupAssistantManager sharedInstance] runFirstApplicationLaunchAssistantWithDelegate:self didEndSelector:@selector(_setupApplication)];
 }
 
 - (void)_setupApplication
 {
-  NSArray *array = [NSArray array];
-  [self _setupApplicationWithLocations:array
-                          h323Accounts:nil
-                           sipAccounts:nil];
-}
-
-- (void)_setupApplicationWithLocations:(NSArray *)locations
-						  h323Accounts:(NSArray *)h323Accounts
-						   sipAccounts:(NSArray *)sipAccounts
-{		
   // registering the call address providers
   [self _preferencesDidChange:nil];
   [[XMCallHistoryCallAddressProvider sharedInstance] setActiveCallAddressProvider:YES];
   
+  // setup the main window
   noCallModule = [[XMNoCallModule alloc] init];
   inCallModule = [[XMInCallModule alloc] init];
   NSArray *mainWindowModules = [[NSArray alloc] initWithObjects:noCallModule, inCallModule, nil];
   [[XMMainWindowController sharedInstance] setModules:mainWindowModules];
   [mainWindowModules release];
   
+  // setup the info inspector
   infoModule = [[XMInfoModule alloc] init];
   [infoModule setTag:XMInspectorControllerTag_Inspector];
   statisticsModule = [[XMStatisticsModule alloc] init];
@@ -788,6 +776,7 @@
   [[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Inspector] setModules:inspectorModules];
   [inspectorModules release];
   
+  // setup the tools inspector
   localAudioVideoModule = [[XMLocalAudioVideoModule alloc] init];
   [localAudioVideoModule setTag:XMInspectorControllerTag_Tools];
   dialPadModule = [[XMDialPadModule alloc] init];
@@ -798,22 +787,15 @@
   [[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Tools] setModules:toolsModules];
   [toolsModules release];
   
+  // setup the addresses inspector
   addressBookModule = [[XMAddressBookModule alloc] init];
   [addressBookModule setTag:XMInspectorControllerTag_Contacts];
   NSArray *contactsModules = [[NSArray alloc] initWithObjects:addressBookModule, nil];
   [[XMInspectorController inspectorWithTag:XMInspectorControllerTag_Contacts] setModules:contactsModules];
   [contactsModules release];
   
-  // causing the PreferencesManager to activate the active location
-  // by calling XMCallManager -setActivePreferences:
-  XMPreferencesManager *preferencesManager = [XMPreferencesManager sharedInstance];
-  [preferencesManager setH323Accounts:h323Accounts];
-  [preferencesManager setSIPAccounts:sipAccounts];
-  [preferencesManager setLocations:locations];
-  
-  if ([locations count] != 0) {
-    [preferencesManager synchronizeAndNotify];
-  }
+  // activate the preferences if needed
+  [[XMPreferencesManager sharedInstance] activatePreferences];
   
   // show the main window
   [[XMMainWindowController sharedInstance] showMainWindow];

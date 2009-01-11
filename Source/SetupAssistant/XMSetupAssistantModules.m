@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantModules.m,v 1.3 2009/01/09 08:08:21 hfriederich Exp $
+ * $Id: XMSetupAssistantModules.m,v 1.4 2009/01/11 17:20:41 hfriederich Exp $
  *
  * Copyright (c) 2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -39,7 +39,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   NSString *str = [nameField stringValue];
   if ([str length] == 0) {
@@ -66,11 +66,7 @@
 
 - (void)controlTextDidChange:(NSNotification *)notif
 {
-  if ([[nameField stringValue] length] == 0) {
-    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:NO];
-  } else {
-    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:YES];
-  }
+  [[XMSetupAssistantManager sharedInstance] updateContinueStatus];
 }
 
 @end
@@ -102,7 +98,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
@@ -112,17 +108,30 @@
   BOOL enableImportLocation = NO;
   BOOL enableEditLocation = NO;
   
-  [locationsTable selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+  NSArray *locations = [data locations];
+  XMLocation *lastLocation = (XMLocation *)[data getAttribute:XMAttribute_LastLocation];
+  unsigned count = [locations count];
+  unsigned selectedIndex = 0;
+  for (unsigned i = 0; i < count; i++) {
+    XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+    if (location == lastLocation) {
+      selectedIndex = i;
+      break;
+    }
+  }
+  
+  [locationsTable selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedIndex] byExtendingSelection:NO];
   [locationsTable reloadData];
   
+  int rowIndex = 0;
   if ([data hasAttribute:XMAttribute_PreferencesEdit]) {
     enableEditLocation = YES;
+    rowIndex = 2; // when editing, by default edit locations and do not create new ones
   }
   
   [[locationRadioButtons cellAtRow:1 column:0] setEnabled:enableImportLocation]; // row 1 is importLocation
   [[locationRadioButtons cellAtRow:2 column:0] setEnabled:enableEditLocation]; // row 2 is editLocation
   
-  int rowIndex = 0;
   if ([data hasAttribute:XMAttribute_NewLocation]) {
     rowIndex = 0;
   } else if ([data hasAttribute:XMAttribute_EditLocation]) {
@@ -144,7 +153,22 @@
   if (rowIndex == 0) { // create new location
     [data clearAttribute:XMAttribute_EditLocation];
     [data setAttribute:XMAttribute_NewLocation];
-    [data setCurrentLocation:[data createLocation]];
+    // keep current location if current location not in locations array,
+    // as this is a new location in this case
+    XMLocation *currentLocation = [data currentLocation];
+    if (currentLocation != nil) {
+      NSArray *locations = [data locations];
+      unsigned count = [locations count];
+      for (unsigned i = 0; i < count; i++) {
+        XMLocation *location = (XMLocation *)[locations objectAtIndex:i];
+        if (location == currentLocation) {
+          [data setCurrentLocation:[data createLocation]];
+          break;
+        }
+      }
+    } else {
+      [data setCurrentLocation:[data createLocation]];
+    }
   } else if (rowIndex == 1) {
     // TODO
   } else {
@@ -155,6 +179,7 @@
     XMLocation *location = (XMLocation *)[[data locations] objectAtIndex:locationIndex];
     [data setCurrentLocation:location];
   }
+  [data setAttribute:XMAttribute_LastLocation value:[data currentLocation]];
 }
 
 - (void)editData:(NSArray *)editKeys
@@ -218,7 +243,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   NSString *str = [nameField stringValue];
   if ([str length] == 0) {
@@ -245,12 +270,7 @@
 
 - (void)controlTextDidChange:(NSNotification *)notif
 {
-  if ([[nameField stringValue] length] == 0) {
-    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:NO];
-  } else {
-    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:YES];
-  }
-}
+  [[XMSetupAssistantManager sharedInstance] updateContinueStatus];}
 
 @end
 
@@ -282,7 +302,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
@@ -331,7 +351,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   if ([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState) {
     return NO;
@@ -368,11 +388,7 @@
 
 - (IBAction)action:(id)sender
 {
-  if ([enableH323Switch state] == NSOffState && [enableSIPSwitch state] == NSOffState) {
-    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:NO];
-  } else {
-    [[XMSetupAssistantManager sharedInstance] setButtonsEnabled:YES];
-  }
+  [[XMSetupAssistantManager sharedInstance] updateContinueStatus];
 }
 
 @end
@@ -408,19 +424,31 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
-  int selectedIndex = [data hasAttribute:XMAttribute_UseGatekeeper] ? 0 : 1;
+  XMLocation *currentLocation = [data currentLocation];
+  XMLocation *lastLocation = (XMLocation *)[data getAttribute:XMAttribute_GatekeeperLastLocation];
+  int selectedIndex = 1;
+  
+  if (currentLocation != lastLocation) { // read value from location
+    selectedIndex = [currentLocation h323AccountTag] != 0 ? 0 : 1;
+    [data clearH323AccountInfo]; // ensure data consistency
+  } else { // read attribute
+    selectedIndex = [data hasAttribute:XMAttribute_UseGatekeeper] ? 0 : 1;
+  }
   [useGkRadioButtons selectCellAtRow:selectedIndex column:0];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  XMLocation *currentLocation = [data currentLocation];
+  [data setAttribute:XMAttribute_GatekeeperLastLocation value:currentLocation]; // store current location to ensure data integrity
+  
   int selectedIndex = [useGkRadioButtons selectedRow];
   if (selectedIndex == 0) {
     [data setAttribute:XMAttribute_UseGatekeeper];
@@ -466,21 +494,40 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
+  NSString *str = [gkUserAlias1Field stringValue];
+  if ([str length] == 0) {
+    [[gkUserAlias1Field window] makeFirstResponder:gkUserAlias1Field];
+    return NO;
+  }
   return YES;
 }
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  [gkHostField setStringValue:[data gkHost]];
+  [gkUserAlias1Field setStringValue:[data gkUserAlias1]];
+  [gkUserAlias2Field setStringValue:[data gkUserAlias2]];
+  [gkPasswordField setStringValue:[data gkPassword]];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  [data setGKHost:[gkHostField stringValue]];
+  [data setGKUserAlias1:[gkUserAlias1Field stringValue]];
+  [data setGKUserAlias2:[gkUserAlias2Field stringValue]];
+  [data setGKPassword:[gkPasswordField stringValue]];
 }
 
 - (void)editData:(NSArray *)editKeys
 {
+  [[gkHostField window] makeFirstResponder:gkHostField];
+}
+
+- (void)controlTextDidChange:(NSNotification *)notif
+{
+  [[XMSetupAssistantManager sharedInstance] updateContinueStatus];
 }
 
 @end
@@ -516,24 +563,36 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
-  int selectedIndex = [data hasAttribute:XMAttribute_UseSIPRegistrar] ? 0 : 1;
-  [useRegistrarRadioButtons selectCellAtRow:selectedIndex column:0];
+  XMLocation *currentLocation = [data currentLocation];
+  XMLocation *lastLocation = (XMLocation *)[data getAttribute:XMAttribute_SIPRegistrationLastLocation];
+  int selectedIndex = 1;
+  
+  if (currentLocation != lastLocation) { // read value from location
+    selectedIndex = [currentLocation defaultSIPAccountTag] != 0 ? 0 : 1;
+    [data clearSIPAccountInfo]; // ensure data consistency
+  } else { // read attribute
+    selectedIndex = [data hasAttribute:XMAttribute_UseSIPRegistration] ? 0 : 1;
+  }
+  [useRegistrationRadioButtons selectCellAtRow:selectedIndex column:0];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
-  int selectedIndex = [useRegistrarRadioButtons selectedRow];
+  XMLocation *currentLocation = [data currentLocation];
+  [data setAttribute:XMAttribute_SIPRegistrationLastLocation value:currentLocation]; // store current location to ensure data integrity
+  
+  int selectedIndex = [useRegistrationRadioButtons selectedRow];
   if (selectedIndex == 0) {
-    [data setAttribute:XMAttribute_UseSIPRegistrar];
+    [data setAttribute:XMAttribute_UseSIPRegistration];
   } else {
-    [data clearAttribute:XMAttribute_UseSIPRegistrar];
+    [data clearAttribute:XMAttribute_UseSIPRegistration];
   }
 }
 
@@ -552,7 +611,7 @@
 
 - (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
 {
-  if ([[data currentLocation] enableSIP] && [data hasAttribute:XMAttribute_UseSIPRegistrar]) {
+  if ([[data currentLocation] enableSIP] && [data hasAttribute:XMAttribute_UseSIPRegistration]) {
     return YES;
   }
   return NO;
@@ -574,21 +633,43 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
+  NSString *str = [sipRegDomainField stringValue];
+  if ([str length] == 0) {
+    return NO;
+  }
+  str = [sipRegUsernameField stringValue];
+  if ([str length] == 0) {
+    return NO;
+  }
   return YES;
 }
 
 - (void)loadData:(id<XMSetupAssistantData>)data
 {
+  [sipRegDomainField setStringValue:[data sipRegDomain]];
+  [sipRegUsernameField setStringValue:[data sipRegUsername]];
+  [sipRegAuthorizationUsernameField setStringValue:[data sipRegAuthorizationUsername]];
+  [sipRegPasswordField setStringValue:[data sipRegPassword]];
 }
 
 - (void)saveData:(id<XMSetupAssistantData>)data
 {
+  [data setSIPRegDomain:[sipRegDomainField stringValue]];
+  [data setSIPRegUsername:[sipRegUsernameField stringValue]];
+  [data setSIPRegAuthorizationUsername:[sipRegAuthorizationUsernameField stringValue]];
+  [data setSIPRegPassword:[sipRegPasswordField stringValue]];
 }
 
 - (void)editData:(NSArray *)editKeys
 {
+  [[sipRegDomainField window] makeFirstResponder:sipRegDomainField];
+}
+
+- (void)controlTextDidChange:(NSNotification *)notif
+{
+  [[XMSetupAssistantManager sharedInstance] updateContinueStatus];
 }
 
 @end
@@ -621,7 +702,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
@@ -683,7 +764,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
@@ -716,7 +797,7 @@
 
 - (NSString *)titleForData:(id<XMSetupAssistantData>)data
 {
-  return NSLocalizedString(@"XM_SETUP_ASSISTANT_PI", @"");
+  return NSLocalizedString(@"XM_SETUP_ASSISTANT_COMPLETED", @"");
 }
 
 - (BOOL)showCornerImage
@@ -729,7 +810,7 @@
   return contentView;
 }
 
-- (BOOL)canSaveData
+- (BOOL)canContinue
 {
   return YES;
 }
@@ -753,3 +834,102 @@
 }
 
 @end
+
+#pragma mark -
+#pragma mark Edit Mode
+
+/**
+ * Dummy module that simply displays a view
+ **/
+@implementation XMSAFirstLaunchIntroductionModule
+
+- (NSArray *)editKeys
+{
+  return [NSArray array];
+}
+
+- (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
+{
+  return YES;
+}
+
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
+{
+  return NSLocalizedString(@"XM_SETUP_ASSISTANT_WELCOME", @"");
+}
+
+- (BOOL)showCornerImage
+{
+  return NO;
+}
+
+- (NSView *)contentView
+{
+  return contentView;
+}
+
+- (BOOL)canContinue
+{
+  return YES;
+}
+
+- (void)loadData:(id<XMSetupAssistantData>)data
+{
+}
+
+- (void)saveData:(id<XMSetupAssistantData>)data
+{
+}
+
+- (void)editData:(NSArray *)editKeys
+{
+}
+
+@end
+
+@implementation XMSAFirstLaunchDoneModule 
+
+- (NSArray *)editKeys
+{
+  return [NSArray array];
+}
+
+- (BOOL)isActiveForData:(id<XMSetupAssistantData>)data
+{
+  return YES;
+}
+
+- (NSString *)titleForData:(id<XMSetupAssistantData>)data
+{
+  return NSLocalizedString(@"XM_SETUP_ASSISTANT_COMPLETED", @"");
+}
+
+- (BOOL)showCornerImage
+{
+  return YES;
+}
+
+- (NSView *)contentView
+{
+  return contentView;
+}
+
+- (BOOL)canContinue
+{
+  return YES;
+}
+
+- (void)loadData:(id<XMSetupAssistantData>)data
+{
+}
+
+- (void)saveData:(id<XMSetupAssistantData>)data
+{
+}
+
+- (void)editData:(NSArray *)editKeys
+{
+}
+
+@end
+

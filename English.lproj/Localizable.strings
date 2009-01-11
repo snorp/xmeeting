@@ -243,8 +243,8 @@
 "XM_SETUP_ASSISTANT_FINISH" = "Finish";
 "XM_SETUP_ASSISTANT_NAME" = "XMeeting Setup Assistant";
 "XM_SETUP_ASSISTANT_NEW_LOCATION_NAME" = "<New Location %d>";
-"XM_SETUP_ASSISTANT_DEFAULT_GK" = "<Default Gatekeeper>";
-"XM_SETUP_ASSISTANT_DEFAULT_REG" = "<Default Registrar>";
+"XM_SETUP_ASSISTANT_NEW_H323_ACCOUNT_NAME" = "<H323 Account %d>";
+"XM_SETUP_ASSISTANT_NEW_SIP_ACCOUNT_NAME" = "<SIP Account %d>";
 "XM_SETUP_ASSISTANT_WELCOME" = "Welcome to XMeeting!";
 "XM_SETUP_ASSISTANT_PI" = "Personal Information";
 "XM_SETUP_ASSISTANT_LOCATIONS" = "Locations";
@@ -253,11 +253,7 @@
 "XM_SETUP_ASSISTANT_LOC_IMPORT_FAILURE" = "Location import failed";
 "XM_SETUP_ASSISTANT_INVALID_FILE" = "File does not contain valid data";
 "XM_SETUP_ASSISTANT_IMPORT" = "Import";
-"XM_SETUP_ASSISTANT_COMPLETED" = "Completed";
-"XM_SETUP_ASSISTANT_NO_NAT" = "It appears that you are not behind a NAT. You may choose to not use STUN or IP address translation in the next view.";
-"XM_SETUP_ASSISTANT_DEFAULT_NAT" = "It appears that you are behind a NAT. It is recommended to enable STUN in the next view or calls may not work.";
-"XM_SETUP_ASSISTANT_SYMMETRIC_NAT" = "It appears that you are behind a NAT of type \"%@\". The STUN protocol cannot help in this case. You need to use port forwarding in your NAT device or calls may not work.";
-"XM_SETUP_ASSISTANT_NAT_ERROR" = "XMeeting could not determine whether you are behind a NAT or not. Your computer is probably not connected to the Internet right now.";
+"XM_SETUP_ASSISTANT_COMPLETED" = "Setup Completed";
 
 /* External Address */
 "XM_FETCHING_EXTERNAL_ADDRESS" = "Fetching...";

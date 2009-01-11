@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesManager.m,v 1.33 2008/12/27 19:04:26 hfriederich Exp $
+ * $Id: XMPreferencesManager.m,v 1.34 2009/01/11 17:19:22 hfriederich Exp $
  *
- * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2009 Hannes Friederich. All rights reserved.
  */
 
 #import <Security/Security.h>
@@ -344,6 +344,13 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
   [userDefaults synchronize];
 }
 
+- (void)activatePreferences
+{
+  if (didActivatePreferences == NO) {
+    [self setLocations:nil];
+  }
+}
+
 #pragma mark -
 #pragma mark Accessor Methods
 
@@ -504,6 +511,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
     XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
     [location storeGlobalInformationsInSubsystem];
     [callManager setActivePreferences:location];
+    didActivatePreferences = YES;
   } else {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     
@@ -554,6 +562,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
       XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
       [location storeGlobalInformationsInSubsystem];
       [callManager setActivePreferences:location];
+      didActivatePreferences = YES;
     } else {
       NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
       
@@ -954,6 +963,7 @@ NSString *XMKey_PreferencesManagerAddressBookPhoneNumberProtocol = @"XMeeting_Ad
     XMLocation *location = (XMLocation *)[locations objectAtIndex:activeLocation];
     [location storeGlobalInformationsInSubsystem];
     [callManager setActivePreferences:location];
+    didActivatePreferences = YES;
     
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     

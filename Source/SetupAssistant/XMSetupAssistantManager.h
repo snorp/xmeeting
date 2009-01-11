@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.h,v 1.12 2009/01/09 08:08:21 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.h,v 1.13 2009/01/11 17:20:41 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -22,19 +22,22 @@
 extern NSString *XMAttribute_FirstLaunch;
 extern NSString *XMAttribute_PreferencesEdit;
 extern NSString *XMAttribute_LocationImport;
+extern NSString *XMAttribute_LastLocation;
 extern NSString *XMAttribute_NewLocation;
 extern NSString *XMAttribute_EditLocation;
+extern NSString *XMAttribute_GatekeeperLastLocation;
 extern NSString *XMAttribute_UseGatekeeper;
-extern NSString *XMAttribute_UseSIPRegistrar;
+extern NSString *XMAttribute_SIPRegistrationLastLocation;
+extern NSString *XMAttribute_UseSIPRegistration;
 
 @protocol XMSetupAssistantData <NSObject>
 
 - (NSArray *)locations;
-- (NSArray *)h323Accounts;
-- (NSArray *)sipAccounts;
 
 - (BOOL)hasAttribute:(NSString *)attribute;
+- (NSObject *)getAttribute:(NSString *)attribute;
 - (void)setAttribute:(NSString *)attribute;
+- (void)setAttribute:(NSString *)attribute value:(NSObject *)value;
 - (void)clearAttribute:(NSString *)attribute;
 
 - (XMLocation *)currentLocation;
@@ -43,6 +46,28 @@ extern NSString *XMAttribute_UseSIPRegistrar;
 
 - (NSString *)username;
 - (void)setUsername:(NSString *)username;
+
+- (void)clearH323AccountInfo;
+- (void)saveH323AccountInfo;
+- (NSString *)gkHost;
+- (void)setGKHost:(NSString *)host;
+- (NSString *)gkUserAlias1;
+- (void)setGKUserAlias1:(NSString *)userAlias;
+- (NSString *)gkUserAlias2;
+- (void)setGKUserAlias2:(NSString *)userAlias;
+- (NSString *)gkPassword;
+- (void)setGKPassword:(NSString *)password;
+
+- (void)clearSIPAccountInfo;
+- (void)saveSIPAccountInfo;
+- (NSString *)sipRegDomain;
+- (void)setSIPRegDomain:(NSString *)domain;
+- (NSString *)sipRegUsername;
+- (void)setSIPRegUsername:(NSString *)username;
+- (NSString *)sipRegAuthorizationUsername;
+- (void)setSIPRegAuthorizationUsername:(NSString *)authorizationUsername;
+- (NSString *)sipRegPassword;
+- (void)setSIPRegPassword:(NSString *)password;
 
 @end
 
@@ -55,7 +80,7 @@ extern NSString *XMAttribute_UseSIPRegistrar;
 - (BOOL)showCornerImage;
 - (NSView *)contentView;
 
-- (BOOL)canSaveData;
+- (BOOL)canContinue;
 
 - (void)loadData:(id<XMSetupAssistantData>)data;
 - (void)saveData:(id<XMSetupAssistantData>)data;
@@ -74,35 +99,26 @@ extern NSString *XMAttribute_UseSIPRegistrar;
 
 @end
 
-/**
- * Keys that are understood when importing locations:
- *
- * XMKey_PreferencesBandwidthLimit
- * XMKey_H323AccountUsername
- * XMKey_H323AccountPhoneNumber
- * XMKey_H323AccountPassword
- * XMKey_SIPAccountUsername
- * XMKey_SIPAccountAuthorizationUsername
- * XMKey_SIPAccountPassword
- **/
-
 @interface XMSetupAssistantManager : NSWindowController <XMSetupAssistantData> {
 	
 @private
+  
+  NSObject *delegate;
+  SEL didEndSelector;
   
   NSArray *locations;
   NSArray *h323Accounts;
   NSArray *sipAccounts;
   XMLocation *currentLocation;
-  XMH323Account *h323Account;
-  XMSIPAccount *sipAccount;
   NSString *username;
-  /*NSDictionary *locationImportData;
-  NSString *locationFilePath;
-  unsigned currentKeysToAskIndex;
-  NSWindow *modalWindow;
-  NSObject *delegate;
-  SEL didEndSelector;*/
+  NSString *gkHost;
+  NSString *gkUserAlias1;
+  NSString *gkUserAlias2;
+  NSString *gkPassword;
+  NSString *sipRegDomain;
+  NSString *sipRegUsername;
+  NSString *sipRegAuthorizationUsername;
+  NSString *sipRegPassword;
   
   id<XMSetupAssistantController> controller;
   id<XMSetupAssistantModule> currentModule;
@@ -136,104 +152,21 @@ extern NSString *XMAttribute_UseSIPRegistrar;
   IBOutlet id<XMSetupAssistantModule> editIntroductionModule;
   IBOutlet id<XMSetupAssistantModule> editDoneModule;
   
-  /*IBOutlet NSView *flIntroductionView;
-  IBOutlet NSView *flGeneralSettingsView;
-  IBOutlet NSView *flLocationView;
-  IBOutlet NSView *flNewLocationView;
-  IBOutlet NSView *flNATDetectionView;
-  IBOutlet NSView *flProtocolsView;
-  IBOutlet NSView *flCompletedView;
-  
-  IBOutlet NSView *liInfoView;
-  IBOutlet NSView *liCompletedView;
-  
-  IBOutlet NSView *networkSettingsView;
-  IBOutlet NSView *natSettingsView;
-  IBOutlet NSView *h323SettingsView;
-  IBOutlet NSView *gatekeeperSettingsView;
-  IBOutlet NSView *sipSettingsView;
-  IBOutlet NSView *registrationSettingsView;
-  IBOutlet NSView *videoSettingsView;*/
-  
-  // flGeneralSettings objects
-  /*IBOutlet NSTextField *userNameField;
-  NSString *userName;
-  
-  // flLocation objects
-  IBOutlet NSMatrix *locationRadioButtons;
-  
-  // flNewLocation objects
-  IBOutlet NSTextField *locationNameField;
-  
-  // flNATDetection objects
-  IBOutlet NSBox *natDetectionBox;
-  IBOutlet NSBox *natTypeBox;
-  IBOutlet NSProgressIndicator *natDetectionProgressIndicator;
-  IBOutlet NSTextField *natTypeField;
-  IBOutlet NSTextField *natTypeExplanationField;
-  IBOutlet NSButton *continueNATSettingsButton;
-  XMNATType detectedNATType;
-  
-  // flProtocol objects;
-  IBOutlet NSButton *enableH323Switch;
-  IBOutlet NSButton *enableSIPSwitch;
-  
-  // liInfo objects
-  IBOutlet NSTextField *infoField;
-  
-  // networkSettings objects
-  IBOutlet NSPopUpButton *bandwidthLimitPopUp;
-  
-  // natSettings object
-  IBOutlet NSButton *useSTUNRadioButton;
-  IBOutlet NSComboBox *stunServerField;
-  IBOutlet NSButton *useIPAddressTranslationRadioButton;
-  IBOutlet NSTextField *publicAddressField;
-  IBOutlet NSButton *updateExternalAddressButton;
-  IBOutlet NSButton *automaticallyGetExternalAddressSwitch;
-  BOOL publicAddressIsValid;
-  IBOutlet NSButton *noneRadioButton;
-  
-  // h323Settings objects
-  IBOutlet NSMatrix *useGatekeeperRadioButtons;
-  
-  // gatekeeperSettings objects
-  IBOutlet NSTextField *gkHostField;
-  IBOutlet NSTextField *gkUsernameField;
-  IBOutlet NSTextField *gkPhoneNumberField;
-  IBOutlet NSTextField *gkPasswordField;
-  
-  // sipSettings objects
-  IBOutlet NSMatrix *useRegistrationRadioButtons;
-  
-  // registrationSettings object
-  IBOutlet NSTextField *registrationDomainField;
-  IBOutlet NSTextField *registrationUsernameField;
-  IBOutlet NSTextField *registrationAuthUsernameField;
-  IBOutlet NSTextField *registrationPasswordField;
-  
-  // videoSettings objects
-  IBOutlet NSMatrix *enableVideoRadioButtons;*/
-
+  IBOutlet id<XMSetupAssistantModule> firstLaunchIntroductionModule;
+  IBOutlet id<XMSetupAssistantModule> firstLaunchDoneModule;
 }
 
 + (XMSetupAssistantManager *)sharedInstance;
 
 - (void)runEditAssistantInWindow:(NSWindow *)window;
 - (void)abortEditAssistant;
+- (void)finishEditAssistant;
 
 /**
  * Runs the assistant in the first application launch mode. When the
  * assistant has finished, didEndSelector is invoked. This selector
  * should have the form 
- * -assistantDidEndWithLocations:(NSArray *)locations 
- *					h323Accounts:(NSArray *)h323Accounts
- *					 sipAccounts:(NSArray *)sipAccounts
- *
- * locations contains the created location or zero elements in case the
- * user canceled.
- * h323Accounts contains any H.323 accounts created by this assistant
- * sipAccounts contains any SIP accounts created by this assistant
+ * -assistantDidEnd
  **/
 - (void)runFirstApplicationLaunchAssistantWithDelegate:(NSObject *)delegate
 										didEndSelector:(SEL)didEndSelector;
@@ -254,6 +187,8 @@ extern NSString *XMAttribute_UseSIPRegistrar;
 - (void)runImportLocationsAssistantModalForWindow:(NSWindow *)window
 									modalDelegate:(NSObject *)modalDelegate
 								   didEndSelector:(SEL)didEndSelector;
+- (void)abortFirstLaunchAssistant;
+- (void)finishFirstLaunchAssistant;
 
 - (NSSize)contentViewSize;
 
@@ -263,25 +198,13 @@ extern NSString *XMAttribute_UseSIPRegistrar;
 - (void)setEditKeys:(NSArray *)editKeys;
 - (void)addLocation:(XMLocation *)location;
 
-- (void)setButtonsEnabled:(BOOL)enable;
+- (void)updateContinueStatus;
 
 // action methods
 - (IBAction)cancelAssistant:(id)sender;
 - (IBAction)continueAssistant:(id)sender;
 - (IBAction)goBackAssistant:(id)sender;
 - (IBAction)switchToDetailedView:(id)sender;
-
-// Action methods for NAT Detection
-//- (IBAction)updateNATType:(id)sender;
-//- (IBAction)continueNATSettings:(id)sender;
-
-// Action methods for NAT Traversal
-//- (IBAction)toggleNATMethod:(id)sender;
-//- (IBAction)getExternalAddress:(id)sender;
-//- (IBAction)toggleAutoGetExternalAddress:(id)sender;
-
-// Action methods for protocol activation
-//- (IBAction)protocolSwitchToggled:(id)sender;
 
 @end
 
@@ -297,6 +220,15 @@ extern NSString *XMAttribute_UseSIPRegistrar;
 - (id)initWithSetupAssistant:(XMSetupAssistantManager *)setupAssistant;
 
 - (void)continueAssistant;
+
+@end
+
+@interface XMSAFirstLaunchController : NSObject <XMSetupAssistantController> {
+  unsigned moduleIndex;
+  NSArray *modules;
+}
+
+- (id)initWithSetupAssistant:(XMSetupAssistantManager *)setupAssistant;
 
 @end
 

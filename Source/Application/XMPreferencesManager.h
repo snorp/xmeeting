@@ -1,9 +1,9 @@
 /*
- * $Id: XMPreferencesManager.h,v 1.21 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMPreferencesManager.h,v 1.22 2009/01/11 17:19:22 hfriederich Exp $
  *
- * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
+ * Copyright (c) 2005-2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
- * Copyright (c) 2005-2008 Hannes Friederich. All rights reserved.
+ * Copyright (c) 2005-2009 Hannes Friederich. All rights reserved.
  */
 
 #ifndef __XM_PREFERENCES_MANAGER_H__
@@ -93,13 +93,13 @@ typedef enum XMIncomingCallAlertType
 @interface XMPreferencesManager : NSObject {
 
 @private
+  BOOL didActivatePreferences;
   NSMutableArray *h323Accounts;
   NSMutableArray *sipAccounts;
   NSMutableArray *locations;
   NSMutableArray *passwordObjects;
   unsigned activeLocation;
   BOOL automaticallyAcceptIncomingCalls;
-	
 }
 
 /**
@@ -137,6 +137,11 @@ typedef enum XMIncomingCallAlertType
  * notifications being posted
  **/
 - (void)synchronize;
+
+/**
+ * Activates the preferences if not already done so.
+ **/
+- (void)activatePreferences;
 
 /**
  * Returns the number of H.323 accounts in the system

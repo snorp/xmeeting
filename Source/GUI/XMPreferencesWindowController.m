@@ -1,5 +1,5 @@
 /*
- * $Id: XMPreferencesWindowController.m,v 1.17 2009/01/09 08:07:44 hfriederich Exp $
+ * $Id: XMPreferencesWindowController.m,v 1.18 2009/01/11 17:21:48 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -164,6 +164,9 @@ enum {
       
       [window setContentView:emptyContentView];
       [window setContentSize:[setupAssistantManager contentViewSize]];
+      
+      [window setDocumentEdited:NO];
+      preferencesHaveChanged = NO;
       
       [setupAssistantManager runEditAssistantInWindow:window];
       

@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantModules.h,v 1.3 2009/01/09 08:08:21 hfriederich Exp $
+ * $Id: XMSetupAssistantModules.h,v 1.4 2009/01/11 17:20:41 hfriederich Exp $
  *
  * Copyright (c) 2009 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -81,6 +81,10 @@
  
   @private
   IBOutlet NSView *contentView;
+  IBOutlet NSTextField *gkHostField;
+  IBOutlet NSTextField *gkUserAlias1Field;
+  IBOutlet NSTextField *gkUserAlias2Field;
+  IBOutlet NSTextField *gkPasswordField;
 }
 
 @end
@@ -89,7 +93,7 @@
   
   @private
   IBOutlet NSView *contentView;
-  IBOutlet NSMatrix *useRegistrarRadioButtons;
+  IBOutlet NSMatrix *useRegistrationRadioButtons;
 }
 
 @end
@@ -98,6 +102,10 @@
   
   @private
   IBOutlet NSView *contentView;
+  IBOutlet NSTextField *sipRegDomainField;
+  IBOutlet NSTextField *sipRegUsernameField;
+  IBOutlet NSTextField *sipRegAuthorizationUsernameField;
+  IBOutlet NSTextField *sipRegPasswordField;
 }
 
 @end
@@ -129,6 +137,25 @@
 }
 
 - (IBAction)continueAssistant:(id)sender;
+
+@end
+
+#pragma mark -
+#pragma mark First Launch Mode
+
+@interface XMSAFirstLaunchIntroductionModule : NSObject <XMSetupAssistantModule> {
+ 
+  @private
+  IBOutlet NSView *contentView;
+}
+
+@end
+
+@interface XMSAFirstLaunchDoneModule : NSObject <XMSetupAssistantModule> {
+  
+  @private
+  IBOutlet NSView *contentView;
+}
 
 @end
 
