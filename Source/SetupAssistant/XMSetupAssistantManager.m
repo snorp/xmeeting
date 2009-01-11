@@ -1,5 +1,5 @@
 /*
- * $Id: XMSetupAssistantManager.m,v 1.23 2009/01/11 17:20:41 hfriederich Exp $
+ * $Id: XMSetupAssistantManager.m,v 1.24 2009/01/11 19:25:31 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -402,7 +402,7 @@ static XMSetupAssistantManager *sharedInstance = nil;
 
 - (XMLocation *)createLocation
 {
-  XMLocation *location = [[XMLocation alloc] init];
+  XMLocation *location = [[XMLocation alloc] initWithName:NSLocalizedString(@"XM_DEFAULT_LOCATION_TEXT", @"")];
   // set some default values
   [location setEnableVideo:YES];
   [location setBandwidthLimit:512000];
