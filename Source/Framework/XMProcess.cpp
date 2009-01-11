@@ -1,5 +1,5 @@
 /*
- * $Id: XMProcess.cpp,v 1.13 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMProcess.cpp,v 1.14 2009/01/11 18:57:54 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -15,7 +15,7 @@ namespace PWLibStupidLinkerHacks {
 }
 
 XMProcess::XMProcess() 
-: PProcess("XMeeting Project", "XMeeting", 0, 4, AlphaCode, 1) 
+: PProcess("XMeeting Project", "XMeeting", 0, 4, BetaCode, 1) 
 {
 }
 
