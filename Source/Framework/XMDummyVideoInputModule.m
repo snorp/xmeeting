@@ -1,5 +1,5 @@
 /*
- * $Id: XMDummyVideoInputModule.m,v 1.21 2008/10/24 12:22:02 hfriederich Exp $
+ * $Id: XMDummyVideoInputModule.m,v 1.22 2009/01/11 17:34:23 hfriederich Exp $
  *
  * Copyright (c) 2005-2008 XMeeting Project ("http://xmeeting.sf.net").
  * All rights reserved.
@@ -183,8 +183,25 @@
     unsigned bytesPerRow = [bitmapImageRep bytesPerRow];
 		
     pixelBuffer = XMCreatePixelBuffer(videoSize);
+    
+    int bitsPerPixel = [bitmapImageRep bitsPerPixel];
+    OSType pixelFormat = k24RGBPixelFormat;
+    switch (bitsPerPixel) {
+      case 32:
+        pixelFormat = k32ARGBPixelFormat;
+        break;
+      case 24:
+        pixelFormat = k24RGBPixelFormat;
+        break;
+      case 16:
+        pixelFormat = k16BE555PixelFormat; // should not appear
+        break;
+      case 8:
+        pixelFormat = k8IndexedPixelFormat; // should not appear
+        break;
+    }
 		
-    void *context = XMCreateImageCopyContext(width, height, 0, 0, bytesPerRow, k24RGBPixelFormat,
+    void *context = XMCreateImageCopyContext(width, height, 0, 0, bytesPerRow, pixelFormat,
                                              NULL, pixelBuffer, XMImageScaleOperation_NoScaling);
 		
     BOOL result = XMCopyImageIntoPixelBuffer(bitmapData, pixelBuffer, context);
